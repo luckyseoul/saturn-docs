@@ -183,16 +183,89 @@ See Ymir CD block code + bulletins #1-8, #11.
 
 See subdirectories for details. Gaps filled from official manuals + Ymir source analysis (e.g., specific VRAM/DMA/cache behaviors from changelogs and code).
 
-## Additional Resources
-- Copetti bibliography (SH-2, VDP, SCSP, etc.).
-- SegaXtreme.net (active RE community).
-- RetroReversing.com/saturn
-- segaretro.org technical pages.
-- Archive.org for magazines + scans.
-- Ymir GitHub (high-accuracy reference implementation).
+## Hardware (Detailed)
 
-**Note on Completeness**: Official docs are scattered across Antime/Exodus/SegaRetro mirrors. This repo collects the best direct links + fills gaps with synthesized accurate info from authoritative sources (manuals + high-accuracy emulators + community RE that has been validated across multiple titles).
+### VDP1
+- See hardware/vdp1.md and commands.md
+- Sprites, polygons, framebuffer.
 
-Additions welcome via PRs or issues. Focus on primary sources + verified behavior.
+### VDP2
+- See hardware/vdp2/modes.md
+- Backgrounds, scroll, rotation.
 
-Last updated: based on comprehensive 2026 web/archival review + Ymir/Kronos source analysis.
+### SCSP
+- See hardware/scsp.md and dsp.md
+- Sound, PCM, DSP (undocumented).
+
+### SCU
+- See hardware/scu.md and dsp.md
+- DMA, DSP, interrupts.
+
+### SH-2
+- See hardware/sh2.md and cache.md
+- Dual CPU, cache emulation.
+
+### Memory
+- See hardware/memory/map.md
+- WRAM, VRAM, access.
+
+### CD Block
+- See hardware/cdblock.md
+- Disc format, LLE/HLE.
+
+### SMPC
+- See hardware/smpc/peripherals.md
+- Peripherals, RTC.
+
+### Boot / IP.BIN
+- See hardware/boot/ipbin.md
+- Security, anti-piracy.
+
+## Software
+
+### SGL
+- See software/sgl.md
+- High-level graphics.
+
+### SBL
+- See software/sbl.md
+- Low-level libs.
+
+### Boot ROM
+- See software/bootrom.md
+- IPL services.
+
+## Tools
+
+### Compilers
+- See tools/compilers.md
+
+### Emulators & RE
+- See tools/emulators.md
+
+## Reverse Engineering
+
+### Quirks
+- See reverse-engineering/quirks.md
+- From emulators.
+
+### Technical Bulletins
+- See reverse-engineering/technical-bulletins.md
+
+### Anti-Piracy
+- See reverse-engineering/anti-piracy.md
+
+## Coverage Note
+After comprehensive searches (Antime, Exodus, SegaRetro, Copetti, Hitachi, Ymir source review), this repo covers:
+
+**All major official documentation** via links and summaries.
+**Hardware components** with details and RE notes from Ymir source (cache, DMA, access patterns, peripherals, DSPs, CD LLE, etc.).
+**Software** (SGL, SBL, bootrom, standards).
+**Tools** (compilers, emulators).
+**RE/Quirks** (VRAM, DSP, cache, DMA, game-specific from Ymir changelogs, bulletins, anti-piracy).
+
+Gaps in official (e.g., SCSP/SCU DSP details, exact timings) filled from validated emulator code and community RE.
+
+For deepest details, consult linked PDFs. This repo synthesizes and expands for developers and researchers.
+
+Last updated: comprehensive expansion including DSP, cache, CD LLE, memory, bulletins, anti-piracy (2026).
