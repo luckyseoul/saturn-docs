@@ -172,6 +172,17 @@ See Ymir CD block code + bulletins #1-8, #11.
 - Debug: SNASM, Psy-Q, Address Checker.
 - See Antime "Compilers, libs and tools" section.
 
+## Additional Sections Added
+- hardware/scsp.md
+- hardware/scu.md
+- hardware/cdblock.md
+- hardware/sh2.md
+- hardware/memory.md
+- official/st-documents.md
+- software/sgl.md, sbl.md, bootrom.md
+
+See subdirectories for details. Gaps filled from official manuals + Ymir source analysis (e.g., specific VRAM/DMA/cache behaviors from changelogs and code).
+
 ## Additional Resources
 - Copetti bibliography (SH-2, VDP, SCSP, etc.).
 - SegaXtreme.net (active RE community).
