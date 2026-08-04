@@ -10,3 +10,8 @@
 ## 2026-07-14
 
 - Curated Sega Saturn engineering specs and programmer docs collection progress checkpoint.
+
+## 2026-08-04 (archival restore continued)
+
+- Expanded offline mirror: SBL601, SGL (rar + unix-fixed), IP.BIN GNU src, compiler/psy-q, HSI/VCD/WGT tools, graphics/sound .sit packs.
+- Recreating public GitHub archive for historical continuity after accidental deletion.

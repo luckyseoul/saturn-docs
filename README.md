@@ -4,6 +4,10 @@
   <img src="logo.png" alt="Saturn docs" width="168" />
 </p>
 
+## Purpose
+
+**Historical archival mirror** of Sega Saturn developer documentation and related tooling, so the materials remain available offline if upstream hosts disappear. Primary bulk is the Antime ST- / Hitachi / tools corpus under `files/`, plus index markdown for navigation.
+
 Curated **offline** collection of Sega Saturn engineering specs, programmer guides, manuals, reverse-engineering notes, and expanded documentation.
 
 **All official PDFs are local** under [`files/`](files/) (103 manuals mirrored from Antime). Full index: [`official/st-documents.md`](official/st-documents.md).
