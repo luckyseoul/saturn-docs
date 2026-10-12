@@ -16,7 +16,7 @@
 - SegaSaturn Developer’s Documentation v2.50 bilingual HTML (`files/ssddv25/`) and original Japanese tree (`files/ssddv25-jp/`)
 - Developer’s Documentation Vol. 1 Rel. 1 Japanese plus the 2019 English translation (`files/ssddv1-jp/`, `files/ssddv1-en/`)
 - PAL service manuals under `files/service/`
-- Antime ST PDF set unchanged (still 103). Vol. 2 (B20-1000) is not public as files.
+- Antime ST PDF set unchanged (still 103). Vol. 2 (B20-1000) disc identity is recorded in the README. The HTML tree is still not public, and no NTSC/JP service PDF under 100 MB turned up.
 
 ## 2026-08-04 (archival restore continued)
 

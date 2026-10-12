@@ -104,7 +104,7 @@ Official ST- documents are **local PDFs** (no external download required for the
 
 The Antime PDFs are the English ST- series. Sega of Japan’s last kit is the August 1997 Developer Tool Kit, documentation **version 2.50** (SBL 6.21 / SGL 3.20 era). Nemesis’s bilingual HTML mirror is under [`files/ssddv25/`](files/ssddv25/) (open `index.html`). The original Japanese tree, whose paths differ, is [`files/ssddv25-jp/`](files/ssddv25-jp/).
 
-Volume 1 Release 1 (CD A19-1000, 1996-04-20) is the earlier electronic edition: Japanese in [`files/ssddv1-jp/`](files/ssddv1-jp/), English translation in [`files/ssddv1-en/`](files/ssddv1-en/). Volume 2 (B20-1000) is dumped on redump.org and is still not in public file form, so it is not here.
+Volume 1 Release 1 (CD A19-1000, 1996-04-20) is the earlier electronic edition: Japanese in [`files/ssddv1-jp/`](files/ssddv1-jp/), English translation in [`files/ssddv1-en/`](files/ssddv1-en/). Volume 2 is the orange-cover hybrid PC/Mac CD B20-1000 (Sega IDs 610-5750 and 670-5512, disk version 1996-04-20, PVD 1996-05-07). Redump disc 131109 is one Mode 1 track, 20,322 sectors, SHA-1 `8e9cfdb6dd4f5b57ef2906b4e433ed3acfeef8bf`. No public file mirror of that HTML tree turned up, so it is not in this repo. A second pass also found no public NTSC or Japanese Saturn service PDF under GitHub's file limit. The PAL scans below are the service set.
 
 PAL service scans from the Exodus technical-docs Drive mirrors:
 
