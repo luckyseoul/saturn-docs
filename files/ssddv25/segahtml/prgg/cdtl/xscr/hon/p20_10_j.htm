@@ -1,0 +1,80 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 5&gt;CDビルダスクリプト文法補足説明</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<B>▲
+<a href="p19_10_j.htm">戻る</A>｜
+<a href="p21_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CDビルダスクリプト文法補足説明</B>
+<H2 ALIGN=CENTER></H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A>
+	<P><DT><H3>３．セクタレートとビットレートの関係について</H3>
+	<DD>　この章ではセクタレートとビットレートの関係について説明します。<BR>セクタレートは任意の整数値が定義できますが、代表的な値として75セクタ／秒と150セクタ／秒の2種類あり、それぞれの場合に記述可能なビットレート(CDレート)は</P>
+	<DD><UL TYPE="DISK">
+	<LI>CDレート(75)= 75 × 2324 × 8 = 1,394,400(bps)
+	<LI>CDレート(150)= 150 × 2324 × 8 = 2,788,800(bps)
+	</UL>
+
+	<P><DD>となります。</P>
+
+	<P>　これは＜File＞‥‥‥＜EndFile＞内で記述可能なビットレートの和の最大値を意味し、このビットレートの和がこの最大値を超えるとストリームのマルチプレックスはできなくなります。<BR>
+ディスクフォーマットをCD-ROM XAに準拠した場合、MPEGマルチプレックスで使用することのできる１セクタ当たりのデータ長はデータの種類によって異なり、次のようになります。</P>
+
+	<P><DD><UL TYPE="DISK">
+	<LI>MPEGビデオ   　　：2296バイト
+	<LI>MPEGオーディオ   ：2279
+	<LI>データ(FORM1)　　：2048
+	<LI>データ(FORM2)　　：2324
+	</UL></P>
+
+	<P><DD>したがって＜BitRate＞キーワードで定義したビットレートとCDレートの間では次のような変換が必要です。</P>
+
+	<P><DD>いまMPEGビデオのビットレートをBR(MV)、MPEGオーディオのをBR(MA)、データ(FORM1)のビットレートをBR(F1)、データ(FORM2)のをBR(F2)とし、この４つのストリームのマルチプレックスを行うものとすると</P>
+
+	<DT><PRE><H3>
+　　　　　　 BR(MV)×2324   BR(MA)×2324   BR(F1)×2324   BR(F2)×2324
+ＣＤレート≧───────＋───────＋───────＋───────
+　　　　　　    2296           2279           2048           2324
+
+　　　　　　　 BR(MV)   BR(MA)   BR(F1)
+　　　　　＝（────＋────＋────）×2324＋BR(F2)
+　　　　　　　  2296     2279     2048
+</H3></PRE></P>
+
+	<P><DD>の関係となります。<BR>
+この関係はマルチプレックス時にはいつも成立している必要があり、実行時にチェックされ、違反している場合はエラーとなります。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p19_10_j.htm">戻る</A>｜
+<a href="p21_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

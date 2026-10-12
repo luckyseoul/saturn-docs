@@ -1,0 +1,39 @@
+﻿<HTML>
+<HEAD>
+<TITLE> Notes on event processing </TITLE>
+</HEAD><BODY>
+
+<P> <A HREF="pr10-4.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr10-6.htm"> Go to next page </A> </BR> </P> <HR>
+
+
+<H2>
+10-5. Notes on event processing
+</H2>
+
+<P>
+When performing event processing, pay particular attention to returning and releasing various areas to the system. This is caused by not checking whether the area pointed to by the parameter specified by the function to be operated is the kind of area that the function should handle during return / release operations.
+</P>
+
+<P>
+For example, if you use the library function “slReturnEvent” to execute the return / release operation of the extended user area, if you accidentally return / release the area registered as a normal event, the following adverse effects It is possible that the CPU will stop in the worst case.
+</P>
+
+<OL>
+<LI> Return of area <BR>
+The EVENT structure specified by the function “slReturnEvent” is returned to the system.
+<LI> Event list <BR>
+Since the EVENT structure is not released as an event, it continues to exist in the event list.
+<LI> New event registration <BR>
+Since the area is in a free state in terms of system, it can be freely used by using a function “slSetEvent” or the like.
+<LI> Chain structure conflict <BR>
+Although it is registered in the event list, the area is in a free state, so the contents of the EVENT structure are rewritten,
+This causes problems in the chain structure.
+<LI> CPU stop <BR>
+The chain structure becomes inconsistent, and in the worst case, the CPU stops.
+</OL>
+
+<H4> Figure 10-15 Incorrect event operation </H4>
+<IMG SRC="p10-14.gif">
+
+<HR>
+<P> <A HREF="pr10-4.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr10-6.htm"> Go to next page </A> </BR> </P> </BODY> </HTML>

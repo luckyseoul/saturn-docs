@@ -1,0 +1,92 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;47/54&gt;VDP1 User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a> ★ <A HREF="p07_00.htm">Chapter 7 Command</a><HR>
+ <B>▲ <A HREF="p07_50.htm">Back</a> ｜ <A HREF="p07_60.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 7 Commands</b><HR NOSHADE>
+<DL>
+<A NAME="no7_51"></A><P><DT><H3> ●Fixed point specification (rectangular sprite drawing command)</H3><DD> The contents of the fixed point specification command table are as follows. <P><!-- -------------------------------------------------------------------------------- -->
+<P><DT><TABLE BORDER=0<TR>
+<TD><TABLE BORDER=1>
+<TR><TH><PRE> bit</TH><TH><PRE> 15</TH><TH><PRE> 14</TH><TH><PRE> 13</TH><TH><PRE> 12</TH><TH><PRE> 11</TH><TH><PRE> 10</TH><TH><PRE> 9</TH><TH><PRE> 8</TH><TH><PRE> 7</TH><TH><PRE> 6</TH><TH><PRE> 5</TH><TH><PRE> 4</TH><TH><PRE> 3</TH><TH><PRE> 2</TH><TH><PRE> 1</TH><TH><PRE> 0</TH></TR>
+<TR ALIGN=CENTER><TD> CMDCTRL<BR>
+ +00</TD><TH> 0</TH><TD COLSPAN=3> JP</TD><TH COLSPAN=4> ZP</TH><TD> 0</TD><TD> 0</TD><TD COLSPAN=2> Dir</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH></TR>
+<TR ALIGN=CENTER><TD> CMDLINK<BR>
+ +02</TD><TD COLSPAN=14> LINK specification/8H</TD><TD> 0</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TD> CMDPMOD<BR>
+ +04</TD><TD> M.O.</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> PC</TD><TD> Cl</TD><TD> Cm</TD><TD> Me</TD><TD> E.C.</TD><TD> SP</TD><TD COLSPAN=3> Color<BR>
+ mode</TD><TD COLSPAN=3> color calculation</TD></TR>
+<TR ALIGN=CENTER><TD> CMDCOLR<BR>
+ +06</TD><TD COLSPAN=16> Color bank, color lookup table/8H (LSB fixed at 00)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDSRCA<BR>
+ +08</TD><TD COLSPAN=16> Character address/8H</TD></TR>
+<TR ALIGN=CENTER><TD> CMDSIZE<BR>
+ +0A</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=6> Character size X/8</TD><TD COLSPAN=8> Character size Y/8</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXA<BR>
+ +0C</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Fixed point (A), X coordinate (XA)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYA<BR>
+ +0E</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Fixed point (A), Y coordinate (YA)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXB<BR>
+ +10</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (B), X coordinate (XB)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYB<BR>
+ +12</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (B), Y coordinate (YB)</TD></TR>
+<TR ALIGN=CENTER><TD> +14</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +16</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +18</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +1A</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> CMDGRDA<BR>
+ +1C</TD><TD COLSPAN=16> Gouraud shading table/8H</TD></TR>
+</TABLE>
+</TD><TD><img srcset="../grp/i122.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD></TR>
+</TABLE>
+<TABLE>
+<TR><TD> 【note】</TD><TD><TABLE BORDER cellspacing=10>
+<TR><TD></TD></TR>
+</TABLE>
+</TD><TD> is ignored (don't care) </TD></TR>
+</TABLE>
+</P>
+<!-- -------------------------------------------------------------------------------- -->
+<P><DD>The fixed point specification for the rectangle sprite drawing command is defined as follows:</P>
+<P><DT><UL TYPE=DISC>
+<LI> Setting the end bit to 0B and the command selection bit to 0001B makes it a rectangular sprite drawing command.</P>
+<P><LI> Specify the jump format. When the jump format is Assign or Call, divide the address of the next command table to be processed by 8H and set it to CMDLINK.</P>
+<P><LI> Set the zoom point. If you set the zoom point (fixed point) to a value other than 0000B, the fixed point will be specified. Setting 0000B specifies two coordinate points.</P>
+<P><LI> For details on zoom points, see the " <A HREF="p06_10.htm#no6_13"><B>Zoom Points</b></a> " section in "Chapter 6 Command Table."</P>
+<P><LI> Set the character pattern read direction. By specifying the reading direction, you can reverse the image vertically or horizontally.</P>
+<P><LI> Set up high speed shrink. Specify whether to prioritize accuracy or speed.</P>
+<P><LI> Set pre-clipping. Specify whether to enable or disable it, considering the clipping area and the drawing position of the part.</P>
+<P><LI> Specify the user clipping enable bit and clipping mode. Specifies whether user clipping is outside or inside in clipping mode.</P>
+<P><LI> Set mesh enabled, end code disabled, transparent pixels disabled. Set MSB on for shade or window processing in VDP2.</P>
+<P><LI> Set the color mode that defines the character pattern. Specifies the color bank when the color mode is color bank mode. When in lookup table mode, divide the color lookup table address by 8H to define.</P>
+<P><LI> Specify color operation. Color calculation is valid in RGB mode. If you do not want to perform color calculations, specify Replace. When performing Gouraud shading processing, divide the address of the Gouraud shading table by 8H and specify it. Gouraud shading processing is valid in RGB mode.</P>
+<P><LI> Divide the character pattern table address by 8H and define it in CMDSRCA. Define the width and height of the character size defined in the character pattern table in CMDSIZE. The horizontal size is defined as the value divided by 8.</P>
+<P><LI> Set the fixed point coordinates of the character to be drawn to the fixed point coordinates (CMDXA, CMDYA). Define the display width to CMDXB, CMDYB. You can scale, stretch, and draw by specifying the display width.</P>
+<P><LI> Note: If you set the values of CMDXB and CMDYB to (0, 0), it will be drawn with 1 pixel.</UL>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_50.htm">Back</a> ｜ <A HREF="p07_60.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

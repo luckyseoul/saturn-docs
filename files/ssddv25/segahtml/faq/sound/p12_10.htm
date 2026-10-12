@@ -1,0 +1,95 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/12&gt;FAQ/Sound related/Others</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no12">Sound related</a><HR>
+ <B>▲ <A HREF="p11_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>FAQ/Sound related</b><H2 ALIGN=CENTER> others</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_01"><HR></a><DL>
+<H3> For MIDI loops, is it okay to use Controll Change 31 to start and end the loop?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I have a question regarding MIDI loops, is it okay to use Control Change 31 to start and end the loop?<P><DT> <FONT SIZE=5>A)</font><DD> Yes, that's right.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_02"><HR></a><DL>
+<H3> What is the standard for MIDI resolution?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Regarding the question regarding MIDI resolution, will it be converted as one quarter note = 480 steps?<P><DT> <FONT SIZE=5>A)</font><DD> The timebase will not be changed during conversion. The timebases supported by Sega Saturn are between 24 and 960.<BR>
+ In reality, the time base is determined by the SMF output specifications of the sequencer you are using.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_03"><HR></a><DL>
+<H3> How should I arrange the commands to be added to the beginning of a song?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it okay to arrange commands such as bank and program changes at the beginning of a song in order using the minimum steps after conversion?<BR>
+ Or is there no problem if I place them all in the same step?<P><DT> <FONT SIZE=5>A)</font><DD> Please use a method of sequentially arranging them with the minimum number of steps.<BR>
+ If you place them all together, when converting</P>
+<P> <B>"The program change position at the beginning of the track is too late."</b></P>
+<P> returns an error such as<BR>
+ The basic data arrangement at the beginning of each track is described below.</P>
+<P><PRE>
+-------------------------------------------------- --------------------
+1/1/000 (measure/beat/clock)
+Tempo event (usually inserted automatically by the sequencer), bank change (#32) 
+1/1/001 (measure/beat/clock)
+Program change, control change (MAIN VOLUME#7, loop command #31 when looping, etc.)
+1/1/002 (measure/beat/clock)
+note on 
+-------------------------------------------------- --------------------
+</PRE></P>
+<P><DT><B>remarks</b><DD> The number of clocks in one beat varies depending on the resolution of each sequencer.<BR>
+ Also, set Control change #7 MAIN VOLUME at the beginning of each track.<BR>
+ Depending on the sequencer, if multiple event data are placed in the same measure/beat/clock, the order in which they are displayed on the sequencer screen and the order in which they are written to the Standard MIDI File may change.<BR>
+ If you want to clarify the order of events, shift the data by one clock.</P>
+<P> Sega Saturn's sound driver processing is based on 2 msec, so even if you create sequence data that treats 1 beat as 480 clocks, when converted playback, 1 beat will have a resolution equivalent to 250 clocks (if the tempo is 120). The sound will be played back as if it had been quantized.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_04"><HR></a><DL>
+<H3> Total memory limit</H3><P><DT> <FONT SIZE=5>Q)</font><DD> There is a symptom where files are corrupted when the total memory exceeds 0x80000.Why is this?<BR>
+ Is it because it is linked to the sound memory limit?<P><DT> <FONT SIZE=5>A)</font><DD> When you say files get corrupted, do you mean files on the hard disk?<BR>
+ If so, it would be a previously unreported example.<BR>
+ If you register data exceeding 0x80000 in the map on the sound simulator, the actual sound memory of the Sega Saturn is 512K bytes, so the sound will not be produced correctly.<BR>
+ In particular, if the target is a Sound BOX, it has 1M byte of memory, which is 512K bytes more than the actual device, so you can transfer it, but the driver side does not support it, so be careful.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_05"><HR></a><DL>
+<H3> AudioMedia2 cannot be used on PowerMac7200</H3>
+<P><DT><FONT SIZE=5>Q)</font><DD> AudioMedia2 function expansion hardware cannot be used on PowerMac7200.
+<P><DT><FONT SIZE=5>A)</font><DD> "AudioMedia2" only supports "NU-BUS".<BR>
+
+<P><DT><FONT SIZE=5>A)</FONT>
+<DD> "AudioMedia2" only supports "NU-BUS". <BR>
+Therefore, the only option for his PCI-BUS Mac is to use "AudioMedia3", but since "SoundDesigner II" does not support this, please use software such as "Pro-Tools".
+</DL>
+<!------------------------------------------------ ----------------------------->
+<A NAME="no12_06"><HR></A><DL>
+<H3>What kind of tone libraries are there? </H3>
+
+<P><DT><FONT SIZE=5>Q)</FONT>
+<DD> Are there any other tone libraries other than InVision's CyberSound?
+
+<P><DT><FONT SIZE=5>A)</FONT>
+<DD> The only sound library that SEGA provides for its licensees is that made by InVision.<BR>
+Please note that when using InVision's tone library, various notation obligations will occur.
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p11_10.htm">Back</A>｜
+　■</B>
+<HR>
+<A HREF="../../index.htm"><IMG srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#sound">FAQ</A>
+★<A HREF="index.htm#no12">Sound related</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

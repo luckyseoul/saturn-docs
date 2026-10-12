@@ -1,0 +1,193 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/13&gt;Virtual CD System/5.CD emulation related tools</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Virtual CD System</a><HR>
+ <B>▲ <A HREF="p10_10.htm">Back</a> ｜ <A HREF="p12_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Virtual CD System User's Manual</b><H2 ALIGN=CENTER> Chapter 5 CD emulation related tools</H2><HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A><P><DT><H3> 5.1 CD Builder</H3><DT><H3> 5.1.1 About CD Builder</H3><DD> CD Builder interprets the script that describes the data arrangement of the CD to be created and outputs a CD image file. The created CD image file is used for CD emulation and writing to a write-once CD.</P>
+<P> CD builders include <B>XBLD</b> and the previously provided VCDBUILD.<BR>
+ XBLD is upwardly compatible with VCDBUILD, and script files created for VCDBUILD can be used as is. It also includes enhancements such as support for on-the-fly writing.<BR>
+ <B>XBLD is explained in detail in the " <A HREF="../../xbld/index.htm">CD Builder XBLD User's Manual</a> ".</b><BR>
+ VCDBUILD is explained in the next section.</P>
+<P> A script that specifies data placement on a CD consists of multiple command lines, each consisting of a keyword followed by zero or more parameters.<BR>
+ <B>The script syntax of the script is explained in detail in <A HREF="../../xscr/index.htm">the CD Builder Script Grammar Manual</a> .</b></P>
+<P> <B>*Please use XBLD to create CD images.</b><BR>
+ <B>Please use VCDBUILD only if you need to create a CD in the same environment as before.</b></P>
+<A NAME="no5_12"></A><P><DT><H3> 5.1.2 VCDBUILD command specifications</H3><P><DT> <B>command:</b><DD> VCDBUILD</P>
+<P><DT> <B>Command name:</b><DD> CD image file creation</P>
+<P><DT> <B>Format:</b><DD> VCDBUILD△Startup file△[ /i/c/d/f/p/a/e/n/s]</P>
+<P><DT> <B>argument:</b><DL>
+<DT> Startup file:<DD> Specify script files and disk configuration information files using startup files</P>
+</DL>
+<P><DT> <B>option:</b><DD><TABLE BORDER=0>
+<TR><TD> /i</TD><TD> Display of ISO9660 related processing</TD></TR>
+<TR><TD> /c</TD><TD> Channel interleave arrangement table display</TD></TR>
+<TR><TD> /d</TD><TD> Display input DOS file processing</TD></TR>
+<TR><TD> /f</TD><TD> File interleave arrangement table display</TD></TR>
+<TR><TD> /p</TD><TD> Perform CD emulation with direct DOS file access</TD></TR>
+<TR><TD> /a</TD><TD> Specify /i, /c, /f, /d all at once</TD></TR>
+<TR><TD> /e</TD><TD> Set ECC data on disk image (default)</TD></TR>
+<TR><TD> /n</TD><TD> Do not set ECC data on disk image</TD></TR>
+<TR><TD> /s</TD><TD> Silence mode. Do not display working messages</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>function:</b><DD> Inputs the script from the specified script file and outputs the disk configuration information file and CD image that represent the disk configuration.</P>
+<P><DT> <B>Example of use:</b><DD> VCDBUILD TSTGAME.PRM<P><DD> Contents of the startup file TSTGAME.PRM</P>
+<HR WIDTH=50% ALIGN=LEFT>
+<PRE>
+SCR TSTGAME.SCR
+RTI TSTGAME.RTI
+</PRE><HR WIDTH=50% ALIGN=LEFT>
+<P><DT><B>remarks:</b><DD> If the extension of the startup file is not specified when entering the command, the script file will be processed as TSTGAME.SCR and the RTI file will be processed as TSTGAME.RTI.</P>
+<P><DT><H3> Message at startup</H3><DD><PRE>
+PreProcess for VCDEMU&lt; VCDBUILD&gt; Ver n.nn Released at dd-mmm-yyyy
+Copyright (c) 1994 Victor Company of Japan&lt; JVC)
+
+script file = xxxxxxxxxx
+rti file = xxxxxxxxxx
+vds, path table and directory records output to xxxxxxxxxx
+</PRE></P>
+<P><DT><B>Message when specifying /i option</b><DD><PRE>
+nnnnnn: write System Area
+nnnnnn: write Primary Volume Descriptor
+nnnnnn: Boot Record
+nnnnnn: Volume Partition Descriptor
+nnnnnn: write Volume Description Terminal
+nnnnnn: write M-path Table
+nnnnnn: write L-path Table
+nnnnnn: write Directory Records for Directory&lt; root&gt;
+nnnnnn: write Directory Records for Directory xxxxxxxxxx
+nnnnnn: Extent Begin
+nnnnnn: ISO-file xxxxxxxxxx Begin
+</PRE></P>
+<P><DT><B>Message when specifying /d option</b><DD><PRE>
+nnnnnn: source dos-file xxxxxxxxxx
+nnnnnn: Open Subsource file
+nnnnnn: LeadOut Begin
+</PRE></P>
+<P><DT><B>Message when specifying /f option</b><DD><PRE>
+------: Disposition pattern for File Interleave
+nnnn]nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:
+:
+nnnnn]nnn:GAP:nnn:nnn:nnn:GAP:nnn:nnn:nnn:GAP:nnn:nnn:nnn:GAP:DMY:DMY:<P>
+</PRE></P>
+<P><DT><B>Message when specifying /c option</b><DD><PRE>
+------: Disposition pattern for Channel Interleave
+nnnn]nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:
+:
+nnnn]nnn:GAP:nnn:nnn:nnn:GAP:nnn:nnn:nnn:GAP:nnn:nnn:nnn:GAP:DMY:DMY:
+</PRE></P>
+<P><DT><H3>VCDBUILD error message</H3><DD> About the meaning of error messages and how to deal with them.<BR>
+ (Note: **** means a string, ** means a number.)</P>
+<P><DT> <B>General error</b><DD> This is a common lexical or syntactic error.</P>
+<DD><DL>
+<P><DT> <B>String length error</b><DD> String is too long. The maximum number of characters in one line is 255 bytes.</P>
+<P><DT> <B>Out of memory space</b><DD> There is no more memory available. The only option is to expand the memory area by removing drivers, etc.</P>
+<P><DT> <B>Illegal character</b><DD> An invalid character code is included in the string.</P>
+<P><DT> <B>Syntax error</b><DD> Syntax error.</P>
+<P><DT> <B>Cannot open File ****</b><DD> The file name indicated by **** cannot be opened. Please check if the file name actually exists.</P>
+<P><DT> <B>Illegal token</b><DD> Syntax error. The cause of the error may be an incorrect reserved word at the beginning of the line.</P>
+<P><DT> <B>Illegal parameter **</b><DD> Syntax error. The cause of the error may be that the type of the parameter indicated by the number ** is incorrect.</P>
+<P><DT> <B>Illegal nesting of Include</b><DD> Too many nested Includes. You can only include up to 2 layers.</P>
+</DL>
+<P><DT> <B>block error</b><DD> The following error occurs when Block and EndBlock do not correspond. If this error occurs, the correspondence of subsequent blocks may be misaligned, so similar errors will occur thereafter. Therefore, fixing the first error may also fix the later errors.</P>
+<DD><DL>
+<P><DT> <B>Illegal nesting of Block</b><DD> Too many nested blocks.</P>
+<P><DT> <B>Illegal definition of Endblock</b><DD> Too many EndBlock definitions.</P>
+<P><DT> <B>Expected ****</b><DD> It appears that the block declaration indicated by **** is missing. **** may be undeclared or there may be an unnecessary End ****.</P>
+<P><DT> <B>Illegal definition in **** block</b><DD> This command can only be defined within a **** block.</P>
+<P><DT> <B>Illegal nesting of Directory</b><DD> Directories are nested too deeply. There are up to 8 directory levels.</P>
+<P><DT> <B>**** block is not closed</b><DD> **** block is not closed. **** may be redundant.</P>
+</DL>
+<P><DT> <B>parameter error</b><DD> This occurs when the characters in a parameter are spelled incorrectly, or when the value exceeds the range of possible values.</P>
+<DD><DL>
+<P><DT> <B>Illegal MS-DOS filename ****</b><DD> The character string indicated by **** has characters or syntax that cannot be used in MS-DOS file names.</P>
+<P><DT> <B>Illegal ISO filename ****</b><DD> The character string indicated by **** has characters or syntax other than those that can be used in ISO9660 file names.</P>
+<P><DT> <B>Illegal Directory name ****</b><DD> The character string indicated by **** has characters or syntax other than those that can be used in ISO9660 directory names.</P>
+<P><DT> <B>Illegal disc type ****</b><DD> Disc type **** is incorrect.</P>
+<P><DT> <B>Illegal track type ****</b><DD> Track type **** is incorrect.</P>
+<P><DT> <B>Illegal Offset</b><DD> The relative position specification is incorrect.</P>
+<P><DT> <B>Illegal Stream type ****</b><DD> Wrong stream type.</P>
+<P><DT> <B>Illegal volume type ****</b><DD> Wrong volume type.</P>
+<P><DT> <B>Illegal location of Primary Volume Descriptor</b><DD> The relative time of the primary volume must be greater than or equal to 00:02:16.</P>
+<P><DT> <B>Illegal catalog number</b><DD> The catalog number contains characters other than numbers.</P>
+<P><DT> <B>Illegal Switch ****</b><DD> The switch can only be TRUE or FALSE.</P>
+<P><DT> <B>Illegal Attribute ****</b><DD> Attribute definition **** is incorrect.</P>
+<P><DT> <B>Illegal Date or Time</b><DD> One of the date or time values is outside the definable range.</P>
+<P><DT> <B>Illegal File No.</b><DD> FileNo is not a value between 1-255.</P>
+<P><DT> <B>Illegal Source type ****</b><DD> Incorrect source type ****.</P>
+<P><DT> <B>Illegal data type ****</b><DD> Data type **** is incorrect.</P>
+<P><DT> <B>Illegal Coding Information</b><DD> Coding information is not a value between 0-255.</P>
+<P><DT> <B>Illegal character in Identifier ****</b><DD> Identifier **** contains characters that cannot be used.</P>
+<P><DT> <B>Illegal Escape Sequence ****</b><DD> Escape Sequence**** is incorrect.</P>
+<P><DT> <B>Illegal unit size</b><DD> Unit size is 0. Unit size cannot be set to 0.</P>
+<P><DT> <B>Illegal channel count</b><DD> The number of channels is only 2 or 4.</P>
+<P><DT> <B>Illegal Channel number</b><DD> Channel number must be a value between 0-255.</P>
+<P><DT> <B>Illegal MinLength</b><DD> The value of MInLength must not be 0.</P>
+<P><DT> <B>Illegal Sector Rate</b><DD> Sector rate can only be 75 or 150.</P>
+<P><DT> <B>Illegal BitRate</b><DD> The bitrate value cannot be 0.</P>
+<P><DT> <B>Illegal Logical Block size</b><DD> LogicalBlockSize can only take values 512, 1024, or 2048.</P>
+</DL>
+<P><DT> <B>attribute error</b><DD> Although the syntax is correct, it is an error due to restrictions such as conditions.</P>
+<DD><DL>
+<P><DT> <B>**** is already defined</b><DD> Items marked **** have already been defined.</P>
+<P><DT> <B>CDDA cannot be defined in the first track</b><DD> A CDDA track cannot be the first track.</P>
+<P><DT> <B>Illegal command in the CDDA track</b><DD> This command cannot be defined within a CDDA track. Please check the track type.</P>
+<P><DT> <B>This command can be defined in the CDDA track only</b><DD> This command can only be defined within a CDDA track. Please check the track type.</P>
+<P><DT> <B>BeginTime and EndTime cannot be defined in a block</b><DD> Both BeginTimeX and EndTimeX cannot be defined in the same block.</P>
+<P><DT> <B>Filesource type error in an ISO-file</b><DD> Different types of file sources are defined within one ISO file.</P>
+<P><DT> <B>Filesource type error in a Channel</b><DD> Different types of file sources are defined within one channel.</P>
+<P><DT> <B>Definition error of BeginTimeE and EndTimeE</b><DD> BeginTimeE and EndTimeE can only be defined within an Extent block.</P>
+<P><DT> <B>Definition error of **** in a Channel block</b><DD> **** can only be defined within a channel block.</P>
+<P><DT> <B>Illegal BeginTimeS</b><DD> BeginTimeS must be greater than or equal to 00:02:16.</P>
+<P><DT> <B>Illegal Extent Time</b><DD> ExtentTime must be greater than or equal to 00:02:17.</P>
+<P><DT> <B>SameName can be used when the SupplementaryVolume is defined</b><DD> SameName is valid when SupplementaryVolume is defined.</P>
+<P><DT> <B>PrimaryVolume is not defined</b><DD> No PrimaryVolume is defined. One PrimaryVolume must be defined.</P>
+<P><DT> <B>LeadIn is not defined</b><DD> LeadIn is not defined before Track definition.</P>
+<P><DT> <B>Illegal LeadOut tracktype</b><DD> LeadOut's track type is not the same as the last track. The LeadOut track type must be the same as the final track's track type.</P>
+<P><DT> <B>MpegMultiplex can be defined once in a block</b><DD> MpegMultiplex can only be defined once within one block.</P>
+<P><DT> <B>Disc is not defined</b><DD> Disc is not defined.</P>
+<P><DT> <B>BitRateis not defined</b><DD> BitRate is not defined.</P>
+<P><DT> <B>**** block is not defined</b><DD> ****Block not defined.</P>
+<P><DT> <B>Illegal track number</b><DD> Too many tracks. The number of tracks is up to 99.</P>
+<P><DT> <B>Any track is not defined before LeadOut area is start</b><DD> Track is not defined before LeadOut.</P>
+<P><DT> <B>Filesource definition error in the CDDA track</b><DD> CDDA tracks have a mix of file sources and file definitions.</P>
+<P><DT> <B>Illegal track type on DiscType "CDROM"</b><DD> When the disc type is CDROM, the track type cannot be set to MODE2.</P>
+<P><DT> <B>This command can be used in the MODE2 track only</b><DD> This command is effective when the track type is MODE2.</P>
+<P><DT> <B>Illegal track type in LeadIn area</b><DD> LeadIn's track type is only MODE1.</P>
+<P><DT> <B>Illegal track type in first track</b><DD> The only track type for Track 1 is MODE1.</P>
+<P><DT> <B>Channel number is already defined</b><DD> That channel number is already defined.</P>
+<P><DT> <B>Expected CloseBracket</b><DD> " [ " is not closed in the macro definition.</P>
+<P><DT> <B>Macro **** is not defined</b><DD> Macro name **** is not defined.</P>
+<P><DT> <B>All FileNos are not defined</b><DD> All FileNos are not defined.</P>
+<P><DT> <B>File No error</b><DD> The same FileNo is defined in file interleaving.</P>
+<P><DT> <B>Too many ISOFiles</b><DD> Too many ISO file definitions in file interleaving.</P>
+<P><DT> <B>ISOFile definition error</b><DD> Multiple ISO files are defined within one file interleave.</P>
+</DL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p10_10.htm">Back</a> ｜ <A HREF="p12_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Virtual CD system</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

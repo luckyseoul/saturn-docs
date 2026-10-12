@@ -1,0 +1,217 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 5&gt;サウンド開発ノウハウ集/DSP関連とDSPLinkerに関して</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm">サウンド開発ノウハウ集</A>
+<HR>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>サウンド開発ノウハウ集</B>
+<H2 ALIGN="CENTER">第4章　DSP関連とDSPLinkerに関して</H2>
+<HR NOSHADE>
+
+<ul>
+<li>DSP WORK RAMの先頭アドレスの設定が2000h単位になってない場合、著しく音が歪む場合が、あります（SndSimでは先頭アドレスが2000h単位でしか指定できないようになっています）。<br>
+サイズに関しては2000h単位である必要はありません。たとえばFree Area Required のサイズが10040Hの場合、（メモリの効率を考えて）そのサイズぴったりに指定して問題ありません。<p>
+
+<li>DSPリンカで使用していないOutputチャンネルのMIXERレベルは最少の0にしておいてください。
+"0"以外である場合は（本来の音に対して直流成分が加算されクリップされた音になるなど）正常なエフェクトが出力されない可能性があります。<p>
+
+<li>DPSリンカでパラメータのツメをもって激しく数値を変更すると、SCSIの通信がうまくいかなくなりMACが飛びやすいのでやめてください。特にMIDI発音中はその頻度が高くなります。<p>
+
+<li>Linker,eLinkerのPEQのQはQ>=1.0を推奨とします。Gainが負の場合や、あまり大きくない正の数の場合は、1.0以下でも可です。<p>
+
+<li>DSPのEffect をかけるためにはEffect Change と MIXER Changeの両方を行う必要があります。MIXER Changeを行わないとDSP出力のレベルがあがらず、Effect 音が再生されません。<p>
+
+<li>DSPのソフトウェアモジュレーションは使わないでください。サウンドドライバが対応していません。<p>
+
+<li>曲とSEで別エフェクトをかけたり、曲中で何種ものエフェクトを切り替えたり、などもデータの作成の仕方によって可能です。ぜひ、試してみてください。<p>
+
+<li>DSPの方が68000よりも、DRAMのバスにアクセスする優先順位が上です。そして、DSPは68000と同じDRAMをアクセスするため、（遅延RAMを何度もRead/WriteするTap処理のある）Delay系のエフェクトを使用すると、68000の処理が先送りされ、曲がもたったり、コマンドを受け付けなかったりしてしまう事態が起こります。<br>
+特にeLinker（拡張リンカ）のリバーブ、アーリーリフレクション等はその可能性が高く、使用スロットの多いFMを使用する場合なども注意が必要です。<p>
+
+<li>SCSPのDSP動作について<br>
+　SCSPのDSPは128ステップの命令を常に処理しています。初期状態では、128ステップすべてNOP(No OPeration)が書き込まれますので、DSPのエフェクトは何も音を出さない状態でひたすら空回りしている訳です。DSPLinkerでエフェクトモジュールをパッチングし、ProcessメニューのLinkを実行することによって、MACINTOSH上でDSPに書き込む命令コード(.EXBの拡張子のついたファイル）が作成されます。そしてProcessメニューのDownloadにてその命令コードがDSPに書き込まれ、DSPはパッチングされたモジュールの（REVERBならREVERBの）動作をする命令を実行しはじめます。このDownloadの動作が実機におけるEffect Changeにあたります。<p>
+
+<li>Option メニューのRingBufferについて<br>
+「RingBuffer」メニューアイテムは、現在編集中のアルゴリズムで使用するリングバッファ（遅延用メモリ）のサイズを設定するために使用します。RingBufferはサウンドRAM4Mbit内にとられます。ここでの設定値が小さすぎると、リンク実行時にエラーが発生します。また、リンクが成功した場合でも使用するサウンドWORK RAMのサイズを少なくするために、リンク結果情報ダイアログの表示内容を参照して、必要最小限の設定とすることを推奨します。<p>
+
+<li>DSP EFFECT モジュールの使用ステップ数<br>
+<table border cellpadding="2">
+<tr><td>INPUT</td><td>2</td></tr>
+<tr><td>OUTPUT</td><td>2</td></tr>
+
+<tr><td>REVERB</td><td>30</td></tr>
+<tr><td>EARLY REFLACTION</td><td>54</td></tr>
+<tr><td>DELAY</td><td>20</td></tr>
+<tr><td>PITCH SHIFT</td><td>24</td></tr>
+<tr><td>CHORUS</td><td>24</td></tr>
+<tr><td>FLANGER</td><td>28</td></tr>
+<tr><td>SYMPHONIC</td><td>24</td></tr>
+<tr><td>SURROUND</td><td>38</td></tr>
+<tr><td>VOICE CANCEL</td><td>38</td></tr>
+<tr><td>AUTO PAN</td><td>6</td></tr>
+<tr><td>PHASER</td><td>18</td></tr>
+<tr><td>DISTORTION</td><td>24</td></tr>
+<tr><td>FILTER</td><td>8</td></tr>
+<tr><td>DYNAMIC FILTER</td><td>20</td></tr>
+<tr><td>PARAMETRIC EQ</td><td>8</td></tr>
+<tr><td>MIXER2</td><td>4</td></tr>
+<tr><td>MIXER3</td><td>4</td></tr>
+<tr><td>MIXER4</td><td>6</td></tr>
+<tr><td>MIXER6</td><td>8</td></tr>
+<tr><td>MIXER8</td><td>10</td></tr>
+</table>
+<p>
+これらの合計が128ステップを超えない範囲で自由にエフェクトをパッチングすることができます。
+<p>
+***参考***<br>
+ 　AUTOPANはゲートとして使えます。あまり左右に広げたくないときは、AUTOPAN用のVOICEのピッチを変えてみるか、MIXERのパンを調整します。<p>
+
+<li>DSP EFFECT モジュール（拡張含む）のメモリアクセス回数と使用ボイス数<p>
+<table border cellpadding="2">
+<tr><td>REVERB</td><td>10</td></tr>
+<tr><td>EARLY REFLACTION</td><td>21</td></tr>
+<tr><td>DELAY</td><td>3</td></tr>
+<tr><td>PITCH SHIFT</td><td>3　+4ボイス</td></tr>
+<tr><td>CHORUS</td><td>3　+1ボイス</td></tr>
+<tr><td>FLANGER</td><td>4　+1ボイス</td></tr>
+<tr><td>SYMPHONIC</td><td>3　+2ボイス</td></tr>
+<tr><td>SURROUND</td><td>15</td></tr>
+<tr><td>VOICE CANCEL</td><td>0</td></tr>
+<tr><td>AUTO PAN</td><td>0　+2ボイス</td></tr>
+<tr><td>PHASER</td><td>3　+1ボイス</td></tr>
+<tr><td>DISTORTION</td><td>0</td></tr>
+<tr><td>FILTER</td><td>0</td></tr>
+<tr><td>DYNAMIC FILTER</td><td>5　+1ボイス</td></tr>
+<tr><td>PARAMETRIC EQ</td><td>0</td></tr>
+<tr><td>MIXER2</td><td>0</td></tr>
+<tr><td>MIXER3</td><td>0</td></tr>
+<tr><td>MIXER4</td><td>0</td></tr>
+<tr><td>MIXER6</td><td>0</td></tr>
+<tr><td>MIXER8</td><td>0</td></tr>
+
+<tr><td>REVERB	E</td><td>29</td></tr>
+<tr><td>EARLY REFLACTION E</td><td>29</td></tr>
+<tr><td>DELAY E</td><td>4</td></tr>
+<tr><td>PITCH SHIFT</td><td>4  +12ボイス</td></tr>
+<tr><td>CHORUS E</td><td>4　+3ボイス</td></tr>
+<tr><td>DIST E</td><td>0</td></tr>
+<tr><td>Q-SOUND4</td><td>0</td></tr>
+<tr><td>Q-SOUND8</td><td>0</td></tr>
+<tr><td>YAMAHA3D-SOUND</td><td>0</td></tr>
+</table><p>
+　メモリアクセス回数が多いDSP EFFECT モジュールほど、サウンドドライバに対して負荷がかります。具体的には、曲がもたったり、同時にいくつもSEが鳴ると音が止まったりします。<br>
+具体的には、拡張リンカのリバーブ類はかなり負荷が大きくなります。<br>
+その場合の対処は、<br>
+<ol>
+<li>曲のシーケンスデータを間引く。
+<li>FM（特に和音）の音色があったら、やめる。
+<li>メモリアクセス回数の少ないエフェクトに変える。
+</ol>
+などしてください。<p>
+　また、サウンドドライバのバージョン2.00から、ドライバの動作が軽くなりましたので、1.xx台より、曲がもたるケースは減るはずです。<br>
+　使用ボイス数の意味は、最大発音数32音からこの数分発音数が減る、ということです。<br>
+また、複数のエフェクトを同時に使用する場合、これらの数字は加算されます。<p>
+
+<li>DSP EFFECT のQ-SOUND8モジュール使用時の対処方法<p>
+　そのまま、Link, Downloadを行うとエラーメッセージがでます。そのときの対処は以下の手順で行ってください。
+<ol>
+<li>ウインドウ内のInput モジュールのSend Levelを選択し、反転させる。
+<li>Global Coef メニューからAlter To GlobalのなかのGLBf100を選択し、反転させ、Alter のボタンを押します。<p>
+
+<img srcset="../image/alter_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p>
+
+<li>Send Levelの表示がGLBf100に変わります。<p>
+
+<img srcset="../image/alter2_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p>
+
+<li>以上の作業を8つのInput モジュールに対して行います。
+</ol>
+<p>
+<li>Ｑサウンド<br>
+　コントロールチェンジ＄５０（８０）でコントロールします。<br>
+　Ｑサウンドのモジュールの入力チャンネル０〜７がそれぞれＭＩＤＩチャンネル１〜８と対応してコントロールされます。<br>
+　従って、ＭＩＤＩを使用してＱサウンド入力チャンネル２をコントロールする場合、ＭＩＤＩチャンネル３にてコントロールチェンジを行います。<br>
+コントロールチェンジで設定するパラメータと効果の関係は次の通りです。<br>
+<pre>
+　　　　　左　〜　中央　〜　右
+　　　　　０　−　１５　−　３０
+</pre>
+<p>
+<li>ヤマハ３Ｄサウンド<br>
+　コントロールチェンジ＄５１、＄５２、＄５３にて３つのパラメータを設定します。<br>
+　このモジュールは１チャンネルのみですので、ＭＩＤＩチャンネルに関わらずコントロール可能です。<br>
+　　コントロールチェンジとパラメータ、効果の関係は次の通り。<p>
+<dl compact>
+<dt>距離<dd>コントロールチェンジ＄５１（８１）
+<pre>
+自分の周囲　〜　遠方
+　＄００　　−　＄７Ｆ
+</pre>
+<dt>方位<dd>コントロールチェンジ＄５２（８２）
+<pre>
+　正面　〜　右９０°〜　　後面　〜　左９０°〜　　正面
+＄００　−　＄２０　−　＄４０　−　＄６０　−　＄７Ｆ
+</pre>
+<dt>高さ<dd>コントロールチェンジ＄５３（８３）
+<pre>
+　真上　〜　目の高さ〜　真下　　〜後方の目の高さ〜　真上
+＄００　−　＄２０　−　＄４０　−　＄６０　　　−　＄７Ｆ
+</pre>
+</dl>
+<p>
+サウンドコントロールコマンド＝11H(YAMAHA 3Dサウンド )、サウンドコントロールコマンド＝12H(Qサウンド )についての
+詳細は「<B>サウンドドライバVer.2.20プログラマーズガイド</B>」の
+<B><a href="../drve/sndcmd0_j.htm">サウンドコントロールコマンド</A></B>および
+<B><a href="../drve/sndctrl_j.htm#no2_51">Ｑサウンド</A></B>および
+<B><a href="../drve/sndctrl_j.htm#no2_52">YAMAHA 3D サウンド</A></B>を参照してください。<p>
+
+<li>EFFECT CHANGE時のノイズについて<br>
+　EFECT CHANGE時にチップの仕様上若干ノイズがでますので、SOUND INITIAL, MIXER CHANGE等のホストコマンドでEFECTリターンレベルを落としてふせぎます。<br>
+　サウンドドライバのVersion1.28以前におけるEFFECT CHANGE時のノイズを最少にする手順は、下記の通りです。<p>
+
+　音色バンクデータにEFFECT RETURNのレベルがすべて0のMIXERデータ(MIXER0)と、RETURNのレベルがあがっているデータ(MIXER1)を用意する。<p>
+<ol>
+<li>シーケンスオフ
+<li>オールノートオフ
+<li>ミキサーチェンジ(MIXER0)　EFFECTのレベル下げる<br>
+<li>エフェクトチェンジ　
+<li>50mSecほど待つ
+<li>ミキサーチェンジ(MIXER1)　EFFECTのレベルあげる
+<li>シーケンススタート
+</ol><p>
+サウンドドライバのVersion1.31以降は特にこの処理は必要ありません。ドライバが以上の管理を行います。そのため、SEQ_START時に最大64msec分、エフェクト音の立ち上がりが遅れますが、聴感上はまず問題ないでしょう。<p>
+</ul>
+
+<HR NOSHADE>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm">サウンド開発ノウハウ集</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

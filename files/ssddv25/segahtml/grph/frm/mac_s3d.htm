@@ -1,0 +1,212 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGA3D file specifications (as of 1995.08.08)</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR NOSHADE>
+<CENTER>
+<H1> SEGA3D file specifications</H1><H5> As of 1995.08.08</H5></CENTER>
+<HR>
+<DL>
+<A NAME="top"></A><P><DT><H3> ■Data structure/file layout</H3><UL TYPE=DISC>
+<LI> <A HREF="#no1">header</a><LI> <A HREF="#no2">model</a><LI> <A HREF="#no3">slip</a><LI> <A HREF="#no4">material</a><LI> <A HREF="#no5">object</a><LI> <A HREF="#no6">light source</a><LI> <A HREF="#no7">attribute</a> </UL>
+</DL>
+<HR>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no1"></A><DL>
+<P><DT><H3> ■Header</H3><DD><PRE>
+"
+    SEGA 3D
+”
+</PRE><DL>
+<P><DT><B>◆Purpose</b><DD> File type identification.<P><DT> <B>◆Terms</b><DD> Must exist at the beginning of the file. </DL>
+</DL>
+<HR>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no2"></A><DL>
+<P><DT><H3> ■Model</H3><DD> There is one pair of vertex structures (vertices) and surface structures (polygons) in one model.<BR>
+ Mixing of the same model name is not allowed.<DD><PRE>
+"
+    model model name
+    {
+        vertices ;number of vertices
+        {    
+            (x0,y0,z0),(nx0,ny0,nz0) ;0
+            (x1,y1,z1),(nx1,ny1,nz1);1
+            .......... ;2
+        }
+        polygons ;number of polygons
+        {
+            (v0,v1,v2,v3),(Nx,Ny,Nz),(Zpos) ;0
+            ....... ;1
+        }
+    }
+”
+</PRE><DL>
+<P><DT><B>◆Purpose</b><DD> Set the vertices and polygon structure of the 4-point polygon model.<P><DT> <B>◆Reserved words</b><DD><TABLE>
+<TR><TD><PRE> model</TD><TD><PRE> : Control structure</TD></TR>
+<TR><TD><PRE> vertices</TD><TD><PRE> : Control structure</TD></TR>
+<TR><TD><PRE> polygons</TD><TD><PRE> : Control structure</TD></TR>
+</TABLE>
+<P><DT> <B>◆Data</b><DD><TABLE>
+<TR><TD><PRE> model name</TD><TD><PRE> : Model name</TD></TR>
+<TR><TD><PRE> (Xn,Yn,Zn)</TD><TD><PRE> : Each vertex coordinate</TD></TR>
+<TR><TD><PRE> (nx0,ny0,nz0)</TD><TD><PRE> : Each vertex normal vector (unit vector)</TD></TR>
+<TR><TD><PRE> (v0,v1,v2,v3)</TD><TD><PRE> : Vertex numbers that make up the surface</TD></TR>
+<TR><TD><PRE> (Nx,Ny,Nz)</TD><TD><PRE> : Surface normal vector</TD></TR>
+<TR><TD><PRE> (Zpos)</TD><TD><PRE> : Z sort criteria (AVE=Center/MIN=Recent/MAX=Farthest)</TD></TR>
+</TABLE>
+<P><DT> <B>◆Terms</b><DD> The order of the vertices that make up the surface is "clockwise."<PRE>
+0         1
+ ┌───────┐ 
+ │   →   │ 
+ │       │ 
+ │↑     ↓│ 
+ │       │ 
+ │   ←   │ 
+ └───────┘ 
+3         2
+</PRE><DD>When representing a triangle, v2 and v3 should be the same number. </DL>
+</DL>
+<HR>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no3"></A><DL>
+<P><DT><H3> ■Slip</H3><DD> Data structure for compatibility with old Saturn tools.<BR>
+ A slip is configured if any material data is present in the model.<DD><PRE>
+"
+    slips model name
+    {
+        materialname_0
+        materialname_1
+        ......
+    }
+”
+</PRE><DL>
+<P><DT><B>◆Purpose</b><DD> Match the material to the surface structure of each model.<P><DT> <B>◆Reserved words</b><DD><TABLE>
+<TR><TD><PRE> slips</TD><TD><PRE> : Control structure</TD></TR>
+</TABLE>
+<P><DT> <B>◆Data</b><DD><TABLE>
+<TR><TD><PRE> model name</TD><TD><PRE> : Compatible model name</TD></TR>
+<TR><TD><PRE> materialname_n</TD><TD><PRE> : Compatible material name</TD></TR>
+</TABLE>
+<P><DT> <B>◆Terms</b><DD> Each material name corresponds to a surface number included in the corresponding model. </DL>
+</DL>
+<HR>
+<!-------------------------------------------------------------------------------->
+<A NAME="no4"></A><DL>
+<P><DT><H3> ■Material</H3><DD> Data structure for compatibility with old Saturn tools.<BR>
+ Each data is configured as necessary.<DD><PRE>
+"
+    material materialname
+    {
+        type (TYPE0|TYPE1|...)
+        texture "textureName"
+        color ColorCode
+        gouraud offset
+        direction 0,1,2,3
+    }
+”
+</PRE><DL>
+<P><DT><B>◆Purpose</b><DD> Set the surface attributes assigned to each surface.<P><DT> <B>◆Reserved words</b><DD><TABLE>
+<TR><TD><PRE> material</TD><TD><PRE> : Control structure</TD></TR>
+<TR><TD><PRE> type</TD><TD><PRE> : Reserved word</TD></TR>
+<TR><TD><PRE> texture</TD><TD><PRE> : Reserved word</TD></TR>
+<TR><TD><PRE> color</TD><TD><PRE> : Reserved word</TD></TR>
+<TR><TD><PRE> gouraud</TD><TD><PRE> : Reserved word</TD></TR>
+<TR><TD><PRE> direction</TD><TD><PRE> : Reserved word</TD></TR>
+</TABLE>
+<P><DT> <B>◆Data</b><DD><TABLE>
+<TR><TD><PRE> materialname</TD><TD><PRE> : Material name</TD></TR>
+<TR><TD><PRE> (TYPEn)</TD><TD><PRE> : Material type. Specify methods such as shading mapping.</TD></TR>
+<TR><TD></TD><TD><PRE> → NULL=none</TD></TR>
+<TR><TD></TD><TD><PRE> FLAT=Flat shading</TD></TR>
+<TR><TD></TD><TD><PRE> TEXT=Texture mapping</TD></TR>
+<TR><TD></TD><TD><PRE> GOUR=Goureau shading</TD></TR>
+<TR><TD></TD><TD><PRE> MESH=Mesh display</TD></TR>
+<TR><TD></TD><TD><PRE> TRAN=translucent</TD></TR>
+<TR><TD></TD><TD><PRE> SHAD=half brightness</TD></TR>
+<TR><TD></TD><TD><PRE> <B>*For multiple specifications, connect them with '|'.</b></TD></TR>
+<TR><TD><PRE> "textureName"</TD><TD><PRE> : Texture map file name</TD></TR>
+<TR><TD><PRE> ColorCode</TD><TD><PRE> : Non-texture color code (RGB each 5bit=1b.B5.G5.R5)</TD></TR>
+<TR><TD><PRE> offset</TD><TD><PRE> : Gouraud color offset=0x10. Unused data.</TD></TR>
+<TR><TD><PRE> 0,1,2,3</TD><TD><PRE> : Correspondence to each vertex of the texture map. Display direction.<BR>
+	<TR><TD></TD><TD><PRE>→ [0,1,2,3]=Normal display</TD></TR>
+	<TR><TD></TD><TD><PRE>[1,0,3,2]=H reverse display</TD></TR>
+	<TR><TD></TD><TD><PRE>[3,2,1,0]=V reverse display</TD></TR>
+	<TR><TD></TD><TD><PRE>[2,3,0,1]=HV reverse display</TD></TR>
+	<TR><TD></TD><TD><PRE>[1,2,3,0]=90 degree rotation normal display</TD></TR>
+	<TR><TD></TD><TD><PRE>[2,1,0,3]=90 degree rotation H reverse display</TD></TR>
+	<TR><TD></TD><TD><PRE>[0,3,2,1]=90 degree rotation V reverse display</TD></TR>
+	<TR><TD></TD><TD><PRE>[3,0,1,2]=90 degree rotation HV reverse display</TD></TR>
+</TABLE></DL></DL><HR><!--------------------------------------------------------------------------------><A NAME="no5"></A><DL><P><DT><H3> ■Object</H3><DD> If multiple models exist, an object structure is constructed.<PRE>
+"
+    object objectname
+    {
+        modelname_0,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+        {
+        }
+        modelname_1,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+        {
+            modelname_2,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+            {
+                modelname_4,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+                {
+                }
+            }
+            modelname_3,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+            {
+            }
+        }
+        ......................................
+        ......................................
+    }
+”
+</PRE><DL><P><DT><B>◆Purpose</b><DD> Set the hierarchical matrix structure for each model.<P><DT> <B>◆Reserved words</b><DD><TABLE><TR><TD><PRE> object</TD><TD><PRE> : Control structure</TD></TR></TABLE><P><DT> <B>◆Data</b><DD><TABLE><TR><TD><PRE> objectname</TD><TD><PRE> : Object name (=file name)</TD></TR><TR><TD><PRE> modelname_n</TD><TD><PRE> : Model name</TD></TR><TR><TD><PRE> (xs,ys,zs)</TD><TD><PRE> : Scale (ratio)</TD></TR><TR><TD><PRE> (xd,yd,zd)</TD><TD><PRE> : Rotate (Angle: -180.0 ~ +179.0)</TD></TR><TR><TD><PRE> (xt,yt,zt)</TD><TD><PRE> : Translation (coordinates)</TD></TR><TR><TD><PRE> (xi,yi,zi)</TD><TD><PRE> : Currently unused = (0,0,0) </TD></TR></TABLE></DL></DL><HR><!--------------------------------------------------------------------------------><A NAME="no6"></A><DL><P><DT> <B>■Light source</b><DD><PRE>
+"
+    light
+    {
+        vector n ;number of light
+        {
+            (X0, Y0, Z0) ;0
+            (X1, Y1, Z1) ;1
+            .........
+        }
+    }
+”
+</PRE><DL><P><DT><B>◆Purpose</b><DD> Set the light source vector.<P><DT> <B>◆Reserved words</b><DD><TABLE><TR><TD><PRE> light</TD><TD><PRE> : Control structure</TD></TR><TR><TD><PRE> vector</TD><TD><PRE> : Control structure</TD></TR></TABLE><P><DT> <B>◆Data</b><DD><TABLE><TR><TD><PRE> (Xn,Yn,Zn)</TD><TD><PRE> : Unit vector of light source </TD></TR></TABLE></DL></DL><HR><!--------------------------------------------------------------------------------><A NAME="no7"></A><DL><P><DT><H3> ■Attribute</H3><DD> Attributes are target-dependent data structures.<PRE>
+"
+    attribute model name
+    {
+        {
+            type (TYPE0|TYPE1|...)
+            texture "textureName"
+            color ColorCode1, ColorCode2
+            gour_color (R1,G1,B1),(R2,G2,B2),(R3,G3,B3),(R4,G4,B4)
+            direction 0,1,2,3
+            zsort (Zpos)
+        }
+        {
+            .....
+        }
+        ..........
+        ..........
+    }
+”
+</PRE><DL><P><DT><B>◆Purpose</b><DD> Set attributes to be assigned to each face of the model.<P><DT> <B>◆Reserved words</b><DD><TABLE><TR><TD><PRE> attribute</TD><TD><PRE> : Control structure</TD></TR><TR><TD><PRE> type</TD><TD><PRE> : Reserved word</TD></TR><TR><TD><PRE> texture</TD><TD><PRE> : Reserved word</TD></TR><TR><TD><PRE> color</TD><TD><PRE> : Reserved word</TD></TR><TR><TD><PRE> gour_color</TD><TD><PRE> : Reserved word</TD></TR><TR><TD><PRE> direction</TD><TD><PRE> : Reserved word</TD></TR></TABLE><P><DT> <B>◆Data</b><DD><TABLE><TR><TD><PRE> model name</TD><TD><PRE> : Model name</TD></TR><TR><TD><PRE> (TYPEn)</TD><TD><PRE> : Material type (same as material data).</TD></TR><TR><TD></TD><TD><PRE> Specify methods such as shading mapping.</TD></TR><TR><TD></TD><TD><PRE> → NULL=none</TD></TR><TR><TD></TD><TD><PRE> FLAT=Flat shading</TD></TR><TR><TD></TD><TD><PRE> TEXT=Texture mapping</TD></TR><TR><TD></TD><TD><PRE> GOUR=Goureau shading</TD></TR><TR><TD></TD><TD><PRE> MESH=Mesh display</TD></TR><TR><TD></TD><TD><PRE> TRAN=translucent</TD></TR><TR><TD></TD><TD><PRE> SHAD=half brightness</TD></TR><TR><TD></TD><TD><PRE> <B>*For multiple specifications, connect them with '|'.</b></TD></TR><TR><TD><PRE> "textureName"</TD><TD><PRE> : Texture map file name</TD></TR><TR><TD><PRE> ColorCode1</TD><TD><PRE> : Non-texture color code set to material</TD></TR><TR><TD></TD><TD><PRE> (RGB each 5bit=1b.B5.G5.R5)</TD></TR><TR><TD><PRE> ColorCode2</TD><TD><PRE> : Non-textured color code calculated by the current light source</TD></TR><TR><TD></TD><TD><PRE> (RGB each 5bit=1b.B5.G5.R5)</TD></TR><TR><TD><PRE> (Rn,Gn,Bn)</TD><TD><PRE> : 4-vertex Gouraud table calculated by the current light source</TD></TR><TR><TD><PRE> 0,1,2,3</TD><TD><PRE> : Correspondence to each vertex of the texture map. Display direction.</TD></TR><TR><TD></TD><TD><PRE> → [0,1,2,3]=Normal display</TD></TR><TR><TD></TD><TD><PRE> [1,0,3,2]=H reverse display</TD></TR><TR><TD></TD><TD><PRE> [3,2,1,0]=V reverse display</TD></TR><TR><TD></TD><TD><PRE> [2,3,0,1]=HV reverse display</TD></TR><TR><TD></TD><TD><PRE> [1,2,3,0]=90 degree rotation normal display</TD></TR><TR><TD></TD><TD><PRE> [2,1,0,3]=90 degree rotation H reverse display</TD></TR><TR><TD></TD><TD><PRE> [0,3,2,1]=90 degree rotation V reverse display</TD></TR><TR><TD></TD><TD><PRE> [3,0,1,2]=90 degree rotation HV reverse display</TD></TR><TR><TD><PRE> (Zpos)</TD><TD><PRE> : Z sort criteria (AVE=Center/MIN=Recent/MAX=Farthest</TD></TR></TABLE></DL></DL><HR NOSHADE><A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS></BODY></HTML>

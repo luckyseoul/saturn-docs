@@ -1,0 +1,239 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/11&gt;VDP1ライブラリ/3.VDP1　３Ｄガイド</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no3">VDP1ライブラリ</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ライブラリ</B>
+<H2 ALIGN=CENTER>3.VDP1　３Ｄガイド</H2>
+<HR NOSHADE>
+<DL>
+
+
+<A NAME="no3_10"></A>
+	<P>	<P><DT><H3>3.1　目的</H3>
+	<DD>VDP1拡張処理ライブラリを用いて3Dのスプライト表示を行うことを目的とします。<BR>以下にその特長を示します。</P>
+	<DT><UL TYPE="DISK">
+	<P><LI>ポリゴンの集まりであるオブジェクトを階層的に接続したモデルを扱えます。</P>
+	<P><LI>モデルおよび、モデル内のオブジェクトの移動にともなうマトリックス演算を意識する必要がありません。</P>
+	<P><LI>ワールド座表系へ変換後の点の座標値を、ユーザコールバックルーチンを通してユーザアプリケーションに通知します。</P>
+	<P><LI>ポリゴン表示にテクスチャマッピングおよび、スプライトの各種カラーモードが適用できます。</P>
+	<P><LI>2Dスプライトと合わせて表示できます。</P>
+	</UL>
+
+<A NAME="no3_20"></A>
+	<P><DT><H3>3.2　3Dの座標系と表示モデル</H3>
+
+	<P><DT><B>　［座標系］</B>
+	<P ALIGN=CENTER><img srcset="../grp/i009_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+	<P><DD>　視点からスクリーンまでの距離は 1.0 に固定。</P>
+
+	<P><DT><B>　［表示モデル］</B>
+	<DD>表示モデルはポリゴンの集まりであるオブジェクトを以下のようにクラスタとして階層構造に接続したものです。クラスタは親子の関係にあり、子クラスタのオブジェクトの位置は親クラスタのボディ座標系に配置されます。したがって、親クラスタが移動すると下に接続される全子クラスタが移動します。</P>
+
+	<DD>
+<PRE>
+┏━━━━━━━┓　　　┏━━━━━━━┓　　　　　　　　　　　　
+┃オブジェクト０┃　　　┃オブジェクト１┃　　　　　　　　　　　　
+┗━━━━━━━┛　　　┗━━━━━━━┛　　　　　　　　　　　　
+　　　：　　　　　　　　　　　：　　　　　　　　　　　　　　　　　
+　　　：　　　　　　　　┌───────┐　　　　　　　　　　　　
+　　　：　　　　　　┌─┤クラスタ　１０│　　　　　　　　　　　　
+　　　：　　　　　　│　└───────┘　　　　　　　　　　　　
+　　　：　　　　　　│　　　　　　　　　　　　　　　　　　　　　　
+┌───────┐　│　┌───────┐　　　　　　　　　　　　
+│クラスタ　００├─┼─┤クラスタ　１１│　　　　　　　　　　　　
+└───────┘　│　└───────┘　　　┌───────┐
+　ルートクラスタ　　│　　　　　　　　　　　┌─┤クラスタ　２０│
+　　　　　　　　　　│　┌───────┐　│　└───────┘
+　　　　　　　　　　└─┤クラスタ　１２├─┤　　　　　　　　　　
+　　　　　　　　　　　　└───────┘　│　┌───────┐
+　　　　　　　　　　　　　　　　　　　　　　└─┤クラスタ　２１│
+　　　　　　　　　　　　　　　　　　　　　　　　└───────┘
+</PRE>
+
+<A NAME="no3_30"></A>
+	<P><DT><H3>3.3　プログラム記述例</H3>
+	<DD>C言語による実際のプログラム例を以下に示します。</P>
+	<DD>
+<PRE>
+#include &lt;machine.h&gt;
+#define  _SPR3_                        /*     スプライト3D表示ライブラリの使用   */
+#define  SPR_3USE_DOUBLE_BUF           /*     ダブルバッファ指定                */
+#include &quot;sega_spr.h&quot;
+#include &quot;sega_scl.h&quot;
+#include &quot;sega_int.h&quot;
+
+SprCluster model0;
+SprCluster model1;
+
+#define COMMAND_MAX        1000        /*     最大コマンド数　                  */
+#define GOUR_TBL_MAX       1000        /*     最大グーローテーブル数　　　       */
+#define LOOKUP_TBL_MAX     1000        /*     最大ルックアップテーブル数　       */
+#define CHAR_MAX           100         /*     最大キャラクタ数　　　　　　       */
+#define DRAW_PRTY_MAX      256         /*     最大描画プライオリティブロック数   */
+SPR_2DefineWork(work2d, COMMAND_MAX, GOUR_TBL_MAX,
+                                 LOOKUP_TBL_MAX, CHAR_MAX, DRAW_PRTY_MAX)
+                                       /*     2Dワークエリア定義　　　　　　     */
+#define OBJ_SURF_MAX       16          /*     オブジェクト内最大面数　　　       */
+#define OBJ_VERT_MAX       16          /*     オブジェクト内最大頂点数　　       */
+SPR_3DefineWork(work3d, OBJ_SURF_MAX, OBJ_VERT_MAX)
+                                       /*     3D表示ワークエリア定義　　　 　    */
+</PRE>
+
+<P><DD>
+<PRE>
+extern void vbStart(void);             /*     V-BLANK IN割り込みルーチン         */
+extern void vbEnd(void);               /*     V-BLANK OUT割り込みルーチン        */ 
+main()
+{
+     set_imask(0);                     /*     割り込み可にします                 */
+
+     SCL_Vdp2Init();                   /*     スクロールとプライオリティの初期化  */
+     SCL_SetPriority(SCL_SP0|SCL_SP1|SCL_SP2|SCL_SP3|SCL_SP4|
+                              SCL_SP5|SCL_SP6|SCL_SP7,7);
+     SCL_SetSpriteMode(SCL_TYPE1,SCL_MIX,SCL_SP_WINDOW);
+
+     SPR_2Initial(&amp;work2d);            /*     2Dスプライト表示初期化             */
+
+     SPR_3Initial(&amp;work3d);            /*     3Dスプライト表示初期化             */
+
+     INT_ChgMsk(INT_MSK_NULL, INT_MSK_VBL_IN | INT_MSK_VBL_OUT);
+                                       /*     V-BLANK割り込みをディセーブル      */
+     INT_SetFunc(INT_SCU_VBLK_IN, &amp;vbStart);
+                                       /*     V-BLANK IN割り込みルーチンの登録   */
+     INT_SetFunc(INT_SCU_VBLK_OUT, &amp;vbEnd);
+                                       /*     V-BLANK OUT割り込みルーチンの登録  */
+     INT_ChgMsk( INT_MSK_VBL_IN | INT_MSK_VBL_OUT, INT_MSK_NULL);
+                                       /*     V-BLANK割り込みをイネーブル        */
+
+     SPR_2FrameChgIntr(0xffff);        /*     フレームチェンジインターバルを不定  */
+                                       /*     モードにセット　　　　　　　　　　  */
+
+     SPR_3SetTexture(texture);         /*     3D用テクスチャデータのセット　　　  */
+
+     for(;;) {
+           ---------------             /*     スクロールデータセット　　　　　　  */
+
+          SPR_3SetLight(...);          /*     3D光源のセット　　　               */
+          SPR_3SetView(...);           /*     3D視点のセット　　　               */
+
+          SPR_2OpenCommand(SPR_2DRAW_PRTY_ON); 
+                                       /*     スプライトコマンド書き込みのオープン*/
+          SPR_2SysClip(SPR_2MOST_FAR,&amp;xy);
+                                       /*     システムクリップエリアコマンド　　  */
+          SPR_2LocalCoord(SPR_2MOST_FAR,&amp;xy); 
+                                       /*     ローカル座標コマンド               */
+
+          SPR_3moveCluster(model0,...);/*     3Dモデル0のルートクラスタを移動　　 */
+          SPR_3DrawModel(model0,...);  /*     3Dモデル0の登録　　　　　　　　　　 */
+
+          SPR_3moveCluster(model1,...);/*     3Dモデル1のルートクラスタを移動　　 */
+          SPR_3DrawModel(model1,...);  /*     3Dモデル1の登録　　　　　　　　　　 */
+                            .
+                            .
+                            .
+          SPR_3Flush();                /*     3Dスプライトコマンドセット　　　　  */
+          SPR_2CloseCommand();         /*     スプライトコマンド書き込みのクローズ*/
+          SCL_DisplayFrame();          /*     V-BLANK割り込みを待ち、　　　      */
+                                       /*     スプライト表示とスクロール動作を行う*/
+      }
+}
+
+−Vブランク処理ルーチン(上記メインとは別ソースファイル)−
+
+#include &lt;machine.h&gt;
+#include &quot;sega_spr.h&quot;
+#include &quot;sega_scl.h&quot;
+
+#pragma  interrupt(VbStart)
+#pragma  interrupt(VbEnd)
+
+void VbStart(void)
+{
+     SCL_VblankStart();           /*     Vブランク開始VDP割り込み処理              */
+     --------                     /*     その他Vブランク開始処理　                 */
+ }
+
+void VbEnd(void)
+{
+     SCL_VblankEnd();        　   /*     Vブランク終了VDP割り込み処理              */
+      --------                    /*     その他Vブランク終了処理　　               */
+}
+</PRE>
+</P>
+
+	<P><DD>　スプライト3D表示ライブラリの視点座標系におけるポリゴンのZソートはVDP1拡張処理ライブラリ(2Dライブラリ)のスプライトコマンドプライオリティ描画機能を用いて行うので、ポリゴンのZソートを行うには SPR_2OpenCommand() ルーチンでプライオリティ描画オン（SPR_2DRAW_PRTY_ON）にする必要があります。</P>
+
+<A NAME="no3_40"></A>
+	<P><DT><H3>3.4　オブジェクト間接続ポリゴンオブジェクト</H3>
+	<DD>　下図のようにObject1の動きに合わせObject2を変形させて表示したい場合に、Object0とObject1の間のポリゴンであるObject2をオブジェクト間接続ポリゴンオブジェクトとして定義することで自動的に変形描画ができます。</P>
+
+	<P ALIGN=CENTER><img srcset="../grp/i013_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DD>　クラスタ、オブジェクト、オブジェクト間接続ポリゴン情報の各テーブルは以下のように接続します。</P>
+<PRE>
+　　　　　　　　　　　　　　　　　　Ｃｈｉｌｄ　　　　　　　　　　　　　　　　　　
+┌──────────────────┐　┌──────────────────┐
+│　　　　　Ｃｌｕｓｔｅｒ０　　　　　│→│　　　　　Ｃｌｕｓｔｅｒ１　　　　　│
+└──────────────────┘　└──────────────────┘
+　　　　　：　　　　　　　　　：　　　　　　　　　　：　　　　　　　　　：　　　　
+　　　　　↓　　　　　　　　　↓　　　　　　　　　　↓　　　　　　　　　↓　　　　
+┌─────────┐┌───────┐　┌─────────┐┌───────┐
+│ＩｎｂｅｔＩｎｆ０││Ｏｂｊｅｃｔ０│　│ＩｎｂｅｔＩｎｆ１││Ｏｂｊｅｃｔ１│
+└─────────┘└───────┘　└─────────┘└───────┘
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　：　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　↓　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　┌───────┐
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│Ｏｂｊｅｃｔ２│
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　└───────┘
+</PRE>
+
+	<P><DT><B>　[オブジェクト間接続ポリゴンオブジェクトの処理]</B>
+	<DT><OL>
+	<P><LI>オブジェクトの描画順番は、親クラスタから子クラスタの順に描画され、クラスタに複数のオブジェクトが接続されている場合は接続順に描画されます。<BR>前記例では、Object0, Object1, Object2の順に描画されます。</P>
+
+	<P><LI>描画の際、クラスタにオブジェクト間接続ポリゴン情報が接続されていた場合に、視点座標系への座標変換済み頂点データを指定テーブルに従い、対応するオブジェクト間接続ポリゴンオブジェクトの頂点データテーブルに設定します。<BR>グーローシェーディングありの場合は、オブジェクト間接続ポリゴンオブジェクトの頂点法線データテーブルに計算済み頂点輝度を設定します。<BR>前記例では、InbetInf0がObject0の視点座標系頂点データ(0,1,2,3)をObject2の頂点データ（4,5,6,7）に設定し、InbetInf1がObject1の視点座標系頂点データ（4,5,6,7）をObject2の頂点データ（0,1,2,3）に設定します。</P>
+
+	<P><LI>描画オブジェクトがオブジェクト間接続ポリゴンオブジェクトの場合、視点座標系への変換済み頂点より各面の法線ベクトルを求め、描画モードに従い描画します。<BR>前記例では、Object2がオブジェクト間接続ポリゴンオブジェクトです。</P>
+
+	<P><LI>オブジェクト間接続ポリゴンオブジェクトの設定条件</P>
+
+	<DD><UL TYPE="DISK">
+	<P><LI>クラスタに複数のオブジェクトの1つとして接続する場合は、オブジェクトチェインの最後に接続します。</P>
+	<P><LI>オブジェクトテーブル内の面法線ベクトルの計算補正値はマイナス値として設定します。</P>
+	</UL></OL>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no3">VDP1ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

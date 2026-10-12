@@ -1,0 +1,104 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;68/86&gt;VDP2 User's Manual/12.1 Color calculation function-3</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no12">VDP2 User's Manual</a> ★ <A HREF="p12_10.htm">Chapter 12 Color calculation</a><HR>
+ <B>▲ <A HREF="p12_11.htm">Back</a> ｜ <A HREF="p12_13.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 12 Color Calculation</b><HR NOSHADE>
+<DL>
+<A NAME="no12_12"></A><P><DT><H3> ●Extended color calculation function</H3><DD> The extended color calculation function is a function that adds the second image and the third image at a certain ratio and uses the result as the second image data. By performing color calculations on this second image and the top image, it is possible to perform color calculations on three screens. When a line color screen is inserted, the result of color calculation at a certain ratio between the third image and the force image is used as third image data, and the third image and line color screen are</P>
+<P><DD> The result of adding at a fixed rate is used as the data for the second image, so color calculations can be performed on 4 screens. However, the extended color calculation function can only be used when the TV screen mode is normal mode, and cannot be used when the TV screen mode is high resolution or dedicated monitor mode.<BR>
+ When performing extended color calculation, whether to add the third image and force image depends on the color calculation enable bit of the screen of the third image, and whether to add the second image and third image depends on the color calculation of the screen of the second image. Follows enable bit.<BR>
+ When using the extended color calculation function, the extended color calculation ratio varies depending on the color RAM mode, insertion of line color screen, color calculation enable bit value and color format of the second and third images, and color format of the force image.<BR>
+ Figure 12.3 shows the extended color calculation function, and Table 12.2 shows the extended color calculation ratio.</P>
+<A NAME="z12_3"></A><P><DD> <B>Figure 12.3 Extended color calculation function</b><PRE>
+●Normal case:
+・When the second image color calculation enable bit = 0 
+                            ┌────────────┐ ┌─────────────────┐
+                            │            │ │Second image     │
+                            │Second image│→│after extended   │
+                            │            │ │color calculation│
+                            └────────────┘ └─────────────────┘
+                                   
+・When the second image color calculation enable bit = 1
+              ┌───────────┐ ┌────────────┐ ┌─────────────────┐
+              │           │ │            │ │Second image     │
+              │Third image│+│Second image│→│after extended   │
+              │           │ │            │ │color calculation│
+              └───────────┘ └────────────┘ └─────────────────┘
+                                   
+●When inserting a line color:
+・When the line color screen color calculation enable bit = 1 
+・When the third image color calculation enable bit = 0 
+              ┌───────────┐ ┌──────────┐ ┌─────────────────┐
+              │           │ │Line color│ │Second image     │
+              │Third image│+│          │→│after extended   │
+              │           │ │  Screen  │ │color calculation│
+              └───────────┘ └──────────┘ └─────────────────┘
+                                   
+・When the line color screen color calculation enable bit = 1 
+・When the third image color calculation enable bit = 1 
+┌───────────┐ ┌───────────┐ ┌────────────┐ ┌─────────────────┐
+│           │ │           │ │            │ │Second image     │
+│Force image│+│Third image│+│Second image│→│after extended   │
+│           │ │           │ │            │ │color calculation│
+└───────────┘ └───────────┘ └────────────┘ └─────────────────┘
+</PRE><A NAME="t12_2"></A><P><DD><B>Table 12.2 Extended color calculation ratio</b><DD><TABLE BORDER>
+<TR><TH ROWSPAN=2><PRE> Color<BR> RAM<BR> mode</TH><TH ROWSPAN=2><PRE> line<BR> color screen</TH><TH COLSPAN=3> color format</TH><TH COLSPAN=2><PRE> Color calculation enabled<BR> bull bit value</TH><TH ROWSPAN=2><PRE> Extended color calculation ratio<BR> Second: Third: Force<BR> image image image image</TH></TR>
+<TR><TH><PRE> second<BR> image</TH><TH><PRE> third<BR> image</TH><TH><PRE> force<BR> image</TH><TH><PRE> second<BR> image</TH><TH><PRE> third<BR> image</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=5><PRE> mode 0</TH><TD ROWSPAN=2> Do not insert</TD><TD ROWSPAN=2> palette<BR>
+ or<BR>
+ RGB format</TD><TD ROWSPAN=2> palette<BR>
+ or<BR>
+ RGB format</TD><TD ROWSPAN=2> −</TD><TD> 0</TD><TD> −</TD><TD> 4:0:0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> −</TD><TD> 2:2:0</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=3> insert</TD><TD ROWSPAN=3> −</TD><TD ROWSPAN=3> palette<BR>
+ or<BR>
+ RGB format</TD><TD ROWSPAN=3> palette<BR>
+ or<BR>
+ RGB format</TD><TD> 0</TD><TD> 0 or 1</TD><TD> 4:0:0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 2:2:0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 2:1:1</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=9><PRE> mode 1<BR> or<BR> mode 2</TH><TD ROWSPAN=3> Do not insert</TD><TD ROWSPAN=3> palette<BR>
+ or<BR>
+ RGB format</TD><TD> palette<BR>
+ format</TD><TD> −</TD><TD> 0 or 1</TD><TD> −</TD><TD> 4:0:0</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> RGB format</TD><TD ROWSPAN=2> −</TD><TD> 0</TD><TD> −</TD><TD> 4:0:0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> −</TD><TD> 2:2:0</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=6> insert</TD><TD ROWSPAN=6> −</TD><TD> palette<BR>
+ format</TD><TD> palette<BR>
+ or<BR>
+ RGB format</TD><TD> 0 or 1</TD><TD> 0 or 1</TD><TD> 4:0:0</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=5> RGB format</TD><TD ROWSPAN=2> palette<BR>
+ format</TD><TD> 0</TD><TD> 0 or 1</TD><TD> 4:0:0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0 or 1</TD><TD> 2:2:0</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=5> RGB format</TD><TD> 0</TD><TD> 0 or 1</TD><TD> 4:0:0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 2:2:0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 2:1:1</TD></TR>
+</TABLE>
+<DD> <B>[note]</b><DD> The extended color calculation function cannot be used when the TV screen mode is high resolution or dedicated monitor mode.<DD> When inserting a line color screen, the color format of the second image will be in palette format.<DD> The extended color calculation ratio is based on the value obtained by multiplying the RGB data by 1/4.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p12_11.htm">Back</a> ｜ <A HREF="p12_13.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no12">VDP2 User's Manual</a> ★ <A HREF="p12_10.htm">Chapter 12 Color calculation</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

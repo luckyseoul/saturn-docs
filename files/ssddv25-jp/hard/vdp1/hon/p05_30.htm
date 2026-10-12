@@ -1,0 +1,101 @@
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;23/54&gt;VDP1ユーザーズマニュアル/5.3　グーローシェーディングテーブル</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p05_20.htm">戻る</A>｜
+     <A HREF="p05_40.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第５章　テーブル</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no5_30"></A>
+	<P><DT><H2>■5.3　グーローシェーディングテーブル</H2>
+	<DD>　パーツにグーローシェーディング処理をするとき、4点のRGBデータを指定するテーブルです。4点のデータはそれぞれ16bitなので1テーブルは8Byte必要です。8HByteのバウンダリアドレスから始まる位置に配置します。
+		ただし00000Hから0001FHには書き込まないでください。<BR>
+		　VRAMは7FFFFH番地までです。80000H番地を越えてグーローシェーディングテーブルを定義しないでください。<BR>
+		　テーブルは頂点(A)、(B)、(C)、(D)の順にRGBデータを定義します。ラインの場合は頂点A、Bのみが有効となり、ライン始点、終点に対応します。スプライトの場合は頂点(A)、(B)、(C)、(D)が、左上、右上、右下、左下に対応します。<BR>
+		　このテーブルは、グーローシェーディング処理が指定されたときコマンドテーブルから参照されます。</P>
+
+<A NAME="t5_2"></A>
+	<P>	<DD><B>表5.2　グーロシェーディングテーブル</B>
+		<DD><TABLE BORDER=1>
+	<TR><TD ROWSPAN=2 ALIGN="CENTER"><PRE>テーブルアドレス</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE>対応する頂点</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>スプライト、ポリゴン、ポリライン</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>ライン</TD></TR>
+	<TR><TD ALIGN="LEFT"><PRE>テーブル先頭アドレス</TD><TD ALIGN="CENTER"><PRE>頂点(A)</TD><TD ALIGN="CENTER"><PRE>ライン始点</TD></TR>
+	<TR><TD ALIGN="LEFT"><PRE>テーブル先頭アドレス＋2</TD><TD ALIGN="CENTER"><PRE>頂点(B)</TD><TD ALIGN="CENTER"><PRE>ライン終点</TD></TR>
+	<TR><TD ALIGN="LEFT"><PRE>テーブル先頭アドレス＋4</TD><TD ALIGN="CENTER"><PRE>頂点(C)</TD><TD ALIGN="CENTER"><PRE>無視</TD></TR>
+	<TR><TD ALIGN="LEFT"><PRE>テーブル先頭アドレス＋6</TD><TD ALIGN="CENTER"><PRE>頂点(D)</TD><TD ALIGN="CENTER"><PRE>無視</TD></TR>
+	</TABLE></P>
+
+<A NAME="z5_4"></A>
+	<P><DD><B>図5.4　RGBコードフォーマット</B>
+<PRE>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　　　　　　　　ＬＳＢ
+┌─┬─────────┬─────────┬─────────┐
+│　│　　　　Ｂ　　　　│　　　　Ｇ　　　　│　　　　Ｒ　　　　│
+│Ｘ├─┬─┬─┬─┬─┼─┬─┬─┬─┬─┼─┬─┬─┬─┬─┤
+│　│４│３│２│１│０│４│３│２│１│０│４│３│２│１│０│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE></P>
+
+<A NAME="_z5_40"></A>
+	<P><DT><B>　●グーローシェーディング</B>
+	<DD>　RGBコードで描かれたパーツに対して、グーローシェーディング処理ができます。グーローシェーディングはRGBコードのパーツに対して、変化させるRGBそれぞれの輝度の変化量をグーローシェーディングテーブルで指定します。
+		RGBコードのカラーコードにのみ有効です。<BR>　カラーバンクコードのカラーコードに対してグーローシェーディングを指定した場合のカラーは保証されません。</P>
+
+<A NAME="_z5_41"></A>
+	<P>	<DT><B>　●グーローシェーディングの指定</B>
+		<DD>　グーローシェーディング処理をするときは色演算ビットでグーローシェーディングを指定します。色演算ビットはコマンドテーブルの先頭アドレス</P>
+
+	<P>	<DD>+04Hの描画モードワードのビット2〜0にあります。グーローシェーディングを指定したときはグーローシェーディングのアドレスを指定します。<BR>
+		　グーローシェーディングテーブルのアドレスはコマンドテーブルの先頭アドレス+1CHに、グーローシェーディングテーブル先頭アドレス/8Hを設定します。</P>
+
+<A NAME="_z5_41"></A>
+	<P>	<DT><B>　●グーローシェーディングの処理</B>
+		<DD>　グーローシェーディングテーブルにはパーツの4点(ラインは2点)のRGBの変化量のデータを指定します。4点の間をRGBごとに補間したデータを、パーツのもとのカラーに加えます。<BR>
+		　RGBの各値は00H〜1FHの値を取るので、補完したRGBデータから10Hを引いたものを、パーツのもとのカラーに加えます。例えば、RGBの値が10Hであれば元のカラーのままとし、00Hであれば−10Hし、1FHであれば+0FHします。
+		演算後の値が00Hより小さくなれば00Hとし、1FHより大きくなれば1FHとします。<BR>
+		　グーローシェーディングテーブルの設定値と補正値の関係を次に示します。</P>
+
+<A NAME="t5_3"></A>
+	<P>	<DD><B>表5.3　グーローシェーディングテーブルの設定値と補正値の関係</B><BR>
+		<DD><TABLE BORDER=1>
+	<TR><TH><PRE>テーブル設定値</TH><TH><PRE>元データに対する補正値</TH><TH><PRE>テーブル設定値</TH><TH><PRE>元データに対する補正値</TH─/TR>
+	<TR align=center><TD><PRE>00H</TD><TD><PRE>−10H</TD><TD><PRE>10H</TD><TD><PRE>0</TD></TR>
+	<TR align=center><TD><PRE>01H</TD><TD><PRE>−0FH</TD><TD><PRE>11H</TD><TD><PRE>＋01H</TD></TR>
+	<TR align=center><TD><PRE>02H</TD><TD><PRE>−0EH</TD><TD><PRE>12H</TD><TD><PRE>＋02H</TD></TR>
+	<TR align=center><TD><PRE>03H</TD><TD><PRE>−0DH</TD><TD><PRE>13H</TD><TD><PRE>＋03H</TD></TR>
+	<TR align=center><TD><PRE>04H</TD><TD><PRE>−0CH</TD><TD><PRE>14H</TD><TD><PRE>＋04H</TD></TR>
+	<TR align=center><TD><PRE>05H</TD><TD><PRE>−0BH</TD><TD><PRE>15H</TD><TD><PRE>＋05H</TD></TR>
+	<TR align=center><TD><PRE>06H</TD><TD><PRE>−0AH</TD><TD><PRE>16H</TD><TD><PRE>＋06H</TD></TR>
+	<TR align=center><TD><PRE>07H</TD><TD><PRE>−09H</TD><TD><PRE>17H</TD><TD><PRE>＋07H</TD></TR>
+	<TR align=center><TD><PRE>08H</TD><TD><PRE>−08H</TD><TD><PRE>18H</TD><TD><PRE>＋08H</TD></TR>
+	<TR align=center><TD><PRE>09H</TD><TD><PRE>−07H</TD><TD><PRE>19H</TD><TD><PRE>＋09H</TD></TR>
+	<TR align=center><TD><PRE>0AH</TD><TD><PRE>−06H</TD><TD><PRE>1AH</TD><TD><PRE>＋0AH</TD></TR>
+	<TR align=center><TD><PRE>0BH</TD><TD><PRE>−05H</TD><TD><PRE>1BH</TD><TD><PRE>＋0BH</TD></TR>
+	<TR align=center><TD><PRE>0CH</TD><TD><PRE>−04H</TD><TD><PRE>1CH</TD><TD><PRE>＋0CH</TD></TR>
+	<TR align=center><TD><PRE>0DH</TD><TD><PRE>−03H</TD><TD><PRE>1DH</TD><TD><PRE>＋0DH</TD></TR>
+	<TR align=center><TD><PRE>0EH</TD><TD><PRE>−02H</TD><TD><PRE>1EH</TD><TD><PRE>＋0EH</TD></TR>
+	<TR align=center><TD><PRE>0FH</TD><TD><PRE>−01H</TD><TD><PRE>1FH</TD><TD><PRE>＋0FH</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　本当のグーローシェーディングは輝度だけを変化させるのですが、この方式ではRGBをそれぞれ変化させるため、場合により色相も変わります。<BR>
+		　色相を変えないようにするには、グーローシェーディングテーブルに定義する1点分のRGB別の各位を同じ値に定義します。これにより、白色のグーローがかかります。<BR>
+		　ライン、ポリライン、ポリゴンのときはノンテクスチャカラーに対して、スプライトのときはキャラクタパターンデータまたはカラールックアップテーブルで参照されたカラーに対して処理されます。</P>
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p05_20.htm">戻る</A>｜
+     <A HREF="p05_40.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

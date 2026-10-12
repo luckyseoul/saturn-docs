@@ -1,0 +1,106 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/18&gt;ストリームシステムライブラリ/1．概要</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<B>■
+　　｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ストリームシステムライブラリ</B>
+<H2 ALIGN=CENTER>1．概要</H2>
+<HR NOSHADE>
+<DL>
+<P><DD>　ストリームシステムライブラリは、CD上のストリーム(インタリーブされたファイルなど)を効率的に読み込むためのライブラリです。</P>
+
+<A NAME="no1_10"></A>
+	<P><DT><H3>1.1　ライブラリ構成</H3>
+		<DD>　CD関係のライブラリ構成を図1.1に示します。</P>
+
+<A NAME="z1_1"></A>
+	<P><DD><B>図1.1　CD関係のライブラリ構成</B>
+<PRE>
+　　　　　　　┌────────────────────────────────┐　　　　
+　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　　　　
+　　　　　　　│　　　　　　　　　　　アプリケーション　　　　　　　　　　　　　│　　　　
+　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　　　　
+　　　　　　　└────────────────────────────────┘　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　┌───────┐　┏━━━━━━━━━━━┓　┌────────┐　　　　
+　　　　　　　│ＭＰＥＧ　　　│　┃ストリームシステム　　┃　│ファイルシステム│　　　　
+　　　　　　　│ライブラリ　　│　┃ライブラリ　　　　　　┃　│ライブラリ　　　│　　　　
+　　　　　　　│　　　　　　　│　┃　　　　　　　┏━━━┛　│　　　　　　　　│　　　　
+　　　　　　　│　　　　　　　│　┃　　　　　　　┃　┌───┘　　　　　　　　│　　　　
+　　　　　　　│　　　　　　　│　┃　　　　　　　┃　│　　　　　　　　　　　　│　　　　
+　　　　　　　└───────┘　┗━━━━━━━┛　└─────┐　　　　　　│　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　
+　　　　　　　┌───────────────────────┐　│　　　　　　│　　　　
+　　　　　　　│　　　　　　ＣＤ通信インタフェース　　　　　　│　│　　　　　　│　　　　
+　　　　　　　└───────────┬───────────┘　└──┬───┘　　　　
+ソフトウェア　　　　　　　　　　　　　│　　　　　　　　　　　　　　　　│　　　　　　　　
+━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━
+ハードウェア　　　　　　　　　　　　　│　　　　　　　　　　　　　　　　│　　　　　　　　
+　　　　　　　　　　　　┌──────┴─────┐　　　┌──────┴──────┐　
+　　　　　　　　　　　　│　　　ＣＤブロック　　　│　　　│ＳＩＭＭ，ＳＣＳＩファイル│　
+　　　　　　　　　　　　└────────────┘　　　└─────────────┘　
+</PRE>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>1.2 ストリームシステムの機能概要</H3>
+
+	<P><DT><B>　(1)CD-ROM　XAレベルのファイルのアクセスをサポートする</B>
+	<DD><UL TYPE="DISK">
+	<LI>サブヘッダを利用したモード２セクタへのアクセスをサポートします。<BR>(モード１セクタへのアクセスも可能)</P>
+	</UL>
+
+	<P><DT><B>　(2)多様な転送方法をサポートする</B>
+	<DD><UL TYPE="DISK">
+
+	<P><LI>CD上のストリームデータを、メインCPUの領域に転送することができます。</P>
+
+	<P><LI>関数を登録することにより、CD上のストリームデータを読み込みながら、データの加工を行うことができます。</P>
+
+	<P><LI>CDバッファに読み込んだストリームデータを、自由に取り扱うことができます。</P>
+	</UL>
+
+	<P><DT><B>　(3)ファイル識別子によるアクセスをサポートする</B>
+	<DD><UL TYPE="DISK">
+	<P><LI>ファイルシステムと同じディレクトリ管理機能を持っているので、ファイル識子(ディレクトリ内の順序番号)によりアクセスすることができます。</P>
+	</UL>
+
+<A NAME="z1_2"></A>
+	<P ALIGN=CENTER><B>図1.2　ストリームシステム概要図</B><BR><img srcset="../grp/i052_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DD>　ストリームシステムにより、インタリーブされた複数のストリームを論理的に立したデータとして扱うことができます。各ストリームはサブヘッダによって区別されます。<BR>　ストリームシステムは、アプリケーションがサーバ関数を呼び出すことで転送処理をします。転送関数を登録した場合、サーバ関数はバッファへの転送の代わりに転送関数を呼び出します。アプリケーションは登録した転送関数によって、データを変換しながら転送することができます。</P>
+
+</DL>
+<HR NOSHADE>
+<B>■
+　　｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

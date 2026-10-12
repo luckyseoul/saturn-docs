@@ -1,0 +1,154 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGASATURN Developer's Information STN-41</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn38.htm">STN-38</a> | <A HREF="stn39.htm">STN-39</a> | <A HREF="stn40.htm">STN-40</a> | <B>STN-41</b> | <A HREF="stn42.htm">STN-42</a> | <A HREF="stn43.htm">STN-43</a> | <A HREF="stn44.htm">STN-44</a> ▼<HR NOSHADE>
+<H1 ALIGN=CENTER> STN-41</H1><H2 ALIGN=CENTER> Virtua Gun User's Manual Ver.1.00</H2><HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> issue number:</TH><TD> STN-41</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> date of issue:</TH><TD> 96/02/16</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> media:</TH><TD> ●Common</TD><TD> ○CD-ROM</TH><TD> ○Cartridge</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> connection:</TH><TD> ○Program</TD><TD> ●Hard</TD><TD> ○Manual</TD><TD> ○Tools</TD><TD> ○Game</TD><TD> ○ Bug</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Information distinction:</TH><TD> ●New</TD><TD> ○Change</TD><TD> ○Addition</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> importance:</TH><TD> ●Strict observance</TD><TD> ○Recommended</TD><TD> ○Reference</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> attached file:</TH><TD> ●No</TH><TD> ○ Yes</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Subject supplement:</TH><TD COLSPAN=7></TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER> Contents</H3><HR>
+<H1 ALIGN=CENTER> Virtua Gun User's Manual</H1><H3 ALIGN=CENTER> Ver1.00</H3><HR>
+<DL>
+<P><H3> ■1. overview</H3><DD> The Virtua Gun is a peripheral that connects to the control terminal of the Sega Saturn console and is used exclusively for games that allow you to shoot enemies on the TV screen. The switch has a trigger and start button.</P>
+<P><DT> <B>●Basic specifications</b></P>
+<DD> Operating environment: 14-inch monitor used, standard indoor light environment<DD> Recommended screen size: 14 inches or more<DD> Effective firing range: Approximately 5 meters from the TV screen<DD> Effective incidence angle: 30 degrees vertically and horizontally relative to the center of the TV screen<DD> <B>Note: The above values may change depending on the screen size, brightness of external light, etc.</b></P>
+<P><DT><H3> ■2. TV where Virtua Gun doesn't work</H3><DD> Virtua Gun detects the scanning line light from the TV's cathode ray tube, correlates it with the TV's display timing, determines the coordinate position, and returns it to the application.<BR>
+ Due to this operating principle, some TVs may not work or may be unstable.</P>
+<P><DT> <B>●Inoperation due to model/scanning method</b><DD> LCD TVs, LCD projectors, etc. do not work because they do not use cathode ray tubes.<DD> High-definition televisions do not work because the screen display method is different.<DD> Double scan TV (EDTV2, Clear Vision) etc. do not work because the scanning line drawing speed is different.</P>
+<P><DT> <B>●Inoperation due to display mode</b><DD> In special display modes such as split-screen and picture-in-picture, image data is stored in the frame buffer and then displayed, resulting in timing discrepancies and problems.<DD> <B>Action</b> : Change to normal display mode.</P>
+<P><DD> It does not work in 4:3 display on some wide TVs.<DD> <B>Action</b> : Set to wide display mode.</P>
+<P><DT> <B>●Others</b><DD> A TV with a dirty screen or a TV whose brightness is adjusted to a low level.<DD> <B>Action</b> : Wipe the screen to remove dirt. Also, adjust the brightness to make the screen brighter.</P>
+<P><DD> Televisions with small screen sizes have insufficient brightness, making it difficult to detect scanning line light.<DD> <B>Compatibility</b> : Recommended size is 14 inches or more. Or add <A HREF="#no4_6">this judgment adjustment mode</a> within the application.</P>
+<P><DT><H3> ■3. Virtual gun peripheral specifications</H3><DT> <B>●About SMPC operation mode</b><DD> Virtua Gun uses the HV counter to detect the position on the screen, so the SMPC must be switched to S "H-2 Direct Mode".</P>
+<P><DT> <B>●Initialization method (SMPC control mode → SH-2 direct mode)</b><OL>
+<LI> Set the external latch enable bit (EXTLEN: bit 9) of the VDP2 external signal enable register (EXTEN: 180002H offset) to [1].</P>
+<LI> Set SMPC to SH-2 direct mode.<BR>
+ Set the IOSEL bit of the parallel I/O register (2010007DH) to [1].<BR>
+<UL>
+<LI> 1P terminal: IOSEL1 (bit0)<LI> 2P terminal: IOSEL2 (bit1)</UL>
+</P>
+<LI> Set the port's input/output setting to "input".<BR>
+ Set all DDR bits (bit0 to bit6) of the parallel I/O register to [0].<BR>
+<UL>
+<LI> 1P terminal: DDR1 (20100079H) all bits (bit6 to bit0) to [0]<LI> 2P terminal: DDR2 (2010007BH) all bits (bit6 to bit0) to [0]</UL>
+</P>
+ Set all bits of the input PDR to [1].<BR>
+<UL>
+<LI> 1P terminal: PDR1 (20100075H) all bits (bit6 to bit0) [1]<LI> 2P terminal: PDR2 (20100077H) all bits (bit6 to bit0) [1]</UL>
+</P>
+<LI> Use bit 6 of the port as an external latch input for VDP2.<BR>
+ Set the EXLE bit at address 2010007FH to [1]. <B>(Usually [0])</b><BR>
+<UL>
+<LI> 1P terminal: EXLE1 bit (2010007FH:bit0) [1]<LI> 2P terminal: EXLE2 bit (2010007FH:bit1) [1]</UL>
+</OL>
+ <B>Note: When accessing SMPC from SH-2, use byte access.</b></P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" <A HREF="../../hard/smpc/hon/p01_20.htm#no1_22">■Parallel I/O register</a><DD> "HARDWARE MANUAL/VDP2 User's Manual" <A HREF="../../hard/vdp2/hon/p02_50.htm#no2_51">●External signal enable register</a></P>
+<P><DT> <B>●Read the position</b><OL>
+<LI> Read the external latch flag (EXLTFG:bit9) of the VDP2 screen status register (TVSTAT:180004H offset), and if this bit is [1], read the value of the HV counter.<BR>
+ In reality, the aimed position and the HV counter position will deviate, so please refer to the "Aiming Correction Mode" described later and correct the difference within the application.<BR>
+<UL>
+<LI> H counter register (HCNT:180008H offset)<LI> V counter register (VCNT:18000AH offset)</UL>
+</P>
+<LI> The screen status register (TVSTAT) is cleared to [0] after reading, so it can only be read once during V_INT.<BR>
+ When reading the HV counter, you cannot read it if the screen is dark (EXLTFG will not become [1]), so make the screen <A HREF="#NO2">white (bright)</a> for 1/60th of a second after pulling the Virtua Gun trigger. The position is determined by using the value read at that time.</OL>
+<P><DT> <B><A NAME="NO2">●White color sample RGB format</a></b><DD> Sprite dot color data white = FFFFH (32768 colors)<DD> Scroll dot color data = 7FFFH (32768 colors)<DD> Scroll dot color data = 00FFFFFFH (16.77 million colors)</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/VDP2 User's Manual" <A HREF="../../hard/vdp2/hon/p02_50.htm#no2_53">■H counter register</a><P><DT> <B>●Read buttons (SH-2 direct mode)</b><DD> There are two buttons: the trigger and the start button. Read PDR of parallel I/O register.<UL>
+<LI> 1P terminal: PDR1 (20100075H)<LI> 2P terminal: PDR2 (20100077H)</UL>
+</P>
+ <B>Note</b> : Both terminals are byte accessed from SH-2.<P><TABLE BORDER>
+<CAPTION> Port assignment</CAPTION>
+<TR><TH ROWSPAN=2> PDRn<BR>
+ n=terminal number</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR><TH> *</TH><TH> latch</TH><TH> start<BR>
+ button</TH><TH> trigger</TH><TH> *</TH><TH> *</TH><TH> *</TH><TH> *</TH></TR>
+</TABLE>
+</P>
+<UL>
+<LI> bit6/latch → external latch Used as external latch input for VDP2 when EXLE bit is [1].<LI> bit5/Start → Start button, the signal is different from the standard putt start button.<LI> bit4/Trigger → Trigger, Virtua Gun trigger switch.<LI> Others → Each bit marked with * is undefined and should not be used.</UL>
+<P><DT> <B>● Obtaining Virtua Gun ID in SMPC control mode</b><UL>
+<LI> Since Virtua Gun is used in SMPC direct mode, it returns [A0H] of the Mega Drive peripheral ID as an <B>"UNKNOUWN"</b> device to the multi-tap ID of the port status instead of the Saturn peripheral ID.</P>
+<LI> The upper 4 bits of 1byte of port status are multi-tap ID [AH] and the lower 4 bits are the number of connectors [0], so the port status is [A0H].</UL>
+</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual"<BR>
+ <A HREF="../../hard/smpc/hon/p03_40.htm#no3_45">●Megadrive peripheral ID of each peripheral</a></P>
+<P><DT> <B>●Virtual Gun ID acquisition in SH-2 direct mode</b><DD> After setting SMPC to direct mode, it is no longer possible to obtain the peripheral ID using the interrupt back (INTBACK) command. The acquisition method using direct mode is shown below.</P>
+<DT><OL>
+<LI> ID check is done during V_INT.</P>
+<LI> Set the input/output settings of the port to [bit6=output], [bit5~0=input].<UL>
+<LI> 1P terminal input/output setting register (20100079H)=[40H] (bit6 output setting)<LI> 2P terminal input/output setting register (2010007BH)=[40H] (bit6 output setting)</UL>
+</P>
+<LI> How to calculate peripheral ID using SH-2 direct mode.<UL>
+<LI> The ID is 4 bits long (ID3 to ID0) and the read port data is calculated using the following formula.<LI> Terminal 1 port address (20100075H)<LI> Terminal 2 port address (20100077H)</P>
+<LI> ID3=(BIT3 or BIT2) and (BIT6=1) -----Calculation formula for ID3 to ID0<LI> ID2=(BIT1 or BIT0) and (BIT6=1)<LI> ID1=(BIT3 or BIT2) and (BIT6=0)<LI> ID0=(BIT1 or BIT0) and (BIT6=0)</P>
+<LI> Verify that the Virtua Gun is connected with peripheral ID=AH.</UL>
+</P>
+<LI> Restore the port's input/output settings.<UL>
+<LI> Set all bits (bit6 to bit0) of the parallel I/O register to input setting [0].<BR>
+ → Return to settings that allow you to use Virtua Gun</UL>
+</OL>
+</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual"<BR>
+ <A HREF="../../hard/smpc/hon/p03_40.htm">■3.4 Peripheral access protocol</a></P>
+<P><DT><H3> ■4. Points to note when creating applications</H3><DT> <B>●Supported peripheral character code</b><DD> The character code for Virtua Gun is <B>"G"</b> .<DD> Write "G" in the corresponding peripheral (starting address 50H) in SYSTEM ID.</P>
+<P><DT> <B>reference:</b><DD> "Programmer's Guide/DISC Format Standard Specifications"<BR>
+ <A HREF="../../prgg/sofg/disc/hon/p04_10.htm">Boot system</a> / <A HREF="../../prgg/sofg/disc/hon/p04_10.htm#07_">supported peripherals</a></P>
+<P><DT> <B>●Aim adjustment mode</b><DD> This adjustment mode allows the user to adjust the aim before playing the game, since the degree of deviation between the point the player is aiming at and the coordinates will vary depending on the environment such as the TV being used, the distance between the TV screen and the Virtua Gun, the amount of indoor light, etc. This is the mode for</P>
+<P><DT>&#65308;&#65308;&#65308; <B>Recommended example of aiming adjustment method</b>&#65310;&#65310;&#65310;<DT><OL>
+<P><B><LI></b> A cross-shaped target (hereinafter referred to as target) is displayed in the center of the TV screen.</P>
+<P><B><LI></b> From the playing position, aim the muzzle at the center of the target and pull the trigger.</P>
+<P><B><LI></b> If the aim is off or not adjusted, the impact point will appear off-center on the target.</P>
+<P><B><LI></b> Pressing the start button clears the previous correction value.</P>
+<P><B><LI></b> Aim the muzzle at the center of the target, hold the muzzle, and pull the trigger. The difference between the values of HCNT and VCNT at this time and the target center coordinates is taken as a correction value.</P>
+<P><B><LI></b> Display a message that adjustment is completed.</P>
+</OL>
+<P><DT> <B>●About the Virtua Gun start button</b><DD> In this manual, this is referred to as a "start button," but this is different from the signal for the control pad's <B>"start button,"</b> so please be careful when creating applications.</P>
+<TABLE>
+<TR><TD><img srcset="../../what/atto.png 5x"></TD><TD> <B>The BOOT ROM multiplayer screen cannot be operated.</b></TD></TABLE>
+<P><DT> <B>●About the enemy (target) at the edge of the screen during the game</b><DD> Some TVs do not display the entire screen, so avoid aiming within about 16 dots from the top, bottom, left and right edges of the screen.</P>
+<P><DT> <B>●When 2 players are playing at the same time</b><DD> If two people are using the Virtua Gun at the same time, the main processing should be 2 frames (1/30sec.) and the reading process of the Virtua Gun should be divided into even frames and odd frames.</P>
+<A NAME="no4_6"></A><P><DT> <B>●Judgment adjustment mode (recommended)</b><DD> If the TV screen is small, the displayed target will be smaller, and even the slightest camera shake will cause the target to shift, making the game more difficult. Therefore, this judgment should be adjustable in the application, like in "Virtua Cop." We recommend that you do so.</P>
+<P><DT> <B>●Connection with multi-terminal</b><DD> Virtua Gun is not compatible with multi-terminals, so please do not connect it.</P>
+<P><DT> <B>●About the display of Virtua Gun on the game screen</b><DD> There are three types of Virtua Guns with different colors depending on the destination region. This takes into account the regulations imposed by each country on toys that imitate the shape of guns. There are no particular regulations regarding the color when displaying the Virtua Gun in OPTION mode, etc.</P>
+<P><TABLE BORDER>
+<CAPTION>&#65308; <B>Table/Virtual Gun colors by region</b>&#65310;</CAPTION>
+<TR><TH> Place of destination</TH><TH> Body color</TH><TH> Trigger/start button</TH><TH> name</TH></TR>
+<TR><TH> Japan/Southeast Asia</TH><TH> black</TH><TH> black</TH><TH> Virtua Gun</TH></TR>
+<TR><TH> America/Canada</TH><TH> orange</TH><TH> black</TH><TH> STUNNER</TH></TR>
+<TR><TH> Europe</TH><TH> blue</TH><TH> black</TH><TH> VIRTUA GUN</TH></TR>
+</TABLE>
+</P>
+</DL>
+<P ALIGN=CENTER>&#65308; <B>STUNNER/VIRTUA GUN color sample</b>&#65310;<BR>
+<img srcset="../grp/stn41_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+ that's all<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn38.htm">STN-38</a> | <A HREF="stn39.htm">STN-39</a> | <A HREF="stn40.htm">STN-40</a> | <B>STN-41</b> | <A HREF="stn42.htm">STN-42</a> | <A HREF="stn43.htm">STN-43</a> | <A HREF="stn44.htm">STN-44</a> ▼<HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

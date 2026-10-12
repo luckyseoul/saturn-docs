@@ -1,0 +1,155 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/19&gt;CD communication I/F (CD part)/Function details-7</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part) (CD part)</a><HR>
+ <B>▲ <A HREF="p08_16.htm">Back</a> ｜ <A HREF="p08_18.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual (CD part)</b><H2 ALIGN=CENTER> Function details-7</H2><HR NOSHADE>
+<H3> 8.2.7 Buffer input/output</H3> Each buffer input/output function (extracting, erasing, writing, copying, and moving sector data) includes connector connection processing.<BR>
+ In other words, by issuing a single command, multiple processes such as connecting the device and selector, and inputting and outputting sectors are performed. Any connectors already connected to the partition output connector will be disconnected.<BR>
+ If the connector is disconnected by another device or selector during a buffer I/O operation, an error will occur. (See " <B><A HREF="p05_10.htm#no5_3_40">5.3.4 Notes on Selectors</a></b> ")<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_1"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_7">one</a><BR> <A HREF="p08_10.htm#t8_1_7">View</a><BR> <A HREF="p08_10.htm#t8_1_7">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Setting sector length</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_SetSctLen</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_SetSctLen(Sint32 getslen, Sint32 putslen)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> getslen</TD><TD><PRE> :Sector length at time of extraction</TD></TR>
+<TR><TD><PRE> putslen</TD><TD><PRE> : Sector length when writing</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code. <B>End flag</b> ESEL flag<DT> <B>function</b><DD> Set the length of one sector (sector length) in the following cases.<BR>
+
+&#12539; Extract sector data (CD buffer → host)<BR>
+
+&#12539; Write sector data (host → CD buffer)<P><DT> <B>(1) Sector length</b><DD><TABLE BORDER=1>
+<TH WIDTH=100><PRE> constant name</TH><TH WIDTH=420><PRE> explanation</TH></TR>
+<TD><PRE> CDC_SLEN_2048</TD><TD><PRE> 2048 bytes (user data)...Initial value<BR> When extracting, if mode 2 form 2, 2324 bytes</TD></TR>
+<TD><PRE> CDC_SLEN_2336</TD><TD><PRE> 2336 bytes (up to subheader)</TD></TR>
+<TD><PRE> CDC_SLEN_2340</TD><TD><PRE> 2340 bytes (up to header)</TD></TR>
+<TD><PRE> CDC_SLEN_2352</TD><TD><PRE> 2352 bytes (whole sector)</TD></TR>
+<TD><PRE> CDC_SLEN_NOCHG</TD><TD><PRE> Do not change settings</TD></TABLE>
+<DT> <B>remarks</b><DD> The set "sector length when retrieving" is also reflected in the calculation of the actual data size ( <B><A HREF="p08_16.htm#no6_3">CDC_CalActSiz</a></b> ).<BR>
+ Do not change the sector length while calculating the actual data size or while transferring sector data (during the processing of <B><A HREF="#no7_2">CDC_GetSctData</a></b> , <B><A HREF="#no7_3">CDC_GetdelSctData</a></b> , and <B><A HREF="#no7_5">CDC_PutSctData</a></b> functions).</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_2"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_7">one</a><BR> <A HREF="p08_10.htm#t8_1_7">View</a><BR> <A HREF="p08_10.htm#t8_1_7">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Extracting sector data</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_GetSctData</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7.2</H4></TD></TR>
+</TABLE>
+</p>
+<DT> <B>Format</b><DD> Sint32 CDC_GetSctData(Sint32 bufno, Sint32 spos, Sint32 snum)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> bufno</TD><TD><PRE> :Buffer section number</TD></TR>
+<TR><TD><PRE> spos</TD><TD><PRE> : Sector position ( <B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</a></b> : Indicates the last sector of the partition)</TD></TR>
+<TR><TD><PRE> snum</TD><TD><PRE> : Number of sectors ( <B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</a></b> : Indicates the number of sectors from spos to the end of the partition)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> EHST flag (becomes 1 after executing <B><A HREF="p08_11.htm#no1_10">CDC_DataEnd</a></b> function)<DT> <B>function</b><DD> Extracts sector data from the specified sector range of the buffer partition.<BR>
+ The length of one sector can be changed by setting the sector length (CDC_SetSctLen).<DT> <B>remarks</b><DD> After the function executes, we need to transfer and retrieve the data.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_3"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_7">one</a><BR> <A HREF="p08_10.htm#t8_1_7">View</a><BR> <A HREF="p08_10.htm#t8_1_7">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Erase sector data</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_DelSctData</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_DelSctData(Sint32 bufno, Sint32 spos, Sint32 snum)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> bufno</TD><TD><PRE> :Buffer section number</TD></TR>
+<TR><TD><PRE> spos</TD><TD><PRE> : Sector position ( <B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</a></b> : Indicates the last sector of the partition)</TD></TR>
+<TR><TD><PRE> snum</TD><TD><PRE> : Number of sectors ( <B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</a></b> : Indicates the number of sectors from spos to the end of the partition)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> EHST flag<DT> <B>function</b><DD> Erases sector data from the specified sector range of the buffer partition.<DT> <B>remarks</b><DD> When data is erased, subsequent sector positions are moved up sequentially.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_4"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_7">one</a><BR> <A HREF="p08_10.htm#t8_1_7">View</a><BR> <A HREF="p08_10.htm#t8_1_7">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Extract and erase sector data</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_GetdelSctData</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_GetdelSctData(Sint32 bufno, Sint32 spos, Sint32 snum)<DT> <B>input</b><DD><TABLE BORDER=1>
+<TR><TD><PRE> bufno</TD><TD><PRE> :Buffer section number</TD></TR>
+<TR><TD><PRE> spos</TD><TD><PRE> : Sector position ( <B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</a></b> : Indicates the last sector of the partition)</TD></TR>
+<TR><TD><PRE> snum</TD><TD><PRE> : Number of sectors ( <B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</a></b> : Indicates the number of sectors from spos to the end of the partition)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> EHST flag (becomes 1 after executing CDC_DataEnd function)<DT> <B>function</b><DD> Extracts and erases sector data from the specified sector range of the buffer partition.<BR>
+ The length of one sector can be changed by setting the sector length (CDC_SetSctLen).<DT> <B>remarks</b><DD> After the function executes, we need to transfer and retrieve the data.<BR>
+ Even if the transfer ends without extracting all the data, all data in the specified sector range will be erased.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_5"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_7">one</a><BR> <A HREF="p08_10.htm#t8_1_7">View</a><BR> <A HREF="p08_10.htm#t8_1_7">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Writing sector data</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_PutSctData</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_PutSctData(Sint32 filtno, Sint32 snum)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> filtno</TD><TD><PRE> : Aperture number</TD></TR>
+<TR><TD><PRE> snum</TD><TD><PRE> : Number of sectors</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> EHST flag (becomes 1 after executing CDC_DataEnd function)<DT> <B>function</b><DD> Writes sector data to the specified aperture.<BR>
+ The length of one sector can be changed by setting the sector length (CDC_SetSctLen).<DT> <B>remarks</b><DD> After the function executes, the data must be transferred and written.<BR>
+ Even if data transfer is interrupted midway, the specified number of sectors of data will be written. Values other than the transferred data are undefined.<P><DT> <B>《Incorporation of sector data》</b><DD> Sector data is incorporated into the partition from the aperture after completing the data transfer (CDC_DataEnd). When all sectors have been embedded, the EHST flag becomes 1.</P>
+<P><DT> <B>《Securing free space》</b><DD> Returns WAIT if there is insufficient free space when issuing the command. (Free space&#65308; If free space cannot be secured after receiving the snum) command, the DRDY flag in the interrupt factor register remains 0 and the EHST flag becomes 1. (If free space is used by other device processes) </P>
+</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_6"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_7">one</a><BR> <A HREF="p08_10.htm#t8_1_7">View</a><BR> <A HREF="p08_10.htm#t8_1_7">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Copying sector data</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_CopySctData</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_CopySctData(Sint32 srcbn, Sint32 spos, Sint32 snum, Sint32 dstfln)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> srcbn</TD><TD><PRE> :Copy source buffer section number</TD></TR>
+<TR><TD><PRE> spos</TD><TD><PRE> : Sector position ( <B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</a></b> : Indicates the last sector of the partition)</TD></TR>
+<TR><TD><PRE> snum</TD><TD><PRE> : Number of sectors ( <B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</a></b> : Indicates the number of sectors from spos to the end of the partition)</TD></TR>
+<TR><TD><PRE> dstfln</TD><TD><PRE> :Destination aperture number</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> ECPY flag<DT> <B>function</b><DD> Copies sector data from the specified sector range of the buffer partition to the aperture. (Copying between selectors)<BR>
+ The length of one sector is fixed at 2352 bytes.<DT> <B>remarks</b><DD> Returns WAIT if there is insufficient free space when issuing the command. (Free space&#65308; snum) If there is no free space during command processing, the copy process will be stopped at that point and an error will occur. (If free space is used by other device processes)<BR>
+ To obtain error information, execute sector data copy/movement error acquisition (CDC_GetCopyErr).</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_7"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_7">one</a><BR> <A HREF="p08_10.htm#t8_1_7">View</a><BR> <A HREF="p08_10.htm#t8_1_7">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Moving sector data</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_MoveSctData</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7.7</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_MoveSctData(Sint32 srcbn, Sint32 spos, Sint32 snum, Sint32 dstfln)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> srcbn</TD><TD><PRE> : Source buffer section number</TD></TR>
+<TR><TD><PRE> spos</TD><TD><PRE> : Sector position ( <B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</a></b> : Indicates the last sector of the partition)</TD></TR>
+<TR><TD><PRE> snum</TD><TD><PRE> : Number of sectors ( <B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</a></b> : Indicates the number of sectors from spos to the end of the partition)</TD></TR>
+<TR><TD><PRE> dstfln</TD><TD><PRE> : Destination aperture number</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> ECPY flag<DT> <B>function</b><DD> Moves sector data from the specified sector range of the buffer partition to the aperture. (move between selectors)<BR>
+ The length of one sector is fixed at 2352 bytes.<DT> <B>remarks</b><DD> It can be executed even if the buffer is full.<BR>
+ To obtain error information, execute sector data copy/movement error acquisition (CDC_GetCopyErr).</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_8"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_7">one</a><BR> <A HREF="p08_10.htm#t8_1_7">View</a><BR> <A HREF="p08_10.htm#t8_1_7">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Sector data copy/move error acquisition</H4></TD><TD WIDTH=160><PRE> Function Name［S-］<BR><H3> CDC_GetCopyErr</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7.8</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_GetCopyErr(Sint32 *cpyerr)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> cpyerr: Copy/move error information<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Obtains error information when copying/moving sector data.<BR>
+ The previous error information is retained until the next copy/move (CDC_CopySctData, CDC_MoveSctData) is executed.<P><DT> <B>(1) Copy/move error information</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> constant name</TH><TH WIDTH=420><PRE> explanation</TH></TR>
+<TR><TD><PRE> CDC_COPY_OK</TD><TD><PRE> Normal end...Initial value</TD></TR>
+<TR><TD><PRE> CDC_COPY_NG</TD><TD><PRE> Error occurred<BR>&#12539; Selector was detached during copy/move.<BR>&#12539; There is no free space in the buffer.</TD></TR>
+<TR><TD><PRE> CDC_COPY_BUSY</TD><TD><PRE> Copy/move processing in progress</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_16.htm">Back</a> ｜ <A HREF="p08_18.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

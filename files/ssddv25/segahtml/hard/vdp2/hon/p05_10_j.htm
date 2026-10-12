@@ -1,0 +1,406 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;36/86&gt;VDP2ユーザーズマニュアル/5.1画面スクロール機能</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no5">VDP2ユーザーズマニュアル</A>
+<HR>
+<B>▲
+<a href="p04_b0_j.htm">戻る</A>｜
+<a href="p05_20_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第５章　ノーマルスクロール画面</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　ノーマルスクロール画面は、NBG0〜NBG3の4面あり、いずれも画面全体を上下左右にスクロールすることができます。NBG0とNBG1は、さらに拡大縮小、ラインスクロール、縦セルスクロールをすることができます。</P>
+
+<A NAME="no5_10"></A>
+	<P>	<DT><H2>■5.1　画面スクロール機能</H2>
+		<DD>　ノーマルスクロール画面は4面すべて、面単位で上下左右のドットスクロールを行うことができ、その画面スクロール値は、TV画面の左上隅に表示するドットの座標を画面スクロール値レジスタに指定します。画面スクロール値は、各画面に対して設定した表示エリアを越えない値までを有効とし、越える値を指定した場合には表示エリアの画面が繰り返されます。また、NBG0用とNBG1用の画面スクロール値の小数部は座標計算にのみ使用され、最終的な表示座標値では切り捨てられます。水平方向画面スクロール値整数部ビットと水平方向画面スクロール値小数部ビットで水平(X)方向の座標を指定し、垂直方向画面スクロール値整数部ビットと垂直方向画面スクロール値小数部ビットで垂直(Y)方向の座標を指定します。<BR>
+　整数部ビットのすぐ下位に小数部ビットが付加されます。ビット構成を図5.1に示します。</P>
+
+<A NAME="z5_1"></A>
+	<P><DD><B>図5.1　画面スクロール値ビットの構成</B>
+	<DT><FONT SIZE="2">
+<PRE>
+●水平方向および垂直方向画面スクロール値レジスタ（ＮＢＧ０，ＮＢＧ１）　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+ビット　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+３１　　　　　　　　　２６　　　　　　　　　　　　　　　　　１６　１５　　　　　　　　　　８　７　　　　　　　　　　　　　０　
+┌─┬─┬─┬─┬─┰─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┰─┬─┬─┬─┬─┬─┬─┰─┬─┬─┬─┬─┬─┬─┬─┐
+│−│−│−│−│−┃　│　│　│　│　│　│　│　│　│　│　┃　│　│　│　│　│　│　┃−│−│−│−│−│−│−│−│
+└─┴─┴─┴─┴─┸─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┸─┴─┴─┴─┴─┴─┴─┸─┴─┴─┴─┴─┴─┴─┴─┘
+　　　　　　　　　　　└───────────────────┘　└───────────┘　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　整数部　　　　　　　　　　　　　　　　小数部　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+●水平方向および垂直方向画面スクロール値レジスタ（ＮＢＧ２，ＮＢＧ３）　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+ビット　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+１５　　　　　　　　１０　　　　　　　　　　　　　　　　　　　　０　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+┌─┬─┬─┬─┬─┰─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+│−│−│−│−│−┃　│　│　│　│　│　│　│　│　│　│　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+└─┴─┴─┴─┴─┸─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　└───────────────────┘　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　整数部　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+</PRE></FONT>
+
+<A NAME="no5_11"></A>
+	<P>	<DT><H3>　●画面スクロール値レジスタ</H3>
+		<DD>　画面スクロール値レジスタは、画面スクロール値を指定します。書き込み専用の16ビットまたは32ビットのレジスタで、180070H〜180076H番地、180080H〜180086H番地、180090H〜180096H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCXIN0_"></A>
+<P>	<DD><B><FONT SIZE=5>SCXIN0</FONT>　<FONT SIZE=4>180070H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI10</A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI9 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI7 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI6 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI5 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI4 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI3 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI2 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI1 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXI0 </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCXDN0_"></A>
+<P>	<DD><B><FONT SIZE=5>SCXDN0</FONT>　<FONT SIZE=4>180072H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#N0SCX_">N0SCXD1 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXD2 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXD3 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXD4 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXD5 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXD6 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXD7 </A></TH>
+<TH><PRE><A HREF="#N0SCX_">N0SCXD8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCYIN0_"></A>
+<P>	<DD><B><FONT SIZE=5>SCYIN0</FONT>　<FONT SIZE=4>180074H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI10</A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI9 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI7 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI6 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI5 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI4 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI3 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI2 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI1 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYI0 </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCYDN0_"></A>
+<P>	<DD><B><FONT SIZE=5>SCYDN0</FONT>　<FONT SIZE=4>180076H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#N0SCY_">N0SCYD1 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYD2 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYD3 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYD4 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYD5 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYD6 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYD7 </A></TH>
+<TH><PRE><A HREF="#N0SCY_">N0SCYD8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+</TR></TABLE></P>
+
+
+
+
+
+
+
+
+
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCXIN1_"></A>
+<P>	<DD><B><FONT SIZE=5>SCXIN1</FONT>　<FONT SIZE=4>180080H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI10</A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI9 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI7 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI6 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI5 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI4 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI3 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI2 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI1 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXI0 </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCXDN1_"></A>
+<P>	<DD><B><FONT SIZE=5>SCXDN1</FONT>　<FONT SIZE=4>180082H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#N1SCX_">N1SCXD1 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXD2 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXD3 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXD4 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXD5 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXD6 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXD7 </A></TH>
+<TH><PRE><A HREF="#N1SCX_">N1SCXD8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCYIN1_"></A>
+<P>	<DD><B><FONT SIZE=5>SCYIN1</FONT>　<FONT SIZE=4>180084H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI10</A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI9 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI7 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI6 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI5 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI4 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI3 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI2 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI1 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYI0 </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCYDN1_"></A>
+<P>	<DD><B><FONT SIZE=5>SCYDN1</FONT>　<FONT SIZE=4>180086H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#N1SCY_">N1SCYD1 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYD2 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYD3 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYD4 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYD5 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYD6 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYD7 </A></TH>
+<TH><PRE><A HREF="#N1SCY_">N1SCYD8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+</TR></TABLE></P>
+
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCXN2_"></A>
+<P>	<DD><B><FONT SIZE=5>SCXN2</FONT>　<FONT SIZE=4>180090H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX10 </A></TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX9  </A></TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX8  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#N2SCX_">N2SCX7  </A></TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX6  </A></TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX5  </A></TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX4  </A></TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX3  </A></TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX2  </A></TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX1  </A></TH>
+<TH><PRE><A HREF="#N2SCX_">N2SCX0  </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCYN2_"></A>
+<P>	<DD><B><FONT SIZE=5>SCYN2</FONT>　<FONT SIZE=4>180092H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY10 </A></TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY9  </A></TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY8  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#N2SCY_">N2SCY7  </A></TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY6  </A></TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY5  </A></TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY4  </A></TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY3  </A></TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY2  </A></TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY1  </A></TH>
+<TH><PRE><A HREF="#N2SCY_">N2SCY0  </A></TH>
+</TR></TABLE></P>
+
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCXN3_"></A>
+<P>	<DD><B><FONT SIZE=5>SCXN3</FONT>　<FONT SIZE=4>180094H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX10 </A></TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX9  </A></TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX8  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#N3SCX_">N3SCX7  </A></TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX6  </A></TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX5  </A></TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX4  </A></TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX3  </A></TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX2  </A></TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX1  </A></TH>
+<TH><PRE><A HREF="#N3SCX_">N3SCX0  </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCYN3_"></A>
+<P>	<DD><B><FONT SIZE=5>SCYN3</FONT>　<FONT SIZE=4>180096H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY10 </A></TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY9  </A></TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY8  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#N3SCY_">N3SCY7  </A></TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY6  </A></TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY5  </A></TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY4  </A></TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY3  </A></TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY2  </A></TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY1  </A></TH>
+<TH><PRE><A HREF="#N3SCY_">N3SCY0  </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="N0SCX_">　</A><A NAME="N0SCY_">　</A>
+<A NAME="N1SCX_">　</A><A NAME="N1SCY_">　</A>
+<A NAME="N2SCX_">　</A><A NAME="N2SCY_">　</A>
+<A NAME="N3SCX_">　</A><A NAME="N3SCY_">　</A>
+	<DT><B>画面スクロール値ビット</B>：Scroll bit
+	<DD>(N0SCXI10〜N0SCXI0, N0SCXD1〜N0SCXD8, N0SCYI10〜N0SCYI0, N0SCYD1〜N0SCYD8, N1SCXI10〜N1SCXI0, N1SCXD1〜N1SCXD8, N1SCYI10〜N1SCYI0, N1SCYD1〜N1SCYD8, N2SCX10〜N2SCX0, N2SCY10〜N2SCY0, N3SCX10〜N3SCX0, N3SCY10〜N3SCY0)
+　各ノーマルスクロール画面の水平、垂直方向の画面スクロール値(座標値)を指定します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>N0SCXI10〜N0SCXI0</TD><TD>180070H</TD><TD>ビット10〜0</TD><TD>NBG0水平方向用（整数部）</TD></TR>
+	<TR><TD>N0SCXD1〜N0SCXD8</TD><TD>180072H</TD><TD>ビット15〜8</TD><TD>NBG0水平方向用（小数部）</TD></TR>
+	<TR><TD>N0SCYI10〜N0SCYI0</TD><TD>180074H</TD><TD>ビット10〜0</TD><TD>NBG0垂直方向用（整数部）</TD></TR>
+	<TR><TD>N0SCYD1〜N0SCYD8</TD><TD>180076H</TD><TD>ビット15〜8</TD><TD>NBG0垂直方向用（小数部）</TD></TR>
+	<TR><TD>N1SCXI10〜N1SCXI0</TD><TD>180080H</TD><TD>ビット10〜0</TD><TD>NBG1水平方向用（整数部）</TD></TR>
+	<TR><TD>N1SCXD1〜N1SCXD8</TD><TD>180082H</TD><TD>ビット15〜8</TD><TD>NBG1水平方向用（小数部）</TD></TR>
+	<TR><TD>N1SCYI10〜N1SCYI0</TD><TD>180084H</TD><TD>ビット10〜0</TD><TD>NBG1垂直方向用（整数部）</TD></TR>
+	<TR><TD>N1SCYD1〜N1SCYD8</TD><TD>180086H</TD><TD>ビット15〜8</TD><TD>NBG1垂直方向用（小数部）</TD></TR>
+	<TR><TD>N2SCX10〜N2SCX0</TD><TD>180090H</TD><TD>ビット10〜0</TD><TD>NBG2水平方向用</TD></TR>
+	<TR><TD>N2SCY10〜N2SCY0</TD><TD>180092H</TD><TD>ビット10〜0</TD><TD>NBG2垂直方向用</TD></TR>
+	<TR><TD>N3SCX10〜N3SCX0</TD><TD>180094H</TD><TD>ビット10〜0</TD><TD>NBG3水平方向用</TD></TR>
+	<TR><TD>N3SCY10〜N3SCY0</TD><TD>180096H</TD><TD>ビット10〜0</TD><TD>NBG3垂直方向用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　画面スクロール値レジスタの値は、各画面の表示エリアを越えない範囲までが有効です。表示エリアを越えた場合には、表示エリアの画面が繰り返し表示されます。<BR>
+　画面スクロール値は、すべて正の値で指定してください。<BR>
+　水平帰線期間中に値を変更することによって、画面途中からスクロール値を変えることもできます。</P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p04_b0_j.htm">戻る</A>｜
+<a href="p05_20_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no5">VDP2ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

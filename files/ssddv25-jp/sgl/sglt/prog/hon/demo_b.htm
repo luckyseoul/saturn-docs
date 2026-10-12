@@ -1,0 +1,130 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/30&gt;SGL Programmer's Tutorial/デモプログラムＢ</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<A HREF="p05_10.htm">戻る</A>｜<A HREF="p06_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PROGRAMMER'S TUTORIAL</B>
+<H2 ALIGN=CENTER>デモプログラムＢ</H2>
+<H3 ALIGN=CENTER>Matrix Animation</H3>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　ここで、階層構造を用いた少し複雑なプログラムを紹介します。</P>
+
+	<P>	<DD>　階層構造は３Ｄグラフィックス特有の考え方です。これは、３Ｄグラフィックスの場合、３次元という広大な空間を対象に扱うため、かなり大量のパラメータを一度に扱う事に起因します。特に、３Ｄ空間内で複数のオブジェクトに関係性を持たせ一度に動かす場		合など、単純ではあるけれども、かなり煩雑なパラメータ群を一度に取り扱う必要があります。そこで、階層構造という観念が現れたわけです。<BR>
+		階層構造は親子構造とも呼ばれます。階層構造は、関節の表現（人体モデルなど）やオブジェクト群の表現に主に用いられます。</P>
+
+<A NAME="zb_1"></A>
+	<P ALIGN=CENTER><H4>図 B-1　階層構造を用いた関節表現</H4><BR>
+	<IMG SRC="../grp/pd_b_1_1.gif"></P>
+
+	<P>	<DD>　デモプログラム“demo_B”は、階層構造を用いたアニメーションを実現するためのサンプルプログラムです。デモでは、３つのオブジェクトに関係性（親子構造）を持たせることで、複雑な動き（関節構造を持ったオブジェクト群のアニメーション）を容易に実現	しています。これは、階層構造という観念を使用しない場合、かなり複雑で煩雑なプログラムとなります。</P>
+
+<A NAME="zb_2"></A>
+	<P ALIGN=CENTER><H4>図 B-2　デモＢのイメージモデル</H4><BR>
+	<IMG SRC="../grp/pd_b_1_2.gif"></P>
+
+<A NAME="lb_1"></A>
+	<P>	<DD><H4>リスト B-1　demo_B：階層構造を用いたアニメーション </H4>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Matrix Animation						*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+extern PDATA PD_PLANE1, PD_PLANE2, PD_PLANE3;
+
+static void set_poly(ANGLE ang[XYZ], FIXED pos[XYZ])
+{
+	slTranslate(pos[X], pos[Y], pos[Z]);
+	slRotX(ang[X]);
+	slRotY(ang[Y]);
+	slRotZ(ang[Z]);
+}
+
+void ss_main(void)
+{
+	static ANGLE ang1[XYZ], ang2[XYZ], ang3[XYZ];
+	static FIXED pos1[XYZ], pos2[XYZ], pos3[XYZ];
+	static ANGLE tang, aang;
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("demo B", slLocate(6,2));
+
+	ang1[X] = ang1[Y] = ang1[Z] = DEGtoANG(0.0);
+	ang2[X] = ang2[Y] = ang2[Z] = DEGtoANG(0.0);
+	ang3[X] = ang3[Y] = ang3[Z] = DEGtoANG(0.0);
+	pos1[X] = toFIXED(  0.0);
+	pos1[Y] = toFIXED( 40.0);
+	pos1[Z] = toFIXED(170.0);
+	pos2[X] = toFIXED(  0.0);
+	pos2[Y] = toFIXED(-40.0);
+	pos2[Z] = toFIXED(  0.0);
+	pos3[X] = toFIXED(  0.0);
+	pos3[Y] = toFIXED(-40.0);
+	pos3[Z] = toFIXED(  0.0);
+	tang = DEGtoANG(0.0);
+	aang = DEGtoANG(2.0);
+
+	while(-1) {
+		slUnitMatrix(CURRENT);
+		ang1[Z] = ang2[Z] = tang;
+		tang += aang;
+		if(tang &lt; DEGtoANG(-90.0)) {
+			aang = DEGtoANG(2.0);
+		} else if(tang &gt; DEGtoANG(90.0)) {
+			aang = -DEGtoANG(2.0);
+		}
+
+		slPushMatrix();
+		{
+			set_poly(ang1, pos1);
+			slPutPolygon(&PD_PLANE1);
+
+			slPushMatrix();
+			{
+				set_poly(ang2, pos2);
+				slPutPolygon(&PD_PLANE2);
+
+				slPushMatrix();
+				{
+					set_poly(ang3, pos3);
+					ang3[Y] += DEGtoANG(5.0);
+					slPutPolygon(&PD_PLANE3);
+				}
+				slPopMatrix();
+			}	
+			slPopMatrix();
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+
+</PRE>
+
+<A NAME="fb_1"></A>
+	<P ALIGN=CENTER><H4>フロー B-1　demo_B：階層構造フローチャート</H4>
+	<IMG SRC="../grp/pd_b_3.gif"></P>
+
+	<P>	<DD>　次章以降、ポリゴンの表面属性（プライオリティー、カラー、テクスチャーなど）を中心に、ゲーム開発には必要不可欠な背景スクロール、文字数字の描画、入出力制御、などの解説を行います。</P>
+
+ 
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p05_10.htm">戻る</A>｜<A HREF="p06_10.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,165 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;21/30&gt;SGL Programmer's Tutorial/8-11.プライオリティ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<a href="p08_a0_j.htm">戻る</A>｜<a href="p08_c0_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no8_b0"></A>
+  <P><DT><H3>8-11. プライオリティ</H3>
+     <DD>　セガサターンでは、描画する全ての面種に対してプライオリティと呼ばれる描画優先順位を設定することが可能です。プライオリティを使用することにより、例えば複数のスクロール面を背景用と文字表示用に分けて描画し、
+	間に３Ｄポリゴン面を挟み込んだりすることが可能になります。ただし、バック画面は常に最背面に描画されます。</P>
+
+<A NAME="z8_28"></A>
+  <P ALIGN=CENTER><B>図8-28　プライオリティイメージ</B><BR>
+  <img srcset="../grp/p08_61_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+
+  <P><DD>　ＳＧＬでスクロールに対してプライオリティを設定するには、スクロール面種に対応したライブラリ関数“slPriorityNbg0〜3”、“slPriorityRbg0”を使用してください。</P>
+
+  <P><DT><B>【void slPriorityNbg0〜3 ( Uint16 priority_num ) ;】</B>
+     <DT><B>【void slPriorityRbg0 ( Uint16 priority_num ) ;】</B>
+     <DD>　それぞれのスクロール面に対して、プライオリティを設定します。<BR>
+	パラメータにはプライオリティ番号と呼ばれる０〜７までの値を代入します。<BR>
+	プライオリティ番号がより大きな値であるほどスクロール面は前面に描画されます。<BR>
+	また、０が指定された場合、そのスクロール面は透明として扱われ実際は描画されません。<BR>
+	複数の面種に同じプライオリティ番号を割り振った場合のプライオリティは、下図を参照してください。</P>
+
+<A NAME="z8_29"></A>
+	<P>	<DD><B>図8-29　プライオリテイ番号が等しい場合のプライオリティ＞</B>
+		<DD>
+<PRE>
+●　プライオリティ番号が等しい場合のプライオリティ　●
+
+<H2>SPRITE＞RBG0＞NBG0＞NBG1＞NBG2＞NBG3</H2>
+<H3>高い(前面)←−−−−−−−−−−−→低い(背面)</H3>
+
+			<B>注）</B>POLYGONは、SPRITEに含まれます。
+</PRE>
+  <P><DD>
+
+  <P>　また、ＳＧＬではデフォルト状態で、各描画面に対して次のようにプライオリティを割り振ってあります。</P>
+
+<A NAME="t8_25"></A>
+	<P>	<DD><B>表8-25　デフォルト状態での各描画面のプライオリティ</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH ROWSPAN=2></TH><TH COLSPAN=8>プライオリティナンバー</TH></TR>	
+	<TR ALIGN=CENTER><TH>　７　</TH><TH>　６　</TH><TH>　５　</TH><TH>　４　</TH><TH>　３　</TH><TH>　２　</TH><TH>　１　</TH><TH>　０　</TH></TR>
+	<TR ALIGN=CENTER><TH>描　画　面</TH><TD>NBG0</TD><TD>SPRITE</TD><TD>SPRITE</TD><TD>RGB0</TD><TD>NBG1</TD><TD>NBG2</TD><TD>NBG3</TD><TD>未設定</TD></TR>
+	</TABLE>
+	<B>注）</B>ポリゴン面はSPRITEに含まれます。</P>
+
+  <P>　次のサンプルプログラム（リスト8-9）はＳＧＬライブラリ関数“slPriorityNbg0〜3,Rbg0”を実際に使用して、スクロールのプライオリティ処理を実現したものです。</P>
+
+<A NAME="l8_9"></A>
+	<P ALIGN=CENTER><B>リスト8-9　sample_8_11：スクロールの表示優先</B>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Scroll Priority Change						*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+#include	"ss_scrol.h"
+
+#define		NBG1_CEL_ADR		( VDP2_VRAM_B1 + 0x02000 )
+#define		NBG1_MAP_ADR		( VDP2_VRAM_B1 + 0x12000 )
+#define		NBG1_COL_ADR		( VDP2_COLRAM + 0x00200 )
+#define		RBG0_CEL_ADR		VDP2_VRAM_A0
+#define		RBG0_MAP_ADR		VDP2_VRAM_B0 
+#define		RBG0_PAR_ADR		( VDP2_VRAM_A1 + 0x1fe00 )
+#define		BACK_COL_ADR		( VDP2_VRAM_A1 + 0x1fffe )
+
+void ss_main(void)
+{
+	Uint16 PryNBG = 4 , PryRBG = 1, PryWRK;
+	FIXED yama_posx = SIPOSX , yama_posy = SIPOSY;
+	ANGLE ascii_angz = DEGtoANG(0.0);
+
+	slInitSystem(TV_320x224,NULL,1);
+	slTVOff();
+	slPrint("Sample program 8.11" , slLocate(9,2));
+
+	slColRAMMode(CRM16_1024);
+	slBack1ColSet((void *)BACK_COL_ADR , 0);
+
+	slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageNbg1((void *)NBG1_CEL_ADR , 0 , PNB_1WORD|CN_12BIT);
+	slPlaneNbg1(PL_SIZE_1x1);
+	slMapNbg1((void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR);
+	Cel2VRAM(yama_cel , (void *)NBG1_CEL_ADR , 31808);
+	Map2VRAM(yama_map , (void *)NBG1_MAP_ADR , 32 , 16 , 1 , 256);
+	Pal2CRAM(yama_pal , (void *)NBG1_COL_ADR , 256);
+
+	slRparaInitSet((void *)RBG0_PAR_ADR);
+	slCharRbg0(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageRbg0((void *)RBG0_CEL_ADR , 0 , PNB_1WORD|CN_10BIT);
+	slPlaneRA(PL_SIZE_1x1);
+	sl1MapRA((void *)RBG0_MAP_ADR);
+	slOverRA(2);
+	Map2VRAM(ascii_map ,(void *)RBG0_MAP_ADR , 32 , 4 , 0 , 0);
+
+	slScrPosNbg1(yama_posx , yama_posy);
+	slDispCenterR(toFIXED(160.0) , toFIXED(112.0));
+	slLookR(toFIXED(128.0) , toFIXED(24.0));
+
+	slPriorityNbg1(PryNBG);
+	slPriorityRbg0(PryRBG);
+
+	slScrAutoDisp(NBG0ON | NBG1ON | RBG0ON);
+	slTVOn();
+
+	while( 1 ){
+		if(yama_posx >= (SX + SIPOSX)) {
+			PryWRK = PryNBG;
+			PryNBG = PryRBG;
+			PryRBG = PryWRK;
+			slPriorityNbg1(PryNBG);
+			slPriorityRbg0(PryRBG);
+			yama_posx = SIPOSX;
+		}
+
+		slScrPosNbg1(yama_posx , yama_posy);
+		yama_posx += POSX_UP;
+
+		slZrotR( ascii_angz );
+		ascii_angz += DEGtoANG(1.0);
+
+		slSynch();
+	} 
+}
+</PRE>
+
+<A NAME="f8_13"></A>
+  <H4>フロー8-13　sample_8_11：スクロールの表示優先</H4>
+  <img srcset="../grp/p08_63_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];">
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p08_a0_j.htm">戻る</A>｜<a href="p08_c0_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,446 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;25/31&gt;SCU User's Manual/5.DSP Instruction Details</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p04_54.htm">Back</a> ｜ <A HREF="p04_56.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 4 DSP Control</b><H2 ALIGN=CENTER> Load Immediate instruction</H2><HR NOSHADE>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="p04_54.htm#d1bus_mov_sd">Back</a> | <A HREF="#mvi_imm_d_z">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d]</H1><DD><H3> Unconditional transfer (Imm→[destination])</H3><P><DT> <B>Operation details</b><DD> Transfers Imm data unconditionally to the RAM or register specified by [destination].<BR>
+ Imm data is signed 25-bit data.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination]<DD> Destination=MC0～MC3 <A HREF="#c1"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>24</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 0</TD><TD COLSPAN=25> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c1"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3), and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_z"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d">Back</a> | <A HREF="#mvi_imm_d_nz">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],Z</H1><DD><H3> Conditional transfer (Z=1 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When the Z flag is 1, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19-bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],Z<DD> Destination=MC0～MC3 <A HREF="#c2"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c2"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3), and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_nz"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d_z">Back</a> | <A HREF="#mvi_imm_d_s">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],NZ</H1><DD><H3> Conditional transfer (Z=0 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When the Z flag is 0, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19-bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],NZ<DD> Destination=MC0～MC3 <A HREF="#c3"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c3"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3), and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_s"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d_nz">Back</a> | <A HREF="#mvi_imm_d_ns">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],S</H1><DD><H3> Conditional transfer (S=1 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When the S flag is 1, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19-bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],S<DD> Destination=MC0～MC3 <A HREF="#c4"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c4"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3) and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_ns"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d_s">Back</a> | <A HREF="#mvi_imm_d_c">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],NS</H1><DD><H3> Conditional transfer (S=0 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When the S flag is 0, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],NS<DD> Destination=MC0～MC3 <A HREF="#c5"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c5"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3) and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_c"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d_ns">Back</a> | <A HREF="#mvi_imm_d_nc">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],C</H1><DD><H3> Conditional transfer (C=1 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When the C flag is 1, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],C<DD> Destination=MC0～MC3 <A HREF="#c6"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c6"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3) and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_nc"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d_c">Back</a> | <A HREF="#mvi_imm_d_t0">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],NC</H1><DD><H3> Conditional transfer (C=0 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When the C flag is 0, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],NC<DD> Destination=MC0～MC3 <A HREF="#c7"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c7"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3) and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_t0"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d_nc">Back</a> | <A HREF="#mvi_imm_d_nt0">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],T0</H1><DD><H3> Conditional transfer (T0=1 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When the T0 flag is 1, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],T0<DD> Destination=MC0～MC3 <A HREF="#c8"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c8"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3) and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_nt0"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d_t0">Back</a> | <A HREF="#mvi_imm_d_zs">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],NT0</H1><DD><H3> Conditional transfer (T0=0 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When the T0 flag is 0, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],NT0<DD> Destination=MC0～MC3 <A HREF="#c9"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c9"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3) and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_zs"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d_nt0">Back</a> | <A HREF="#mvi_imm_d_nzs">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],ZS</H1><DD><H3> Conditional transfer (Z=1 or S=1 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When the Z flag or S flag is 1, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],ZS<DD> Destination=MC0～MC3 <A HREF="#c10"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c10"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3) and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="mvi_imm_d_nzs"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#load">List</a> | ▲ <A HREF="#mvi_imm_d_zs">Back</a> | <A HREF="p04_56.htm#dma_d0_ram_simm">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MVI Imm,[d],NZS</H1><DD><H3> Conditional transfer (Z=S=0 then Imm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> When both the Z flag and S flag are 0, Imm data is transferred to the RAM or register specified by [destination].<BR>
+ Imm data is signed 19bit data.</BR>
+ It can also be used to execute a subroutine program by saving the value of the PC (jump destination address at the end of the subroutine) to TOP and transferring the Imm data (subroutine start address) to the PC (see instruction code <B>* *</b> ). Please note that in this case, the address next to this instruction will be executed twice, once before and after the subroutine execution.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MVI Imm,[Destination],NZS<DD> Destination=MC0～MC3 <A HREF="#c11"><B>*</b></a> ,RX,PL,RA0,WA0,LOP,PC</P>
+<P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TH>29</TH><TH>28</TH><TH>27</TH><TH>26</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>18</TD><TD>　</TD><TD>　</TD>
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD COLSPAN=19> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH><TH> bit29</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [PC]→[TOP],[PC]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> unused</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<A NAME="c11"></A><P><DT> <B>remarks</b><DD> *[MCx(x=0~3)] specifies DATA RAMx(x=0~3) and increments [CTx(x=0~3)] after transfer.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_54.htm">Back</a> ｜ <A HREF="p04_56.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

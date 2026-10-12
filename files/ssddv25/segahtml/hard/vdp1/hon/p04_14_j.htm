@@ -1,0 +1,218 @@
+﻿<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;15/54&gt;VDP1ユーザーズマニュアル/4.4　イレースライト</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p04_13_j.htm">戻る</A>｜
+     <a href="p04_15_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第４章　システムレジスタ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_40"></A>
+	<P>	<DT><H2>■4.4　イレースライト</H2>
+		<DD>　描画を開始する前に、スプライトICはフレームバッファの内容を消去します。この消去をイレースライトと呼び、消去するフィル領域とその領域に書き込むフィルデータを指定します。
+			イレースライトに関連するレジスタには、<A HREF="#no4_14_1">イレースライトデータレジスタ</A>、<A HREF="#no4_14_2">イレースライト左上座標レジスタ</A>、<A HREF="#no4_14_3">イレースライト右下座標レジスタ</A>の3つがあります。</P>
+
+<A NAME="no4_14_1"></A>
+	<P>	<DT><H2>■イレースライトデータレジスタ</H2>
+		<DD>　イレースライトデータレジスタ(EWDR、Erase write data register)は、イレースライトのときのフィルデータを定義します。書き込み専用の16bitのレジスタで、100006H番地にあります。
+		電源投入後またはリセット後は、値が不定になりますので、必ずフィルデータを設定してください。</P>
+
+	<P>	<DT><B>16bit/pixel時</B>
+		<DT><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH ROWSPAN=2><PRE>EWDR<BR>100006H<BR>(W)</TH>
+	<TH><PRE>bit15</TH><TH><PRE>bit14</TH><TH><PRE>bit13</TH><TH><PRE>bit12</TH><TH><PRE>bit11</TH><TH><PRE>bit10</TH><TH><PRE>bit９</TH><TH><PRE>bit８</TH>
+	<TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+	<TR ALIGN=CENTER>
+	<TD COLSPAN=16>イレースライトデータ</TD>
+	</TR></TABLE></P>
+
+	<P>	<DT><B>8bit/pixel時</B>
+		<DT><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH ROWSPAN=2><PRE>EWDR<BR>100006H<BR>(W)</TH>
+	<TH><PRE>bit15</TH><TH><PRE>bit14</TH><TH><PRE>bit13</TH><TH><PRE>bit12</TH><TH><PRE>bit11</TH><TH><PRE>bit10</TH><TH><PRE>bit９</TH><TH><PRE>bit８</TH>
+	<TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+	<TR ALIGN=CENTER>
+	<TD COLSPAN=8>偶数X座標イレースライトデータ</TD><TD COLSPAN=8>奇数X座標イレースライトデータ</TD>
+	</TR></TABLE></P>
+
+	<P><DT><B>イレースライトデータ:</B>　erase write data、bit15〜0
+	<DD>　フレームバッファにパーツを描画するとき、VDP1は自動的にフレームバッファを消去します。この消去(イレースライト)時にイレースライトデータレジスタに設定した16bitのデータがフレームバッファに満たされ(フィルされ)ます。</P>
+
+	<P><DD>　フレームバッファへの描画が8bit/pixel(ハイレゾリューションまたは回転8)のときは2pixelずつイレースライトされることになります。<BR>
+		　イレースライトする領域はイレースライト左上座標レジスタ、イレースライト右下座標レジスタで設定されます。</P>
+
+<A NAME="no4_14_2"></A>
+	<P><DT><H2>■イレースライト左上座標レジスタ</H2>
+	<DD>　イレースライト左上座標レジスタ(EWLR、Erase write left coordinate　register)は、イレースライト領域の左上座標を設定します。書き込み専用の16bitのレジスタで、100008H番地にあります。
+		電源投入後またはリセット後は、値が不定になりますので、必ず座標を設定してください。未使用ビットは0に設定してください。</P>
+
+		<DT><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH ROWSPAN=2><PRE>EWLR<BR>100008H<BR>(W)</TH>
+	<TH><PRE>bit15</TH><TH><PRE>bit14</TH><TH><PRE>bit13</TH><TH><PRE>bit12</TH><TH><PRE>bit11</TH><TH><PRE>bit10</TH><TH><PRE>bit９</TH><TH><PRE>bit８</TH>
+	<TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+	<TR ALIGN=CENTER>
+	<TD>0</TD><TD COLSPAN=6>左上座標X1</TD><TD COLSPAN=9>左上座標Y1</TD>
+	</TR></TABLE></P>
+
+	<P>	<DT><B>イレースライト左上座標X1:</B>　bit14〜9
+		<DT><B>イレースライト左上座標Y1:</B>　bit8〜0</P>
+
+<A NAME="no4_14_3"></A>
+	<P>	<DT><H2>■イレースライト右下座標レジスタ</H2>
+		<DD>　イレースライト右上座標レジスタ(EWRR、Erase write right coordinate　register)は、イレースライト領域の右下座標を設定します。書き込み専用の16ビットのレジスタで、10000AH番地にあります。
+		電源投入後またはリセット後は、値が不定になりますので、必ず座標を設定してください。</P>
+
+
+		<DT><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH ROWSPAN=2><PRE>EWRR<BR>10000AH<BR>(W)</TH>
+	<TH><PRE>bit15</TH><TH><PRE>bit14</TH><TH><PRE>bit13</TH><TH><PRE>bit12</TH><TH><PRE>bit11</TH><TH><PRE>bit10</TH><TH><PRE>bit９</TH><TH><PRE>bit８</TH>
+	<TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+	<TR ALIGN=CENTER>
+	<TD COLSPAN=7>右下座標X3</TD><TD COLSPAN=9>右下座標Y3</TD>
+	</TR></TABLE></P>
+
+	<P>	<DT><B>イレースライト右下座標X3:</B>　bit15〜9
+		<DT><B>イレースライト右下座標Y3:</B>　bit8〜0</P>
+
+	<P>	<DT><UL TYPE=DISC>
+		<LI>イレースライト時、フレームバッファのフィル領域を指定します。</P>
+
+	<P>	<LI>X座標は、16bit/pixel(ノーマル、回転16、HDTV)のとき8pixel単位、8bit/pixel(ハイレゾリューション、回転8)のとき16pixel単位で設定します。システムレジスタの値が1のとき8または16となります。<BR>
+		実際の右下のX座標は、レジスタ設定値を8、16倍して1を引いた値になります。</P>
+
+	<P>	<LI>Y座標は1ライン単位で設定します。倍密インタレースのときY座標のレジスタ設定値の2倍になるので、実際の座標値の1/2を設定してください。例えば、設定値223のとき、座標値は447になります。</P>
+
+	<P>	<LI>実際のX座標はつぎの式で表されます。</UL></P>
+
+	<DL>
+	<P>	<DT><B>16bit/pixel時</B>
+		<DD>左上座標X1=レジスタ設定値×8
+		<DD>右下座標X3=レジスタ設定値×8−1</P>
+
+	<P>	<DT><B>8bit/pixel時</B>
+		<DD>左上座標X1=レジスタ設定値×16
+		<DD>右下座標X3=レジスタ設定値×16−1</P></DL>
+
+	<P>	<DD>　したがって、左上座標X1、右下座標X3の取りうる値は以下のとおりです。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR ALIGN=CENTER><TD ROWSPAN=3><PRE>システム<BR>レジスタの値</TD><TD ROWSPAN=2 COLSPAN=2><PRE>16bit／pixel</TD><TD COLSPAN=4><PRE>8bit／pixel</TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=2><PRE>ハイレゾリューション</TD><TD COLSPAN=2><PRE>回転8</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>左上座標X1</TD><TD><PRE>右下座標X3</TD><TD><PRE>左上座標X1</TD><TD><PRE>右下座標X3</TD><TD><PRE>左上座標X1</TD><TD><PRE>右下座標X3</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>設定禁止</TD><TD><PRE>0</TD><TD><PRE>設定禁止</TD><TD><PRE>0</TD><TD><PRE>設定禁止</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>8</TD><TD><PRE>7</TD><TD><PRE>16</TD><TD><PRE>15</TD><TD><PRE>16</TD><TD><PRE>15</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>16</TD><TD><PRE>15</TD><TD><PRE>32</TD><TD><PRE>31</TD><TD><PRE>32</TD><TD><PRE>31</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>31</TD><TD><PRE>248</TD><TD><PRE>247</TD><TD><PRE>496</TD><TD><PRE>495</TD><TD><PRE>496</TD><TD><PRE>495</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>32</TD><TD><PRE>256</TD><TD><PRE>255</TD><TD><PRE>512</TD><TD><PRE>511</TD><TD><PRE>設定禁止</TD><TD><PRE>511</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>33</TD><TD><PRE>264</TD><TD><PRE>263</TD><TD><PRE>528</TD><TD><PRE>527</TD><TD><PRE>設定禁止</TD><TD><PRE>設定禁止</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>40</TD><TD><PRE>320</TD><TD><PRE>319</TD><TD><PRE>640</TD><TD><PRE>639</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>43</TD><TD><PRE>344</TD><TD><PRE>343</TD><TD><PRE>688</TD><TD><PRE>687</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>44</TD><TD><PRE>352</TD><TD><PRE>351</TD><TD><PRE>704</TD><TD><PRE>703</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>62</TD><TD><PRE>496</TD><TD><PRE>495</TD><TD><PRE>992</TD><TD><PRE>991</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>63</TD><TD><PRE>504</TD><TD><PRE>503</TD><TD><PRE>1008</TD><TD><PRE>1007</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>64</TD><TD><PRE>設定禁止</TD><TD><PRE>511</TD><TD><PRE>設定禁止</TD><TD><PRE>1023</TD><TD><PRE>：</TD><TD><PRE>：</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>65〜</TD><TD><PRE>設定禁止</TD><TD><PRE>設定禁止</TD><TD><PRE>設定禁止</TD><TD><PRE>設定禁止</TD><TD><PRE>設定禁止</TD><TD><PRE>設定禁止</TD></TR>
+	</TABLE></P>
+
+	<P>	<DT><UL TYPE=DISK>
+	<P>	<LI>イレースライトの座標のチェックは行いませんので、あらかじめCPUでX1＜X3、Y1≦Y3となるよう設定してください。</P>
+	<P>	<LI>各TVモードにおけるイレースライト範囲は、それぞれのメモリマップの範囲内を設定してください。</UL></P>
+
+<A NAME="z4_2"></A>
+	<P ALIGN=CENTER><B>図4.2　イレースライト領域</B><BR><img srcset="../grp/i048_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P>
+
+	<P>	<DT><UL TYPE="DISC">
+		<LI>X1≧X3、またはY1＞Y3に設定した場合は、</P>
+
+	<P>	<DD><B>ノーマル、ハイレゾリューション時　→　1ドット
+		<DD>回転・ＨＤＴＶ時　→　8ドット</B></P>
+
+	<P>	<DT>　のイレースライトが行われます。この場合、領域は(X1, Y1)、（X3＝X1＋1, Y3＝Y1）、に設定されたと仮定してイレースライトを行います。</P>
+
+	<P>	<LI>ノーマル、ハイレゾリューションで、VBE＝0のときのイレースライトは、表示期間中にフレームバッファーをはみ出してイレースライトを行います。X3座標を表示画面を超えて設定した場合は、有効データの最終(HTIMの立ち下がり)以降、
+		ノーマル時4pixel、ハイレゾリューション時8pixelイレースライトが継続され、それ以外の表示画面外ではイレースライトは行われません。</P>
+
+	<P>	<LI>イレースライト範囲を表示画面内に設定した場合は、表示範囲外のイレースライトはまったく行われません。</P>
+
+	<P>	<LI>イレースライトはクリッピングの影響を受けません。</P>
+
+	<P>	<LI>HDTV、フレームバッファの拡大縮小、回転表示時には、表示中にフレームバッファのイレースライトを行うことができません。この場合イレースライトは垂直帰線期間(V＿BLANK)に行うため、時間が不足し、画面全体をイレースライトすることはできません。
+		全画面をイレースライトしたいときは、未消去部分を描画開始時にポリゴンで埋める必要があります。</P>
+
+	<P>	<LI>Vブランクイレースに必要なピクセル数は</P>
+
+	<P>	<DD><B>(X3−X1＋1)×（Y3−Y1＋1）×8</B></P>
+
+	<P>	<DT>で表わされます。これがVブランクイレースに使用できるピクセル数以内なら、イレースライトが完了します。</P>
+
+	<P>	<LI>Vブランクイレースに使用できるピクセル数は</P>
+
+	<P>	<DD><PRE><B>{(1ラスター中のピクセル数)−200 ｝×｛(1フィールド中のラスター数)−(表示ラスター数)｝</B></PRE></P>
+
+	<P>	<DT>となります。それぞれの値は次のとおりです。</P>
+	</UL>
+
+<A NAME="t4_4"></A>
+	<P>	<DD><B>表4.4　ラスター数とピクセル数</B>
+		<DD><TABLE BORDER>
+	<TR><TD><PRE>画面モード</TD><TD><PRE>横ピクセル数</TD><TD><PRE>1ラスター中<BR>のピクセル数</TD><TD><PRE>1フィールド中<BR>のラスター数</TD></TR>
+	<TR><TD><PRE>NTSC</TD><TD><PRE>320</TD><TD><PRE>1708</TD><TD><PRE>263</TD></TR>
+	<TR><TD><PRE>PAL</TD><TD><PRE>352</TD><TD><PRE>1820</TD><TD><PRE>313</TD></TR>
+	<TR><TD><PRE>31KC</TD><TD><PRE>−</TD><TD><PRE>852</TD><TD><PRE>525</TD></TR>
+	<TR><TD><PRE>HDTV</TD><TD><PRE>−</TD><TD><PRE>848</TD><TD><PRE>562</TD></TR>
+	</TABLE></P>
+
+<A NAME="t4_5"></A>
+	<P>	<DD><B>表4.5　Vブランクイレースに使用できるピクセル数(ノンインタレース時)</B>
+	<TABLE BORDER=1>
+	<TR><TD><PRE>画面モード</TD><TD><PRE>解像度（横×縦）</TD><TD><PRE>使用できるピクセル数</TD></TR>
+	<TR><TD ROWSPAN=4><PRE>NTSC</TD><TD><PRE>320×224</TD><TD><PRE>58812</TD></TR>
+	<TR><TD><PRE>320×240</TD><TD><PRE>34684</TD></TR>
+	<TR><TD><PRE>352×224</TD><TD><PRE>63180</TD></TR>
+	<TR><TD><PRE>352×240</TD><TD><PRE>37260</TD></TR>
+	<TR><TD ROWSPAN=6><PRE>PAL</TD><TD><PRE>320×224</TD><TD><PRE>134212</TD></TR>
+	<TR><TD><PRE>320×240</TD><TD><PRE>110084</TD></TR>
+	<TR><TD><PRE>320×256</TD><TD><PRE>85956</TD></TR>
+	<TR><TD><PRE>352×224</TD><TD><PRE>144180</TD></TR>
+	<TR><TD><PRE>352×240</TD><TD><PRE>118260</TD></TR>
+	<TR><TD><PRE>352×256</TD><TD><PRE>92340</TD></TR>
+	<TR><TD><PRE>31KC</TD><TD><PRE>320×480</TD><TD><PRE>29340</TD></TR>
+	<TR><TD><PRE>HDTV</TD><TD><PRE>352×480</TD><TD><PRE>53136</TD></TR>
+	</TABLE></P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p04_13_j.htm">戻る</A>｜
+     <a href="p04_15_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,27 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p064.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p066.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H4> (3) Transfer function settings </H4>
+<DD> When transferring the data of stream B to read_buf using the function “decodeFunc” in program (1), change as follows. <P>
+(a) Change STM_SetTrBuf in the dotted line part to STM_SetTrFunc. <P>
+STM_SetTrFunc(b_stm, decodeFunc, read_buf);<P>
+This causes decodeFunc to be invoked each time the server function STM_ExecServer tries to transfer stream B data. <P>
+(b) “decodeFunc” is as follows. <P>
+Uint8 read_buf [READBUF_SIZE]; <P>
+<TABLE> <TD> <PRE> Sint32 decodeFunc (void * obj, StmHn stm, Sint32 nsct) <BR> {<BR> Sint32 i; <BR> Sint32 read_len; / * Number of longwords transferred by subFunc <BR> Sint32 nlongword; / * Number of transfer long words <BR> Uint32 * src; / * Source address <BR> Sint32 dadr; / * Address / change for each longword transfer <BR> Uint32 * buffer; / * Transfer area </TD> <TD> <BR> <BR> <BR> * / <BR> * / <BR> * / <BR> * / <BR> * / </TD> <TR>
+<TD> / * Conversion from number of sectors to number of words (called before transfer starts) <BR> nlongword = STM_SctToWord (stm, nsct) / 2; </TD> <TD> * / <BR> </TD> <TR>
+<TD> <PRE> src = STM_StartTrans (stm, & dadr); / * Start transfer </TD> <TD> * / </TD> <TR>
+<TD> <PRE> buffer = (Uint8 *) obj; / * The third argument of STM_SetTrFunc is passed to obj </TD> <TD> * / </TD> <TR>
+<TD> <PRE> for (i = 0; i <nlongword; i + = read_len) {<BR> / * Function that returns the number of expanded bytes <BR> buffer + = subFunc (src, dadr, buffer, & read_len) ; <BR> src + = read_len * dadr; <BR>} <BR> return (nsct); / * returns the number of transferred sectors <BR>} </TD> <TD> <BR> * / <BR> <BR> <BR> <BR> * / <BR> </TD> </TABLE>
+<PRE> (c) Must be transferred in units of sectors.
+(d) If data transfer has not been completed when decodeFunc ends, (-1) must be returned.
+In this case, other streams cannot be transferred until the data transfer is completed. Once you ’ve transferred the data,
+Returns the number of transferred sectors. During this time, do not call STM_StartTrans. </PRE><P>
+</DL><P><P><HR>
+<A HREF=p064.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p066.htm> Go to next page </A>
+</BODY>
+</HTML>

@@ -1,0 +1,112 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/12&gt;FAQ/Sound related/Sound driver</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no6">Sound related</a><HR>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Sound related</b><H2 ALIGN=CENTER> sound driver</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_01"><HR></a><DL>
+<H3> Releases are interrupted after version 2.10.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If you use SoundDriver 2.10 to play data that had no problems with SoundDriver 2.04, the tone release will be interrupted.<P><DT> <FONT SIZE=5>A)</font><DD> The data created between sound driver versions 2.04 and 2.10 is not compatible.<BR>
+ Please use the Ver 2.04 driver to play data created with the Ver 2.04 sound development environment.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_02"><HR></a><DL>
+<H3> Dynamic filter doesn't work.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Even if I create a dynamic filter .EXB file using Linker or eLinker and try to play it on a sound simulator (on CartDev) or an actual device such as P-Box, the dynamic filter does not work.<BR>
+ If I use "Link" and "Down Load" from the Process menu on Linker, the filter works, but when I use "Change Mixer" in SndSim's sound simulator, it stops playing again.<BR>
+ Does Linker and eLinker perform any special processing? Or is there a regulation regarding the arrangement of BOOOH to 80000H in sound memory due to the Coef Table?<P><DT> <FONT SIZE=5>A)</font><DD> This is a bug in the sound driver where the transfer size of the coefficient table = A00H was not actually sent for A00H, and this has been fixed in Ver2.10 and later.<BR>
+ When modifying the source code, modify "D-Filter CPU control" in TRGT.ASM.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_03"><HR></a><DL>
+<H3> Sequence fade processing does not work properly</H3><P><DT> <FONT SIZE=5>Q)</font><DD> It works fine until I want the sound sequence to fade out, but then I can't make it fade in.<P><DT> <FONT SIZE=5>A)</font><DD> If the sound driver version is 2.04, there is a bug where fade processing does not work properly if the pronunciation management number is other than 0, so this seems to be the cause.<BR>
+ Please use version 2.08, which is provided separately with bug fixes.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_04"><HR></a><DL>
+<H3> BGM volume decreases</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I'm having trouble with the sound volume.<BR>
+ If you call SE while BGM is playing, the BGM volume will be reduced for a while.<BR>
+ I'm having trouble hearing the background music when I frequently play SE.<BR>
+ I'm using SGL.<BR>
+ The sound driver used is 25488 bytes as of October 27, 1995 at 18:00.<P><DT> <FONT SIZE=5>A)</font><DD> The above driver is old, Ver. 2.00, and this version has some problems.<BR>
+ The latest version, Ver 2.10, which has resolved these issues, has been uploaded to Nifty, so please try it here.<BR>
+ If you have a problem with Ver. 2.10, we will provide Ver. 2.08, which is provided as an individual response.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_05"><HR></a><DL>
+<H3> I can't set the sequence volume.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> It often happens that the sequence volume setting does not output the volume as set.<BR>
+ Change the sequence volume and fade out while BGM is playing using sound management number 0.<BR>
+ Under these conditions, if you set the sequence volume to maximum (127) and start the sequence, the sequence volume will not be reset and the music will play at the volume at the moment the volume was set.<BR>
+ When the fade-out is reached, there is no output at all, and if you make changes during the fade, the volume stops at the fade-out level.<BR>
+ I thought that the command could be overwritten to the sound driver, so I took measures to reduce the frequency of issuing commands, but the problem persists.<BR>
+ Actually, 8 buffer work commands (0x25a00700-0x25a007ff) are issued as many as 0.<BR>
+ If I knew the current volume from the sound driver side, I could take measures to reset it, but since I can't find any such work, I can't take a complete solution.<BR>
+ Ver. 2.10 has severe sound lag, so we are currently refraining from using it, so we have not confirmed this phenomenon.<P><DT> <FONT SIZE=5>A)</font><DD> The above phenomenon has been confirmed to be a bug in Ver 2.04.<BR>
+ The specifications are the same as Ver. 2.04, but Ver. 2.08, which fixes this bug, is provided separately.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_06"><HR></a><DL>
+<H3> If you fade pronunciation control number 0, the sounds of other control numbers will gradually become quieter.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If you specify fade rate with SND_SetSeqVl() and fade out for pronunciation control number 0, the volume of subsequent sequence playback for pronunciation control numbers 1-7 will change even if you specify the volume each time. Regardless, it will gradually become smaller.<BR>
+ If I play the song again with pronunciation control number 0, it seems to return to normal.<P><DT> <FONT SIZE=5>A)</font><DD> This is due to a bug in sddrv 2.01, so we are separately providing sddrv 2.08, a bug-fixed version of 2.04.<BR>
+ Try this.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_07"><HR></a><DL>
+<H3> No longer produces sound in Ver2.00->Ver2.10</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I upgraded the sound driver from Ver. 2.00 to Ver. 2.10, there was no sound during sequence playback.<P><DT> <FONT SIZE=5>A)</font><DD> Possible causes include:</P>
+<DL>
+<P><DT> <B>1) Possible causes on the program side ~</b><UL TYPE=DISC>
+<P><LI> The size specification of the driver being transferred during sound initialization with "SND_Init()" and "slInitSound()" has not been changed.</P>
+</UL>
+<P><DT> <B>2) Possible causes on the data creation side ~</b><UL TYPE=DISC>
+<P><LI> Ver 2.10 analyzes the voice data at the bank change (control 32) timing and sets the flag bit to 0 for PCM and 1 for FM, which was incomplete in the previous sound driver. To do. Normally, this process should be set up in advance when creating data, but the current tone editor does not include this process, so please wait until the next version of the tone editor is updated.<BR>
+ Therefore, please be careful to strictly observe the following points when creating data.</P>
+<P><OL>
+<B><LI></b> Never create a voice without at least one layer.<B><LI></b> Do not create layers that do not have waveform data assigned to them.<B><LI></b> Be sure to send a bank change when editing FM.<B><LI></b> FM and PCM cannot be mixed in the same layer.</OL>
+</P>
+<P><LI> The sound driver version 2.10 and earlier was designed to set bank=0 when a non-existent bank was selected, but this caused frequent problems when incorporated into games, so from this version bank numbers are no longer set for such cases. (For example, suppose you create a sound effect for bank 1 and create a map without sending bank 0 to the sound simulator.)<BR>
+ At this time, the program knows that this is an error, but since it sets bank=0, the pronunciation appears to be correct at first glance.<BR>
+ If you incorporate data created in this way into a game, it will cause unexpected problems.)</P>
+</UL>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_08"><HR></a><DL>
+<H3> sound driver modification</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I modified the sound driver source, reassembled it, and tried to link it, but I couldn't find "dsp3d.asm".<BR>
+ Could you please provide it?<P><DT> <FONT SIZE=5>A)</font><DD> Unfortunately, the source code of this YAMAHA 3D sound, the program coefficient data in the DSP, the contents of the work area, etc. cannot be made public due to a confidentiality agreement signed between Sega and Yamaha.<BR>
+ Additionally, reassembling or linking is not supported.<BR>
+ If you do not want to use 3D sound, please perform the following procedure: ``Delete the YAMAHA 3D sound part and reassemble.''</P>
+<DL>
+<P><DT> <B>Step 1</b><DD> Change the following parts in the source code of sound driver ver2.10</P>
+<P><PRE>
+"host.asm" line 930 extern xseq_YMH3Dw,dsp3d_init Delete one line of
+"host.asm" line 935 bsr xseq_YMH3Dw Delete one line of
+"host.asm" line 939 bsr dsp3d_init Delete one line of
+"sdmain.asm" line 146 extern dsp3d_init,dsp3d_op Delete from to line 217
+"sddrv.asm" line 33 extern dsp3d_op Delete one line of
+"sddrv.asm" line 51 bsr dsp3d_op Delete one line of
+"midi.asm" line 1384 extern xseq_YMH3Dw Delete one line of
+"midi.asm" line 1391 bsr xseq_YMH3Dw Delete one line of
+"midi.asm" line 1399 bsr xseq_YMH3Dw Delete one line of
+"midi.asm" line 1407 bsr xseq_YMH3Dw Delete one line of
+</PRE></P>
+<P><DT> <B>Step 2</b><DD> Remove "dsp3d.obj" from the link and re-link it.</P>
+</DL>
+<P> If you want to use 3D sound, you will need to obtain an assembler for the 68000 called ``2500AD'' that was used in the Mega Drive era. This is because (~.obj) cannot be linked without this. Please contact 2500AD (URL http://www.2500ad.com/) for information on how to obtain it.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no6">Sound related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,107 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;34/54&gt;VDP1 User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p06_36.htm">Back</a> ｜ <A HREF="p06_38.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 6 Command Table</b><HR NOSHADE>
+<DL>
+<A NAME="no6_37"></A><P><DT><H3> ■Color calculation</H3><A NAME="no6_37_1"></A><P><DT> <B>Color calculation bit:</b> color calculation bit, bits 2 to 0<BR>
+<DD> Specifies color operations for Gouraud shading, shadow, semi-brightness, and translucency.<BR>
+ The respective function of each bit is as follows.</P>
+<P><DD><TABLE BORDER>
+<TR><TD WIDTH=60><PRE> bit</TD><TD><PRE> function</TD></TR>
+<TR><TH> 2</TH><TD><PRE> Gouraud shading enable bit</TD></TR>
+<TR><TH> 1</TH><TD><PRE> Original picture 1/2 effective bit</TD></TR>
+<TR><TH> 0</TH><TD><PRE> Base 1/2 effective bit</TD></TR>
+</TABLE>
+</P>
+<P><DD> Performs color operations on the sprite or non-texture pixel data being drawn and the pixel data already drawn in the frame buffer.<BR>
+ Other than replacement and shadow color calculations, the color code of the original picture is valid only when it is an RGB code. Color operations can also be performed on color bank codes, but the results are not guaranteed.<BR>
+ For sprites, color operations can be performed when the color mode is mode 1 (lookup table mode) and the color code of the color lookup table is an RGB code, or when mode 5 (RGB mode) is selected. When non-textured, color calculations can be performed when the non-textured color is an RGB code.<BR>
+ In color calculations for parts with original pictures, the transparent code is valid when SPD=0, and the end code is valid when ECD=0, and color calculations are not performed for those pixels.<BR>
+ For color calculations on polygons, polylines, and lines, color calculations are valid only when the non-texture color is an RGB code.<BR>
+ Color calculations cannot be performed at 8bit/pixel (high resolution or rotation 8).</P>
+<A NAME="no6_37_2"></A><P><DT> <B>color calculation</b><BR>
+<DD> Color operations include replace, shadow, semi-brightness, semi-transparent, Gouraud shading, and Gouraud shading semi-brightness and Gouraud shading semi-transparent, which are a combination of the two. Here's how to specify them:<BR>
+<DD><TABLE BORDER>
+<TR><TH COLSPAN=3><PRE> color calculation<BR> bit</TH><TH WIDTH=60 ROWSPAN=2><PRE> Base<BR> MSB</TH><TH WIDTH=60 ROWSPAN=2><PRE> Original picture</TH><TH WIDTH=60 ROWSPAN=2><PRE> Base</TH><TH ROWSPAN=2><PRE> Types of color operations</TH><TH COLSPAN=2><PRE> Available modes</TH></TR>
+<TR><TH WIDTH=60><PRE> 2</TH><TH WIDTH=60><PRE> 1</TH><TH WIDTH=60><PRE> 0</TH><TH><PRE> Original picture</TH><TH><PRE> Base</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> −</TH><TH> 1</TH><TH> 0</TH><TD><PRE> replace</TD><TD><PRE> No limit</TD><TD ROWSPAN=><PRE> No limit</TD></TR>
+<TR><TH ROWSPAN=2> 0</TH><TH ROWSPAN=2> 0</TH><TH ROWSPAN=2> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD><PRE> Not rewritten</TD><TD ROWSPAN=2><PRE> No limit</TD><TD><PRE> No limit</TD></TR>
+<TR><TH> 1</TH><TH><PRE> 0*1</TH><TH> 1/2</TH><TD><PRE> shadow</TD><TD><PRE> RGB</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> −</TH><TH><PRE> 1/2</TH><TH> 0</TH><TD><PRE> half luminance</TD><TD><PRE> RGB</TD><TD><PRE> No limit</TD></TR>
+<TR><TH ROWSPAN=2> 0</TH><TH ROWSPAN=2> 1</TH><TH ROWSPAN=2> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD><PRE> replace</TD><TD ROWSPAN=2><PRE> RGB</TD><TD><PRE> No limit</TD></TR>
+<TR><TH> 1</TH><TH><PRE> 1/2</TH><TH><PRE> 1/2</TH><TH><PRE> half translucent</TD><TD><PRE> RGB</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> −</TH><TH><PRE> gouraud</TD><TH> 0</TH><TD><PRE> gouraud shading</TD><TD><PRE> RGB</TD><TD><PRE> No limit</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> −</TH><TH><PRE> −</TH><TH> −</TH><TD><PRE> Setting prohibited (please do not set)</TD><TD><PRE> −</TD><TD><PRE> −</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> −</TH><TH><PRE> gouraud 1/2</TH><TH> 0</TH><TD><PRE> Gouraud shading + half brightness *2</TD><TD><PRE> RGB</TD><TD><PRE> No limit</TD></TR>
+<TR><TH ROWSPAN=2> 1</TH><TH ROWSPAN=2> 1</TH><TH ROWSPAN=2> 1</TH><TH> 0</TH><TH><PRE> gouraud</TH><TH> 0</TH><TD><PRE> gouraud shading</TD><TD ROWSPAN=2><PRE> RGB</TD><TD><PRE> No limit</TD></TR>
+<TR><TH> 1</TH><TH><PRE> gouraud 1/2</TH><TH><PRE> 1/2</TH><TD><PRE> Gouraud shading + translucent *3</TD><TD><PRE> RGB</TD></TR>
+</TABLE>
+<DD><PRE> [Note]−: Don't care</TD>
+  Original picture: Pixel data to be drawn with sprite or non-texture</TD>
+  Base: pixel data already drawn in the frame buffer</TD>
+  *1: The original picture (transparent pixels and end code) will be referenced.</TD>
+  *2: After Gouraud operation, the data that has been saturated is halved.</TD>
+  *3: After the Gouraud operation, the base is added to the data that has undergone saturation processing, making it 1/2.</PRE></P><A NAME="no6_37_3"></A><P><DT> <B>Replace (color calculation mode = 0)</b><BR><DD> Replace does not perform color calculations. The parts to be drawn are written directly to the frame buffer.<BR> Pixel data already written to the framebuffer is not affected.<BR> Color calculations are not possible when using 8bit/pixel, so please specify replacement.</P><A NAME="no6_37_4"></A><P><DT> <B>Shadow (color calculation mode = 1)</b><BR><DD> Processing differs depending on the MSB of pixel data already drawn in the frame buffer. If the MSB of the frame buffer is 0, no color calculations are performed, including replacement, and the frame buffer remains as is.<BR> Shadowing occurs when the MSB of the frame buffer is 1.<BR> Shadows perform color operations on pixel data that has already been written to the frame buffer. For sprites, the target area on the frame buffer is determined from the character pattern and its drawing coordinates, and for non-textures, from the drawing coordinates. The brightness of the pixel data in the target area where the part is drawn and that has already been written to the frame buffer will be halved for each of R, G, and B.<BR> Shadows do not change the underlying MSB. Areas that were transparent remain transparent.</P><DD> Shadows reduce the brightness of pixels in the framebuffer by 1/2. If you want to reduce the brightness to 1/4, set the same command table twice on VRAM. If you want to set it to 1/8, set it 3 times.<BR> Please note that with shadows, calculations are performed on pixel data read from the writing coordinates of the original picture's pixel data, so the drawing speed will slow down. It takes 6 times as long as without color calculation.</P><A NAME="no6_37_5"></A><DT> <B>Half brightness (color calculation mode = 2)</b><BR><DD> Half-brightness reduces the brightness of each pixel data of the drawn part by half for R, G, and B.<BR> Pixel data already written to the framebuffer is not affected.</P><A NAME="no6_37_6"></A><DT> <B>Semi-transparent (color calculation mode = 3)</b><BR><DD> Processing differs depending on the MSB of the frame buffer. If the MSB of the frame buffer is 0, it will be replaced.<BR> If the MSB of the frame buffer is 1, it will be semi-transparent.<BR> For semi-transparent, 1/2 (average) of the sum of the original image and background data is written to the frame buffer.<BR> In the case of translucent color calculations, color calculations are performed on the pixel data of the original picture and the pixel data read from the writing coordinates. Please note that this will slow down the drawing speed. It takes 6 times as long as without color calculation.</P><A NAME="no6_37_7"></A><DT> <B>Gouraud shading (color calculation mode = 4)</b><BR><DD> Gouraud shading performs Gouraud shading processing using the RGB code set in the Gouraud shading table.<BR> Pixel data already written to the framebuffer is not affected.<BR> The Gouraud shading table address is specified by CMDGRDA (command table start address + 1CH).</P><A NAME="no6_37_8"></A><DT> <B>Gouraud shading half brightness (color calculation mode = 6)</b><BR><DD> Gouraud shading half-brightness combines Gouraud shading and half-brightness processing. After applying Gouraud shading to the parts, perform half-brightness processing.</P><DT> <B>Gouraud shading translucent (color calculation mode = 7)</b><BR><DD> Processing differs depending on the MSB of the frame buffer. If the MSB of the frame buffer is 0, it will be Gouraud shading.<BR> If the MSB of the frame buffer is 1, Gouraud shading becomes semi-transparent.</P><DD> Gouraud shading translucency combines Gouraud shading and translucency. After applying Gouraud shading to the parts, apply semi-transparency.</P><A NAME="no6_37_9"></A><DT> <B>Original picture</b><BR><DD> For parts (sprites) with original pictures, color calculations other than shadows are only valid in RGB mode (color mode 1, lookup table is RGB code, color mode 5). Results are not guaranteed when not in RGB mode (when using characters in color bank mode).<BR> In color calculations for parts with original pictures, the transparent code is enabled when SPD=0, and the end code is enabled when ECD=0, so color calculations are not performed for that pixel.<BR> If you perform color calculations other than shadows in RGB mode (color mode 5) and SPD=1, the results for pixels with the transparent color code (0000H) in the original picture are not guaranteed. Color calculations are performed assuming that it is black.<BR> If you perform color calculations other than shadows in RGB mode (color mode 5) and ECD=1, the result of the pixel with the end code (7FFFH) of the original picture is not guaranteed. Color calculations are performed assuming that it is white.<BR> Color operations other than shadows for polygons, polylines, and lines are valid only when the non-texture color is an RGB code.</P><A NAME="z6_15"></A><P><DD> <B>Figure 6.15 Example of color operation</b><PRE>
+┏ ━ ━ ━ ━ ━ ━ ┓ ┏━━━━━━━━━┓
+                ┃  MSB=0  ┃
+┃ ┌─────────┐ ┃ ┃(Pallets,┃
+  │         │   ┃   etc.) ┃
+┃ │Original │ ┃ ┃         ┃
+  │picture  │   ┠───base──┨
+┃ │         │ ┃ ┃  MSB=1  ┃
+  └─────────┘   ┃ (RGB,   ┃
+┃             ┃ ┃  etc.)  ┃
+                ┃         ┃
+┗ ━ ━ ━ ━ ━ ━ ┛ ┗━━━━━━━━━┛
+
+
+Color              Color              Color              Color 
+calculation        calculation        calculation        calculation
+mode = 0           mode = 1           mode = 2           mode = 3　
+┏━━━━━━━━━━━━━━━━┓ ┏━━━━━━━━━━━━━━━━┓ ┏━━━━━━━━━━━━━━━━┓ ┏━━━━━━━━━━━━━━━━┓
+┃                ┃ ┃                ┃ ┃                ┃ ┃                ┃
+┃ ┌────────────┐ ┃ ┃                ┃ ┃ ┌────────────┐ ┃ ┃ ┌────────────┐ ┃
+┃ │            │ ┃ ┃                ┃ ┃ │            │ ┃ ┃ │Replace     │ ┃
+┠─┤Replace     ├─┨ ┠─┬────────────┬─┨ ┠─┤Half        ├─┨ ┠─┼────────────┼─┨
+┃ │            │ ┃ ┃ │Shadow      │ ┃ ┃ │brightness  │ ┃ ┃ │Translucent │ ┃
+┃ └────────────┘ ┃ ┃ └────────────┘ ┃ ┃ └────────────┘ ┃ ┃ └────────────┘ ┃
+┃                ┃ ┃                ┃ ┃                ┃ ┃                ┃
+┗━━━━━━━━━━━━━━━━┛ ┗━━━━━━━━━━━━━━━━┛ ┗━━━━━━━━━━━━━━━━┛ ┗━━━━━━━━━━━━━━━━┛
+
+
+Color              Color              Color              Color 
+calculation        calculation        calculation        calculation
+mode = 4           mode = 5           mode = 6           mode = 7　
+┏━━━━━━━━━━━━━━━━┓ ┏ ━ ━ ━ ━ ━ ━ ━ ━┓ ┏━━━━━━━━━━━━━━━━┓ ┏━━━━━━━━━━━━━━━━┓
+┃                ┃ ┃                ┃ ┃                ┃ ┃                ┃
+┃ ┌────────────┐ ┃ ┃                ┃ ┃ ┌────────────┐ ┃ ┃ ┌────────────┐ ┃
+┃ │            │ ┃ ┃                ┃ ┃ │Gouraud     │ ┃ ┃ │Gouraud     │ ┃
+┠─┤Gouraud     ├─┨ ┃Settings        ┃ ┠─┤            ├─┨ ┠─┼────────────┼─┨
+┃ │            │ ┃ ┃prohibited      ┃ ┃ │+Half-      │ ┃ ┃ │Gouraud+    │ ┃
+┃ │            │ ┃ ┃                ┃ ┃ │brightness  │ ┃ ┃ │Translucent │ ┃
+┃ └────────────┘ ┃ ┃                ┃ ┃ └────────────┘ ┃ ┃ └────────────┘ ┃
+┃                ┃ ┃                ┃ ┃                ┃ ┃                ┃
+┗━━━━━━━━━━━━━━━━┛ ┗ ━ ━ ━ ━ ━ ━ ━ ━┛ ┗━━━━━━━━━━━━━━━━┛ ┗━━━━━━━━━━━━━━━━┛
+
+</PRE></DL><HR NOSHADE><B>▲ <A HREF="p06_36.htm">Back</a> ｜ <A HREF="p06_38.htm">Forward</a> ▼</b><HR><A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

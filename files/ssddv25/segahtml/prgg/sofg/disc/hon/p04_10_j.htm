@@ -1,0 +1,534 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 9&gt;DISCフォーマット規格仕様書/ブートシステム</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sofg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no4">DISCフォーマット規格仕様書</A>
+<HR>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>DISCフォーマット規格仕様書</B>
+<H2 ALIGN=CENTER>ブートシステム</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_11"></A>
+  <P><DT><H3>■システムエリア</H3>
+     <DD>　システムエリアとは、CD−ROMの最初に配置される領域です。<BR>
+　システムエリアには、アプリケーション起動用のシステム情報やイニシャルプログラムが書き込まれています。<BR>
+　これらをIP(Initial Program)としてシステムエリア内に連続に配置しなくてはなりません。<BR>
+　IPは、ブートコードとアプリケーションイニシャルプログラム(AIP)から構成されます。ブートコードには、ゲーム名などのIDやセキュリティコードが含まれます。AIPには、各イニシャルプログラムなどのコードが含まれます。</P>
+
+<A NAME="t4_1"></A>
+	<P>	<DD><B>表4.1　IPの構造</B>
+		<TABLE BORDER=1>
+	<TR><TH COLSPAN=3><PRE>構  造</TH><TH><PRE>サイズ</TH><TH><PRE>備  考</TH></TR>
+	<TR><TD ROWSPAN=4><PRE>IP</TD><TD ROWSPAN=3><PRE>BOOT CODE</TD><TD><PRE>SYSTEM ID</TD><TD><PRE>100H</TD><TD><PRE>ゲーム名、商品番号、バージョンなど</TD></TR>
+	<TR><TD><PRE>SECURITY CODE</TD><TD><PRE>D00H</TD><TD><PRE>セキュリティコード</TD></TR>
+	<TR><TD><PRE>AREA CODE GROUP</TD><TD><PRE>20H〜100H</TD><TD><PRE>エリアコードグループ</TD></TR>
+	<TR><TD COLSPAN=2><PRE>APLICATION INITIAL PROGRAM</TD><TD><PRE>100H〜71E0H</TD><TD><PRE>イニシャルプログラムやファイルシステムなど</TD></TR>
+	</TABLE></P>
+	<DD>(全体で1000H〜8000H)<P>
+
+<A NAME="no4_12"></A>
+  <P><DT><H3>■SYSTEM ID</H3>
+     <DD>　システムエリア内の最初に配置しておくデータです。</P>
+
+<A NAME="t4_2">
+	<P>	<DD><B>表4.2　SYSTEM IDの構造</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD><PRE>　　</TD>
+<TD><PRE> ０ </TD><TD><PRE> １ </TD><TD><PRE> ２ </TD><TD><PRE> ３ </TD><TD><PRE> ４ </TD><TD><PRE> ５ </TD><TD><PRE> ６ </TD><TD><PRE> ７ </TD><TD><PRE> ８ </TD><TD><PRE> ９ </TD><TD><PRE> Ａ </TD><TD><PRE> Ｂ </TD><TD><PRE> Ｃ </TD><TD><PRE> Ｄ </TD><TD><PRE> Ｅ </TD><TD><PRE> Ｆ </TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>00H</TD><TD COLSPAN=16><PRE><A HREF="#00_">ハードウェア識別子</A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>10H</TD><TD COLSPAN=16><PRE><A HREF="#01_">メーカーID</A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>20H</TD><TD COLSPAN=10><PRE><A HREF="#02_">商品番号</A></TD><TD COLSPAN=6><PRE><A HREF="#03_">バージョン</A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>30H</TD><TD COLSPAN=08><PRE><A HREF="#04_">リリース年月日</A></TD><TD COLSPAN=8><PRE><A HREF="#05_">デバイス情報</A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>40H</TD><TD COLSPAN=10><PRE><A HREF="#06_">対応エリアシンボル</A></TD><TD COLSPAN=6><PRE>スペース</A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>50H</TD><TD COLSPAN=16><PRE><A HREF="#07_">対応ペリフェラル</A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>60H</TD><TD ROWSPAN=07 COLSPAN=16><PRE><A HREF="#08_">ゲーム名</A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>70H</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>80H</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>90H</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>A0H</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>B0H</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>C0H</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>D0H</TD><TD COLSPAN=16><PRE>RESERVED</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>E0H</TD><TD COLSPAN=4><PRE><A HREF="#09_">IP SIZE</A></TD><TD COLSPAN=4><PRE>RESERVED</TD><TD COLSPAN=4><PRE><A HREF="#10_">STACK-M</A></TD><TD COLSPAN=4><PRE><A HREF="#11_">STACK-S</A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>F0H</TD><TD COLSPAN=4><PRE><A HREF="#12_">1st READ ADDRESS</A></TD><TD COLSPAN=4><PRE><A HREF="#13_">1st READ SIZE</A></TD><TD COLSPAN=4><PRE>RESERVED</TD><TD COLSPAN=4><PRE>RESERVED</TD></TR>
+	</TABLE></P>
+
+<A NAME="no4_13"></A>
+  <P><DT><H3>■SYSTEM IDの説明(記述原則)</H3>
+
+<A NAME="no4_131"></A>
+     <DT><B>　●使用可能文字</B>
+     <DD>　SYSTEM ID中で使用可能な文字は全てASCIIコードの英数字とする。但し項目によっては「. / - :」の使用を許可する。<BR>　また、特に指示のない限り全て大文字・小文字とも使用可能とする。</P>
+
+<A NAME="no4_132"></A>
+  <P><DT><B>　●記入</B>
+     <DD>　指示のない限り全て左詰めで記入する。前にスペースを入れたりしない。<BR>　指示のない限り空いている部分は全てASCIIコードの20Hで埋める。</P>
+
+<A NAME="no4_133"></A>
+  <P><DT><B>　●表現の定義</B>
+     <DD>　説明中で使用している△およびスペースはASCIIコードの20Hとする。</P>
+
+<A NAME="no4_134"></A>
+  <P><DT><B>　●その他規定</B>
+     <DD>　RESERVED領域は必ず00Hで埋める。</P>
+
+<A NAME="no4_14"></A>
+  <P><DT><H3>■各項目説明</H3>
+
+
+</DL><A NAME="00_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>ハードウェア識別子(開始アドレス:00H)</H3>
+		<DT><B>定義</B>
+		<DD>ハードウェアに対する固有のIDを記入する</P>
+	<P>	<DT><B>使用可能文字</B>
+		<DD>大文字の英字のみ</P>
+	<P>	<DT><B>文字数</B>
+		<DD>16文字</P>
+	<P>	<DT><B>記入規定</B>
+		<DD>「SEGA△SEGASATURN△」を必ず入れる。</P>
+
+</DL></DL><A NAME="01_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>メーカーID(開始アドレス:10H)</H3>
+		<DT><B>定義</B>
+		<DD>SEGAが指定するメーカーIDを記入する</P>
+
+	<P>	<DT><B>使用可能文字</B>
+		<DD>英数字のみ</P>
+
+	<P>	<DT><B>文字数</B>
+		<DD>16文字</P>
+
+	<P>	<DT><B>記入規定</B></P>
+	
+	<P>	<DT><B>　SEGAブランドの場合：</B>
+		<DD>　「SEGA△ENTERPRISES」の16文字固定
+		<DT><B>　ライセンシィの場合：</B>
+		<DD>　「SEGA△TP△KAISHA-A」の16文字
+		<DD>　KAISHA-Aには、各ライセンシィに与えられる固有の会社コードを入れる。
+		<DT><B>　例)</B>
+		<DD>SEGA△TP△T-999△△△
+		<DT><B>　規定：</B>
+		<DD>メーカーIDは左詰めで記入し、余りはスペースで埋めて必ず16文字にする。</P>
+
+</DL></DL><A NAME="02_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>商品番号(開始アドレス:20H)</H3>
+		<DT><B>定義</B>
+		<DD>SEGA指定の商品番号を記入する。</P>
+	<P>	<DT><B>使用可能文字</B>
+		<DD>英数字のみ</P>
+	<P>	<DT><B>文字数</B>
+		<DD>10文字</P>
+	<P>	<DT><B>記入規定</B>
+		<DD>空きはスペースで埋める。</P>
+	<P>	<DT><B>記入例</B>
+		<DD><B>SEGAブランドタイトル：</B>GS-9099△△△<BR><B>ライセンシィタイトル：</B>T-99901G△△</P>
+
+</DL></DL><A NAME="03_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>バージョン(開始アドレス:2AH)</H3>
+	<P>	<DT><B>定義</B>
+		<DD>アプリケーションのバージョンを記入する。</P>
+
+	<P>	<DT><B>使用可能文字</B>
+		<DD>大文字の「V」、数字、「.」(ピリオド)</P>
+
+	<P>	<DT><B>文字数</B>
+		<DD>６文字</P>
+
+	<P>	<DT><B>記入規定</B>
+		<DD>始まりは必ず「V」、次に１桁の数字、次に「.」、次に３桁の数字。<BR>最終リリースがV1.000となる。</P>
+
+	<P>	<DT><B>記入例</B>
+		<DD>サンプルディスクの場合→V0.801<BR>マスターディスクの場合→V1.000</P>
+
+</DL></DL><A NAME="04_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>リリース年月日(開始アドレス:30H)</H3>
+		<DT><B>定義</B>
+		<DD>マスタディスク(ライトワンスディスク)を作成した年月日を記入する。</P>
+
+	<P>	<DT><B>使用可能文字</B>
+		<DD>数字のみ</P>
+
+	<P>	<DT><B>文字数</B>
+		<DD>８文字</P>
+
+	<P>	<DT><B>記入規定</B>
+		<DD>年は４桁、月日は必ず２桁にする。</P>
+
+	<P>	<DT><B>記入例</B>
+		<DD>19940912(1994年９月12日の場合)</P>
+
+</DL></DL><A NAME="05_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>デバイス情報(開始アドレス:38H)</H3>
+		<DT><B>定義</B>
+		<DD>デバイスの情報を記入。CDの場合は何枚組の何枚目かを記入する。</P>
+
+	<P>	<DT><B>使用可能文字</B>
+		<DD>英数字および「/-」</P>
+
+	<P>	<DT><B>文字数</B>
+		<DD>８文字</P>
+
+	<P>	<DT><B>記入規定</B>
+		<DD>空きはスペースで埋める。</P>
+
+	<P>	<DT><B>記入例</B>
+		<DD>CD１枚組、１枚目の場合→CD-1/1△△<BR>CD３枚組、２枚目の場合→CD-2/3△△</P>
+
+</DL></DL><A NAME="06_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>対応エリアシンボル(開始アドレス:40H)</H3>
+		<DT><B>定義</B>
+		<DD>アプリケーションを動作させたい地域のエリアシンボルを入れる。</P>
+
+	<P>	<DT><B>使用可能文字</B>
+		<DD>下記エリアシンボル一覧で指定される大文字の英字のみ</P>
+
+	<P>	<DT><B>文字数</B>
+		<DD>10文字</P>
+
+	<P>	<DT><B>記入規定</B>
+		<DD>複数記入可。エリアシンボルとエリアシンボルは詰めて記入し、間にスペースやカンマは入れない。空きはスペースで埋める。</P>
+
+	<P>	<DT><B>エリアシンボル一覧</B>
+		<DD>J→日本<BR>T→アジアＮＴＳＣ(台湾、フィリピン、韓国)<BR>U→北米地域(米国、カナダ)、中南米NTSC(ブラジル)<BR>E→ヨーロッパPAL、東アジアPAL、中南米PAL</P>
+
+	<P>	<DT><B>記入例</B>
+		<DD>日本と台湾と韓国で動作させるアプリケーションの場合<BR>（それ以外の地域では動作しない)→JTK△△△△△△△</P>
+
+	<P>	<DT><B>注意</B>
+		<DD>ここで記入した地域に対応するエリアコードを、エリアコードグループに入れる必要がある。(「<B>4.5 エリアコード</B>」を参照)</P>
+
+	<P>	<DT><B>補足説明</B>
+		<DD>ハードウェアは、販売地域によって異なる情報「エリアシンボル」を持つ。「エリアシンボル」と「対応エリアシンボル内のエリアシンボル」と「エリアコード」が一致した場合にアプリケーションは起動する。</P>
+
+</DL></DL><A NAME="07_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>対応ペリフェラル(開始アドレス:50H)</H3>
+		<DT><B>定義</B>
+		<DD>完全対応入力ペリフェラルの情報を記入する。</P>
+
+	<P>	<DT><B>使用可能文字</B>
+		<DD>下記キャラクター一覧で指定される英数字のみ</P>
+
+	<P>	<DT><B>文字数</B>
+		<DD>16文字</P>
+
+	<P>	<DT><B>記入規定</B>
+		<DD>複数記入可。キャラクタの順番は問わない。<BR>キャラクタとキャラクタは詰めて記入し、間にスペースやカンマは入れない。空きはスペースで埋める。</P>
+
+	<P>	<DT><B>キャラクタ一覧</B>
+		<DD>A→ミッションスティック<BR>C→対戦ケーブル<BR>D→モデム(もしくは、Net Link)<BR>E→マルチコントローラ<BR>F→FDD<BR>G→銃(バーチャガン)<BR>J→セガサターン標準パッド<BR>K→キーボード<BR>M→シャトルマウス<BR>P→MPEG<BR>R→データカートリッジ(ツインアドバンスドシステム)<BR>S→ステアリングコントローラ<BR>T→マルチターミナル６<BR>W→拡張ラムカートリッジ<BR>X→ＸＢＡＮＤ</P>
+
+
+
+
+
+
+
+	<P>	<DT><B>記入例</B>
+		<DD>標準ジョイパッドとマウスに対応しているアプリケーションの場合<BR>JM△△△△△△△△△△△△△△</P>
+
+	<P>	<DT><B>補足</B>
+		<DD>今後ペリフェラルが増加すると共にキャラクタも増える予定。<BR>完全対応の定義については、「ソフトウェア作成基準」のパッドチェックの項目を参照のこと。</P>
+
+</DL></DL><A NAME="08_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>ゲーム名(開始アドレス:60H)</H3>
+		<DT><B>定義</B>
+		<DD>ゲーム名を記入する。</P>
+
+	<P>	<DT><B>使用可能文字</B>
+		<DD>ゲーム名は英数字のみ。ゲーム名中にスペース使用可。<BR>複数タイトルを列記する場合、タイトル間の区切り文字として「/-:」を使用可。</P>
+
+	<P>	<DT><B>文字数</B>
+		<DD>112文字。</P>
+
+	<P>	<DT><B>記入規定</B>
+		<DD>発売エリアにより名前が異なる等の場合、タイトルを複数列記してもい。複数記入する際の細かい規定は設けないが、この部分を見てタイトルが判別できるよう記入すること。空きの部分はスペースで埋める。</P>
+
+	<P>	<DT><B>記入例</B>
+		<DD>タイトルが複数ある場合</P>
+
+	<P>	<DT><B>　例１)</B>
+		<DD>TITLE1/TITLE2/TITLE3△△△△</P>
+
+	<P>	<DT><B>　例２)</B>
+		<DD>J:TITLE1△△U:TITLE2△△△△△△</P>
+
+</DL></DL><A NAME="09_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>IP SIZE(開始アドレス:E0H)</H3>
+		<DT><B>定義</B>
+		<DD>IP(Initial Program)のサイズ（バイト数）を指定する。</P>
+
+	<P>	<DT><B>サイズ</B>
+		<DD>４バイト</P>
+
+	<P>	<DT><B>規定</B>
+		<DD>AIPをブートコードのすぐ後ろにつけて１ファイルにし、そのファイルのサイズを指定する。<BR>パラメータは、ロングワード境界(4Hの倍数)であること。</P>
+
+	<P>	<DT><B>範囲</B>
+		<DD>1000H〜8000H</P>
+
+</DL></DL><A NAME="10_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>STACK-M(開始アドレス:E8H)</H3>
+		<DT><B>定義</B>
+		<DD>Master-SH２のスタックポインタのアドレス。<BR>デフォルト(0指定)で6001000H〜6001FFFHがスタックエリアとなる。</P>
+
+	<P>	<DT><B>サイズ</B>
+		<DD>４バイト</P>
+
+	<P>	<DT><B>規定</B>
+		<DD>パラメータは、ロングワード境界(4Hの倍数)であること。</P>
+
+	<P>	<DT><B>範囲</B>
+		<DD>600B000H〜6100000H</P>
+
+</DL></DL><A NAME="11_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>STACK-S(開始アドレス:ECH)</H3>
+		<DT><B>定義</B>
+		<DD>Slave-SH２のスタックポインタのアドレス。<BR>デフォルト(0指定)で6000E00H〜6000FFFHがスタックエリアとなる。</P></P>
+
+	<P>	<DT><B>サイズ</B>
+		<DD>４バイト</P>
+
+	<P>	<DT><B>規定</B>
+		<DD>パラメータは、ロングワード境界(4Hの倍数)であること。</P>
+
+	<P>	<DT><B>範囲</B>
+		<DD>600A200H〜6100000H</P>
+
+</DL></DL><A NAME="12_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>1st READ ADDRESS(開始アドレス:F0H)</H3>
+		<DT><B>定義</B>
+		<DD>先読みファイル(1st READ FILE)の転送アドレス。<BR>先読みファイルとは、ライセンスセガロゴ表示中に、ブートシステムがWORKRAMへ転送するファイルのこと。</P>
+
+	<P>	<DT><B>サイズ</B>
+		<DD>４バイト</P>
+
+	<P>	<DT><B>規定</B>
+		<DD>０Hの場合、転送は行わない。<BR>転送を行う場合、CDならば、ファイル識別子［2］のファイルを転送する。パラメータは、ロングワード境界(4Hの倍数)であること。</P>
+
+	<P>	<DT><B>範囲</B>
+		<DD>200000H〜300000H<BR>(6002000H+IPSIZE)〜6100000H</P>
+
+	<P>	<DT><B>補足</B>
+		<DD>「4.7先読みファイルとアプリケーションイニシャルプログラム」の項参照<BR>先読みファイルは必ずMODE1のトラックにあること。また、必ずトラック１であること。<BR>ファイル識別子［２］のファイルは、ルートディレクトリの先頭のファイルとなる。ファイル名を“１ST.BIN”等にすると、ソートされて先頭になる。</P>
+
+</DL></DL><A NAME="13_"><HR></A><FONT SIZE=1><A HREF="#t4_2">表4.2　SYSTEM IDの構造</A></FONT><DL><DL>
+	<P>	<DT><H3>1st READ SIZE(開始アドレス:F4H)</H3>
+		<DT><B>定義</B>
+		<DD>CDの場合は無視される。</P>
+
+	<P>	<DT><B>サイズ</B>
+		<DD>４バイト</P>
+
+	<P>	<DT><B>規定</B>
+		<DD>パラメータは、ロングワード境界に(4Hの倍数)であること。</P>
+</DL></DL>
+<HR>
+<DL>
+<A NAME="no4_15"></A>
+  <P><DT><H3>■セキュリティコード</H3>
+     <DD>　SYSTEM IDのすぐ後ろに配置します。コードはSEGAからオブジェクトコードで提供しますので、一切の変更を加えずにそのまま使用してください。内容はSEGAのライセンス表示をするプログラムとデータです。
+	正しいセキュリティコードが存在しないアプリケーションは、セガサターン用のCDとして認識されないため、ゲームが起動できません。<BR>
+	　セキュリティコード提供ファイル名：ソフトウェアライブラリディスクインストール後のディレクトリ内</P>
+
+	<P>	<DD><PRE><B>
+¥SATURN¥SEGALIB¥LIB¥SYS_SEC.OBJ
+                    ‾‾‾‾‾‾‾‾‾‾‾
+</B></PRE></P>
+
+<A NAME="no4_16"></A>
+  <P><DT><H3>■エリアコード</H3>
+     <DD>　セキュリティコードのすぐ後ろに配置します。コードはSEGAからオブジェクトコードで提供しますので、<B>一切の変更を加えずにそのまま使用してください。</B><BR>
+　エリアコードはハードウェアの販売エリア別に４種類存在しますが、SYSTEM IDの「対応エリアシンボル」に対応するエリアコードを入れる必要があります。複数列挙する場合、
+「対応エリアシンボル」と「エリアコード」は記入順が一致するようにしてください。<BR>
+　それぞれのエリアコードの大きさは同じなので容易に変更できるようになっています。<BR>
+　またエリアコードを複数つなげることで、共通ディスクを製作することが可能です。
+(『<a href="p05_10_j.htm">付録A各種サンプルリスト</A>』参照)
+　エリアコード提供ファイル名：ソフトウェアライブラリディスクインストール後のディレクトリ内</P>
+
+	<P>	<DD><PRE><B>
+¥SATURN¥SEGALIB¥LIB¥SYS_ARE?.OBJ     ;？は対応エリアと同じキャラクター
+                    ‾‾‾‾‾‾‾‾‾‾‾‾     ;４種類存在
+</B></PRE></P>
+
+	<P><DD>　ハードウェアの販売地域とエリアコードと対応エリアシンボルの関係を表4.3に示します。</P>
+
+<A NAME="t4_3"></A>
+	<P>	<DD><B>表4.3　エリアコードとエリアシンボルの関係</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH><PRE>対応エリア</TH><TH><PRE>ハードウェア販売地域</TH><TH><PRE>エリアコードファイル名</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>J</TD><TD><PRE>日本</TD><TD ALIGN=CENTER><PRE>SYS_AREJ.OBJ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>T</TD><TD><PRE>アジアNTSC地域</TD><TD ALIGN=CENTER><PRE>SYS_ARET.OBJ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>U</TD><TD><PRE>北米、中南米NTSC地域</TD><TD ALIGN=CENTER><PRE>SYS_AREU.OBJ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>E</TD><TD><PRE>ヨーロッパPAL、東アジアPAL、中南米PAL</TD><TD ALIGN=CENTER><PRE>SYS_AREE.OBJ</TD></TR>
+	</TABLE></P>
+
+<A NAME="no4_17"></A>
+  <P><DT><H3>■アプリケーションイニシャルプログラム</H3>
+     <DD>　エリアコードグループのすぐ後ろに配置しておくことにより、エリアコードの実行後すぐに実行されます。以後は、アプリケーションの制御下でプログラムが進行します。</P>
+
+<A NAME="no4_18"></A>
+  <P><DT><H3>■先読みファイルとアプリケーションイニシャルプログラム</H3>
+     <DD>　両者とも、BOOT ROMがCD-ROMからファイルを自動的に転送するシステムです。これを利用することにより、起動時において、アプリケーションがプログラムを組むことなく、指定したファイルを転送することができます。</P>
+
+<A NAME="no4_19"></A>
+  <P><DT><H3>■1st READ FILE</H3>
+     <DD>　ライセンスセガロゴ表示中(セキュリティコード実行中)にブートシステムが読み込むファイル（ファイル識別子が[2]）を1st READ FILE（先読みファイル）と呼びます。ライセンスセガロゴ表示は、この1st READ FILEを読み込み終わるまで終了しません。
+	従って、転送ファイルの容量が大きいほど、ライセンスセガロゴ画面の時間が長くなります。（最低２秒、最大約3.5秒）<BR>
+	　1st READ ADDRESSをセットすると、1st READ FILEは読み込まれるだけで自動的には実行はされません。<BR>
+	　指定しないことも可能ですが、ライセンスセガロゴ表示中の時間を有効に使えるので、使用されることを推奨します。</P>
+
+<A NAME="no4_1a"></A>
+  <P><DT><H3>■アプリケーションイニシャルプログラム</H3>
+     <DD>　例えば、このプログラム中にファイルシステムを置いておくことにより、以降のCDへのアクセスは、ファイル単位で簡単にアクセスできます。<BR>
+	　両者をうまく利用することにより、効率の良いアプリケーションを作成することが可能となります。</P>
+
+<A NAME="z4_1"></A>
+	<P><DT><B>図4.1　電源投入時からの概念</B>
+	<DT><PRE>
+TV screen: BOOT-ROM ~ Application startup　
+:　
+: (Power on)　
+: ┌──────┴──────┐　
+: │ │　
+┌────────────┐┌──────┴──────┐┌──────┴──────┐　
+│ ││ ││SYSTEM ID check│　
+│ ││ ││ │ │　
+│ ││ ││Security code check│　
+│SEGA SATURN logo││SEGA SATURN logo││ │ │　
+│ ││ Display processing ││ Area code check │　
+│ ││ ││ │ │　
+│ ││ ││ IP load ┌──┴─────────┐
+└──────┬──────┘└──────┬─────┘└──────┬───┤AIP is loaded│
+│ │ │ └──────────────┘
+┌──────┴──────┐┌──────┴──────┐┌──────┴──────────────── ┐
+│ ││ ││ │
+│ ││Security code execution ││ │
+│ ││ │ ││ Read the file with file identifier [2], │
+│ License Sega logo ││ Area code execution ││SYSTEM ID │
+│ ││ │ ││1stREAD ADDRESS │
+│ ││Execute system initialization code││ Transfer to destination written in │
+│ ││ (SYS_INIT) ││ │
+└──────┬──────┘└──────┬──────┘└──────┬──────────────── ┘
+│ │ │　
+┌──────┴──────┐┌──────┴──────────────┴──────┐　
+│ ││Application initial program (AIP) execution │　
+│ ││ (SMPSYS.C etc.) │　
+│ │└──────┬──────────────┬──────┘　
+│ Application │ │ │　
+│ │┌──────┴──────────────┴──────┐　
+│ ││Execute the application program body │　
+│ ││ (1stREAD file) │　
+└────────────┘└──────────────────────────┘　
+
+
+
+
+　　　　ＴＶ画面　　　　　：　　　　ＢＯＯＴ−ＲＯＭ 〜 アプリケーション起動　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　：　　　　　　　　　　　　　　　　　　　　　　　　  　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　：　　　　　　　　　　（電　源　投　入）　　　　　  　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　：　　　　　　　┌──────┴──────┐　　  　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　：　　　　　　　│　　　　　　　　　　　　　│　　  　　　　　　　　　　　　　　　
+┌────────────┐┌──────┴─────┐┌──────┴──────┐　　　　　　　　　　
+│　　　　　　　　　　　　││　　　　　　　　　　　　││ＳＹＳＴＥＭ　ＩＤチェック│　　　　　　　　　　
+│　　　　　　　　　　　　││　　　　　　　　　　　　││　　　　　　│　　　　　　│　　　　　　　　　　
+│　　　　　　　　　　　　││　　　　　　　　　　　　││セキュリティコードチェック│　　　　　　　　　　
+│ＳＥＧＡＳＡＴＵＲＮロゴ││ＳＥＧＡＳＡＴＵＲＮロゴ││　　　　　　│　　　　　　│　　　　　　　　　　
+│　　　　　　　　　　　　││　　　　表示処理　　　　││　エリアコードチェック　　│　　　　　　　　　　
+│　　　　　　　　　　　　││　　　　　　　　　　　　││　　　　　　│　　　　　　│　　　　　　　　　　
+│　　　　　　　　　　　　││　　　　　　　　　　　　││　　　　ＩＰロード　┌──┴─────────┐
+└──────┬─────┘└──────┬─────┘└──────┬───┤ＡＩＰがロードされている│
+　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　│　　　└────────────┘
+┌──────┴─────┐┌──────┴─────┐┌──────┴──────────────┐
+│　　　　　　　　　　　　││　　　　　　　　　　　　││　　　　　　　　　　　　　　　　　　　　　│
+│　　　　　　　　　　　　││セキュリティコード実行　││　　　　　　　　　　　　　　　　　　　　　│
+│　　　　　　　　　　　　││　　　　　　│　　　　　││ファイル識別子［２］のファイルをリードし、│
+│　ライセンスセガロゴ　　││　　エリアコード実行　　││ＳＹＳＴＥＭ　ＩＤの　　　　　　　　　　　│
+│　　　　　　　　　　　　││　　　　　　│　　　　　││１ｓｔＲＥＡＤ　ＡＤＤＲＥＳＳ　　　　　　│
+│　　　　　　　　　　　　││システム初期化コード実行││に書かれた転送先に転送　　　　　　　　　　│
+│　　　　　　　　　　　　││（ＳＹＳ＿ＩＮＩＴ）　　││　　　　　　　　　　　　　　　　　　　　　│
+└──────┬─────┘└──────┬─────┘└──────┬──────────────┘
+　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　　　
+┌──────┴─────┐┌──────┴─────────────┴─────┐　　　　　　　　　
+│　　　　　　　　　　　　││アプリケーションイニシャルプログラム（ＡＩＰ）実行　│　　　　　　　　　
+│　　　　　　　　　　　　││　（ＳＭＰＳＹＳ．Ｃ　等）　　　　　　　　　　　　　│　　　　　　　　　
+│　　　　　　　　　　　　│└──────┬─────────────┬─────┘　　　　　　　　　
+│　　アプリケーション　　│　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　　　
+│　　　　　　　　　　　　│┌──────┴─────────────┴─────┐　　　　　　　　　
+│　　　　　　　　　　　　││アプリケーションプログラム本体を実行　　　　　　　　│　　　　　　　　　
+│　　　　　　　　　　　　││（１ｓｔＲＥＡＤファイル）　　　　　　　　　　　　　│　　　　　　　　　
+└────────────┘└──────────────────────────┘　　　　　　　　　
+</PRE></P>
+
+<A NAME="no4_1b"></A>
+  <P><DT><H3>■IＰの作成方法</H3>
+
+<A NAME="no4_1b1"></A>
+     <DT><B>　●SYS＿ID.SRC</B>
+     <DD>　SYSTEM ID作成用のアセンブラソースプログラムのサンプルです。アプリケーションに応じて変更してください。(『4.3SYSTEM IDの説明』参照)<BR>
+　必ず<B>プログラムの先頭</B>に置いてください。</P>
+
+	<P>	<DD>　上記サンプル提供ファイル名：ソフトウェアライブラリディスクインストール後のディレクトリ内</P>
+	<P>	<DD><PRE><B><FONT SIZE=5>
+¥SATURN¥SEGASMP¥SYS¥SYS_ID.SRC
+</FONT></B></PRE></P>
+
+<A NAME="no4_1b2"></A>
+  <P><DT><B>　●SYS＿SEC.OBJ</B>
+	<DD>　セキュリティコードのオブジェクト。(『<A HREF="#no4_15">■セキュリティーコード</A>』参照)そのままの形でリンクして組み込みます。</P>
+
+<A NAME="no4_1b3"></A>
+  <P><DT><B>　●SYS＿ARE？.OBJ</B>
+	<DD>　エリアコードのオブジェクト。(『<A HREF="#no4_16">■エリアコード</A>』参照)そのままの形でリンクして組み込みます。</P>
+
+<A NAME="no4_1b4"></A>
+	<P><DT><B>　●SYS＿INIT.OBJ</B>
+	<DD>　システム初期化コードのオブジェクト。そのままの形でリンクして組み込みます。
+
+	<P><DD>以上のファイルを</P>
+
+	<P><DD><PRE><B>
+SYS＿ID.OBJ、SYS＿SEC.OBJ、SYS＿ARE？.OBJ、SYS_INIT.OBJ、・・・・・
+</B></PRE></P>
+
+  <P><DD>の順にリンクしてSYS＿IP.BINを作成します。このファイルは、CDのシステムエリア内にいれてください。</P>
+
+<A NAME="no4_1c"></A>
+  <P><DT><H3>■IＰの配置</H3>
+     <DD>　IPのサイズは最小２セクタ、最大16セクタの範囲で作成することが可能です。<BR>
+　もし必要なIPサイズが８セクタ以下ならば信頼性向上のため複数のIPを記録することが可能です。このとき各IPは、セクタの先頭から配置してください。<BR>
+　このようにすることで、最初のセクタに読み込み不良が発生しても起動できる可能性が向上します。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sofg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no4">DISCフォーマット規格仕様書</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,34 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p021.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p023.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD><UL><PRE>--------------------------------------------------------------------------
+     @ TEMP01 * C2L + ( MEMS01 * C1L + ( MEMS00 * C0L + ) ) 〉TEMP00
+--------------------------------------------------------------------------</PRE>
+Thus, in order to describe the continuous multiplication and addition as described in (1) to (3) above, please note that the actual order of each multiplication must be reversed. </UL><P>
+<DD> <B> 3-3 Write to Lch side ring buffer </B> <P>
+From <UL> signal flow diagram, <P>
+(a) Value of input EXTS00 multiplied by coefficient EffSendLevelL <BR>
+(b) The value stored in TEMP00 in 3-2 (4) multiplied by the coefficient FbL <P>
+You can see that you can write the sum of the two to the ring buffer. The write address on the ring buffer is waL, and the address description element “DEC” is used in the same way as MR [...] in 3-1. The above contents are expressed on the dAsms source code as follows. <P>
+<PRE>--------------------------------------------------------------------------
+     @ TEMP00 * FbL + ( EXTS00 * EffSendLevelL + ) 〉MW[waL+DEC]
+--------------------------------------------------------------------------</PRE></UL>
+<DD> <B> 3-4 Generation of Lch output data and writing to EFREG </B> <P>
+From <UL> signal flow diagram, <P>
+(a) Data read from address raL on the ring buffer multiplied by coefficient EffRtnLevelL <BR>
+(b) The value of the input EXTS00 multiplied by the coefficient DrctLevelL <P>
+You can see that you can store the result of adding the two in EFREG00. Here, the data necessary for multiplication in (a) (read from the ring buffer) is loaded into MEMS00 in 3-1, so this is used. The above contents are expressed on the dAsms source code as follows. <P>
+<PRE>--------------------------------------------------------------------------
+     @ EXTS00 * DrctLevelL + ( MEMS00 * EffRtnLevelL + ) 〉EFREG00
+--------------------------------------------------------------------------</PRE>
+This completes the description of the Lch source code. </UL><P>
+<DD> <B> 3-5 Description of Rch source code </B> <P>
+<UL> The function of this program example is stereo (L / R independent) delay, but as you can see from the signal flow diagram, the processing content on the Rch side is the same as that on the Lch side. However, the coefficient / address constant symbol names and register names used are different. Therefore, if you copy and paste the Lch source code described up to the previous section and rewrite only the changed part, it becomes the Rch source code. </UL><BR>
+</DL><P><P><HR>
+<A HREF=p021.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p023.htm> Go to next page </A>
+</BODY>
+</HTML>

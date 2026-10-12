@@ -1,0 +1,133 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/19&gt;SMPC User's Manual/3.1INTBACK command command parameters</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p03_12.htm">Back</a> ｜ <A HREF="p03_14.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/3.1 SMPC Control Mode</b><H2> ◆Command parameters of INTBACK command</H2><HR NOSHADE>
+<DL>
+<P><DD> The command parameters when acquiring peripheral data using the INTBACK command are explained below.</P>
+<A NAME="no3_13_01"></A><P><DT><H3> ●IREG0</H3><DD> There are two types of IREG0 settings: when issuing an INTBACK command and when requesting a continue or break.</P>
+<P><DT> <B>(1) When issuing the INTBACK command</b><DD> IREG0 is used for the SMPC status acquisition switch.</P>
+<A NAME="z3_6"></A><P><DD> <B>Figure 3.6 IREG0 (when issuing INTBACK command)</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> IREG0</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100001H</TH><TD COLSPAN=8> SMPC status acquisition switch ( <B>00H</b> or <B>01H</b> )<BR>
+ Initial value undefined/Write Only</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>IREG0: SMPC status acquisition switch setting value</b><DD><TABLE BORDER=1>
+<TR><TH> IREG0 setting value</TH><TH> explanation</TH></TR>
+<TR><TH ALIGN=CENTER> 00H</TH><TD> date and time, cartridge code, area code, terminal status, SMEM,<BR>
+ Do not return reset button data</TD></TR>
+<TR><TH ALIGN=CENTER> 01H</TH><TD> date and time, cartridge code, area code, terminal status, SMEM,<BR>
+ Return each data of reset button</TD></TR>
+</TABLE>
+</P>
+<P><DD> When using the INTBACK command, be sure to set one of the above settings.</P>
+<P><DT> <B>(2) When requesting continue or break</b><DD> IREG0 is used for continue requests and break requests to SMPC.<BR>
+ SMPC starts collecting remaining peripheral data when a continue request is received. When a break request is received, peripheral data collection is terminated and the INTBACK command is terminated.</P>
+<A NAME="z3_7"></A><P><DD> <B>Figure 3.7 IREG0 (when requesting continue or break)</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> IREG0</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100001H</TH><TD> CONT</TD><TD> BR</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD></TR>
+</TABLE>
+<TABLE>
+<TR><TD><PRE> <B>CONT</b></TD><TD><PRE> :Continue request bit ( <B>if reversed</b> , continues request)</TD></TR>
+<TR><TD><PRE> <B>BR</b></TD><TD><PRE> :Break request bit (If set to <B>"1B"</b> , break request)</TD></TR>
+<TR><TD><PRE> <B>−</b></TD><TD><PRE> : Either "1B" or "0B" is acceptable.</TD></TR>
+</TABLE>
+</P>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../what/atto.png 5x"></TD><TD> <B>If a value that satisfies both CONT and BR requests is written to IREG0, SMPC cannot guarantee which operation will be executed.</b> (See <A HREF="p03_10.htm#t3_2">Table 3.2</a> )</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_13_02"></A><P><DT><H3> ●IREG1</H3><DD> IREG1 is used to set peripheral data acquisition mode.</P>
+<P><DT> <B>●IREG1</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> IREG1</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> 20100003H</TH><TD> P2MD1</TD><TD> P2MD0</TD><TD> P1MD1</TD><TD> P1MD0</TD><TD> PEN</TD><TD> 0</TD><TD> OPE</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ -</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ -</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<CAPTION> <B>Bits 7,6: Port 2 mode</b></CAPTION>
+<TR><TH> bit 7</TH><TH> Bit 6</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> P2MD1</TH><TH> P2MD0</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TD> 15 byte mode</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TD> 255 byte mode</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TD> SEGA RESERVED ( <B>setting prohibited</b> )</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TD> 0 byte mode</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<CAPTION> <B>Bits 5,4: Port 1 mode</b></CAPTION>
+<TR><TH> bit 5</TH><TH> bit 4</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> P1MD1</TH><TH> P1MD0</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TD> 15 byte mode</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TD> 255 byte mode</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TD> SEGA RESERVED ( <B>setting prohibited</b> )</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TD> 0 byte mode</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<CAPTION> <B>Bit 3: Peripheral data enable</b></CAPTION>
+<TR><TH> Bit 3</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> PEN</TH></TR>
+<TR><TH> 0</TH><TD> do not return peripheral data</TD></TR>
+<TR><TH> 1</TH><TD> return peripheral data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<CAPTION> <B>Bit 1: Optimization of peripheral data acquisition time</b></CAPTION>
+<TR><TH> Bit 1</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> OPE</TH></TR>
+<TR><TH> 0</TH><TD> Optimize</TD></TR>
+<TR><TH> 1</TH><TD> no optimization</TD></TR>
+</TABLE>
+</P>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../what/atto.png 5x"></TD><TD> <B>When using SH-2 direct mode and SMPC control mode together, use the port used in SH-2 direct mode in 0-byte mode when issuing the INTBACK command.</b></TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>Example</b> : Port 1 = SH-2 direct mode, Port 2 = SMPC control mode, etc.</P>
+<A NAME="no3_13_03"></A><P><DT><H3> ●IREG2</H3><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> IREG2</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100005H</TH><TD COLSPAN=8> <B>F0H</b><BR>
+ Initial value: Undefined Write Only</TD></TR>
+</TABLE>
+</P>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../what/atto.png 5x"></TD><TD> <B>When issuing the INTBACK command, be sure to set IREG2 to 0FH.</b></TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_12.htm">Back</a> ｜ <A HREF="p03_14.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

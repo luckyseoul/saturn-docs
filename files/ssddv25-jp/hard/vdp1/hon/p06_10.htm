@@ -1,0 +1,391 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;25/54&gt;VDP1ユーザーズマニュアル/</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p05_40.htm">戻る</A>｜
+     <A HREF="p06_20.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第６章　コマンドテーブル</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no6_10"></A>
+	<P><DT><H2>■6.1　CMDCTRL(コントロールワード)</H2>
+		<DD>　CMDCTRLはコマンドの指定とコマンドテーブルの制御、スプライトの反転と不動点の指定をします。CMDCTRLは、コマンドテーブル先頭アドレス+00Hにある16bitで、ビット構成は次のとおりです。未使用ビットは0に設定してください。</P>
+
+	<P>	<DT><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD>ビット</TD>
+	<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>CMDCTRL<BR>+00H</TD>
+	<TD>END</TD><TD COLSPAN=3>JP</TD><TD COLSPAN=4>ZP</TD><TD>0</TD><TD>0</TD><TD COLSPAN=2>Dir</TD><TD COLSPAN=4>Comm</TD></TR>
+	</TABLE></P>
+
+	<DL>
+	<P>	<DT><B>エンドビット：</B>　end bit(END)、ビット15
+		<DD>　描画終了コマンドを表します。描画終了コマンドでないときコマンド選択ビットが有効になります。</P>
+
+	<P>	<DT><B><A HREF="#no6_12">ジャンプ形式</A>：</B>　jump select(JP)、ビット14〜12
+		<DD>　次に読み込む(フェッチする)コマンドテーブルを指定する方法を表します。</P>
+
+	<P>	<DT><B><A HREF="#no6_13">ズームポイントビット</A>：</B>　zoom point(ZP)、ビット11〜8
+		<DD>　矩形スプライト描画コマンドのとき、ズームポイント(不動点)を表します。ズームポイントは反転、拡大縮小の基準点を指定します。</P>
+
+	<P>	<DT><B><A HREF="#no6_14">キャラクタ読み出し方向ビット</A>：</B>　character read direction(Dir)、ビット5〜4
+		<DD>　テクスチャ描画コマンドのとき、キャラクタパターンテーブルからの読み出し方向を表します。</P>
+
+	<P>	<DT><B><A HREF="#no6_11">コマンド選択ビット</A>：</B>　command select(Comm)、ビット3〜0
+		<DD>　コマンドの機能を表します。エンドビットが終了コマンドのときコマンド選択は無効になります。</P>
+	</DL>
+
+<A NAME="no6_11"></A>
+	<P>	<DT><H3>　●コマンド</H3>
+		<DD>　コマンドは、CMDCTRLのエンドビット(END、ビット15)とコマンド選択ビット(Comm、ビット3〜0)により決まります。エンドビットとコマンド選択ビットとで設定されるコマンドは次のとおりです。<BR>
+		　コマンドによりVRAMのコマンドテーブルの内容が決まります。</P>
+
+<A NAME="t6_1"></A>
+	<P>	<DD><B>表6.1　コマンド</B>
+		<DD><TABLE BORDER=1>
+		<TR><TD><PRE>END</TD><TD COLSPAN=4><PRE>Comm</TD><TD ROWSPAN=2 COLSPAN=2><PRE>機能</TD><TD ROWSPAN=2><PRE>コマンド</TD></TR>
+		<TR><TD><PRE>ビット15</TD><TD><PRE>3</TD><TD><PRE>2</TD><TD><PRE>1</TD><TD><PRE>0</TD></TR>
+		<TR><TD ROWSPAN=9><PRE>0</TD><TD ROWSPAN=6><PRE>0</TD><TD ROWSPAN=3><PRE>0</TD><TD><PRE>0</TD><TD><PRE>0</TD><TD ROWSPAN=6 ALIGN="LEFT"><PRE>描画<BR>コマンド</TD><TD ROWSPAN=3 ALIGN="LEFT"><PRE>テクスチャ<BR>描画コマンド</TD>
+			<TD ALIGN="LEFT"><PRE>定形スプライト描画コマンド</TD></TR>
+		<TR><TD><PRE>0</TD><TD><PRE>1</TD><TD ALIGN="LEFT"><PRE>矩形スプライト描画コマンド</TD></TR>
+		<TR><TD><PRE>1</TD><TD><PRE>0</TD><TD ALIGN="LEFT"><PRE>変形スプライト描画コマンド</TD></TR>
+		<TR><TD ROWSPAN=3><PRE>1</TD><TD><PRE>0</TD><TD><PRE>0</TD><TD ROWSPAN=3 ALIGN="LEFT"><PRE>ノンテクスチャ<BR>描画コマンド</TD><TD ALIGN="LEFT"><PRE>ポリゴン描画コマンド</TD></TR>
+		<TR><TD><PRE>0</TD><TD><PRE>1</TD><TD ALIGN="LEFT"><PRE>ポリライン描画コマンド</TD></TR>
+		<TR><TD><PRE>1</TD><TD><PRE>0</TD><TD ALIGN="LEFT"><PRE>ライン描画コマンド</TD></TR>
+		<TR><TD ROWSPAN=3><PRE>1</TD><TD ROWSPAN=3><PRE>0</TD><TD ROWSPAN=2><PRE>0</TD><TD><PRE>0</TD><TD ROWSPAN=3 ALIGN="LEFT"><PRE>座標設定<BR>コマンド</TD><TD ROWSPAN=2 ALIGN="LEFT"><PRE>クリッピング座標<BR>設定コマンド</TD>
+			<TD ALIGN="LEFT"><PRE>ユーザクリッピング座標設定コマンド</TD></TR>
+		<TR><TD><PRE>1</TD><TD ALIGN="LEFT"><PRE>システムクリッピング座標設定コマンド</TD></TR>
+		<TR><TD><PRE>1</TD><TD><PRE>0</TD><TD COLSPAN=2 ALIGN="LEFT"><PRE>相対座標設定コマンド</TD></TR>
+		<TR><TD><PRE>1</TD><TD COLSPAN=4><PRE>0　0　0　0</TD><TD COLSPAN=3 ALIGN="LEFT"><PRE>描画終了コマンド</TD></TR>
+		<TR><TD COLSPAN=5 ALIGN="LEFT"><PRE>上記以外のコード</TD><TD COLSPAN=3 ALIGN="LEFT"><PRE>設定禁止（設定しないでください）</TD></TR>
+		</TABLE></P>
+
+<A NAME="no6_12"></A>
+	<P>	<DT><H3>　●ジャンプ形式</H3>
+		<DD>　ジャンプ形式は、次に処理されるコマンドテーブルとそのテーブルへのジャンプ形式を指定します。<BR>
+		　ジャンプ形式がアドレスを指定してジャンプする場合に、ジャンプ先のコマンドテーブルのアドレスをCMDLINK(コマンドテーブル先頭アドレス+02H、16ビット)に設定します。</P>
+	<DL>
+
+<A NAME="no6_12_0"></A>
+	<P>	<DT><B>ジャンプ形式：</B>　jump mode(JP)、コマンドテーブル先頭アドレス+00H、ビット14〜12
+		<DD>　次に処理されるコマンドテーブルへのジャンプ形式を指定します。ジャンプ形式がスキップ(ビット14=1)のときコマンドテーブルの読み出しはそこで終了し、そのテーブルは処理されません。<BR>
+		　ジャンプコールによるネスティングは1レベルです。<B>サブルーチンの中でのジャンプコールは禁止です</B>。</P>
+
+<A NAME="no6_12_1"></A>
+	<P>	<DT><B>000 ジャンプネクスト（jump next）</B>
+		<DD>このテーブルを処理後、自動的に次のテーブル（＋20H番地）に移行します（CMDLINKは無視されます）</P>
+
+<A NAME="no6_12_2"></A>
+	<P>	<DT><B>001 ジャンプアサイン（jump assign）</B>
+		<DD>このテーブルを処理後、CMDLINKのテーブルに移行します</P>
+
+<A NAME="no6_12_3"></A>
+	<P>	<DT><B>010 ジャンプコール　（jump call）</B>
+		<DD>このテーブルを処理後、CMDLINKのテーブルをサブルーチンコールします</P>
+
+<A NAME="no6_12_4"></A>
+	<P>	<DT><B>011 ジャンプリターン（jump return）</B>
+		<DD>このテーブルを処理後、メインルーチンに戻ります（CMDLINKは無視されます）</P>
+
+<A NAME="no6_12_5"></A>
+	<P>	<DT><B>100 スキップネクスト（skip next）</B>
+		<DD>このテーブルを処理せずに、次のテーブル（＋20H番地）に移行します（CMDLINKは無視されます）</P>
+
+<A NAME="no6_12_6"></A>
+	<P>	<DT><B>101 スキップアサイン（skip assign）</B>
+		<DD>このテーブルを処理せずに、CMDLINKのテーブルに移行します</P>
+
+<A NAME="no6_12_7"></A>
+	<P>	<DT><B>110 スキップコール　（skip call）</B>
+		<DD>このテーブルを処理せずに、CMDLINKのテーブルをサブルーチンコールします</P>
+
+<A NAME="no6_12_8"></A>
+	<P>	<DT><B>111 スキップリターン（skip return）</B>
+		<DD>このテーブルを処理せずに、メインルーチンに戻ります（CMDLINKは無視されます）</P>
+	</DL>
+	
+	<P>	<DD>　ジャンプアサイン</A>、ジャンプコール、スキップアサイン、スキップコールを指定した場合は、次に処理するテーブルのアドレスをCMDLINKに指定します。<BR>
+		　ジャンプネクスト、ジャンプリターン、スキップネクスト、スキップリターンを指定した場合は、CMDLINKは無視されます。</P>
+
+<A NAME="no6_13"></A>
+	<P>	<DT><H3>　●ズームポイント</H3>
+		<DD>　ズームポイントは矩形スプライトを拡大/縮小して描画するときキャラクタの不動点を指定します。矩形スプライトのみが対象になります。</P>
+
+	<DL>
+	<P><DT><B>ズームポイント：</B>zoom point(ZP)、コマンドテーブル先頭アドレス+00H、ビット11〜8
+		<DD>　ズームポイントは矩形スプライトを拡大、縮小して描画するときキャラクタの不動点を指定します。ズームポイントの値と不動点との関係は次のとおりです。
+		ズームポイント(ZP)が0Hのときズームポイントは存在せず、左上座標、右下座標の2点指定で描画されます。<BR>
+		　矩形スプライト以外ではズームポイントは0Hに固定してください。</P>
+	</DL>
+
+	<P>	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD COLSPAN=4><PRE>ZP</TD><TD WIDTH=60 ROWSPAN=2><PRE>コード</TD><TD ROWSPAN=2><PRE>ズームポイント</TD></TR>
+	<TR ALIGN=CENTER><TD WIDTH=60><PRE>ビット11</TD><TD WIDTH=60><PRE>10</TD><TD WIDTH=60><PRE>9</TD><TD WIDTH=60><PRE>8</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>0H</TD><TD><PRE>座標2点指定</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>5H</TD><TD><PRE>上辺の左端</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>6H</TD><TD><PRE>上辺の中央</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>7H</TD><TD><PRE>上辺の右端</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>9H</TD><TD><PRE>中央の左端</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>AH</TD><TD><PRE>中央の中央</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>BH</TD><TD><PRE>中央の右端</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>DH</TD><TD><PRE>下辺の左端</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>EH</TD><TD><PRE>下辺の中央</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>FH</TD><TD><PRE>下辺の右端</TD></TR>
+	</TABLE></P>
+
+	<P>	<DT><TABLE><TR>
+	<TD><IMG SRC="../../../what/atto.gif"></TD>
+	<TD><B>厳守★上記以外の設定は禁止です。</B></TD></TR></TABLE></P>
+
+<A NAME="z6_1"></A>	
+	<CENTER><B>図6.1　ズームポイント</B>
+<FONT SIZE="2"><PRE>
+　　　＋１　　　　＋２　　　　　　＋３　　　　　
+　　　　　　　　　　　┃　　　　　　　　　　　　
+　　　┌─┬─┬─┬─╂─┬─┬─┬─┐　　　　
+＋４　│■│　│　│■┃　│　│　│■│　　　　
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+　　　│　│　│　│　┃　│　│　│　│　　　　
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+　　　│　│　│　│　┃　│　│　│　│　　　　
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+　　　│　│　│　│　┃　│　│　│　│　　　　
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+　　　│　│　│　│　┃　│　│　│　│　　　　
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+＋８　┿■┿━┿━┿■╋━┿━┿━┿■┿　中心線
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+　　　│　│　│　│　┃　│　│　│　│　　　　
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+　　　│　│　│　│　┃　│　│　│　│　　　　
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+　　　│　│　│　│　┃　│　│　│　│　　　　
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+　　　│　│　│　│　┃　│　│　│　│　　　　
+　　　├─┼─┼─┼─╂─┼─┼─┼─┤　　　　
+＋Ｃ　│■│　│　│■┃　│　│　│■│　　　　
+　　　└─┴─┴─┴─╂─┴─┴─┴─┘　　　　
+　　　　　　　　　　　┃　　　　　　　　　　　　
+　　　　　　　　　　中心線　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　
+これら縦、横の値を加えたものがズームポイントの値
+となります　　　　　　　　　　　　　　　　　　　
+</PRE></FONT></CENTER>
+
+
+	<P>	<DD>　ズームポイント(ZP)に0以外の値を指定したときは、ズームポイント(ZP)と不動点座標、表示幅で、スプライトの描画位置、描画サイズが決められます。<BR>
+		　不動点座標(CMDXA、CMDYA)にズームポイントで指定されたキャラクタの不動点が描画されます。<BR>
+		　描画サイズは、表示幅(CMDXB、CMDYB)で決まります。<BR>
+		　縮小時、ピクセルが間引きされ、指定した不動点が消滅することがあります。<BR>
+		　ズームポイントとして決められた以外の値は指定しないでください。決められた以外の値を指定された場合の描画は保証されません。<BR>
+		　キャラクタサイズのX方向の長さは8の倍数なので、中央を指定しても厳密には不動点は中央となりません。Y方向の長さが偶数の場合も中央になりません。<BR>
+		　キャラクタの描画の方向は、キャラクタ読み出し方向ビットで指定します。<BR>
+		　X方向の表示幅が負の場合、X方向のキャラクタ読み出しビットで指定した方向とは逆のX方向に描画します。Y方向の表示幅が負の場合は、Y方向のキャラクタ読み出しビットで指定した方向とは逆のY方向に描画します。</P>
+
+	<P>	<DD><B>不動点指定</B>
+		<DD>　ZPが0H以外のとき、不動点座標をCMDXA、CMDYAに、表示幅をCMDXB、CMDYBに指定します。</P>
+
+
+	<P>	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER>
+	<TD COLSPAN=2></TD>
+	<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>CMDXA</TD><TD>+0CH</TD>
+		<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>不動点,X座標(XA)</TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>CMDYA</TD><TD>+0EH</TD>
+		<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>不動点,Y座標(YA)</TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>CMDXB</TD><TD>+10H</TD>
+		<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>表示,X座標(XB)</TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>CMDYB</TD><TD>+12H</TD>
+		<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>表示,Y座標(YB)</TD></TR>
+	</TABLE></P>
+
+
+
+	<P>	<DD><B>座標2点指定</B><BR>
+		<DD>　ZPが0Hのとき、左上座標、右下座標の2点指定となります。頂点　をCMDXA、CMDYAに、頂点　をCMDXC、CMDYCに指定します。</P>
+
+	<P>	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER>
+	<TD COLSPAN=2></TD>
+	<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+
+	<TR ALIGN=CENTER>
+	<TD>CMDXA</TD><TD>+0CH</TD>
+		<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(A),X座標(XA)</TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>CMDYA</TD><TD>+0EH</TD>
+		<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(A),Y座標(YA)</TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>　</TD><TD>+10H</TD>
+		<TD COLSPAN=16><B>：</B></TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>　</TD><TD>+12H</TD>
+		<TD COLSPAN=16><B>：</B></TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>CMDXC</TD><TD>+14H</TD>
+		<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(C),X座標(XC)</TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>CMDYC</TD><TD>+16H</TD>
+		<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(C),Y座標(YC)</TD></TR>
+	</TABLE>
+
+
+
+	<P>	<DD><B>描画領域</B>
+		<DD>　CMDXA、CMDYAには不動点座標を指定します。不動点座標にはズームポイント(ZP)で指定した不動点を描画します。不動点はキャラクタをズームするときの基準点となります。<BR>
+	　CMDXB、CMDYBには表示幅を指定します。表示幅は描画するサイズになります。<BR>
+	　キャラクタが描画される領域は、ズームポイントビット(ZP)、不動点座標、および表示幅で決まります。不動点座標を(XA,YA)、表示幅を(XB,YB)としたとき、次のようになります。</P>
+
+<A NAME="z6_2"></A>
+	<CENTER><B>図6.2　描画領域</B>
+
+
+<FONT SIZE="2"><PRE>
+　┌────────────────→左端が不動点、左端＝ＸＡ　　　　　　　　　
+　│　　　　　　　　　　　　　　　　　　　　　　　　右端＝ＸＡ＋ＸＢ　　　　　　
+　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+　│　　　　　┌──────────→中央が不動点、左端＝ＸＡ−ＸＢ／２　　　　
+　│　　　　　│　　　　　　　　　　　　　　　　　　右端＝ＸＡ＋（ＸＢ＋１）／２
+　│　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+　│　　　　　│　　　　　　　┌───右端が不動点、左端＝ＸＡ−ＸＢ　　　　　　
+　│　　　　　│　　　　　　　│　　　　　　　　　　右端＝ＸＡ　　　　　　　　　
+　│　　　　　│　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　
+┌─┬─┬─┬─┬─┬─┬─┬─┐　　　　　　　　　　　　　　　　　　　　　　　
+│■│　│　│■│　│　│　│■│─→上辺が不動点、上辺＝ＹＡ　　　　　　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　下辺＝ＹＡ＋ＹＢ　　　　　　
+│　│　│　│　│　│　│　│　│　　　　　　　　　　　　　　　　　　　　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　　　　　　　　　　　　　　　
+│　│　│　│　│　│　│　│　│　　　　　　　　　　　　　　　　　　　　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　　　　　　　　　　　　　　　
+│　│　│　│　│　│　│　│　│　　　　　　　　　　　　　　　　　　　　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　　　　　　　　　　　　　　　
+│　│　│　│　│　│　│　│　│　　　　　　　　　　　　　　　　　　　　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　　　　　　　　　　　　　　　
+│■│　│　│■│　│　│　│■│─→中央が不動点、上辺＝ＹＡ−ＹＢ／２　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　下辺＝ＹＡ＋（ＹＢ＋１）／２
+│　│　│　│　│　│　│　│　│　　　　　　　　　　　　　　　　　　　　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　　　　　　　　　　　　　　　
+│　│　│　│　│　│　│　│　│　　　　　　　　　　　　　　　　　　　　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　　　　　　　　　　　　　　　
+│　│　│　│　│　│　│　│　│　　　　　　　　　　　　　　　　　　　　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　　　　　　　　　　　　　　　
+│　│　│　│　│　│　│　│　│　　　　　　　　　　　　　　　　　　　　　　　
+├─┼─┼─┼─┼─┼─┼─┼─┤　　　　　　　　　　　　　　　　　　　　　　　
+│■│　│　│■│　│　│　│■│─→下辺が不動点、上辺＝ＹＡ−ＹＢ　　　　　　
+└─┴─┴─┴─┴─┴─┴─┴─┘　　　　　　　　　下辺＝ＹＡ　　　　　　　　　
+
+［注］小数点以下は切り捨て
+</PRE></FONT></CENTER>
+
+
+
+
+	<P>	<DD><B>ズームポイントと描画領域</B>
+		<DD>　不動点座標が(100, 50)、表示幅が(40, 30)のとき、各頂点の座標は次のようになります。ただし、上下左右の反転の指定はないものとします。ズームポイント(ZP)が0Hのときは、頂点　が(100, 50)、頂点　が(140, 80)の場合です。</P>
+
+<A NAME="z6_3"></A>
+	<P><DD><B>図6.3　ズームポイントと描画領域</B>
+<PRE>
+ＺＰ＝０
+（１００，５０）　　　　　　　　　　
+　　　┏━━━━━━━━┓　　　　　
+　　　┃　　　　　　　　┃　　　　　
+　　　┃　　　　　　　　┃　　　　　
+　　　┃　　　　　　　　┃　　　　　
+　　　┃　　　　　　　　┃　　　　　
+　　　┃　　　　　　　　┃　　　　　
+　　　┗━━━━━━━━┛　　　　　
+　　　　　　　　　　（１４０，８０）
+
+
+ＺＰ＝５Ｈ　　　　　　　　　　　　　　　　ＺＰ＝６Ｈ　　　　　　　　　　　　　　　ＺＰ＝７Ｈ　　　　　　　　　　　　
+（１００，５０）　　（１４０，５０）　　（８０，５０　　　　（１２０，５０）　　（６０，５０　　　　（１００，５０）
+　　　┏┿━━━━━━━┓　　　　　　　　　　┏━━━┿━━━━┓　　　　　　　　　　┏━━━━━━━┿┓　　　　　
+　　　╂■───────╂　　　　　　　　　　╂───■────╂　　　　　　　　　　╂───────■╂　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┗┿━━━━━━━┛　　　　　　　　　　┗━━━┿━━━━┛　　　　　　　　　　┗━━━━━━━┿┛　　　　　
+（１００，８０）　　（１４０，８０）　　（８０，８０）　　　（１４０，８０）　　（６０，８０）　　　（１００，８０）
+
+
+ＺＰ＝９Ｈ　　　　　　　　　　　　　　　　ＺＰ＝ＡＨ（１０）　　　　　　　　　　　ＺＰ＝ＢＨ（１１）　　　　　　　　
+（１００，３５）　　（１４０，３５）　　（８０，３５　　　　（１２０，３５）　　（６０，３５　　　　（１００，３５）
+　　　┏┿━━━━━━━┓　　　　　　　　　　┏━━━┿━━━━┓　　　　　　　　　　┏━━━━━━━┿┓　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　╂■───────╂　　　　　　　　　　╂───■────╂　　　　　　　　　　╂───────■╂　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┗┿━━━━━━━┛　　　　　　　　　　┗━━━┿━━━━┛　　　　　　　　　　┗━━━━━━━┿┛　　　　　
+（１００，６５）　　（１４０，６５）　　（８０，６５）　　　（１４０，６５）　　（６０，６５）　　　（１００，６５）
+
+
+ＺＰ＝ＤＨ（１３）　　　　　　　　　　　　ＺＰ＝ＥＨ（１４）　　　　　　　　　　　ＺＰ＝ＦＨ（１５）　　　　　　　　
+（１００，２０）　　（１４０，２０）　　（８０，２０　　　　（１２０，２０）　　（６０，２０　　　　（１００，２０）
+　　　┏┿━━━━━━━┓　　　　　　　　　　┏━━━┿━━━━┓　　　　　　　　　　┏━━━━━━━┿┓　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　┃│　　　　　　　┃　　　　　　　　　　┃　　　│　　　　┃　　　　　　　　　　┃　　　　　　　│┃　　　　　
+　　　╂■───────╂　　　　　　　　　　╂───■────╂　　　　　　　　　　╂───────■╂　　　　　
+　　　┗┿━━━━━━━┛　　　　　　　　　　┗━━━┿━━━━┛　　　　　　　　　　┗━━━━━━━┿┛　　　　　
+（１００，５０）　　（１４０，５０）　　（８０，５０）　　　（１４０，５０）　　（６０，５０）　　　（１００，５０）
+</PRE>
+
+
+<A NAME="no6_14"></A>
+	<P>	<DT><H3>　●キャラクタ読み出し方向</H3>
+		<DD>　キャラクタの読み出し方向を指定することができます。この指定でキャラクタを上下反転、左右反転させることができます。</P>
+	<DL>
+	<P>	<DT><B>キャラクタ読み出し方向ビット：</B>character read direction(Dir)、コマンドテーブル先頭アドレス+00H、ビット5、4
+		<DD>　キャラクタパターンの読み出し方向を指定します。上下反転指示、左右反転指示、または同時に上下左右反転指示ができます。<BR>
+		　ビット5が0のとき上下の反転はせず、縦(Y)方向はそのまま描画します。1のとき上下を反転して描画します。<BR>
+		　ビット4が0のとき左右の反転はせず、横(X)方向はそのまま描画します。1のとき左右を反転して描画します。<BR>
+		　ビット4、5が共に0のとき、反転させずにキャラクタパターンを描画します。ビット4、5が共に1のとき、上下と左右を反転して描画します。<BR>
+		　スプライト以外ではキャラクタ読み出し方向は00Bに固定してください。</P>
+	</DL>
+
+	<P>	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD COLSPAN=2><PRE>Dir</TD><TD ROWSPAN=2><PRE>反転処理</TD></TR>
+	<TR ALIGN=CENTER><TH WIDTH=50><PRE>Y</TH><TH WIDTH=50><PRE>X</TH></TR>
+	<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>0</TD><TD ALIGN="LEFT"><PRE>反転しません</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>1</TD><TD ALIGN="LEFT"><PRE>左右反転します</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>0</TD><TD ALIGN="LEFT"><PRE>上下反転します</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>1</TD><TD ALIGN="LEFT"><PRE>上下左右反転します</TD></TR>
+	</TABLE></P>
+
+<A NAME="z6_4"></A>
+	<P ALIGN=CENTER><B>図6.4　キャラクタ読み出し方向</B><BR><IMG SRC="../grp/i077_02.gif"></P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p05_40.htm">戻る</A>｜
+     <A HREF="p06_20.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

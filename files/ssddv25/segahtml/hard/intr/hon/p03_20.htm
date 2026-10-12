@@ -1,0 +1,53 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 9&gt;SEGA Saturn Overview Manual/3.Functions/3.2 SCU</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#intr">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">SEGA Saturn Overview Manual</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p03_30.htm">Forward</a> ▼</b><HR NOSHADE>
+<DL>
+<A NAME="no3_20"></A><P><DT><H3> ■3.2 SCU</H3><DD> The SCU smoothly interfaces multiple processors to the CPU-bus, A-bus, and B-bus. Furthermore, it is equipped with a DMA controller, interrupt controller, and DSP.<A NAME="no3_21"></A><P><DT> <B>●System configuration</b><DD> The SMPC is connected to the CPU-bus and controls the system reset signal and control pad.<BR>
+ Devices that supply programs, such as cartridges and CDs, are connected to the A-bus.<BR>
+ The SCU interrupt controller controls interrupts from A-bus, B-bus, and SMPC. It also supports timer interrupts and can generate an interrupt (INT signal) in synchronization with the screen display (Figure 3.1).<A NAME="z3_1"></A><P ALIGN="CENTER"> <B>Figure 3.1 SCU system configuration</b><BR>
+<img srcset="../grp/i013_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><A NAME="no3_22"></A><P><DT> <B>●System specifications</b><A NAME="t3_2"></A><DD><TABLE BORDER>
+<CAPTION> <B>Table 3.2 SCU system specifications</b></CAPTION>
+<TR><TH> No</TH><TH> Item</TH><TH> specification</TH><TH> remarks</TH></TR>
+<TR><TH> 1</TH><TD><PRE> DSP</TD><TD><PRE>・32bit×32bit → 48bit<BR>&#12539; 14MHz <A HREF="#t3_2_1"><B>Note 1</b></a><BR>&#12539; Program RAM 32bit×256word<BR>&#12539; DATA RAM 32bit×64word×4 pieces<BR>&#12539; Includes DMA instructions</TD><TD><PRE><PRE></TD></TR>
+<TR><TH> 2</TH><TD><PRE> DMA</TD><TD><PRE>・3ch for CPU, 1ch for DSP<BR>&#12539; 3 levels, 1 stack set<BR>&#12539; Can be activated by interrupt<BR>&#12539; With indirect mode</TD><TD><PRE></TD></TR>
+<TR><TH> 4</TH><TD><PRE> interrupt control</TD><TD><PRE>・Timer (2ch) synchronized with the screen and<BR>&#12539; Controlling interrupts from external pins</TD><TD><PRE></TD></TR>
+<TR><TH> 5</TH><TD><PRE> A-bus control</TD><TD><PRE>・Bus sizing of A-bus (external bus)<BR>&#12539; weight control<BR>&#12539; Setting burst size<BR>&#12539; Refresh control</TD><TD><PRE></TD></TR>
+<TR><TH> 6</TH><TD><PRE> B-bus control</TD><TD><PRE>・B-bus (internal bus) control</TD><TD><PRE>・VDP1, VDP2, SCSP only</TD></TR>
+</TABLE>
+</CENTER>
+<A NAME="no3_23"></A><P><DT> <B>●Function</b><DD> The features of SCU are listed below.<A NAME="no3_231"></A><P><DD> <B>Data transfer between main CPU (SH-2), internal DSP, A-bus, and B-bus</b><DD> The SCU is equipped with a CPU I/F, A-bus I/F, and B-bus I/F, and can smoothly interface with multiple processors connected via each I/F and bus. I will do it. Furthermore, it is possible to transfer programs from the main CPU to the DSP inside the SCU. Additionally, while data is being transferred between the A-bus and B-bus, the CPU can access the work area using the CPU-bus, allowing processing to be executed using independent buses in parallel. Masu.<A NAME="no3_232"></A><P><DD> <B>interrupt control</b><DD> Interrupts that span other processors are issued via the SCU. For example, if you want to display the volume level on the screen, the SCSP generates an interrupt requesting the SCU to display the screen. Additionally, the SCU recognizes interrupts and causes them to be issued in synchronization with the screen. At this time, an interrupt can be issued at any point (dot) on the screen.<A NAME="no3_233"></A><P><DD> <B>Internal DSP</b><DD> The SCU is equipped with an internal DSP. This is provided to enable processing that would be difficult to implement due to the excessive load placed on the main CPU alone.<A NAME="no3_234"></A><P><DD> <B>Operating frequency</b><DD> The operating frequency of the DSP inside the SCU is 1/2 that of the main CPU. The relationship with the operating frequency of the main CPU is as follows.<A NAME="t3_2_1"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 3.2.1 SCU-DMA clock details</b></CAPTION>
+<TR ALIGN=CENTER><TH> Screen display mode</TH><TH> SH-2 operating clock</TH><TH> SCU-DSP operating clock</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> In 320 dot mode (NTSC system)</TD><TD><PRE> 26.8741MHz</TD><TD><PRE> 13.4371MHz</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 352 dot mode (NTSC system)</TD><TD><PRE> 28.6364MHz</TD><TD><PRE> 14.3182MHz</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> In 320 dot mode (PAL system)</TD><TD><PRE> 26.6877MHz</TD><TD><PRE> 13.3439MHz</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 352 dot mode (PAL system)</TD><TD><PRE> 28.4377MHz</TD><TD><PRE> 14.2189MHz</TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p03_30.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm#intr">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">SEGA Saturn Overview Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

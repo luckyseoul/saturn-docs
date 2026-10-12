@@ -1,0 +1,48 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p017.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p019.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H4> (3) Read ahead to CD buffer </H4>
+<DD> When reading large files successively little by little, you can maximize the CD reading speed by specifying prefetching to the CD buffer with GFS_NwCdRead. <BR>
+In the following program example, a 1000-sector file is read continuously 10 sectors at a time. Since GFS_NwCdRead specifies that 1000 sectors are read ahead, the target file is played back continuously for 1000 sectors and stored in the buffer. Since data is taken out from the CD buffer in parallel with this processing, the buffer is not full and playback is not interrupted. <BR>
+* If the processing in this example is performed without using prefetching, CD playback will be interrupted every 10 sectors, resulting in wasted time. <P>
+<PRE> [Example]
+#define SECT_SIZE 2048
+#define FILE_SIZE     1000*SECT_SIZE
+#define RD_UNIT       10<P>
+Uint8 * rd_bp, * proc_bp; / * Read buffer and processing buffer * /
+Uint32 buf1 [RD_UNIT * SECT_SIZE / 4]; / ​​* Data storage area 1 * /
+Uint32 buf2 [RD_UNIT * SECT_SIZE / 4]; / ​​* Data storage area 2 * /
+GfsHn gfs;
+Sint32 i, stat, nbyte;<P>
+gfs = GFS_Open(fid);
+GFS_NwCdRead (gfs, FILE_SIZE); / * Prefetch instruction to CD buffer * /
+GFS_SetTransPara (gfs, RD_UNIT); / * Take out the maximum RD_UNIT sector once * /
+for (i = 0; i <FILE_SIZE / RD_UNIT; ++ i) {
+    / * Read and process buffer settings * /
+    if (i & 1) {
+        rd_bp = buf1;
+        proc_bp = buf2;
+    } else {
+        rd_bp = buf2;
+        proc_bp = buf1;
+    }
+    / * Eject from CD buffer * /
+    GFS_NwFread(gfs, RD_UNIT, rd_bp, RD_UNIT * SECT_SIZE);
+    do {
+        if (i & 0) {
+            user_process (proc_bp); / * Process for the read data * /
+        } else {
+            user_process0 (); / * Process before data is read * /
+        }
+          GFS_NwExecOne(gfs);
+          GFS_NwGetStat(gfs, &stat, &nbyte);
+    } While (nbyte <RD_UNIT * SECT_SIZE);
+}</PRE><BR>
+</DL><P><P><HR>
+<A HREF=p017.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p019.htm> Go to next page </A>
+</BODY>
+</HTML>

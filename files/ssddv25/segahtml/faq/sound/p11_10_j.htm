@@ -1,0 +1,107 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/12&gt;FAQ/サウンド関連/ハードウェア</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#sound">FAQ</A>
+★<a href="index_j.htm#no11">サウンド関連</A>
+<HR>
+<B>▲
+<a href="p10_10_j.htm">戻る</A>｜
+<a href="p12_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/サウンド関連</B>
+<H2 ALIGN=CENTER>ハードウェア</H2>
+<HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no11_01"><HR></A><DL>
+<H3>セガサターンのサウンド関連部分のハードウェア構成について教えてください。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> セガサターンのサウンド関連部分のハードウェア構成について教えてください。
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> セガサターンのハードウェアでは68EC000(CPU)、SCSP、サウンドメモリ(512KB RAM)
+      の3つがサウンドに深く関わっています。<BR>音色データ、 DSPプログラム、
+      シーケンスデータ、サウンドドライバは全てこの512KByteのサウンドメモリに
+      納めることになります。<BR>
+      このうちサウンドドライバとそのワーク領域として44KB(0B000H)が
+      使用されます。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no11_02"><HR></A><DL>
+<H3>サウンドCPUはバイトアクセスができないって本当ですか？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> SCSPユーザーズマニュアル(第1版)の<a href="../../hard/scsp/hon/p02_10_j.htm#t2_1">●サウンドCPU仕様</A>に
+
+<P><B>　「ハードウェア構成：MC68000CPUからMC6800(8ビット)インターフェースを削除したもの」</B></P>
+
+<P>      とありますが、これは何を意味するのでしょうか？ <BR>サウンドCPUはメモリにバイト
+      アクセスできないということでしょうか。
+
+<!--あ1997-04-15「11ページの表2.1」→「削除」-->
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> SCSPユーザーズマニュアルの記述はあくまでハード設計上8ビットの
+      回路を使用できないという説明であり、ソフトウェアを組む上では
+      特に気にする必要  はありません。</P>
+<P>      もちろんサウンドＣＰＵは「move.b」命令などでサウンドメモリに
+      バイトアクセス可能です。<BR>
+      ただし、使用禁止の命令として「RESET」と「TAS」命令があります。<BR>
+<P><DT><B>参照</B>
+<DD>     詳細についてはDeveloper's Information <a href="../../info/hon/stn51_j.htm">STN-51</A>「68000での使用禁止命令」を参照してください。
+
+<!-- あ1997-04-15「Dev Info NO.51」→「Developer's Information STN-51」-->
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no11_03"><HR></A><DL>
+<H3>「SCSPは全体的に22.68μsecを1つの大きなサイクルとして動作します。」とは？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> SCSPユーザーズマニュアル第4章
+        「SCSPレジスタ／<a href="../../hard/scsp/hon/p04_fm1_j.htm">FM音源方式を使用するにあたって</A>」に</P>
+
+<P><B>　「SCSPは全体的に22.68μsecを1つの大きなサイクルとして動作します」</B></P>
+
+<P>      とありますが、このサイクルをもっと具体的に説明していただけないでしょうか。
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> SCSPは、サンプリングレート44.1KHzのシステムのため、一回の処理の要する時間
+      は、そのシステムで許される最大の時間以内ということになります。</P>
+<P>      1秒間に44100回の処理ですのでその逆数(=1/44100 SEC)をとると、
+      22.6757μSEC以内にその処理を完了していなくてはいけません。</P>
+<P>      SCSP内蔵のDSPに於いても同様で、SCSPのDSPは128ステップで動作するDSPのため
+      128ステップ分の処理を22.6757μSECで終らせます。<BR>
+      従って1ステップは、(22.6757÷128=0.177154)177nSEC掛かります。</P>
+<P>      また、サウンドCPUやメインCPUからのアクセスもこのDSPの1ステップ分の処理時間
+      つまり177nsに合わせるようにして実行されます。
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p10_10_j.htm">戻る</A>｜
+<a href="p12_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#sound">FAQ</A>
+★<a href="index_j.htm#no11">サウンド関連</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

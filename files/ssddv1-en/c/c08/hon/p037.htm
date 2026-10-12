@@ -1,0 +1,29 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p036.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p038.htm> Go to next page </A>
+<HR><P><P>
+<H3> 6.4 PCM stream playback </H3>
+<H4> 6.4.1 How to have a data area </H4>
+To perform <UL> PCM stream playback, a data area (PCM stream buffer) for playing back PCM waveform data is required. The PCM stream buffer can be specified anywhere in the sound memory. Normally, the unused portion of the tone data, song data, etc. is used, but if there is a tone bank that is not used at the same time as PCM stream playback, that area can also be used. <BR>
+You can know the current playback position in 4K sample units. Therefore, PCM stream playback can be performed by having at least two 4K sample buffers. The PCM stream buffer size can be up to 64K samples per channel, so it can be set freely within this range. <BR></UL>
+<H4> 6.4.2 Buffer rewrite timing </H4>
+When <UL> PCM stream playback starts, the current waveform playback position is written to the host interface work. The playback position is a numeric value from 0 to 15, with a value of 0 at the start of playback, and increments by 1 each time 4K sample playback progresses. When playback is completed up to the end of the buffer, playback starts again from the beginning of the buffer. At this point, the playback position value returns to 0. <P>
+<table border cellpadding=5>
+<th align = "center"> <pre> Example of how to hold the buffer </th> <th align = "center"> <pre> Play position value </th> <tr>
+<td align = "left"> <pre> When there are two 4K sample buffers </td> <td align = "left"> <pre> 0,1,0,1,0,1 ... </td><tr>
+<td align = "left"> <pre> With 4K sample buffers on 3 sides </td> <td align = "left"> <pre> 0,1,2,0,1,2,0, 1,2...</td><tr>
+<td align = "left"> <pre> When 4K sample buffer has 16 sides </td> <td align = "left"> <pre> 0,1,2,3 ---- 12,13 ,14,15,0,1,2,3...</td>
+</table><p>
+The main system should monitor this playback position and transfer the next waveform data. Since the PCM stream buffer can capture up to 64K samples, it can be selected from a minimum of 2 to a maximum of 16 planes. <BR>
+It is also possible to generate an interrupt to the main system when the playback position is updated, so use this if necessary. Since there is control information for this interrupt in the system interface work, refer to “Chapter 5 System Area 5.1.3 System Interface Work” for the setting contents. <P></UL>
+<H4> 6.4.3 Transfer load </H4>
+<UL> PCM playback slot is fixed at 44.1KHz in hardware, so one sample is played every 22.68usec from the start of playback. In other words, after playback starts, waveform data for 44,100 samples per second per channel must be replenished. It will be 44,100 bytes for 8-bit PCM and 88,200 bytes for 16-bit PCM. <BR>
+The time required for this transfer, including reading from the CD and transferring to the sound memory, is the main system load. Since the transfer time depends on the hardware of the main system, it can be calculated by waiting for CD rotation, seek time, SH (or DMA) transfer clock and the number of transfer bytes. <P>
+However, the number of bytes above is the amount of data at 44.1KHz. For example, if half of 22KHz is sufficient, the amount of data is half that. Therefore, the transfer load is also halved. Conversely, when stereo playback or multiple channels are played back simultaneously, the load increases accordingly. <BR></UL>
+<P><P><HR>
+<A HREF=p036.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p038.htm> Go to next page </A>
+</BODY>
+</HTML>

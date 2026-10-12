@@ -1,0 +1,325 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/22&gt; <!-- Number of pages/total number of pages -->
+ SGL function reference/bitmap function <!-- Title name -->
+ </TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><!-------------------------------------------------------------------------------->
+<HR>
+<H1> About bitmap graphics functions</H1><BR><BR>
+ <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slInitBitMap"><HR NOSHADE></a><H4> function</H4><H1> slInitBitMap </H1></PRE></P><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slInitBitMapNbg0"><HR NOSHADE></a><H4> macro</H4><H1> slInitBitMapNbg0 </H1></PRE></P><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slInitBitMapNbg1"><HR NOSHADE></a><H4> macro</H4><H1> slInitBitMapNbg1 </H1></PRE></P><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slInitBitMapRbg0"><HR NOSHADE></a><H4> macro</H4><H1> slInitBitMapRbg0</H1><HR><H3> Declaring and initializing the use of bitmap graphics</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode;
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> size;
+    void *addr_A;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slInitBitMap( mode, size, addr_A );
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slInitBitMapNbg0( size, addr_A );
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slInitBitMapNbg1( size, addr_A );
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slInitBitMapRbg0( size, addr_A );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode - Screen to draw (described later).<BR>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> size - Screen size (described later).<BR>
+    void *addr_A - Start (absolute) address of VRAM used as bitmap (described below).<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Sets the bitmap screen in 256 color mode.<BR>
+    Screen clearing will not be performed.<BR>
+    In mode,
+      <A HREF="../struct/constscl.htm#bmNBG0"><I>bmNBG0</i></a> , <A HREF="../struct/constscl.htm#bmNBG1"><I>bmNBG1</i></a> , <A HREF="../struct/constscl.htm#bmRBG0"><I>bmRBG0</i></a>
+    Either size is
+      <A HREF="../struct/constscl.htm#BM_512x256"><I>BM_512x256</i></a> , <A HREF="../struct/constscl.htm#BM_512x512"><I>BM_512x512</i></a> , <A HREF="../struct/constscl.htm#BM_1024x256"><I>BM_1024x256</i></a> , <A HREF="../struct/constscl.htm#BM_1024x512"><I>BM_1024x512</i></a>
+    Specify one of the following.<BR>
+    addr_A must be a 20000H boundary.<BR>
+    In this function <A HREF="../func/scroll.htm#slBitMapNbg0"><I>, slBitMapNbg0</i></a> , <A HREF="../func/scroll.htm#slBitMapNbg1"><I>slBitMapNbg1</i></a> ,
+    <A HREF="../func/scroll.htm#slBitMapRbg0"><I>slBitMapRbg0</i></a> is executed.<BR>
+    The center position of the screen is set as the origin.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+    <A HREF="../func/bitmap.htm#slInitBitMap"><I>slInitBitMap</i></a> ( <A HREF="../struct/constscl.htm#bmNBG1"><I>bmNBG1</i></a> , <A HREF="../struct/constscl.htm#BM_512x256"><I>BM_512x256</i></a> , ( void * )0x25e00000 );
+
+    <A HREF="../func/scl_ram.htm#slScrAutoDisp"><I>slScrAutoDisp</i></a> ( <A HREF="../struct/constscl.htm#NBG0ON"><I>NBG0ON</i></a> | <A HREF="../struct/constscl.htm#NBG1ON"><I>NBG1ON</i></a> | <A HREF="../struct/constscl.htm#NBG2OFF"><I>NBG2OFF</i></a> | <A HREF="../struct/constscl.htm#NBG3OFF"><I>NBG3OFF</i></a> );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/scroll.htm#slBitMapNbg0">slBitMapNbg0</a></TD><TD><PRE> <A HREF="../func/scroll.htm#slBitMapNbg1">slBitMapNbg1</a></TD><TD><PRE> <A HREF="../func/scroll.htm#slBitMapRbg0">slBitMapRbg0</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBitMapBase"><HR NOSHADE></a><H4> function</H4><H1> slBitMapBase</H1><HR><H3> Setting the center point of bitmap graphics</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y;
+
+    void slBitMapBase( pos_x, pos_y );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x - X coordinate of the bitmap screen origin.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y - Y coordinate of the origin of the bitmap screen.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Set the origin position of the bitmap screen.<BR>
+    Specify the top left of the screen as (0,0).<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Set the center coordinates to the center and bottom of the screen.<BR>
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+    <A HREF="../func/bitmap.htm#slInitBitMap"><I>slInitBitMap</i></a> ( <A HREF="../struct/constscl.htm#bmNBG1"><I>bmNBG1</i></a> , <A HREF="../struct/constscl.htm#BM_512x256"><I>BM_512x256</i></a> , ( void * )0x25e00000 );
+    <A HREF="../func/bitmap.htm#slBitMapBase"><I>slBitMapBase</i></a> ( 160, 224 );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slInitBitMap">slInitBitMap</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slLocateBitMap"><HR NOSHADE></a><H4> function</H4><H1> slLocateBitMap</H1><HR><H3> Coordinate address conversion</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y;
+
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> *slLocateBitMap( pos_x, pos_y );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x - X coordinate of the position for which you want the address.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y - Y coordinate of the position you want to find the address for.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> * - VRAM (absolute) address of the specified location.<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Returns the VRAM address of the specified location.<BR>
+    Returns <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> if it is off-screen.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Block transfer data to the address obtained with <A HREF="../func/bitmap.htm#slLocateBitMap"><I>slLocateBitMap</i></a> .<BR>
+    addr = <A HREF="../func/bitmap.htm#slLocateBitMap"><I>slLocateBitMap</i></a> ( 10, 10 );
+    <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> ( addr, dest, size );
+</PRE></P><P><DT><H3>reference </H3><DD><TABLE BORDER></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slClearBitMap"><HR NOSHADE></a><H4> function</H4><H1> slClearBitMap</H1><HR><H3> Clear bitmap graphics surface</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col;
+
+    void slClearBitMap( col );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col - Palette number.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Clears the bitmap screen with the specified color.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/bitmap.htm#slClearBitMap"><I>slClearBitMap</i></a> ( 6 );
+</PRE></P><P><DT><H3>reference </H3><DD><TABLE BORDER></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBMPset"><HR NOSHADE></a><H4> function</H4><H1> slBMPset</H1><HR><H3> Drop a dot on a bitmap graphics surface</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y;
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slBMPset( pos_x, pos_y, col );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x - X coordinate of the position you want to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y - Y coordinate of the position you want to draw.<BR>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col;
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Draws a point at the specified location.<BR>
+    Returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if it is off-screen.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Point a dot at (10,10).<BR>
+    if ( <A HREF="../func/bitmap.htm#slBMPset"><I>slBMPset</i></a> ( 10, 10, 3 ) == <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> ) {
+      <A HREF="../func/packs.htm#slPrint"><I>slPrint</i></a> ( "Error occurred.", <A HREF="../func/packs.htm#slLocate"><I>slLocate</i></a> ( 9, 2 ) );
+    }
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMPoint">slBMPoint</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMCircle">slBMCircle</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMLine">slBMLine</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMBox">slBMBox</a></TD></TR><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMBoxFill">slBMBoxFill</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBMPoint"><HR NOSHADE></a><H4> function</H4><H1> slBMPoint</H1><HR><H3> Get palette value of bitmap coordinates</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y;
+
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> slBMPoint( pos_x, pos_y );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x - X coordinate of the position for which you want to know the palette code.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y - Y coordinate of the position for which you want to know the palette code.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> palette code</PRE></P><P><DT><H3> function</H3><DD><PRE>
+    Reads the point at the specified position and returns the palette code.<BR>
+    If it is off-screen, 0 is returned.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Know the RGB code of dot (10,5).<BR>
+    rgb = *( <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> * )( 0x25f00000 + <A HREF="../func/bitmap.htm#slBMPoint"><I>slBMPoint</i></a> ( 10, 5 ) );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMPoint">slBMPoint</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMCircle">slBMCircle</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMBox">slBMBox</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMBoxFill">slBMBoxFill</a></TD></TR><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMPset">slBMPset</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBMCircle"><HR NOSHADE></a><H4> function</H4><H1> slBMCircle</H1><HR><H3> Draw a circle on a bitmap graphic surface</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> size;
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col;
+
+    void slBMCircle( pos_x, pos_y, size, col );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_x - X coordinate of the position you want to display.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_y - Y coordinate of the position you want to display.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> size - radius of the circle.<BR>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col - Palette code of the color you want to display.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Draws a circle centered at the specified location.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Draw a circle with radius 20 centered at the origin.<BR>
+    <A HREF="../func/bitmap.htm#slBMCircle"><I>slBMCircle</i></a> ( 0, 0, 20, 120 );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMPoint">slBMPoint</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMPset">slBMPset</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMLine">slBMLine</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMBox">slBMBox</a></TD></TR><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMBoxFill">slBMBoxFill</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBMLine"><HR NOSHADE></a><H4> function</H4><H1> slBMLine</H1><HR><H3> Draw a line on a bitmap graphic surface</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y;
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slBMLine( pos_s_x, pos_s_y, pos_e_x, pos_e_y, col );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x - X coordinate of the starting point of the line.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y - Y coordinate of the starting point of the line.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x - X coordinate of the end point of the line.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y - Y coordinate of the end point of the line <br>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col - Palette code.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Draws a straight line connecting two specified points.<BR>
+    Returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if it is off-screen.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Draw a line starting at (10,54) and ending at (-3,35).<BR>
+    <A HREF="../func/bitmap.htm#slBMLine"><I>slBMLine</i></a> ( 10, 54, -3, 35 );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMPoint">slBMPoint</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMCircle">slBMCircle</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMPset">slBMPset</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMBox">slBMBox</a></TD></TR><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMBoxFill">slBMBoxFill</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBMBox"><HR NOSHADE></a><H4> function</H4><H1> slBMBox</H1><HR><H3> Draw a rectangle on a bitmap graphic surface</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y;
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slBMBox( pos_s_x, pos_s_y, pos_e_x, pos_e_y, col );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x - X coordinate of the upper left point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y - Y coordinate of the upper left point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x - X coordinate of the lower right point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y - Y coordinate of the lower right point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col - Palette code for the color to draw.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Draws a rectangle with two vertices at the specified points.<BR>
+    Returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if it is off-screen.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Draw a rectangle with top left (120,35) and bottom right (47,100).<BR>
+    <A HREF="../func/bitmap.htm#slBMBox"><I>slBMBox</i></a> ( 120, 35, 47, 100, 1 );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMPoint">slBMPoint</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMCircle">slBMCircle</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMLine">slBMLine</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMPset">slBMPset</a></TD></TR><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMBox">slBMBox</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBMBoxFill"><HR NOSHADE></a><H4> function</H4><H1> slBMBoxFill</H1><HR><H3> Draw a rectangle on a bitmap graphic surface and fill it inside</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y;
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slBMBoxFill( pos_s_x, pos_s_y, pos_e_x, pos_e_y, col );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x - X coordinate of the upper left point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y - Y coordinate of the upper left point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x - X coordinate of the lower right point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y - Y coordinate of the lower right point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> col - Palette code for the color to draw.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Draws a rectangle with two vertices at the specified points.<BR>
+    Also draw the inside of the rectangle.<BR>
+    Returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if it is off-screen.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Draw a rectangle with the upper left (120,35) and lower right (47,100) and fill it in.<BR>
+    <A HREF="../func/bitmap.htm#slBMBoxFill"><I>slBMBoxFill</i></a> ( 120, 35, 47, 100, 1 );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMPoint">slBMPoint</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMCircle">slBMCircle</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMLine">slBMLine</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMPset">slBMPset</a></TD></TR><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMBox">slBMBox</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBMGet"><HR NOSHADE></a><H4> function</H4><H1> slBMGet</H1><HR><H3> Obtain bitmap data of rectangular area</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y;
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> addr_A;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slBMGet( pos_s_x, pos_s_y, pos_e_x, pos_e_y, addr_A );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x - X coordinate of the top left point of the rectangle to retrieve.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y - Y coordinate of the top left point of the rectangle to retrieve.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x - X coordinate of the lower right point of the rectangle to retrieve.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y - Y coordinate of the lower right point of the rectangle to retrieve.<BR>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> addr_A - Address of the buffer that will hold the area's data.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Copies the bitmap data in a rectangle with two vertices at the specified points to the buffer. If part of the rectangle is outside the screen, the data in that part will not be copied.<BR>
+    Returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if the entire rectangle is off-screen.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> buffer[ 10 * 30 ]; stores the inside of the rectangle with upper left (20,20) and lower right (30,50) as a buffer;
+    <A HREF="../func/bitmap.htm#slBMGet"><I>slBMGet</i></a> ( 20, 20, 30, 50, buffer );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMPut">slBMPut</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMSprPut">slBMSprPut</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBMPut"><HR NOSHADE></a><H4> function</H4><H1> slBMPut</H1><HR><H3> Transferring data to a rectangular area in a bitmap graphics plane</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y;
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> *addr_A;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slBMPut( pos_s_x, pos_s_y, pos_e_x, pos_e_y, addr_A );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x - X coordinate of the upper left point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y - Y coordinate of the upper left point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x - X coordinate of the lower right point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y - Y coordinate of the lower right point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> *addr_A - Address where the original data is located.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Copies the bitmap data in the buffer into a rectangle with two vertices at the specified points. If part of the rectangle is outside the screen, the data in that part will not be copied.<BR>
+    Returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if the entire rectangle is off-screen.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> buffer[ 50 * 50 ];
+
+    <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> ( buffer, dest, 50 * 50 );
+    <A HREF="../func/bitmap.htm#slBMPut"><I>slBMPut</i></a> ( 34, 56, 84, 106, buffer );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMGet">slBMGet</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMSprPut">slBMSprPut</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#bitmap">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slBMSprPut"><HR NOSHADE></a><H4> function</H4><H1> slBMSprPut</H1><HR><H3> Transferring data to a rectangular area in a bitmap graphics plane</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y;
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> *addr_A;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slBMSprPut( pos_s_x, pos_s_y, pos_e_x, pos_e_y, addr_A );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_x - X coordinate of the upper left point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_s_y - Y coordinate of the upper left point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_x - X coordinate of the lower right point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> pos_e_y - Y coordinate of the lower right point of the rectangle to draw.<BR>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> *addr_A - Address where the original data is located.<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Copies the bitmap data in the buffer into a rectangle with two vertices at the specified points. However, the space part (palette code 0) is not copied.
+    If part of the rectangle is off-screen, the data in that part will not be copied.<BR>
+    Returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if the entire rectangle is off-screen.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> buffer[ 50 * 50 ];
+
+    <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> ( buffer, dest, 50 * 50 );
+    <A HREF="../func/bitmap.htm#slBMPut"><I>slBMPut</i></a> ( 34, 56, 84, 106, buffer );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/bitmap.htm#slBMGet">slBMGet</a></TD><TD><PRE> <A HREF="../func/bitmap.htm#slBMPut">slBMPut</a></TD></TR></TABLE></DL><HR NOSHADE> <A HREF="index.htm">return</a><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

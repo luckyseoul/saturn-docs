@@ -1,0 +1,57 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p010.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p012.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H4> [Example] Simultaneous access to multiple files in different directories </H4>
+<DD> To access a file in a different directory, the target file must be opened while switching the current directory. <BR>
+An example of accessing two files in two subdirectories directly under the current directory at the same time. Assume that the file identifiers of the two subdirectories that contain the files you want to access are specified by dir_fid1 and dir_fid2, respectively. <P>
+<PRE>
+#define MAX_DIR 10 / * Maximum number of directory information * / <P>
+GfsDirTbl curdir; / ​​* Current directory at this point * /
+GfsDirTbl dirtbl1, dirtbl2; / * Directory information management area * /
+GfsDirId dirid1 [MAX_DIR]; / * Directory information storage area * /
+GfsDirId dirid2 [MAX_DIR]; / * Directory information storage area * /
+Sint32 dir_fid1, dir_fid2; / * Contains the directory file identifier * /
+Sint32 fid1, fid2; / * Contains the identifier of the file to be accessed * /
+GfsHn gfs1, gfs2; / * File handle of the file to be accessed * / <P>
+/ * Read directory information of dir_fid1 of current directory * /
+GFS_DIRTBL_TYPE (&dirtbl1) = GFS_DIR_ID;
+GFS_DIRTBL_NDIR (&dirtbl1) = MAX_DIR;
+GFS_DIRTBL_DIRID(&dirtbl1) = dirid1;
+GFS_LoadDir(dir_gfs1, &dirtbl1);<P>
+/ * Read the directory information of dir_fid2 of the current directory * /
+GFS_DIRTBL_TYPE (&dirtbl2) = GFS_DIR_ID;
+GFS_DIRTBL_NDIR (&dirtbl2) = MAX_DIR;
+GFS_DIRTBL_DIRID(&dirtbl2) = dirid2;
+GFS_LoadDir(dir_gfs2, &dirtbl2);<P>
+/ * Open the file dir_fid1 and fid1 * /
+GFS_SetDir (&dirtbl1);
+gfs1 = GFS_Open(fid1);<P>
+/ * Open the file dir_fid2 and fid2 * /
+GFS_SetDir (&dirtbl2);
+gfs2 = GFS_Open(fid2);
+/*
+* File access here
+*/
+GFS_Close(gfs1);
+GFS_Close(gfs2);</PRE><P>
+<DT> <H2> 3.4 Mutual conversion of file name and file identifier </H2>
+<DD> If directory information including the file name is set in the current directory, the mutual conversion function between the file name and the file identifier can be used. <BR>
+∙ An error will occur if these functions are called when directory information that does not include a file name is set as the current directory. <BR>
+∙ An example of defining a function that opens a file with a file name using this function is shown below. <BR>
+<PRE> [Example] / * Open the file specified by the file name * /
+GfsHn OpenByName (Uint8 * fname)
+{
+Sint32 fid = GFS_NameToId (fname); <P>
+If (fid <0) {
+Return NULL;
+}
+Return GFS_Open (fid);
+</PRE> <BR>
+</DL><P><P><HR>
+<A HREF=p010.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p012.htm> Go to next page </A>
+</BODY>
+</HTML>

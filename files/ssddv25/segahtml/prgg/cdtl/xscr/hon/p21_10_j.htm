@@ -1,0 +1,96 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 5&gt;CDビルダスクリプト文法補足説明</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<B>▲
+<a href="p20_10_j.htm">戻る</A>｜
+<a href="p22_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CDビルダスクリプト文法補足説明</B>
+<H2 ALIGN=CENTER></H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P><DT><H3>４．MPEGストリーム　ビルド時の注意事項</H3>
+	<DD>　MPEGストリームをビルドする場合、以下の注意事項があります。</P>
+<A NAME="no4_11"></A>
+	<P><DT><B>　●セクタレート指定</B>
+	<DD>　CDビルダでMPEGストリームをビルドする場合、セクタレートとビットレートの差の分だけダミーのデータ（エンプティセクタ）が入ってしまいます。その結果、次のような問題が発生します。</P>
+
+	<P><DD><OL TYPE=a>
+	<B><LI></B>ファイルサイズが大きくなってしまう。
+	<B><LI></B>CDバッファへの先読みの効果がなくなってしまう。</OL></P>
+
+	<P><DD>エンプティセクタを除去するには、次の関係を満たす範囲で、できるだけ小さなセクタレートを指定します。即ち、全ビットレートの合計を越え、それに最も近いセクタレートの値です。</P>
+
+	<P><DD><H4>　セクタレート≧全ビットレートの合計</H4></P>
+
+	<P><DD>セクタレートを計算するには、前章の「セクタレートとビットレートの関係について」を参照してください。<BR>　なお、セクタレートに0または65535を指定すると、ダミーセクタを最小にするセクタレートを自動的に計算し設定します。</P>
+
+<A NAME="no4_12"></A>
+	<P><DT><B>　●MPEGファイルとマルチDOSファイルのチャネルインタリーブ</B>
+	<DD>　MPEGファイルとマルチDOSファイルのチャネルインタリーブは、いったんMPEGビデオストリームとMPEGオーディオストリームをマルチプレックスしてISO11172ストリームをビルドした後、このISO11172ストリームをソースファイルとして再度マルチDOSファイルとのチャネルインタリーブを行う、いわゆる2パス方式により実現することができます。</P>
+
+	<P><DD><B>［実行手順］</B>
+	<DD><OL>
+	<P><B><LI></B>MPEGビデオストリームとMPEGオーディオストリームをマルチプレックスし、ISO11172ストリームをDOSファイルとして出力するスクリプト1を作成する。
+	<P><B><LI></B>スクリプト1を用いてCDビルダを実行する。
+	<P><B><LI></B>作成したISO11172ストリームとマルチDOSファイルをチャネルインタリーブするスクリプト2を作成する。
+	<P><B><LI></B>スクリプト2を用いてCDビルダを実行する。
+	</OL>
+
+<A NAME="no4_13"></A>
+	<P><DT><B>　●MPEGビデオストリームの定義</B>
+	<DD>　MPEGビデオストリームをFileSourceコマンドを使って定義する場合、ファイルソースタイプをMPEG_VIDEOと記述します。<BR>
+この記述によりファイルソースがMPEGビデオストリームであることを識別し、MPEGビデオストリームの最後に記録されているsequence_end_codeの直後に16ワードの"0"データを付加します。<BR>
+セガサターンに於けるMPEGビデオストリームの正常な再生のためにはこの記述は必要です。</P>
+
+	<P><UL>
+HFileSource　　入力ファイル名<BR>
+SourceType　　MPEG_VIDEO<BR>
+EndFileSource</UL></P>
+
+	<P><DD>　また、MPEGビデオストリームをMpegStreamコマンドを使って定義する場合には、パラメータのVIDEOを識別することで同様の処理を行います。</P>
+
+	<P><UL>MpegStream　　ソースファイル名　　VIDEO</UL></P>
+
+
+<A NAME="no4_14"></A>
+	<P><DT><B>　●ISO11172ストリームのサブヘッダ</H3>
+	<DD>　MPEGビデオストリームとMPEGオーディオストリームをマルチプレックスしてISO11172ストリームをビルドする場合、サブヘッダにはISO11172ストリーム固有の値が設定されます。</P>
+
+	<DL>
+	<P><DT>(a) コーディングインフォメーション
+	<DD>・オーディオストリームは7FH、ビデオストリームは0FHが設定される。</P></DL>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p20_10_j.htm">戻る</A>｜
+<a href="p22_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

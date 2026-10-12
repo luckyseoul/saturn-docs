@@ -1,0 +1,144 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/86&gt;VDP2ユーザーズマニュアル/3.2VRAMバンク分割</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p03_30_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第３章　ＲＡＭ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_20"></A>
+	<P>	<DT><H2>■3.2　VRAMバンク分割</H2>
+		<DD>　VDP2は、VRAM-A、VRAM-Bをそれぞれ2分割すると、VRAM-A0、VRAM-A1、VRAM-B0、VRAM-B1の4つのバンクを同時にアクセスすることができます。そのため、2分割しない場合より多くの画像データを一度に得ることができ、同時に表示できるスクロール画面数を多くしたり、色数の多い画面を表示したりできるようになります。しかし、表示期間中のCPUによるVRAMリード／ライトアクセスの指定に制限があります。したがって、表示期間中にCPUによるリード／ライトアクセスを多く行いたい場合にはVRAMを2分割せず、通常の場合には2分割すると、効率のよいアクセスを行うことができます。</P>
+
+<A NAME="no3_21"></A>
+	<P>	<DT><H3>　●RAMコントロールレジスタ</H3>
+		<DD>　RAMコントロールレジスタはVRAMのバンク分割、回転スクロール画面のVRAMの使用目的およびカラーRAMモードを指定します。リードライト可能な16ビットのレジスタで、18000EH番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<A NAME="RAMCTL_"></A>
+<P>	<DD><B><FONT SIZE=5>RAMCTL</FONT>　<FONT SIZE=4>18000EH</FONT></B>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><A HREF="#CRKTE_">CRKTE</A></TH><TH>-</TH><TH><A HREF="#CRMD_">CRMD1</A></TH><TH><A HREF="#CRMD_">CRMD0</A></TH><TH>-</TH><TH>-</TH><TH><A HREF="#VRBMD_">VRBMD</A></TH><TH><A HREF="#VRAMD_">VRAMD</A></TH>
+</TR></TABLE><P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR>
+<TH><A HREF="#RDBSx_">RDBSB11</A></TH><TH><A HREF="#RDBSx_">RDBSB10</A></TH><TH><A HREF="#RDBSx_">RDBSB01</A></TH><TH><A HREF="#RDBSx_">RDBSB00</A></TH>
+<TH><A HREF="#RDBSx_">RDBSA11</A></TH><TH><A HREF="#RDBSx_">RDBSA10</A></TH><TH><A HREF="#RDBSx_">RDBSA01</A></TH><TH><A HREF="#RDBSx_">RDBSA00</A></TH></TR></TABLE></P>
+
+
+<A NAME="CRKTE_"></A>
+	<P>	<DT><B>カラーRAM係数テーブルビット</B>：Color RAM coefficient table enable bit(CRKTE)、ビット15
+		<DD>「<a href="p06_40_j.htm"><B>6.4  係数テーブル制御</B></A>」を参照してください。</P>
+
+<A NAME="CRMD_"></A>
+	<P>	<DT><B>カラーRAMモードビット</B>：Color RAM mode bit (CRMD1, CRMD0)、ビット13、12
+		<DD>「<a href="p03_40_j.htm"><B>3.4　カラーRAMモード</B></A>」を参照してください。</P>
+
+	<P>	<DD>　CRKTEビットを1にしたときには、カラーRAMモードをモード1にしてください。その際、カラーRAMの後半(100800H〜100FFFH)は、係数テーブルデータ用に使用されるので、カラーデータを格納できなくなります。</P>
+
+<A NAME="VRAMD_"></A>
+<A NAME="VRBMD_"></A>
+	<P>	<DT><B>VRAMモードビット</B>：VRAM mode bit (VRBMD, VRAMD)
+		<DD>　VRAMのバンク分割を制御します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TH WIDTH=110><PRE>VRAMD</TH><TD><PRE>18000EH</TD><TD><PRE>ビット8</TD><TD WIDTH=220><PRE>VRAM-A用</TD></TR>
+	<TR><TH><PRE>VRBMD</TH><TD><PRE>18000EH</TD><TD><PRE>ビット9</TD><TD><PRE>VRAM-B用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>VRxMD</TH><TH WIDTH=250><PRE>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>2つのバンクに分割しない</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>2つのバンクに分割する</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxには、AまたはBが入ります。</P>
+
+<A NAME="RDBSx_"></A>
+<A NAME="RDBSA0_"></A>
+<A NAME="RDBSA1_"></A>
+<A NAME="RDBSB0_"></A>
+<A NAME="RDBSB1_"></A>
+	<P>	<DT><B>回転データバンク指定ビット</B>：RBG0 data bank select bit (RDBSA00〜RDBSB11)、ビット7〜0
+		<DD>「<a href="p06_20_j.htm"><B>6.2　回転スクロール画面表示制御</B></A>」を参照してください。<BR>　CRKTEビットを1にしたとき、VRAMの4バンクは係数テーブルデータ用RAMとして使用するように指定しないでください。</P>
+
+
+<!-- 97/01/01あけましておめでとうございます。追加(STN-13)やれやれやっと本文に追加されたか -->
+<A NAME="no3_22"></A>
+	<P>	<DT><H3>　●パターンネームデータの格納場所</H3>
+		<DD>　スクロール面のパターンネームデータ格納場所は、ノーマルスクロール面や回転スクロール面に関係なく、次のような制限があります。<BR>
+VRAMモードビットとパターンネームデータ格納場所の制限を下記<A HREF="#t3_2">表3.2</A>に示します。<BR>
+　なお、キャラクタパターンデータまたはビットマップパターンデータの格納場所に制限はありません。</P>
+
+	<P>	<DT><OL>
+		<LI><B>VRAM-A、VRAM-Bのどちらも２分割しない場合</B>
+		<DT>　VRAM-AまたはVRAM-Bのどちらか一方にしか格納できない</P>
+
+	<P>	<LI><B>VRAM-Aだけを２分割する場合</B>
+		<DT>a)　VRAM-Bに格納するときは、VRAM-A1に格納してもよい
+		<DT>b)　VRAM-Bに格納しないときは、VRAM-A0，A1のどちらに格納してもよい</P>
+
+	<P>	<LI><B>VRAM-Bだけを２分割する場合</B>
+		<DT>a)　VRAM-Aに格納するときは、VRAM-B1に格納してもよい
+		<DT>b)　VRAM-Aに格納しないときは、VRAM-B0，B1のどちらに格納してもよい</P>
+
+	<P>	<LI><B>VRAM-A、VRAM-Bのどちらも２分割する場合</B>
+		<DT>　VRAM-A0かVRAM-B0どちらか一方と、VRAM-A1かVRAM-B1のどちらか一方にしか格納できない。</P>
+	</OL>
+
+<A NAME="t3_2"></A>
+	<P>	<DD><B>表3.2　パターンネームデータ格納場所の制限</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH COLSPAN=2><PRE>VRAMモードビットの設定値</TH><TH COLSPAN=4><PRE>　パターンネームデータ格納場所　</TH></TR>
+	<TR ALIGN=CENTER><TH ROWSPAN=2>VRAMD</TH><TH ROWSPAN=2>VRBMD</TH><TH COLSPAN=2>VRAM-A</TH><TH COLSPAN=2>VRAM-B</TH></TR>
+	<TR ALIGN=CENTER>                                          <TH>VRAM-A0</TH><TH>VRAM-A1</TH><TH>VRAM-B0</TH><TH>VRAM-B1</TH></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>０</TD><TD ROWSPAN=2>０</TD><TD COLSPAN=2>○</TD>           <TD COLSPAN=2>×</TD></TR>
+	<TR ALIGN=CENTER>                                          <TD COLSPAN=2>×</TD>           <TD COLSPAN=2>○</TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>１</TD><TD ROWSPAN=2>０</TD><TD>×</TD><TD>○</TD>          <TD COLSPAN=2>○</TD></TR>
+	<TR ALIGN=CENTER>                                          <TD>○</TD><TD>○</TD>          <TD COLSPAN=2>×</TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>０</TD><TD ROWSPAN=2>１</TD><TD COLSPAN=2>○</TD>           <TD>×</TD><TD>○</TD></TR>
+	<TR ALIGN=CENTER>                                          <TD COLSPAN=2>×</TD>           <TD>○</TD><TD>○</TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=4>１</TD><TD ROWSPAN=4>１</TD><TD>○</TD><TD>○</TD>          <TD>×</TD><TD>×</TD></TR>
+	<TR ALIGN=CENTER>                                          <TD>○</TD><TD>×</TD>          <TD>×</TD><TD>○</TD></TR>
+	<TR ALIGN=CENTER>                                          <TD>×</TD><TD>○</TD>          <TD>○</TD><TD>×</TD></TR>
+	<TR ALIGN=CENTER>                                          <TD>×</TD><TD>×</TD>          <TD>○</TD><TD>○</TD></TR>
+	</TABLE>
+	<DD>○：格納できる
+	<DD>×：格納できない
+	<DD><B>[注]</B>格納できる場所が複数ある場合、全てに格納する必要はありません</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p03_30_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

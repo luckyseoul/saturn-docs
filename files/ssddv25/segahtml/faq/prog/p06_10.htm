@@ -1,0 +1,110 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/ 7&gt;FAQ/General program</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Program General</b><H2 ALIGN=CENTER> SOUND</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_01"><HR></a><DL>
+<H3> What are the STEREO/MONO settings for CD-DA?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How to switch between STEREO and MONORAL for CDDA sound At first, I thought that I could just change the stereo/mono settings in BOOT-ROM, but according to the software creation guidelines, the BOOT-ROM settings are prohibited from being rewritten from an application. I don't know what to do.</P>
+<P> There is a stereo/monaural switch in the sound driver, but it seems to be a setting for PCM vocalization, so this is different from the information I want.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> CDDA sound can also be changed using the stereo/monaural switching bit in the sound driver.</P>
+<P> Also, to obtain the multiplayer status (stereo/monaural), use the SMPC I/F library.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_02"><HR></a><DL>
+<H3> If I set SND_Init to slInitSound, it doesn't work.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I changed the setting to SND_Init to slInitSound, no sound came out.<BR>
+ Aren't both functions just transferring driver and map data and activating the sound CPU?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> wrong. It is true that both functions transfer the driver and map and activate the 68000, but each function also performs the task of initializing the shared area.</P>
+<P> SND_Init initializes the shared variables used by the SND_* functions, and slInitSound initializes the parts of the SGL system variable area that are used by sounds, so when you use these sound functions, you have to look at uninitialized data. Of course, there will be no sound as you will be operating it.</P>
+<P> These two function groups cannot be used at the same time, but if you use SND_* functions in Cinepak etc., but use slSnd* in the main program, you can use them by performing slInitSound before using the slSnd* functions. You can.<BR>
+ Of course, the process is the same in reverse.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_03"><HR></a><DL>
+<H3> How to set volume/Pan without using sound I/F library in SBL?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How to set volume/Pan without using sound I/F library (SND_SetCdDaLev / SND_SetCdDaPan) in SBL</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There is no other way to operate at the library level.<BR>
+ Another method is to use a sound driver.<BR>
+ <A HREF="../../sndt/prog/drve/sndcmd_.htm#19">CD-DA Level</a> and <A HREF="../../sndt/prog/drve/sndcmd_.htm#20">CD-DA Pan</a> can be operated as sound control commands.<BR>
+ Please see the SATURN Sound Driver System Interface Manual for this information.<BR>
+ Note that SND_SetCdDaLev / SND_SetCdDaPan also performs similar processing.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_04"><HR></a><DL>
+<H3> I want to pan the sequence, but the sound is coming out in the middle.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I tried panning the sequence but it sounds right in the middle. I have set L to the maximum (1F), and when I check the command history, the pan command is sent correctly (0E,01,...).</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> First, check whether any effects (DSP) are used in the sequence. Also, if you pan too much to the left or right, the sound may sound more centered, so in that case, try adjusting the setting value to a smaller value.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_05"><HR></a><DL>
+<H3> How do you calculate the PCM playback pitch?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I don't know how to calculate the value specified for the PCM playback pitch.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The playback pitch calculation is as follows.<BR>
+ If the playback frequency is Fn,</P>
+<P><DD><PRE> <B>( ( s^-OCT × 1024 × Fn ) / 44.1 - 1024 ) × OCT × 2048</b></PRE></P>
+<P> It becomes. However, the OCT value is</P>
+<P><DD><PRE>
+ 5.5125KHz ~ 11.025KHz -3
+11.025KHz ~ 22.05KHz -2
+22.05KHz ~ 44.1KHz -1
+44.1KHz ~ 88.2KHz 0
+88.2KHz ~ 1
+</PRE></P>
+<P>is. For details, please refer to 6.4.5 "Support for playback frequencies other than 44.1kHz" in the Sound Embedded Manual of PROGRAMMERS GUIDE VOL.1.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_06"><HR></a><DL>
+<H3> I want to bring the data to the 68000 side when playing the PCM stream.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Does all the data for "PCM stream playback" have to be stored in the SH2's main memory?<BR>
+ Is it not possible to pull the data to the main before transferring it to the 68000?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is a specification of the stream library, so stream data cannot be brought directly to the 68000 side.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_07"><HR></a><DL>
+<H3> How to apply effects to PCM stream playback</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to apply an effect from the built-in DSP to PCM stream playback, but the parameters are initialized to 0 and cannot be changed.Is there any support in the library that allows you to change the effect send level? ?</P>
+<P> In the sound driver, it seems that the effect parameters such as volume, localization, and effect send level can be changed, but in the library, there was an annotation that ``DSP is not used'' and it was fixed to 0.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The only option is to issue commands directly to the sound driver.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_08"><HR></a><DL>
+<H3> Slot is fixed when playing PCM stream</H3><P><DT> <FONT SIZE=5>Q)</font><DD> While checking the slot status to check the number of pronunciations, I found out that the PCM stream seems to be occupying slots 3 and 4.<BR>
+ The sound driver side should be using dynamic voice allocation, but if this continues, if some BGM instruments are playing in slot number 3 and PCM is played, the sound will be erased.<BR>
+ Is there a way to avoid this?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> If you bring the PCM stream to number 4 as much as possible, the songs that came in up to number 3 will not be deleted, so please deal with it accordingly.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_09"><HR></a><DL>
+<H3> Volume is low with direct MIDI</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When playing SE continuously using direct MIDI, the volume (Velocity) suddenly decreases. The note-off command is issued correctly, but is there another cause?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Is there a one-to-one correspondence between note-offs and are commands issued each time? Also, if the parameters specified at that time are not the same as those for note-on (such as the Velocity setting), the above phenomenon may occur. not.<BR>
+ Other than that, I can't think of any particular cause.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_10"><HR></a><DL>
+<H3> Regarding the floating point specifications of the delay buffer.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me the floating point format of one piece of data (16bit) in the delay buffer.<BR>
+ Also</P>
+<P><DD> <B>LDI MEMSXX, MR[Table + ADREG/NF]</b></P>
+<P> When data is loaded with non-floating specification like this, does it go into the upper 16 bits of the 24 bits of the MEMSXX register? Does it go into the lower 16 bits?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The floating point format cannot be disclosed due to a non-disclosure agreement with Yamaha.<BR>
+ It is stored in the upper 16 bits of the register, and the rest are filled with 0.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

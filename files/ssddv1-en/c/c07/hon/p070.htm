@@ -1,0 +1,47 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p069.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p071.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 1.3 Detailed explanation </H2>
+<H3>SCU</H3>
+<DD> <H3> How to use </H3>
+<UL> For details on how to use, see the timer interrupt in the SCU User's Manual. <P>
+<B> Calling sequence </B> <BR>
+The following shows a calling sequence that causes a timer 1 interrupt when drawing on the 10th bit of each line using timer 1 and inverts that line for odd lines. <P>
+<PRE> Uint32 time_flg; / * Interrupt flag * /
+...
+void vblankOut () / * V-BLANK OUT execution function * /
+{
+     Uint32 intr_count = 0; / * Interrupt counter * /
+     ...
+     TIM_T1_DISABLE (); / * Disable timer 1 interrupt * /
+     TIM_T1_SET_MODE (TIM_MD_LINE); / * Specify the occurrence of interrupt for each line * /
+     TIM_T1_SET_DATA(10);                 
+                  / * Specify the interrupt generation timing at the 10th bit of the line * /
+     time_flg = OFF; / * Turn off the interrupt flag * /
+     TIM_T1_ENABLE (); / * Timer 1 interrupt enable * /
+     ...
+     for(intr_count &lt; ALL_LINE_NUM){
+                                           / * Until all line interrupts are executed * /
+               changeLine (intr_count); / * Invert odd number line * /
+               intr_count ++; / * Line count * /
+     }
+}
+void timeIntr () / * Interrupt execution function * /
+{
+     time_flg = ON; / * Turn on the interrupt flag * /
+}</PRE><P></UL></UL>
+<H3>CPU</H3>
+<UL> <H3> Basic matters </H3>
+<UL> <B> Counter value </B> <BR>
+∙ The counter value is used to specify the time to FRT. This counter value is described below. <P>
+The count-up cycle of the counter value varies depending on the frequency division specification and graphic mode specification. The count-up cycle can be obtained by the following calculation. <P>
+Count-up cycle (s) = Divide x 1 / Clock frequency (Hz) <P>
+∙ Use the following function format macro to convert the count value to microseconds and the microseconds to count value. </UL></UL><P>
+</DL><P><P><HR>
+<A HREF=p069.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p071.htm> Go to next page </A>
+</BODY>
+</HTML>

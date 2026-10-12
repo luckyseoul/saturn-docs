@@ -1,0 +1,246 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 3&gt;デバッグサポートライブラリ/2.2　関数仕様</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">デバッグサポートライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>デバッグサポートライブラリ/2.リファレンス</B>
+<HR NOSHADE>
+<H3>2.2　関数仕様</H3>
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no1"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>デバッグ環境の初期化</TD>
+<TD WIDTH=160><PRE><B>Function Name</B><BR>DBG_Initial</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>1</TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void　DBG_Initial (Uint16 *PadData, Rgb16 charColor, Rgb16 backColor)<P>
+<DT><B>　入　力</B><DD><DL>
+	<P><DT>apPadData：専用パッドデータのポインタ
+		<DD>V-Blankユーザールーチンにてペリフェラルライブラリを使用して獲得したパッドデータを設定するパッドデータエリアを指定してください。<BR>また、パッドデータは、0、1を反転して設定してください。</P>
+	<P><DT>charColor：表示用文字色を16ビットRGBで指定します。
+		<DD>backColor：表示用バック画面の色を16ビットRGBで指定します。0を指定すると透明色となります。</P>
+	</DL>
+
+<P><DT><B>　設定例</B>
+	<DD>＝＝＝　Ｖブランク割り込みルーチン（パッドデータ取得）　＝＝＝
+<PRE>
+    PerDgtInfo  *pad;
+        Uint16          PadData1;
+
+    PadData1  = pad[0].data ^ 0xffff;
+</PRE>
+
+	<P><DD>＝＝＝　DBG_Initial 呼び出し側ルーチン　＝＝＝
+<PRE>
+        extern Uint16          PadData1;
+
+        DBG_Initial(&PadData1, ...);
+</PRE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>デバッグサポートライブラリの初期化と、以下のプログラム例外割り込みベクタにプログラムエラー表示ルーチンのエントリを設定します。
+<DD><UL TYPE="DISK">
+<LI>一般不当命令割り込み
+<LI>スロット不当命令割り込み
+<LI>CPUアドレスエラー割り込み
+<LI>DMAアドレスエラー割り込み</UL>
+<DD>プログラムエラー表示ルーチンは、エラーが発生した場合に上記エラー原因と現レジスタ内容、スタックエリア内容を表示して簡易モニタに制御を渡します。
+<DT><B>　備　考</B><DD>ライブラリ使用者は、最初に実行しなければなりません。
+</DL>
+
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no2"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>デバッグ画面の表示ON</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>DBG_DisplayOn</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>2</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void　DBG_DisplayOn(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>デバッグ画面を表示します。
+</DL>
+
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no3"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>デバッグ画面の表示OFF</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>DBG_DisplayOff</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>3</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void　DBG_DisplayOff(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>デバッグ画面を表示しません。
+</DL>
+
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no4"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>デバッグ画面のクリア</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>DBG_ClearScreen</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>4</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void　DBG_ClearScreen(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>デバッグ画面に書かれたデータを消去します。
+</DL>
+
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no5"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>デバッグ画面カーソルセット</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>DBG_SetCursol</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>5</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void　DBG_SetCursol(Uint16 x,Uint16 y)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>x</TD><TD><PRE>：X座標</TD></TR>
+	<TR><TD><PRE>y</TD><TD><PRE>：Y座標</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>カーソルの位置を指定します。
+</DL>
+
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no6"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>デバッグ画面に文字列表示</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>DBG_Printf</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>6</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void　DBG_Printf(const char *control, ...)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>control</TD><TD><PRE>：書式を示す文字列へのポインタ</TD></TR>
+	<TR><TD><PRE>...    </TD><TD><PRE>：引数リスト</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>デバッグ画面に文字列を書きます。printf()と同じ使い方をします。
+<DT><B>　　例　</B><DD><PRE>
+sample()
+        {
+            DBG_Printf(“%s¥n”,“SEGA”);
+        }
+</PRE>
+</DL>
+
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no7"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>ソフトウェアキーボードによる<BR>キー入力処理</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>DBG_GetKeyStr</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>7</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>char　*DBG_GetKeyStr(char *keyStr)
+<DT><B>　入　力</B><DD>keyStr：入力キーストリングリターンエリアのポインタ。
+<DT><B>　出　力</B><DD>keyStr：入力キーストリングデータ。
+<DT><B>　関数値</B><DD>指定された入力キーストリングリターンエリアのポインタ
+<DT><B>　機　能</B><DD>デバッグ画面上にソフトウェアキーボードを表示して文字列を取り込みます。
+<DT><B>　キーパッド操作</B>
+<DD><TABLE>
+	<TR><TD><PRE>R    </TD><TD><PRE>：キー選択カーソルの右移動</TD></TR>
+	<TR><TD><PRE>L    </TD><TD><PRE>：キー選択カーソルの左移動</TD></TR>
+	<TR><TD><PRE>U    </TD><TD><PRE>：キー選択カーソルの上移動</TD></TR>
+	<TR><TD><PRE>D    </TD><TD><PRE>：キー選択カーソルの下移動</TD></TR>
+	<TR><TD><PRE>B + R</TD><TD><PRE>：キーウィンドウの右移動</TD></TR>
+	<TR><TD><PRE>B + L</TD><TD><PRE>：キーウィンドウの左移動</TD></TR>
+	<TR><TD><PRE>B + U</TD><TD><PRE>：キーウィンドウの上移動</TD></TR>
+	<TR><TD><PRE>B + D</TD><TD><PRE>：キーウィンドウの下移動</TD></TR>
+	<TR><TD><PRE>A    </TD><TD><PRE>：キー選択カーソル位置の文字を入力</TD></TR>
+	<TR><TD><PRE>C    </TD><TD><PRE>：入力文字の削除(バックスペース)</TD></TR>
+	<TR><TD><PRE>START</TD><TD><PRE>：入力終了(リターン)</TD></TR>
+	<TR><TD><PRE>X    </TD><TD><PRE>：スプライト画面の非表示／表示</TD></TR>
+	<TR><TD><PRE>Y    </TD><TD><PRE>：スクロール(ノーマル０以外)画面の非表示／表示</TD></TR></TABLE>
+
+</DL>
+
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no8"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>簡易デバッグ処理</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>DBG_Monitor</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>8</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void　DBG_Monitor(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>以下のコマンドを入力し、メモリ内容の表示変更等を行います。
+
+<P><DD>[]内は省略可能で、/ はどれかを選択してください。</P>
+<DT><OL>
+<P><B><LI>メモリ内容の表示</B>
+<TABLE>
+<TR><TD COLSPAN=2>D fromAddr [toAddr/@size] [;B/W/L] &lt;RTN&gt;</TD></TR>
+<TR><TD><PRE>fromAddr</TD><TD><PRE>：ダンプ開始アドレス</TD></TR>
+<TR><TD><PRE>toAddr  </TD><TD><PRE>：ダンプ終了アドレス</TD></TR>
+<TR><TD><PRE>@size   </TD><TD><PRE>：ダンプサイズ(HEX)</TD></TR>
+<TR><TD><PRE>B       </TD><TD><PRE>：バイト(8ビット)表示指定</TD></TR>
+<TR><TD><PRE>W       </TD><TD><PRE>：ワード(16ビット)表示指定</TD></TR>
+<TR><TD><PRE>L       </TD><TD><PRE>：ロング(32ビット)表示指定</TD></TR></TABLE>
+　Dコマンドのあとのコマンド入力で、&lt;RTN&gt;だけをキーインするとメモリダンプを続けます。</P>
+
+<P><B><LI>メモリ内容の変更</B><BR> D toAddr [data] [;B/W/L] &lt;RTN&gt;
+<TABLE>
+<TR><TD><PRE>toAddr  </TD><TD><PRE>：メモリアドレス</TD></TR>
+<TR><TD><PRE>data    </TD><TD><PRE>：変更データ(HEX)</TD></TR>
+<TR><TD><PRE>B       </TD><TD><PRE>：バイト(8ビット)データ指定</TD></TR>
+<TR><TD><PRE>W       </TD><TD><PRE>：ワード(16ビット)データ指定</TD></TR>
+<TR><TD><PRE>L       </TD><TD><PRE>：ロング(32ビット)データ指定</TD></TR></TABLE>
+　dataを省略すると指定アドレスからデータ変更のプロンプトが表示されますので、順次データを入力します。この時、^を入力すると変更アドレスをマイナスし、&lt;RTN&gt;を入力すると変更アドレスをプラスします。また、. を入力するとメモリ変更を終了します。</P>
+
+<P><B><LI>レジスタ内容の表示</B><BR>
+Ｒ<IMG SRC="../../../../what/retkey.gif"><BR>
+　プログラムの例外処理ルーチンから呼び出された場合のみ有効です。</P>
+
+<P><B><LI>簡易デバッグ処理の終了</B><BR>
+Ｑ<IMG SRC="../../../../what/retkey.gif"><BR>
+　本ルーチンの呼び出し元に戻ります。ただし、プログラムの例外処理ルーチンから呼び出された場合は無効です。</P>
+
+<P><B><LI>コマンドのヘルプ表示</B><BR>
+Ｈ<IMG SRC="../../../../what/retkey.gif"></P>
+</OL>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+　　■</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">デバッグサポートライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,40 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p051.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p053.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD><IMG SRC="hyou/i052-01.gif"><BR>
+<B> Figure 4 16-bit bitmap data </​​B> <BR>
+<DT> <H3> Example of program description </H3>
+An example of actual program in <DD> C language is shown below. <P>
+<PRE>#include &lt;machine.h&gt;
+#include "sega_scl.h"<P>
+                                     / * Set cycle pattern table * /
+Uint16 n0_cycle [] = {0x44ff, 0x0fff, / * Character pattern of VRAM A (A0) NBG0
+                                             And pattern name table * /
+                    0xffff, 0xffff, / * VRAM A1 VRAM A is not divided * /
+                                     /*     unused     */
+                    0xffff, 0xffff, / * VRAM B (B0) no data * /
+                    0xffff, 0xffff}; / * VRAM B1 VRAM B is not divided * /
+                                     / * Not used * / <P>
+extern Uint16 ColData []; / * Pallet data pointer * / <P>
+SclConfig     scfg;
+main()
+{
+     SCL_Vdp2Init (); / * Initialize VDP2 library * / <P>
+     SCL_SetDisplayMode(SCL_NON_INTER,SCL_224LINE,SCL_NOMAL_A);
+                                                 / * Set screen mode * / <P>
+     SCL_SetColRamMode(SCL_CRM_2048);
+                                                 / * Color RAM mode setting * /
+     SCL_AllocColRam(SCL_NBG0,256,ON);
+                                                 / * Secure pallet area * /
+     SCL_SetColRam(SCL_NBG0,0,265,ColData);
+                                                 / * Set palette data * / <P>
+     ..... / * Scroll data is stored in VDP2 VRAM. */
+     SCL_InitConfigTb (& scfg); / * Scroll NBG0 configuration initialization * / </PRE>
+</DL><P><P><HR>
+<A HREF=p051.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p053.htm> Go to next page </A>
+</BODY>
+</HTML>

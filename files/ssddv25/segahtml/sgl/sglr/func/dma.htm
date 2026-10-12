@@ -1,0 +1,221 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/22&gt; <!-- Number of pages/total number of pages -->
+ SGL function reference/dma function <!-- Title name -->
+ </TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#dma">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDMACopy"><HR NOSHADE></a><H4> function</H4><H1> slDMACopy</H1><HR>
+<H3> Memory transfer using DMA</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void *src_A;
+    void *dest_A;
+    <A HREF="../struct/types.htm#Uint32"><I>Uint32</i></a> size;
+
+    void slDMACopy( src_A, dest_A, size );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void *src_A - Address where the original data is located.<BR>
+    void *dest_A - Destination address.<BR>
+    <A HREF="../struct/types.htm#Uint32"><I>Uint32</i></a> size - Size to transfer (in bytes).<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Block transfers are performed using the CPU's built-in DMA.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> ( high_ram, vdp2, size );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function terminates immediately after starting DMA, so if you want to know when the transfer is complete, use the " <A HREF="../func/dma.htm#slDMAWait"><I>slDMAWait</i></a> " function.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/dma.htm#slDMAWait">slDMAWait</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#dma">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDMAXCopy"><HR NOSHADE></a><H4> function</H4><H1> slDMAXCopy</H1><HR>
+<H3> Memory transfer using DMA</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void *src_A;
+    void *dest_A;
+    <A HREF="../struct/types.htm#Uint32"><I>Uint32</i></a> size;
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode;
+
+    void slDMAXCopy( src_A, dest_A, size, mode );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void *src_A - Address where the original data is located.<BR>
+    void *dest_A - Destination address.<BR>
+    <A HREF="../struct/types.htm#Uint32"><I>Uint32</i></a> size - Size to transfer (in transfer size units).<BR>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode - Transfer mode (described later).<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Block transfers are performed using the CPU's built-in DMA.<BR>
+    The arguments are the same as <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> above, but mode is specified as follows.<BR>
+<PRE>    mode:
+      In the format SourceMode_DestinationMode_Size,
+      SourceMode :
+        Sinc: Transfer while incrementing the source address.<BR>
+        Sdec: Transfer while decreasing the source address.<BR>
+        Sfix: Transfers with a fixed source address.<BR>
+      DestinationMode:
+        Dinc: Transfer while increasing the destination address.<BR>
+        Ddec: Transfer while decreasing the destination address.<BR>
+        Dfix: Transfer with a fixed destination address.<BR>
+      Size :
+        Byte: Transfer 1 byte at a time.<BR>
+        Word: Transfer every 2 bytes.<BR>
+        Long: Transfer every 4 bytes.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Fill an area with 0.<BR>
+    <A HREF="../struct/types.htm#Uint32"><I>Uint32</i></a> dest = 0;
+    <A HREF="../func/dma.htm#slDMAXCopy"><I>slDMAXCopy</i></a> ( src, &dest, size, <A HREF="../struct/constdma.htm#Sfix_Dinc_Long"><I>Sfix_Dinc_Long</i></a> );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    Address changes are executed every time a transfer unit ends, so if you specify subtraction,
+    Please note that the transfer will first be forwarded to the specified destination, the address will be reduced, and then the next transfer will be made.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/dma.htm#slDMACopy">slDMACopy</a></TD><TD><PRE> <A HREF="../func/dma.htm#slDMAWait">slDMAWait</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMASt_CPU0">DMASt_CPU0</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#dma">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDMAWait"><HR NOSHADE></a><H4> function</H4><H1> slDMAWait</H1><HR>
+<H3> Waiting for DMA transfer</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void slDMAWait();
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - Pass nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Waits for the DMA started with <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> and <A HREF="../func/dma.htm#slDMAXCopy"><I>slDMAXCopy</i></a> to finish.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> ( src0, dst0, cnt0 ); /* First transfer request */
+    <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> ( src1, dst1, cnt1 ); /* Second transfer request */
+                                    /* (Executed after the first one finishes) */
+    <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> ( src2, dst2, cnt2); /* Third transfer request (same as above) */
+
+    <A HREF="../func/dma.htm#slDMAWait"><I>slDMAWait</i></a> (); /* Wait for third transfer to finish */
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> and <A HREF="../func/dma.htm#slDMAXCopy"><I>slDMAXCopy</i></a> always use the same channel, and if a transfer is in progress, they wait for the transfer to end before starting a new transfer, so they can be executed continuously.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/dma.htm#slDMACopy">slDMACopy</a></TD><TD><PRE> <A HREF="../func/dma.htm#slDMAXCopy">slDMAXCopy</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#dma">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDMAStatus"><HR NOSHADE></a><H4> function</H4><H1> slDMAStatus</H1><HR>
+<H3> DMA startup status</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slDMAStatus();
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - Pass nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Checks whether the above <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> and <A HREF="../func/dma.htm#slDMAXCopy"><I>slDMAXCopy</i></a> are being executed and returns the status.<BR>
+    Returns <A HREF="../struct/constenm.htm#ON"><I>ON</i></a> if running, <A HREF="../struct/constenm.htm#OFF"><I>OFF</i></a> if finished.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> ( src, dest, size );
+    if ( <A HREF="../func/dma.htm#slDMAStatus"><I>slDMAStatus</i></a> () == <A HREF="../struct/constenm.htm#ON"><I>ON</i></a> ) {
+                    :
+    } else {
+                    :
+    }
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/dma.htm#slDMACopy">slDMACopy</a></TD><TD><PRE> <A HREF="../func/dma.htm#slDMAXCopy">slDMAXCopy</a></TD><TD><PRE> <A HREF="../func/dma.htm#slDMAWait">slDMAWait</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#dma">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slCashPurge"><HR NOSHADE></a><H4> function</H4><H1> slCashPurge</H1><HR>
+<H3> Initialize cache</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void slCashPurge();
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - Pass nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Clears the CPU's built-in cache. This is used when the cache area is changed due to DMA transfer, etc.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    *( <A HREF="../struct/types.htm#Uint32"><I>Uint32</i></a> * )( 0x26020000 ) = 0x25e09990;
+              :
+    <A HREF="../func/dma.htm#slCashPurge"><I>slCashPurge</i></a> ();
+    test = *( <A HREF="../struct/types.htm#Uint32"><I>Uint32</i></a> * )( 0x6020000 );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    For <A HREF="../func/dma.htm#slDMACopy"><I>slDMACopy</i></a> and <A HREF="../func/dma.htm#slDMAXCopy"><I>slDMAXCopy</i></a> , if the transfer destination is a cache area, the cache will be cleared.</i></b><BR><B><I>
+    Also, when viewing the memory of the master CPU from the slave CPU, on the slave CPU,
+                                                      ^^^^^^^^^^^^
+    Please run this function before viewing.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/int.htm#slSynch">slSynch</a></TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+ <A HREF="index.htm">return</a><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

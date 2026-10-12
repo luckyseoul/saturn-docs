@@ -1,0 +1,229 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 7&gt;FAQ/General program</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Program General</b><H2 ALIGN=CENTER> VDP</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_01"><HR></a><DL>
+<H3> I want to insert sprites between BG.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to sandwich a sprite (16/256 colors) between the four 256-color BG surfaces, but how can I freely sandwich one part of the sprite between the BG surfaces instead of all of it?</P>
+<P> There seem to be 8 priority registers (25f800f0 to fc), but there is no priority or type setting in the sprite command table, so I don't know how to set them.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> With palette-style sprites, up to 8 types of priorities can be used at the same time.</P>
+<P> To specify the priority register referenced for each sprite, use the priority bits in the color control word of the VDP1 command table.</P>
+<P> Please note that which bit in the color control word corresponds to the priority bit varies depending on the sprite type used.</P>
+<P> For more information, please refer to the sprite data section of the VDP2 manual.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_02"><HR></a><DL>
+<H3> The aspect ratio looks the same for 320x224 and 320x240.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> In the screen mode, the resolution 352x240 pixel mode cannot be displayed completely on a regular TV monitor because the resolution is insufficient, but when I compared the resolution 320x240 and the resolution 320x224 on a regular TV monitor, the resolution was only shifted by the display position. It doesn't seem to have changed, what does that mean?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Basically, the screen aspect ratio does not change when the vertical resolution is 224 or 240.<BR>
+ (Pixel aspect is independent of vertical resolution.)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_03"><HR></a><DL>
+<H3> About the aspect ratio of screen modes.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I experimented, the aspect ratio seemed to be the same for 320x224 and 320x240. Is there a mode that achieves a 1:1 dot ratio on the Sega Saturn?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The aspect ratio of each graphic mode is as follows. (Note that the aspect ratio depends only on the horizontal resolution and not on the vertical resolution.)</P>
+<DD><TABLE BORDER=1>
+<TR><TH ROWSPAN=2> Screen display mode</TH><TH COLSPAN=2> Aspect ratio (vertical: horizontal)</TH></TR>
+<TR><TH WIDTH=80> NTSC</TH><TH WIDTH=80> PAL</TH></TR>
+<TR ALIGN=CENTER><TD> Normal graphics mode A (horizontal resolution 320 dots)</TD><TD> 1:0.90</TD><TD> 1:1.10</TD></TR>
+<TR ALIGN=CENTER><TD> Normal graphics mode B (horizontal resolution 352 dots)</TD><TD> 1:0.86</TD><TD> 1:0.96</TD></TR>
+<TR ALIGN=CENTER><TD> High resolution graphic mode A (horizontal resolution 640 dots)</TD><TD> 1:0.45</TD><TD> 1:0.55</TD></TR>
+<TR ALIGN=CENTER><TD> High resolution graphic mode B (horizontal resolution 704 dots)</TD><TD> 1:0.43</TD><TD> 1:0.48</TD></TR>
+<TR ALIGN=CENTER><TD> Monitor graphics mode (horizontal resolution 640 dots)</TD><TD COLSPAN=2> 1:0.90</TD></TR>
+<TR ALIGN=CENTER><TD> High-definition graphic mode (horizontal resolution 704 dots)</TD><TD COLSPAN=2> 1:1.10</TD></TR>
+</TABLE>
+<DD> There is no screen mode with a 1:1 aspect ratio.<BR>
+ If you want to accurately display an image written in a 1:1 aspect ratio, for example, you can make it look like that by using a magnification function, although it is forced.<BR>
+ (However, it is not the fundamental solution.)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_04"><HR></a><DL>
+<H3> Is it possible to output RGB code and palette code at the same time?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When drawing sprites in VDP1, when transparent pixels are enabled with color mode 5 (RGB mode) and no color calculation (replace), pixels other than the transparent color code become transparent.</P>
+<P><DD> For example, if you draw an 8x8 dot sprite like the one below that uses the VDP2 palette (MSB=1) as part of the texture, the part that uses the palette will be treated as transparent (the sprite drawn below it). ).</P>
+<P><DD><PRE>
+FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF
+FFFF 0001 0001 0001 0001 0001 0001 FFFF
+FFFF 0001 0001 0001 0001 0001 0001 FFFF
+FFFF 0001 0001 0001 0001 0001 0001 FFFF
+FFFF 0001 0001 0001 0001 0001 0001 FFFF
+FFFF 0001 0001 0001 0001 0001 0001 FFFF
+FFFF 0001 0001 0001 0001 0001 0001 FFFF
+FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF
+</PRE></P>
+<P><DD>Disabling transparent pixels will display as intended, but of course you will no longer be able to use transparency.<BR>
+ Is it not possible to draw data that uses the VDP2 palette in this mode?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Palette codes cannot be used in color mode 5 (RGB mode).<BR>
+ Color codes 0001 to 7FFE are prohibited.</P>
+<P><DT> <B>reference</b><DD> "Hardware Manual/VDP1 User's Manual" " <A HREF="../../hard/vdp1/hon/p06_30.htm">6.3 CMDPMOD→ <B>Color Mode</b></a> "</P>
+<P> Note that in color mode 1 (color lookup table mode), RGB codes and palette codes can be mixed.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_05"><HR></a><DL>
+<H3> Please tell me the difference between color lookup table (CLUT) mode and 16 color palette mode.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What is the difference between color lookup table (CLUT) mode and 16 color palette mode?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Color mode 1 of VDP1 is color lookup table (CLUT) mode.<BR>
+ The features of this color mode are as follows.</P>
+<DT><UL TYPE=DISC>
+<LI> Define and use 16 colors in the color lookup table<LI> RGB codes and palette codes can be mixed freely within the range of 16 colors.<LI> Multiple texture patterns can share the same color lookup table<LI> Color lookup table is stored in VRAM of VDP1<LI> Each color lookup table uses 16 words to store.<LI> Any number of color lookup tables can be defined (as long as they fit in VRAM)<LI> Texture pattern definition is 4bit/dot (same as 16 color palette mode)</UL>
+</P>
+<P><DD> While the normal palette mode refers to the RGB codes stored in the VDP2's color RAM, this mode stores a type of palette table called a color lookup table in the VDP1's VRAM.</P>
+<P><DD> When RGB codes are stored in the color lookup table, VDP1's color calculation functions can be used in the same way as when drawing in RGB mode.<BR>
+ (translucent, gouro, etc.)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_06"><HR></a><DL>
+<H3> Please tell me how to use color lookup mode.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to use color lookup mode.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> As shown in the example in the question above, in the case of color lookup mode, the lookup table in VDP1 is referenced, so this lookup table must be prepared first.</P>
+<P> Lookup tables can contain RGB codes or color bank codes. (A mixture of both is also possible.)</P>
+<P><DT> <B>reference</b><DD> "Hardware Manual/VDP1 User's Manual" " <A HREF="../../hard/vdp1/hon/p05_20.htm">5.2 Color Lookup Table</a> ")<P> VDP1 writes sprite pixel values as they are to the frame buffer in color bank mode or RGB mode, but in color lookup mode it writes the contents of this table as pixel values to the frame buffer.</P>
+<P><DT> <B>reference</b><DD> "Hardware Manual/VDP1 User's Manual" " <A HREF="../../hard/vdp1/hon/p06_40.htm">6.4 CMDCOLR (Color Control Word</a> )"</P>
+<P> If the color code in the lookup table is a color bank, the actual color specified by that bank is written to the VDP2's color RAM. The offset defaults to the beginning of the color RAM, and the boundary is in units of one color. (1Word/Color is 2 bytes, 2Word/Color is 4 bytes.)<BR>
+ If other color banks are specified, color calculation ratio bits, priority bits, and shadow bits can be added according to the sprite type.</P>
+<P><DT> <B>reference</b><DD> "Hardware Manual/VDP2 User's Manual" " <A HREF="../../hard/vdp2/hon/p09_10.htm">9.1 Sprite Data</a> "</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_07"><HR></a><DL>
+<H3> Can VDP1 be Lowreso and VDP2 be Hireso?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> In Developer's Information STN-22,<BR>
+ VDP1 is normal (320 dots)<BR>
+ VDP2 is hireso (640 dot)<BR>
+ Is it correct to interpret this as saying that the frame buffer on the VDP1 side can remain 16bit/pixel and only the VDP2 side can be set to hireso?<BR>
+ Also, in that case, I would like to know if there are any restrictions on the order of register settings.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> That's right.</P>
+<P> To make this setting, use SBL to execute the mode set function for each of VDP1 and VDP2. for example,</P>
+<P><DD><PRE>
+SPR_2SetTvMode( SPR_TV_NORMAL, SPR_TV_320x224, OFF );
+SCL_SetDisplayMode( SCL_NON_INTER, SCL_224LINE, SCL_HIRESO_A );
+</PRE><P>Make settings like this.<BR>
+ At SGL,</P>
+<P><DD><PRE>
+slSetScrTVMode( TV_320x224 );
+</PRE></P>
+<P>*After making this setting, you will need to reset the cycle pattern.</P>
+<P><PRE>
+slSetSprTVMode( TV_640x224 );
+</PRE></P>
+<P>Make settings like this.<BR>
+ There are no particular restrictions on the order of settings.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_08"><HR></a><DL>
+<H3> Is it possible to have a horizontal resolution of 256?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it possible to set a vertical resolution of 256 pixels?<BR>
+ If it is possible with the hardware, please tell me how to set it up.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is possible in PAL mode. To set it, set the TV mode in the second argument of slInitSystem for SGL, and with both the SCL_SetDisplayMode and SPR_2SetTvMode functions for SBL.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_09"><HR></a><DL>
+<H3> How can I display 32000 colors in 640x480 TV mode?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> According to the Sega Saturn's hardware overview, the scroll surface can display 16, 256, 2048, 32,768, and 16.77 million colors, and multiple resolutions can be set, but the display resolution is 640x480. Is it possible to display 32000 colors?<BR>
+ Maybe 512KB of VRAM isn't enough memory?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> As you pointed out, you will run out of memory, but the conclusion is that it is possible if you use the cell format. There are 32000 color modes in cell format.<BR>
+ If you use this to share cells, I think you can fit it into 512KB of VRAM.</P>
+<P> If the image is compressed using vertical cell scrolling and line scrolling (Developers Information STN-14), the portion that overflows VRAM will be displayed repeatedly from the beginning of VRAM. (There are no hardware restrictions.)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_10"><HR></a><DL>
+<H3> When using ColorRAM in 2048 color mode, the 2047th color code cannot be used.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When using color RAM in 2048 color mode, the 2047th color code from the beginning cannot be used.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The 2047th color in color RAM is used by VDP2's normal shadow function, so it cannot be used in sprites.<BR>
+ Please use another pallet number.<BR>
+ (This is a Sega Saturn specification.)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_11"><HR></a><DL>
+<H3> When I use mesh, the screen blurs.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I'm currently using a mesh for a sprite, but the mesh part becomes rainbow-colored. Is there a way to avoid this?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Isn't that probably because the number of dots next to the screen mode is set to 320 dots?<BR>
+ I think the rainbow occurs because the horizontal frequency of NTSC and the period of the dots are different, causing interference fringes.<BR>
+ To avoid this, try using a mode with a horizontal resolution of 352 dots.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_12"><HR></a><DL>
+<H3> If you change the horizontal resolution, noise will appear on the screen.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I change the resolution from 320 to 352 or from 352 to 320, there is a momentary noise on the screen. Please let me know if there is a solution.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> A29) No. The reason for this is that when you change the mode as described above, the system operating clock changes, causing the TV synchronization signal to go out of order for a moment.</P>
+<P> However, changing from 320 to 640 or 352 to 704 is not a problem as long as the VRAM cycle pattern settings are correct.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_13"><HR></a><DL>
+<H3> When I change the horizontal resolution from 320 to 352, the display shifts to the left...</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I change the resolution from 320 to 352, the display shifts to the left...</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is because 352 mode has a larger horizontal display area than 320 mode.</P>
+<P><UL TYPE=DISC>
+<LI> 320MODE: Horizontal display time (47.6295μs)<LI> 352MODE: Horizontal display time (49.1682μs)</UL>
+</P>
+<P><DD> 49.1682μs 47.6295μs = 1.5287μs is the difference time.<BR>
+ Converting this to 320 mode conversion</P>
+<P><DD> <B>1.5278μs / (1 / 6.7185MHz ) = 10 dots</b></P>
+<P> In other words, in 352 dot mode, the display area is 10 dots larger when converted to 320 dot mode. The display image in this case is</P>
+<P><DD> <B>352MODE = 5+320+5 MODE</b></P>
+<P> This means that it will appear to be shifted 5 dots to the left.<BR>
+ (See display image below for details)</P>
+<P><DD><PRE>
+(Display image)
+   |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|____|  H-Sync
+   |=======          63.5556us(NTSC)          ===============|
+
+ ●320 Mode
+   |_______|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|___________|
+     H-blank    display 1280 CLK (47.6295us)      H-blank
+            0.1.2.3.4.5.6.7.8.................319 dot
+            012345678.........................639 dot
+
+ ●352 Mode
+   |____|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|________|
+   H-blank    display 1408 CLK (49.1682us)          H-blank
+         0.1.2.3.4.5.6...........................351 dot
+         012345678...............................703 dot
+</PRE></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_14"><HR></a><DL>
+<H3> What does it mean that NBG1 can be used as an expansion screen?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I heard that NBG1 of VDP2 can be used as an expansion screen, but what does that mean?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> What is currently being used as an extended screen is a movie card.<BR>
+ This extended screen is provided to set up another screen that is not available on the Sega Saturn main body instead of the scroll screen (NBG1).<BR>
+ Naturally, the movie card (MPEG screen) and NBG1 cannot be used at the same time.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_15"><HR></a><DL>
+<H3> How to display RBG in high resolution?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I'm trying to display RBG0 in high resolution, but what is displayed in low resolution is not displayed in high resolution.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> If the problem occurs only by changing the resolution register (25F80000H) from high resolution to low resolution, there is probably a screen other than RBG0 that you are trying to display at the same time.</P>
+<P> When changing from low resolution to high resolution, the most important things to be careful of are:<BR>
+ The valid range of the cycle pattern register changes as follows:</P>
+<P><DD> <B>Low resolution: T0~T7 → High resolution: T0~T3</b></P>
+<P> Although this is not directly related to RBG0, it greatly affects normal scrolling.<BR>
+ In other words, if T4 to T7 are set to read normal scroll data, normal scroll will not be displayed correctly when switching to high resolution.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_16"><HR></a><DL>
+<H3> Is it possible to play Gouro in high resolution?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When using high resolution, is the Gouraud shading table not accessible on the hardware side?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Basically, Hi-Res + Gouraud is no good. However, if such a specification is made for the hardware, the hardware will work.</P>
+<P> When the hardware receives Gouraud's instructions, it performs 16-bit interpolation for each RGB and writes only the lower 8 bits to the frame buffer.<BR>
+ Therefore, there are only 256 colors in the frame buffer, but it is possible to use Gouraud with some techniques.</P>
+<P> Lower 8Bits of 16BitRBG = R 5Bit + G 3Bit. The data interpolated by the hardware is displayed in this bit, so if you write the data for Gouraud in the VDP2 color palette (256 entries), Gouraud with up to 256 colors will be displayed on the screen.</P>
+<P> <B>*</b> However, this method is not recommended as it is difficult to manage the color RAM.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_17"><HR></a><DL>
+<H3> When using RBG0 and RBG1, is it only possible to rotate on 2 axes?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If I use RBG0 and RBG1 at the same time, will RBG0 be able to only rotate on 2 axes because it cannot secure a bank for the coefficient table?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> When displaying RBG0,1 at the same time, if RBG0 is a bitmap, the coefficient table can be stored in the remaining VRAM bank and the coefficient can be used for each dot.</P>
+<P> Also, even if RBG0 is in cell format, the coefficient table can be used for each dot on the color RAM side.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

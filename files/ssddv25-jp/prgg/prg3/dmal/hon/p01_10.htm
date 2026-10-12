@@ -1,0 +1,84 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/5&gt;ＤＭＡライブラリ/1．ガイド</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#">ＤＭＡライブラリ</A>
+<HR>
+<B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ＤＭＡライブラリ</B>
+<H2 ALIGN=CENTER>1．ガイド</H2>
+<HR NOSHADE>
+<DL>
+
+<A NAME="no1_10"></A>
+	<P><DT><H3>1.1　目的</H3>
+	<DD>　DMAは、CPUの負担を減らすため、CPUに代わってデータの転送処理を行います。このライブラリでは、DMAの基本機能を提供します。</P>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>1.2　概要</H3>
+	<DD>　DMAは、CPUとSCUの2つのデバイスに用意されています。ライブラリは両方に対応しています。<BR>　関数は、CPUとSCUのそれぞれについて高水準と低水準のライブラリを用意しました。</P>
+	<P><DD>　高水準、低水準関数の内容を以下に説明します。</P>
+	<DD><UL TYPE=DISC>
+	<P><LI><B>高水準関数</B><BR>バイト、ワード、ロングワード転送などを簡単な設定で実行できる、基本的な関数を用意しました。</P>
+	<P><LI><B>低水準関数</B><BR>状態取得、モード設定、割り込みなどの細かい設定ができる関数を用意しました。</P>
+	</UL>
+
+	<P><DD>　CPUとSCUでの用途の主な違いを以下に説明します(詳しくはハードウェアマニュアルをご覧ください)。</P>
+	<DD><UL TYPE=DISC>
+	<P><LI><B>CPU</B><BR>SCUでは実現できないため、同一バス間(ワークRAM間等)の転送に有効です。</P>
+	<P><LI><B>SCU</B><BR>転送中にCPUを並行動作できるため、CPU_Busを使用しない転送に有効です。CPUよりも高速であるため、高速転送を行うときに有効です。</P>
+	</UL>
+
+<A NAME="no1_30"></A>
+	<P><DT><H3>1.3　使用上の注意</H3>
+	<DD><UL TYPE="DISK">
+	<P><LI>転送に使用したいソースとディスティネーションのアクセス単位を調べた上、適切な関数を使用してください。アクセス単位については、各ハードウェアマニュアルをご覧ください。</P>
+	<P><LI>高水準DMA転送ではディスティネーションが以下の条件のとき、転送後にディスティネーションエリアのキャッシュをパージします。<BR>
+<B>[条件]</B>　ディスティネーションがワークRAMのとき。<BR>
+<B>[理由]</B>　前提としてキャッシュを使用して読み込むRAMはワークRAMとしているため。<BR>
+キャッシュを使用してワークRAM以外を読み込む必要性が低いため上記を前提としています。</P>
+
+	<P><LI>CPUではバーストモードは使用できません。</P>
+
+	<P><LI>低水準SCU DMAを使用する場合、使用するチャネルに対応したDMA終了割込みマスクレジスタを許可してください。</P>
+
+	</UL>
+
+<A NAME="no1_40"></A>
+	<P><DT><H3>1.4　コーリングシーケンス</H3>
+	<DD>以下に、DMA転送のコーリングシーケンスを示します。</P>
+	<DD><PRE>
+#define SCLA_CFRAME  ((void *)0x5e60000)   /* VDP2 VRAM スクロール係数アドレス   */
+#define K_NUM     (424)                    /* スクロール係数データサイズ         */
+Uint32 scl_k_data[512];             　     /* ワークRAMのスクロール係数データ領域 */
+...
+void copyToData()
+{
+     DMA_ScuCopyMem(SCLA_CFRAME, scl_k_data, K_NUM);
+　                                          /*ワークRAMからVDP2 VRAMへデータ転送  */
+     ...
+     if(DMA_ScuResult() == DMA_SCU_BUSY){　 /* DMA_ScuCopyMem()の終了チェック　　 */
+     ...
+     }
+}
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#">ＤＭＡライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

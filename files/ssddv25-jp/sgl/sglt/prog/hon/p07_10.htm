@@ -1,0 +1,727 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/30&gt;SGL Programmer's Tutorial/7.ポリゴンの面属性</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>
+▲<A HREF="p06_10.htm">戻る</A>
+｜<A HREF="p08_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PROGRAMMER'S TUTORIAL</B>
+<H2 ALIGN=CENTER>7.ポリゴンの面属性</H2>
+<HR NOSHADE>
+
+<P>　本章ではセガサターンにおけるポリゴンの面属性について解説します。<BR>
+ポリゴンには、各々のポリゴンの表示順を決定するための基準位置を表す「Sort」、
+ポリゴンの片面を表示するか両面表示をするかを指定する「表裏属性」、ポリゴンに２次元の絵
+（ビットマップ・データ）を張り付ける「テクスチャ」といった要素があります。<BR>
+これらをまとめて「ポリゴンの面属性」と呼びます。<BR>
+ポリゴンの面属性を指定することで、これまで単なる絵だったポリゴンに様々な表現を加えるこ
+とができます。</P>
+
+<DL>
+<A NAME="no7_10"></A>
+  <P><DT><H3>7-1. アトリビュート</H3>
+     <DD>　セガ・グラフィック・ライブラリ（ＳＧＬ）では、ATTRIBUTEマクロで、ポリゴンの
+面属性を指定するようになっています。<BR>
+本章までのサンプルプログラムでは、各パラメータの内容を詳しく説明することなく、
+暗黙のうちにアトリビュートの設定を行ってきました。<BR>
+しかしながら、アトリビュートにはポリゴンを扱っていく上での重要な要素が集まっています。
+そこで、ここではATTRIBUTEマクロの各パラメータの意味とを詳しく解説をしていきます。</P>
+
+<A NAME="l7_1"></A>
+	<P>	<DD><B>リスト7-1　アトリビュートデータ</B>
+		<DD>
+<PRE>
+●アトリビュートデータ
+<H3>
+ATTR attribute_label[]={
+	ATTRIBUTE(Plane,Sort,Texture,Color,Gouraund,Mode,Dir,Option),
+	...................
+};
+</H3>
+<H4>注）ATTRIBUTEマクロは“sl_def.h”で定義されています。</H4>
+</PRE></P>
+
+  <P><DD>　各パラメータの意味は以下の通りです。</P>
+
+<PRE>
+Plane  ：片面ポリゴンか両面ポリゴンかを示します（表裏属性）
+Sort   ：ポリゴンの位置関係の代表点を示します（Ｚソート）
+Texture：テクスチャ名（No.）を示します
+Color  ：カラーデータを示します
+Gouraud：グーローシェーディングテーブルのアドレスを示します
+Mode   ：ポリゴンの描画モードを示します（各種モード設定）
+Dir    ：ポリゴンやテクスチャの状態を示します
+Option ：その他の機能を示します（オプション設定）
+</PRE>
+
+<A NAME="no7_20"></A>
+  <P><DT><H3>7-2. Plane</H3>
+     <DD>　アトリビュートの最初のパラメータ“Plane”はポリゴンの表裏属性を示します。
+	表裏属性とは、そのポリゴンが片面ポリゴンであるのか両面ポリゴンであるのかを表
+	す属性のことです。<BR>
+	両面ポリゴンは裏表どちらからも見ることができますが、片面ポリゴンは裏にまわる
+	と見えなくなります。<BR>
+	以下に、このパラメータに指定できるマクロを紹介します。</P>
+
+<A NAME="t7_1"></A>
+	<P>	<DD><TABLE BORDER=1>
+	<CAPTION>表7-1　Plane（表裏属性）</CAPTION>
+	<TR><TH>　マ　ク　ロ　</TH><TH>　　内　　容　　</TH></TR>
+	<TR ALIGN=CENTER><TD>Single_Plane</TD><TD>ポリゴンの片面表示</TD></TR>
+	<TR ALIGN=CENTER><TD>Dual_Plane</TD><TD>ポリゴンの両面表示</TD></TR></TABLE></P>
+	
+  <P><DD>　それでは、サンプルプログラム（リスト 7-2）を見てみましょう。<BR>
+	片面表示の黄色いポリゴンがＹ軸を支点に回転します。<BR>
+	片面ポリゴンなので、裏側は表示されません。</P>
+
+<A NAME="l7_2"></A>
+	<P>	<DD><B>リスト7-2　sample_7_2：main.c</B>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Rotation of Single Plane Polygon				*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+extern	PDATA PD_PLANE;
+
+void ss_main(void)
+{
+	static ANGLE	ang[XYZ];
+	static FIXED	pos[XYZ];
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 7.2" , slLocate(6,2));
+
+	ang[X] = ang[Y] = ang[Z] = DEGtoANG(0.0);
+	pos[X] = toFIXED( 0.0);
+	pos[Y] = toFIXED( 0.0);
+	pos[Z] = toFIXED(170.0);
+
+	while(-1){
+
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			ang[Y] += DEGtoANG(2.0);
+			slPutPolygon(&amp;PD_PLANE);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+
+</PRE></P>
+
+  <P><DD>　27行目を見てください。ポリゴン描画ルーチン“slPutPolygon”を呼び出して、
+ポリゴンデータ“PD_PLANE”へのポインタを渡しています。<BR>
+“PD_PLANE”はソース“polygon.c”で次のように定義されています。</P>
+
+<A NAME="l7_3"></A>
+	<P>	<DD><B>リスト7-3　sample_7_2：Polygon.c</B>
+<PRE>
+#include	"sgl.h"
+
+POINT point_PLANE[] = {
+	POStoFIXED(-20.0, -20.0, 0.0),
+	POStoFIXED( 20.0, -20.0, 0.0),
+	POStoFIXED( 20.0,  20.0, 0.0),
+	POStoFIXED(-20.0,  20.0, 0.0),
+};
+
+POLYGON polygon_PLANE[] = {
+	NORMAL(0.0,0.0,1.0), VERTICES(0,1,2,3),
+};
+
+ATTR attribute_PLANE[] = {
+	ATTRIBUTE(Single_Plane,SORT_CEN,No_Texture,C_RGB(31,31,0),No_Gouraud,MESHoff,sprPolygon,No_Option),
+};
+
+PDATA PD_PLANE = {
+	point_PLANE , sizeof(point_PLANE)/sizeof(POINT) ,
+	polygon_PLANE , sizeof(polygon_PLANE)/sizeof(POLYGON) ,
+	attribute_PLANE
+};
+</PRE></P>
+
+  <P><DD>　18行目以降がポリゴンデータです。21行目はアトリビュートデータへのポインタ
+なので、実際のデータは14行目からになります。<BR>
+第一パラメータが“Single_Plane”になっているのが分かると思います。<BR>
+<ここを“Dual_Plane”に書き換えて実行してみてください、今まで片面しか表示されなかった
+ポリゴンが、両面とも表示されるようになるはずです。</P>
+
+
+<A NAME="no7_30"></A>
+  <P><DT><H3>7-3. Sort</H3>
+     <DD>　２番目のパラメータ“Sort”はポリゴン上のＺソートの位置を示します。
+	Ｚソートとは、各ポリゴン上の代表点を以てその３Ｄ空間上の位置や前後関係
+	を決定する方式であり、Ｚバッファ（ポリゴン上の各ピクセルごとに位置を決める）
+	方式よりも高速に計算、描画できるのが特徴です。以下に、このパラメータに指定で
+	きるマクロを紹介します。</P>
+
+<A NAME="t7_2"></A>
+	<P>	<DD><TABLE BORDER=1>
+	<CAPTION>表7-2　Sort（Ｚソート指定）</CAPTION>
+	<TR><TH>　マ　ク　ロ　</TH><TH>　　内　　容　　</TH></TR>
+	<TR ALIGN=CENTER><TD>SORT_MIN</TD><TD>カメラに一番近いポリゴン上の頂点を代表点とする</TD></TR>
+	<TR ALIGN=CENTER><TD>SORT_CEN</TD><TD>ポリゴンの中心点を代表点とする</TD></TR>
+	<TR ALIGN=CENTER><TD>SORT_MAX</TD><TD>カメラから一番遠い点を代表点とする</TD></TR>
+	<TR ALIGN=CENTER><TD>SORT_BFR</TD><TD>直前に登録したポリゴンの手前に表示される</TD></TR></TABLE></P>
+
+
+  <P><DD>　また、これを図にすると次のようになります。</P>
+
+<A NAME="z7_1"></A>
+  <P ALIGN=CENTER><B>＜図7-1　Ｚソートの代表点＞</B><BR>
+  <IMG SRC="../grp/p07_05_2.gif"></P>
+
+  <P>　“SORT_BFR”は特殊な指定であり、あるポリゴンを別のポリゴンの上（手前）
+	に表示したい時に使用します。具体的には、“SORT_BFR”を指定したポリゴン
+	の表示位置は、そのポリゴンの直前に登録されているポリゴンのすぐ手前になります。
+	ただし、２枚のポリゴンをグループ化して使いたいとき等に初めて意味を持つ指定なので、
+	通常はあまり使用することはないでしょう。</P>
+
+  <P>　Ｚソート方式はその性質上、代表点の取り方次第で前後関係がおかしくなる可能性を含んでいます。
+	次の例を見てください。</P>
+
+<A NAME="z7_2"></A>
+  <P ALIGN=CENTER><B>＜図7-2　代表点による前後関係の相違＞</B><BR>
+  <IMG SRC="../grp/p07_06_1.gif"></P>
+
+  <P>　上図のような代表点の指定をした場合は、実際の画面は下図のようになります。</P>
+
+<A NAME="z7_3"></A>
+  <P ALIGN=CENTER><B>＜図7-3　実際の画面＞</B><BR>
+  <IMG SRC="../grp/p07_06_2.gif"></P>
+
+<A NAME="no7_40"></A>
+  <P><DT><H3>7-4. Texture</H3>
+     <DD>　３番目のパラメータ“Texture”はテクスチャマッピングを使用する時に必要となるパラメータです。ここには、関数“slInitSystem”で登録したテクスチャテーブルの中から実際に使用するテクスチャのナンバーを指定します。<BR>
+テクスチャを使用しない時は、マクロ“No_Texture”を指定します。テクスチャマッピングとは、ポリゴンの表面に２次元のグラフィックスを張り込む機能の総称です。言うまでもなく、ポリゴンで表現できるのは表示色のみで、そのリアリティには限界があります。しかし、テクスチャマッピング機能を駆使することによって、ポリゴンだけでは表現できなかった物体の質感、表面の模様といった、よりリアリティの高い３Ｄオブジェクトを表現することができます。</P>
+
+<A NAME="z7_4></A>
+  <P ALIGN=CENTER><B>＜図7-4　テクスチャマッピング＞</B><BR><IMG SRC="../grp/p07_07_1.gif"></P>
+  <P>　セガサターンのテクスチャマッピングと、一般的なＣＧにおけるいわゆるテクスチャマッピングとでは、表 7-3 に示すように大きく分けて２つの異なった性質があります。</P>
+
+<A NAME="t7_3"></A>
+	<P><TABLE BORDER=1>
+	<CAPTION><B>表7-3　セガサターンのテクスチャマッピングと一般的 CG のテキスチャマッピングとの相違</B></CAPTION>
+	<TR ALIGN=CENTER><TD COLSPAN=2></TD><TD COLSPAN=2>テクスチャマッピング</TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=2></TD><TD>セガサターンの場合</TD><TD>一般ＣＧの場合</TD></TR>
+	<TR><TD ROWSPAN=2><PRE>テクスチャの</TD><TD><PRE>張り込み</TD><TD>1枚のポリゴンに対して1枚のテクスチャの張り込みが可能です。</TD>
+															<TD>複数のポリゴンに渡って1枚のテクスチャを張り込みできます。</TD></TR>
+	<TR><TD><PRE>変形</TD><TD>ポリゴンの形状に応じてテクスチャをも変形します。</TD><TD>ポリゴンの形にテクスチャがクリッピングされます。</TD></TR></TABLE></P>
+
+  <P><DT>　<B>●テクスチャの貼込み</B></P>
+
+<A NAME="z7_5"></A>
+	<P ALIGN=CENTER><B>＜図7-5　テクスチャの特徴 １＞</B><BR><IMG SRC="../grp/p07_08.gif"></P>
+
+  <P><DT><B>注）</B>
+     <DD>　テクスチャとポリゴンが一対一に対応します。</P>
+
+  <P>　一般的なＣＧにおけるテクスチャは、複数のポリゴンに渡って張り込むことができますが、セガサターンの場合は一枚のテクスチャを一枚のポリゴンに対応させて張り込むことになります。２枚以上のポリゴンに渡ったテクスチャを貼る場合は、図 7-5 のようにそれぞれのポリゴンに合わせてテクスチャを分割する必要があります。</P>
+
+  <P><DT>　<B>●テクスチャの変形</B>
+     <DD>　一般的なＣＧのテクスチャは、ポリゴンが長方形（含む正方形）でない場合は、テクスチャはポリゴンの形にクリッピングされます。しかし、セガサターンにおいては、テクスチャはクリッピングされずにポリゴンに沿って変形します。ポリゴンが三角形の場合でも、テクスチャ全体が三角形に変形します。</P>
+
+  <P ALIGN=CENTER><B>＜図7-6　テクスチャの特徴２＞</B><BR><IMG SRC="../grp/p07_09_1.gif"></P>
+
+  <P><DT><B>注）</B>
+     <DD>　ポリゴンの形に対応してテクスチャが変形します。</P>
+
+  <P><DT><H3>テクスチャの歪みについて</H3>
+     <DD>　ポリゴンが長方形で、それに張り込むテクスチャが正方形の場合、テクスチャはポリゴンの縦横比に合わせて長方形に変形してしまいます。従って、テクスチャの縦横比は、できる限りポリゴンの縦横比に合わせた方が、テクスチャの歪みも少なくなるということを念頭に入れておいてください。</P>
+
+  <P ALIGN=CENTER><B>＜図7-7　テクスチャの歪み＞</B><BR><IMG SRC="../grp/p07_09_2.gif"></P>
+
+  <P>　それでは、サンプルプログラム（リスト 7-4）を見てみましょう。<BR>
+	テクスチャが貼られた１枚のポリゴンが、Ｙ軸を支点に回転します。<BR>
+	ここではあらかじめ２枚のテクスチャを登録しておきます。<BR>
+	一枚は［SONIC］の絵（size：64×64pixel）で、もう一枚は「ＡＭ２」マーク（size：64×32pixel）です。</P>
+
+<A NAME="l7_4"></A>
+	<P><DD><B>リスト7-4　sample_7_4：main.c</B>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Polygon &amp; Texture						*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+extern PDATA 	PD_PLANE;
+extern TEXTURE	tex_sample[];
+extern PICTURE	pic_sample[];
+
+#define		max_texture		2
+
+void set_texture(PICTURE *pcptr , Uint32 NbPicture)
+{
+	TEXTURE *txptr;
+ 
+	for(; NbPicture--&gt; 0; pcptr++){
+		txptr = tex_sample + pcptr-&gt;texno;
+		slDMACopy((void *)pcptr->pcsrc,
+			(void *)(SpriteVRAM + ((txptr-&gt;CGadr) &lt;&lt; 3)),
+			(Uint32)((txptr-&gt;Hsize * txptr-&gt;Vsize * 4) >> (pcptr-&gt;cmode)));
+	}
+}
+
+void ss_main(void)
+{
+	static ANGLE	ang[XYZ];
+	static FIXED	pos[XYZ];
+
+	slInitSystem(TV_320x224,tex_sample,1);
+	set_texture(pic_sample,max_texture);
+	slPrint("Sample program 7.4" , slLocate(9,2));
+
+	ang[X] = ang[Y] = ang[Z] = DEGtoANG(0.0);
+	pos[X] = toFIXED(  0.0);
+	pos[Y] = toFIXED(  0.0);
+	pos[Z] = toFIXED(170.0);
+
+	while(-1){
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			ang[Y] += DEGtoANG(2.0);
+			slPutPolygon(&amp;PD_PLANE);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+
+</PRE></P>
+
+  <P><DD>　プログラムの流れ自体は、リスト 7-2 と大差ありません。</P>
+
+  <P>　まず29行目に注目してください。<BR>
+	今まで暗黙のうちに使用していたイニシャライズルーチンですが、
+	第二パラメータがこれまでと違っています。ここにはＳＧＬに渡すテクスチャテーブル
+	へのポインタを指定します。
+	（実際のテーブルは“texture.c”で定義。<A HREF="#l7_5">リスト 7-5</A> 参照。）
+	これまではテクスチャを使用していなかったので、“NULL”を代入していたというわけです。</P>
+
+  <P>　30行目ではテクスチャデータをV-RAMに転送しています。<BR>
+	このテクスチャデータ転送はイニシャライズ後いつでも実行できるので、
+	ゲーム中にテクスチャを描き替えるといったテクニックも容易に行うことができます。</P>
+
+  <P>　12行目以降は実際のテクスチャデータ転送ルーチンになります。<BR>
+	ここではテクスチャテーブルの先頭アドレスとテクスチャ登録数を受け取っています。
+	そして18行目の“slDMACopy”関数で、ＤＭＡを使ってデータを高速転送しています。<BR>
+	この関数の第一パラメータは転送元アドレス、第二パラメータが転送先アドレス、
+	第三パラメータが転送サイズとなっています。</P>
+
+  <P><DT><B>【void slDMACopy ( void *src , void *dst , Uint32 cnt ) ;】</B>
+     <DD>　CPUに内蔵されたDMAを使用してデータのブロック転送を行います<BR>。
+	パラメータには、転送元メモリー領域の先頭アドレス、転送先メモリ領域の
+	先頭アドレス、ブロック転送量（単位：バイト）をそれぞれ代入します。<BR>
+	当該関数は、DMA起動後すぐに転送を終了します。<BR>
+	転送完了を知りたい場合は、関数“slDMAWait”を使用してください。</P>
+
+  <P>　次にテクスチャデータを見てみましょう。</P>
+
+<A NAME="l7_5"></A>
+	<P>	<DD><B>リスト7-5　sample_7_4：texture.c</B>
+<PRE>
+
+#include	"sgl.h"
+/********************************/
+/*	Texture Data		*/
+/********************************/
+
+TEXDAT sonic_64x64[]={					/* テクスチャテ−タ１ */
+	 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+					:
+					:
+				      中略
+					:
+};
+
+TEXDAT    am2_64x32[]={					/* テクスチャテ−タ２ */
+	 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+					:
+					:
+				      中略
+					:
+};
+
+TEXTURE tex_sample[]={					/* SGLに渡すテーブル */
+	TEXDEF(64,64,0),
+	TEXDEF(64,32,64*64*1),
+};
+
+PICTURE	pic_sample[]={					/* VRAM転送用テーブル */
+	PICDEF(0,COL_32K,sonic_64x64),
+	PICDEF(1,COL_32K,am2_64x32),
+};
+
+</PRE></P>
+
+  <P><DD>　TEXDATマクロで記述された部分が、実際のテクスチャデータになります。<BR>
+	上記リストでは省略していますが、ソースには全てのデータが入っています。
+	なお、テクスチャデータのフォーマットについてはここでは言及しません。
+	リファレンスマニュアルの“関数リファレンス”を参照してください。</P>
+
+  <P>　TEXTUREマクロで記述された部分がＳＧＬに渡すテクスチャテーブルです。<BR>
+	それぞれのテクスチャのサイズ（横×縦）と、実際のテクスチャデータの先頭
+	アドレスからのオフセット値をセットします。</P>
+
+  <P>　最後に、PICTUREマクロ部分がVRAM転送用のテーブルになります。<BR>
+	テクスチャナンバー、カラーモード、テクスチャデータへのポインタ
+	をそれぞれセットします。</P>
+
+  <P>　それでは最後になりましたが、ポリゴンデータのアトリビュートを見てみましょう。</P>
+
+<A NAME="l7_6"></A>
+	<P>	<DD><B>リスト7-6　sample_7_4：polygon.c</B>
+	<P>	<DD>
+<PRE>
+#include	"sgl.h"
+
+#define		PN_SONIC		0
+#define		PN_AM2			1
+
+POINT point_plane[] = {
+        POStoFIXED(-40.0 , -40.0 , 0.0) ,
+        POStoFIXED( 40.0 , -40.0 , 0.0) ,
+        POStoFIXED( 40.0 ,  40.0 , 0.0) ,
+        POStoFIXED(-40.0 ,  40.0 , 0.0)
+};
+
+POLYGON polygon_plane[] = {
+        NORMAL(0.0,0.0,1.0), VERTICES(0 , 1 , 2 , 3)
+};
+
+ATTR attribute_plane[] = {
+	ATTRIBUTE(Single_Plane, SORT_CEN, PN_SONIC, No_Palet, No_Gouraud, CL32KRGB|MESHoff, sprNoflip, No_Option),
+};
+
+PDATA PD_PLANE = {
+        point_plane , sizeof(point_plane)/sizeof(POINT),
+        polygon_plane, sizeof(polygon_plane)/sizeof(POLYGON),
+        attribute_plane
+};
+</PRE></P>
+
+  <P><DD>　“ATTRIBUTE”の第三パラメータが“PN_SONIC”になっています。<BR>
+	すなわち登録ナンバー［０］のテクスチャである「SONIC」がポリゴンに貼
+	られて表示されるというわけです。<BR>
+	また、このパラメータを“PN_AM2”に変更してみてください。<BR>
+	今度はテクスチャが登録ナンバー［１］の「ＡＭ２」マークに変わるはずです。<BR>
+	さらに、第一パラメータの“Single_Plane”を“Dual_Plane”に変更することで、
+	テクスチャを裏側から見ることも可能です。</P>
+
+
+<A NAME="no7_50"></A>
+  <P><DT><H3>7-5. Color</H3>
+     <DD>　４番目のパラメータ“Color”では、ポリゴンの色やテクスチャのカラーパレット
+	へのオフセットアドレスを指定します。<BR>
+	ポリゴンの場合、色データの指定方式はＲＧＢダイレクトに限られます。書式は、
+	“C_RGB(r,g,b)”となります。r,g,bはそれぞれ光の三原色を示し、０〜３１の
+	十進数で指定します。<BR>
+	テクスチャの場合は、色データの指定方式は"Mode"（アトリビュートの第六パラメータ。
+	"<A HREF="#no7_70">7-7　Mode</A>" 参照。）での指定に左右されます。
+	32768色ＲＧＢモードの場合はマクロ“No_Palet”を、それ以外のインデックスモードの
+	場合はカラーパレットへのオフセットアドレスを指定します。</P>
+
+<A NAME="no7_60"></A>
+  <P><DT><H3>7-6. Gouraud</H3>
+     <DD>　５番目のパラメータ“Gouraud”にはグーローシェーディングに使用するグーローテーブル
+	を指定します。グーローシェーディングとは、ポリゴンとポリゴンの境界線がハッキリしてい
+	るフラットシェーディングに対する用語で、ポリゴン面に陰影処理を施し、ポリゴン同士の境
+	界線を消すことによって曲面らしく見せる技法のことです。セガサターンでは、ポリゴンの頂
+	点間の色のグラデーションを利用して、グーローシェーディングを実現しています。</P>
+
+<A NAME="z7_8"></A>
+  <TABLE><CAPTION><B>＜図7-8　グーローシェーディング＞</B></CAPTION>
+  <TR><TH ALIGN=CENTER><IMG SRC="../grp/p7_15_0.gif"></TH>
+      <TH ALIGN=CENTER><IMG SRC="../grp/p7_15_1.gif"></TH>
+      <TH ALIGN=CENTER><IMG SRC="../grp/p7_15_2.gif"></TH></TR>
+  <TR><TH>フラットシェーディング</TH>
+      <TH>　　　</TH>
+      <TH>グ−ロシェーディング</TH></TR>
+  </TABLE>
+
+  <P><DD>　それでは、サンプルプログラム（リスト 7-7）を見てみましょう。
+	グーローシェーディングの施された立方体が、Ｙ軸を支点に回転します。</P>
+
+<A NAME="l7_7"></A>
+	<P>	<DD><B>リスト7-7　sample_7_6：main.c</B>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Gouraud Shading							*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+extern PDATA PD_CUBE;
+
+#define		GRoffsetTBL(r,g,b)	(((b &amp; 0x1f) &lt;&lt;0) | ((g &amp; 0x1f) &lt;&lt; 5) | (r &amp; 0x1f))
+#define		VRAMaddr		(SpriteVRAM+0x70000)
+
+static Uint16 GRdata[6][4] = {
+	{ GRoffsetTBL(  0,-16,-16) , GRoffsetTBL(  0,-16,-16) ,
+	  GRoffsetTBL(  0,-16,-16) , GRoffsetTBL(-16, 15,  0) } , 
+	{ GRoffsetTBL(  0,-16,-16) , GRoffsetTBL(  0,-16,-16) ,
+	  GRoffsetTBL(-16, 15,  0) , GRoffsetTBL(  0,-16,-16) } , 
+	{ GRoffsetTBL(-16, 15,  0) , GRoffsetTBL(  0,-16,-16) ,
+	  GRoffsetTBL(  0,-16,-16) , GRoffsetTBL(  0,-16,-16) } , 
+	{ GRoffsetTBL(  0,-16,-16) , GRoffsetTBL(-16, 15,  0) ,
+	  GRoffsetTBL(  0,-16,-16) , GRoffsetTBL(  0,-16,-16) } , 
+	{ GRoffsetTBL(  0,-16,-16) , GRoffsetTBL(-16, 15,  0) ,
+	  GRoffsetTBL(  0,-16,-16) , GRoffsetTBL(  0,-16,-16) } , 
+	{ GRoffsetTBL(-16, 15,  0) , GRoffsetTBL(  0,-16,-16) , 
+	  GRoffsetTBL(  0,-16,-16) , GRoffsetTBL(  0,-16,-16) } 
+};
+
+void ss_main(void)
+{
+	static ANGLE	ang[XYZ];
+	static FIXED	pos[XYZ];
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 7.6" , slLocate(9,2));
+
+	ang[X] = DEGtoANG(30.0);
+	ang[Y] = DEGtoANG( 0.0);
+	ang[Z] = DEGtoANG( 0.0);
+	pos[X] = toFIXED( 0.0);
+	pos[Y] = toFIXED( 0.0);
+	pos[Z] = toFIXED(200.0);
+
+	slDMACopy(GRdata,(void *)VRAMaddr,sizeof(GRdata));
+
+	while(-1){
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			slPutPolygon(&amp;PD_CUBE);
+		}
+		slPopMatrix();
+
+		ang[Y] += DEGtoANG(1.0);
+
+		slSynch();
+	}
+}
+</PRE></P>
+
+  <P><DD>　立方体を描画して回転させるルーチン自体は、今までのものと大差ないので説明
+	を省きます。これまでと違うのは41行目、グーローテーブルをVRAMに転送していると
+	ころです。考え方はテクスチャデータの転送と同じで、最初に必要なテーブルを全て
+	VRAMに格納してしまいます。</P>
+
+  <P>　それでは、次にアトリビュートを見てみましょう。</P>
+
+<A NAME="l7_7"></A>
+	<P>	<DD><B>リスト7-8　sample_7_6：polygon.c</B>
+	<P>	<DD>
+<PRE>
+#include	"sgl.h"
+
+#define		GRaddr		0xe000
+
+static POINT point_CUBE[] = {
+	POStoFIXED(-20.0 , -20.0 ,  20.0) ,
+	POStoFIXED( 20.0 , -20.0 ,  20.0) ,
+	POStoFIXED( 20.0 ,  20.0 ,  20.0) ,
+	POStoFIXED(-20.0 ,  20.0 ,  20.0) ,
+	POStoFIXED(-20.0 , -20.0 , -20.0) ,
+	POStoFIXED( 20.0 , -20.0 , -20.0) ,
+	POStoFIXED( 20.0 ,  20.0 , -20.0) ,
+	POStoFIXED(-20.0 ,  20.0 , -20.0)
+};
+
+static POLYGON polygon_CUBE[] = {
+	NORMAL( 0.0 , 0.0 , 1.0), VERTICES(0 , 1 , 2 , 3),
+	NORMAL(-1.0 , 0.0 , 0.0), VERTICES(4 , 0 , 3 , 7),
+	NORMAL( 0.0 , 0.0 ,-1.0), VERTICES(5 , 4 , 7 , 6),
+	NORMAL( 1.0 , 0.0 , 0.0), VERTICES(1 , 5 , 6 , 2),
+	NORMAL( 0.0 ,-1.0 , 0.0), VERTICES(4 , 5 , 1 , 0),
+	NORMAL( 0.0 , 1.0 , 0.0), VERTICES(3 , 2 , 6 , 7)
+};
+
+static ATTR attribute_CUBE[] = {
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr,   MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+1, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+2, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+3, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+4, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+5, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+};
+
+PDATA PD_CUBE = {
+	point_CUBE , sizeof(point_CUBE)/sizeof(POINT),
+	polygon_CUBE , sizeof(polygon_CUBE)/sizeof(POLYGON) ,
+	attribute_CUBE
+};
+</PRE></P>
+
+  <P><DD>　アトリビュートに注目してください。<BR>
+	第5パラメータ“Gouraud”に、先ほどグーローデータを格納したVRAMアドレスがセット
+	されています。ここでのVRAMアドレスは（相対アドレス÷８）になります。</P>
+
+  <P>　第6パラメータ“Mode”にも注目してください。<BR>
+	グーローシェーディングを使う場合、必ずここに“CL_Gouraud”を指定する必要があります。
+	なお、グーローシェーディングを使わない時は、第5パラメータ、“Gouraud”には
+	マクロ“No_Gouraud”を指定してください。</P>
+
+<A NAME="no7_70"></A>
+  <P><DT><H3>7-7. Mode</H3>
+     <DD>　６番目のパラメータは“Mode”です。<BR>
+	ここではポリゴンに様々な条件や設定を付加することができます。
+	ここで指定できるマクロは以下の通りです。</P>
+
+<A NAME="t7_4"></A>
+	<P>	<DD><TABLE BORDER=1>
+	<CAPTION><B>表7-4　Mode</B></CAPTION>
+	<TR ALIGN=CENTER><TH>　グループ　</TH><TH>　マクロ　</TH><TH>　内容　</TH></TR>
+	<TR ALIGN=CENTER>	<TD ROWSPAN=3>【1】</TD>
+						<TD>No_Window </TD><TD>Windowの制限を受けない(default) </TD></TR>
+	<TR ALIGN=CENTER>	<TD>Window_In </TD><TD>Windowの内側に表示する </TD></TR>
+	<TR ALIGN=CENTER>	<TD>Window_Out</TD><TD>Windowの外側に表示する </TD></TR>
+	<TR ALIGN=CENTER>	<TD ROWSPAN=2>【2】</TD>
+						<TD>MESHoff </TD><TD>通常表示(default) </TD></TR>
+	<TR ALIGN=CENTER>	<TD>MESHon  </TD><TD>メッシュで表示する </TD></TR>
+	<TR ALIGN=CENTER>	<TD ROWSPAN=2>【3】</TD>
+						<TD>ECdis </TD><TD>EndCodeを無効にする </TD></TR>
+	<TR ALIGN=CENTER>	<TD>ECenb </TD><TD>EndCodeを有効にする(default) </TD></TR>
+	<TR ALIGN=CENTER>	<TD ROWSPAN=2>【4】</TD>
+						<TD>SPdis </TD><TD>透明ピクセルも表示する(default) </TD></TR>
+	<TR ALIGN=CENTER>	<TD>SPenb </TD><TD>透明ピクセルは表示しない </TD></TR>
+	<TR ALIGN=CENTER>	<TD ROWSPAN=6>【5】</TD>
+						<TD>CL16Bnk   </TD><TD>16色カラーバンクモード(default)</TD></TR>
+	<TR ALIGN=CENTER>	<TD>CL16Look  </TD><TD>16色ルックアップテーブル</TD></TR>
+	<TR ALIGN=CENTER>	<TD>CL64Bnk   </TD><TD>64色カラーバンクモード</TD></TR>
+	<TR ALIGN=CENTER>	<TD>CL128Bnk  </TD><TD>128色カラーバンクモード </TD></TR>
+	<TR ALIGN=CENTER>	<TD>CL256Bnk  </TD><TD>256色カラーバンクモード </TD></TR>
+	<TR ALIGN=CENTER>	<TD>CL32KRGB  </TD><TD>32768色ＲＧＢモード </TD></TR>
+	<TR ALIGN=CENTER>	<TD ROWSPAN=5>【6】</TD>
+						<TD>CL_Replace </TD><TD>上書き(標準)モード(default)</TD></TR>
+	<TR ALIGN=CENTER>	<TD>CL_Shadow  </TD><TD>影モード </TD></TR>
+	<TR ALIGN=CENTER>	<TD>CL_Half    </TD><TD>半輝度モード </TD></TR>
+	<TR ALIGN=CENTER>	<TD>CL_Trans   </TD><TD>半透明モード </TD></TR>
+	<TR ALIGN=CENTER>	<TD>CL_Gouraud </TD><TD>グーローシェーディングモード </TD></TR>
+<!-- 谷岡    1997.4.24 -->
+	<TR ALIGN=CENTER>	<TD ROWSPAN=2>【7】</TD>
+						<TD>HSSon </TD><TD>ハイスピードシュリンクを使用 </TD></TR>
+	<TR ALIGN=CENTER>	<TD>HSSoff </TD><TD>ハイスピードシュリンクを使わない(default) </TD></TR>
+	<TR ALIGN=CENTER>	<TD ROWSPAN=2>【8】</TD>
+						<TD>MSBon </TD><TD>フレームバッファに書き込むときにMSBを立てる </TD></TR>
+	<TR ALIGN=CENTER>	<TD>MSBoff </TD><TD>フレームバッファに書き込むときにMSBを立てない(default) </TD></TR>
+<!-- ここまで -->
+	</TABLE></P>
+
+  <P><DD>　各グループにつき一つのオプションを指定することができます。<BR>
+	ｏｒ演算子“｜”で連続表記してください。<BR>
+	省略されたグループは、デフォルトが指定されたものとして扱われます。</P>
+
+  <P><DT><B>注意</B>
+     <DD>　全てのグループを省略表記することはできません。全てをデフォルトにする場合は、
+	ダミーで“No_Window”と指定してください。</P>
+  <P>　グループ【５】は、テクスチャのカラーモード指定するためのものなので、
+	テクスチャを使用しない場合は、必ずデフォルト（“CL_16Bnk”あるいは指定しない）
+	にしてください。ここに他のモードを指定すると、ポリゴンが表示されなくなります。</P>
+
+  <P>　グループ【６】の例外として、“CL_Gouraud |- CL_Half”と“CL_Gouraud |- CL_Trans”
+	が使用できます。
+	半輝度グーローシェーディング、半透明グーローシェーディングを使いたい時に利用してください。<BR>
+	なお、グーローシェーディングを使用する場合は、第5パラメータの設定と併せてここにも“CL_Gouraud”
+	をセットする必要があります。<BR>
+	半輝度、半透明、グーローシェーディングを使用する場合、ポリゴンではＲＧＢダイレクト、
+	テクスチャーは32768色ＲＧＢモードのみサポートされます。
+	その他の設定では正しく表示できませんので注意してください。</P>
+
+<A NAME="no7_80"></A>
+  <P><DT><H3>7-8. Dir</H3>
+     <DD>　７番目のパラメータは“Dir”です。オブジェクトがポリゴンなのかテクスチャなのか、
+	また、テクスチャならばどのように反転させるのかを指定します。</P>
+
+<NAME="7_5"></A> 
+	<P>	<DD><TABLE BORDER=1>
+	<CAPTION><B>表7-5　Dir</B></CAPTION>
+	<TR ALIGN=CENTER><TH>　マクロ　 </TH><TH>　　内　　容　　</TH></TR>
+	<TR ALIGN=CENTER><TD>sprNoflip  </TD><TD>テクスチャを通常表示します</TD></TR>
+	<TR ALIGN=CENTER><TD>sprHflip   </TD><TD>テクスチャを左右反転します</TD></TR>
+	<TR ALIGN=CENTER><TD>sprVflip   </TD><TD>テクスチャを上下反転します</TD></TR>
+	<TR ALIGN=CENTER><TD>sprHVflip  </TD><TD>テクスチャを上下左右反転します</TD></TR>
+	<TR ALIGN=CENTER><TD>sprPolygon </TD><TD>ポリゴンを表示します</TD></TR>
+	<TR ALIGN=CENTER><TD>sprPolyLine</TD><TD>ポリラインを表示します</TD></TR>
+	<TR ALIGN=CENTER><TD>sprLine    </TD><TD>初めの２点を使用した直線を表示します</TD></TR>
+	</TABLE></P>
+
+
+  <P><DT><B>注意</B>
+     <DD>　オブジェクトにテクスチャを使っていない場合は、“sprHflip”や“sprVflip”
+	を指定しないでください。<BR>
+	“sprLine”は、他のポリゴンと同様に4点として指定してください
+	（初めの2点を繰り返し指定）。</P>
+
+<A NAME="no7_90"></A>
+  <P><DT><H3>7-9. Option</H3>
+<!-- 谷岡     1997/4/24   -->
+     <DD>　最後のパラメータは“Option”です。ポリゴン、テクスチャに対するその他の設定は、
+	ここで指定します。現在のＳＧＬ(Ver 3.0)でサポートしているオプションは次の5つです。</P>
+<!-- ここまで     -->
+
+<A NAME="t7_6"></A>
+	<P>	<DD><TABLE BORDER=1>
+	<CAPTION><B>表7-6　Option</B></CAPTION>
+	<TR ALIGN=CENTER><TH>　マクロ　 </TH><TH>　　　　　　内　　　　容　　　　　</TH></TR>
+<!-- 谷岡     1997/4/24   -->
+	<TR ALIGN=CENTER><TD>UseLight  </TD><TD>光源計算を行う</TD></TR>
+	<TR ALIGN=CENTER><TD>UsePalette</TD><TD>ポリゴンのカラーがパレット形式であることを示す</TD></TR>
+	<TR ALIGN=CENTER><TD>UseNearClip</TD><TD>４頂点がslWindowClipLevelで指定した画面外に出たら表示しない</TD></TR>
+	<TR ALIGN=CENTER><TD>UseDepth</TD><TD>平行光源でのデプスキューの計算を行う</TD></TR>
+	<TR ALIGN=CENTER><TD>UseGouraud</TD><TD>リアルタイムグーローによる光源計算を行う(slPutPolygonXでのみ有効)</TD></TR>
+<!-- ここまで     -->
+	</TABLE></P>
+
+  <P><DD>　これらのオプションはｏｒ演算子“ ｜”を使って複数指定することができます。</P>
+
+  <P><DT><B>注意</B>
+     <DD>　オプションを使わない場合は、マクロ“No_Option”を指定してください。<BR>
+	ポリゴンのカラーがパレット形式の時に光源計算を行いたい場合は、“UsePalette”と“UseLight”を併用してください。</P>
+
+<A NAME="no7_f"></A>
+  <P><DT><H3>付記　本章に登場した SGL ライブラリ関数</H3>
+     <DD>　本章では、次表の関数を解説しました。</P>
+
+<A NAME="t7_7"></A>
+	<P>	<DT><TABLE BORDER=1>
+	<CAPTION><B>表7-7　本章に登場した SGL ライブラリ関数</B></CAPTION>
+	<TR ALIGN=CENTER><TH>　関数型　</TH><TH>　関数名　</TH><TH>　パラメータ　</TH><TH>　機　能　</TH></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slDMACopy</TD><TD>Src,dst,cnt</TD><TD>CPU DMAを用いたブロック転送</TD></TR>
+	</TABLE></P>
+</DL>
+<HR NOSHADE>
+<B>
+▲<A HREF="p06_10.htm">戻る</A>
+｜<A HREF="p08_10.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

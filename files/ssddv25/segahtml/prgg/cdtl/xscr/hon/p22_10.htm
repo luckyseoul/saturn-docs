@@ -1,0 +1,294 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 5&gt; CD builder script grammar supplementary explanation</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+ <B>▲ <A HREF="p21_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>CD builder script grammar supplementary explanation</b><H2 ALIGN=CENTER></H2><HR NOSHADE>
+<DL>
+<A NAME="no5_00"></A><P><DT><H3> 5. Script writing example</H3><DD> An example of how to determine the disk configuration using a script is shown below. The exact notation method for output file names, etc. used for parameters is defined in the already published manual. For example, if it is an output file name, it simply means writing the output file name.</P>
+<P><DD>&#65308;&#65310; opt indicates that it can be omitted, { ｜ } indicates an option, and the following indicates a comment.</P>
+</DL>
+<!---------------------------------------------------------------------------->
+<A NAME="no5_01"><HR></a><DL>
+<DT> <B>●Sample script for CD-ROM (MODE1+CD-DA) disk</b><DD><PRE>
+Disc             OutputFileName
+Session          CDROM        &lt;OutputFileName&gt;opt
+LeadIn           MODE1
+EndLeadIn
+；
+&lt;SystemArea MSDOSFileName&gt;opt
+；
+Track         MODE1
+    Volume    ISO9660        OutputFileName
+    PrimaryVolume    0:2:16
+              &lt;PVD definition line&gt;opt                           ；‥‥‥<B><A HREF="#no5_11">(1)</A></B>
+    EndPrimaryVolume
+    &lt;SupplementaryVolume    RelativeTime&gt;opt
+              &lt;SVD definition line&gt;opt                           ；‥‥‥<B><A HREF="#no5_12">(2)</A></B>
+    &lt;EndSupplementaryVolume&gt;opt
+    &lt;BootRecord             RelativeTime&gt;opt
+              &lt;boot record definition line&gt;opt                 ；‥‥‥<B><A HREF="#no5_13">(3)</A></B>
+    &lt;EndBootRecord&gt;opt
+    EndVolume
+；
+    File      ISO9660FileName    &lt;OutputFileName&gt;opt
+              &lt;file definition line&gt;opt　　　                 ；‥‥‥<B><A HREF="#no5_14">(4)</A></B>
+    FileSource               InputFileName
+              &lt;file source definition line&gt;opt                 ；‥‥‥<B><A HREF="#no5_15">(5)</A></B>
+    EndFileSource
+    EndFile
+    ；
+    ；        File 〜 EndFile
+    ；
+    PostGap   75
+EndTrack
+；
+Track         CDDA
+    Pause     150
+    FileSource               InputFileName
+              &lt;file source definition line&gt;opt                ；‥‥‥<B><A HREF="#no5_15">(5)</A></B>
+    EndFileSource
+EndTrack
+；
+；    Track 〜 EndTrack
+；
+；
+LeadOut        CDDA
+Empty          300
+EndLeadOut
+EndSession
+EndDisc
+</PRE></P>
+</DL>
+<!--------------------------------------------------------------------------->
+<A NAME="no5_02"><HR></a><DL>
+<P><DT> <B>-Sample script for CD-ROM XA (MODE1+MODE2+CD-DA) disc</b><DD><PRE>
+Disc            OutputFileName
+Session         SEMIXA          &lt;OutputFileName&gt;opt
+LeadIn          MODE1
+EndLeadIn
+；
+&lt;SystemArea    MSDOSFileName&gt;opt
+；
+Track          MODE1
+    Volume    ISO9660          OutputFileName
+    PrimaryVolume              0:2:16
+              &lt;PVD definition line&gt;opt　　　　　           ；‥‥‥<B><A HREF="#no5_11">(1)</A></B>
+    EndPrimaryVolume
+    &lt;SupplementaryVolume    RelativeTime&gt;opt
+              &lt;SVD definition line&gt;opt　　　　　           ；‥‥‥<B><A HREF="#no5_12">(2)</A></B>
+    &lt;EndSupplementaryVolume&gt;opt
+    &lt;BootRecord              RelativeTime&gt;opt
+              &lt;boot record definition line&gt;opt             ；‥‥‥<B><A HREF="#no5_13">(3)</A></B>
+    &lt;EndBootRecord&gt;opt
+    EndVolume
+；
+    FileISO9660FileName    &lt;OutputFileName&gt;opt
+              &lt;file definition line&gt;opt　　　             ；‥‥‥<B><A HREF="#no5_14">(4)</A></B>
+    File    Source              InputFileName
+              &lt;file source definition line&gt;opt             ；‥‥‥<B><A HREF="#no5_15">(5)</A></B>
+    EndFileSource
+    EndFile
+    ；
+    ；          File 〜 EndFile
+    ；
+    PostGap          75
+EndTrack
+；
+Track          MODE2
+    PreGap          150
+    File            ISO9660FileName    &lt;OutputFileName&gt;opt
+；Example of channel interleaving using SectorRate rows
+    SectorRate          &lt;Positive integer&gt;opt          ；Required when defining MPEG
+    MpegMultiplex             &lt;OutputFileName&gt;opt
+          &lt;RealTime&gt;opt                    ；When specifying DATA in MpegStream line
+          MpegStream          SourceFileName          ｛ AUDIO | VIDEO | DATA｝
+          BitRate             BitRate               &lt;sequence number&gt;opt
+          &lt;DataType          { FORM1 | FORM2 }&gt;opt          ；In the MpegStream line
+          &lt;MpegFlush&gt;opt                                            When specifying DATA
+          EndMpegStream
+          MpegStream          SourceFileName          ｛ AUDIO | VIDEO | DATA｝
+              ：
+          EndMpegStream
+    EndMpegMultiplex
+    EndFile
+
+    File              ISO9660FileName    &lt;OutputFileName&gt;opt
+；Example of channel interleaving using UnitSize and GapSize lines
+    Channel                    ChannelNumber
+          FileSource           InputFileName
+          UnitSize             UnitSize
+          GapSize              GapSize
+          ：
+          EndFileSource
+    EndChannel
+    Channel                    ChannelNumber
+          FileSource           InputFileName
+          UnitSize             UnitSize
+          GapSize              GapSize
+          ：
+          EndFileSource
+    EndChannel
+    EndFile
+    Extent          &lt;RelativeTime&gt;opt
+          FileInterleave    UnitSize          GapSize
+          File              ISO9660FileName       &lt;OutputFileName&gt;opt
+          FileSource              InputFileName
+          EndFileSource
+          EndFile
+          EndFileInterleave
+          FileInterleave    UnitSize          GapSize
+          File              ISO9660FileName       &lt;OutputFileName&gt;opt
+          FileSource              InputFileName
+          EndFileSource
+          EndFile
+          EndFileInterleave
+    EndExtent
+    Directory          DirectoryName
+    &lt;directory attribute definition&gt;opt
+          Directory    DirectoryName
+          File              ISO9660FileName        &lt;OutputFileName&gt;opt
+          FileSource              InputFileName
+          EndFileSource
+          EndFile
+          EndDirectory
+    EndDirectory
+PostGap          75
+EndTrack
+；
+Track          CDDA
+    Pause    150
+    FileSource          InputFileName
+              &lt;file source definition line&gt;opt              ；‥‥‥<B><A HREF="#no5_15">(5)</A></B>
+    EndFileSource
+EndTrack
+；
+；    Track 〜 EndTrack
+；
+LeadOut        CDDA
+Empty          300
+EndLeadOut
+EndSession
+EndDisc
+</PRE></P>
+</DL>
+<A NAME="no5_11"><HR></a><DL>
+<DT><H4>(1).PVD definition line</H4><DD><PRE>
+&lt;SystemIdentifier                    A identifier&gt;opt
+&lt;VolumeIdentifier                    D identifier&gt;opt
+&lt;LogicalBlockSize                    Number of blocks&gt;opt
+&lt;OptionalLPath&gt;opt
+&lt;OptionalMPath&gt;opt
+&lt;VolumeSetIdentifier                 D identifier&gt;opt
+&lt;PublisherIdentifier                 A identifier&gt;opt
+&lt;DataPreparerIdentifier              A identifier&gt;opt
+&lt;ApplicationIdentifier               A identifier&gt;opt
+&lt;CopyrightFileIdentifier             D+ identifier&gt;opt
+&lt;AbstractFileIdentifier              D+ identifier&gt;opt
+&lt;BibliographicFileIdentifier         D+ identifier&gt;opt
+&lt;VolumeCreationDate                  date&gt;opt
+&lt;VolumeModificationDate              date&gt;opt
+&lt;VolumeExpirationDate                date&gt;opt
+&lt;VolumeEffectiveDate                 date&gt;opt
+&lt;ApplicationUse                      MS-DOS file name&gt;opt
+</PRE><P></DL>
+<!--------------------------------------------------------------------------->
+<A NAME="no5_12"><HR></a><DL>
+<P><DT><H4> (2).SVD definition line</H4><DD><PRE>
+&lt;SystemIdentifier                    A identifier&gt;opt
+&lt;VolumeIdentifier                    D identifier&gt;opt
+&lt;LogicalBlockSize                    Number of blocks&gt;opt
+&lt;EscapeSequences                     Kanji code&gt;opt
+&lt;OptionalLPath&gt;opt
+&lt;OptionalMPath&gt;opt
+&lt;VolumeSetIdentifier                 D identifier&gt;opt
+&lt;PublisherIdentifier                 A identifier&gt;opt
+&lt;DataPreparerIdentifier              A identifier&gt;opt
+&lt;ApplicationIdentifier               A identifier&gt;opt
+&lt;CopyrightFileIdentifier             D+ identifier&gt;opt
+&lt;AbstractFileIdentifier              D+ identifier&gt;opt
+&lt;BibliographicFileIdentifier         D+ identifier&gt;opt
+&lt;VolumeCreationDate                  date&gt;opt
+&lt;VolumeModificationDate              date&gt;opt
+&lt;VolumeExpirationDate                date&gt;opt
+&lt;VolumeEffectiveDate                 date&gt;opt
+&lt;ApplicationUse                      MS-DOS file name&gt;opt
+</PRE></P>
+</DL>
+<!--------------------------------------------------------------------------->
+<A NAME="no5_13"><HR></a><DL>
+<P><DT><H4> (3).Boot record definition line</H4><DD><PRE>
+&lt;BootSystemIdentifier                A identifier&gt;opt
+&lt;BootIdentifier                      A identifier&gt;opt
+</PRE></P>
+</DL>
+<!--------------------------------------------------------------------------->
+<A NAME="no5_14"><HR></a><DL>
+<P><DT><H4> (4).File definition line</H4><DD><PRE>
+&lt;BeginTimeS              RelativeTime&gt;opt
+&lt;EndTimeS                RelativeTime&gt;opt
+&lt;Attributes              { HIDDEN | NOHIDDEN }{ RECORD | NOTRECORD }&gt;opt
+&lt;RecordingDate           date&gt;opt
+&lt;MinLength               { number of bytes | Number of sectors } &gt;opt
+&lt;Trigger                 RelativeTime&gt;opt
+&lt;Eors                    RelativeTime&gt;opt
+&lt;Pack&gt;opt
+&lt;SectorRate              { Positive production value } &gt;opt
+&lt;FileNo                  file number&gt;opt      ；1 〜 255
+&lt;BeginTimeE              { RelativeTime | + } &gt;opt
+&lt;EndTimeE                { RelativeTime | - } &gt;opt
+&lt;SameName                directory name file name&gt;opt
+&lt;SysOwnerID              number string&gt;opt
+&lt;SysReadAttributes       { OWNER | NOTOWNER }{ GROUP | NOTGROUP }
+　                        { WORLD | NOTWORLD }&gt;opt
+&lt;SysExecuteAttributes    { OWNER | NOTOWNER }{ GROUP | NOTGROUP }
+　                        { WORLD | NOTWORLD }&gt;opt
+</PRE></P>
+</DL>
+<!--------------------------------------------------------------------------->
+<A NAME="no5_15"><HR></a><DL>
+<P><DT><H4> (5).File source definition line</H4><DD><PRE>
+&lt;SubHeader&gt;opt
+&lt;Offset input position   input length&gt;opt
+&lt;BitRate                 bit rate  &lt;sequence number&gt;opt &gt;opt
+&lt;UnitSize                unit size&gt;opt
+&lt;GapSize                 gap size&gt;opt
+&lt;RealTime&gt;opt
+&lt;BeginTimeF              { RelativeTime | + } &gt;opt
+&lt;EndTimeF                { RelativeTime | - } &gt;opt
+&lt;DataType                { FORM1 | FORM2 }&gt;opt
+&lt;AutoEOR&gt;opt
+&lt;CodingInformation       Coding information&gt;opt
+&lt;SourceType              {  MONO_A | MONO_B | MONO_C | STEREO_A | STEREO_B |
+　                                      STEREO_C | CDDA | AUDIO | ISO11172 | MPEG_VIDEO |
+　                                      VIDEO | DATA  } &gt;opt
+　                                              ；Valid only when MODE2 is specified in the Track line
+&lt;SubSource               file name&gt;opt
+&lt;SubEmpty                Number of blocks&gt;opt
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p21_10.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

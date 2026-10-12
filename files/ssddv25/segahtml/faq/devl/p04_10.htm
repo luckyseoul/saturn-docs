@@ -1,0 +1,76 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/10&gt;FAQ/Development environment/Hitach Compiler related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Development environment</b><H2 ALIGN=CENTER> Hitach Compiler related</H2></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_01"><HR NOSHADE></a><DL>
+<H3> Which of SHCLIB.LIB, SHCPIC.LIB, and SHCNPIC.LIB should I link?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> There are three types of libraries in the SH C standard library: SHCLIB.LIB, SHCPIC.LIB, and SHCNPIC.LIB, but which one should I link?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There are three types of SH C standard libraries: SHCLIB.LIB, SHCPIC.LIB, and SHCNPIC.LIB, but SHCNPIC.LIB is used for Sega Saturn development.<BR>
+ This library is compatible with the SH7600 series (SH2) and does not generate position independent code.<BR>
+ Position-independent code is a program section that can be executed by placing it at an arbitrary address during linking, and is not supported by the Sega Saturn.<BR>
+ Also, do not link multiple standard libraries when linking.</P>
+<P><UL TYPE=DISC>
+<LI> SHCLIB.LIB is a library for the SH7000 series (SH1)<LI> SHCPIC.LIB is a library that supports position independent code for the SH7600 series.</UL>
+</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_02"><HR></a><DL>
+<H3> Is there anything I should be careful about with SH C compiler options when developing Sega Saturn?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is there anything I should be careful about with SH C compiler options when developing Sega Saturn?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> By default, the SH C compiler outputs code for the SH7000 series (SH1).<BR>
+ The Sega Saturn CPU is equivalent to the SH7600 series (SH2), so be sure to specify in the CPU option to output SH7600 series objects.</P>
+<P><DD>&#65308; <B>example</b>&#65310;<BR>
+<PRE><B>
+shc -CPU=7600 -def=_SH /i=segalib\include /optimize=1 /speed sample.c
+</b></PRE></P>
+<P><DD>*For WS (sun SPARC Station, HP9000/700 series, Hitachi 3050RX), please use "/" to specify the path. This is the same path name description rule that is allowed to be used in each processing system.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_03"><HR></a><DL>
+<H3> The source file does not appear in the file list in GUISH.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I try to display the source code using GUISH, the file does not appear in the file list.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> When debugging source code, you need to specify the DEBUG option when compiling and linking.<BR>
+ Please note that the source file will not be displayed if the DEBUG option is not specified or if only one option is specified (only when compiling or linking).</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_04"><HR></a><DL>
+<H3> I want to display double-byte code characters such as kanji in source code with GUISH.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to display kanji in source code with GUISH.<P><DT> <FONT SIZE=5>A)</font><DD> Kanji codes can be displayed in the SPARC version and the IBM-PC version.<BR>
+ It can be displayed by specifying a kanji font in the font settings of <B>"View - Source Display... - Setting..."</b> .</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_05_"><HR></a><DL>
+<H3> When I start GUISH, the message "NO INTERFACE BOARD" is displayed.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I start GUISH for E7000PC or EVA board, the message <B>"NO INTERFACE BOARD"</b> is displayed.<P><DT> <FONT SIZE=5>A)</font><DD> It seems that the settings on the Windows side are not configured correctly. Check whether EMMExclude is set in the [386Enh] section of SYSTEM.INI.<BR>
+ For the EMMExclude address, write the address specified on the I/F board as a shared address.<BR>
+ For details, see 3.4.2 "Installation Method" in the 7000PC edition of the E7000 SH7604 Emulator Manual.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_06"><HR></a><DL>
+<H3> I want to use GUISH for debugging both master and slave.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am developing with dual CPUs, but can I use GUISH with two E7000PC ICE/EVA boards at the same time?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Can not do. It is possible to use it with IPI.EXE in DOS window. In such cases, use the master and slave CPUs as GUISH and IPI, respectively, or vice versa.<BR>
+ Windows95 allows multiple DOS windows to operate in parallel, but it is unconfirmed whether IPI can operate on DOS windows at the same time.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

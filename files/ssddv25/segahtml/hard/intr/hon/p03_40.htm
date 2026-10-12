@@ -1,0 +1,147 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/ 9&gt;SEGA Saturn Overview Manual/3.Functions/3.4 VDP2</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm#intr">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">SEGA Saturn Overview Manual</a><HR>
+ <B>▲ <A HREF="p03_30.htm">Back</a> ｜ <A HREF="p03_50.htm">Forward</a> ▼</b><HR NOSHADE>
+<DL>
+<A NAME="no3_40"></A><P><DT><H3> ■3.4 VDP2</H3><DD> VDP2 displays the scroll screen and determines the priority of the entire screen (including sprites). The simultaneous display of scroll screens can be extended to up to 5 screens, and the screen can be moved up, down, left and right, and rotated. The priority (display priority order) can be set programmably for each character.</P>
+<A NAME="no3_41"></A><P><DT> <B>●System configuration</b><DD> VDP2 is connected to VRAM and has built-in color RAM. Image data is defined from the CPU through the SCU to VRAM and color RAM.<BR>
+ The data defined in VRAM is read out according to the register settings and becomes the image data for each scroll screen. The image data of each scroll screen and the image data sent from VDP1 and external image circuit are prioritized for display according to register settings and become display image data. Furthermore, the display image data is converted to display color data and output to the TV (Figure 3.12).</P>
+<A NAME="z3_12"></A><P ALIGN="CENTER"> <B>Figure 3.12 VDP2 system configuration</b> <BR>
+<img srcset="../grp/i027_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="t3_7"></A><P><DT><TABLE BORDER=1>
+<CAPTION> <B>Table 3.7 VDP2 system specifications</b></CAPTION>
+<TR><TH><PRE> No</TH><TH><PRE> Item</TH><TH><PRE> specification</TH><TH><PRE> remarks</TH></TR>
+<TR><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="LEFT"><PRE> TV screen</TD><TD ALIGN="LEFT"><PRE>・Horizontal resolution<BR> Choose from 320, 352, 640, 704 pixels<BR>&#12539; vertical resolution<BR> 224, 240, 256 pixels (non-interlaced)<BR> 448, 480, 512 pixels (when interlaced)<BR> Select from</TD><TD ALIGN="LEFT"><PRE> Vertical resolution 256 and 512 pins<BR> Xcel is only available in PAL format. <BR><BR><BR><BR></TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 2</TD><TD ALIGN="LEFT"><PRE> charactor</TD><TD ALIGN="LEFT"><PRE>・Character size<BR> Select from 1×1 cell or 2×2 cell<BR>&#12539; Number of character colors<BR> Choose from 16, 256, 2048, 32768, 16.77 million colors</TD><TD ALIGN="LEFT"><PRE> Bitmap method is also possible<BR><BR><BR></TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 3</TD><TD ALIGN="LEFT"><PRE> Normal scroll surface</TD><TD ALIGN="LEFT"><PRE>・Maximum number of simultaneous display screens: 4<BR>&#12539; Vertical and horizontal screen scrolling possible<BR>&#12539; line scrollable<BR>&#12539; Vertical cell scrolling possible<BR>&#12539; Can be scaled from 1/4 to 256 times<BR>&#12539; Mosaic function</TD><TD><PRE></TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 4</TD><TD ALIGN="LEFT"><PRE> rotating scroll surface</TD><TD ALIGN="LEFT"><PRE>・Maximum number of simultaneous display screens: 2<BR>&#12539; Can be scaled and rotated<BR>&#12539; Rotation parameters can be switched on the screen<BR>&#12539; Special screen processing using coefficient table</TD><TD ALIGN="LEFT"><PRE> When displayed on two sides, normal screen<BR> Roll surface cannot be displayed<BR><BR></TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 5</TD><TD ALIGN="LEFT"><PRE> window</TD><TD ALIGN="LEFT"><PRE>・2 normal windows<BR>&#12539; 1 sprite window<BR>&#12539; Line window possible</TD><TD><PRE></TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 6</TD><TD ALIGN="LEFT"><PRE> priority</TD><TD ALIGN="LEFT"><PRE>・Programmable priority setting for each screen<BR> can be determined<BR>&#12539; Priority per character and per dot<BR> property can be replaced</TD><TD><PRE></TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 7</TD><TD ALIGN="LEFT"><PRE> Screen processing</TD><TD ALIGN="LEFT"><PRE>・Color calculations can be performed on up to 4 screens<BR>&#12539; Color calculation ratio 32 levels<BR>&#12539; Color offset function<BR>&#12539; shadow function</TD><TD><PRE></TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_42"></A><P><DT> <B>●Function</b><DD> VDP2 has a scroll function that controls scroll screen display and a priority function that determines display priority.</P>
+<A NAME="z3_13"></A><P ALIGN=CENTER> <B>Figure 3.13 Scroll and priority function</b><PRE>
+Scroll function ────┬─ Enlarge/reduce　
+                    ├─ Line scroll
+                    ├─ Vertical cell scroll
+                    ├─ Mosaic processing
+                    └─ Window
+
+Priority function ──┬─ Color calculation　
+                    ├─ Color offset
+                    └─ Shadow
+</PRE><A NAME="no3_43"></A><P><DT><B>●Scroll screen</b><DD> Scroll has a scroll screen to display pictures and a window to control the display. Furthermore, there are two types of scroll screens: a normal scroll screen where you can change the number of pages that can be displayed, and a rotating scroll screen where you can rotate the display.<BR>
+ Table 3.8 shows the functions of the normal scroll screen and rotary scroll screen, and the number of character colors.</P>
+<A NAME="t3_8"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 3.8 Scroll screen functions</b></CAPTION>
+<TR><TH ROWSPAN=2><PRE> function</TH><TH COLSPAN=4><PRE> Normal scroll screen</TH><TH COLSPAN=2><PRE> rotating scroll screen</TH></TR>
+<TR><TD ALIGN="CENTER"><PRE> Screen 0</TD><TD ALIGN="CENTER"><PRE> Screen 1</TD><TD ALIGN="CENTER"><PRE> Screen 2</TD><TD ALIGN="CENTER"><PRE> Screen 3</TD><TD ALIGN="CENTER"><PRE> Screen 0</TD><TD ALIGN="CENTER"><PRE> Screen 1</TD></TR>
+<TR><TD><PRE> Scaling function</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> 1/4x ~ 256x</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> none</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> Possible at any magnification</TD></TR>
+<TR><TD><PRE> Rotation function</TD><TD COLSPAN=4 ALIGN="CENTER"><PRE> none</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> can be</TD></TR>
+<TR><TD><PRE> Line scroll function</TD><TD ALIGN="CENTER"><PRE> can be</TD><TD ALIGN="CENTER"><PRE> can be</TD><TD ALIGN="CENTER"><PRE> none</TD><TD ALIGN="CENTER"><PRE> none</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> none</TD></TR>
+<TR><TD><PRE> Vertical cell scrolling function</TD><TD ALIGN="CENTER"><PRE> can be</TD><TD ALIGN="CENTER"><PRE> can be</TD><TD ALIGN="CENTER"><PRE> none</TD><TD ALIGN="CENTER"><PRE> none</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> none</TD></TR>
+<TR><TD><PRE> Mosaic processing function</TD><TD COLSPAN=4 ALIGN="CENTER"><PRE> can be</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> Yes (horizontal direction only)</TD></TR>
+<TR><TD><PRE> Bitmap display</TD><TD ALIGN="CENTER"><PRE> It can be displayed</TD><TD ALIGN="CENTER"><PRE> It can be displayed</TD><TD ALIGN="CENTER"><PRE> Not displayable</TD><TD ALIGN="CENTER"><PRE> Not displayable</TD><TD ALIGN="CENTER"><PRE> It can be displayed</TD><TD ALIGN="CENTER"><PRE> Not displayable</TD></TR>
+<TR><TD><PRE> Number of character colors</TD><TD ALIGN="LEFT"><PRE> 16 colors<BR> 256 colors<BR> 2048 colors<BR> 32768 colors<BR> 16.77 million colors<BR> more selection</TD><TD ALIGN="LEFT"><PRE> 16 colors<BR> 256 colors<BR> 2048 colors<BR> 32768 colors<BR> more selection</TD><TD ALIGN="LEFT"><PRE> 16 colors<BR> 256 colors<BR> more selection</TD><TD ALIGN="LEFT"><PRE> 16 colors<BR> 256 colors<BR> more selection</TD><TD ALIGN="LEFT"><PRE> 16 colors<BR> 256 colors<BR> 2048 colors<BR> 32768 colors<BR> 16.77 million colors<BR> more selection</TD><TD ALIGN="LEFT"><PRE> 16 colors<BR> 256 colors<BR> 2048 colors<BR> 32768 colors<BR> 16.77 million colors<BR> more selection</TD></TR>
+</TABLE>
+<P><A NAME="no3_43_0"></A><P><DT> <B>◆Scaling function</b><DD> You can scale the entire screen horizontally and vertically. When reducing the display horizontally, there are restrictions such as a reduction in the number of pages.</P>
+<DT> <B>◆Line scroll function</b><BR>
+<DD> With the ability to scroll vertically and horizontally for each line and to scale horizontally, you can create a sense of distance on roads in driving games, for example.<P><DT> <B>◆Vertical scroll function</b><BR>
+<DD> This function allows you to scroll up and down in horizontal cell units, which can add depth to vertically scrolling games, for example.<P><DT> <B>◆Mosaic function</b><BR>
+<DD> Divide each scroll screen into specified horizontal and vertical directions, and display the color of the upper left dot in each area on all dots in that area.<BR>
+<A NAME="z3_14"></A><P ALIGN="CENTER"> <B>Figure 3.14 Mosaic pattern</b><BR>
+<img srcset="../grp/i031_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<A NAME="no3_431"></A><P> <B>◆Rotation function</b></P>
+<UL>
+<P><LI> <B>rotation display</b><BR>
+ The rotating scroll surface has rotation on the coordinate axes (X, Y, Z axes) and rotation on the screen axis perpendicular to the TV screen. You can also display up to two screens at the same time.</P>
+<A NAME="z3_15"></A><P ALIGN="CENTER"> <B>Figure 3.15 Image change due to rotation axis</b><BR>
+<img srcset="../grp/i031_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z3_16"></A><P ALIGN="CENTER"> <B>Figure 3.16 Image change according to screen axis</b><BR>
+<img srcset="../grp/i032_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><LI> <B>rotation calculation</b><BR>
+ Rotation calculations are performed by the hardware according to the specified parameters, so rotations can be displayed without placing too much strain on the CPU. Additionally, since coordinates can be calculated by multiplying each dot by a different value, it is possible to display distorted images.</P>
+<P><LI> <B>Simultaneous display by split screen</b><BR>
+ With this function, you can display an image that looks like two screens by simply displaying one rotating scroll screen.</P>
+</UL>
+<DL>
+<A NAME="no3_432"></A><DT> <B>◆Scroll screen configuration</b><DD> There are two screen formats for the scroll screen: cell format and bitmap format. The cell format is a method of displaying cells side by side, similar to conventional home game consoles, and the bitmap format is a method of displaying a corresponding picture for each dot on the screen, similar to computers.<P></DL>
+<UL>
+<A NAME="no3_432_1"></A><P><LI> <B>cell format</b><BR>
+ The cell-format scroll screen has three types: ``Cell'' which is a picture pattern of 8 dots horizontally x 8 dots vertically, ``Character pattern'' which is an arrangement of cells, ``Page'' which is an arrangement of character patterns, ``Plain'' which is an arrangement of pages, It consists of a ``map'' that arranges planes. Figure 3.17 shows the structure of a scroll screen in cell format.</P>
+<A NAME="z3_17"></A><P ALIGN="CENTER"> <B>Figure 3.17 Scroll screen in cell format</b><BR>
+<img srcset="../grp/i033_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no3_432_2"></A><P><LI> <B>bitmap format</b><BR>
+ A scroll screen in bitmap format consists of a bitmap pattern with a size of 512 dots or 1024 dots horizontally and 256 dots or 512 dots vertically. Figure 3.18 shows the configuration of the scroll screen in bitmap format.</P>
+</UL>
+<A NAME="z3_18"></A><CENTER>
+ <B>Figure 3.18 Relationship between bitmap format scroll screen and data settings</b><BR>
+<img srcset="../grp/i033_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><PRE>
+512 dots horizontally x 256 dots high</PRE></CENTER>
+<DL>
+<A NAME="no3_433"></A><DT> <B>◆Window</b><DD> Windows are classified into three types depending on the area specification (coordinate specification) method.</DL>
+<UL>
+<P><LI> <B>Normal rectangular window</b><BR>
+ Specified by the coordinates of two points, the start point and the end point</P>
+<P><LI> <B>normal line window</b><BR>
+ Specified by the coordinates of the start and end points for each line</P>
+<P><LI> <B>sprite window</b><BR>
+ Specified by sprite character pattern</P>
+<A NAME="z3_19"></A><P ALIGN="CENTER"> <B>Figure 3.19 Window</b><BR>
+<img srcset="../grp/i034_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</UL>
+<A NAME="no3_44"></A><P> <B>●Priority function</b><BR>
+ The display priority of sprites and scroll screens is determined by a 3-bit priority number. Up to eight values can be set for the sprite's priority number, one of which is specified for each character.</P>
+<DL>
+<A NAME="no3_441"></A><DT> <B>◆Judgment of priorities</b><DD> The priority number for the scroll screen is usually specified in units of planes. (Using the special priority function, you can change it in character or dot units.)<P><A NAME="z3_20"></A><P ALIGN="CENTER"> <B>Figure 3.20 Priority function</b><BR>
+<img srcset="../grp/i034_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<DL>
+<A NAME="no3_442"></A><DT> <B>◆Special priority function</b><DD> You can change the priority number corresponding to each scroll screen on a character or dot basis. By using this function to change the priority of only certain parts of the scroll screen, you can make a single scroll screen appear to have multiple screens.</DL>
+<DL>
+<A NAME="no3_443"></A><DT> <B>◆Color calculation function</b><DD> The color calculation function adds the color data of multiple screens to create the effect of seeing the background screen through the foreground screen. Normally, this is done on two screens, the top image and the second image, but if you use the extended color calculation function, you can do it on up to four screens.<A NAME="z3_21"></A><P ALIGN="CENTER"> <B>Figure 3.21 Color calculation function</b><BR>
+<img srcset="../grp/i035_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<DL>
+<A NAME="no3_444"></A><DT> <B>◆Insert line color screen</b><DD> The line color screen is a screen that forcibly inserts the specified screen as a second image in the area where it is the top image and performs color calculations. At that time, in the area where the line color screen is inserted, the second image before insertion becomes the third image, and the third image becomes the image one level below it (force image). Figure 3.22 shows the insertion of a line color screen.<A NAME="z3_22"></A><P ALIGN="CENTER"> <B>Figure 3.22 Inserting a line color screen</b><BR>
+<img srcset="../grp/i036_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<DL>
+<A NAME="no3_445"></A><DT> <B>◆Shadow function</b><BR>
+<DD> The shadow function is a function that casts a shadow in the shape of a sprite character on each screen.<P><A NAME="z3_23"></A><P ALIGN="CENTER"> <B>Figure 3.23 Shadow function</b><BR>
+<img srcset="../grp/i036_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<DL>
+<A NAME="no3_446"></A><DT> <B>◆Blur calculation function</b><DD> The blur calculation function is a function that adds horizontal color data for one specified screen at a fixed rate, creating an effect that blurs distant backgrounds.<A NAME="z3_24"></A><P ALIGN="CENTER"> <B>Figure 3.24 Blur calculation function</b><BR>
+<img srcset="../grp/i037_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<DD> Forces the color data addition result to become the second image for the area where the specified screen becomes the top image or second image. By performing color calculations on this second image and the top image, you can display a blurred picture.</DL>
+<DL>
+<A NAME="no3_447"></A><DT> <B>◆Color offset function</b><DD> The color offset function is a function that adds (subtracts) an offset value to the color data on the screen and displays it, and is used for fade-ins and fade-outs. You can specify whether to use the color offset function for each screen.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_30.htm">Back</a> ｜ <A HREF="p03_50.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm#intr">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">SEGA Saturn Overview Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

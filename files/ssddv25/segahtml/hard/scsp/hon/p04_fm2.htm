@@ -1,0 +1,152 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/29&gt;SCSP User's Manual/How to use the FM sound source method/2</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p04_fm1.htm">Back</a> ｜ <A HREF="p04_fm3.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/4.3 Sound source register</b><HR NOSHADE>
+<DL>
+<P><DD> In FM voice synthesis, the connection between slots (actually, the connection between the sound stack and slots) is important. The slot calculation in the FM audio configuration diagram in Figure 4.28 can be expressed as shown in Figure 4.24.<P><A NAME="z4_24"></A><P ALIGN=CENTER> <B>Figure 4.24 Slot calculation and sound stack status</b><BR>
+<img srcset="../grp/i056_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Slot calculation starts with PG calculation processing and PLFO calculation processing (OP1), ADP (address pointer) calculation processing, MD (modulation) data reading (OP2), waveform data reading (OP3), interpolation calculation processing and EG calculation processing. It is executed in the following cycles: ALFO calculation processing (OP4), level calculation processing (OP5) (OP6), and waveform output value sound stack write (OP7). Level calculation processing requires two cycles because the calculation process is long.<BR>
+ Looking at the calculation processing temporarily, for example, "When slot 3 is performing PG calculation processing and PLFO calculation processing, ADP calculation processing and MD reading are performed in slot 2 and waveform processing.<BR>
+<P><DD> Data reading is performed in slot 1, interpolation calculation processing, EG calculation processing, and ALFO calculation processing is performed in slot 0, level calculation processing is performed in slot 31 and slot 30, and sound stack is written in slot 30.<BR>
+ Slot calculations start from slot 0 and work their way to slot 31, so they are written to the sound stack in ascending order from slot 0. However, there is a time lag between the time the slot calculation starts and the time the slot is written to the sound stack. For example, it takes 6 cycles to write slot 0 to the sound stack, as shown in Figure 4.25.<BR>
+ As shown in Figure 4.24, when connecting a slot to another slot, the connection cannot actually be made unless the slot being connected is in the OP2 state and data has already been written to the sound stack.<BR>
+ For example, for other slots that can be connected to slot 0, when OP2 is slot 0, slots up to "27" are written in the sound stack, so colored sound data up to "27" will apply. This can be expressed formally as follows.</P>
+<A NAME="s4_0"></A><P><DD><PRE><B>
+●Slot connection formula {Current slot number + 32 – Slot number you want to connect (sound stack) + A }≧5
+</b></PRE></P>
+<P><DD>The current slot number represents the slot number of the register. However, for A, substitute "32" if the sound stack of the slot you want to connect is in the current cycle, and "0" if it is in the past cycle.<BR>
+ The past here refers to the data from the cycle one sample ago.<P><A NAME="z4_25"></A><P ALIGN=CENTER> <B>Figure 4.25 Time difference until slots are written to the sound stack</b><BR>
+<img srcset="../grp/i057_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="MDXSL_MSYSL"></A><P><DD> <B>Calculation formula for "MDXSL" and "MDYSL"</b><P><DD> Two or more slots are connected to configure FM voice synthesis, and we will explain how to calculate "MDXSL" and "MDYSL" (6 bits each) at this time.<BR>
+ When connecting two slots, let M be the slot on the side that applies modulation (modulator), C be the slot on the side that is modulated (carrier), and let J be the answer to M - C.</P>
+<P><DD><PRE>
+<B>M−C=J</b> . ．． ．． ．． ．． 4.1 formula</PRE></P>
+<P><DD> It becomes. Depending on the value of J obtained, the value of the most significant bit (MSB...6th bit) of "MDXSL" and "MDYSL" will change. The conditions are shown below.</P>
+<P><DD> <B>●Condition 1 When J≧28</b><DD><UL TYPE=DISC>
+<LI> Convert the value of J to a 5-bit hexadecimal value.<LI> For the latest sample, set the MSB (6th bit) to "0B".<BR>
+ For past samples, set it to "1B".</UL>
+</P>
+<P><DD> <B>●Condition 2 J</b>&#65308; <B>If 0 (J is negative)</b><DD><UL TYPE=DISC>
+<LI> Calculate 32+J (calculated in decimal).<LI> Next, convert the above value to a 5-bit hexadecimal value.<LI> For the latest sample, set the MSB (6th bit) to "0B".<BR>
+ For past samples, set it to "1B".</UL>
+</P>
+<P><DD> <B>●Condition 3: When the value of J does not apply to either Condition 1 or Condition 2.</b><DD><UL TYPE=DISC>
+<LI> Convert the value of J to a 5-bit hexadecimal value.<LI> For the latest sample, set the MSB (6th bit) to "1B".<BR>
+ For past samples, set it to "0B".</UL>
+</P>
+<P><DD> Here are some things to keep in mind when actually implementing FM voice synthesis.</P>
+<A NAME="z4_26"></A><P ALIGN=CENTER><PRE> <B>Figure 4.26 Slot averaging operation</b><BR>
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃Slot input/output         Modulation input ┃
+┃                                           ┃
+┃   X   Y...Modulation  X    Y              ┃
+┃   ↓   ↓   input       ↓    ↓              ┃
+┃ ┌─┴───┴─┐           ┌─┴────┴──┐           ┃
+┃ │       │           │Averaging│    X + Y  ┃
+┃ │ Slot  │           │operation│ = ─────── ┃
+┃ │       │           │ section │      2    ┃
+┃ └───┬───┘           └────┬────┘           ┃
+┃     ↓                    ↓                ┃
+┃ Waveform              POINTER             ┃
+┃ data output           TO ADDRESS          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+</PRE></P>
+<P><DD>The source input to the slot is the data in the sound stack ("SOUS"). Therefore, modulating a slot means assigning and connecting the sound stack corresponding to the modulating slot to the modulated slot. The actual functions include "MDXSL" and "MDYXL" that select the sound stack to be input for modulation inputs Y and there is.<BR>
+ There are also two modulation inputs to the slot: X and Y. Please note that these two inputs will be multiplied by 1/2 by the averaging operation. Therefore, if a single slot input is connected, set the same parameters to the X and Y inputs and input the same slot's sound stack data. If you set it to input only on one side, unexpected data may be mixed in or the FM modulation degree may seem small.<BR>
+ Next, we will calculate each parameter using the "MDXSL" and "MDYSL" calculation methods, using a 4-slot FM sound source that is actually used in FM voice synthesis as an example.<BR>
+ First, we will explain how to read the FM speech synthesis algorithm shown in Figure 4.27.<P><A NAME="z4_27"></A><P ALIGN=CENTER> <B>Figure 4.27 Algorithm for 4-slot configuration</b><BR>
+<img srcset="../grp/i059_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>●Slot 0</b><DD> The output of slot 0 is used as the input of slot 2, while the output of slot 0 is used as the input of slot 0. This is called self-feedback.</P>
+<P><DD> <B>●Slot 1</b><DD> Slot 1 uses its output as input for slot 2.</P>
+<P><DD> <B>●Slot 2</b><DD> Slot 2 uses the outputs of slot 0 and slot 1 as input. The output is used as the input for slot 3.</P>
+<P><DD> <B>●Slot 3</b><DD> Slot 3 takes the output of slot 2 as its input. The output of slot 3 is not connected to anything, but we will use it as an audio output.</P>
+<P><DD> <B>(1) Parameters set in slot 0</b><A NAME="z4_28"></A><P ALIGN=CENTER> <B>Figure 4.28 Slot 0 algorithm</b><BR>
+<img srcset="../grp/i060_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Self-feedback configurations such as slot 0 require connecting the sound stack containing the slot 0 output data to the modulation inputs X and Y.<BR>
+ The sound stack has the latest sample and past sample for the sample currently being calculated, so input the latest sample or past sample to both modulation inputs X and Y, or input the latest sample to one and the past sample to the other. There are three possible input methods:</P>
+<P><DD> <B>※Note</b><DD> However, in the case of self-feedback, inputting the same sample may cause oscillation, so be sure to input the latest sample on one side and the past sample on the other.<BR>
+ Since the values of MDXSL and MDYSL are 0 for both the slot to which modulation is applied and the slot to which modulation is applied, substituting them into equation 4.1 results in the following.</P>
+<P><DD><PRE><B>
+0 - 0 = 0
+</b></PRE></P>
+<P><DD>This satisfies condition 3 of equation 4.1, so the MSB of MDXSL and MDYSL is</P>
+<P><DD><PRE>
+For the latest sample MSB=1(<B>1</b>00000)B = 20H
+For past samples      MSB=0(<B>0</b>00000)B = 00H
+</PRE></P>
+<P><DD>It becomes.</P>
+<P><DD> <B>(2) Parameters set for slot 2</b></P>
+<A NAME="z4_29"></A><P ALIGN=CENTER> <B>Figure 4.29 Slot 2 algorithm</b><BR>
+<img srcset="../grp/i061_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Slot 2 is an input for multiple slots, so there is no need to be particular about inputting the latest or past samples.<BR>
+ The values of "MDXSL" and "MDYSL" with slot 1 as input (slot 1 side) are modulated slot 1 and modulation slot 2, so when they are substituted into equation 4.1, they become as follows.</P>
+<P><DD><PRE><B>
+1 - 2 = -1
+</b></PRE></P>
+<P><DD>This satisfies condition 2 of formula 4.1, so the MSB of "MDXSL" and "MDYSL" is</P>
+<P><DD><PRE><B>
+32 + (-1) = 31 = 1FH = (011111)B
+</b>
+For the latest sample MSB=0(<B>0</b>11111)B = 1FH
+For past samples      MSB=1(<B>1</b>11111)B = 3FH
+</PRE></P>
+<P><DD>It becomes.</P>
+<A NAME="z4_30"></A><P ALIGN=CENTER> <B>Figure 4.30 Slot 2 algorithm (by input slot)</b><BR>
+<img srcset="../grp/i061_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Next, the values of "MDXSL" and "MDYSL" with slot 0 as input (slot 0 side) are the slot to which modulation is applied is 0 and the slot to which modulation is applied is 2, so when substituted into equation 4.1, it becomes as follows. Become.</P>
+<P><DD><PRE><B>
+0 − 2 = −2
+</b></PRE></P>
+<P><DD>This satisfies condition 2 of formula 4.1, so the MSB of "MDXSL" and "MDYSL" is</P>
+<P><DD><PRE><B>
+32 + (-2) = 30 = 1EH = (011111)B
+</b>
+For the latest sample MSB=0(<B>0</b>11110)B = 1EH
+For past samples      MSB=1(<B>1</b>11110)B = 3EH
+</PRE></P>
+<P><DD>It becomes.</P>
+<P><DD> <B>※Note</b><DD> Basically, when entering slots with different numbers, enter samples of the same generation. Conventional FM sound sources use this method, so please use this method when porting an FM sound source tone library.</P>
+<P><DD> <B>(3) Parameters set in slot 3</b><A NAME="z4_31"></A><P ALIGN=CENTER> <B>Figure 4.31 Slot 3 algorithm</b><BR>
+<img srcset="../grp/i062_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Since slot 3 has only one input, the output of slot 2 must be applied to both modulation inputs X and Y.<BR>
+ If the connected slots are different, there is no possibility of oscillation, so even if you input only the latest sample or only the past sample to both modulation inputs X and Y, or input the latest sample to one and the past sample to the other. does not matter. When porting a conventional FM sound source tone library, please use only one of the samples.</P>
+<P><DD> The values of MDXSL and MDYSL with slot 2 as input are 2 slots to be modulated and 3 slots to be modulated, so when substituted into equation 4.1, the values are as follows.</P>
+<P><DD><PRE><B>
+2 − 3 = −1
+</b></PRE></P>
+<P><DD>This satisfies condition 2 of formula 4.1, so the MSB of "MDXSL" and "MDYSL" is</P>
+<P><DD><PRE><B>
+32 + (-1) = 31 = 1FH>= (011111)B
+</b>
+For the latest sample MSB=0(<B>0</b>11111)B = 1FH
+For past samples      MSB=1(<B>1</b>11111)B = 3FH
+</PRE></P>
+<P><DD>It becomes.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_fm1.htm">Back</a> ｜ <A HREF="p04_fm3.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

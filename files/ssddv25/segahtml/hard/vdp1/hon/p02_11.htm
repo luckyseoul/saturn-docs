@@ -1,0 +1,127 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/54&gt;VDP1 User's Manual/2.Address Map/Frame Buffer</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p02_12.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 2 Address Map</b><HR NOSHADE>
+<DL>
+<A NAME="no2_11_0"></A><P><DT><H3> ●Frame buffer</H3><DT><UL TYPE=DISC>
+<LI> It consists of two 2Mbit DRAMs and is divided into two sides: a display frame buffer and a drawing frame buffer.</P>
+<P><LI> The display frame buffer and drawing frame buffer functions are switched immediately before the screen display period (DISP). After power-on or reset, frame buffer 0 becomes the drawing frame buffer and frame buffer 1 becomes the display frame buffer.</P>
+<P><LI> Read/write access from the system controller (system controller IC) to the frame buffer is performed only to the drawing frame buffer. The display frame buffer is in the back bank and cannot be accessed.</P>
+<P><LI> Drawing is performed in synchronization with the CPU operating clock. The CPU operating clock is 28MHz, and one pixel of data is drawn in synchronization with this clock.</P>
+<P><LI> Read/write access from the system controller to the frame buffer and drawing access from VDP1 are prioritized.</P>
+<A NAME="no2_11_1"></A><P><LI> Frame buffer access priority is always</P>
+<P><DD> <B>system controller</b>&#65310; <B>drawing</b></P>
+<P> This is the order.</P>
+<P><LI> If you access from the system controller while drawing, the drawing will be interrupted and the process will take a long time, so please avoid this as much as possible.</P>
+<P><LI> In order to prevent drawing and CPU access from occurring at the same time, use a method such as manual start of drawing to control it.</P>
+<P><LI> Word access is possible. Byte access is possible when the display is 8bit/pixel (high resolution or rotation 8). Do not perform byte access when using 16bit/pixel.</P>
+<P><LI> By reading the frame buffer diagonally, the entire frame buffer can be rotated and displayed. Additionally, the entire frame buffer plane can be expanded or contracted by skipping or repeating the read addresses. Rotation, enlargement, and reduction can be performed at the same time.</P>
+<P><LI> Rotation is instructed using VDP2. Please refer to the VDP2 manual for detailed rotation instructions.</UL>
+</P>
+<P><DT> <B>frame buffer plane</b><DD> The framebuffer plane coordinates are: The lower right coordinate value increases.</P>
+<P><DD> <B>X: −1024≦X≦1023</b><DD> <B>Y: −1024≦Y≦1023</b></P>
+<P><DD> Operation is not guaranteed if you specify more than these values.</P>
+<A NAME="z2_2"></A><P ALIGN=CENTER> <B>Figure 2.2 Frame buffer plane</b><BR>
+<img srcset="../grp/i021_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> You can also place parts outside the display screen, as shown in the image above. However, nothing is written beyond the frame buffer plane.</P>
+<P><DT> <B>Pixel data on frame buffer</b></P>
+<DD> The pixel data on the framebuffer is: There is 16bit and 8bit data. RGB data that does not go through VDP2's color RAM is only 16 bit. When all bits are 0, it is treated as a transparent dot by VDP2.</P>
+<DT><UL TYPE="DISC">
+<LI> <B>Bit configuration when passing through color RAM (color RAM address)</b><BR>
+<PRE>
+16 color mode (4bit/pixel)
+MSB LSB
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│15│14│13│12│11│10│ 9│ 8│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+ └─────────────────────────────────┘ └──────────┘　
+      Color bank                    Character data　
+
+64 color mode (6bit/pixel)
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│15│14│13│12│11│10│ 9│ 8│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+└────────────────────────────┘ └────────────────┘　
+      Color bank                 Character data　
+
+128 color mode (7bit/pixel)
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│15│14│13│12│11│10│ 9│ 8│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+ └────────────────────────┘ └──────────────────┘　
+      Color bank               Character data　
+　
+256 color mode (8bit/pixel)
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│15│14│13│12│11│10│ 9│ 8│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+ └─────────────────────┘ └─────────────────────┘　
+      Color bank             Character data　
+
+[Note] b15=0 when RGB data is mixed, optional when not mixed</PRE><P><LI> <B>Bit configuration when not going through color RAM (RGB data)</b><BR>
+<PRE>
+MSB LSB
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│ *│14│13│12│11│10│ 9│ 8│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+  ↑ └────────────┘ └────────────┘ └─────────────┘
+ "1"  BLUE data      GREEN data      RED data　
+</PRE><P><LI><B>Bit configuration when pixel data is 8 bits (color RAM address)</b><PRE>
+16 color mode (4bit/pixel)
+MSB LSB
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│−−│−−│−−│−−│−−│−−│−−│−−│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+                        └──────────┘ └──────────┘
+                         Color bank  Character data　
+
+64 color mode (6bit/pixel)
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│−−│−−│−−│−−│−−│−−│−−│−−│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+                        └────┘ └────────────────┘
+                         Color   Character data　
+                         bank
+
+128 color mode (7bit/pixel)
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│−−│−−│−−│−−│−−│−−│−−│−−│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+                        └──┘└───────────────────┘　
+                       Color   Character data　
+                        bank
+
+256 color mode (6bit/pixel)
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│−−│−−│−−│−−│−−│−−│−−│−−│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+                         └─────────────────────┘　
+                             Character data　
+</PRE></UL>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p02_12.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

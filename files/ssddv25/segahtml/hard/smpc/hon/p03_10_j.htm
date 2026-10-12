@@ -1,0 +1,133 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/19&gt;SMPCユーザーズマニュアル/第3章　ペリフェラルコントロール</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p02_50_j.htm">戻る</A>｜
+     <a href="p03_11_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SMPCユーザーズマニュアル</B>
+<H1 ALIGN=CENTER>第３章　ペリフェラルコントロール</H1>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A>
+  <P><DT><H2>■3.1　ペリフェラルコントロールモード</H2>
+     <DD>　SH-2は、SMPCを介してペリフェラルをコントロールすることができます。
+         ペリフェラルコントロール方式には、以下の2つの方式があります。</P>
+
+  <P><DD>(1)SMPCコントロールモード
+     <DD>(2)SH-2ダイレクトモード</P>
+
+<A NAME="no3_11"></A>
+	<P>	<DT><H2>◆SMPCコントロールモード</H2>
+
+<A NAME="no3_11_0"></A>
+     <DD><H4>●ブロック図</H4>
+     <DD>　図3.1にSMPCコントロールモードのブロック図を示します。SMPCコントロールモードは、
+        SH-2インタフェースレジスタのIREGにコマンドパラメータを設定しINTBACKコマンドを発行することにより、
+        起動されます。ペリフェラルデータの収集結果を、リザルトパラメータとして、OREGに出力します。</P>
+
+<A NAME="z3_1"></A>
+	<P ALIGN=CENTER><B>図3.1　SMPCコントロールモードのブロック図</B><BR><img srcset="../grp/i048_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no3_11_1"></A>
+  <P><DD><H4>●特長</H4>
+     <DD>　アプリケーション内で、ペリフェラルをアクセスするためのオーバーヘッドを最小限にしたい
+         ときに有効な手段です。</P>
+
+<A NAME="no3_11_2"></A>
+	<P><DD><H4>●SMPCコントロールモードを使用するための設定</H4>
+     <DD>　図3.2に、SMPCコントロールモードを使用するための設定例を示します。
+     <DD>　図3.2は、ポート1への設定例を示しています。なお、モード設定は、各々のポートに対して独立に設定できます。</P>
+
+<A NAME="z3_2"></A>
+	<P ALIGN=CENTER><B>図3.2　SMPCコントロールモードの設定例</B><BR><img srcset="../grp/i049_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no3_11_3"></A>
+  <P><DD><H4>●パワーON時のパラレルI/Oレジスタのデフォルト値</H4>
+     <DD>　パワーON時のパラレルI/Oレジスタは表3.1に示すデフォルト値に設定されます。</P>
+
+<A NAME="t3_1"></A>
+	<P><DD><TABLE BORDER><CAPTION><B>表3.1　パワーON時のパラレルI/Oレジスタデフォルト値</B></CAPTION>
+	<TR><TD ALIGN="CENTER"><PRE>レジスタ名</TD><TD ALIGN="CENTER"><PRE>設定値</TD><TD WIDTH=400 ALIGN="CENTER"><PRE>内　　　容</TD></TR>
+	<TR><TD><PRE>IOSEL1/2</TD><TD ALIGN="CENTER"><PRE>0H</TD><TD WIDTH=400><PRE>SMPCコントロールモード</TD></TR>
+	<TR><TD><PRE>EXL1/2</TD><TD ALIGN="CENTER"><PRE>0H</TD><TD WIDTH=400><PRE>PAD割り込み、VDP2外部ラッチディセーブル</TD></TR>
+	<TR><TD><PRE>DDR1/2</TD><TD ALIGN="CENTER"><PRE>00H</TD><TD WIDTH=400><PRE>全ビット入力</TD></TR>
+	</TABLE></P>
+
+<A NAME="no3_11_4"></A>
+  <P><DD><H4>●SMPCコントロールモードの使用方法</H4>
+     <DD>　INTBACKコマンドを使用しペリフェラルデータを取得する際、収集したペリフェラルデータはリザルトパラメータとしてOREGに出力されます。
+         しかし、ペリフェラルデータは、OREGの容量よりも多いことが考えられます。そこでSMPCコントロールモードでは、OREGがフルになる度にペリフェラルデータ収集を中断します。
+         OREGがペリフェラルデータでフルになるとSMPCはSMPC割り込みを発生し、SH-2にペリフェラルデータの取得を要求します。<BR>
+         　また、収集すべきペリフェラルデータが残っている時にはステータスレジスタに残りデータ有りを表示します。
+        SH-2が、ペリフェラルデータを取得した後、SMPCへコンティニューを要求することで、SMPCはペリフェラルデータ収集を再開します。
+        また、残りペリフェラルデータが不要なときは、ブレイク要求によりペリフェラルデータ収集を終了することもできます。
+        以上のシーケンスを図3.3および図3.4に示します。</P>
+
+<A NAME="no3_12_0"></A>
+  <P><DD><B>・コンティニュー要求</B>
+     <DD>　SH-2からSMPCへのコンティニューは、IREG0のビット7を反転させることで要求できます。</P>
+
+<A NAME="no3_12_1"></A>
+  <P><DD><B>・ブレイク要求</B>
+     <DD>　SH-2からSMPCへのブレイクは、IREG0のビット6に"1"を書き込むことにより要求できます。</P>
+
+<A NAME="no3_12_2"></A>
+  <P><DD><B>・コンティニュー、ブレイク要求での注意点</B>
+     <DD>　コンティニューおよびブレイクを要求するときには、表3.2に示した条件に注意してください。</P>
+
+<A NAME="t3_2"></A>
+	<P><DD><TABLE BORDER><CAPTION><B>表3.2　コンティニュー及びブレイクの発行条件</B></CAPTION>
+	<TR><TD COLSPAN=2 ALIGN="CENTER"><PRE>発行する要求</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE>受付条件</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE>SMPC動作</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>コンティ<BR>ニュー</TD><TD ALIGN="CENTER"><PRE>ブレイク</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>×</TD><TD ALIGN="CENTER"><PRE>×</TD><TD><PRE>保留</TD><TD><PRE>要求待ち</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>×</TD><TD ALIGN="CENTER"><PRE>○</TD><TD><PRE>ブレイク</TD><TD><PRE>ペリフェラルデータ収集中断、INTBACKコマンドを終了</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>○</TD><TD ALIGN="CENTER"><PRE>×</TD><TD><PRE>コンティニュー</TD><TD><PRE>続きのペリフェラルデータ収集</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>○</TD><TD ALIGN="CENTER"><PRE>○</TD><TD><PRE>禁止</TD><TD><PRE>保証なし</TD></TR>
+	</TABLE></P>
+
+<A NAME="no3_12_3"></A>
+  <P><DD><B>・ペリフェラルデータを取得するINTBACKコマンドの終了条件</B>
+     <DD>　ペリフェラルデータを取得するINTBACKコマンドは、以下の条件で終了します。</P>
+
+  <P><DD>(1)ペリフェラルデータ収集を全て完了したとき
+     <DD>(2)V-BLANK-INまでにペリフェラルデータ収集を完了できなかったとき(タイムオーバー)
+     <DD>(3)SH-2からのブレイク要求によりペリフェラルデータ収集を終了したとき</P>
+
+<A NAME="z3_3"></A>
+	<P ALIGN=CENTER><B>図3.3　全ペリフェラルデータ取得シーケンス</B><BR><img srcset="../grp/i051_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z3_4"></A>
+	<P ALIGN=CENTER><B>図3.4　ブレイク要求によるペリフェラルデータ取得キャンセルシーケンス</B><BR><img srcset="../grp/i052_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p02_50_j.htm">戻る</A>｜
+     <a href="p03_11_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

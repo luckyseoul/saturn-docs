@@ -1,0 +1,94 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/19&gt;SMPC User's Manual/2.5 RTC Command</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p02_40.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/Chapter 2 SMPC Commands</b><HR NOSHADE>
+<DL>
+<A NAME="no2_50"></A><P><DT><H2> ■2.5 RTC commands</H2><DD> Details of RTC commands are shown in table format. The table of each command and notes are as follows. In addition, by using status flags in all commands, you can manage double issuing of commands.</P>
+<A NAME="no2_51"></A><P><DT> <B>●SMPC interrupt</b><DD> Items marked as "occurrence" generate an SMPC interrupt to the SH-2 via the SCU at the end of the command. Additionally, interrupts can be enabled/disabled by setting the SCU.</P>
+<A NAME="no2_52"></A><P><DT> <B>●IREG, OREG</b></P>
+<DD><UL TYPE=DISC>
+<LI> Details of IREG and OREG used in the command are shown.<LI> Command parameters are parameters that are set in IREG before issuing the command.<LI> Result parameters are parameters set in OREG by command execution.<LI> Result parameter OREG31 is set by SMPC when command processing begins. The command code is output to OREG31. By using it together with status flag (SF),</UL>
+</P>
+<P><DD> By using it together with status flag (SF),</P>
+<UL TYPE=DISC>
+<LI> Which command is being executed ( <B>SF=1</b> )<LI> Which command finished ( <B>SF=0</b> )</UL>
+</P>
+<P><DD> can be judged.</P>
+<A NAME="no2_53"></A><P><DT> <B>●Execution time</b><DD> The execution time is calculated from the number of steps in the SMPC internal firmware. If there is a conflict with an internal task such as RTC increment, the command execution time will change, so it is described in the range of minimum and maximum values.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c3_01"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_3">List</a> |▲ <A HREF="p02_40.htm#c2_02">Back</a> | ■</b><DL>
+<P><DT> No.1<DT><H1> SETTIME</H1><DD><H2> Time setting</H2></P>
+<P><DT><PRE>
+<B>Command code</b> 16H
+<B>SMPC interrupt</b> generation disabled
+<B>IREG</b> 0 to 6
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=70μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Set RTC time.</P>
+<P><DT> <B>command parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2></TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> OREG0</TH><TH> 20100001H</TH><TD COLSPAN=4> Year 1000 (BCD)</TD><TD COLSPAN=4> Year 100 (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG1</TH><TH> 20100003H</TH><TD COLSPAN=4> Year number 10 (BCD)</TD><TD COLSPAN=4> First place in the Western calendar (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG2</TH><TH> 20100005H</TH><TD COLSPAN=4> Day of the week (hexadecimal) <B>Note 1</b></TD><TD COLSPAN=4> Month (hexadecimal) <B>Note 2</b></TD></TR>
+<TR ALIGN=CENTER><TH> OREG3</TH><TH> 20100007H</TH><TD COLSPAN=4> 10th place per day (BCD)</TD><TD COLSPAN=4> No. 1 per day (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG4</TH><TH> 20100009H</TH><TD COLSPAN=4> 10th position (BCD)</TD><TD COLSPAN=4> 1st place (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG5</TH><TH> 2010000BH</TH><TD COLSPAN=4> Tenth place (BCD)</TD><TD COLSPAN=4> Minute 1st place (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG6</TH><TH> 2010000DH</TH><TD COLSPAN=4> Ten seconds (BCD)</TD><TD COLSPAN=4> Second place (BCD)</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>Note 1</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> day of week</TH><TH> Sunday</TH><TH> Monday</TH><TH> Tuesday</TH><TH> Wednesday</TH><TH> Thursday</TH><TH> Friday</TH><TH> Saturday</TH></TR>
+<TR ALIGN=CENTER><TH> value</TH><TD> 0H</TD><TD> 1H</TD><TD> 2H</TD><TD> 3H</TD><TD> 4H</TD><TD> 5H</TD><TD> 6H</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>Note 2</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> Month</TH><TH> January</TH><TH> February</TH><TH> March</TH><TH> April</TH><TH> May</TH><TH> June</TH><TH> July</TH><TH> August</TH><TH> September</TH><TH> October</TH><TH> November</TH><TH> December</TH></TR>
+<TR ALIGN=CENTER><TH> value</TH><TD> 1H</TD><TD> 2H</TD><TD> 3H</TD><TD> 4H</TD><TD> 5H</TD><TD> 6H</TD><TD> 7H</TD><TD> 8H</TD><TD> 9H</TD><TD> AH</TD><TD> BH</TD><TD> CH</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DD> ●The time is initialized to " <B>23:59:59, Friday, December 31, 1993</b> " at the time of SMPC cold reset and starts counting.</P>
+<P><DD> SMPC cold reset occurs under the following conditions<DD><OL>
+<LI> When you press the reset switch inside the battery box on the back of Sega Saturn<LI> When the main power is turned on (ON) when the battery is not installed or when the battery is exhausted<LI> When the battery is inserted while the power is OFF</OL>
+</P>
+<P><DD> ●If you set data that does not actually exist, <B>a day of the week</b> 7 or more, <B>a month</b> 13 or more, <B>a date</b> that does not correspond to a month (leap year correction is corrected up to 2099), <B>a time</b> 24 or more, <B>minutes</b> and <B>seconds</b> 60 or more, The set value and subsequent count will be undefined.</P>
+<P><DD> ●If the power is turned OFF while the SETTIME command is being issued,</P>
+<P><DD><OL>
+<LI> If the internal processing of the SETTIME command can be executed before the power OFF sequence, all data will be updated.<LI> If the power OFF sequence is executed first, the data before the command is issued will be retained.</OL>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_40.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

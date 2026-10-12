@@ -1,0 +1,229 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/11&gt;Cinepak for SEGASaturn User's Manual/4. Cinepak Library</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">MOVIE TOOLS GUIDE</a> ★ <A HREF="../index.htm">Cinepak for SEGA Saturn</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p04_11.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Cinepak for SEGASaturn/4． Cinepak Library</b><HR NOSHADE>
+<DL>
+<A NAME="no4_30"></A><P><DT><H2> 4.3 Programming considerations</H2><DD> Here are some things to keep in mind when playing movies using the Cinepak library.</P>
+<A NAME="4_3_01"></A><P><DT><H3> (1) Precautions when creating applications</H3><DT><UL TYPE=SQUARE>
+<P><LI> Please specify the WORK_RAM-H area (06000000H~) for the buffer address (CPK_PARA_WORK_ADDR, CPK_PARA_BUF_ADDR of CpkCreatePara) to be specified when creating a movie.<BR>
+ Specifying a slow RAM area will reduce Cinepak's performance.</P>
+<P><LI> The Cinepak library uses the CPU's DMA and timers. Do not use CPU DMA and timer when Cinepak is operating.</P>
+<P><LI> If the same sound occurs twice, it is likely that CPK_Task is not called too many times or the image size is too large.<BR>
+ Please call CPK_Task more often or reduce the image size.</P>
+</UL>
+<A NAME="4_3_02"></A><P><DT><H3> (2) Relationship with other libraries</H3><DT><UL TYPE=SQUARE>
+<P><LI> This library uses file system, stream system, and DMA library. Please link these files.</P>
+</UL>
+<A NAME="4_3_03"></A><P><DT><H3> (3) How to take a buffer</H3><DT><UL TYPE=SQUARE>
+<P><LI> The size of the ring buffer has a lot to do with the sound content. The higher the quality of the sound, the more buffer you will need. Specifically, please ensure the minimum size of the movie file header + 0.5 seconds of sound + 80KB. Note that the larger the ring buffer, the faster Cinepak's processing will be.</P>
+<P> <B>"example"</b><UL TYPE=DISC>
+<P><LI> 1 minute movie, 44KHz, 16 bit, stereo at 30fps<BR>
+ Ring buffer size ≧ 32KB + 88KB + 80KB = 200KB</P>
+<P><LI> 1 minute movie, 30fps, 11KHz, 8 bit, monaural<BR>
+ Ring buffer size ≧ 32KB + 5.5KB + 80KB = 117.5KB</P>
+</UL>
+<P><LI> The sound memory buffer size (CPK_PARA_PCM_SIZE of CpkCreatePara), which is a parameter when creating a movie, is the PCM quantization number for 1 channel.<BR>
+ Please specify an integer multiple of 4096. The range is 4096*4 to 4096*16.<BR>
+ For the buffer size, please specify a PCM quantization number of 1.4 seconds or more.</P>
+<P> <B>"example"</b><UL TYPE=DISC>
+<P><LI> If the sampling frequency is 44kHz, set the buffer size to 64K.</P>
+<P><LI> If the sampling frequency is 22kHz, set the buffer size to 32K or more.</P>
+</UL>
+</UL>
+<A NAME="4_3_04"></A><P><DT><H3> (4) Chroma key processing</H3><DT><UL TYPE=SQUARE>
+<P><LI> Chromakey processing slightly increases CPK_Task processing time.<P><LI> When using chromakey processing, set the transparent pixel invalid bit in the sprite command to 0.<P><LI> If you want to change the range of transparent colors during chromakey processing, change the range using the key out (transparent color) range setting function (CPK_SetKeyOutRange).</P>
+</UL>
+<A NAME="4_3_05"></A><P><DT><H3> (5) Seamless branch</H3><DT><UL TYPE=SQUARE>
+<P><LI> When seamless branching with CPK_EntryNext, the PCM volume and PAN will be the same as the previous movie.</P>
+<P><LI> When seamless branching with CPK_EntryNext, you can play continuously for up to 60 minutes. Continuous playback is not possible beyond this point. Please start playing the movie once with CPK_Start.</P>
+<P><LI> When seamless branching, please pre-read the movie file in the application program.</P>
+<P><LI> If you use a file system, you cannot use seamless branching.</P>
+<P><LI> Seamless branching can only be performed during playback of one movie.<BR>
+ This cannot be executed while playing a multi-movie.</P>
+</UL>
+<A NAME="4_3_06"></A><P><DT><H3> (6) Multi-movie playback</H3><DT><UL TYPE=SQUARE>
+<P><LI> When playing multi-movies, set the PCM stream playback number to a different number.</P>
+<P><LI> When playing multiple movies on a CD at the same time, use file interleaving or channel interleaving. In that case, use the stream system.</P>
+<P><LI> The same file cannot be played in multi-movie. Please specify a different file.</P>
+<P><LI> Multi-movie playback can be performed on up to four movies at the same time.</P>
+</UL>
+<A NAME="4_3_07"></A><P><DT><H3> (7) Expanding the specified frame</H3><DT><UL TYPE=SQUARE>
+<P><LI> When using specified frame decompression (CPK_DecodeFrame), please use a movie file with only keyframes without sound.<BR>
+ Use the file system or stream system in your application program to load movie files into memory before decompressing them. Please use CPK_CreateMemMovie.</P>
+</UL>
+<A NAME="4_3_08"></A><P><DT><H3> (8) Function usage</H3><DT><UL TYPE=SQUARE>
+<P><LI> Be sure to call CPK_Init at the beginning of your program.</P>
+<P><LI> Be sure to call CPK_VblIn within the V blank IN interrupt.</P>
+<P><LI> Please use CPK_GetTimeScale and CPK_GetHeader after reading the header part of the movie.</P>
+<P><LI> CPK_Start can only be executed once for a movie handle.<BR>
+ If you want to play the same movie file multiple times, please generate a movie handle each time.</P>
+<P><LI> Please call CPK_SetDecodeAddr, CPK_SetColor, CPK_SetLoadNum, CPK_SetPcmCmdBlockNo, CPK_SetPcmStreamNo before playing the movie.</P>
+<P><LI> After calling CPK_Task, be sure to check CPK_IsDispTime to see if the display timing is set.<BR>
+ When CPK_IsDispTime returns TRUE, be sure to call CPK_CompleteDisp afterwards.</P>
+<P><LI> For the movie handle generated with CPK_CreateMemMovie, be sure to notify the size of the movie file with CPK_NotifyWriteSize.</P>
+</UL>
+<A NAME="4_3_09"></A><P><DT><H3> (9) Error handling</H3><DD> If an error occurs in the file system or stream system during movie playback, movie playback cannot be continued. In this case, delete the movie handle and close the file. After that, perform other processing such as playing the movie again.<BR>
+ Be sure to set each error processing function GFS_SetErrFunc, STM_SetErrFunc, CPK_SetErrFunc to detect errors. It also improves debugging efficiency.</P>
+<A NAME="4_3_10"></A><P><DT><H3> (10) Precautions when using SCU-DMA</H3><DD> When data is transferred from the CD block to the ring buffer using SCU's DMA, peripheral information may not be obtained correctly.<BR>
+ In this case, it can be improved by setting the maximum number of transferred sectors (default value 20) to a smaller value, but if the setting is smaller, the task function must be called frequently enough to compensate.</P>
+<P><DD> <B>[Processing example]</b><DD><PRE>
+CPK_SetTrModeCd(cpk, CPK_TRMODE_SCU); /* Transfer using SCU-DMA */
+CPK_SetLoadNum(cpk, 10); /* Maximum amount of transfer at one time [sector] */
+</PRE></P>
+<P><DD>Also, during SCU-DMA transfer, the bus used is occupied, so SH will be in a wait state from the moment you try to access the CPU bus. Please avoid using SCU-DMA as much as possible.</P>
+<A NAME="4_3_11"></A><P><DT><H3> (11) Regarding changing the registration of the next handle</H3><DD> CPK_EntryNext is designed to cancel the previous registration by calling it again before switching. However, this cannot be canceled if processing of the next handle has already started internally just before switching.<BR>
+ Applications can determine this transition period from the replay status of the next handle.</P>
+<P><DD><PRE>
+if (CPK_GetPlayStatus(cpk_now) == CPK_STAT_PLAY_TIME) {
+	if (CPK_GetPlayStatus(cpk_next) != CPK_STAT_PLAY_STOP) {
+
+		/* We are currently in the transition period to the next handle, so never */
+		/* Do not call CPK_EntryNext. */
+
+	} else {
+
+		/* Processing of the next handle has not started yet */
+		/* It is possible to change the registration of the next handle. */
+		/*Please refer to [Note]. */
+
+	}
+} else {
+
+	/* It has already been switched to the registered handle. */
+	/* It is possible to register the next handle. */
+
+}
+</PRE></P>
+<P><DD>There are two possible ways to regenerate the desired handle during the transition period to the next handle.</P>
+<DD><OL>
+<P><B><LI></b> How to stay seamless during the transition period<BR>
+ In this situation, in order to switch seamlessly without freezing the screen, wait for the next handle to start playing, call CPK_EntryNext, then use CPK_CheckChange to make sure that enough data has been supplied, and switch using CPK_Change. .</P>
+<P><B><LI></b> How to force a switch during the transition period If seamlessness is not required, stop (erase) the currently playing handle and the next handle, and start playing the handle you want to play using CPK_Start or CPK_EntryNext and CPK_Change.</P>
+</OL>
+<P><DD> <B>【Note】</b><DD> The CinePack library cannot guarantee whether or not the switching will be seamless, as it is affected by the seek time to read the data of the next handle.<BR>
+ In the judgment processing example above, the statement ``Processing of the next handle has not started yet, so the registration of the next handle can be changed.'' does not mean that there is no problem when using the CinePack library. Therefore, this criterion may not be seamless.</P>
+<P><DD> To ensure complete seamlessness during registration changes, estimate the remaining playback time of the data stored in the currently active handle and ensure that you can seek and read in less time. If this is not possible, do not change the registration, wait until the handle is transferred, and switch using method ( <B>1.</b> ).<BR>
+ Although it is difficult to make this judgment strictly, you can estimate the stockpiling amount using CPK_GetStockSize and CPK_GetStockTime, and you can be safe by assuming the worst seek and read times.</P>
+<A NAME="4_3_12"></A><P><DT><H3> (12) Relationship between frame size and Cinepak compression method</H3><DD> Cinepak performs compression processing by dividing one frame into 1 to 3 parts depending on the frame size (area).<BR>
+ Before and after the splitting conditions, internal compression efficiency and image quality become discontinuous, and the following trends are thought to occur.</P>
+<P><DD><UL TYPE=DISC>
+<LI> If it is smaller than the dividing condition and close to the dividing condition: poor image quality (compression rate is slightly better)<LI> If it is larger than the dividing condition and close to the dividing condition: Good image quality (compression rate is slightly bad)</UL>
+<P><DD> The exact dividing conditions are unknown, but the ranges we have confirmed are shown below.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH><PRE> Area [pixel]</TH><TH><PRE> Number of frame divisions (number of tiles)</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 96000 = 480×200 or more</TD><TD> 3</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 95744 = 352×272 or less<BR> 59904 = 208×288 or more</TD><TD> 2</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 57344 = 256×224 or less</TD><TD> 1<BR>
+ (Do not split)</TD></TR>
+</TABLE>
+<DD> <B>*</b> The CinePack library supports splitting into two or less.</P>
+<A NAME="4_3_13"></A><P><DT><DT><H3> (13) Efficiency of image decompression processing</H3><DD> Image decompression processing is more efficient to output to WORK RAM-H than directly to VRAM, so task functions operate faster this way.<BR>
+ If you output it to WORK RAM-H and then transfer it to VRAM using SCU-DMA, the processing time will be shorter even if you add the transfer time.</P>
+<A NAME="4_3_14"></A><P><DT><H3> (14) Supports uncompressed video</H3><DT><OL>
+<P> <B><LI>overview</li>
+</b><BR>
+ You can now play 24-bit uncompressed movies. Use this when you want to suppress the image size and frame rate and prioritize image quality.<BR>
+ It does not support 15-bit color movies; it supports 32,000-color display of 24-bit data, but you will be wasting high-quality data.<BR>
+ Convert an uncompressed QuickTime Movie with MovieToSaturn_J. There are no functions added for playing uncompressed movies. Since the file header is interpreted and processed, it can be played using exactly the same procedure. However, the ring buffer must be larger than when compressed.</P>
+<P> <B><LI>ring buffer size</li>
+</b><BR>
+ Ring buffers must be allocated to meet the following conditions:<BR>
+<PRE>
+<H3>ring ≧ header + sound + frame</H3>
+ring: Ring buffer size header: File header size (rounded up to sector size boundary)
+sound : Size of 0.5 seconds of sound frame : 1 frame uncompressed size</PRE></P>
+<P> <B><LI>Video performance</li>
+</b><BR>
+ Based on the data transfer rate from the CD, the video performance will be as shown below.<BR>
+<TABLE BORDER=1>
+<TR><TH> Audio conditions</TH><TH> Limit video performance</TH></TR>
+<TR><TD><PRE> 44kHz, 16bit, stereo</TD><TD><PRE> 320×224[dot] 0.60[fps]</TD></TR>
+<TR><TD><PRE> 22kHz, 8bit, monaural</TD><TD><PRE> 320×224[dot] 1.32[fps]</TD></TR>
+<TR><TD><PRE> video only movie</TD><TD><PRE> 320×224[dot] 1.42[fps]</TD></TR>
+<TR><TD><PRE> video only movie</TD><TD><PRE> 160×112[dot] 5.71[fps]</TD></TR>
+</TABLE>
+</P>
+</OL>
+<A NAME="4_3_15"></A><P><DT><H3> (15) Execution history output for debugging</H3><DD> Outputs the execution history of the main processing of the Cinepack library.<BR>
+ If you experience malfunctions such as not being able to play smoothly, this will help you find the cause.<BR>
+ You can check whether tasks are being called regularly, whether data supply is delayed, and whether frames are being dropped.<BR>
+ It will be easier to analyze the history if you create a simpler execution history after checking the reproducibility of the malfunction.</P>
+<P><DD> <B>[Internal processing of Cinepack library that outputs history]</b><DD> When an error occurs, when a task function is called, when ring buffer data is supplied and consumed, when the display request flag is turned on/off, frame drop processing, PCM start/stop</P>
+<P><DD> <B>[Output specification]</b><DD><B>・When using the production program as is</b><DD> Break after processing CPK_Init.<BR>
+ Check the address of the CpkdSys type structure cpkd_sys in the map file created during linking, and use the ICE command to set the value of cpkd_sys.mode to 0x00000001.</P>
+<P><DD> :m 060XXXXX 1;l</P>
+<P><DD> The output address will be 0x04000000 to 0x047fffff.</P>
+<P><DD> <B>- When creating a program for debugging output,</b> set CPKD_SetMode(ON) after CPK_Init.<BR>
+ CPKD_SetPrintAddr allows you to set the output address.<BR>
+ With CPKD_PrintStr and CPKD_PrintData, it is possible to add and output the execution history of the application side processing. When additionally outputting, please make the output size an integral multiple of 16 bytes to make the history information easier to read.</P>
+<P><DD> <B>[Check output information]</b><DD> Dump and display the output address using the ICE command. You can easily analyze the behavior by saving the displayed content as a text file and viewing it in a text editor.</P>
+<P><DD><PRE>
+:> hist.txt [RET]
+:d 04000000 04001000;l [RET]
+:>- [RET]
+</PRE></P>
+<P><DD><B>[Format of output information]</b><DD><PRE>
+========+============================================+
+ADDRESS : 0 1  2 3   4 5  6 7   8 9  A B   C D  E F  :
+========+============================================+
+04000000: AAAA_AAAA  ---- ----  ---- ----  ---- ---- :
+04000010: "Err "     ---- VVVV  ---- ----  EEEE_EEEE : Error 
+04000020: "Task"     PPPP VVVV  HHHH_HHHH  CCCC_CCCC : start of CPK_MeTask
+04000030: "RWri"     WWWW VVVV  HHHH_HHHH  DDDD_DDDD : WRIte Ringbuffer
+04000040: "RRea"     RRRR VVVV  HHHH_HHHH  DDDD_DDDD : REAd Ringbuffer
+04000050: "DOn "     FFFF VVVV  LLLL_LLLL  TTTT_TTTT : set Disp flag On
+04000060: "DOff"     FFFF VVVV  HHHH_HHHH  TTTT_TTTT : set Disp flag Off
+04000070: "PcmS"     MODE VVVV  HHHH_HHHH  ADDR SIZE : PCM Start
+04000080: "PcmE"     MODE VVVV  HHHH_HHHH  ---- ---- : PCM Stop
+04000090: "LosF"     FFFF VVVV  LFLF_LFLF  SSSS_SSSS : LOse Frame
+        :
+        :
+</PRE></P>
+<P><DD><B>[Description of output information]</b><DD><PRE>
+AAAA_AAAA : Current history information output address.
+---- VVVV : Vbl counter. Know the approximate time.
+EEEE_EEEE : Error code.
+PPPP ---- : Playback status [-1, 0, 1, 2, 3, 4, 5].
+HHHH_HHHH : Cinepack handle.
+CCCC_CCCC : Cinepack task call counter.
+DDDD_DDDD : Remaining amount of data in the ring buffer [byte]. Find out if there is a supply disruption.
+WWWW ---- : Write size to ring buffer [sector].
+RRRR ---- : Read size from ring buffer [byte].
+FFFF ---- : Frame number.
+LLLL_LLLL : Delay time. (Current time - frame display time)
+TTTT_TTTT : Frame time. (Frame display time + frame display duration)
+LFLF_LFLF : Dropped frame counter.
+SSSS_SSSS : Sample counter.
+MODE ---- : 0x80##:Stereo, 0x10##:8bit, 0x##03:PCM stream playback number 3
+             (In case of PCM Stop, only the PCM stream playback number is displayed)
+ADDR ---- : PCM buffer start address (4bit right shift value)
+SIZE ---- : PCM buffer size [sample/1ch]
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p04_11.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">MOVIE TOOLS GUIDE</a> ★ <A HREF="../index.htm">Cinepak for SEGA Saturn</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

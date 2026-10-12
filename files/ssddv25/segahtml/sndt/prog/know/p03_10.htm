@@ -1,0 +1,58 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 5&gt; Sound development know-how/3. Regarding tone and TONE EDITOR</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm">Sound development know-how collection</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound development know-how collection</b><H2 ALIGN="CENTER"> Chapter 3 Tone related and TONE EDITOR</H2><HR NOSHADE>
+<ul>
+<li> The sum of TL+VolBias must not exceed the maximum. In that case, the driver returns an error number in Status and does not play the sequence.<BR>
+ Specifically, if TL is 0, VolBias must be less than or equal to 0.<p><li> Even if the velocity curve is linear in the editor's display, it may not be as linear in the auditory sense. Regarding velocity control, please use your hearing as a guide.<p><li> Do not violently change the values using the parameter tabs in the tone editor, as this will cause SCSI communication to fail and cause the MAC to jump. The frequency is especially high during MIDI sound.<p><li> Soft LFO cannot be controlled ON/OFF by MIDI modulation wheel.<p><li> The LFO modulation waveform is only a sine wave.<p><li> About FM<BR>
+ One slot can be freely assigned to carrier or modulator, and self-modulation (self-feedback) is also possible. It is possible to output a waveform that is sufficient for practical use with self-modulation alone, so in that case, the FM output will be a maximum of 32-tone polyphony. However, if you use a lot of FM tones, the operation may become slow.<p><li> TONE editor's VOICE parameter and PLAY MODE only support poly mode. MONO, PORTA, LEGATO, L&P other than POLY are invalid. The sound driver will not work properly in these modes even if you can set it with TONE EDITOR. Please do not use this as it may cause bugs such as the sound not turning off.<p><li> PORTAMENT TIME in the voice window is not working. Setting this will cause trouble, so it is better not to set it. The future response is also completely undecided.<p><li> There are some bugs in the operation of PEG, and it may not work as expected.<p><li> TONEEditor refers to AIFF data by file name to prevent data volume from increasing due to duplication of tone data. In other words, if you select the same AIFF data as another layer within the same tone data, the data will not be loaded and the same settings as the tone previously loaded into RAM will be applied. Therefore, even if you edit the waveform of an AIFF file that has been imported into tone data using a waveform editor, if the file name is the same, the tone editor will not read the newly edited AIFF data and the tone data will not be updated. If you want to read it, please change the file name or import different data and try loading it again.<BR>
+ For VOICEs that share a waveform, an asterisk (*) will be displayed after the size.<p><img srcset="../image/tone.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p><li> By default, the Tone editor refers to the address and size of tone BANK0 in the current sound map in SndSimulator. If the size of tone BANK 0 is set too small, a SCSI error may occur. Please increase the size of tone BANK0. It is also possible to set a tone other than BANK0. When editing tone data, we recommend that you create a map with a larger size of the set tone BANK and use it for creation.<BR>
+ Also, the Tone Editor always tries to transfer the tone data to the Sound Box when you open a tone file.<BR>
+ (If you need to transfer it again, please select Download from the Preference menu.)<p><li> simple question<BR>
+ Even though I changed the tone parameters using MIDI input, they remain the same on the TONE editor screen. This is because the TONE editor sends changed data to the SOUND BOX via SCSI communication, but it is not designed to recognize data changed via MIDI and reflect it on the TONE editor screen.<p><li> The current PAN position of the tone editor (Ver2.06) is from the left.<p> L16,L15,L14,L13,L12,L11,L10,L9,L8,L7,L6,L5,L4,L3,L2,L1,C,R1,R2,R3,R4,R5,R6,R7,R8, R9,R10,R11,R12,R13,R14,R15<p> Although it is lined up with<p> L15,L14,L13,L12,L11,L10,L9,L8,L7,L6,L5,L4,L3,L2,L1,C,C,R1,R2,R3,R4,R5,R6,R7,R8, R9,R10,R11,R12,R13,R14,R15<p> is. It's just a display error, but you need to be careful. This bug will be fixed in the next version (Ver2.07).<p><li> About the mysterious parameters of TONE EDITOR<p> <b>When you open the waveform loading window, it looks like this.</b><p><img srcset="../image/wave.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p> The meaning of the radio button above is<p><dl compact>
+<dt>・ALL'0'<dd> There is no sound.<dt>・NOISE<dd> It's called Shah. Please try using it.</dl>
+<p> <b>When you open the EG window, it looks like this.</b><p><img srcset="../image/eg.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p><dl compact>
+<dt>・EGHOLD<dd> If checked, the AR value will be ignored and the EG will start from the maximum volume.<dt>・KEY RATE SCALE<dd> The higher the value from 0 to 14, the stronger the key scaling effect will be. Please note that at 15, no key scaling effect is applied.<dt>・LPSLNK<dd> If you don't check LooP StartLiNK, the EG relationship and the EG at the LoopStart point are unrelated. If checked, the EG effect will change depending on the LoopStart position.</dl>
+ (For details, please refer to "Hardware Manual/SCSP User's Manual/ <B><A HREF="../../../hard/scsp/hon/p04_22.htm">EG Register</a></b> ").<p><p> <b>When you open the LFO (hardware-based) window, it looks like this.</b><p><img srcset="../image/lfo.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p><dl compact>
+<dt>・MODULATION<dd> The LFO can be turned on or off by the modulation depth value of MIDI Control Change number 1.<BR>
+ 0 is off, 1-127 is on, and depth cannot be controlled.<dt>・LFO RESET<dd> Each time a note is pressed, the LFO waveform is reset and modulation starts from the standard pitch.</dl>
+<p> <b>When you open the INVERT window, it looks like this.</b><p><img srcset="../image/invert.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p><dl compact>
+<dt>・SAOFSET<dd> This is an abbreviation for Start Address OFfSET, which gives an offset to the value written to the Start Address of the PCM waveform. Used when using effects such as DSP chorus to shift the phase of the modulation waveform and make it undulate.<BR>
+ Currently it is not referenced by the sound driver, so it is meaningless no matter what you put in it.<dt>・FMWAVE<dd> When checked, FM modulation, which is normally done with a 3-wavelength sine wave, will be done with one wavelength. There is no benefit other than a slight reduction in data. It would be better to think about it and not use it.<dt>・SPCTL1, SPCTL0<dd> Do not check this, as it is not normally used.</dl>
+<p> <b>When you open the TOTAL LEVEL window, it looks like this.</b><p><img srcset="../image/tl.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p><dl compact>
+<dt>・MOD<dd> Parameters used for DSP modulation waveform<BR>
+ Well, I don't usually use it.<dt>・SDIR<dd> Abbreviation for SoundDIRect<BR>
+ No EG or LFO is applied, and the PCM waveform sounds as is. The volume remains at maximum volume and does not change.<BR>
+ It also does not accept Sequence Volume effects from the SH2 side, so it is better not to check it. Some of the tones created by Invision are checked, but please note that you may need to remove them if you want to use Sequence Volume.<BR>
+ Also, I recently found out that this seems to be the cause of the noise, so it would be wise not to check it.<dt>・STINH<dd> STackWrite INHibit Writing to the stack is prohibited. This is a parameter that is normally not checked.</dl>
+<p> <b>When you open the FM window, it looks like this.</b><p><img srcset="../image/fm.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p><dl compact>
+<dt>・generation<dd> It's either 0 or 1, but don't worry about it. 0 is ok.<BR>
+ (For details, refer to "Hardware Manual/SCSP User's Manual/ <B><A HREF="../../../hard/scsp/hon/p04_fm1.htm">When Using</a></b> <B><A HREF="../../../hard/scsp/hon/p04_23.htm">FM Modulation Register</a></b> and FM Sound Source Method").<p></dl>
+</ul>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm">Sound development know-how collection</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

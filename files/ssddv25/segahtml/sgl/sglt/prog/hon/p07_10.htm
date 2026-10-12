@@ -1,0 +1,520 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/30&gt;SGL Programmer's Tutorial/7.Polygon surface attributes</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>PROGRAMMER'S TUTORIAL</b><H2 ALIGN=CENTER> 7.Polygon surface attributes</H2><HR NOSHADE>
+<P> This chapter explains the surface attributes of polygons on Sega Saturn.<BR>
+ For polygons, "Sort" indicates the reference position to determine the display order of each polygon, "Front and back attributes" specify whether to display one side or both sides of the polygon, and a two-dimensional picture ( There are elements such as "textures" that paste bitmap data).<BR>
+ These are collectively called "polygon surface attributes."<BR>
+ By specifying the surface attributes of polygons, you can add various expressions to polygons that were previously just pictures.</P>
+<DL>
+<A NAME="no7_10"></A><P><DT><H3> 7-1. Attributes</H3><DD> In Sega Graphic Library (SGL), the surface attributes of polygons can be specified using the ATTRIBUTE macro.<BR>
+ In the sample programs up to this chapter, attributes have been set implicitly without explaining the contents of each parameter in detail.<BR>
+ However, attributes gather important elements when working with polygons. Therefore, here we will explain in detail the meaning of each parameter of the ATTRIBUTE macro.</P>
+<A NAME="l7_1"></A><P><DD> <B>Listing 7-1 Attribute data</b><DD><PRE>
+●Attribute data<H3>
+ATTR attribute_label[]={
+	ATTRIBUTE(Plane,Sort,Texture,Color,Gouraund,Mode,Dir,Option),
+	......................
+};
+</H3>
+<H4>Note) The ATTRIBUTE macro is defined in “sl_def.h”.</H4>
+</PRE></P>
+<P><DD>The meaning of each parameter is as follows.</P>
+<PRE>
+Plane: Indicates whether it is a single-sided polygon or a double-sided polygon (front and back attributes)
+Sort: Indicates the representative point of the positional relationship of polygons (Z sort)
+Texture: Indicates the texture name (No.) Color: Indicates the color data Gouraud: Indicates the address of the Gouraud shading table Mode: Indicates the polygon drawing mode (various mode settings)
+Dir: Indicates the state of polygons and textures Option: Indicates other functions (option settings)
+</PRE><A NAME="no7_20"></A><P><DT><H3>7-2.Plane</H3><DD> The first attribute parameter “Plane” indicates the front and back attributes of the polygon. The front and back attributes are attributes that indicate whether the polygon is a one-sided polygon or a double-sided polygon.<BR>
+ Double-sided polygons can be seen from both sides, but single-sided polygons disappear when turned to the back.<BR>
+ Below are the macros that can be specified for this parameter.</P>
+<A NAME="t7_1"></A><P><DD><TABLE BORDER=1>
+<CAPTION> Table 7-1 Plane (front and back attributes)</CAPTION>
+<TR><TH> macro</TH><TH> Contents</TH></TR>
+<TR ALIGN=CENTER><TD> Single_Plane</TD><TD> One-sided display of polygons</TD></TR>
+<TR ALIGN=CENTER><TD> Dual_Plane</TD><TD> Double-sided display of polygons</TD></TR>
+</TABLE>
+</P>
+<P><DD> Now, let's take a look at the sample program (Listing 7-2).<BR>
+ A one-sided yellow polygon rotates around the Y axis.<BR>
+ Since it is a single-sided polygon, the back side is not displayed.</P>
+<A NAME="l7_2"></A><P><DD> <B>Listing 7-2 sample_7_2: main.c</b><PRE>
+/*------------------------------------------------ ----------------------*/
+/* Rotation of Single Plane Polygon */
+/*------------------------------------------------ ----------------------*/
+#include "sgl.h"
+
+extern PDATA PD_PLANE;
+
+void ss_main(void)
+{
+	static ANGLE ang[XYZ];
+	static FIXED pos[XYZ];
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 7.2" , slLocate(6,2));
+
+	ang[X] = ang[Y] = ang[Z] = DEGtoANG(0.0);
+	pos[X] = toFIXED( 0.0);
+	pos[Y] = toFIXED( 0.0);
+	pos[Z] = toFIXED(170.0);
+
+	while(-1){
+
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			ang[Y] += DEGtoANG(2.0);
+			slPutPolygon(&PD_PLANE);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+
+</PRE></P>
+<P><DD>Look at line 27. The polygon drawing routine “slPutPolygon” is called and a pointer to the polygon data “PD_PLANE” is passed.<BR>
+ “PD_PLANE” is defined in the source “polygon.c” as follows.</P>
+<A NAME="l7_3"></A><P><DD> <B>Listing 7-3 sample_7_2: Polygon.c</b><PRE>
+#include "sgl.h"
+
+POINT point_PLANE[] = {
+	POStoFIXED(-20.0, -20.0, 0.0),
+	POStoFIXED( 20.0, -20.0, 0.0),
+	POStoFIXED( 20.0, 20.0, 0.0),
+	POStoFIXED(-20.0, 20.0, 0.0),
+};
+
+POLYGON polygon_PLANE[] = {
+	NORMAL(0.0,0.0,1.0), VERTICES(0,1,2,3),
+};
+
+ATTR attribute_PLANE[] = {
+	ATTRIBUTE(Single_Plane,SORT_CEN,No_Texture,C_RGB(31,31,0),No_Gouraud,MESHoff,sprPolygon,No_Option),
+};
+
+PDATA PD_PLANE = {
+	point_PLANE , sizeof(point_PLANE)/sizeof(POINT) ,
+	polygon_PLANE , sizeof(polygon_PLANE)/sizeof(POLYGON) ,
+	attribute_PLANE
+};
+</PRE></P>
+<P><DD>The 18th line and subsequent lines are polygon data. The 21st line is a pointer to the attribute data, so the actual data starts from the 14th line.<BR>
+ You can see that the first parameter is “Single_Plane”.<BR>
+ <Please change this to “Dual_Plane” and run it. Polygons that were previously only displayed on one side should now be displayed on both sides.</P>
+<A NAME="no7_30"></A><P><DT><H3> 7-3. Sort</H3><DD> The second parameter “Sort” indicates the position of the Z sort on the polygon. Z-sort is a method that uses the representative point on each polygon to determine its position and context in 3D space, and is faster to calculate and draw than the Z-buffer (position is determined for each pixel on a polygon) method. The feature is that it can be done. Below are the macros that can be specified for this parameter.</P>
+<A NAME="t7_2"></A><P><DD><TABLE BORDER=1>
+<CAPTION> Table 7-2 Sort (Z sort specification)</CAPTION>
+<TR><TH> macro</TH><TH> Contents</TH></TR>
+<TR ALIGN=CENTER><TD> SORT_MIN</TD><TD> Set the vertex on the polygon closest to the camera as the representative point</TD></TR>
+<TR ALIGN=CENTER><TD> SORT_CEN</TD><TD> Set the center point of the polygon as the representative point</TD></TR>
+<TR ALIGN=CENTER><TD> SORT_MAX</TD><TD> Set the point farthest from the camera as the representative point</TD></TR>
+<TR ALIGN=CENTER><TD> SORT_BFR</TD><TD> Displayed in front of the polygon registered just before</TD></TR>
+</TABLE>
+</P>
+<P><DD> Also, if you make a diagram of this, it will look like this:</P>
+<A NAME="z7_1"></A><P ALIGN=CENTER>&#65308; <B>Figure 7-1 Representative points of Z sort</b>&#65310;<BR>
+<img srcset="../grp/p07_05_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P> “SORT_BFR” is a special specification and is used when you want to display one polygon above (in front of) another polygon. Specifically, the display position of a polygon with “SORT_BFR” specified will be immediately in front of the polygon registered immediately before that polygon. However, this specification only becomes meaningful when you want to use two polygons as a group, so it is not usually used.</P>
+<P> Due to its nature, the Z-sort method includes the possibility that the context may become incorrect depending on how representative points are taken. Take a look at the following example.</P>
+<A NAME="z7_2"></A><P ALIGN=CENTER>&#65308; <B>Figure 7-2 Differences in context due to representative points</b>&#65310;<BR>
+<img srcset="../grp/p07_06_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P> If you specify the representative point as shown in the figure above, the actual screen will look like the figure below.</P>
+<A NAME="z7_3"></A><P ALIGN=CENTER>&#65308; <B>Figure 7-3 Actual screen</b>&#65310;<BR>
+<img srcset="../grp/p07_06_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no7_40"></A><P><DT><H3>7-4.Texture</H3><DD> The third parameter “Texture” is a parameter required when using texture mapping. Here, specify the number of the texture actually used from the texture table registered with the function "slInitSystem".<BR>
+ When not using a texture, specify the macro “No_Texture”. Texture mapping is a general term for functions that paste two-dimensional graphics onto the surface of polygons. Needless to say, polygons can only represent display colors, and there are limits to their reality. However, by making full use of the texture mapping function, it is possible to express 3D objects with a higher degree of reality, such as object textures and surface patterns that could not be expressed using polygons alone.</P>
+ Texture mapping for Sega Saturn and so-called texture mapping for general CG have two different characteristics, as shown in Table 7-3.</P>
+<A NAME="t7_3"></A><P><TABLE BORDER=1>
+<CAPTION> <B>Table 7-3 Differences between Sega Saturn texture mapping and general CG texture mapping</b></CAPTION>
+<TR ALIGN=CENTER><TD COLSPAN=2></TD><TD COLSPAN=2> texture mapping</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2></TD><TD> For Sega Saturn</TD><TD> For general CG</TD></TR>
+<TR><TD ROWSPAN=2><PRE> of texture</TD><TD><PRE> stakeout</TD><TD> It is possible to paste one texture to one polygon.</TD><TD> A single texture can be pasted across multiple polygons.</TD></TR>
+<TR><TD><PRE> deformation</TD><TD> The texture is also transformed according to the shape of the polygon.</TD><TD> The texture will be clipped to the shape of the polygon.</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>●Pasting textures</b></P>
+<A NAME="z7_5"></A><P ALIGN=CENTER>&#65308; <B>Figure 7-5 Characteristics of texture 1</b>&#65310;<BR>
+<img srcset="../grp/p07_08.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>note)</b><DD> There is a one-to-one correspondence between textures and polygons.</P>
+<P> Textures in general CG can be pasted across multiple polygons, but in the case of Sega Saturn, one texture is pasted in correspondence to one polygon. If you want to paste a texture that spans two or more polygons, you need to divide the texture according to each polygon as shown in Figure 7-5.</P>
+<P><DT> <B>●Texture deformation</b><DD> For general CG textures, if the polygon is not a rectangle (including a square), the texture will be clipped to the polygon shape. However, on the Sega Saturn, textures are not clipped and are deformed along polygons. Even if the polygon is a triangle, the entire texture will be transformed into a triangle.</P>
+<P ALIGN=CENTER>&#65308; <B>Figure 7-6 Texture characteristics 2</b>&#65310;<BR>
+<img srcset="../grp/p07_09_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>note)</b><DD> The texture transforms according to the shape of the polygon.</P>
+<P><DT><H3> About texture distortion</H3><DD> If the polygon is a rectangle and the texture attached to it is square, the texture will be transformed into a rectangle according to the aspect ratio of the polygon. Therefore, keep in mind that the texture will be less distorted if the aspect ratio of the texture matches the aspect ratio of the polygon as much as possible.</P>
+<P ALIGN=CENTER>&#65308; <B>Figure 7-7 Texture distortion</b>&#65310;<BR>
+<img srcset="../grp/p07_09_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P> Now, let's take a look at the sample program (Listing 7-4).<BR>
+ A single polygon with a texture attached rotates around the Y axis.<BR>
+ Here, we will register two textures in advance.<BR>
+ One is a picture of [SONIC] (size: 64 x 64 pixels), and the other is the "AM2" mark (size: 64 x 32 pixels).</P>
+<A NAME="l7_4"></A><P><DD> <B>Listing 7-4 sample_7_4: main.c</b><PRE>
+/*------------------------------------------------ ----------------------*/
+/* Polygon & Texture */
+/*------------------------------------------------ ----------------------*/
+#include "sgl.h"
+
+extern PDATA PD_PLANE;
+extern TEXTURE tex_sample[];
+extern PICTURE pic_sample[];
+
+#define max_texture 2
+
+void set_texture(PICTURE *pcptr , Uint32 NbPicture)
+{
+	TEXTURE *txptr;
+ 
+	for(; NbPicture--&gt; 0; pcptr++){
+		txptr = tex_sample + pcptr-&gt; texno;
+		slDMACopy((void *)pcptr->pcsrc,
+			(void *)(SpriteVRAM + ((txptr-&gt; (CGadr)&lt;&lt; 3)),
+			(Uint32)((txptr-&gt; Hsize * txptr-&gt; Vsize * 4) >> (pcptr-&gt; cmode)));
+	}
+}
+
+void ss_main(void)
+{
+	static ANGLE ang[XYZ];
+	static FIXED pos[XYZ];
+
+	slInitSystem(TV_320x224,tex_sample,1);
+	set_texture(pic_sample,max_texture);
+	slPrint("Sample program 7.4" , slLocate(9,2));
+
+	ang[X] = ang[Y] = ang[Z] = DEGtoANG(0.0);
+	pos[X] = toFIXED( 0.0);
+	pos[Y] = toFIXED( 0.0);
+	pos[Z] = toFIXED(170.0);
+
+	while(-1){
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			ang[Y] += DEGtoANG(2.0);
+			slPutPolygon(&PD_PLANE);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+
+</PRE></P>
+<P><DD>The program flow itself is not much different from Listing 7-2.</P>
+<P> First, pay attention to line 29.<BR>
+ This is an initialization routine that has been used implicitly until now, but the second parameter is different from before. Specify a pointer to the texture table to be passed to SGL here. (The actual table is defined in “texture.c”. See <A HREF="#l7_5">Listing 7-5</a> .) Up until now, we had not used textures, so we had assigned “NULL”.</P>
+<P> Line 30 transfers the texture data to V-RAM.<BR>
+ This texture data transfer can be performed at any time after initialization, so techniques such as redrawing textures during the game can be easily performed.</P>
+<P> The 12th line and subsequent lines are the actual texture data transfer routine.<BR>
+ Here, we receive the start address of the texture table and the number of registered textures. The “slDMACopy” function on line 18 uses DMA to transfer data at high speed.<BR>
+ The first parameter of this function is the transfer source address, the second parameter is the transfer destination address, and the third parameter is the transfer size.</P>
+<P><DT> <B>[void slDMACopy ( void *src , void *dst , Uint32 cnt ) ;]</b><DD> Uses the CPU's built-in DMA to perform block transfers of data<BR>
+ . Assign the start address of the transfer source memory area, the start address of the transfer destination memory area, and the block transfer amount (unit: bytes) to the parameters.<BR>
+ This function ends the transfer immediately after starting the DMA.<BR>
+ If you want to know when the transfer is complete, use the function “slDMAWait”.</P>
+<P> Next, let's look at the texture data.</P>
+<A NAME="l7_5"></A><P><DD> <B>Listing 7-5 sample_7_4:texture.c</b><PRE>
+
+#include "sgl.h"
+/********************************/
+/* Texture Data */
+/********************************/
+
+TEXDAT sonic_64x64[]={ /* Texture data 1 */
+	 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+					:
+					:
+				      Omitted:
+};
+
+TEXDAT am2_64x32[]={ /* Texture data 2 */
+	 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+					:
+					:
+				      Omitted:
+};
+
+TEXTURE tex_sample[]={ /* Table to be passed to SGL */
+	TEXDEF(64,64,0),
+	TEXDEF(64,32,64*64*1),
+};
+
+PICTURE pic_sample[]={ /* VRAM transfer table */
+	PICDEF(0,COL_32K,sonic_64x64),
+	PICDEF(1,COL_32K,am2_64x32),
+};
+
+</PRE></P>
+<P><DD>The part written by the TEXDAT macro becomes the actual texture data.<BR>
+ Although omitted in the above list, all data is included in the source. Note that the format of texture data is not mentioned here. Please refer to “Function Reference” in the reference manual.</P>
+<P> The part written by the TEXTURE macro is the texture table passed to SGL.<BR>
+ Set the size (width x height) of each texture and the offset value from the start address of the actual texture data.</P>
+<P> Finally, the PICTURE macro part becomes the table for VRAM transfer.<BR>
+ Set the texture number, color mode, and pointer to texture data.</P>
+<P> Now, last but not least, let's take a look at the attributes of the polygon data.</P>
+<A NAME="l7_6"></A><P><DD> <B>Listing 7-6 sample_7_4: polygon.c</b><P><DD><PRE>
+#include "sgl.h"
+
+#define PN_SONIC 0
+#define PN_AM2 1
+
+POINT point_plane[] = {
+        POStoFIXED(-40.0 , -40.0 , 0.0) ,
+        POStoFIXED( 40.0 , -40.0 , 0.0) ,
+        POStoFIXED( 40.0 , 40.0 , 0.0) ,
+        POStoFIXED(-40.0 , 40.0 , 0.0)
+};
+
+POLYGON polygon_plane[] = {
+        NORMAL(0.0,0.0,1.0), VERTICES(0 , 1 , 2 , 3)
+};
+
+ATTR attribute_plane[] = {
+	ATTRIBUTE(Single_Plane, SORT_CEN, PN_SONIC, No_Palet, No_Gouraud, CL32KRGB|MESHoff, sprNoflip, No_Option),
+};
+
+PDATA PD_PLANE = {
+        point_plane , sizeof(point_plane)/sizeof(POINT),
+        polygon_plane, sizeof(polygon_plane)/sizeof(POLYGON),
+        attribute_plane
+};
+</PRE></P>
+<P><DD>The third parameter of “ATTRIBUTE” is “PN_SONIC”.<BR>
+ In other words, the texture "SONIC" with registration number [0] is pasted on the polygon and displayed.<BR>
+ Also, try changing this parameter to “PN_AM2”.<BR>
+ This time, the texture should change to the "AM2" mark with registration number [1].<BR>
+ Furthermore, by changing the first parameter “Single_Plane” to “Dual_Plane”, it is also possible to view the texture from the back side.</P>
+<A NAME="no7_50"></A><P><DT><H3> 7-5.Color</H3><DD> The fourth parameter “Color” specifies the offset address to the polygon color and texture color palette.<BR>
+ For polygons, the color data specification method is limited to RGB Direct. The format is “C_RGB(r,g,b)”. r, g, and b indicate the three primary colors of light, and are specified as decimal numbers from 0 to 31.<BR>
+ For textures, the color data specification method depends on the specification in "Mode" (sixth parameter of the attribute. See " <A HREF="#no7_70">7-7 Mode</a> "). For 32768-color RGB mode, specify the macro “No_Palet”; for other index modes, specify the offset address to the color palette.</P>
+<A NAME="no7_60"></A><P><DT><H3> 7-6. Gouraud</H3><DD> The fifth parameter “Gouraud” specifies the Gouraud table used for Gouraud shading. Gouraud shading is a term for flat shading in which the boundaries between polygons are clearly defined, and is a technique that applies shading to polygon surfaces and erases the boundaries between polygons to make them look like curved surfaces. The Sega Saturn uses the color gradation between the vertices of polygons to achieve Gouraud shading.</P>
+<A NAME="z7_8"></A><TABLE>
+<CAPTION>&#65308; <B>Figure 7-8 Gouraud shading</b> &#65310;</CAPTION>
+<TR><TH ALIGN=CENTER><img srcset="../grp/p7_15_0.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TH><TH ALIGN=CENTER><img srcset="../grp/p7_15_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TH><TH ALIGN=CENTER><img srcset="../grp/p7_15_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TH></TR>
+<TR><TH>flat shading</TH><TH></TH><TH> Gouro shading</TH></TR>
+</TABLE>
+<P><DD> Now, let's take a look at the sample program (Listing 7-7). A cube with Gouraud shading rotates around the Y axis.</P>
+<A NAME="l7_7"></A><P><DD> <B>Listing 7-7 sample_7_6: main.c</b><P><DD><PRE>
+/*------------------------------------------------ ----------------------*/
+/* Gouraud Shading */
+/*------------------------------------------------ ----------------------*/
+#include "sgl.h"
+
+extern PDATA PD_CUBE;
+
+#define GRoffsetTBL(r,g,b) (((b & 0x1f)&lt;&lt; 0) | ((g & 0x1f)&lt;&lt; 5) | (r & 0x1f))
+#define VRAMaddr (SpriteVRAM+0x70000)
+
+static Uint16 GRdata[6][4] = {
+	{ GRoffsetTBL( 0,-16,-16) , GRoffsetTBL( 0,-16,-16) ,
+	  GRoffsetTBL( 0,-16,-16) , GRoffsetTBL(-16, 15, 0) } , 
+	{ GRoffsetTBL( 0,-16,-16) , GRoffsetTBL( 0,-16,-16) ,
+	  GRoffsetTBL(-16, 15, 0) , GRoffsetTBL( 0,-16,-16) } , 
+	{ GRoffsetTBL(-16, 15, 0) , GRoffsetTBL( 0,-16,-16) ,
+	  GRoffsetTBL( 0,-16,-16) , GRoffsetTBL( 0,-16,-16) } , 
+	{ GRoffsetTBL( 0,-16,-16) , GRoffsetTBL(-16, 15, 0) ,
+	  GRoffsetTBL( 0,-16,-16) , GRoffsetTBL( 0,-16,-16) } , 
+	{ GRoffsetTBL( 0,-16,-16) , GRoffsetTBL(-16, 15, 0) ,
+	  GRoffsetTBL( 0,-16,-16) , GRoffsetTBL( 0,-16,-16) } , 
+	{ GRoffsetTBL(-16, 15, 0) , GRoffsetTBL( 0,-16,-16) , 
+	  GRoffsetTBL( 0,-16,-16) , GRoffsetTBL( 0,-16,-16) } 
+};
+
+void ss_main(void)
+{
+	static ANGLE ang[XYZ];
+	static FIXED pos[XYZ];
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 7.6" , slLocate(9,2));
+
+	ang[X] = DEGtoANG(30.0);
+	ang[Y] = DEGtoANG( 0.0);
+	ang[Z] = DEGtoANG( 0.0);
+	pos[X] = toFIXED( 0.0);
+	pos[Y] = toFIXED( 0.0);
+	pos[Z] = toFIXED(200.0);
+
+	slDMACopy(GRdata,(void *)VRAMaddr,sizeof(GRdata));
+
+	while(-1){
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			slPutPolygon(&PD_CUBE);
+		}
+		slPopMatrix();
+
+		ang[Y] += DEGtoANG(1.0);
+
+		slSynch();
+	}
+}
+</PRE></P>
+<P><DD>The routine for drawing and rotating a cube is not much different from the previous one, so I will omit the explanation. The difference is line 41, where the Gouraud table is transferred to VRAM. The idea is the same as transferring texture data, first store all the necessary tables in VRAM.</P>
+<P> Now let's take a look at the attributes.</P>
+<A NAME="l7_7"></A><P><DD> <B>Listing 7-8 sample_7_6: polygon.c</b><P><DD><PRE>
+#include "sgl.h"
+
+#define GRaddr 0xe000
+
+static POINT point_CUBE[] = {
+	POStoFIXED(-20.0 , -20.0 , 20.0) ,
+	POStoFIXED( 20.0 , -20.0 , 20.0) ,
+	POStoFIXED( 20.0 , 20.0 , 20.0) ,
+	POStoFIXED(-20.0 , 20.0 , 20.0) ,
+	POStoFIXED(-20.0 , -20.0 , -20.0) ,
+	POStoFIXED( 20.0 , -20.0 , -20.0) ,
+	POStoFIXED( 20.0 , 20.0 , -20.0) ,
+	POStoFIXED(-20.0 , 20.0 , -20.0)
+};
+
+static POLYGON polygon_CUBE[] = {
+	NORMAL( 0.0 , 0.0 , 1.0), VERTICES(0 , 1 , 2 , 3),
+	NORMAL(-1.0 , 0.0 , 0.0), VERTICES(4 , 0 , 3 , 7),
+	NORMAL( 0.0 , 0.0 ,-1.0), VERTICES(5 , 4 , 7 , 6),
+	NORMAL( 1.0 , 0.0 , 0.0), VERTICES(1 , 5 , 6 , 2),
+	NORMAL( 0.0 ,-1.0 , 0.0), VERTICES(4 , 5 , 1 , 0),
+	NORMAL( 0.0 , 1.0 , 0.0), VERTICES(3 , 2 , 6 , 7)
+};
+
+static ATTR attribute_CUBE[] = {
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+1, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+2, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+3, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+4, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,16,31), GRaddr+5, MESHoff|CL_Gouraud, sprPolygon,No_Option),
+};
+
+PDATA PD_CUBE = {
+	point_CUBE , sizeof(point_CUBE)/sizeof(POINT),
+	polygon_CUBE , sizeof(polygon_CUBE)/sizeof(POLYGON) ,
+	attribute_CUBE
+};
+</PRE></P>
+<P><DD>Pay attention to the attributes.<BR>
+ The fifth parameter “Gouraud” is set to the VRAM address where the Gouraud data was stored earlier. The VRAM address here is (relative address ÷ 8).</P>
+<P> Please also pay attention to the 6th parameter “Mode”.<BR>
+ When using Gouraud shading, “CL_Gouraud” must be specified here. If you do not use Gouraud shading, please specify the macro "No_Gouraud" for the fifth parameter "Gouraud".</P>
+<A NAME="no7_70"></A><P><DT><H3> 7-7.Mode</H3><DD> The sixth parameter is “Mode”.<BR>
+ Here you can add various conditions and settings to polygons. The macros that can be specified here are as follows.</P>
+<A NAME="t7_4"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 7-4 Mode</b></CAPTION>
+<TR ALIGN=CENTER><TH> group</TH><TH> macro</TH><TH> Content</TH></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=3> [1]</TD><TD> No_Window</TD><TD> Not subject to Window restrictions (default)</TD></TR>
+<TR ALIGN=CENTER><TD> Window_In</TD><TD> Display inside Window</TD></TR>
+<TR ALIGN=CENTER><TD> Window_Out</TD><TD> Display outside the window</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> [2]</TD><TD> MESHoff</TD><TD> Normal display (default)</TD></TR>
+<TR ALIGN=CENTER><TD> MESHon</TD><TD> Display as mesh</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> [3]</TD><TD> ECdis</TD><TD> Disable EndCode</TD></TR>
+<TR ALIGN=CENTER><TD> ECenb</TD><TD> Enable EndCode (default)</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> [4]</TD><TD> SPdis</TD><TD> Also display transparent pixels (default)</TD></TR>
+<TR ALIGN=CENTER><TD> SPenb</TD><TD> Do not display transparent pixels</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=6> [5]</TD><TD> CL16Bnk</TD><TD> 16-color color bank mode (default)</TD></TR>
+<TR ALIGN=CENTER><TD> CL16Look</TD><TD> 16 color lookup table</TD></TR>
+<TR ALIGN=CENTER><TD> CL64Bnk</TD><TD> 64 color color bank mode</TD></TR>
+<TR ALIGN=CENTER><TD> CL128Bnk</TD><TD> 128 color color bank mode</TD></TR>
+<TR ALIGN=CENTER><TD> CL256Bnk</TD><TD> 256 color color bank mode</TD></TR>
+<TR ALIGN=CENTER><TD> CL32KRGB</TD><TD> 32768 colors RGB mode</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=5> [6]</TD><TD> CL_Replace</TD><TD> Overwrite (standard) mode (default)</TD></TR>
+<TR ALIGN=CENTER><TD> CL_Shadow</TD><TD> shadow mode</TD></TR>
+<TR ALIGN=CENTER><TD> CL_Half</TD><TD> half brightness mode</TD></TR>
+<TR ALIGN=CENTER><TD> CL_Trans</TD><TD> Translucent mode</TD></TR>
+<TR ALIGN=CENTER><TD> CL_Gouraud</TD><TD> gouraud shading mode</TD></TR>
+<!-- 谷岡    1997.4.24 -->
+<TR ALIGN=CENTER><TD ROWSPAN=2> [7]</TD><TD> HSSon</TD><TD> Use high speed shrink</TD></TR>
+<TR ALIGN=CENTER><TD> HSSoff</TD><TD> Do not use high speed shrink (default)</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> [8]</TD><TD> MSBon</TD><TD> Set MSB when writing to frame buffer</TD></TR>
+<TR ALIGN=CENTER><TD> MSBoff</TD><TD> Do not set MSB when writing to frame buffer (default)</TD></TR>
+<!-- ここまで -->
+</TABLE>
+</P>
+<P><DD> You can specify one option for each group.<BR>
+ Please write consecutively using the or operator "|".<BR>
+ Omitted groups are treated as if the default was specified.</P>
+<P><DT> <B>Note</b><DD> All groups cannot be abbreviated. If you want to set everything to default, please specify “No_Window” as a dummy.</P>
+<P> Group [5] is for specifying the color mode of the texture, so if you do not use the texture, be sure to set it to the default (“CL_16Bnk” or do not specify it). If you specify any other mode here, the polygons will not be displayed.</P>
+<P> As exceptions to group [6], “CL_Gouraud |- CL_Half” and “CL_Gouraud |- CL_Trans” can be used. Please use it when you want to use semi-bright Gouraud shading or semi-transparent Gouraud shading.<BR>
+ If you use Gouraud shading, you need to set “CL_Gouraud” here as well as setting the 5th parameter.<BR>
+ When using semi-brightness, semi-transparent, and Gouraud shading, only RGB direct mode is supported for polygons and 32768-color RGB mode for textures. Please note that other settings will not display correctly.</P>
+<A NAME="no7_80"></A><P><DT><H3> 7-8.Dir</H3><DD> The seventh parameter is “Dir”. Specify whether the object is a polygon or a texture, and if it is a texture, how to flip it.</P>
+<NAME="7_5">
+<P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 7-5 Dir</b></CAPTION>
+<TR ALIGN=CENTER><TH> macro</TH><TH> Contents</TH></TR>
+<TR ALIGN=CENTER><TD> sprNoflip</TD><TD> Display texture normally</TD></TR>
+<TR ALIGN=CENTER><TD> sprHflip</TD><TD> Flip the texture horizontally</TD></TR>
+<TR ALIGN=CENTER><TD> sprVflip</TD><TD> Flip the texture vertically</TD></TR>
+<TR ALIGN=CENTER><TD> sprHVflip</TD><TD> Flip the texture vertically and horizontally</TD></TR>
+<TR ALIGN=CENTER><TD> sprPolygon</TD><TD> display polygons</TD></TR>
+<TR ALIGN=CENTER><TD> sprPolyLine</TD><TD> display polyline</TD></TR>
+<TR ALIGN=CENTER><TD> sprLine</TD><TD> Displays a straight line using the first two points</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>Note</b><DD> If you are not using textures for the object, do not specify “sprHflip” or “sprVflip”.<BR>
+ Specify “sprLine” as 4 points like other polygons (repeatedly specify the first 2 points).</P>
+<A NAME="no7_90"></A><P><DT><H3> 7-9.Option</H3><!-- 谷岡     1997/4/24   -->
+<DD> The last parameter is “Option”. Other settings for polygons and textures are specified here. The following five options are supported by the current SGL (Ver 3.0).</P>
+<!-- ここまで     -->
+<A NAME="t7_6"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 7-6 Option</b></CAPTION>
+<TR ALIGN=CENTER><TH> macro</TH><TH> Contents</TH></TR>
+<!-- 谷岡     1997/4/24   -->
+<TR ALIGN=CENTER><TD> UseLight</TD><TD> Perform light source calculations</TD></TR>
+<TR ALIGN=CENTER><TD> Use Palette</TD><TD> Indicates that polygon colors are in palette format</TD></TR>
+<TR ALIGN=CENTER><TD> UseNearClip</TD><TD> If the 4 vertices go outside the screen specified by slWindowClipLevel, they will not be displayed.</TD></TR>
+<TR ALIGN=CENTER><TD> UseDepth</TD><TD> Calculate depth cue with parallel light source</TD></TR>
+<TR ALIGN=CENTER><TD> UseGouraud</TD><TD> Performs light source calculation using real-time Gouraud (valid only with slPutPolygonX)</TD></TR>
+<!-- ここまで     -->
+</TABLE>
+</P>
+<P><DD> Multiple options can be specified using the or operator "|".</P>
+<P><DT> <B>Note</b><DD> If you do not want to use options, please specify the macro “No_Option”.<BR>
+ If you want to perform light source calculation when the polygon color is in palette format, use “UsePalette” and “UseLight” together.</P>
+<A NAME="no7_f"></A><P><DT><H3> Appendix: SGL library functions that appear in this chapter</H3><DD> In this chapter, we explained the functions in the table below.</P>
+<A NAME="t7_7"></A><P><DT><TABLE BORDER=1>
+<CAPTION> <B>Table 7-7 SGL library functions introduced in this chapter</b></CAPTION>
+<TR ALIGN=CENTER><TH> functional type</TH><TH> function name</TH><TH> parameters</TH><TH> function</TH></TR>
+<TR ALIGN=CENTER><TD> void</TD><TD> slDMACopy</TD><TD> Src,dst,cnt</TD><TD> Block transfer using CPU DMA</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

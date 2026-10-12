@@ -1,0 +1,102 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/30&gt;SGL Programmer's Tutorial/1-2.ライブラリ使用上の注意</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<A HREF="p01_10.htm">戻る</A>｜<A HREF="p02_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PROGRAMMER'S TUTORIAL/1.セガサターン・3Dゲーム・ライブラリについて</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_20"></A>
+	<P>	<DT><H2>1-2.ライブラリ使用上の注意</H2>
+<A NAME="no1_21"></A>
+	<P>	<DT><H3>ライブラリで使用する数値</H3>
+		<DD>　ＳＧＬでは、浮動小数点数をサポートしていません。<BR>
+			そこで、固定小数点数を基本とした、次の３つの変数型を設けています。</P>
+
+	<P>	<DT><TABLE><TR>
+		<TD><IMG SRC="../../../../what/atto.gif"></TD>
+		<TD><B>実際は、マクロ定義という形で浮動小数点数から固定小数点数への変換をサポートしますので、各個人による個別の変換は不要となります（“表1-1: 数値型変換用マクロ例”参照）。</B></TD></TR></TABLE></P>
+
+	<P>	<DD><OL>
+		<LI><B>固定小数点数 ( 座標上のポジションや三角関数などの値に使用 )</B><BR>
+			　型名称：FIXED<BR>
+			　上位１６ビットが整数部、下位１６ビットが小数部の３２ビット（符号付き）</P>
+<A NAME="z1_2_0">
+<P><PRE>
+例）16.5を表す場合
+<H3>
+１６.５　→　０ｘ００１０＿８０００
+　　　　　　　｜　　 　　　｜
+　　　　　　　｜　　 　　　｜
+　　　　　　　｜　　　　　
+　　　　　　　　　　 　　　小数部
+　　　　　　　整数部
+</H3>
+</PRE></P>
+
+	<P>	<LI><B>角度（回転角など全ての角値表現に使用）</B><BR>
+			　型名称：ANGLE<BR>
+			　３６０度を１６ビットで表現</P>
+
+<A NAME="z1_4"></A>
+	<P ALIGN=CENTER><B>図1-4　ANGLEで表現された角度</B><BR>
+	<IMG SRC="../grp/p01_10_2.gif"></P>
+
+	<P>	<LI><B>行列（変換行列など全てのマトリクス変数に使用）</B><BR>
+			　型名称：MATRIX<BR>
+			　数値はFIXEDを使用した４行＊３列の行列（メモリ上の配置は下図参照）</P>
+		</OL>
+
+<A NAME="z1_5"></A>
+	<P ALIGN=CENTER><B>図1-5　行列のメモリ上の配置</B><BR>
+	<IMG SRC="../grp/p01_10_3.gif"></P>
+
+	<P>	<DD>　次表は、ＳＧＬでサポートする数値変換用マクロの一覧です。<BR>
+		ＳＧＬでは、この他にも、目的に応じた幾つかのマクロをサポートしています。<BR>
+		ＳＧＬがサポートするマクロは、ヘッダファイル“sgl.h”及び“sl_def.h”中で定義してあります（詳細は、リファレンスマニュアルの“構造体リファレンス”を参照してください）。</P>
+
+<A NAME="t1_1"></A>
+	<P>	<DT><TABLE BORDER=1><CAPTION><B>表1-1　数値型変換用マクロ例</CAPTION>
+	<TR ALIGN=CENTER><TH><PRE>変換型</TH><TH><PRE>　　　マクロ名　　　</TH><TH><PRE>　　　　マ　ク　ロ　内　容　　　　</TH><TH><PRE>　　　　使　用　法　　　　</TH></TR>
+	<TR ALIGN=CENTER><TD>FIXED </TD><TD>toFIXED(p)       </TD>   <TD>((FIXED)((p)*65536.0))            </TD><TD>数値のFIXED型への変換 </TD></TR>
+	<TR ALIGN=CENTER><TD>ANGLE </TD><TD>DEGtoANG(d)      </TD>   <TD>((ANGLE)((d)*65536.0/360.0))      </TD><TD>DEG型角値のANGLE型への変換</TD></TR>
+	<TR ALIGN=CENTER><TD>FIXED </TD><TD>POStoFIXED(x,y,z)</TD>   <TD>{toFIXED(x),toFIXED(y),toFIXED(z)}</TD><TD>XYZ座標のFIXED型への変換</TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=4>注）マクロは、インクルードファイル”sgl.h”および”sl_def.h”中で定義されています。</TD></TR></TABLE></P>
+
+	<P>	<DT><TABLE><TR>
+		<TD><IMG SRC="../../../../what/atto.gif"></TD>
+		<TD><B>本書中のサンプルプログラムでも、断り無く当該マクロを使用することがあります。</B></TD></TR></TABLE></P>
+
+<A NAME="no1_22"></A>
+	<P>	<DT><H3>座標系</H3>
+		<DD>　セガサターンでは、一般に右手座標系と呼ばる座標系を採用しています。<BR>
+			また、回転行列を用いたときの角度の正方向は、軸に対して右回転となります。</P>
+
+<A NAME="z1_6"></A>
+	<P>	<DD><TABLE BORDER=0><CAPTION><B>図1-6　セガサターンでの座標系</CAPTION>
+	<TR ALIGN=CENTER><TD><IMG SRC="../grp/p01_1131.gif"></TD><TD><IMG SRC="../grp/p01_1132.gif"></TD></TR>
+	<TR><TD>a)セガサターンの用いる座標系(右手系)</TD>
+	<TD>b)Z軸に対する回転の正方向<BR>
+	・Ｚ方向の正方向を画面奥に据えたとき、Yの正方向は下、Xの正方向は画面右に向かって伸びる<BR>
+	・回転の正方向は軸に対して右向き</TD></TR>
+	</TABLE>
+
+</DL>
+
+<HR NOSHADE>
+<B>▲<A HREF="p01_10.htm">戻る</A>｜<A HREF="p02_10.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

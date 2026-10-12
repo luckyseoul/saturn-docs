@@ -1,0 +1,100 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;15/29&gt;SCSP User's Manual/How to use the FM sound source method/1</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p04_23.htm">Back</a> ｜ <A HREF="p04_fm2.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/4.2 Sound source register</b><HR NOSHADE>
+<DL>
+<A NAME="fm2_00"></A><P><DT><H3> ■When using the FM sound source method</H3><DD> The FM sound source method is a method that performs modulation by adding the output of a different waveform generator to the phase input of one waveform generator. FM voice synthesis is realized by a waveform calculation unit called a slot.<BR>
+ Figure 4.12 shows a block diagram of the slot.</P>
+<A NAME="z4_12"></A><P ALIGN=CENTER> <B>Figure 4.12 Slot block diagram</b><BR>
+<img srcset="../grp/i047_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> In order to output sound from the slot, write the waveform data for generating the slot onto the waveform RAM. Furthermore, set the waveform read address, loop start address, loop end address, sound pitch, sound level, and EG, and start sound by pressing KEY_ON.<BR>
+ SCSP operates as one large cycle of 22.68[μsec].<BR>
+ The PG (Phase Generator) manages the waveform data readout speed, which is determined by the sound frequency setting. Unless the sound frequency is changed, the PG generates a constant value every 1Fs cycle (22.68[μsec]=1/44.1KHz), performs cumulative addition every Fs cycle, and outputs it. This is added to various addresses using the address pointer as shown in Figure 4.13, the resulting value is output to the address bus as a waveform address, and the waveform data corresponding to the waveform address is read from RAM.</P>
+<A NAME="z4_13"></A><P ALIGN=CENTER> <B>Figure 4.13 Waveform address generation calculation section</b><BR>
+<img srcset="../grp/i048_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z4_14"></A><P ALIGN=CENTER> <B>Figure 4.14 Waveform address generation/waveform data reading</b><BR>
+<img srcset="../grp/i048_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> When the oscillation frequency is constant (when the internal generation of PG is constant in all Fs cycles), the address pointer output becomes a straight line as shown in Figure 4.14, and can be read out without changing the waveform on the waveform RAM. .<BR>
+ Although the address pointer appears to be a straight line, it actually performs calculations every 1 Fs cycle, so it draws a step-like trajectory as shown in Figure 4.15. This step becomes the PG's internally generated value.</P>
+<A NAME="z4_15"></A><P ALIGN=CENTER> <B>Figure 4.15 Enlarged view of address pointer output</b><BR>
+<img srcset="../grp/i049_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> When the frequency is increased, the PG generated value increases, so the slope of the PG output and address pointer output value (function) becomes steeper.<BR>
+ Conversely, when the frequency is lowered, the PG generated value decreases, so the PG output value and address pointer output value have a gentle slope as shown in Figure 4.16.</P>
+<A NAME="z4_16"></A> <A ALIGN=CENTER><B>Figure 4.16 Frequency address pointer output value</b></a><BR>
+<A ALIGN=CENTER><img srcset="../grp/i050_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></a><DD> When performing FM voice synthesis, a short cycle waveform is used in a loop. Therefore, the output value (function) of the address pointer will be as shown in Figure 4.17.</P>
+<A NAME="z4_17"></A><P ALIGN=CENTER> <B>Figure 4.17 Address pointer output value when executing FM voice synthesis (1)</b><BR>
+<img srcset="../grp/i050_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P ALIGN=CENTER> <B>Figure 4.17 Address pointer output value when executing FM voice synthesis (1)</b><BR>
+<img srcset="../grp/i050_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Set the start address to address a, set the loop start address value to "0000H", and set the waveform read address and waveform loop start address to the same address. Furthermore, by setting the loop end address so that address b becomes the waveform loop end address, a waveform like the one shown in Figure 4.17 will be obtained.</P>
+<A NAME="z4_18"></A><P ALIGN=CENTER> <B>Figure 4.18 Address pointer output value when executing FM voice synthesis (2)</b><BR>
+<img srcset="../grp/i051_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P ALIGN=CENTER> <B>Figure 4.18 Address pointer output value when executing FM voice synthesis (2)</b><BR>
+<img srcset="../grp/i051_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> If the output value of the address pointer is made linear as shown in Figure 4.18 (waveform A), it will be output according to the waveform of RAM (waveform 1). However, when it becomes a nonlinear function (waveform B), the way the waveform is read changes, and waveform 2 is output. When the waveform is transformed in this way, the tone changes.<BR>
+ FM speech synthesis is an application of distorting the waveform by varying this phase value over time. The FM voice synthesis method actually uses a method of adding the output values of other (or own) slots to make the address pointer output value (phase value) nonlinear. Up until now, we have explained the normal mode as an example, but it is also possible to set reverse loop and alternative loop by changing the "LPCTL" register. The loop data that can be specified by the "LPCTL" register is shown in Figures 4.19, 4.20, and 4.21.</P>
+<A NAME="z4_19"></A><P ALIGN=CENTER> <B>Figure 4.19 Normal loop</b><BR>
+<img srcset="../grp/i051_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z4_20"></A><P ALIGN=CENTER> <B>Figure 4.20 Reverse loop</b><BR>
+<img srcset="../grp/i052_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z4_21"></A><P ALIGN=CENTER> <B>Figure 4.21 Alternative loop</b><BR>
+<img srcset="../grp/i052_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Normal loop and reverse loop assume that the data corresponding to "LSA" and "LEA" are the same, so please copy the data of "LSA" to "LEA" to create loop data. The alternative loop setting value must be "LSA"&#65308; Please set it to be "LEA" ("LSA" in all loops).&#65310; (Operation cannot be guaranteed if "LEA" is selected.) Also, by placing duplicate data at the loop start point and loop end point, you can match the pitch of an alternative loop to the pitch of other loop modes. When the loop mode of all waveforms is limited to alternative loop, the data corresponding to "LSA" and "LEA" do not need to be the same value.</P>
+<P><DD> A block diagram of how to actually implement FM speech synthesis is shown in Figure 4.22.</P>
+<A NAME="z4_22"></A><P ALIGN=CENTER> <B>Figure 4.22 FM sound source configuration diagram</b><BR>
+<img srcset="../grp/i053_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Each block of the FM sound source configuration diagram is explained below.</P>
+<A NAME="4_22_0"></A><P><DT> <B>SOUND STACK</b><DD> Stores the output of each slot. SCSP slots can input the output values (data in the sound stack) of two slots.</P>
+<A NAME="4_22_1"></A><P><DT> <B>Averaging calculation section</b><DD> Each slot has two modulation inputs, X and Y. To combine these two inputs into one, we need to perform addition. In order to prevent the addition result from overflowing, there is a method of multiplying the two inputs by 1/2 and then adding them together.<BR>
+ By adopting this method, SCSP converts two input data into one output data.<BR>
+ If the input data is XD and YD and the output data is ZD, it can be expressed by the following formula.</P>
+<A NAME="z4_23"></A><P ALIGN=CENTER><PRE> <B>Averaging calculation part formula</b><BR>
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                     YD     XD    ┃
+┃                     │      │     ┃
+┃                   ┌─┴──────┴──┐  ┃
+┃       XD + YD     │Averaging  │  ┃
+┃ ZD = ─────────    │calculation│  ┃
+┃          2        │section    │  ┃
+┃                   └─────┬─────┘  ┃
+┃                         │        ┃
+┃                         ZD       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+</PRE></P>
+<P><DD>This calculation block is called the averaging calculation block because it is the same as the formula for calculating the average value.</P>
+<A NAME="4_23_0"></A><P><DT> <B>MDL [Modulation level (change amount)]</b><DD> Used to adjust the degree of FM applied by external slot input.</P>
+<A NAME="4_23_1"></A><P><DT> <B>phase adder</b><DD> Adds (subtracts) the phase value generated by the PG and the phase value generated by the MDL operation via the averaging operation section. Additionally, the decision to perform addition or subtraction is determined by the loop mode and loop state.</P>
+<A NAME="4_23_2"></A><P><DT> <B>Level multiplier</b><DD> Multiply the waveform read from waveform memory by the level coefficient generated by ALFO, TL (Total Level), and EG. Furthermore, adjust the actual waveform output level.</P>
+<A NAME="4_23_3"></A><P><DT> <B>Waveform RAM</b><DD> RAM for sound.</P>
+<A NAME="4_23_4"></A><P><DT> <B>waveform address pointer</b><DD> This block generates the actual waveform memory address by adding or subtracting the SA (start address) value set in each slot and the waveform phase value output from the phase adder.</P>
+<A NAME="4_23_5"></A><P><DT> <B>Waveform data buffer</b><DD> This is a memory for temporarily storing waveforms read from waveform memory.</P>
+<A NAME="4_23_6"></A><P><DT> <B>PG (Phase Generator)</b><DD> Manages the readout speed of the sound frequency waveform. (Actually, the waveform is skipped.)</P>
+<A NAME="PG_"></A><P><DT> <B>EG(Envelope Generator)</b><DD> This block creates temporal changes in value (envelope curve) according to each rate and level setting. The value generated here is sent to the level calculation section and then multiplied by the waveform data, causing the waveform output level to change over time.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_23.htm">Back</a> ｜ <A HREF="p04_fm2.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

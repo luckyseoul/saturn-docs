@@ -1,0 +1,69 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;75/86&gt;VDP2 User's Manual/15.2 How to use RAM</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no15">VDP2 User's Manual</a> ★ <A HREF="p15_10.htm">Chapter 15 How to use VDP2</a><HR>
+ <B>▲ <A HREF="p15_10.htm">Back</a> ｜ <A HREF="p15_30.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 15 How to use VDP2</b><HR NOSHADE>
+<DL>
+<P><DT><H2> ■15.2 How to use RAM</H2><DD> When using VDP2, define and set data in VRAM, color RAM, and registers.</P>
+<A NAME="no15_21"></A><P><DT><H3> ●VRAM</H3><DD> The data defined in VRAM varies depending on the scroll screen used, screen format, screen size, and image processing function used. Define each data in VRAM according to the register settings, and set the defined address in each address register. Table 15.1 shows the data defined in VRAM and the related main registers.</P>
+<A NAME="t15_1"></A><P><DD> <B>Table 15.1 Data defined in VRAM and related registers</b><DT><TABLE BORDER CELLPADDING=5>
+<TR><TH><PRE> data</TH><TH><PRE> What to define</TH><TH><PRE> Related registers</TH><TH><PRE> Data to set</TH></TR>
+<TR><TD ALIGN=CENTER ROWSPAN=5><PRE> pattern name table</TD><TD ALIGN=CENTER ROWSPAN=5><PRE> character pattern<BR> starting address of</TD><TD ALIGN=CENTER ><PRE> pattern name control register<BR> (Text/Reference)</TD><TD><PRE>・Pattern name data size<BR>&#12539; Character number assistance mode<BR>&#12539; Pattern name auxiliary data</TD></TR>
+<TR><TD ALIGN=CENTER ><PRE> Plane size register<BR> (Text/Reference)</TD><TD><PRE>・Plain size when displaying in cell format</TD></TR>
+<TR><TD ALIGN=CENTER ><PRE> Normal scroll screen map<BR> register<BR> (Text/Reference)</TD><TD><PRE>・Start address of pattern name table placed on each plane</TD></TR>
+<TR><TD ALIGN=CENTER ><PRE> Rotating scroll screen map register<BR> (Text/Reference)</TD><TD><PRE>・Start address of pattern name table placed on each plane</TD></TR>
+<TR><TD ALIGN=CENTER ><PRE> map offset register<BR> (Text/Reference)</TD><TD><PRE>・3-bit map offset value added to the upper part of the map register</TD></TR>
+<TR><TD ALIGN=CENTER ><PRE> character pattern</TD><TD ALIGN=CENTER ><PRE> cell dot data</TD><TD ALIGN=CENTER > character control register<BR>
+ (Text/Reference)</TD><TD><PRE>・Number of character colors, character size</TD></TR>
+<TR><TD ALIGN=CENTER ROWSPAN=2><PRE> bitmap pattern</TD><TD ALIGN=CENTER ROWSPAN=2><PRE> bitmap pattern<BR> Data of</TD><TD ALIGN=CENTER><PRE> character control register<BR> (Text/Reference)</TD><TD><PRE>・Number of character colors (number of bitmap colors)<BR>&#12539; bitmap size<BR>&#12539; bitmap enable</TD></TR>
+<TR><TD ALIGN=CENTER ><PRE> map offset register<BR> (Text/Reference)</TD><TD><PRE>・Address of bitmap pattern boundary</TD></TR>
+<TR><TD ALIGN=CENTER ROWSPAN=2><PRE> line scroll table</TD><TD ALIGN=CENTER ROWSPAN=2><PRE> horizontal and vertical<BR> screen scroll value,<BR> horizontal coordinate increment</TD><TD ALIGN=CENTER ><PRE> line scroll table address<BR> register<BR> (Text/Reference)</TD><TD><PRE>・Start address of line scroll table</TD></TR>
+<TR><TD ALIGN=CENTER ><PRE> Line & vertical cell scroll control<BR> register<BR> (Text/Reference)</TD><TD><PRE>・Scroll function control data</TD></TR>
+<TR><TD ALIGN=CENTER ROWSPAN=2><PRE> vertical cell scroll table</TD><TD ALIGN=CENTER ROWSPAN=2><PRE> Vertical screen scroll value</TD><TD ALIGN=CENTER ><PRE> Vertical cell scroll table address<BR> register<BR> (Text/Reference)</TD><TD><PRE>・Start address of vertical cell scroll table</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> Line & vertical cell scroll control<BR> register<BR> (Text/Reference)</TD><TD><PRE>・Scroll function control data</TD></TR>
+<TR><TD ALIGN=CENTER ROWSPAN=3><PRE> Rotation parameter table</TD><TD ALIGN=CENTER ROWSPAN=3><PRE> rotation parameters,<BR> Related registers of coefficient table</TD><TD ALIGN=CENTER > RAM control register<BR>
+ (Text/Reference)</TD><TD><PRE> - Purpose of using VRAM on rotating scroll screen</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> Rotation parameter table address<BR> register<BR> (Text/Reference)</TD><TD><PRE>・Start address of parameter table</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> Rotation parameter mode register<BR> (Text/Reference)</TD><TD><PRE>・Specification of rotation parameter mode</TD></TR>
+<TR><TD ALIGN=CENTER ROWSPAN=3><PRE> coefficient table</TD><TD ALIGN=CENTER ROWSPAN=3><PRE> Coefficient table data<BR> (scaling coefficient kx, ky,<BR> Starting point coordinates Xp after rotation transformation)</TD><TD ALIGN=CENTER><PRE> RAM control register<BR> (Text/Reference)</TD><TD><PRE> - Purpose of using VRAM on rotating scroll screen</TD></TR>
+<TR><TD ALIGN=CENTER ><PRE> Coefficient table control<BR> register<BR> (Text/Reference)</TD><TD><PRE>・Coefficient data mode<BR>&#12539; Data size of coefficient data<BR>&#12539; Coefficient table enable</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> Coefficient table address offset<BR> register<BR> (Text/Reference)</TD><TD><PRE>・Start address offset value of coefficient table</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> line color screen table</TD><TD ALIGN=CENTER><PRE> color ram address</TD><TD ALIGN=CENTER > line color screen table address<BR>
+ register<BR>
+ (Text/Reference)</TD><TD><PRE>・Color mode of line color screen<BR>&#12539; Start address of line color screen table</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> back screen table</TD><TD ALIGN=CENTER><PRE> RGB color data</TD><TD ALIGN=CENTER><PRE> Back screen table address<BR> register<BR> (Text/Reference)</TD><TD><PRE>・Back screen color mode<BR>&#12539; Back screen table start address</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> line window table</TD><TD ALIGN=CENTER><PRE> horizontal starting point coordinates,<BR> Horizontal end point coordinates</TD><TD ALIGN=CENTER><PRE> line window table ad<BR> response register<BR> (Text/Reference)</TD><TD><PRE>・Line window enable<BR>&#12539; Start address of line window table</TD></TR>
+</TABLE>
+</P>
+<A NAME="no15_22"></A><P><DT><H3> ●Definition of color RAM</H3><DD> Define color data for palette-style sprites and scroll screens. The color data stored in the color RAM is in RGB format and has three modes. The mode selection is specified by the color RAM mode (CRMD1, CRMD0, bits 13 and 12) of the RAM control register (18000EH).</P>
+<P><DD> The most significant bit of the color data stored in the color RAM is the enable bit when the special color calculation mode is mode 3. When the special color calculation mode is mode 3, the color format is palette format, and the color calculation enable bit is 1, color calculation is performed on a dot-by-dot basis using color data whose most significant bit is 1. Masu.</P>
+<A NAME="no15_23"></A><P><DT><H3> ●Color RAM reference</H3><DD> Color RAM is referenced from data in character patterns, bitmap patterns, and line color screen tables. Color RAM addresses are represented by 11 bits. If the number of character colors or bitmap colors is 16, a 7-bit palette number is added to the upper part, making it 11 bits, and if it is 256 colors, a 3-bit palette number is added to the upper part, making it 11 bits. Masu. The palette number of a character pattern is located in the pattern name data and auxiliary data of the pattern name control register, and the palette number of a bitmap pattern is located in the bitmap palette number register.</P>
+<A NAME="no15_24"></A><P><DT><H3> ●Register</H3><DD> Registers are generally 16 bits that are write-only and specify the functionality of VDP2. One function may span several registers, and some functions may be grouped together in one register.<BR>
+ Set the registers that correspond to the functions you want to use as necessary.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p15_10.htm">Back</a> ｜ <A HREF="p15_30.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no15">VDP2 User's Manual</a> ★ <A HREF="p15_10.htm">Chapter 15 How to use VDP2</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

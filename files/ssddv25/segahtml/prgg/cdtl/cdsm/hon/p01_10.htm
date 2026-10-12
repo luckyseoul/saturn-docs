@@ -1,0 +1,162 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 4&gt;Simple CD simulator/1.Introduction</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Simple CD simulator</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ Simple CD simulator<H1> 1.Introduction</H1><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><H3> ■Introduction</H3><DD> The "Simple CD Simulator" includes a "SIMM system" that uses RAM on the target, and a "SCSI system" that can read DOS files on a SCSI hard disk. This debug support function is available from "Software Library/CD Library/File System Library".</P>
+<P><DT> <B>●Notations used in this document</b><DD> Gothic font represents the name. Example: <B>CD Tools</b><BR>
+ <B>[xxxx]</b> represents a file name, DOS command name, or key name. Example: <B>[cdsim.exe]</b><BR>
+ Underlines represent user input. <B>Example: MFCAT[RET]</b><BR>
+ <B>[RET]</b> represents the return key input.<BR>
+ <B>[\n]</b> represents a line feed code.</P>
+<A NAME="no1_20"></A><P><DT><H3> ■Development environment overview</H3><P><DT> <B>●Hardware environment</b><DD>
+<PRE>
+┌─────────────┐   ┌─────┐    ┌───────┐ 
+│Basic program│   │ TV  │    │Monitor│ 
+│development  │   │     │    │       │ 
+│tools        │   └──┬──┘    └───┬───┘ 
+│ *PC         │ ┌────┴─────┐ ┌───┴───┐
+│ *WS         │ │Target box│ │ PC/AT │
+│ *ICE        ├─┤SIMM      │ │       │
+│ *EVA        │ │SCSI I/F  ├─┤SCSI BD│
+│ *ETC.       │ │          │ │       │
+└─────────────┘ └──────────┘ └───────┘
+</PRE><P><DT><B>●Software environment</b><DD><PRE>
+┌───┐               ┌───┐          ┌───┐ 
+│Basic program      │CD library    │CDSIM
+│development tools  │/File system  │   │ 
+│   │               │   │          │   │ 
+└───┘               └───┘          └───┘ 
+                            
+┌───┐                       
+│MFCAT                      
+│   │                       
+│   │                       
+└───┘                       
+</PRE><P><DT><B>●Hardware/Software list</b><DD> <B>Basic program development tools</b><DD> There are no hardware or software restrictions for using the CD tool.<BR>
+ Choose from the recommended tools.</P>
+<P><DD> <B>target box</b><DD> SIMM and SCSI I/F are built-in as standard. (programming box)</P>
+<P><DD> <B>IBM PC compatible</b><DD> Recommended models for the CD tool, including HDD, SCSI board, and OS, will be announced separately.</P>
+<DD> <B>Software library/CD library/file system</b><BR>
+<DD> A file system for a simple CD simulator.</BR>
+ It is provided by SEGA as <B>a software library</b> .</P>
+<DD> <B>MFCAT</b><DD> A tool to create memory files.<BR>
+ It is provided by SEGA as <B>a CD tool</b> .</P>
+<DD> <B>CDSIM</b><DD> A PC application that loads files from a PC to a file system on a SCSI system.<BR>
+ It is provided by SEGA as <B>a CD tool</b> .</P>
+<P><DT> <B>●Hardware/software required for each system</b><DD><TABLE BORDER>
+<TD ALIGN="CENTER"><PRE></TD><TD ALIGN="CENTER"><PRE> SIMM</TD><TD ALIGN="CENTER"><pre> SCSI</td><tr><td align="left"><pre> Basic program development tools</td><td align="center"><pre> ○</td><td align="center"><pre> ○</td><tr><td align="left"><pre> target box</td><td align="center"><pre> ○</td><td align="center"><pre> ○</td><tr><td align="left"><pre> IBM PC compatible machine</td><td align="center"><pre> −</td><td align="center"><pre> ○</td><tr><td align="left"><pre> file system</td><td align="center"><pre> ○</td><td align="center"><pre> ○</td><tr><td align="left"><pre> MFCAT</td><td align="center"><pre> ○</td><td align="center"><pre> −</td><tr><td align="left"><pre> CDSIM</td><td align="center"><pre> −</td><td align="center"><pre> ○</td></table>
+</p>
+<P><DT> <B>Note</b><DD> Even if you use a PC environment for the basic program development tools, please prepare a separate IBM PC compatible machine for the SCSI system.</P>
+<A NAME="no1_30"></A><P><DT><H3> ■Hardware setup</H3><DD> The steps for setting up the hardware are shown below.</P>
+<P><DT> <B>●Simple CD simulator/SIMM system</b><P><DT> <B>(1) Target preparation</b><DD> If you are not using a SCSI system, turn dip switch SW2-4 to OFF.</P>
+<P><DT> <B>(2) Turn on the power</b><DD> Run the BOOT ROM before using it.</P>
+<P><DT> <B>●Simple CD simulator/SCSI system</b><P><DT> <B>(1) Target preparation</b><DD><OL>
+<P><B><LI></b> Set dip switch 2 as follows.<BR>
+<PRE>
+  1    2    3    4    5    6    7    8    OFF→Return the switch to the horizontal position
+[OFF][OFF][OFF][O N][ * ][   SCSI-ID   ]  O N→Push the switch downward
+  |    |    |    |
+  |    |    |    +------Using SCSI
+  |    |    +-----------Using as a simple CD simulator
+  +----+----------------Workstation type
+                        OFF  OFF :  PC version
+                        OFF  ON  : SUN version
+                        ON   ON  :  HP version
+</PRE><BR>
+ For HP version, set the SCSI-ID to a larger ID than the boot device.</P>
+<P><B><LI></b> Make sure that the ICE emulation memory is not mapped.</P>
+</OL>
+<P><DT> <B>(2) Preparing the PC</b><DD><OL>
+<P><B><LI></b> Register the SCSI driver in [CONFIG.SYS].<BR>
+ For workstations, set the TTY port you are using to not be used by the terminal.</P>
+<P><B><LI></b> Install [cdsim.exe] into a directory included in PATH.</P>
+<P><B><LI></b> Prepare the definition file and the actual file.</P>
+</OL>
+<P><DT> <B>(3) Connection method</b><DD><OL>
+<P><B><LI></b> Connect the target box's SCSI connector to the PC's SCSI connector with a SCSI cable.</P>
+<P><B><LI></b> For workstations (SUN, HP), connect the RS-232C connector and the workstation's RS-232C connector with a cross RS232C cable.</P>
+</OL>
+<P><DT> <B>(4) Turn on the power</b><DD> <B>(Target side)</b><DD><OL>
+<P><B><LI></b> Turn on or reset power.</P>
+<P><B><LI></b> Run the BOOT ROM.</P>
+<P><B><LI></b> The SEGASATURN logo will be displayed.</P>
+</OL>
+<DD> <B>(PC side)</b><DD><OL>
+<P><B><LI></b> Wait until you see the SEGASATURN logo to power on or reset your PC.</P>
+<P><B><LI></b> Run [cdsim.exe].</P>
+</OL>
+<A NAME="no1_40"></A><P><DT><H3> ■Software setup</H3><P><DT> <B>●How to install</b><DD><OL>
+<P><B><LI></b> Please refer to the "Introduction Manual".<BR>
+ [MFCAT.EXE] is located in the [SATURN\SEGABIN\BIN\] directory, and [CDSIM.EXE] is located in the [SATURN\SEGABIN\BINCD\] directory.</P>
+</OL>
+<P><DT> <B>●How to set</b><DD> <B>Setting the PATH</b><DD> If the installation directory is not set in the [PATH] environment variable, add it.</P>
+<P><DT> <B>●How to start and shut down</b><P><DD> <B>Starting and stopping MFCAT</b><DD> <B>boot</b><DD><OL>
+<P><B><LI></b> Start [mfcat.exe] from the DOS prompt.<BR>
+<HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+c:\&gt; MFCAT[RET]
+</PRE><HR WIDTH=60% ALIGN=LEFT>
+</P>
+<P>The following display will appear.<BR>
+<HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+MFCAT ver 1.00 Copyright(c) 1995 SEGA
+usage: mfcat [-oOUTFILE] -fFLIST
+        mfcat [-oOUTFILE] file file2 ...
+</PRE><HR WIDTH=60% ALIGN=LEFT>
+</P>
+</OL>
+<P><DD><B>end</b><DD> It will close automatically.</P>
+<P><DD> <B>Starting and stopping CDSIM</b><P><DD> <B>boot</b><DD><OL>
+<P><B><LI></b> Start [cdsim.exe] from the DOS prompt.<BR>
+<HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+c:\&gt; CDSIM[RET]
+</PRE><HR WIDTH=60% ALIGN=LEFT>
+</P>
+<P>The following display will appear.<BR>
+<P> SUN startup example (when using PORT-A/SCSI ID 2)<BR>
+ CDSIM -i/dev/ttya -o/dev/rsd2a (CR)<BR>
+<P> HP startup example (when using PORT-0/SCSI ID 5)<BR>
+ CDSIM i/dev/tty00 -o/dev/dsk/c201d5s0 (CR)<BR>
+<HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+CDSIM ver 1.00 Copyright(c) 1994 SEGA
+Check Syntax: CDSIM.DAT
+File Can't Open:CDSIM.DAT
+</PRE><HR WIDTH=60% ALIGN=LEFT>
+</P>
+</OL>
+<P><DD><B>end</b><DD> It will automatically end with an error.<BR>
+ If it does not end automatically, press the [ESC] key to end it.<BR>
+ For SUN and HP, press [CTRL]+[C] to exit.</P>
+<P><DT> <B>●Confirm installation</b><DD> To confirm that it has been installed correctly, start the software after making the necessary settings, check the copyright notice, and then exit.</P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Simple CD simulator</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,163 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;33/54&gt;VDP1 User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p06_35.htm">Back</a> ｜ <A HREF="p06_37.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 6 Command Table</b><HR NOSHADE>
+<DL>
+<A NAME="no6_36"></A><P><DT><H3> ■Color mode</H3><DT> <B>Color mode bit:</b> color mode bit, bits 5 to 3<BR>
+<DD> Specify the number of colors and expression method for drawing sprites. Valid only for sprites. For non-textures, set the color mode to 000B. For non-texture, specify the color using non-texture color.<BR>
+ There are three ways to specify color modes: color bank mode, which uses a palette code and color bank, lookup table mode, which uses a color lookup table, and RGB mode, which specifies brightness directly.<BR>
+ In color bank mode, you can choose from 16, 64, 128, or 256 colors depending on the bit number of pixel data, in lookup table mode you can draw in 16 colors, and in RGB mode you can draw in 32,768 colors.<BR>
+ The contents of the color mode bits are:</P>
+<P><DD><TABLE BORDER>
+<TR><TH COLSPAN=3><PRE> color mode</TH><TH ROWSPAN=2 WIDTH=60><PRE> mode</TH><TH COLSPAN=2><PRE> Content</TH><TH ROWSPAN=2><PRE> 1pixel<BR> Number of bits</TH></TR>
+<TR><TH WIDTH=60><PRE> bit 5</TH><TH WIDTH=60><PRE> 4</TH><TH WIDTH=60><PRE> 3</TH><TH><PRE> Number of colors</TH><TH><PRE> mode name</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD><PRE> 16 colors</TD><TD><PRE> color bank mode</TD><TD><PRE> 4bit</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD><PRE> 16 colors</TD><TD><PRE> lookup table mode</TD><TD><PRE> 4bit</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 2</TH><TD><PRE> 64 colors</TD><TD><PRE> color bank mode</TD><TD><PRE> 8bit</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 3</TH><TD><PRE> 128 colors</TD><TD><PRE> color bank mode</TD><TD><PRE> 8bit</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 4</TH><TD><PRE> 256 colors</TD><TD><PRE> color bank mode</TD><TD><PRE> 8bit</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 5</TH><TD><PRE> 32768 colors</TD><TD><PRE> RGB mode</TD><TD><PRE> 16bit</TD></TR>
+<TR><TH COLSPAN=3><PRE> Other than those above</TH><TH> →</TH><TH COLSPAN=3><PRE> Setting prohibited (please do not set)</TH></TR>
+</TABLE>
+</P>
+<DT> <B>Character pattern for each mode</b><BR>
+<DD> Character patterns are stored on VRAM in each mode. Let's take 8 pixels horizontally and 1 pixel vertically as an example.</P>
+<A NAME="mode0"></A><P><DT> <B>mode 0</b><BR>
+<DD> Color bank mode with 16 colors. Colors are represented by palette codes and color banks.<BR>
+ 1 pixel is represented by 4 bits. You can draw in 16 colors. 4Bytes are required to represent 8 pixels. 1Byte has 2 pixels of data, and when not flipped horizontally, the upper 4 bits represent the left pixel and the lower 4 bits represent the right pixel.<BR>
+ The palette code is represented by 4 bits, and the upper 12 bits are added to the color bank from the color bank word (start address of the command table +06H) and written to the frame buffer as 16-bit data.<BR>
+ When 8bit/pixel (frame buffer rotation or high resolution), the lower 8 bits of 16 bits are written to the frame buffer. The upper 8 bits are discarded.<BR>
+ Since the drawing pixel data is a color bank code, color calculations cannot be performed.</P>
+<P><DD><PRE>
+ Bit 15     12 11     8 7      4 3       0　
+     ┌────────┬────────┬────────┬────────┐
++00H |Pixel 0 |Pixel 1 |Pixel 2 |Pixel 3 |
+     ├────────┼────────┼────────┼────────┤
++02H |Pixel 4 |Pixel 5 |Pixel 6 |Pixel 7 |
+     └────────┴────────┴────────┴────────┘
+</PRE></P>
+<A NAME="mode1"></A><P><DT><B>mode 1</b><DD> Lookup table mode using color lookup table.<BR>
+ 4 bits represents 1 pixel. It is possible to draw in 16 colors. Character data is the same as mode 0.<BR>
+ One color data is selected in 4 bits from among the 16 16-bit colors stored in the color lookup table and written to the frame buffer. When 8bit/pixel (frame buffer rotation or high resolution), the lower 8 bits of 16 bits are written to the frame buffer.<BR>
+ Write the color lookup table address to the lookup table address (command table start address +06H, shared with color bank word). The lookup table color code can be specified as either a color bank code or an RGB code. However, RGB code is prohibited at 8bit/pixel.</P>
+<A NAME="z6_11"></A><P><DD> <B>Figure 6.11 Drawing example in modes 0 and 1</b><PRE>
+For an original picture of 8 pixels horizontally　
+     ┌───────┬───────┐
++00H→|0 1 2 3 4 5 6 7|←+02H
+     ├───────┼───────┤
++04H→│8 9 A B C D E F│←+06H
+     ├───────┼───────┤
+     │   :       :   │
+     │   :       :   │
+</PRE></P>
+<A NAME="mode2"></A><P><DT><B>Mode 2, Mode 3, Mode 4</b><DD> Mode 2 is a color bank mode with 64 colors, mode 3 with 128 colors, and mode 4 with 256 colors. Colors are represented by palette codes and color banks.<BR>
+ 1 pixel is represented by 8 bits. You can draw 64 colors, 128 colors, and 256 colors respectively. 8Byte is required to represent 8 pixels.<BR>
+ The palette code is represented by 6 bits, 7 bits, and 8 bits, and the upper 10 bits, 9 bits, and 8 bits are added to the color bank from the color bank word (start address of the command table +06H), and written to the frame buffer as 16-bit data. In mode 2 and mode 3, the upper 2 bits and 1 bit are ignored respectively. When 8bit/pixel (frame buffer rotation or high resolution), the lower 8 bits of 16 bits are written to the frame buffer.<BR>
+ Since the drawing pixel data is a color bank code, color calculations cannot be performed.</P>
+<P><PRE>
+  bit 15              8 7                 0　
+      ┌────────────────┬──────────────────┐
+ +00H |    Pixel 0           Pixel 1      |
+      ├────────────────┼──────────────────┤
+ +02H |    Pixel 2           Pixel 3      |
+      ├────────────────┼──────────────────┤
+ +04H |    Pixel 4           Pixel 5      |
+      ├────────────────┼──────────────────┤
+ +06H │    Pixel 6           Pixel 7      │
+      ├────────────────┼──────────────────┤
+      │       :                 :         │
+</PRE></P>
+<A NAME="z6_12"></A><P><DD><B>Figure 6.12 Drawing example for modes 2, 3, and 4</b><PRE>
+For an original picture of 8 pixels horizontally　
+      ┌───┬───┬───┬───┐
++00H →│0 1│2 3│4 5│6 7│← +06H
+      ├───┼───┼───┼───┤
++08H →│8 9│A B│C D│E F│← +0EH
+      ├───┼───┼───┼───┤
+      │ : │ : │ : │ : │
+      │ : │ : │ : │ : │
+</PRE></P>
+<A NAME="mode5"></A><P><DT><B>mode 5</b><DD> RGB mode with 32768 colors. Colors are represented by the brightness of each RGB (red, green, and blue). 1 pixel is represented by 16 bits. You can draw in 32768 colors. 16 bytes are required to represent 8 pixels.<BR>
+ The RGB code represents the RGB code with MSB1bit (value is 1) and the brightness of each RGB with 5bits. The brightness of each RGB color ranges from 00H to 1FH; the closer it gets to 00H, the darker it gets, and the closer it gets to 1FH, the brighter it gets. When all RGB are 00H, it is 8000H, representing black; when all RGB is 1FH, it is FFFFH, representing white.<BR>
+ 16 bits of RGB code is written to the frame buffer as is. This mode cannot be used when using 8bit/pixel (frame buffer rotation or high resolution).<BR>
+ RGB codes can perform color calculations.</P>
+<P><PRE>
+  bit 15              8 7                 0　
+      ┌────────────────┬──────────────────┐
+ +00H |   Pixel 0            Pixel 0      |
+      | (upper byte)       (lower byte)   |
+      ├────────────────┼──────────────────┤
+ +02H |   Pixel 1            Pixel 1      |
+      | (upper byte)       (lower byte)   |
+      ├────────────────┼──────────────────┤
+ +04H |   Pixel 2            Pixel 2      |
+      | (upper byte)       (lower byte)   |
+      ├────────────────┼──────────────────┤
+ +06H |   Pixel 3            Pixel 3      |
+      | (upper byte)       (lower byte)   |
+      ├────────────────┼──────────────────┤
+ +08H |   Pixel 4            Pixel 4      |
+      | (upper byte)       (lower byte)   |
+      ├────────────────┼──────────────────┤
+ +0AH |   Pixel 5            Pixel 5      |
+      | (upper byte)       (lower byte)   |
+      ├────────────────┼──────────────────┤
+ +0CH │   Pixel 6            Pixel 6      │
+      | (upper byte)       (lower byte)   |
+      ├────────────────┼──────────────────┤
+      │       :                 :         │
+</PRE></P>
+<A NAME="z6_13"></A><P><DT><B>Figure 6.13 RGB code format</b><DD><PRE>
+MSB LSB
+┌─┬─────────┬─────────┬─────────┐
+│ │    B    │    G    │    R    │
+│1├─┬─┬─┬─┬─┼─┬─┬─┬─┬─┼─┬─┬─┬─┬─┤
+│ │4│3│2│1│0│4│3│2│1│0│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+[Note] MBS is “1”</PRE></P>
+<A NAME="t6_2"></A><DD> <B>Table 6.2 Pixel data</b><DD><TABLE BORDER>
+<TR><TH><PRE> pixel data</TH><TH><PRE> drawing data</TH></TR>
+<TR><TH><PRE> 0000H</TH><TD><PRE> transparent color code</TD></TR>
+<TR><TH><PRE> 0001H<BR> :<BR> 7FFEH</TD><TD><PRE> Setting prohibited<BR> (Do not set in RGB mode)<BR> (Palette bank code)</TD></TR>
+<TR><TH><PRE> 7FFEH</TH><TD><PRE> end code</TD></TR>
+<TR><TH><PRE> 8000H<BR> :<BR> FFFFH</TH><TD><PRE> RGB code</TD></TR>
+</TABLE>
+</P>
+<A NAME="z6_14"></A><P><DD> <B>Figure 6.14 Mode 5 drawing example</b><PRE>
+   For an original picture of 8 pixels horizontally　
+      ┌─┬─┬─┬─┬─┬─┬─┬─┐
++00H →│0│1│2│3│4│5│6│7│← +0EH
+      ├─┼─┼─┼─┼─┼─┼─┼─┤
++10H →│8│9│A│B│C│D│E│F│← +1EH
+      ├─┼─┼─┼─┼─┼─┼─┼─┤
+      │:│:│:│:│:│:│:│:│
+      │:│:│:│:│:│:│:│:│
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p06_35.htm">Back</a> ｜ <A HREF="p06_37.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

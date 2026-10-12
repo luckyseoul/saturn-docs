@@ -1,0 +1,155 @@
+<HTML>
+<HEAD>
+<TITLE> Sound driver settings </TITLE>
+</HEAD><BODY>
+
+<P> <A HREF="pr14-1.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr14-3.htm"> Go to next page </A> </BR> </P>
+<HR>
+
+
+<H2>
+14-2. Sound driver settings
+</H2>
+<P>
+To control sound with SEGA Saturn using a sound driver, follow the steps below.
+</P>
+
+<H4> Figure 14-2 Sound control procedure </H4>
+<IMG SRC="p14-3.gif">
+
+<H3>
+<A NAME="NO1"> Set sound driver and start MC68000 </A>
+</H3>
+<P>
+In order to use sound, you must first start MC68000 for sound control. A driver program that runs on the MC68000 is also required. These can be set by executing the library function “slInitSound ()”.
+</P>
+
+<DL>
+<DT> <B> [void slInitSound (void * drv, Uint32 drvsz, void * map, Uint32 mapsz);] </B>
+<DD> Set the sound driver and initialize the sound CPU (MC68000). “Drv” is a sound driver program that runs on the MC68000 and is loaded from address 0 of the MC68000. “Drvsz” is the size of this driver program. <BR>
+Usually <BR>
+slInitSound(drv , sizeof(drv) , maptbl , sizeof(maptbl)) ;<BR>
+Use it like this.
+</DL>
+
+<P>
+This function “slInitSound ()” executes the following procedure.
+</P>
+
+<OL>
+<LI> Reset MC68000
+<LI> MC68000 memory area 0 clear up to 0xB000
+<LI> Driver program transfer (size from address 0)
+<LI> Map data transfer (size from address 0xA000)
+<LI> Registering memory area for PCM playback
+<LI> MC68000 start
+<LI> Map data registration
+</OL>
+
+<H3>
+<A NAME="SOUNDDATE"> Sound data set </A>
+</H3>
+<P>
+By simply executing “slInitSound ()” above, the performance data has not been set yet, so set it. Performance data is stored after 0xB000 (0x25A0B000 on the program) in the memory area of ​​MC68000 (please contact the sound designer as it may vary depending on the map data). Transfer using the following function:
+</P>
+
+<H4> Figure 14-3 Example of sound data set </H4>
+
+<UL>
+<LI>slDMACopy(sounddat , (void *)0x25a0b000 , sizeof(sounddat)) ;
+<LI>slDMAWait() ;
+</UL>
+<P>
+Now you are ready to play.
+</P>
+
+<H3>
+<A NAME="BGM"> BGM performance </A>
+</H3>
+<P>
+Music (and sound effects) are handled in units called sequences. A sequence is to play a series of sound combinations (flow) from the beginning to the end (this is a song or a one-shot sound effect). You can play up to eight at the same time. SGL allocates number 0 for BGM in these 8 sequences. To play BGM, execute the “slBGMOn ()” function.
+</P>
+
+<DL>
+<DT> <B> [Bool slBGMOn (Uint16 Song, Uint8 Prio, Uint8 Volume, Uint8 Rate);] </B>
+<DD> Starts BGM performance.
+<PRE>
+Song: Song (sound effect) number
+Prio: Priority when using sound sources
+Volume: Volume
+Rate: Time to reach Volume
+</PRE>
+
+<DD> Priority “Prio” is called priority when using sound sources. Since multiple sequences share sound sources with 32 channels and produce sound, the total number of channels used by each exceeds 32. This is to secure the channel by deleting from the low priority sound.
+</DL>
+
+<P>
+The volume “volume” can be selected from 0 to 127. The higher the value, the higher the volume. The rate “Rate” is the time to reach the specified volume, and can be specified from 0 to 255. If it is 0, it will be instantly volume, and if it is 1-255, it will fade in from volume 0 to the specified volume.
+</P>
+<P>
+BGM can change the tempo and volume by the following functions, and can stop, pause and resume the performance.
+</P>
+<PRE>
+slBGMTempo (Sint16 Tempo); / * Change tempo * /
+slBGMFade (Uint8 Volume, Uint8 Rate); / * Volume change * /
+slBGMOff (); / * Stop playing * /
+slBGMPause (); / * Pause performance * /
+slBGMCont (); / * Resume performance * /
+slBGMStat (); / * Check if playing * /
+</PRE>
+
+<H3>
+<A NAME="KOUKA"> Sound effect output </A>
+</H3>
+<P>
+Sound effects are also managed as a sequence, similar to the above BGM.
+To output sound effects, execute the function “slSequenceOn ()”.
+</P>
+
+<DL>
+<DT> <B> [Uint8 slSequenceOn (Uint16 Song, Uint8 Prio, Uint8 Volume, Uint8 Pan);] </B>
+<DD>
+<PRE>
+Song: Song (sound effect) number
+Prio: Priority when using sound sources
+Volume: Volume
+Pan: Left / right volume distribution
+</PRE>
+<P>
+The parameters are similar to BGM functions, but the parameter Pan is different. This indicates how the left and right volumes are distributed, and can be used to determine the direction in which the sound can be heard.
+For Pan, values ​​from -128 to +127 can be specified, -128 represents the left, 0 represents the front, and +127 represents the right.
+</P>
+<P>
+Assigned value of parameter Pan: <BR>
+Left : -128  &lt;&lt;  0  &gt;&gt; +127 : Right
+</P>
+</DL>
+
+<P>
+If you set Volume or Pan depending on the distance or direction in the explosion of a 3D shooting game, you should feel more realistic.
+</P>
+<P>
+This function “slSequenceOn ()” returns the number of the pronunciation management number for the specified sound effect. This pronunciation management number is used when the output sound effect is changed using the following function.
+</P>
+<PRE>
+slSequenceTempo (Uint8 Seqnm, Sint16 Tempo); / * Change tempo * /
+
+slSequenceFade (Uint8 Seqnm, Uint8 Volume, Uint8 Rate); / * Change volume * /
+
+slSequencePan (Uint8 Seqnm, Uint8 Pan); / * Change the direction of occurrence * /
+
+slSequenceOff (Uint8 Seqnm); / * Stop the sequence * /
+
+slSequencePause (Uint8 Seqnm); / * Pause the sequence * /
+
+slSequenceCont (Uint8 Seqnm); / * Resume a paused sequence * /
+
+slSequenceStat (Uint8 Seqnm); / * Check if the sequence is playing * /
+</PRE>
+
+
+<H3>
+<A NAME="NO5"> Sound effect output using PCM sound source </A>
+</H3>
+<P>
+You can use a PCM sound source to output sampled sound effects such as voice and explosion sounds. In addition to the above sequence, sound effect playback by PCM stream can be output simultaneously up to 4 channels. When using a PCM stream, the function “slPCMOn ()”

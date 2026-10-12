@@ -1,0 +1,149 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/19&gt;CD通信I/F(CDパート)/概要</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<B>■
+　　｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>概　要</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　本書は、CDブロックの機能と、CD通信インタフェースの外部仕様についてまとめたものです。<BR>
+　CDブロックの機能は表1.1のように分類されます。</P>
+
+<A NAME="t1_1"></A>
+	<P>	<DD><B>表1.1　CDブロックの機能分類</B><BR>
+	<TABLE BORDER=1>
+	<TR><TH><PRE>分類</TD><TH><PRE>内　容</TD></TR>
+	<TR><TD><PRE>CDパート</TD><TD><PRE>通信方式、CDドライブ関連、CDバッファ関連<BR>CDブロックファイルシステム関連</TD></TR>
+	<TR><TD><PRE>MPEGパート</TD><TD><PRE>MPEG関連</TD></TR></TABLE></P>
+
+	<P>	<DD>　CD通信インタフェースにより、共通のソフトウェアインタフェースでCDブロックの機能を使うことができます。</P>
+
+<A NAME="no1_10"></A>
+	<P>	<DT><H3>1.1　ライブラリ構成</H3>
+		<DD>　CD関係のライブラリ構成を図1.1に示します。<P>
+
+<A NAME="z1_1"></A>
+	<P><DD><B>図1.1　CD関係のライブラリ構成</B>
+<PRE>
+　　　　　　　┌────────────────────────────────┐　　　　
+　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　　　　
+　　　　　　　│　　　　　　　　　　　アプリケーション　　　　　　　　　　　　　│　　　　
+　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　　　　
+　　　　　　　└────────────────────────────────┘　　　　
+　　　　　　　┌───────┐　┌───────────┐　┌────────┐　　　　
+　　　　　　　│ＭＰＥＧ　　　│　│ストリームシステム　　│　│ファイルシステム│　　　　
+　　　　　　　│ライブラリ　　│　│ライブラリ　　　　　　│　│ライブラリ　　　│　　　　
+　　　　　　　│　　　　　　　│　│　　　　　　　┌───┘　│　　　　　　　　│　　　　
+　　　　　　　│　　　　　　　│　│　　　　　　　│　┌───┘　　　　　　　　│　　　　
+　　　　　　　│　　　　　　　│　│　　　　　　　│　│　　　　　　　　　　　　│　　　　
+　　　　　　　└───────┘　└───────┘　└─────┐　　　　　　│　　　　
+　　　　　　　┏━━━━━━━━━━━━━━━━━━━━━━━┓　│　　　　　　│　　　　
+　　　　　　　┃　　　　　　ＣＤ通信インタフェース　　　　　　┃　│　　　　　　│　　　　
+　　　　　　　┗━━━━━━━━━━━┯━━━━━━━━━━━┛　└──┬───┘　　　　
+ソフトウェア　　　　　　　　　　　　　│　　　　　　　　　　　　　　　　│　　　　　　　　
+━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━
+ハードウェア　　　　　　　　　　　　　│　　　　　　　　　　　　　　　　│　　　　　　　　
+　　　　　　　　　　　　┌──────┴─────┐　　　┌──────┴──────┐　
+　　　　　　　　　　　　│　　　ＣＤブロック　　　│　　　│ＳＩＭＭ，ＳＣＳＩファイル│　
+　　　　　　　　　　　　└────────────┘　　　└─────────────┘　
+</PRE>
+
+
+	<P>	<DD>　CDCといった、ライブラリを表す英字記号をライブラリ記号と呼びます。<BR>
+　本書では、CD通信インタフェースのことを「<B>CDC</B>」と略称する場合があります。</P>
+
+<A NAME="no1_20"></A>
+	<P>	<DT><H3>1.2　システム構成</H3>
+		<DD>　CD関係のシステム構成を図1.2に示します。</P>
+
+<A NAME="z1_2"></A>
+	<P ALIGN=CENTER><B>図1.2　CD関係のシステム構成</B><img srcset="../grp/i050_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><BR></P>
+
+	<P><DD>CDブロックとのインタフェースは、メインシステムのことをホストと呼びます。<BR>また、CDブロックは、サブシステムの一つです。</P>
+
+<A NAME="no1_21"></A>
+	<P>	<DT><B>　(1)CDブロックとの通信</B>
+		<DD>　ホストとCDブロックは、ハードウェアインタフェース上のレジスタを使って通信(コマンド／レスポンス、データ転送)をします。<BR>
+　ホストからCDブロックに対して発行するコマンドのことを、CDブロックコマンドと呼びます。通常は「コマンド」と略称します。</P>
+
+<A NAME="no1_22"></A>
+	<P>	<DT><B>　(2)CDドライブ</B>
+		<DD>　CDブロックはCDドライブと定期的に通信し、ホストからのコマンドに対してCDドライブの制御をします。<BR>
+　CDドライブはCD-ROMXA規格とマルチセッションに対応しています。また、標準速／2倍速の切り替えが可能です。(CD-DA再生時は自動的に標準速となります。)</P>
+
+<A NAME="no1_30"></A>
+	<P>	<DT><H3>1.3　機能と特徴</H3>
+		<DD>　<B>(1)〜(3)</B>はCD通信インタフェースの機能、<B>(4)〜(7)</B>はCDブロックの機能です。</P>
+
+<A NAME="no1_31"></A>
+	<P>	<DT><B>　(1)CDブロックとの通信機能</B>
+		<DD><OL TYPE=a>
+		<LI>ホストとCDブロックの通信を行う、C言語のインタフェース関数群です。
+		<LI>CDブロックに対してコマンドを発行し、レスポンスを受け取ります。
+		<LI>CDブロックコマンドと、ほぼ1対1に対応します。</OL></P>
+
+<A NAME="no1_32"></A>
+	<P>	<DT><B>　(2)データ転送の補助機能</B>
+		<DD>　データ転送の準備・終了やデータ転送レジスタのアドレスの取得といった、データ転送に関する補助機能をサポートします。<BR>
+　CDブロックに対して取り出し・書き込みするデータは、CDブロックのデータ転送レジスタを通して転送します。転送自体はCD通信インタフェースを経由しません。DMA等のデータ転送モジュールが仲介します。(CPUによるソフトウェア転送、CPUのDMA、SCUのDMAが可能)</P>
+
+<A NAME="no1_33"></A>
+	<P>	<DT><B>　(3)レジスタアクセス機能</B>
+		<DD>　CDブロックのレジスタにアクセスする関数をサポートします。</P>
+
+<A NAME="no1_34"></A>
+	<P>	<DT><B>　(4)CDドライブ機能</B>
+		<DD>　音楽再生(CD-DA)とセクタリード（CD-ROM）を、CD再生という同一形式のコマンドで扱います。<BR>
+　CD再生の中止(ストップ)、一時停止（ポーズ）はシークコマンドで、CD再生の再開（ポーズ解除）はCD再生コマンドで実行します。</P>
+
+<A NAME="no1_35"></A>
+	<P>	<DT><B>　(5)サブコードR〜Wのデコード機能</B>
+		<DD>　CD-DA再生時にサブコードR〜Wをデコードします。デコードされたパックデータを格納するため、24パック分のパックバッファがあります。</P>
+
+<A NAME="no1_36"></A>
+	<P>	<DT><B>　(6)ストリーム選択機能</B>
+		<DD>　CD-ROM XA規格のセクタや各種デバイス(ホスト、MPEG等)のストリームを統一的に処理します。</P>
+
+	<P>	<DD><OL TYPE=a>
+		<LI>ストリームを格納するため、200セクタ分(約460Ｋバイト)のCDバッファがあります。
+		<LI>ストリームを選択(分離・格納・取り出し)するため、24個の独立したセレクタがあります。</OL></P>
+
+<A NAME="no1_37"></A>
+	<P>	<DT><B>　(7)CDブロックファイルシステム機能（ISO9660）</B>
+		<DD>　ISO9660規格に準拠したファイルを容易にアクセスするため、CDブロック内でディレクトリ情報を保持します。</P>
+</DL>
+<HR NOSHADE>
+<B>■
+　　｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

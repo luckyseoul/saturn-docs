@@ -1,0 +1,78 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/17&gt;MPEG Library/5.MPEG Window</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no5">MPEG library</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>MPEG library</b><H2 ALIGN=CENTER> 5.MPEG window</H2><HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A><P><DT><H3> 5.1 MPEG Window Control</H3><DD> You can open a window for output to an area within the framebuffer. This window's control interface makes it easy to create visual effects.</P>
+<P><DT> <B>(1)Display window</b><DD> Set up the display window as a rectangular area that actually appears on your TV monitor.<BR>
+ For VDP2 direct output method, specify the position and size relative to the TV monitor. In the case of host transfer method, only the size is specified because it is not displayed directly on the TV monitor.</P>
+<P><DT> <B>(2)Frame buffer window</b><DD> A display window outputs data from an arbitrary rectangular area within the frame buffer. This rectangular area within the frame buffer is called the frame buffer window. A framebuffer window can be opened within the area of one framebank.</P>
+<P><DT> <B>(3) Window control parameters</b><DD> The control parameters for the display window and frame buffer window are as follows.</P>
+<DT><OL TYPE=a>
+<P><LI> display window<UL TYPE="DISK">
+<LI> Display reference position (DZX, DZY): Reference position of display on TV monitor<LI> Display relative position (DLX, DLY): Relative coordinates from the display reference position<LI> Display size (DSX, DSY): Size on TV monitor</UL>
+</P>
+<P><LI> frame buffer window<UL TYPE="DISK">
+<LI> Zoom point (FZX, FZY): Reference position for display within the frame buffer<LI> Magnification (FRX, FRY): Magnification rate in the X direction and Y direction</UL>
+</P>
+</OL>
+<P><DD> Set the position, size, and magnification rate of the frame buffer window so that the display reference position (Pz') and zoom point (Pz) overlap. Also, any value can be specified for the magnification (FRX, FRY), which will be converted and set to the magnification that can be set by the LSI.<BR>
+ A conceptual diagram is shown below.</P>
+<A NAME="z5_1"></A><P ALIGN=CENTER> <B>Figure 5.1 Display window and frame buffer window</b><BR>
+<img srcset="../grp/i111_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The MPEG window control interface can achieve the following visual effects with a small number of parameters. The parameters to be manipulated when running visual effects are shown below.</P>
+<A NAME="t5_1"></A><P><DD> <B>Table 5.1 Visual effects and control parameters</b><DD><table border>
+<TR><TH><pre> visual effects</TH><TH><pre> Parameters to control</TH><TH><pre> effect</TH></tr>
+<TR><td><pre> zoom</td><td><pre> FRX, FRY</td><td><pre> Freezes the display window and zooms the displayed image.</td></tr>
+<TR><td><pre> scroll</td><td><pre> FZX, FZY</td><td><pre> Moves the image left, right, up and down without changing the magnification.</td></tr>
+<TR><td><pre> move</td><td><pre> DZX，DZY</td><td><pre> Moves the display reference position without changing the zoom point.</td></tr>
+<TR><td><pre> Peeping</td><td><pre> DLX，DLY</td><td><pre> You can peek at the image in the frame buffer while changing the relative display position of the image.</td></tr>
+<TR><td><pre> wipe</td><td><pre> DLX, DLY, DSX, DSY</td><td><pre> The display window size changes without changing the image magnification.</td></tr>
+<TR><td><pre> Expand</td><td><pre> DLX, DLY, DSX, DSY<BR> FRX, FRY</td><td><pre> The display window size changes as the image size changes.</td></TR>
+</table>
+</p>
+<A NAME="no5_20"></A><P><DT><H3> 5.2 Notes on using MPEG window</H3><P><DT> <B>(1) MPEG window display switch</b><DD> The following restrictions apply to the MPEG window display switch.</P>
+<DD><OL TYPE=a>
+<P><LI> Do not turn on the display switches of two or more VDP2 output windows at the same time.<BR>
+ Please connect and use as shown below.</OL>
+</P>
+<P ALIGN=CENTER><img srcset="../grp/i112_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(2) Host transfer output</b><DD> When transmitting and outputting an image to the host, the number of pixels in the X direction is twice the frame buffer window size due to the specifications of the MPEG system. To avoid this, you need to set the display size to half in the X direction and double the magnification as shown in the example below.</P>
+<P><DD><PRE>
+/* Transfer and output a 352 x 240 pixel image at the same size to the host */
+/* Change display size */
+MPG_WnSetSize(mpgwn, (352/2), 240);
+
+/* Set magnification */
+MPG_WnSetDispRatio(mpgwn, 2000, 1000);
+
+/* Execute host transfer output */
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no5">MPEG library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

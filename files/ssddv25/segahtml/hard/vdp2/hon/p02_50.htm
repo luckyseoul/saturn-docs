@@ -1,0 +1,191 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/86&gt;VDP2 User's Manual/2.5 External signals and scanning status</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP2 User's Manual</a> ★ <A HREF="p02_10.htm">Chapter 2 TV Screen</a><HR>
+ <B>▲ <A HREF="p02_40.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 2 TV Screen</b><HR NOSHADE>
+<DL>
+<A NAME="no2_50"></A><DT><H2> ■2.5 External signals and scanning status</H2><DD> The registers that control external signals include the external signal enable register, and the registers that display the TV scanning status include the screen status register, H counter register, and V counter register.<BR>
+<A NAME="no2_51"></A><P><DT><H3> ●External signal enable register</H3><DD> The external signal enable register controls signals from outside the VDP2. This is a 16-bit readable and writable register located at address 180002H. The value is cleared to 0 after power-on or reset, so be sure to set it.</P>
+<A NAME="EXTEN_"></A><P><DD> <B><FONT SIZE=5>EXTEN</font> <FONT SIZE=4>180002H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> <A HREF="#EXLTEN_">EXLTEN</a><TH> <A HREF="#EXSYEN_">EXSYEN</a></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> <A HREF="#DASEL_">DASEL</a><TH> <A HREF="#EXBGEN_">EXBGEN</a></TR>
+</TABLE>
+</P>
+<A NAME="EXLTEN_"></A><P><DT> <B><A HREF="#EXTEN_">▲</a> External latch enable bit</b> : External latch enable bit (EXLTEN), bit 9<DD> Specify the conditions for latching the HV counter value into the HV counter register.</P>
+<P><DD><TABLE BORDER CELLPADDING=5>
+<TR><TH WIDTH=50><PRE> EXLTEN</TH><TH WIDTH=200><PRE> condition</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Latch when external signal enable register is read</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Latch by external signal</TD></TR>
+</TABLE>
+</P>
+<P><DD> The latched H counter value can be read in the H counter register, and the V counter value can be read in the V counter register.<BR>
+ Set this to 1 when reading the H and V counter values using an external signal such as <A HREF="../../../info/hon/stn41.htm">a ray gun</a> . Normally set to 0.</P>
+<A NAME="EXSYEN_"></A><P><DT> <B><A HREF="#EXTEN_">▲</a> External synchronization enable bit</b> : EXSYNC enable bit (EXSYEN), bit 8<DD> Controls input of external synchronization signal to internal synchronization circuit.</P>
+<TABLE BORDER CELLPADDING=5>
+<TR><TH WIDTH=50><PRE> EXSYEN</TH><TH WIDTH=400><PRE> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Do not input external synchronization signal</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Inputting an external synchronization signal to synchronize the TV screen display with the external device</TD></TR>
+</TABLE>
+</P>
+<P><DD> If you want to synchronize the screen display with another device, set it to 1 and input an external synchronization signal. Normally, leave it at 0.</P>
+<A NAME="DASEL_"></A><P><DT> <B><A HREF="#EXTEN_">▲</a> Image display area select bit</b> : Display area select bit (DASEL), bit 1<DD> Specify the image display area. Valid only when the EXBGEN bit is 1.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=50><PRE> DASEL</TH><TH WIDTH=400><PRE> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Display images only in the settings display area</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Display images in all standard display areas</TD></TR>
+</TABLE>
+</P>
+<P><DD> When displaying in all standard display areas, images based on external screen data will be displayed correctly in all areas. However, images outside of the settings display area (sprites, scroll screens, etc.) cannot be displayed correctly. Therefore, use a window to force other images to be transparent except for the settings display area.</P>
+<A NAME="EXBGEN_"></A><P><DT> <B><A HREF="#EXTEN_">▲</a> External screen enable bit</b> : EXBG enable bit (EXBGEN), bit 0<DD> Controls input of external screen data.</P>
+<P><TABLE BORDER=1>
+<TR><TH WIDTH=50><PRE> EXBGEN</TH><TH WIDTH=400><PRE> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Do not enter external screen data</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Enter external screen data</TD></TR>
+</TABLE>
+</P>
+<P> When inputting external screen data, that data becomes NBG1 screen data, so the external screen settings for NBG1 are used.<BR>
+ Table 2.2 shows the register bits for external screen settings.</P>
+<A NAME="t2_2"></A><P><DD> <B>Table 2.2 Registers for external screen settings</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> address</TH><TH><PRE> bit number</TH><TH COLSPAN=2><PRE> Bit name</TH></TR>
+<TR><TD><PRE> 180020H</TD><TD><PRE> 9</TD><TD><PRE> N1TPON</TD><TD><PRE> Transparent display enable</TD></TR>
+<TR><TD><PRE> 180028H</TD><TD><PRE> 13, 12</TD><TD><PRE> N1CHCN1, N1CHCN0</TD><TD><PRE> Number of character colors</TD></TR>
+<TR><TD ROWSPAN=7><PRE> 1800D0H</TD><TD><PRE> 8</TD><TD><PRE> N1W0A</TD><TD><PRE> W0 window area</TD></TR>
+<TR><TD><PRE> 9</TD><TD><PRE> N1W0E</TD><TD><PRE> W0 window enable</TD></TR>
+<TR><TD><PRE> 10</TD><TD><PRE> N1W1A</TD><TD><PRE> W1 window area</TD></TR>
+<TR><TD><PRE> 11</TD><TD><PRE> N1W1E</TD><TD><PRE> W1 window enable</TD></TR>
+<TR><TD><PRE> 12</TD><TD><PRE> N1SWA</TD><TD><PRE> SW window area</TD></TR>
+<TR><TD><PRE> 13</TD><TD><PRE> N1SWE</TD><TD><PRE> SW window enable</TD></TR>
+<TR><TD><PRE> 15</TD><TD><PRE> N1LOG</TD><TD><PRE> window logic</TD></TR>
+<TR><TD><PRE> 1800E2H</TD><TD><PRE> 1</TD><TD><PRE> N1SDEN</TD><TD><PRE> shadow enable</TD></TR>
+<TR><TD><PRE> 1800E4H</TD><TD><PRE> 6 to 4</TD><TD><PRE> N1CAOS2～N1CAOS0</TD><TD><PRE> Color RAM address offset</TD></TR>
+<TR><TD><PRE> 1800E8H</TD><TD><PRE> 1</TD><TD><PRE> N1LCEN</TD><TD><PRE> Line color screen insertion enable</TD></TR>
+<TR><TD><PRE> 1800EAH</TD><TD><PRE> 3, 2</TD><TD><PRE> N1SPRM1, N1SPRM0</TD><TD><PRE> Special priority mode</TD></TR>
+<TR><TD><PRE> 1800ECH</TD><TD><PRE> 1</TD><TD><PRE> N1CCEN</TD><TD><PRE> Color calculation enable</TD></TR>
+<TR><TD><PRE> 1800EEH</TD><TD><PRE> 3, 2</TD><TD><PRE> N1SCCM，N1SCCM0</TD><TD><PRE> Special color calculation mode</TD></TR>
+<TR><TD><PRE> 1800F8H</TD><TD><PRE> 10~8</TD><TD><PRE> N1PRIN2～N1PRIN0</TD><TD><PRE> priority number</TD></TR>
+<TR><TD><PRE> 180118H</TD><TD><PRE> 12-8</TD><TD><PRE> N1CCRT4～N1CCRT0</TD><TD><PRE> Color calculation ratio</TD></TR>
+<TR><TD><PRE> 180110H</TD><TD><PRE> 1</TD><TD><PRE> N1COEN</TD><TD><PRE> color offset enable</TD></TR>
+<TR><TD><PRE> 180112H</TD><TD><PRE> 1</TD><TD><PRE> N1COSL</TD><TD><PRE> color offset selection</TD></TR>
+</TABLE>
+</P>
+<A NAME="no2_52"></A><P><DT><H3> ●Screen status register</H3><DD> The screen status register displays information on the TV screen. This is a 16-bit read-only register located at address 180004H.</P>
+<A NAME="TVSTAT_"></A><P><DD> <B><FONT SIZE=5>TVSTAT</font> <FONT SIZE=4>180004H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> <A HREF="#EXLTFG_">EXLTFG</a><TH> <A HREF="#EXSYFG_">EXSYFG</a></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> <A HREF="#VBLANK_">VBLANK</a><TH> <A HREF="#HBLANK_">HBLANK</a><TH> <A HREF="#ODD_">O.D.D.</a><TH> <A HREF="#PAL_">PAL</a></TR>
+</TABLE>
+</P>
+<A NAME="EXLTFG_"></A><P><DT> <B><A HREF="#TVSTAT_">▲</a> External latch flag</b> : External latch flag (EXLTFG), bit 9<DD> Indicates whether the HV counter value is latched into the HV counter register by an external signal. It is cleared to 0 when the screen status register is read.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=50><PRE> EXLTFG</TH><TH WIDTH=250><PRE> HV counter value status</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Not yet latched into a register</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> latched in register</TD></TR>
+</TABLE>
+</P>
+<A NAME="EXSYFG_"></A><P><DT> <B><A HREF="#TVSTAT_">▲</a> External SYNC flag</b> (EXSYFG), bit 8<DD> Indicates whether the internal circuit has been synchronized by an external synchronization signal. It is cleared to 0 when the screen status register is read.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=50><PRE> EXSYFG</TH><TH WIDTH=250><PRE> External synchronization status</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> not synced</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Internal circuits are synchronized</TD></TR>
+</TABLE>
+</P>
+<A NAME="VBLANK_"></A><P><DT> <B><A HREF="#TVSTAT_">▲</a> V blank flag</b> : Vertical blank flag (VBLANK), bit 3<DD> Indicates the vertical scanning status of the TV screen.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=50><PRE> VBLANK</TH><TH WIDTH=250><PRE> Vertical scanning state</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Scanning is during vertical display period</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Scanning is during vertical retrace period (during VBLANK period)</TD></TR>
+</TABLE>
+</P>
+<P><DD> This bit is valid only when <A HREF="p02_40.htm#DISP_">the TV screen display bit ( <B>DISP</b> )</a> in <A HREF="p02_40.htm#no2_40">the TV screen mode register</a> is 1. When the TV screen display bit ( <B>DISP</b> ) is 0, the V blank flag ( <B>VBLANK</b> ) is always 1.</P>
+<A NAME="HBLANK_"></A><P><DT> <B><A HREF="#TVSTAT_">▲</a> H blank flag</b> : Horizontal blank flag (HBLANK), bit 2<DD> Indicates the horizontal scanning status of the TV screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> HBLANK</TH><TH WIDTH=250><PRE> Horizontal scanning state</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Scanning is during horizontal display period</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Scanning is during horizontal retrace period (during HBLANK period)</TD></TR>
+</TABLE>
+</P>
+<A NAME="ODD_"></A><P><DT> <B><A HREF="#TVSTAT_">▲</a> Scanning field flag</b> : Odd/even field flag (ODD), bit 1<DD> Indicates the scanning status when the TV screen mode is interlaced mode.<BR>
+ In non-interlaced mode, it is always 1.<P><P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> O.D.D.</TH><TH WIDTH=250><PRE> display</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Scan during even field period</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Scanning during odd field period</TD></TR>
+</TABLE>
+</P>
+<A NAME="PAL_"></A><P><DT> <B><A HREF="#TVSTAT_">▲</a> TV system flag</b> : PAL/NTSC flag (PAL), bit 0<DD> Indicates the TV system status.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> PAL</TH><TH WIDTH=250><PRE> display</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> NTSC method</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> PAL method</TD></TR>
+</TABLE>
+<P><A NAME="no2_53"></A><P><DT><H3> ●H counter register</H3><DD> The H counter register indicates the H counter value. This is a read-only 16-bit register located at address 180008H.</P>
+<A NAME="HCNT_"></A><P><DD> <B><FONT SIZE=5>HCNT</font> <FONT SIZE=4>180008H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> <A HREF="#HCT_">HCT9</a><TH> <A HREF="#HCT_">HCT8</a></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH> <A HREF="#HCT_">HCT7</a><TH> <A HREF="#HCT_">HCT6</a><TH> <A HREF="#HCT_">HCT5</a><TH> <A HREF="#HCT_">HCT4</a><TH> <A HREF="#HCT_">HCT3</a><TH> <A HREF="#HCT_">HCT2</a><TH> <A HREF="#HCT_">HCT1</a><TH> <A HREF="#HCT_">HCT0</a></TR>
+</TABLE>
+</P>
+<A NAME="HCT_"></A><P><DT> <B><A HREF="#HCNT_">▲</a> H counter value bit</b> : H counter bit (HCT9 to HCT0), bits 9 to 0<DD> This signal is controlled by the external signal enable register EXLTEN and represents the value of the latched H counter. The bit configuration of this register changes depending on the graphics mode setting, as shown in Table 2.3.<BR>
+ In the case of normal graphics, the H counter value has the least significant bit HCT0 as invalid data. In the case of dedicated normal graphics, the H counter value has the most significant bit HCT9 as invalid data.<BR>
+ Also, in the case of dedicated high resolution graphics, the H counter value will be a value in units of 2 dots because the most significant bit HCT9 is invalid data and there is no bit for H0.</P>
+<A NAME="t2_3"></A><DD> <B>Table 2.3 H counter register bit contents</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE> graphic<BR> mode</TH><TH><PRE> HCT9</TH><TH><PRE> HCT8</TH><TH><PRE> HCT7</TH><TH><PRE> HCT6</TH><TH><PRE> HCT5</TH><TH><PRE> HCT4</TH><TH><PRE> HCT3</TH><TH><PRE> HCT2</TH><TH><PRE> HCT1</TH><TH><PRE> HCT0</TH></TR>
+<TR ALIGN=CENTER><TH><PRE> normal<BR></TH><TD><PRE> H8</TD><TD><PRE> H7</TD><TD><PRE> H6</TD><TD><PRE> H5</TD><TD><PRE> H4</TD><TD><PRE> H3</TD><TD><PRE> H2</TD><TD><PRE> H1</TD><TD><PRE> H0</TD><TD><PRE> invalid</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> high resolution<BR></TH><TD><PRE> H9</TD><TD><PRE> H8</TD><TD><PRE> H7</TD><TD><PRE> H6</TD><TD><PRE> H5</TD><TD><PRE> H4</TD><TD><PRE> H3</TD><TD><PRE> H2</TD><TD><PRE> H1</TD><TD><PRE> H0</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> exclusive<BR> normal</TH><TD><PRE> invalid</TD><TD><PRE> H8</TD><TD><PRE> H7</TD><TD><PRE> H6</TD><TD><PRE> H5</TD><TD><PRE> H4</TD><TD><PRE> H3</TD><TD><PRE> H2</TD><TD><PRE> H1</TD><TD><PRE> H0</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> exclusive<BR> high resolution</TH><TD><PRE> invalid</TD><TD><PRE> H9</TD><TD><PRE> H8</TD><TD><PRE> H7</TD><TD><PRE> H6</TD><TD><PRE> H5</TD><TD><PRE> H4</TD><TD><PRE> H3</TD><TD><PRE> H2</TD><TD><PRE> H1</TD></TR>
+</TABLE>
+<P><A NAME="no2_54"></A><P><DT><H3> ●V counter register</H3><DD> The V counter register indicates the V counter value. This is a 16-bit read-only register located at address 18000AH.</P>
+<A NAME="VCNT_"></A><P><DD> <B><FONT SIZE=5>VCNT</font> <FONT SIZE=4>18000AH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> <A HREF="#VCT_">VCT9</a><TH> <A HREF="#VCT_">VCT8</a></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH> <A HREF="#VCT_">VCT7</a><TH> <A HREF="#VCT_">VCT6</a><TH> <A HREF="#VCT_">VCT5</a><TH> <A HREF="#VCT_">VCT4</a><TH> <A HREF="#VCT_">VCT3</a><TH> <A HREF="#VCT_">VCT2</a><TH> <A HREF="#VCT_">VCT1</a><TH> <A HREF="#VCT_">VCT0</a></TR>
+</TABLE>
+</P>
+<A NAME="VCT_"></A><P><DT> <B><A HREF="#VCNT_">▲</a> V counter value bit</b> : V counter bit (VCT9 to VCT0), bits 9 to 0<DD> This signal is controlled by the external signal enable register EXLTEN and represents the value of the latched V counter. The bit configuration of this register changes depending on the TV screen mode setting, as shown in Table 2.4. The V counter value in the case of single dense interlacing in normal and high resolution modes represents the V counter value in each of the even and odd fields. In the case of double-density interlacing in normal and high resolution modes, the V counter value indicates an odd field when the least significant bit VCT0 is 0, an even field when it is 1, and VCT1 to VCT9 are the values in each field. Represents the V counter value.</P>
+<A NAME="t2_4"></A><P><DD> <B>Table 2.4 V counter register bit contents</b><DD><TABLE BORDER>
+<TR><TH><PRE> TV screen mode<BR> (interlaced)</TH><TH><PRE> VCT9</TH><TH><PRE> VCT8</TH><TH><PRE> VCT7</TH><TH><PRE> VCT6</TH><TH><PRE> VCT5</TH><TH><PRE> VCT4</TH><TH><PRE> VCT3</TH><TH><PRE> VCT2</TH><TH><PRE> VCT1</TH><TH><PRE> VCT0</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> normal,<BR> high resolution<BR> (Non-interlaced,<BR> single dense interlace)</TD><TD><PRE> V9</TD><TD><PRE> V8</TD><TD><PRE> V7</TD><TD><PRE> V6</TD><TD><PRE> V5</TD><TD><PRE> V4</TD><TD><PRE> V3</TD><TD><PRE> V2</TD><TD><PRE> V1</TD><TD><PRE> V0</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> normal,<BR> high resolution,<BR> (Double dense interlace)</TD><TD><PRE> V8</TD><TD><PRE> V7</TD><TD><PRE> V6</TD><TD><PRE> V5</TD><TD><PRE> V4</TD><TD><PRE> V3</TD><TD><PRE> V2</TD><TD><PRE> V1</TD><TD><PRE> V0</TD><TD><PRE> 0: odd number<BR> 1: Even number</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> exclusive<BR> monitor</TD><TD><PRE> V9</TD><TD><PRE> V8</TD><TD><PRE> V7</TD><TD><PRE> V6</TD><TD><PRE> V5</TD><TD><PRE> V4</TD><TD><PRE> V3</TD><TD><PRE> V2</TD><TD><PRE> V1</TD><TD><PRE> V0</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_40.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP2 User's Manual</a> ★ <A HREF="p02_10.htm">Chapter 2 TV Screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

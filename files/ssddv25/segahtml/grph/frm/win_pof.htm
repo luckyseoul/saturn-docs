@@ -1,0 +1,127 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>POF file format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR NOSHADE>
+<CENTER>
+<H1> POF file format</H1><H5> 1997-06-20</H5></CENTER>
+<HR>
+<DL>
+<P><DT><H3> ■Format</H3><DD><TABLE BORDER=1>
+<TR><TH COLSPAN=2> size</TH><TH> Purpose</TH></TR>
+<TR><TD COLSPAN=2> (WORD)</TD><TD> grit x size</TD></TR>
+<TR><TD COLSPAN=2> (WORD)</TD><TD> Grit Y size</TD></TR>
+<TR><TD COLSPAN=2> (WORD)</TD><TD> Group number MAX value</TD></TR>
+<TR><TD COLSPAN=2> (WORD)</TD><TD> Attribute number MAX value</TD></TR>
+<TR><TD COLSPAN=2> (WORD)</TD><TD> Number of vertices n</TD></TR>
+<TR><TD ROWSPAN=3> Vertex 1</TD><TD> (FLOAT)</TD><TD> Vertex coordinates</TD></TR>
+<TR><TD> (FLOAT)</TD><TD> Vertex coordinate Y</TD></TR>
+<TR><TD> (FLOAT)</TD><TD> Vertex coordinate Z</TD></TR>
+<TR><TD ROWSPAN=3> Vertex 2</TD><TD> (FLOAT)</TD><TD> Vertex coordinates</TD></TR>
+<TR><TD> (FLOAT)</TD><TD> Vertex coordinate Y</TD></TR>
+<TR><TD> (FLOAT)</TD><TD> Vertex coordinate Z</TD></TR>
+<TR><TD ROWSPAN=3> :</TD><TD> :</TD><TD> :</TD></TR>
+<TR><TD> :</TD><TD> :</TD></TR>
+<TR><TD> :</TD><TD> :</TD></TR>
+<TR><TD ROWSPAN=3> vertex n</TD><TD> (FLOAT)</TD><TD> Vertex coordinates</TD></TR>
+<TR><TD> (FLOAT)</TD><TD> Vertex coordinate Y</TD></TR>
+<TR><TD> (FLOAT)</TD><TD> Vertex coordinate Z</TD></TR>
+<TR><TD COLSPAN=2> (WORD)</TD><TD> Number of polygons m</TD></TR>
+<TR><TD ROWSPAN=9> Port<BR>
+ Li<BR>
+ Go<BR>
+ hmm<BR>
+ 1</TD><TD> (WORD)</TD><TD> Reference number of polygon vertex 0</TD></TR>
+<TR><TD> (WORD)</TD><TD> Reference number of polygon vertex 1</TD></TR>
+<TR><TD> (WORD)</TD><TD> Reference number of polygon vertex 2</TD></TR>
+<TR><TD> (WORD)</TD><TD> Reference number of polygon vertex 3</TD></TR>
+<TR><TD> (WORD)</TD><TD> group number</TD></TR>
+<TR><TD> (WORD)</TD><TD> attribute number</TD></TR>
+<TR><TD> (WORD)</TD><TD> Palette information</TD></TR>
+<TR><TD> (WORD)</TD><TD> Texture information</TD></TR>
+<TR><TD> (DWORD)</TD><TD> Attribute information*</TD></TR>
+<TR><TD> :<BR>
+ :<BR>
+ :</TD><TD> :<BR>
+ :<BR>
+ :</TD><TD> :<BR>
+ :<BR>
+ :</TD></TR>
+<TR><TD ROWSPAN=9> Port<BR>
+ Li<BR>
+ Go<BR>
+ hmm<BR>
+ m</TD><TD> (WORD)</TD><TD> Reference number of polygon vertex 0</TD></TR>
+<TR><TD> (WORD)</TD><TD> Reference number of polygon vertex 1</TD></TR>
+<TR><TD> (WORD)</TD><TD> Reference number of polygon vertex 2</TD></TR>
+<TR><TD> (WORD)</TD><TD> Reference number of polygon vertex 3</TD></TR>
+<TR><TD> (WORD)</TD><TD> group number</TD></TR>
+<TR><TD> (WORD)</TD><TD> attribute number</TD></TR>
+<TR><TD> (WORD)</TD><TD> Palette information</TD></TR>
+<TR><TD> (WORD)</TD><TD> Texture information</TD></TR>
+<TR><TD> (DWORD)</TD><TD> Attribute information <B>*</b></TD></TR>
+</TABLE>
+<P><DT> <B>*Attribute information</b><DD><PRE>
+MSB
+  ■■■■ ■■■■ ..■■ ...■
+  ││││ ││││   ││    └──0:OFF 1:ON mesh
+  ││││ ││││   ││     
+  ││││ ││││   └┴───────sort 0:Setting prohibited
+  ││││ ││││                 1:center
+  ││││ ││││                 2:periapsis
+  ││││ ││││                 3:far point
+  ││││ ││││          
+  ││││ └┴┴┴────────────mode 0:polygon (palette)
+  ││││                      1:Polygon (RGB)
+  ││││                      2:Polyline (palette)
+  ││││                      3:Polyline (RGB)
+  ││││                      4:texture
+  ││││               
+  └┴┴┴─────────────────color mode
+                          0: 16 colors
+                          1: 16 colors (lookup)
+                          2: 64 colors
+                          3:128 colors
+                          4:256 colors
+                          5:32K colors (RGB)
+                     
+                    LSB
+  ■■■■ ■■■■ ■■■■ .... 
+  ││││ ││││ │││└───────0:OFF 1:ON light processing
+  ││││ ││││ ││└────────0:OFF 1:ON real time gouro
+  ││││ ││││ │└─────────0:OFF 1:ON depth cue
+  ││││ ││││ └──────────0:OFF 1:ON near clip
+  ││││ ││││           
+  ││││ │││└────────────0:OFF 1:ON Window (IN/OUT)
+  ││││ ││└─────────────0:OFF 1:ON window mode
+  ││││ │└──────────────0:OFF 1:ON end code
+  ││││ └───────────────0:OFF 1:ON high speed shrink
+  ││││                
+  │││└─────────────────0:OFF 1:ON transparent
+  ││└──────────────────0:OFF 1:ON Translucent
+  │└───────────────────0:OFF 1:ON half brightness
+  └────────────────────0:OFF 1:ON shadow
+</PRE></DL>
+<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

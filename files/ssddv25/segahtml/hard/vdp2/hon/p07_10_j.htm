@@ -1,0 +1,200 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;51/86&gt;VDP2ユーザーズマニュアル/7.1　ラインカラー画面</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no7">VDP2ユーザーズマニュアル</A>
+<HR>
+<B>▲
+<a href="p06_43_j.htm">戻る</A>｜
+<a href="p07_20_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第７章　ライン画面</H2>
+<HR NOSHADE>
+<DL>
+	<P><DD>　ライン画面は、ラインカラー画面(LNCL)とバック画面(BACK)の2面あり、ラインごとにカラーを指定する、あるいは画面全体を単色に指定することができます。スクロール画面と違ってキャラクタを表示することはできません。ラインカラー画面を使うには、ラインごとのデータをラインカラー画面テーブルとしてVRAMに格納します。単色の場合は、テーブルの先頭のデータが画面全体に使われます。ライン画面を図7.1に示します。</P>
+
+<A NAME="z7_1"></A>
+	<CENTER><B>図7.1　ライン画面</B>
+<PRE>
+　ライン画面テーブル（ＶＲＡＭ）　　　　　　　　　　　　ライン画面　　　　　　　　　
+┌──────────────┐　　　　　　┏━━━━━━━━━━━━━━───　　
+│１ライン目のライン画面データ│────→　┃　　　　　　　　　　　　　　１ライン目
+├──────────────┤　　　　　　┣━━━━━━━━━━━━━━　　　　　
+│２ライン目のライン画面データ│────→　┃　　　　　　　　　　　　　　２ライン目
+├──────────────┤　　　　　　┣━━━━━━━━━━━━━━　　　　　
+│３ライン目のライン画面データ│────→　┃　　　　　　　　　　　　　　３ライン目
+├──────────────┤　　　　　　┣━━━━━━━━━━━━━━　　　　　
+│４ライン目のライン画面データ│　　　　　　┃　　　　　　　　　　　　　　：　　　　
+├──────────────┤　　　　　　┃　　　　　　　　　　　　　　　　　　　
+│　　　　　　：　　　　　　　│　　　　　　┃　　　　　　　　　　　　　　　　　　　
+├──────────────┤　　　　　　┃　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+［注］単色の場合は、１ライン目のデータが画面全体に使用されます。　　　　　　　　　　
+</PRE></CENTER>
+
+<A NAME="no7_10"></A>
+	<P>	<DT><H2>■7.1　ラインカラー画面</H2>
+		<DD>　ラインカラー画面(LNCL)は、カラー演算をするためだけに使われる画面で、画面全体を単色に指定するか、ラインごとにカラーを指定するかを選ぶことができます。そのラインで使用するカラーのカラーRAMアドレスをラインカラー画面データとしてVRAMに格納します。</P>
+	<P><DD>　インタレース設定によって、1つのラインカラー画面データが指定するライン数が変わります。ノンインタレースと倍密インタレースモードでは、1ラインごとにカラーを指定できますが、単密インタレースモードでは、2ラインごとにしか指定できません。<BR>
+　また、ラインカラー画面は、係数データ中のラインカラー画面データを使用すると回転させることもできます。係数データについては「<B>6.4　係数テーブル制御</B>」を参照してください。<BR>
+　インタレースモード別のラインカラー画面テーブルの構成を図7.2に、ラインカラー画面テーブル上でのデータの構成を図7.3に示します。</P>
+
+<A NAME="z7_2"></A>
+	<P><DD><B>図7.2　ラインカラー画面テーブルの構成</B></P>
+
+	<P><DD>　●ノンインタレースおよび倍密インタレースモード
+		<DD><TABLE BORDER=1>
+	<TR><TD><PRE>　　　</TD><TH><PRE>ビット15　←　ラインカラー画面テーブル(VRAM)　→　0</TH></TR>
+	<TR><TH>+00H</TH><TD ALIGN=CENTER>１ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+02H</TH><TD ALIGN=CENTER>２ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+04H</TH><TD ALIGN=CENTER>３ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+06H</TH><TD ALIGN=CENTER>４ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+08H</TH><TD ALIGN=CENTER>５ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+0AH</TH><TD ALIGN=CENTER>６ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>:<BR>:</TH><TD ALIGN=CENTER>:<BR>:</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>
+	<DD>単色の場合は、１ライン目のカラーRAMアドレスがラインカラー全体に使用されます。<BR>
+倍密インタレースの場合、偶数フィールドと奇数フィールドのラインカラーデータを一緒に格納します</P>
+
+
+	<P><DD>　●単密インタレースモード
+		<DD><TABLE BORDER=1>
+	<TR><TD><PRE>　　　</TD><TH><PRE>ビット15　←　ラインカラー画面テーブル(VRAM)　→　0</TH></TR>
+	<TR><TH>+00H</TH><TD ALIGN=CENTER>　１，　２ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+02H</TH><TD ALIGN=CENTER>　３，　４ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+04H</TH><TD ALIGN=CENTER>　５，　６ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+06H</TH><TD ALIGN=CENTER>　７，　８ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+08H</TH><TD ALIGN=CENTER>　９，１０ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>+0AH</TH><TD ALIGN=CENTER>１１，１２ライン目のカラーRAMアドレス</TD></TR>
+	<TR><TH>:<BR>:</TH><TD ALIGN=CENTER>:<BR>:</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>
+	<DD>単色の場合は、１，２ライン目のカラーRAMアドレスがラインカラー全体に使用されます。</P>
+
+
+<A NAME="z7_3"></A>
+	<P><DD><B>図7.3　ラインカラー画面テーブルデータのビット構成</B>
+
+<P><TABLE BORDER><TR>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+<TR><TH COLSPAN=5><TH COLSPAN=11>カラーRAMアドレス　11ビット</TD></TR></TABLE></P>
+
+	<P><DD><TABLE><TR><TD>
+	<TABLE BORDER CELLSPACING=5><TR><TD></TD></TR></TABLE>
+	</TD><TD>部は無視されます。</TD></TR></TABLE>
+	<DD>また、カラーRAMモードがモード0またはモード2のときは、アドレスの最上位ビットは無視されます。</P>
+	
+
+<A NAME="no7_11"></A>
+	<P>	<DT><H3>　●ラインカラー画面テーブルアドレスレジスタ</H3>
+		<DD>　ラインカラー画面テーブルアドレスレジスタは、ラインカラー画面のカラーモードとテーブルの先頭アドレスを指定します。書き込み専用の32ビットのレジスタで、1800A8H〜1800AAH番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LCTAU_"></A>
+<P>	<DD><B><FONT SIZE=5>LCTAU</FONT>　<FONT SIZE=4>1800A8</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#LCCLMD_">LCCLMD </A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#LCTA_">LCTA18 </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA17 </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA16 </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LCTAL_"></A>
+<P>	<DD><B><FONT SIZE=5>LCTAL</FONT>　<FONT SIZE=4>1800AA</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#LCTA_">LCTA15 </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA14 </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA13 </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA12 </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA11 </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA10 </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA9  </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA8  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#LCTA_">LCTA7  </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA6  </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA5  </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA4  </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA3  </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA2  </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA1  </A></TH>
+<TH><PRE><A HREF="#LCTA_">LCTA0  </A></TH>
+</TR></TABLE></P>
+
+
+<A NAME="LCCLMD_">　</A>
+	<DT><B>ラインカラー画面カラーモードビット</B>：LNCL color mode bit (LCCLMD)、ビット15
+	<DD>　ラインカラー画面のカラーモードを指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD>LCCLMD</TD><TD>ラインカラー画面カラー</TD></TR>
+	<TR><TH><PRE>0</TH><TD>単色にする</TD></TR>
+	<TR><TH><PRE>1</TH><TD>ラインごとに指定する</TD></TR>
+	</TABLE></P>
+
+<A NAME="LCTA_">　</A>
+	<DT><B>ラインカラー画面テーブルアドレスビット</B>：LNCL table address bit (LCTA18〜LCTA0)
+	<DD>　VRAM上のラインカラー画面テーブルの先頭アドレスを指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD>LCTA18〜LCTA16</TD><TD>1800A8H</TD><TD>ビット2〜0</TD><TD>　　　　　　　　　　</TD></TR>
+	<TR><TD>LCTA15〜LCTA0</TD><TD>1800AAH</TD><TD>ビット15〜0</TD><TD>　　　　　　　　　　</TD></TR>
+	</TABLE></P>
+
+	<P><DD>　実際の先頭VRAMアドレスは、以下の式で計算されます。VRAM容量が4Mビットの場合は、アドレスの最上位ビットは無視されます。</P>
+
+	<P><DD><PRE>
+<B>
+(ラインカラー画面テーブル先頭アドレス)
+           ＝(ラインカラー画面テーブルアドレスレジスタ値19ビット)×2H
+</B></PRE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p06_43_j.htm">戻る</A>｜
+<a href="p07_20_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+★<a href="../index_j.htm#no7">VDP2ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

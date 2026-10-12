@@ -1,0 +1,21 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p046.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p048.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD> <UL TYPE = "DISK"> <LI> <B> Undefined interval manual change mode (synchronous mode) </B> <BR>
+If 0xffff is specified as the number of V-BLANK intervals in the SCL_SetFrameInterval () routine, it becomes indefinite interval manual change mode.
+Indeterminate is a mode in which the frame change is performed simultaneously with the first V-BLANK interrupt when the command writing to VRAM is completed and the SCL_DisplayFrame routine is called. However, before changing the frame, VDP1 loops and waits for drawing to the current frame buffer. In addition, since the frame buffer is not erased at the time of frame change, it is necessary to clear the frame buffer by polygons at the beginning of the VRAM command on the user side. </UL><P>
+<DT> <H3> [V-BLANKVDP interrupt handling] </H3>
+<DD> When using the sprite (VDP1) or scroll (VDP2) display library, the user must create a V-BLANK interrupt routine that calls the following routine provided by this library and set it with INT_SetScuFunc () . You can also call your own interrupt handling routine without using the following routine. <P>
+<UL TYPE = "DISK"> <LI> <B> V-BLANK start VDP interrupt handling routine </B> <BR>
+If the frame change is a constant interval manual change mode, the V-BLANK count is counted, and if the number of intervals is reached, the frame change flag is turned on. In the indefinite interval manual change mode, the frame change flag is turned on immediately.
+In this access routine, the scroll operation and the frame change of Preite are synchronized by writing the contents of the scroll data to the scroll register during V-BLANK at the frame change timing. If this method does not suit your AP, you will need to register your own interrupt routine. <P>
+<LI> <B> VDPLANK termination VDP interrupt handling routine </B> <BR>
+If the frame change flag is on, a frame change is performed. </UL></PRE>
+</DL><P><P><HR>
+<A HREF=p046.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p048.htm> Go to next page </A>
+</BODY>
+</HTML>

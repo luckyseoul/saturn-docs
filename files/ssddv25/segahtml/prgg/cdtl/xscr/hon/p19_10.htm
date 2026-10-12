@@ -1,0 +1,82 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 5&gt; CD builder script grammar supplementary explanation</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+ <B>▲ <A HREF="p18_10.htm">Back</a> ｜ <A HREF="p20_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD builder script grammar supplementary explanation</b><H2 ALIGN=CENTER></H2><HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A><P><DT><H3> 2. About relative time specification</H3><DD> The script allows you to specify three types of relative positions on the disk.</P>
+<P><DD><UL TYPE="DISK">
+<LI> Session relative time<BR>
+<LI> extent relative time<BR>
+<LI> file relative time</UL>
+</P>
+<P><DD> Each has a start (BeginTime) and end (EndTime) specification, but the relationship between the specified position and the position where the actual data is placed is as follows.</P>
+<A NAME="no2_11"></A><P><DT> <B>(1) When BeginTime is specified</b><DD><PRE>
+      Begin Time
+      ↓
+┏━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯
+┃ │ │ │■│■│■│■│■│■│■│■│■│■│■│■│
+┗━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷
+</PRE><A NAME="no2_12"></A><P><DT><B>(2) When EndTime is specified</b><DD><PRE>
+                      End Time
+                      ↓
+┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┓
+│■│■ ■│■│■│■│■│■│■│■│■│ │ │ │ ┃
+┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┛
+The starting position is set so that the file ends at *End Time.
+</PRE><A NAME="no2_13"></A><P><DT><B>(3) When BeginTime, UnitSize, GapSize is specified</b><DD><PRE>
+      Begin Time
+      ↓
+┏━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯
+┃ │ │ │■│■│ │ │ │■│■│ │ │ │■│■│
+┗━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷
+       ↑  └─────┘↑  └─────┘↑   
+       │    Gap  │    Gap  │   
+      ─┴─────────┴─────────┘   
+      Unit                       
+</PRE><A NAME="no2_14"></A><P><DT><B>(4) When EndTime, UnitSize, GapSize is specified</b><DD><PRE>
+                  End Time
+                     ↓
+ ┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┓
+ │ │ │ │■│■│ │ │ │■│■┃
+ ┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┛
+        ↑  └─────┘↑   
+        │    Gap  │   
+  ──────┴─────────┘   
+  Unit                  
+</PRE><A NAME="no2_15"></A><P><DT><B>(5) Session relative time (BeginTimeS, EndTimeS)</b><DD> This specifies the location of ISO files that are not file interleaved.<BR>
+ It will be ignored if specified in the definition of an ISO file that is file interleaved.<BR>
+ The specified time is expressed in (minutes:seconds:frames) with the session start at 00:00:00.</P>
+<A NAME="no2_16"></A><P><DT> <B>(6) Extent relative time (BeginTimeE, EndTimeE)</b><DD> This specifies the location of ISO files that are file interleaved. Used to indicate the positional relationship between interleaved files. Define in Extent line&#65308; extension file&#65310; If specified anywhere else, an error will occur.<BR>
+ The specified time is expressed in minutes: seconds: frames, with the start of the extent being 00:00:00.<BR>
+ If you want to specify the position within the session, specify the positions of interleaved files all together in the Extent line argument.</P>
+<A NAME="no2_17"></A><P><DT> <B>(7) File relative time (BeginTimeF, EndTimeF)</b><DD> This specifies the location of the file source within the ISO file. If specified anywhere other than the file source definition, an error will occur. The specified time is expressed as (minutes:seconds:frames) with the start of the file as 00:00:00.</P>
+<P> When defining an ISO file that is channel interleaved, you can specify the channel's position within the ISO file by specifying BeginTimeF or EndTimeF in the file source definition that makes up the channel, and you can define the positional relationship between the channels.<BR>
+ The beginning of the file sources that make up the channel becomes the channel's starting position, and the end of the file source becomes the channel's final position.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p18_10.htm">Back</a> ｜ <A HREF="p20_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

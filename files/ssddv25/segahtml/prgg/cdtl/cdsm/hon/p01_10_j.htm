@@ -1,0 +1,231 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 4&gt;簡易CDシミュレータ/1.導入</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">簡易CDシュミレータ</A>
+<HR>
+<B>■　　｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+簡易CDシミュレータ
+<H1>1.導入</H1>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A>
+	<P><H3>■はじめに</H3>
+	<DD>「簡易CDシミュレータ」には、ターゲット上のRAMを利用する「SIMMシステム」と、SCSIハードディスク上のDOSファイルを読み出せる「SCSIシステム」があります。このデバッグサポート機能は、「ソフトウェアライブラリ/CDライブラリ/ファイルシステムライブラリ」から利用可能です。</P>
+
+	<P><DT><B>　●このドキュメントで使用されている表記方法</B>
+	<DD>ゴシック体は、名称を表します。例：<B>CDツール</B><BR>
+<B>[xxxx]</B>　は、ファイル名やDOSコマンド名、キー名を表します。例：<B>[cdsim.exe]</B><BR>
+下線は、ユーザの入力を表します。<B>例：MFCAT[RET]</B><BR>
+<B>[RET]</B>　は、リターンキーの入力を表します。<BR>
+<B>[¥n]</B>　は、改行コードを表します。</P>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>■開発環境概要</H3>
+	<P><DT><B>　●ハードウェア環境</B>
+	<DD>
+<PRE>
+┌────────────┐　　　┌─────┐　　　　┌─────┐　
+│プログラム開発基本ツール│　　　│　Ｔ　Ｖ　│　　　　│　モニタ　│　
+│　　　　　　　　　　　　│　　　│　　　　　│　　　　│　　　　　│　
+│　・ＰＣ　　　　　　　　│　　　└──┬──┘　　　　└──┬──┘　
+│　・ＷＳ　　　　　　　　│　┌────┴────┐　┌───┴───┐
+│　・ＩＣＥ　　　　　　　│　│ターゲットボックス│　│　ＰＣ／ＡＴ　│
+│　・ＥＶＡ　　　　　　　├─┤ＳＩＭＭ　　　　　│　│　　　　　　　│
+│　・ＥＴＣ．　　　　　　│　│ＳＣＳＩ　Ｉ／Ｆ　├─┤ＳＣＳＩ　ＢＤ│
+│　　　　　　　　　　　　│　│　　　　　　　　　│　│　　　　　　　│
+└────────────┘　└─────────┘　└───────┘
+</PRE>
+
+	<P><DT><B>　●ソフトウェア環境</B>
+	<DD>
+<PRE>
+┌───┐　　　　　┌───┐　　　　　　　┌───┐　
+│プログラム開発　　│ＣＤライブラリ　　　　│ＣＤＳＩＭ
+│　　基本ツール　　│／ファイルシステム　　│　　　│　
+│　　　│　　　　　│　　　│　　　　　　　│　　　│　
+└───┘　　　　　└───┘　　　　　　　└───┘　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+┌───┐　　　　　　　　　　　　　　　　　　　　　　　
+│ＭＦＣＡＴ　　　　　　　　　　　　　　　　　　　　　　
+│　　　│　　　　　　　　　　　　　　　　　　　　　　　
+│　　　│　　　　　　　　　　　　　　　　　　　　　　　
+└───┘　　　　　　　　　　　　　　　　　　　　　　　
+</PRE>
+
+	<P><DT><B>　●ハードウェア／ソフトウェアリスト</B>
+	<DD><B>プログラム開発基本ツール</B>
+	<DD>　CDツールを使用する上での限定条件は、ハードウェア/ソフトウェアともありません。<BR>推奨ツールの中から、選択してください。</P>
+
+	<P><DD><B>ターゲットボックス</B>
+	<DD>　SIMM、SCSI I/Fは、標準で内蔵しています。(プログラミングボックス)</P>
+
+	<P><DD><B>IBM PC互換機</B>
+	<DD>　CDツール用推奨機種は、HDD、SCSIボード、OSを含めて、別途お知らせします。</P>
+
+	<DD><B>ソフトウェアライブラリ/CDライブラリ/ファイルシステム</B><BR>
+	<DD>　簡易CDシミュレータ用のファイルシステムです。</BR><B>ソフトウェアライブラリ</B>としてSEGAより提供されます。</P>
+
+	<DD><B>MFCAT</B>
+	<DD>　メモリファイルを作成するツールです。<BR><B>CDツール</B>としてSEGAより提供されます。</P>
+
+	<DD><B>CDSIM</B>
+	<DD>　SCSIシステム上で、PCからファイルシステムにファイルをロードする、PCのアプリケーションです。<BR><B>CDツール</B>としてSEGAより提供されます。</P>
+
+	<P><DT><B>　●各システムに必要なハードウェア/ソフトウェア</B>
+	<DD><TABLE BORDER>
+<TD ALIGN="CENTER"><PRE>　</TD><TD ALIGN="CENTER"><PRE>SIMM</TD><TD ALIGN="CENTER"><pre>SCSI</td><tr>
+<td align="left"><pre>プログラム開発基本ツール</td><td align="center"><pre>○</td><td align="center"><pre>○</td><tr>
+<td align="left"><pre>ターゲットボックス</td><td align="center"><pre>○</td><td align="center"><pre>○</td><tr>
+<td align="left"><pre>IBMPC互換機</td><td align="center"><pre>−</td><td align="center"><pre>○</td><tr>
+<td align="left"><pre>ファイルシステム</td><td align="center"><pre>○</td><td align="center"><pre>○</td><tr>
+<td align="left"><pre>MFCAT</td><td align="center"><pre>○</td><td align="center"><pre>−</td><tr>
+<td align="left"><pre>CDSIM</td><td align="center"><pre>−</td><td align="center"><pre>○</td>
+</table></p>
+
+	<P><DT><B>　注意</B>
+	<DD>　プログラム開発基本ツールでPC環境を利用する場合でも、SCSIシステム用のIBM PC互換機を別に用意してください。</P>
+
+<A NAME="no1_30"></A>
+	<P><DT><H3>■ハードウェアセットアップ</H3>
+	<DD>　ハードウェアセットアップの手順を以下に示します。</P>
+
+	<P><DT><B>　●簡易CDシミュレータ／SIMMシステム</B>
+
+	<P><DT><B>　(1) ターゲットの準備</B>
+	<DD>　SCSIシステムを併用しない場合は、ディップスイッチのSW2-4をOFFにします。</P>
+
+	<P><DT><B>　(2) 電源の投入</B>
+	<DD> BOOT ROMを実行してから使用します。</P>
+
+	<P><DT><B>　●簡易CDシミュレータ/SCSIシステム</B>
+	<P><DT><B>　(1) ターゲットの準備</B>
+	<DD><OL>
+	<P><B><LI></B>ディップスイッチ2を次のように設定します。<BR>
+<PRE>
+  1    2    3    4    5    6    7    8    OFF→水平にスイッチを戻す
+[OFF][OFF][OFF][O N][ * ][   SCSI-ID   ]  O N→下側にスイッチを押し下げる
+  |    |    |    |
+  |    |    |    +------SCSIを使用する
+  |    |    +-----------簡易CDシュミレータとして使用
+  +----+----------------ワークステーションタイプ
+                        OFF  OFF :  PC版
+                        OFF  ON  : SUN版
+                        ON   ON  :  HP版
+</PRE><BR>
+HP版では、SCSI−IDをブートデバイスより大きいIDに設定してください。</P>
+
+	<P><B><LI></B>ICEのエミュレーションメモリがMAPされていない状態であることを確認します。</P></OL>
+
+	<P><DT><B>　(2) PCの準備</B>
+	<DD><OL>
+	<P><B><LI></B>SCSIドライバを[CONFIG.SYS]に登録します。<BR>ワークステーションの場合、使用するTTYポートはターミナルで使用しないように設定してください。</P>
+	<P><B><LI></B>[cdsim.exe]をPATHの通ったディレクトリにインストールします。</P>
+	<P><B><LI></B>定義ファイルとファイルの実体を用意します。</P></OL>
+
+	<P><DT><B>　(3) 接続方法</B>
+	<DD><OL>
+	<P><B><LI></B>ターゲットボックスのSCSIコネクタとPCのSCSIコネクタをSCSIケーブルで接続します。</P>
+	<P><B><LI></B>ワークステーション(SUN、HP)の場合には、RS-232CコネクタとワークステーションのRS-232CコネクタをクロスのRS232Cケーブルで接続します。</P></OL>
+
+	<P><DT><B>　(4) 電源の投入</B>
+	<DD><B>(ターゲット側)</B>
+	<DD><OL>
+	<P><B><LI></B>電源を投入またはリセットします。</P>
+	<P><B><LI></B>BOOT ROMを実行します。</P>
+	<P><B><LI></B>SEGASATURNロゴが表示されます。</P></OL>
+
+	<DD><B>(PC側)</B>
+	<DD><OL>
+	<P><B><LI></B>SEGASATURNロゴが表示されてから、PCの電源を投入またはリセットします。</P>
+	<P><B><LI></B>[cdsim.exe]を実行します。</P></OL>
+
+<A NAME="no1_40"></A>
+	<P><DT><H3>■ソフトウェアセットアップ</H3>
+	<P><DT><B>　●インストールのしかた</B>
+	<DD><OL>
+	<P><B><LI></B>「イントロダクションマニュアル」を参照してください。<BR>
+　　[MFCAT.EXE]は[SATURN¥SEGABIN¥BIN¥]ディレクトリに、[CDSIM.EXE]は[SATURN¥SEGABIN¥BINCD¥]ディレクトリにあります。</P></OL>
+
+	<P><DT><B>　●設定のしかた</B>
+	<DD><B>PATHの設定</B>
+	<DD>　インストール先ディレクトリが、環境変数の[PATH]に設定されていない場合には、追加してください。</P>
+
+	<P><DT><B>　●起動と終了のしかた</B>
+	<P><DD><B>MFCATの起動と終了</B>
+	<DD><B>起動</B>
+	<DD><OL>
+
+<P><B><LI></B>DOSプロンプトから、[mfcat.exe]を起動してください。<BR>
+<HR WIDTH=60% ALIGN=LEFT><PRE>
+c:¥&gt;MFCAT[RET]
+</PRE><HR WIDTH=60% ALIGN=LEFT></P>
+
+	<P>次の表示が出ます。<BR>
+	<HR WIDTH=60% ALIGN=LEFT><PRE>
+MFCAT ver 1.00 Copyright(c) 1995 SEGA
+usage:  mfcat [-oOUTFILE] -fFLIST
+        mfcat [-oOUTFILE] file file2 ...
+</PRE><HR WIDTH=60% ALIGN=LEFT></P></OL>
+
+
+	<P><DD><B>終了</B>
+	<DD>自動的に終了します。</P>
+
+	<P><DD><B>CDSIMの起動と終了</B>
+	<P><DD><B>起動</B>
+	<DD><OL>
+	<P><B><LI></B>DOSプロンプトから、[cdsim.exe]を起動してください。<BR>
+<HR WIDTH=60% ALIGN=LEFT><PRE>
+c:¥&gt;CDSIM[RET]
+</PRE><HR WIDTH=60% ALIGN=LEFT></P>
+	<P>次の表示が出ます。<BR>
+	<P>　SUNの起動例 (PORT-A/SCSI ID 2を使用した場合)<BR>
+　　CDSIM -i/dev/ttya -o/dev/rsd2a (CR)<BR>
+
+	<P>　HPの起動例 (PORT-0/SCSI ID 5を使用した場合)<BR>
+　　CDSIM i/dev/tty00 -o/dev/dsk/c201d5s0 (CR)<BR>
+
+<HR WIDTH=60% ALIGN=LEFT><PRE>
+CDSIM ver 1.00 Copyright(c) 1994 SEGA
+Check Syntax: CDSIM.DAT
+File Can't Open:CDSIM.DAT
+</PRE><HR WIDTH=60% ALIGN=LEFT></P></OL>
+
+	<P><DD><B>終了</B>
+	<DD>自動的にエラー終了します。<BR>自動的に終了しない場合には、[ESC]キーを押すと終了します。<BR>SUN、HPの場合には[CTRL]＋[C]を押すと終了します。</P>
+
+
+	<P><DT><B>　●インストールの確認</B>
+	<DD>正しくインストールされたことを確認するために、必要な設定を行ってからソフトウェアを起動し、コピーライト表示を確認後、終了してください。</P>
+</DL>
+<HR NOSHADE>
+<B>■　　｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">簡易CDシュミレータ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

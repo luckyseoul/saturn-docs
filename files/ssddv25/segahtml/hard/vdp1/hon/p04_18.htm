@@ -1,0 +1,51 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/54&gt;VDP1 User's Manual/4.8 Current Processing Table Address Register</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p04_17.htm">Back</a> ｜ <A HREF="p04_19.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 4 System Registers</b><HR NOSHADE>
+<DL>
+<A NAME="no4_80"></A><P><DT><H2> ■4.8 Current processing table address register</H2><DD> The current operation command address register (COPR) indicates the command table address currently being processed. This is a read-only 16-bit register located at address 100014H.</P>
+<DT><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> COPR<BR> 100014H<BR> (R)</TH><TH><PRE> bit15</TH><TH><PRE> bit14</TH><TH><PRE> bit13</TH><TH><PRE> bit12</TH><TH><PRE> bit11</TH><TH><PRE> bit10</TH><TH><PRE> bit9</TH><TH><PRE> bit8</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=14> Current processing table address/8H</TD><TD> 0</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>Current processing table address:</b> bit15~0</P>
+<P><DT><UL TYPE="DISC">
+<LI> The value obtained by dividing the command table address containing the parameter currently being processed by 8H is written to this register.</P>
+<P><LI> You can know the address of the command table currently being processed. Address values are constantly updated during command processing.</P>
+<P><LI> In the case of fetching the drawing end command or forcefully stopping drawing, the updated address value will be saved as is until drawing starts due to a frame change or plot trigger.</P>
+<P><LI> When fetching the drawing end command, it is the address of the drawing end command table (/8H). In the case of forced termination of drawing, this is the address (/8H) of the command table where the drawing was forcibly terminated.</P>
+<P><LI> Since the table address boundary is 20HByte, the lower 2 bits of the register are fixed to 00B.</UL>
+<P><A NAME="no4_81"></A><P><DT> <B>●Pseudo drawing continuation</b></P>
+<DT><UL TYPE="DISC">
+<LI> If the amount of data to be drawn is large and the drawing does not finish within one frame, force the drawing to end in the middle and use pseudo-drawing continuation to divide it into two or more parts.</P>
+<P><LI> Follow the steps below to create a pseudo-continuation of drawing. Force drawing to end, rewrite the first command to jump to the processing interruption table address at that time, and set the plot trigger mode to start drawing at the time of writing (PTM=01B).</P>
+<P><LI> Draws to the extent that can be drawn within one frame, and at that point the CPU forcibly terminates (interrupts) the drawing. Next, rewrite the jump destination in the first command table on VRAM from the CPU to the command table address at the time of forced termination, and immediately start drawing in plot trigger mode (PTM=01B). In this way, you can create a pseudo-continuation of drawing. However, if the command table address at the time of forced termination is within a subroutine, drawing cannot be continued. In this case, set the drawing time required to transfer each pixel data to the frame buffer to be shorter than the time until the end of each frame.</P>
+<P><LI> If semi-transparent color calculations are being performed when drawing is forcibly terminated, if you connect the drawings using the above method, there is a possibility that dots will be processed twice (color calculations will be performed twice). there is. It is necessary to forcefully terminate drawing when not performing translucent color calculations.</UL>
+<P></DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_17.htm">Back</a> ｜ <A HREF="p04_19.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,244 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 4&gt;簡易CDシミュレータ/2.ツールガイド</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">簡易CDシュミレータ</A>
+<HR>
+<B>▲<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>簡易CDシミュレータ</B>
+<H1>2.ツールガイド</H1>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A>
+	<P><DT><H3>■デバッグサポート機能概要</H3>
+	<P><DT><B>　●デバッグサポート機能概要</B>
+	<DD>　CDから読み出すべきファイルを、ターゲット上のRAMにあるメモリファイルや、SCSIハードディスク内にあるDOSファイルから読み出して、CD-ROMのシミュレーションをすることで、効率良くデバッグができるようサポートします。<BR>
+同じファイル名が、存在した場合には、SIMM、SCSI、CDの順に優先順位が高いので、デバッグ済みファイルはCDから、デバッグ中ファイルはSCSIから、プログラムやデータにパッチをあてて動作を試したい場合にはSIMMからファイルをロードするようにすることで、効率的なデバッグが可能となります。</P>
+
+	<P><DT><B>　●CDライブラリによるデバッグサポート機能</B>
+	<DD>
+<PRE>
+　┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓　　
+　┃　　　　　　　　　　　　　　　　アプリケーション　　　　　　　　　　　　　　　　┃　　
+　┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛　　
+　┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓　　
+　┃　　　　　　　　ファイルシステムライブラリ（ＩＯＳ９６６０対応）　　　　　　　　┃　　
+　┃　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　┃　　
+　┃　　　　　　　　　　　　　　　　　┌──────────────────────╂┐　
+　┃●論理ファイルアクセス機能　　　　│　●簡易ＣＤシミュレータによる　　　　　　　┃│　
+　┃●即時復帰型アクセス機能　　　　　│　　ＣＤブロック代替機能　　　　　　　　　　┃│　
+　┗━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━┛│　
+　┏━━━━━━━━━━━┓　　　　　│┏━━━━━━━━━━┓　　　　　　　　　　　│　
+　┃ＣＤ通信インタフェース┃　　　　　│┃ＳＣＳＩドライバ　　┃　　　　　　　　　　　│　
+　┗━━━━━━━━━━━┛　　　　　│┗━━━━━━━━━━┛　　　　　　　　　　　│　
+━　━　━　━　━　━　━　━　━　━│━　━　━　━　━　━　━　━　━　━　━　━│━
+　┏━━━━━━━━━━━┓　　　　　│┏━━━━━━━━━━┓　┏━━━━━━━━┓│　
+　┃ＣＤブロック　　　　　┃　　　　　│┃ＩＢＭ　ＰＣ　ＨＤＤ┃　┃ＳＩＭＭ　　　　┃│　
+　┃●ＣＤファイル　　　　┃　　　　　│┃●ＤＯＳファイル　　┃　┃●メモリファイル┃│　
+　┗━━━━━━━━━━━┛　　　　　│┗━━━━━━━━━━┛　┗━━━━━━━━┛│　
+　　　　　　　　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　│　
+　　　　　　　　　　　　　　　　　　　└───────────────────────┘　
+</PRE>
+
+	<P><DD><B>CDファイル</B>
+	<DD>　ISO9660フォーマットでCD上に記録されたファイルです。<BR>CDブロックを通して、CDディスク、または、CDエミュレータから読み出すことができます。</P>
+
+	<P><DD><B>DOSファイル</B>
+	<DD>　MS-DOSフォーマットでHDD上に記録されたファイルです。<BR>SCSIドライバを使って、IBM PCの簡易シミュレータソフトから読み出すことができます。</P>
+
+	<P><DD><B>メモリファイル</B>
+	<DD>　メモリファイルフォーマットでメモリ上に記録されたファイルです。<BR>ファイルシステムライブラリを使って、直接読み出すことができます。</P>
+
+	<P><DT><B>　●前提条件</B>
+	<DD><B>CDファイル</B>
+	<DD>　簡易CDシミュレータでは、CDファイルの読み出しはできません。<BR>CDエミュレーションシステムで対応されます。</P>
+
+	<P><DD><B>同名ファイル</B>
+	<DD>　これら３つのファイルは同時にアクセス可能ですが、同名のファイルがあった場合、</P>
+
+	<P><DD><OL>
+	<P><B><LI></B>メモリファイル</P>
+	<P><B><LI></B>DOSファイル</P>
+	<P><B><LI></B>CDファイル</P></OL>
+
+	<P><DD>の順に優先的に読み出されます。</P>
+
+	<P><DD><B>リアルタイムエミュレーション</B>
+	<DD>　簡易CDシミュレータでは、リアルタイムエミュレーションは行いません。</P>
+
+<A NAME="no2_20"></A>
+	<P><DT><H3>■簡易CDシミュレータ/SIMMシステム</H3>
+	<P><DT><B>　●SIMMシステムの概要</B>
+	<DD>　デバッグ時の処理の流れは以下のとおりです。</P>
+
+	<P><DD><OL>
+	<P><B><LI></B>CD上に配置されるべき、バイナリファイルを作成する。</P>
+	<P><B><LI></B>[MFCAT.EXE]を使用して、複数のファイルを結合し、メモリファイルを作成する。</P>
+	<P><B><LI></B>ターゲット上のRAMにメモリファイルをロードしておく。<BR></P>
+	<P><B><LI></B>CDファイルシステムライブラリを利用して、CDからファイルを読み出すのと同じように、ターゲット上のRAMのメモリファイルからファイルを読み出す。</P></OL>
+
+	<P><DT><B>　●メモリファイルの作成方法</B>
+	<DD>
+<PRE>
+┌─────┐　　　┌──────┐　　　┌─────┐　　　　　　　　　　　　　　　┌─────┐
+├─────┤　　　│コンパイラ　│　　　├─────┤　　　┌───────┐　　　├─────┤
+│　ソース　├──→│アセンブラ　│──→│ロード　　│──→│ＲＯＦ２ＢＩＮ│──→│バイナリ　│
+│　　　　　│　　　│リンカ　　　│　　　│モジュール│　　　└───────┘　　　│モジュール│
+└─────┘　　　└──────┘　　　└─────┘　　　　　　　　　　　　　　　└──┬──┘
+　　　　　　　　┌─────────────────────────────────────┘　　　
+┌─────┐　│　　　　　　　　　　　　┌─────┐　　　　　　　　　　　　　　　　　　　　　　
+├─────┤　│　┌──────┐　　　├─────┤　　　　　　　　　　　　　　　　　　　　　　
+│バイナリ　│─┼→│ＭＦＣＡＴ　│──→│メモリ　　│　　　　　　　　　　　　　　　　　　　　　　
+│モジュール│　│　└──────┘　　　│ファイル　│　　　　　　　　　　　　　　　　　　　　　　
+└─────┘　│　　　　　　　　　　　　└─────┘　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+┌─────┐　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+├─────┤　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+│バイナリ　├─┘　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+│モジュール│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+└─────┘　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+</PRE>
+
+	<P><DD><OL>
+	<P><B><LI></B>ソースファイルをコンパイル、アセンブル、リンクしてSYSROF形式のロードモジュールを作成します。</P>
+	<P><B><LI></B>ROF2BINでバイナリモジュールに変換します。</P>
+	<P><B><LI></B>CD-ROMのファイルとして、メモリファイルからロードしたいファイルを、<手順>1と2を繰り返して、複数個作成します。</P>
+	<P><B><LI></B>MFCATを使用して、複数のファイルを結合して、メモリファイルを作成します。</P></OL>
+
+	<P><DT><B>　●メモリファイルの利用方法</B>
+	<DD>　ICEが起動してからターゲットプログラムを実行するまでの標準的な手順を以下に示します。</P>
+
+	<P><DT><B>　(1)BOOT ROM起動</B>
+	<DD><OL>
+	<P><B><LI></B>BOOT ROMを起動します。<BR>
+<HR WIDTH=60% ALIGN=LEFT><PRE>
+:rs[RET]
+** RESET IN BY E700 !
+
+:g[RET]
+** PC = 060027XX
+</PRE><HR WIDTH=60% ALIGN=LEFT></P>
+
+	<P><B><LI></B>ロゴが表示されたら[Ctrl-C]を押します。<BR>
+<HR WIDTH=60% ALIGN=LEFT><PRE>
+PC=
+PR=
+MACH=
+R0-7
+R8-15
+RUN-TIME=
++++:BREAKE KEY
+</PRE><HR WIDTH=60% ALIGN=LEFT></P></OL>
+
+
+	<P><DT><B>　(2)ロード</B>
+	<DD><OL>
+	<P><B><LI></B>ICEのファイル読込みコマンドの形式に従ってターゲットプログラムとメモリファイルをロードします。</P></OL>
+
+	<P><DT><B>　(3)メモリファイルの設定</B>
+	<DD><OL>
+	<P><B><LI></B>メモリファイルがロードされていることをファイルシステムライブラリに認識させるために、メモリファイルの先頭アドレスを設定します。</P>
+	<P><B><LI></B>ターゲットプログラムのマップファイルから[_GFMC_base]のアドレスを検索し、そこにメモリファイルをロードしたアドレスを設定します。</P>
+	</OL>
+
+	<P><DT><B>　(4) ターゲットプログラム実行</B>
+	<DD><OL>
+	<P><B><LI></B>ターゲットプログラムのスタートアドレスから実行させます。</P></OL>
+
+<A NAME="no2_30"></A>
+	<P><DT><H3>■簡易CDシミュレータ/SCSIシステム</H3>
+	<P><DT><B>　●SCSIシステムの概要</B>
+	<DD>　デバッグ時の処理の流れは以下のとおりです。
+	<DD><OL>
+	<P><B><LI></B>CD上に配置されるべき、バイナリファイルを作成する。</P>
+	<P><B><LI></B>MS-DOSのプロンプトから CDSIM.EXE とタイプして起動する。</P>
+	<P><B><LI></B>CDファイルシステムライブラリを利用して、CDからファイルを読み出すのと同じように、SCSIハードディスクからファイルを読み出す。</P>
+	</OL>
+
+	<P><DT><B>　●プログラム実行までの操作</B>
+	<DD>　ICEが起動してからターゲットプログラムを実行するまでの標準的な手順を以下に示します。</P>
+
+	<P><DT><B>　(1)BOOT ROM起動</B>
+	<DD><OL>
+	<P><B><LI></B>BOOT ROMを起動します。<BR>
+<HR WIDTH=60% ALIGN=LEFT><PRE>
+:rs[RET]
+** RESET IN BY E700 !
+
+:g[RET]
+** PC = 060027XX
+</PRE><HR WIDTH=60% ALIGN=LEFT></P>
+
+	<P><B><LI></B>ロゴが表示されたら[Ctrl-C]を押します。<BR>
+<HR WIDTH=60% ALIGN=LEFT><PRE>
+PC=
+PR=
+MACH=
+R0-7
+R8-15
+RUN-TIME=
++++:BREAKE KEY
+</PRE><HR WIDTH=60% ALIGN=LEFT></P></OL>
+
+	<P><DT><B>　(2)PC側起動</B>
+	<DD><OL>
+	<P><B><LI></B>PCを電源投入またはリセットします。<BR>
+　起動途中に次のようなメッセージが表示されます。<BR>
+　特に「SEGA SATURN XXXX」というメッセージが出力されることを確認してください。<BR>
+<HR WIDTH=60% ALIGN=LEFT><PRE>
+AHA-1540/1542/1640 APSI Manager for DOS
+Version 3.XX
+
+	中　略
+
+Host Adapter #0 - SCSI IS 1 - LUN 0: SEGA SATURN  XXXX
+
+	以下略
+</PRE><HR WIDTH=60% ALIGN=LEFT></P>
+	</OL>
+
+
+	<P><DT><B>　(3)ターゲットプログラムロード</B>
+	<DD><OL>
+	<P><B><LI></B>ICEのファイル読込みコマンドの形式に従ってターゲットプログラムをロードします。<BR>
+　SIMMシステムも同時に使う場合はこのときにメモリファイルのロード、設定を行います。</P></OL>
+
+	<P><DT><B>　(4)ターゲットプログラム実行</B>
+	<DD><OL>
+	<P><B><LI></B>ターゲットプログラムのスタートアドレスから実行させます。</P></OL>
+
+	<P><DT><B>　(5)[CDSIM.EXE]起動</B>
+	<DD><OL>
+	<P><B><LI></B>適切なディレクトリで[CDSIM.EXE]を起動します。</P></OL>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">簡易CDシュミレータ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

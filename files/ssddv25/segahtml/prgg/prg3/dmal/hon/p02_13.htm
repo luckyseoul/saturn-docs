@@ -1,0 +1,189 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/5&gt;DMA library/2.4 Function specifications</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">DMA library</a><HR>
+ <B>▲ <A HREF="p02_12.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>DMA library/2.Reference</b><HR NOSHADE>
+<A NAME="no2_40"></A><H3> 2.4 Function specifications</H3><H2> [High level SCU]</H2><!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no1"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> SCU DMA initialization</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_ScuInit</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_ScuMemCopy(void *dst, void *src, Uint32 cnt)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Initialize SCU DMA.<BR>
+ Be sure to do this before executing DMA_ScuCopyMem() and DMA_ScuResult().</P>
+<DT><TABLE>
+<TR><TH><PRE> Note<BR><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>SCU DMA uses DMA mode 0 transfer end interrupt handling. Therefore, do not change the interrupt mask register for the transfer end interrupt in DMA mode 0.</b> </TD></TABLE>
+</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no2"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> DMA data transfer</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_ScuMemCopy</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_ScuMemCopy(void *dst, void *src, Uint32 cnt)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> *dst</TD><TD><PRE> :Destination address</TD></TR>
+<TR><TD><PRE> *src</TD><TD><PRE> : source address</TD></TR>
+<TR><TD><PRE> cnt</TD><TD><PRE> : Number of bytes transferred</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Performs DMA transfer using SCU's DMA mode 0 direct mode. Please refer to the SCU User's Manual for details. The operation differs depending on whether the destination address is work RAM or other than work RAM. The operation of each is shown below.<DT><UL TYPE="DISK">
+<P><LI> <B>Work RAM</b><BR>
+ To eliminate inconsistencies with the cache, purge the destination area after transfer. Also, since CPU_Bus is used, control does not return to the CPU until DMA execution is finished.</P>
+<P><LI> <B>Other than work RAM</b><BR>
+ Since CPU_Bus is not used, control returns to the CPU immediately after the transfer starts. In this case, please check the completion using DMA_ScuResult().</P>
+</UL>
+<DD> The transfer unit is basically a longword, but the source and destination addresses can be specified in bytes. However, if your device requires word boundaries, etc., follow them. Please see the SCU User's Manual for details.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no3"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Data transfer completion check</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_ScuResult</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Uint32 DMA_ScuResult(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Result of DMA_ScuMemCopy()<DT> <B>function</b><DD> Checks the completion of DMA_ScuMemCopy(). The following values are returned.<DD> Execution result constant name<TABLE BORDER CELLPADDING=5>
+<TH WIDTH=160 ALIGN="CENTER"><PRE> constant name</TH><TH WIDTH=280 ALIGN="CENTER"><PRE> explanation</TH><TR><TD><PRE> DMA_SCU_END</TD><TD><PRE> normal termination</TD><TR><TD><PRE> DMA_SCU_FAIL</TD><TD><PRE> abnormal termination</TD><TR><TD><PRE> DMA_SCU_BUSY</TD><TD><PRE> Running</TD><TR></TABLE>
+<P><DT> <B>remarks</b><DD> If CPU_Bus is specified as the source or destination in DMA_ScuMemCopy(), the CPU cannot operate while DMA is running. Therefore, the execution result at this time will not be running (DMA_SCU_BUSY).</DL>
+<HR>
+<H2> [High level CPU]</H2><!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no4"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Data transfer (in bytes)</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuMemCopy1</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuMemCopy1(void *dst, void *src, Uint32 cnt)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> *dst</TD><TD><PRE> ;destination address</TD></TR>
+<TR><TD><PRE> *src</TD><TD><PRE> ;source address</TD></TR>
+<TR><TD><PRE> cnt</TD><TD><PRE> ;Transfer count (0-16777215)<BR> 0x00000001 1 time<BR> 0x00ffffff 16777215 times<BR> 0x00000000 16777216 times</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Transfers byte data from the src address to the dst address cnt times. Transfer amount is cnt bytes. Channel 0, cycle steal mode, transferring without end interrupt. When the destination address is work RAM, the destination area is purged after the transfer to eliminate inconsistencies with the cache. There are no restrictions on addresses.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no5"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Data transfer (word unit)</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuMemCopy2</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 5</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuMemCopy2(void *dst, void *src, Uint32 cnt)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> *dst</TD><TD><PRE> ;destination address</TD></TR>
+<TR><TD><PRE> *src</TD><TD><PRE> ;source address</TD></TR>
+<TR><TD><PRE> cnt</TD><TD><PRE> ;Transfer count (0-16777215)<BR> 0x00000001 1 time<BR> 0x00ffffff 16777215 times<BR> 0x00000000 16777216 times</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Transfer word data from src address to dst address cnt times. Transfer amount is cnt*2 bytes. Channel 0, cycle steal mode, transferring without end interrupt. When the destination address is work RAM, the destination area is purged after the transfer to eliminate inconsistencies with the cache. Addresses must be word boundaries.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no6"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Data transfer (longword unit)</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuMemCopy4</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuMemCopy4(void *dst, void *src, Uint32 cnt)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> *dst</TD><TD><PRE> ;destination address</TD></TR>
+<TR><TD><PRE> *src</TD><TD><PRE> ;source address</TD></TR>
+<TR><TD><PRE> cnt</TD><TD><PRE> ;Transfer count (0-16777215)<BR> 0x00000001 1 time<BR> 0x00ffffff 16777215 times<BR> 0x00000000 16777216 times</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Transfers longword data from the src address to the dst address cnt times. Transfer amount is cnt*4 bytes. Channel 0, cycle steal mode, transferring without end interrupt. When the destination address is work RAM, the destination area is purged after the transfer to eliminate inconsistencies with the cache. Addresses must be longword boundaries.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no7"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Data transfer (16 byte units)</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuMemCopy16</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuMemCopy16(void *dst, void *src, Uint32 cnt)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> *dst</TD><TD><PRE> ; destination address</TD></TR>
+<TR><TD><PRE> *src</TD><TD><PRE> ; source address</TD></TR>
+<TR><TD><PRE> cnt</TD><TD><PRE> ; Transfer count (0-16777215) (longword unit)<BR> 0x00000001 1 time<BR> 0x00ffffff 16777215 times<BR> 0x00000000 16777216 times</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Transfers longword data from the src address to the dst address cnt times. Transfer amount is cnt x 4 bytes. Channel 0, cycle steal mode, transferring without end interrupt. When the destination address is work RAM, the destination area is purged after the transfer to eliminate inconsistencies with the cache. Addresses must be longword boundaries.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no8"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Data transfer completion check</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuResult</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Uint32 DMA_CpuResult(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Result of DMA_CpuMemCopy1,2,4,16()<DT> <B>function</b><DD> Check the completion of DMA_CpuMemCopy1,2,4,16(). The following values are returned.<DD> Execution result constant name<TABLE BORDER CELLPADDING=5>
+<TH WIDTH=160 ALIGN="CENTER"><PRE> constant name</TH><TH WIDTH=280 ALIGN="CENTER"><PRE> explanation</TH><TR><TD><PRE> DMA_CPU_END</TD><TD><PRE> normal termination</TD><TR><TD><PRE> DMA_CPU_BUSY</TD><TD><PRE> Running</TD><TR></TABLE>
+<P></DL>
+<HR>
+<H2> [Low level SCU]</H2><P><!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no9"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> DMA transfer parameter settings</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_ScuSetPrm</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 9</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_ScuSetPrm(DmaScuPrm *prm, Uint32 ch)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> prm</TD><TD><PRE> :Transfer parameters</TD></TR>
+<TR><TD><PRE> ch</TD><TD><PRE> :DMA channel</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Sets the transfer parameter values for the specified DMA channel.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no10"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> DMA transfer start</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_ScuStart</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 10</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_ScuStart(Uint32 ch)<DT> <B>input</b><DD> ch: DMA channel<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Starts a DMA transfer on the specified DMA channel.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no11"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Get DMA status</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_ScuGetStatus</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 11</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_ScuGetStatus(DmaScuStatus *status,Uint32 ch)<DT> <B>input</b><DD> ch: input channel<DT> <B>output</b><DD> status: status pointer<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Gets the status of the specified DMA channel.<DT> <B>!!Note!!</b><DD> The members of the DmaScuStatus structure, dxbk (DMA suspended flag) and dxwt (DMA waiting flag), have been deleted.</DL>
+<HR>
+<H2> [Low level CPU]</H2><!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no12"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> DMA common transfer parameter settings</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuSetComPrm</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 12</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuSetComPrm(DmaCpuComPrm *com_prm)<DT> <B>input</b><DD> com_prm: Common transfer parameters<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Sets the specified common transfer parameters. However, parameters masked by DmaCpuComPrm.msk are not set.<DT> <B>remarks</b><DD> If DMA_CPU_M_AE was not masked in DmaCpuComPrm.msk, clear the address error flag. If you did not mask DMA_CPU_M_NMIF, clear the NMI flag.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no13"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> DMA transfer parameter settings</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuSetPrm</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 13</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuSetPrm(DmaCpuPrm *prm Uint32 ch)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> prm</TD><TD><PRE> :Transfer parameters</TD></TR>
+<TR><TD><PRE> ch</TD><TD><PRE> :DMA channel</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Sets transfer parameters to the specified DMA channel. However, parameters masked by DmaCpuPrm.msk are not set.<DT> <B>remarks</b><DD> If you did not mask DMA_CPU_TE in DmaCpuPrm.msk, clear the transfer end flag bit.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no14"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> DMA transfer start</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuStart</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 14</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Uint32 DMA_CpuStart(Uint32 ch)<DT> <B>input</b><DD> ch: DMA channel<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Starts a DMA transfer on the specified DMA channel.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no15"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> DMA transfer aborted</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuStop</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 15</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuStop(Uint32 ch)<DT> <B>input</b><DD> ch: DMA channel<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Terminates DMA transfer for the specified DMA channel.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no16"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> DMA all channel transfer cancellation</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuAllStop</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 16</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuAllStop(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Aborts DMA transfers for all DMA channels.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no17"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> DMA common status acquisition</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuGetComStatus</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 17</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuGetComStatus(DmaCpuComStatus *status)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> status: status pointer<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Gets the specified common status.</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no18"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p02_12.htm#no2_30">one</a><BR> <A HREF="p02_12.htm#no2_30">View</a><BR> <A HREF="p02_12.htm#no2_30">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Get DMA status</H4></TD><TD WIDTH=200><PRE> Function name<BR><H3> DMA_CpuGetStatus</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 18</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DMA_CpuGetStatus(DmaCpuStatus *status, Uint32 ch)<DT> <B>input</b><DD> ch: DMA channel<DT> <B>output</b><DD> status: status pointer<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Gets the status of the specified DMA channel.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_12.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">DMA library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,71 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGASATURN Developer's Information STN-52</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn49.htm">STN-49</a> | <A HREF="stn50.htm">STN-50</a> | <A HREF="stn51.htm">STN-51</a> | <B>STN-52</b> ■<HR NOSHADE>
+<H1 ALIGN=CENTER> STN-52</H1><H2 ALIGN=CENTER> Backup library work area size</H2><HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> issue number:</TH><TD> STN-52</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> date of issue:</TH><TD> 96/11/07</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> media:</TH><TD> ●Common</TD><TD> ○CD-ROM</TH><TD> ○Cartridge</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> connection:</TH><TD> ●Program</TD><TD> ○Hard</TD><TD> ○Manual</TD><TD> ○Tools</TD><TD> ○Game</TD><TD> ○ Bug</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Information distinction:</TH><TD> ●New</TD><TD> ○Change</TD><TD> ○Addition</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> importance:</TH><TD> ●Strict observance</TD><TD> ○Recommended</TD><TD> ○Reference</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> attached file:</TH><TD> ●No</TH><TD> ○ Yes</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Subject supplement:</TH><TD COLSPAN=7></TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER> Contents</H3><DL>
+<P><DT><H3> ■Destruction of variable area</H3><DD> If 8192 bytes of work area are secured for the backup library, other variable areas may be destroyed under the following conditions.<P><OL>
+<LI> When creating data of maximum size<LI> When using the last 30 blocks of the block access table (2048 blocks)</OL>
+</P>
+<P><DD> This is because the block access table uses 8192 bytes (2048 blocks), which leaves 120 bytes of the variable area used by the backup library, so the last 120 bytes (30 blocks) of the block access table are used by other variable areas. Because it will destroy it.</P>
+<PRE>
+  Before change           After Change    
+＋−−−−−−−−−−＋−−−−−−−−−− ＋−−−−−−−−−−＋−−−−−−
+｜ Variable ｜    ↑      ｜ Variable ｜    ↑ 
+｜ area     ｜           ｜ area     ｜      
+｜ 120 bytes｜           ｜ 120 bytes｜      
+＋−−−−−−−−−−＋           ＋−−−−−−−−−−＋      
+｜     ↑    ｜ Definition｜     ↑    ｜      
+｜ Block    ｜ size      ｜ Block    ｜      
+｜ access   ｜ 8192 bytes｜ access   ｜Definition 
+｜ table    ｜           ｜ table    ｜size
+｜8192 bytes｜    ↓      ｜8192 bytes｜8312 bytes
+＋ − − − − −＋−−−−−−−−−− ＋          ＋      
+｜          ｜←This part ｜          ｜      
+｜          ｜ will be   ｜          ｜      
+｜     ↓    ｜ destroyed ｜     ↓    ｜    ↓ 
+＋−−−−−−−−−−＋ − − − − − ＋−−−−−−−−−−＋−−−−−−
+</PRE><P><DD>Note: "Variable area = 120 bytes" is the variable area used by the backup library.<P><DT><H3> ■Countermeasures</H3><DD> Please reserve 8312 bytes of work area for the backup library.<BR>
+ The reason for this is</P>
+<P><DD><UL TYPE=DISC>
+<LI> Block access table 2048 pieces x 4 8192 bytes (2048 blocks)<LI> Backup library variable area 120 bytes (30 blocks)</UL>
+<P><DD> The total is 8312 bytes.</P>
+<P><DT><TABLE>
+<TR><TH><img srcset="../../what/atto.png 5x"></TH><TD> <B>The block access table uses longword access (4 bytes), so define it as Uint32.</b></TD></TABLE>
+</P>
+<P><DT><H3> ■Example</H3><DD> Uint32 BackUpRamWork[2048+30];</DL>
+ that's all<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn49.htm">STN-49</a> | <A HREF="stn50.htm">STN-50</a> | <A HREF="stn51.htm">STN-51</a> | <B>STN-52</b> ■<HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

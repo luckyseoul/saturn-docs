@@ -1,0 +1,962 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 11/22&gt;          <!-- 何ページ目／総ページ数 -->
+SGL関数リファレンス/scl_cc関数  <!-- タイトルネーム　-->
+</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★ラインカラー</H1><BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slLineColTable"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slLineColTable</H1>
+<HR><H3>ラインカラーテーブルアドレスをレジスタにセット</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void *addr;
+
+    void slLineColTable( addr );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void *addr - VRAM上のラインカラーテーブルアドレス。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    ラインカラーテーブルアドレスをレジスタにセットします。<BR>
+    addrには、VDP2の先頭からのオフセット又は、絶対アドレスどちらも
+    使用できます。(下位20ビットのみ有効です。)
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>( src, ( void * )0x25e20000, 256 * sizeof( <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> ) );
+                     :
+    <a href="../func/scl_cc_j.htm#slLineColTable"><I>slLineColTable</I></A>( ( void * )0x25e20000 );
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLine1ColSet">slLine1ColSet</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalc">slColorCalc</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcOn">slColorCalcOn</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColDisp">slLineColDisp</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcMode">slColorCalcMode</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateLNCL">slColRateLNCL</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_LCTA">VDP2_LCTA</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slLine1ColSet"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slLine1ColSet</H1>
+<HR><H3>ラインカラー画面の設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void   *addr;
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> color;
+
+    void slLine1ColSet( addr, color );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void   *addr - VRAM上のラインカラーテーブルアドレス
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> color - カラー番号。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    ラインカラー画面を単一色にし、その色を設定します。<BR>
+    addrには、VDP2の先頭からのオフセット又は、絶対アドレスどちらも
+    使用できます。(下位20ビットのみ有効です。)
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    NBG1にラインカラーを掛ける。(ラインカラーテーブルは、25E20000H)
+    <a href="../func/scl_cc_j.htm#slColorCalc"><I>slColorCalc</I></A>( <a href="../struct/constscl_j.htm#CC_RATE"><I>CC_RATE</I></A>| <a href="../struct/constscl_j.htm#CC_2ND"><I>CC_2ND</I></A>| <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>);
+    <a href="../func/scl_cc_j.htm#slColorCalcOn"><I>slColorCalcOn</I></A>( <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>);
+
+    slLine1ColSet( ( void * )0x20000, 128 );
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalc">slColorCalc</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcOn">slColorCalcOn</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColDisp">slLineColDisp</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcMode">slColorCalcMode</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateLNCL">slColRateLNCL</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_LCTA">VDP2_LCTA</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slLineColDisp"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slLineColDisp</H1>
+<HR><H3>トップ画像になった時にラインカラーの影響を受ける画面を</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    void slLineColDisp( mode );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode - トップ画像になった時にラインカラーの影響を受ける画面。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    トップ画像になった時にラインカラーの影響を受ける画面を設定します。<BR>
+    modeには、
+        <a href="../struct/constscl_j.htm#NBG0ON"><I>NBG0ON</I></A>、<a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>、<a href="../struct/constscl_j.htm#NBG2ON"><I>NBG2ON</I></A>、<a href="../struct/constscl_j.htm#NBG3ON"><I>NBG3ON</I></A>、<a href="../struct/constscl_j.htm#RBG0ON"><I>RBG0ON</I></A>、<a href="../struct/constscl_j.htm#LNCLON"><I>LNCLON</I></A>
+    が入ります。<BR>
+    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"で
+    つないで指定してください。<BR>
+    スプライトを設定したい場合には <a href="../struct/constscl_j.htm#LNCLON"><I>LNCLON</I></A>を使用してください。<BR>
+    (これは他のレジスタとビット位置が異なっているためです)
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    NBG1にラインカラーを掛ける。<BR>
+    <a href="../func/scl_cc_j.htm#slColorCalcMode"><I>slColorCalcMode</I></A>( <a href="../struct/constscl_j.htm#CC_RATE"><I>CC_RATE</I></A>| <a href="../struct/constscl_j.htm#CC_2ND"><I>CC_2ND</I></A>);
+    <a href="../func/scl_cc_j.htm#slColorCalcOn"><I>slColorCalcOn</I></A>( <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>);
+    <a href="../func/scl_cc_j.htm#slLineColTable"><I>slLineColTable</I></A>( ( void * )0x25e20000 );
+    <a href="../func/scl_cc_j.htm#slLineColDisp"><I>slLineColDisp</I></A>( <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>);
+    <a href="../func/scl_cc_j.htm#slColRateLNCL"><I>slColRateLNCL</I></A>( <a href="../struct/constenm_j.htm#CLRate20_12"><I>CLRate20_12</I></A>);
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLine1ColSet">slLine1ColSet</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalc">slColorCalc</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcOn">slColorCalcOn</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcMode">slColorCalcMode</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateLNCL">slColRateLNCL</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_LNCLEN">VDP2_LNCLEN</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★カラー演算</H1><BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColorCalc"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slColorCalc</H1>
+<HR><H3>カラー演算のためのパラメータを設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    void slColorCalc( mode );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode - カラー演算のためのパラメータ(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    カラー演算のためのパラメータを設定します。<BR>
+    modeは以下のパラメータを指定します。<BR>
+        <a href="../struct/constscl_j.htm#CC_RATE"><I>CC_RATE</I></A>| <a href="../struct/constscl_j.htm#CC_ADD"><I>CC_ADD</I></A>                                 : 演算方法
+        <a href="../struct/constscl_j.htm#CC_TOP"><I>CC_TOP</I></A>| <a href="../struct/constscl_j.htm#CC_2ND"><I>CC_2ND</I></A>                                  : 演算指定画面
+        <a href="../struct/constscl_j.htm#CC_EXT"><I>CC_EXT</I></A>                                           : 拡張カラー演算
+        <a href="../struct/constscl_j.htm#NBG0ON"><I>NBG0ON</I></A>| <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>| <a href="../struct/constscl_j.htm#NBG2ON"><I>NBG2ON</I></A>| <a href="../struct/constscl_j.htm#NBG3ON"><I>NBG3ON</I></A>| <a href="../struct/constscl_j.htm#RBG0ON"><I>RBG0ON</I></A>| <a href="../struct/constscl_j.htm#LNCLON"><I>LNCLON</I></A>| <a href="../struct/constscl_j.htm#SPRON"><I>SPRON</I></A>: 登録面
+   使用する機能に応じて上記の値を "|" でつないで指定してください。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    NBG1にラインカラーを掛ける。<BR>
+    <a href="../func/scl_cc_j.htm#slColorCalc"><I>slColorCalc</I></A>( <a href="../struct/constscl_j.htm#CC_RATE"><I>CC_RATE</I></A>| <a href="../struct/constscl_j.htm#CC_2ND"><I>CC_2ND</I></A>| <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>);
+    <a href="../func/scl_cc_j.htm#slLineColTable"><I>slLineColTable</I></A>( ( void * )0x25e20000 );
+    <a href="../func/scl_cc_j.htm#slLineColDisp"><I>slLineColDisp</I></A>( <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>);
+    <a href="../func/scl_cc_j.htm#slColRateLNCL"><I>slColRateLNCL</I></A>( <a href="../struct/constenm_j.htm#CLRate20_12"><I>CLRate20_12</I></A>);
+
+    NBG0とNBG1での、拡張カラー演算。<BR>
+    <a href="../func/scl_cc_j.htm#slColorCalc"><I>slColorCalc</I></A>( <a href="../struct/constscl_j.htm#CC_RATE"><I>CC_RATE</I></A>| <a href="../struct/constscl_j.htm#CC_TOP"><I>CC_TOP</I></A>| <a href="../struct/constscl_j.htm#NBG0ON"><I>NBG0ON</I></A>| <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>| <a href="../struct/constscl_j.htm#CC_EXT"><I>CC_EXT</I></A>);
+    <a href="../func/scl_cc_j.htm#slColRateNbg0"><I>slColRateNbg0</I></A>( <a href="../struct/constenm_j.htm#CLRate6_26"><I>CLRate6_26</I></A>);
+    <a href="../func/scl_cc_j.htm#slColRateNbg1"><I>slColRateNbg1</I></A>( <a href="../struct/constenm_j.htm#CLRate12_20"><I>CLRate12_20</I></A>);
+    <a href="../func/scroll_j.htm#slPriorityNbg0"><I>slPriorityNbg0</I></A>( 7 );
+    <a href="../func/scroll_j.htm#slPriorityNbg1"><I>slPriorityNbg1</I></A>( 6 );
+    <a href="../func/scroll_j.htm#slPriorityNbg2"><I>slPriorityNbg2</I></A>( 5 );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は、<a href="../func/scl_cc_j.htm#slColorCalcMode"><I>slColorCalcMode</I></A>と<a href="../func/scl_cc_j.htm#slColorCalcOn"><I>slColorCalcOn</I></A>の両方
+    を実行するのと同じです。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLine1ColSet">slLine1ColSet</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcOn">slColorCalcOn</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcMode">slColorCalcMode</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRate">slColRate</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg0">slColRateNbg0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg1">slColRateNbg1</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg2">slColRateNbg2</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg3">slColRateNbg3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateRbg0">slColRateRbg0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateLNCL">slColRateLNCL</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateBACK">slColRateBACK</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr0">slColRateSpr0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr1">slColRateSpr1</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr2">slColRateSpr2</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr3">slColRateSpr3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr4">slColRateSpr4</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr5">slColRateSpr5</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr6">slColRateSpr6</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr7">slColRateSpr7</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_CCCTL">VDP2_CCCTL</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColorCalcMode"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slColorCalcMode</H1>
+<HR><H3>カラー演算モードの設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    void slColorCalcMode( mode );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode - カラー演算モード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    <a href="../func/scl_cc_j.htm#slColorCalc"><I>slColorCalc</I></A>関数のモード設定部分のみを行う関数です。<BR>
+    <a href="../func/scl_cc_j.htm#slColorCalcOn"><I>slColorCalcOn</I></A>関数と併用します。<BR>
+    modeは以下のパラメータを指定します。<BR>
+      <a href="../struct/constscl_j.htm#CC_RATE"><I>CC_RATE</I></A>| <a href="../struct/constscl_j.htm#CC_ADD"><I>CC_ADD</I></A>                                 : 演算方法
+      <a href="../struct/constscl_j.htm#CC_TOP"><I>CC_TOP</I></A>| <a href="../struct/constscl_j.htm#CC_2ND"><I>CC_2ND</I></A>                                  : 演算指定画面
+      <a href="../struct/constscl_j.htm#CC_EXT"><I>CC_EXT</I></A>                                           : 拡張カラー演算
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    NBG1にラインカラーを掛ける。<BR>
+    <a href="../func/scl_cc_j.htm#slColorCalcMode"><I>slColorCalcMode</I></A>( <a href="../struct/constscl_j.htm#CC_RATE"><I>CC_RATE</I></A>| <a href="../struct/constscl_j.htm#CC_2ND"><I>CC_2ND</I></A>);
+    <a href="../func/scl_cc_j.htm#slColorCalcOn"><I>slColorCalcOn</I></A>( <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>);
+    <a href="../func/scl_cc_j.htm#slLineColTable"><I>slLineColTable</I></A>( ( void * )0x25e20000 );
+    <a href="../func/scl_cc_j.htm#slLineColDisp"><I>slLineColDisp</I></A>( <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>);
+    <a href="../func/scl_cc_j.htm#slColRateLNCL"><I>slColRateLNCL</I></A>( <a href="../struct/constenm_j.htm#CLRate20_12"><I>CLRate20_12</I></A>);
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLine1ColSet">slLine1ColSet</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalc">slColorCalc</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcMode">slColorCalcMode</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRate">slColRate</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg0">slColRateNbg0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg1">slColRateNbg1</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg2">slColRateNbg2</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg3">slColRateNbg3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateRbg0">slColRateRbg0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateLNCL">slColRateLNCL</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateBACK">slColRateBACK</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr0">slColRateSpr0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr1">slColRateSpr1</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr2">slColRateSpr2</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr3">slColRateSpr3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr4">slColRateSpr4</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr5">slColRateSpr5</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr6">slColRateSpr6</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr7">slColRateSpr7</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_CCCTL">VDP2_CCCTL</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColorCalcOn"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slColorCalcOn</H1>
+<HR><H3>カラー演算コントロールの影響を受ける画面の設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    void slColorCalcOn( mode );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode - カラー演算コントロールの影響を受ける画面
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    カラー演算コントロールの影響を受ける画面を設定します。<BR>
+    modeには、
+    <a href="../struct/constscl_j.htm#NBG0ON"><I>NBG0ON</I></A>、<a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>、<a href="../struct/constscl_j.htm#NBG2ON"><I>NBG2ON</I></A>、<a href="../struct/constscl_j.htm#NBG3ON"><I>NBG3ON</I></A>、<a href="../struct/constscl_j.htm#RBG0ON"><I>RBG0ON</I></A>、<a href="../struct/constscl_j.htm#LNCLON"><I>LNCLON</I></A>、<a href="../struct/constscl_j.htm#SPRON"><I>SPRON</I></A>
+    が入ります。<BR>
+    複数のスクロール面の描画設定を同時に行なう場合は、各面のモードを "|"で
+    つないで指定してください。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    NBG1にラインカラーを掛ける。<BR>
+    <a href="../func/scl_cc_j.htm#slColorCalcMode"><I>slColorCalcMode</I></A>( <a href="../struct/constscl_j.htm#CC_RATE"><I>CC_RATE</I></A>| <a href="../struct/constscl_j.htm#CC_2ND"><I>CC_2ND</I></A>);
+    <a href="../func/scl_cc_j.htm#slColorCalcOn"><I>slColorCalcOn</I></A>( <a href="../struct/constscl_j.htm#NBG1ON"><I>NBG1ON</I></A>);
+    <a href="../func/scl_cc_j.htm#slColRateNbg1"><I>slColRateNbg1</I></A>( <a href="../struct/constenm_j.htm#CLRate20_12"><I>CLRate20_12</I></A>);
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLine1ColSet">slLine1ColSet</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalc">slColorCalc</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcOn">slColorCalcOn</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRate">slColRate</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg0">slColRateNbg0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg1">slColRateNbg1</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg2">slColRateNbg2</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg3">slColRateNbg3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateRbg0">slColRateRbg0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateLNCL">slColRateLNCL</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateBACK">slColRateBACK</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr0">slColRateSpr0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr1">slColRateSpr1</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr2">slColRateSpr2</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr3">slColRateSpr3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr4">slColRateSpr4</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr5">slColRateSpr5</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr6">slColRateSpr6</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr7">slColRateSpr7</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_CCCTL">VDP2_CCCTL</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slGradationOn"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slGradationOn</H1>
+<HR><H3>ボカシ機能の設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    void slGradationOn( mode );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode - ボカシ機能を作用させる面(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    ボカシ機能を有効にし、作用する画面を指定します。<BR>
+    modeには、
+        <a href="../struct/constscl_j.htm#grdNBG0"><I>grdNBG0</I></A>、<a href="../struct/constscl_j.htm#grdNBG1"><I>grdNBG1</I></A>、<a href="../struct/constscl_j.htm#grdNBG2"><I>grdNBG2</I></A>、<a href="../struct/constscl_j.htm#grdNBG3"><I>grdNBG3</I></A>、<a href="../struct/constscl_j.htm#grdRBG0"><I>grdRBG0</I></A>、<a href="../struct/constscl_j.htm#grdSPR"><I>grdSPR</I></A>、OFF
+    のいずれかのみ指定します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/scl_ram_j.htm#slColRAMMode"><I>slColRAMMode</I></A>( <a href="../struct/constscl_j.htm#CRM16_1024"><I>CRM16_1024</I></A>);
+            :
+    <a href="../func/scl_cc_j.htm#slGradationOn"><I>slGradationOn</I></A>( <a href="../struct/constscl_j.htm#grdNBG0"><I>grdNBG0</I></A>);
+    <a href="../func/scl_cc_j.htm#slColorCalc"><I>slColorCalc</I></A>( <a href="../struct/constscl_j.htm#CC_RATE"><I>CC_RATE</I></A>| <a href="../struct/constscl_j.htm#CC_TOP"><I>CC_TOP</I></A>| <a href="../struct/constscl_j.htm#NBG0ON"><I>NBG0ON</I></A>);
+    <a href="../func/scl_cc_j.htm#slColRateNbg0"><I>slColRateNbg0</I></A>( <a href="../struct/constenm_j.htm#CLRate20_12"><I>CLRate20_12</I></A> );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    ボカシ機能は、カラーRAMモードが0の場合にしか使えません。<BR>
+    また、ボカシ機能はカラー演算と併用しないと機能しませんので注意して
+    ください。<BR>
+    ボカシ機能を取り消す時は、引数に <a href="../struct/constenm_j.htm#OFF"><I>OFF</I></A> を指定するか、
+    <a href="../func/scl_cc_j.htm#slGradationOff"><I>slGradationOff</I></A>関数を利用してください。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLine1ColSet">slLine1ColSet</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalc">slColorCalc</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcOn">slColorCalcOn</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcMode">slColorCalcMode</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRate">slColRate</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg0">slColRateNbg0</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg1">slColRateNbg1</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg2">slColRateNbg2</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg3">slColRateNbg3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateRbg0">slColRateRbg0</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateLNCL">slColRateLNCL</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateBACK">slColRateBACK</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr0">slColRateSpr0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr1">slColRateSpr1</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr2">slColRateSpr2</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr3">slColRateSpr3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr4">slColRateSpr4</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr5">slColRateSpr5</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr6">slColRateSpr6</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr7">slColRateSpr7</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slGradationOff">slGradationOff</A></TD>
+<TD><PRE><a href="../func/scl_ram_j.htm#slColRAMMode">slColRAMMode</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_CCCTL">VDP2_CCCTL</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slGradationOff"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slGradationOff</H1>
+<HR><H3>ボカシ機能を無効にする</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void slGradationOff( void );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も与えません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    ボカシ機能を無効にします。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/scl_cc_j.htm#slGradationOff"><I>slGradationOff</I></A>();
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLine1ColSet">slLine1ColSet</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalc">slColorCalc</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcOn">slColorCalcOn</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcMode">slColorCalcMode</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRate">slColRate</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg0">slColRateNbg0</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg1">slColRateNbg1</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg2">slColRateNbg2</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateNbg3">slColRateNbg3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateRbg0">slColRateRbg0</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateLNCL">slColRateLNCL</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateBACK">slColRateBACK</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr0">slColRateSpr0</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr1">slColRateSpr1</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr2">slColRateSpr2</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr3">slColRateSpr3</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr4">slColRateSpr4</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr5">slColRateSpr5</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr6">slColRateSpr6</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColRateSpr7">slColRateSpr7</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slGradationOn">slGradationOn</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRate"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slColRate</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateNbg0"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateNbg0</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateNbg1"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateNbg1</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateNbg2"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateNbg2</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateNbg3"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateNbg3</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateRbg0"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateRbg0</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateLNCL"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateLNCL</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateBACK"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateBACK</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateSpr0"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateSpr0</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateSpr1"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateSpr1</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateSpr2"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateSpr2</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateSpr3"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateSpr3</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateSpr4"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateSpr4</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateSpr5"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateSpr5</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateSpr6"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateSpr6</H1>
+</PRE></P>
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slColRateSpr7"><HR NOSHADE></A>
+<H4>マクロ</H4>
+<H1>slColRateSpr7</H1>
+<HR><H3>カラー演算割合の指定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> rate;
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    void slColRate( mode, rate );
+    void slColRateNbg0( rate );
+    void slColRateNbg1( rate );
+    void slColRateNbg2( rate );
+    void slColRateNbg3( rate );
+    void slColRateRbg0( rate );
+    void slColRateLNCL( rate );
+    void slColRateBACK( rate );
+    void slColRateSpr0( rate );
+    void slColRateSpr1( rate );
+    void slColRateSpr2( rate );
+    void slColRateSpr3( rate );
+    void slColRateSpr4( rate );
+    void slColRateSpr5( rate );
+    void slColRateSpr6( rate );
+    void slColRateSpr7( rate );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode - カラー演算割合を指定する面(後述)。<BR>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> rate - カラー演算割合。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    各画面のカラー演算割合を指定します。<BR>
+    modeには、
+        <a href="../struct/constscl_j.htm#scnNBG0"><I>scnNBG0</I></A>、<a href="../struct/constscl_j.htm#scnNBG1"><I>scnNBG1</I></A>、<a href="../struct/constscl_j.htm#scnNBG2"><I>scnNBG2</I></A>、<a href="../struct/constscl_j.htm#scnNBG3"><I>scnNBG3</I></A>、<a href="../struct/constscl_j.htm#scnRBG0"><I>scnRBG0</I></A>、<a href="../struct/constscl_j.htm#scnLNCL"><I>scnLNCL</I></A>、<a href="../struct/constscl_j.htm#scnBACK"><I>scnBACK</I></A>
+    のいずれかを指定します。<BR>
+    rateは<a href="../struct/constenm_j.htm#CLRate31_1"><I>CLRate31_1</I></A>〜<a href="../struct/constenm_j.htm#CLRate0_32"><I>CLRate0_32</I></A>の範囲で指定します。<BR>
+           rate               Top Screen : Second Screen
+           <a href="../struct/constenm_j.htm#CLRate31_1"><I>CLRate31_1</I></A>          31:1
+           <a href="../struct/constenm_j.htm#CLRate30_2"><I>CLRate30_2</I></A>          30:2
+           <a href="../struct/constenm_j.htm#CLRate29_3"><I>CLRate29_3</I></A>          29:3
+           <a href="../struct/constenm_j.htm#CLRate28_4"><I>CLRate28_4</I></A>          28:4
+           <a href="../struct/constenm_j.htm#CLRate27_5"><I>CLRate27_5</I></A>          27:5
+           <a href="../struct/constenm_j.htm#CLRate26_6"><I>CLRate26_6</I></A>          26:6
+           <a href="../struct/constenm_j.htm#CLRate25_7"><I>CLRate25_7</I></A>          25:7
+           <a href="../struct/constenm_j.htm#CLRate24_8"><I>CLRate24_8</I></A>          24:8
+           <a href="../struct/constenm_j.htm#CLRate23_9"><I>CLRate23_9</I></A>          23:9
+           <a href="../struct/constenm_j.htm#CLRate22_10"><I>CLRate22_10</I></A>         22:10
+           <a href="../struct/constenm_j.htm#CLRate21_11"><I>CLRate21_11</I></A>         21:11
+           <a href="../struct/constenm_j.htm#CLRate20_12"><I>CLRate20_12</I></A>         20:12
+           <a href="../struct/constenm_j.htm#CLRate19_13"><I>CLRate19_13</I></A>         19:13
+           <a href="../struct/constenm_j.htm#CLRate18_14"><I>CLRate18_14</I></A>         18:14
+           <a href="../struct/constenm_j.htm#CLRate17_15"><I>CLRate17_15</I></A>         17:15
+           <a href="../struct/constenm_j.htm#CLRate16_16"><I>CLRate16_16</I></A>         16:16
+           <a href="../struct/constenm_j.htm#CLRate15_17"><I>CLRate15_17</I></A>         15:17
+           <a href="../struct/constenm_j.htm#CLRate14_18"><I>CLRate14_18</I></A>         14:18
+           <a href="../struct/constenm_j.htm#CLRate13_19"><I>CLRate13_19</I></A>         13:19
+           <a href="../struct/constenm_j.htm#CLRate12_20"><I>CLRate12_20</I></A>         12:20
+           <a href="../struct/constenm_j.htm#CLRate11_21"><I>CLRate11_21</I></A>         11:21
+           <a href="../struct/constenm_j.htm#CLRate10_22"><I>CLRate10_22</I></A>         10:22
+           <a href="../struct/constenm_j.htm#CLRate9_23"><I>CLRate9_23</I></A>           9:23
+           <a href="../struct/constenm_j.htm#CLRate8_24"><I>CLRate8_24</I></A>           8:24
+           <a href="../struct/constenm_j.htm#CLRate7_25"><I>CLRate7_25</I></A>           7:25
+           <a href="../struct/constenm_j.htm#CLRate6_26"><I>CLRate6_26</I></A>           6:26
+           <a href="../struct/constenm_j.htm#CLRate5_27"><I>CLRate5_27</I></A>           5:27
+           <a href="../struct/constenm_j.htm#CLRate4_28"><I>CLRate4_28</I></A>           4:28
+           <a href="../struct/constenm_j.htm#CLRate3_29"><I>CLRate3_29</I></A>           3:29
+           <a href="../struct/constenm_j.htm#CLRate2_30"><I>CLRate2_30</I></A>           2:30
+           <a href="../struct/constenm_j.htm#CLRate1_31"><I>CLRate1_31</I></A>           1:31
+           <a href="../struct/constenm_j.htm#CLRate0_32"><I>CLRate0_32</I></A>           0:32
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/scl_cc_j.htm#slColRate"><I>slColRate</I></A>( <a href="../struct/constscl_j.htm#scnNBG0"><I>scnNBG0</I></A>, <a href="../struct/constenm_j.htm#CLRate29_3"><I>CLRate29_3</I></A>);
+    <a href="../func/scl_cc_j.htm#slColRateNbg2"><I>slColRateNbg2</I></A>( <a href="../struct/constenm_j.htm#CLRate2_30"><I>CLRate2_30</I></A>);
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLine1ColSet">slLine1ColSet</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slLineColTable">slLineColTable</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalc">slColorCalc</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcOn">slColorCalcOn</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slColorCalcMode">slColorCalcMode</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slGradationOn">slGradationOn</A></TD>
+<TD><PRE><a href="../func/scl_cc_j.htm#slGradationOff">slGradationOff</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CCRNA">VDP2_CCRNA</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★バックカラー画面</H1><BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slBackColTable"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slBackColTable</H1>
+<HR><H3>バック画面のカラーテーブルのセットとモードの切替</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void *addr_A;
+
+    void slBackColTable( addr_A );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void *addr_A - バック画面のカラーテーブルを示す絶対アドレス。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    バック画面のカラーテーブルをセットし、ラスター単位でカラーを切り替える
+    モードに設定します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    ss_main() {
+      <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> col[ 256 ] = {
+        <a href="../struct/macro_j.htm#C_RGB"><I>C_RGB</I></A>( 3, 6, 6 ), ...
+      };
+         :
+      <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>( col, ( void * )( 0x25e40000 ), 256 * sizeof( <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> ) );
+         :
+      <a href="../func/scl_cc_j.htm#slBackColTable"><I>slBackColTable</I></A>( ( void * )( 0x25e40000 ) );
+         :
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数に与える引数は、VDP2のVRAMのアドレスを絶対アドレスで指定します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slBack1ColSet">slBack1ColSet</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_BKTA">VDP2_BKTA</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#scl_cc">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slBack1ColSet"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slBack1ColSet</H1>
+<HR><H3>バック画面の設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void   *addr_A;
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> color;
+    
+    void slBack1ColSet( addr_A, color );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void   *addr_A - バックカラーを格納するVRAMの先頭アドレス(絶対アドレス)。<BR>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> color   - カラーデータをRGB各5ビットで指定。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    バック画面の設定を行ないます。バック画面とは、他の画面が全く描画されて
+    いない部分に表示される、最背面の描画面のことです。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    バック画面を白くする。<BR>
+    <a href="../func/scl_cc_j.htm#slBack1ColSet"><I>slBack1ColSet</I></A>( ( void * )0x25e00000, 0x7fff
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    VRAMはカラーRAMでなく、VDP2のVRAM領域を用います。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/scl_cc_j.htm#slBackColTable">slBackColTable</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_BKTA">VDP2_BKTA</A></TD>
+</TR>
+</TABLE>
+</DL>
+
+<HR NOSHADE>
+<A HREF="index_j.htm">戻る</A><ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

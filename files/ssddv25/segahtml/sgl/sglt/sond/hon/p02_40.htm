@@ -1,0 +1,86 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 7&gt;SGL Sound Tutorial/2. Create a song</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">SOUND TUTORIAL</a><HR>
+ <B>▲ <A HREF="p02_30.htm">Back</a> ｜ <A HREF="p02_50.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SOUND TUTORIAL/2. Create a song</b><HR NOSHADE>
+<DL>
+<A NAME="no2_40"></A><P><DT><H2> 2-4.Creating a DSP program</H2><DD> In addition to the songs played by the built-in sound source, the Saturn allows you to apply effects using the built-in DSP to sounds from SE and CD. Here we will explain how to create a DSP program for this purpose.<BR>
+ However, the sound will still be produced even without this DSP program, so if you want to produce sound without effects, you can skip this item.</P>
+<A NAME="no2_41"></A><P><DT> <B>1) Start DSP Linker</b><DD> First, double-click DSP Linker to start it. To create a new file, select “New” from the File menu and give it a name. The Algorithm Edit window will then open and a “.YLI” extension will be automatically added to the file name.</P>
+<A NAME="no2_42"></A><P><DT> <B>2) Placement of DSP input/output module</b><DD> Select “I/O Modules” from the Window menu to open the “I/O Module” window.</P>
+<A NAME="z2_20"></A><P ALIGN=CENTER> <B>Figure 2-20 I/O Module window</b><BR>
+<img srcset="../grp/2_20.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> By double-clicking the “Input” (input to the DSP) and “Output” (output from the DSP) modules in the “I/O Module” window, or by clicking to select them and selecting them using the “Select” button. , import each module into the algorithm edit window. We'll build a reverb as an example, so let's import one “Input” module and two “Output” modules.<BR>
+ Move each imported module to a position where it can be easily seen so that they do not overlap.</P>
+<A NAME="z2_21"></A><P ALIGN=CENTER> <B>Figure 2-21 DSP input/output module arrangement</b><BR>
+<img srcset="../grp/2_21.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no2_43"></A><P><DT> <B>3) Effect module placement</b><DD> Select "Effect Modules" from the Window menu to open the "Effect Module" window.</P>
+<A NAME="z2_22"></A><P ALIGN=CENTER> <B>Figure 2-22 Effect Module Window</b><BR>
+<img srcset="../grp/2_22.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Select the effect you want to apply from among these and import it into the Algorithm Edit window in the same way as for the input/output module.</P>
+<A NAME="z2_23"></A><P ALIGN=CENTER> <B>Figure 2-23 Effect module arrangement</b><BR>
+<img srcset="../grp/2_23.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no2_44"></A><P><DT> <B>4) Wiring between modules</b><DD> In order to determine the flow of sound data between each module, we will connect each module. If you click the output port of a module and then click the input port of the next module, a line will connect each module.</P>
+<A NAME="z2_24"></A><P ALIGN=CENTER> <B>Figure 2-24 Wiring between modules</b><BR>
+<img srcset="../grp/2_24.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> This allows sound data to flow from the input module through the effect module(s) to the output module.</P>
+<A NAME="no2_45"></A><P><DT> <B>5) Link</b><DD> After connecting the modules, select “Link” from the Process menu to link the created effect algorithm. If the link is successful, the "Link Result Information" dialog will be displayed. This dialog displays information regarding the usage status of DSP-related hardware resources.</P>
+<A NAME="z2_25"></A><P ALIGN=CENTER> <B>Figure 2-25 "Link result information" dialog</b><BR>
+<img srcset="../grp/2_25.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The value shown in "Free Area Required" in this "Link Result Information" dialog is the size of the DSP work RAM to be secured in the map.<BR>
+ When setting the DSP work RAM in the sound simulator, the first address is separated by 2000h. If you try to set an address smaller than that, it will be automatically moved back to a well-separated address.</P>
+<P><DT> <B>Processing when “Ring buffer too small” message occurs</b><DD> When you try to link, you may get a “Ring buffer too small” message and be unable to link. In this case, select “Ring Buffer” from the Option menu to increase the size of the ring buffer. (The larger the ring buffer, the larger the amount of DSP work RAM that must be reserved for the map.)</P>
+<A NAME="z2_26"></A><P ALIGN=CENTER> <B>Figure 2-26 Ring buffer size selection</b><BR>
+<img srcset="../grp/2_26.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no2_46"></A><P><DT> <B>6) Download</b><DD> Once linked, select “Download” from the Process menu. The created effect algorithm will now be downloaded to the target (development board) and the DSP will start operating.</P>
+<A NAME="z2_27"></A><P ALIGN=CENTER> <B>Figure 2-27 Download to target</b><BR>
+<img srcset="../grp/2_27.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no2_47"></A><P><DT> <B>7) Editing effect parameters</b><DD> The parameter edit window will be opened by double-clicking the margin (where no text is displayed) of each module in the algorithm edit window, or by selecting it and selecting “Parameters” from the Window menu. Masu.</P>
+<A NAME="z2_28"></A><P ALIGN=CENTER> <B>Figure 2-28 Editing the reverb module</b><BR>
+<img srcset="../grp/2_28.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> By changing the values in this parameter edit window, you can change the detailed parameters of the effect. This work can be done in real time while actually playing the song or SE. However, please note that if you frequently operate the slider while playing a sequence, SCSI problems may occur more easily.</P>
+<P><DD> For effects that give a stereo feel like reverb, prepare two output modules. Then, by assigning different exits, you can move each to the left and right to create a stereo effect.<BR>
+ The “ch” of the output module corresponds to the channel in the mixer window of the tone editor.<BR>
+ In addition, the input channel “ch” corresponds to the “Effect Select” of each layer in the tone editor.</P>
+<A NAME="z2_29"></A><P ALIGN=CENTER> <B>Figure 2-29 Editing the input/output module</b><BR>
+<img srcset="../grp/2_29.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no2_48"></A><P><DT> <B>8) Save file</b><DD> At this stage, the effect algorithm you created only exists in the target's memory and is not saved as a file. If you want to save the effect algorithm after completing it, or even while you are working on it, select “Save” from the File menu.<BR>
+ When you save, four files with the extensions “.YLI”, “.EXL”, “.LRI”, and “.EXB” will be created.</P>
+<P><DD> If you want to reopen a previously saved file, open the file with the “.YLI” extension.</P>
+<P><DD> The files that are actually included in the map or passed to the main programmer are files with an “.EXB” extension.</P>
+<A NAME="no2_49"></A><P><DT> <B>9) Modulation effects</b><DD> Modulation effects such as chorus and autopan cannot be linked unless you specify the modulator input buffer number (DSP input buffer number).<BR>
+ Click on the “M” part to open the modulator input buffer settings dialog.</P>
+<A NAME="z2_30"></A><P ALIGN=CENTER> <B>Figure 2-30 Modulation effects</b><BR>
+<img srcset="../grp/2_30.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Be sure to select the “Slot” side for the “Slot” and “Soft” buttons.</P>
+<P><DD> Please incorporate the modulation voices such as “VoiceForAutoPan” and “VoiceForModulations” in the DSP tool folder into the tone bank you are using.<BR>
+ Make sure that the DSP input buffer number (Effect Select) of these voices and the modulator input buffer number are the same. (15 is selected for these Voices by default)</P>
+<P><DD> When using these effects, the modulation voice must be activated. Please include the data that will make this Voice sound in the sequence data (as the Direct Level is set to 0, this Voice will not sound as a sound).<BR>
+ Adjust the modulation speed using the pitch of this Voice.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_30.htm">Back</a> ｜ <A HREF="p02_50.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">SOUND TUTORIAL</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

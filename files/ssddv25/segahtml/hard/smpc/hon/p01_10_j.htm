@@ -1,0 +1,138 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/19&gt;SMPCユーザーズマニュアル/第１章　概要</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<B>■　　｜
+<a href="p01_20_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SMPCユーザーズマニュアル</B>
+<H1 ALIGN=CENTER>第１章　概要</H1>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A>
+	<P>	<DT><H2>■1.1　システム構成</H2>
+		<DD>　SMPCは、パワーON時のサターンシステムのリセット制御やリセットボタン押下時のマスタSH-2へのNMIリクエストを管理します。
+			また、SH-2からのコマンドによって各LSIのON/OFF、カレンダ時計の設定や取得、ペリフェラルからのデータ収集等を行います。
+			更にクロックチェンジコマンドによって、水平解像度を320ドットまたは352ドットに切り替えます。</P>
+
+<A NAME="z1_1"></A>
+	<P ALIGN=CENTER><B>図1.1　SMPCシステム構成</B><BR><img srcset="../grp/i002_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　SMPCには7ビットのパラレルI/Oポートが2組用意されています。<BR>
+			　I/Oポートへのアクセスは、SMPC内部のファームウェアによってコントロールし、収集データをSMPCアウトプットレジスタ(OREG)に出力するSMPCコントロールモードとSH-2から直接アクセスできるSH-2ダイレクトモードの2つのアクセス方法を選択できます。
+			SMPCコントロールモードおよびSH-2ダイレクトモードの詳細は、それぞれ
+第3章「<a href="p03_10_j.htm">◆SMPCコントロールモード</A>」、
+「<a href="p03_18_j.htm">◆SH-2ダイレクトモード</A>」を参照してください。<BR>なお、パワーON時にサターン内部の各ユニットは、以下の状態に初期化されます。</P>
+
+
+<A NAME="no1_10_1"></A>
+	<DL>
+	<P>	<DT><B>＜パワーON時の初期状態＞</B></p>
+
+	<p>	<DT><B>　サウンドCPU OFF状態</B>
+		<DD>サウンドCPUにリセットが入っています。SNDONコマンドによりパワーオンベクタから動き出します。</P>
+
+	<P>	<DT><B>　VDP1,VDP2,SCU,SCSP ON状態</B>
+		<DD>SH-2からアクセス可能な状態になっています。
+
+	<P>	<DT><B>　スレーブSH OFF状態</B>
+		<DD>スレーブSH-2にリセットが入っています。SSHONコマンドによりパワーオンベクタから動き出します。
+
+	<P>	<DT><B>　DOT SEL OFF状態</B>
+		<DD>PLL発振周波数が320モード(NTSC:26.8741MHz,PAL:26.6875MHz)となっておりVDP1,VDP2,SH-2はこの周波数で動作しています。CKCHG352コマンドにて352モード(NTSC:28.6364MHz,PAL:28.4375MHz)で動作します。</P>
+
+	<P>	<DT><B>　CDブロックON状態</B>
+		<DD>SH-2からアクセス可能な状態になっています。</P>
+	</DL>
+
+<A NAME="no1_11"></A>
+	<P>	<DT><H3>　●機能</H3>
+		<DD>　SMPCは、大きく分けてRTC(Real Time Clock), SM(System Management), PC(Peripheral Control)の3つの機能を持っています。以下にSMPCの主な機能を示します。</P>
+
+	<DL>
+	<P>	<DT><B>＜SMPCの主な機能＞</B></P>
+
+<A NAME="no1_11_0"></A>
+	<P>	<DT><B>　RTC(Real Time Clock)</B>
+		<DD>・SH-2からの時刻設定および取得
+		<DD>・年月日、曜日、時分秒を自動更新
+		<DD>　(メインパワーOFF時のバッテリバックアップが可能)</P>
+
+<A NAME="no1_11_1"></A>
+	<P>	<DT><B>　SM(System Management)</B>
+		<DD>・サウンドCPUのON/OFF
+		<DD>・マスタSH-2、スレーブSH-2のON/OFF
+		<DD>・システムリセットの制御
+		<DD>・クロックの切り替え(PLL制御)
+		<DD>・パワーONリセット
+		<DD>・フロントパネルボタン押下でマスタS-2にNMIを要求</P>
+
+<A NAME="no1_11_2"></A>
+	<P>	<DT><B>　PC(Peripheral Control)</B>
+		<DD>・サターンペリフェラルインタフェース仕様のペリフェラルをサポート可能
+		<DD>・コントロールパッド、マウス等のペリフェラルデータを自動収集
+		<DD>・メガドライブペリフェラルもサポート
+		<DD>　(3ボタン、6ボタン、セガタップ等ただし、変換アダプタが必要)</P>
+	</DL>
+
+<A NAME="no1_12"></A>
+	<P>	<DT><H3>　●入力ぺリフェラル</H3></P>
+	
+	<P>	<DD><B>◆セガサターン標準パット</B>
+		<DD>　セガサターン用デジタル標準パットは、上、下、左、右、A、B、C、X、Y、Z、L、R、スタートの各ボタンを装備しています。</P>
+
+	<P>	<DD><B>◆マルチコントローラ</B>
+		<DD>　マルチコントローラは、セガサターン標準パットを互換性を保ちつつアナログキーおよび、及びアナログLRボタンを装備しています。
+		<DD>　参考：<a href="../../../info/hon/stn43_j.htm"><B>STN-43</B></A>「マルチコントローラユーザーズマニュアルVer1.00 」</P>
+
+	<P>	<DD><B>◆ミッションスティック</B>
+		<DD>　
+		<DD>　参考：<a href="../../../info/hon/stn34_j.htm"><B>STN-34</B></A>「アナログミッションスティックマニュアル」</P>
+
+	<P>	<DD><B>◆レーシングコントローラ</B>
+		<DD>　
+		<DD>　参考：<a href="../../../info/hon/stn38_j.htm"><B>STN-38</B></A>「レーシングコントローラマニュアル」</P>
+
+	<P>	<DD><B>◆シャトルマウス</B>
+		<DD>　
+		<DD>　参考：<a href="../../../info/hon/stn44_j.htm"><B>STN-44</B></A>「シャトルマウスの補足説明」</P>
+
+	<P>	<DD><B>◆セガサターンキーボード</B>
+		<DD>　
+		<DD>　参考：<a href="../../../info/hon/stn45_j.htm"><B>STN-45</B></A>「サターンキーボードの補足説明」</P></P>
+
+	<P>	<DD><B>◆バーチャガン</B>
+		<DD>　
+		<DD>　参考：<a href="../../../info/hon/stn41_j.htm"><B>STN-41</B></A>「バーチャガンユーザーズマニュアル Ver1.00」</P></P>
+</DL>
+
+<HR NOSHADE>
+<B>■　　｜
+<a href="p01_20_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

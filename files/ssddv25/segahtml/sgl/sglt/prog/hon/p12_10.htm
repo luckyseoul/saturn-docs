@@ -1,0 +1,640 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;28/30&gt;SGL Programmer's Tutorial/12.CD-ROM Library</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+ <B>▲ <A HREF="demo_c.htm">Back</a> ｜ <A HREF="p13_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>PROGRAMMER'S TUTORIAL</b><H2 ALIGN=CENTER> 12.CD-ROM library</H2><HR NOSHADE>
+<P> This chapter explains how to access CD-ROM using the CD-ROM library. By using the CD-ROM library, you can read data and programs from CD-ROMs and play music. This chapter also includes a list of CD-ROM library function references. </P>
+<DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_10"><HR></a><P><DT><H2> 12-1.About CD-ROM library</H2><DD> SGL provides functions for accessing CD-ROMs and virtual CDs. By using these functions, you can achieve the following functionality:</P>
+<P><DD><UL TYPE=DISC>
+<LI> Loading programs and data from CD-ROM<LI> Reading data using CD-ROM XA standard<LI> Music playback using CDDA files</UL>
+</P>
+<P><DT><TABLE>
+<TR><TH><B><PRE> Note<BR><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>The CD-ROM library functions are not listed in the separate " <FONT SIZE="5">Function Reference</font> ", but are listed in <A HREF="#no12_30">the latter half of this chapter</a> .</b></TD></TR>
+</TABLE>
+</P>
+<P><DD> For information on how to burn a CD-ROM, refer to "Chapter 3 of Data Transfer: How to Burn a CD-ROM."</P>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_20"><HR></a><P><DT><H2> 12-2. CD-ROM access</H2><DD> The flow of reading data from a CD-ROM is as follows.</P>
+<A NAME="z12_"></A><P ALIGN=CENTER> <B>Figure 12-1 Flow of CD-ROM access</b><BR>
+<img srcset="../grp/p12_03_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Since accessing a CD-ROM involves mechanical operations, the data is not read into memory the moment a read request is made. Also, the speed at which data is read from a CD-ROM is extremely slow compared to the speed of the CPU. SGL uses a method of accessing the CD-ROM while monitoring the read status so that programs other than CD-ROM access can be executed during this waiting time.</P>
+<A NAME="no12_21"></A><P><DT><H3> Logical structure of CD-ROM</H3><DD> A CD-ROM is made up of units called sectors. Sectors are generally 2048 bytes (FORM1), but if you really want to secure transfer capacity, such as music data, where there is no problem even if the sector is read slightly incorrectly, you can set it to 2324 bytes (FORM2). can. Each sector within the same file <A NAME="KD">has information called a subheader consisting of</a> <A NAME="CHANNEL">channel number,</a> submode, and coding information. <A NAME="KD">A simple representation of the sector structure is as follows.<A NAME="z12_2"></A></a><P ALIGN=CENTER> <B>Figure 12-2 Sector structure</b><BR>
+<img srcset="../grp/p12_03_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> SGL has a function to classify data according to subheaders. In SGL, this information is called a "key." Each bit of submode and coding information has a meaning, and SGL selects and reads only sectors where the specified bit is 1.</P>
+<A NAME="no12_22"></A><P><DT><H3> Load file</H3><DD> To load files, use the functions “slCdOpen”, “slCdLoadFile”, “slCdGetStatus”.</P>
+<P><DD> <B>【CDHN slCdOpen(Sint8 *pathname, CDKEY key[]);】</b><DD> Specify the file to read.<BR>
+ “key” is the type of sector to read. You can specify multiple types of sectors. After specifying all sector types, specify “CDKEY_TERM” as the last channel number.<BR>
+ If the file can be opened correctly, a non-NULL file handle is returned as the return value.<BR>
+ However, if the total number of keys in the open file exceeds 24, opening will fail. Opened files are automatically closed when reading is interrupted or completed.</P>
+<P><DD> <B>[Sint32 slCdLoadFile (CDHN cdhn, CDBUF buf []);]</b><DD> Specify the area to load.<BR>
+ The order of “buf” corresponds to the order of “key” in the function “slCdOpen”.<P><DD> To copy data from CD-ROM to work RAM, specify as follows.<PRE>
+buf[ i ]. type = CDBUF_COPY;
+buf[ i ]. trans.copy.addr = address of read area;
+buf[ i ]. trans.copy.unit = unit of read area size (CDBUF_FORM1/CDBUF_FORM2/CDBUF_BYTE);
+buf[ i ]. trans.copy.size = number of read area units;
+</PRE><P><DD>If “addr” is set to NULL and size is set to 0, it will not be loaded. For "unit", match the unit of the read area size to the sector type of the CD-ROM. This allows you to read data efficiently. The actual read area should be set to "unit" x "size" on a 4-byte boundary.</P>
+<P><DD> If you want to read data while processing it, you can register a function as follows.<PRE>
+buf[ i ]. type = CDBUF_FUNC;
+buf[ i ]. trans.func.func. = function pointer;
+buf[ i ]. trans.func.obj = value passed to the first argument of the function;
+</PRE><P><DD>The registered function is “Sint32 (*func) (void *obj, Uint32 *addr, Sint32 adinc, Sint32 nsct)”.<BR>
+ “obj” will contain the value of “buf [ i ]. trans.func.obj” as is.<BR>
+ “addr” is the address from which the data will be copied.<BR>
+ “adinc” is the value added to “addr” when 4 bytes are extracted from “addr”, in units of 4 bytes.<BR>
+ “nsct” is the number of sectors that can be read. The return value is the number of sectors actually transferred. After specifying all transfer areas, specify “CDBUF_TERM” in the last “buf[].type”.<P><DD> <B>[Sint32 slCdGetStatus (CDHN cdhn, Sint32 ndata[]); ]</b><DD> Please call the function “slCdGetStatus” periodically in the main loop, etc., and monitor the loading status.<BR>
+ When the function value becomes “CDSTAT_COMPLETED”, loading is complete.<BR>
+ The number of bytes read is stored in “ndata” in the order corresponding to the “key” of the function “slCdOpen”.</P>
+<P><DD> Sample program 1 shows an example program for reading files.</P>
+<P><DD> This sample program is a process for reading files on a CD-ROM, and is an example of how to use a basic library for reading files from a CD-ROM. The steps will be explained according to Flow 12-1.</P>
+<P><DD><OL>
+<LI> Initializes the system such as graphics.</P>
+<P><LI> Initialize the CD-ROM system.<P><LI> Open the file.<BR>
+ There is key information for classifying data in the input parameter of the function that opens the file, so please set this information as necessary.</P>
+<P><LI> Reads the file using the file handle and read area information returned by the file open function as parameters.<P><LI> Executes the graphics library (function “slSynch()”).<BR>
+ The file specified in File Load is actually read piecemeal at this time.<P><LI> Get the status information and check if the file has finished loading.<BR>
+ If the file has not finished reading, it will loop until the status shows that it has finished reading.<BR>
+ Inside this loop, call the function “slSynch()”.</OL>
+</P>
+<A NAME="f12_1"></A><P ALIGN=CENTER> <B>Flow 12-1 Sample program 1 (load file sample_cd1/main.c)</b><img srcset="../grp/p12_05.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="l12_1"></A><P><DD> <B>Listing 12-1 Sample program 1 (loading file sample_cd1/main.c)</b><PRE>
+/************************************************* ****************************
+ *
+ * Copyright (c) 1994 SEGA
+ *
+ *File:main.c
+ *Date :1995-02-20
+ * Version:0.00
+ *Author:
+ ************************************************** **********************************/
+#include "sgl.h"
+#include "sgl_cd.h"
+
+/************************************************* ***************************/
+#define MAX_FILE 128
+#define READSECT 50
+/************************************************* ***************************/
+Sint32 dirwork[SLCD_WORK_SIZE(MAX_FILE)];
+Sint32 readbuf[ READSECT * CDBUF_FORM1 / sizeof(Sint32)];
+    
+/************************************************* ***************************/
+void ss_main(void)
+{
+    Sint32ndir;
+    CDHN cdhn;
+    CDKEY key[2];
+    CDBUF buf[2];
+    Sint32 stat;
+    Sint32 len[2];
+    Sint32 ypos = 1;
+
+    slInitSystem(TV_320x224, NULL, 1);		
+    ndir = slCdInit(MAX_FILE, dirwork);	
+    slPrint("slCdInit:", slLocate(1,ypos));
+    slPrintFX(toFIXED(ndir), slLocate(11, ypos));
+    ypos++;
+
+    key[0].cn = key[0].sm = key[0].ci = CDKEY_NONE;
+    key[1].cn = CDKEY_TERM;	
+    cdhn = slCdOpen("S2100D0_.M", key);	
+    slPrint("slCdOpen:", slLocate(1, ypos));
+    slDispHex((Uint32)cdhn, slLocate(11, ypos));
+
+    buf[0].type = CDBUF_COPY;	
+    buf[0].trans.copy.addr = readbuf;	
+    buf[0].trans.copy.unit = CDBUF_FORM1;
+    buf[0].trans.copy.size = READSECT;	
+    buf[1].type = CDBUF_TERM;
+    slCdLoadFile(cdhn, buf);		
+    ypos++;
+
+    while (1) {
+	slSynch();     			
+	stat = slCdGetStatus(cdhn, len);
+	slPrint("stat:", slLocate(1, ypos));
+	slDispHex((Uint32)stat, slLocate(7, ypos));
+	ypos++;
+	if (ypos >= 27) ypos = 1;
+	if (stat == CDSTAT_COMPLETED) break;
+    }
+    while (1);
+}
+</PRE><A NAME="no12_23"></A><P><DT><H3>Separate file loading</H3><DD> Please use the function “slCdResetBuf” to load a large amount of data in pieces, such as videos.</P>
+<P><DD> <B>[Bool slCdResetBuf (CDHN cdhn, CDKEY *key);]</b><DD> Returns the loading destination of the data corresponding to the file handle "key" to the beginning of the area specified by the function "slCdLoadFile".<BR>
+ Use the function “slCdGetStatus” to obtain the number of valid data in the read area, process the data when the read area is full, and call the function “slCdResetBuf”.<P><DD> Sample program 2 shows an example of a program that divides and reads data.</P>
+<P> This sample program is a process for reading files on a CD-ROM into parts, and is an example of how to use a basic library for reading files from a CD-ROM. I will explain the steps according to Flow 12-2.</P>
+<P><DD><OL>
+<LI> Initializes the system such as graphics.</P>
+<P><LI> Initialize the CD-ROM system.<P><LI> Open the file.<BR>
+ There is key information for classifying data in the input parameter of the function that opens the file, so please set this information as necessary.</P>
+<P><LI> Reads the file using the file handle and read area information returned by the file open function as parameters.</P>
+<P><LI> Executes the graphics library (function “slSynch()”).<BR>
+ The file specified in File Load is actually read piecemeal at this time.</P>
+<P><LI> Get the status information and check if the file has finished loading.<BR>
+ Also, check if the loading area is full. If it is full, process the data as needed and then reset the loading area.<BR>
+ If the file has not finished reading, it will loop until the status shows that it has finished reading.<BR>
+ Inside this loop, call the function “slSynch()”.</P>
+</OL>
+</P>
+<A NAME="f12_2"></A><P ALIGN=CENTER> <B>Flow 12-2 Sample program 2 (divided file reading sample_cd2/main.c)</b><img srcset="../grp/p12_09.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="l12_2"></A><P><DD> <B>Listing 12-2 Sample program 2 (divided file reading sample_cd2/main.c)</b><PRE>
+/************************************************* ****************************
+ *
+ * Copyright (c) 1994 SEGA
+ *
+ *File:main.c
+ *Date :1995-02-20
+ * Version:0.00
+ *Author:
+ ************************************************** **********************************/
+#include "sgl.h"
+#include "sgl_cd.h"
+
+/************************************************* ***************************/
+#define MAX_OPEN 128	
+#define FNAME "S2100D0_.M"
+#define slsize 2	
+
+/************************************************* ***************************/
+Sint32 lib_work[SLCD_WORK_SIZE(MAX_OPEN)];
+Sint32 readbuf[ (CDBUF_FORM1 * slsize) / sizeof(Sint32) ];
+
+/************************************************* ***************************/
+void ss_main(void)
+{
+    Sint32 ndir;			
+    Sint32 ypos = 1 ;	
+    Sint32 ret ;		
+    Sint32 ndata[2] ;	
+    CDHN cdhn;		
+    CDKEY key[2];
+    CDBUF buf[2];
+
+    slInitSystem(TV_320x224, NULL, 1);	
+    ndir = slCdInit(MAX_OPEN, lib_work);
+    slPrint("slCdInit:", slLocate(1,ypos));
+    slPrintFX(toFIXED(ndir), slLocate(11, ypos));
+    ypos++;
+
+    key[0].cn = key[0].sm = key[0].ci = CDKEY_NONE;
+    key[1].cn = CDKEY_TERM ;	
+    cdhn = slCdOpen(FNAME, key);	
+    slPrint("slCdOpen:", slLocate(1, ypos));
+    slDispHex((Uint32)cdhn, slLocate(11, ypos));
+
+    buf[0].type = CDBUF_COPY ;
+    buf[0].trans.copy.addr = readbuf;
+    buf[0].trans.copy.unit = CDBUF_FORM1 ;
+    buf[0].trans.copy.size = slsize;	
+    buf[1].type = CDBUF_TERM ;
+    ypos++;
+
+    slCdLoadFile(cdhn, buf);	 
+    while( 1 ){
+
+	slSynch();			
+	ret = slCdGetStatus( cdhn, ndata );
+	slPrint("stat:", slLocate(1, ypos));
+	slDispHex( (Uint32)ret, slLocate(7, ypos));
+	ypos++;
+	if (ypos >= 27) ypos = 3;
+	if ( ret == CDSTAT_COMPLETED ) break;
+	if ( ndata[0] == CDBUF_FORM1 * slsize ){
+		slCdResetBuf(cdhn, &(key[0]));
+	} 
+   }
+    while( 1 );          
+}
+</PRE><A NAME="no12_24"></A><P><DT><H3>About the read-ahead function</H3><DD> When reading data from a CD-ROM, the mechanical movement of the CD drive is involved, so the data is not actually read the moment the reading starts. The look-ahead function is a function that minimizes this waiting time. The Sega Saturn has an area that temporarily stores data read from CD-ROM. This area is called the CD buffer. Once the next file to read is determined, it starts reading data into the CD buffer, and when the data is needed it is transferred to memory.</P>
+<A NAME="z12_3"></A><P ALIGN=CENTER> <B>Figure 12-3 CD buffer</b><BR>
+<img srcset="../grp/p12_12.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Set the address of the read area of the previously explained function “slCdLoadFile” to NULL and the size of the read area to 0, and when the return value of the function “slCdGetStatus” becomes “CDSTAT_WAIT”, the read ahead is complete. After this, set the address and size of the read area using the function “slCdLoadFile” and transfer will begin immediately. You can also set the address and size of the read area before the read-ahead into the CD buffer is complete.</P>
+<P><DD> <B>[Sint32 slCdLoadFile (CDHN cdhn, CDBUF buf[]);]</b><DD> Specify the following in the CD buffer to read ahead:<PRE>
+buf[ i ]. type = CDBUF_COPY;
+buf[ i ]. trans.copy.addr = NULL;
+buf[ i ]. trans.copy.unit = CDBUF_FORM1;
+buf[ i ]. trans.copy.size = 0;
+</PRE><P><DD>After specifying all transfer areas, specify “CDBUF_TERM” for the last “type”.</P>
+<P><DD> Sample program 3 shows an example of a read-ahead program.</P>
+<P><DD> This sample program is a process for reading files on a CD-ROM, and is a basic usage example of library processing that pre-reads files from a CD-ROM. I will explain the steps according to Flow 12-3.</P>
+<P><DD><OL>
+<LI> Initializes the system such as graphics.</P>
+<P><LI> Initialize the CD-ROM system.</P>
+<P><LI> Open the file.<BR>
+ There is key information for classifying data in the input parameter of the function that opens the file, so please set this information as necessary.</P>
+<P><LI> Reads the file using the file handle and read area information returned by the file open function as parameters.<BR>
+ At this time, set NULL to the read area address of the read area information, set 0 to the size, and pre-read the file.</P>
+<P><LI> Executes the graphics library (function “slSynch()”).</P>
+<P><LI> Get the status information and check whether it is waiting for transfer.<BR>
+ If it is in the transfer waiting state, the loop ends.<BR>
+ Call the function “slSynch()” in this loop.</P>
+<P><LI> Load the file again.<BR>
+ At this time, set the address in the read area address of the read area information and read the file.</P>
+<P><LI> Executes the graphics library (function “slSynch()”).<BR>
+ The file specified in Load File is actually loaded at this time.</P>
+<P><LI> Get the status information and check if the file has finished loading.<BR>
+ If the file has not finished reading, it will loop until the status shows that it has finished reading.<BR>
+ Inside this loop, call the function “slSynch()”.</P>
+</OL>
+</P>
+<A NAME="f12_3"></A><P ALIGN=CENTER> <B>Flow 12-3 Sample program 3 (read ahead sample_cd3/main.c)</b><img srcset="../grp/p12_14.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="l12_3"></A><P><DD> <B>Listing 12-3 Sample program 3 (read ahead sample_cd3/main.c)</b><PRE>
+/************************************************* ****************************
+ * Copyright (c) 1994 SEGA
+ *
+ *File:main.c
+ *Date :1995-02-20
+ * Version:0.00
+ *Author:
+ *
+ ************************************************** **********************************/
+#include "sgl.h"
+#include "sgl_cd.h"
+
+/************************************************* ***************************/
+#define MAX_OPEN 128	
+#define FNAME "S2100D0_.M"
+#define slsize 2
+
+/************************************************* ***************************/
+Sint32 lib_work[SLCD_WORK_SIZE(MAX_OPEN)];	
+Sint32 readbuf[ (CDBUF_FORM1 * slsize) / sizeof(Sint32)];
+	
+/************************************************* ***************************/
+void ss_main(void)
+{
+    Sint32 ndir;		
+    Sint32 ypos = 1 ;	
+    Sint32 ret ;		
+    Sint32 ndata[2] ;	
+    CDHN cdhn;			
+    CDKEY key[2];	
+    CDBUF buf[2];		
+
+    slInitSystem(TV_320x224, NULL, 1);		
+    ndir = slCdInit(MAX_OPEN, lib_work);
+    slPrint("slCdInit:", slLocate(1,ypos));
+    slPrintFX(toFIXED(ndir), slLocate(11, ypos));
+    ypos++;
+ 					
+    key[0].cn = key[0].sm = key[0].ci = CDKEY_NONE;
+    key[1].cn = CDKEY_TERM ;	
+    cdhn = slCdOpen(FNAME, key);	
+    slPrint("slCdOpen:", slLocate(1, ypos));
+    slDispHex((Uint32)cdhn, slLocate(11, ypos));
+
+    buf[0].type = CDBUF_COPY ;	
+    buf[0].trans.copy.addr = NULL ;
+    buf[0].trans.copy.unit = CDBUF_FORM1 ;
+    buf[0].trans.copy.size = 0;	
+    buf[1].type = CDBUF_TERM ;	
+    slCdLoadFile( cdhn, buf );
+    ypos++;
+
+    while( 1 ){
+	slSynch();			
+	ret = slCdGetStatus( cdhn, NULL );	
+	slPrint("stat1:", slLocate(1, ypos));
+	slDispHex( (Uint32)ret, slLocate(7, ypos));
+	ypos++;
+	if (ypos >= 27) ypos = 3;
+	if ( ret == CDSTAT_WAIT ) {	
+		buf[0].trans.copy.addr = readbuf; 
+    		buf[0].trans.copy.size = slsize; 
+		break ;
+	}
+    }
+
+    slCdLoadFile( cdhn, buf );	
+
+    while( 1 ){
+
+	slSynch();				
+	ret = slCdGetStatus( cdhn, ndata );
+	slPrint("stat2:", slLocate(1, ypos));
+	slDispHex( ret, slLocate(7, ypos));
+	ypos++;
+	slPrint("ndata:", slLocate(1, ypos));
+	slDispHex( ndata[0], slLocate(7, ypos));
+	ypos++;
+	if (ypos >= 27) ypos = 3;
+ 	if ( ret == CDSTAT_COMPLETED ) break;
+	if ( ndata[0] == CDBUF_FORM1 * slsize ){
+		slCdLoadFile(cdhn, buf);
+	}
+    }
+    while( 1 );          
+}
+</PRE><A NAME="no12_25"></A><P><DT><H3>Playing CDDA files</H3><DD> To play a CDDA file, initialize the sound and use the functions “slCdOpen”, “slCdLoadFile” and “slCdGetStatus”.</P>
+<P><DD> <B>[Sint32 slCdLoadFile (CDHN cdhn, CDBUF buf[]);]</b><DD> To play a CDDA file, specify:</P>
+<PRE>
+buf[ 0 ]. type = CDBUF_COPY;
+buf[ 0 ]. trans.copy.addr = NULL;
+buf[ 0 ]. trans.copy.unit = CDBUF_FORM1;
+buf[ 0 ]. trans.copy.size = 0;
+buf[ 1 ]. type = CDBUF_TERM;
+</PRE><P><DD>Sample program 4 shows an example program for playing CDDA files.</P>
+<P><DD> This sample program is a process for reading CDDA files on a CD-ROM, and is an example of how to use a basic library to play CDDA files on a CD-ROM.<BR>
+ I will explain the steps according to flow 12-4.</P>
+<P><DD><OL>
+<LI> Initializes the system such as graphics.</P>
+<P><LI> Initialize the sound.</P>
+<P><LI> Initialize the CD-ROM system.</P>
+<P><LI> Open the file.<BR>
+ There is key information for classifying data in the input parameter of the function that opens the file, but this information is not necessary, so please set it so that it is not selected here.</P>
+<P><LI> Plays CDDA files.<BR>
+ Plays the CDDA file using the file handle and read area information as the return value of the file open function as parameters.</P>
+<P><LI> Executes the graphics library (function “slSynch()”).</P>
+<P><LI> Get the status information and check whether the CDDA file has finished playing.<BR>
+ When the playback is finished, end the loop.<BR>
+ Call the function “slSynch()” in this loop.</P>
+</OL>
+<A NAME="f12_4"></A><P ALIGN=CENTER> <B>Flow 12-4 Sample program 4 (CDDA file playback sample_cd4/main.c)</b><img srcset="../grp/p12_18.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="l12_4"></A><P><DD> <B>Listing 12-4 Sample program 4 (CDDA file playback sample_cd4/main.c)</b><PRE>
+/************************************************* ****************************
+ *
+ * Copyright (c) 1994 SEGA
+ *
+ *File:main.c
+ *Date :1995-02-20
+ * Version:0.00
+ *Author:
+ *
+ ************************************************** **********************************/
+#include "sgl.h"
+#include "sgl_cd.h"
+#include "sddrvs.dat"
+
+/************************************************* ***************************/
+#define WIN_ORG_X 0		
+#define WIN_ORG_Y 0		
+#define WIN_SIZE_X 320		
+#define WIN_SIZE_Y 240	
+#define MAX_FILE 128
+Sint32 dirwork[SLCD_WORK_SIZE(MAX_FILE)];
+
+Uint8 sdmap[] = {
+	0x00, 0x00, 0xB0, 0x00, 0x00, 0x00, 0x80, 0x00,
+	0x10, 0x01, 0x30, 0x00, 0x00, 0x00, 0x10, 0x00,
+	0x11, 0x01, 0x40, 0x00, 0x00, 0x00, 0x20, 0x00,
+	0x20, 0x01, 0x60, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x21, 0x01, 0x68, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x22, 0x01, 0x70, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x23, 0x01, 0x78, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x24, 0x01, 0x80, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x01, 0x01, 0x86, 0x00, 0x00, 0x04, 0x00, 0x00,
+	0x30, 0x05, 0xA0, 0x00, 0x00, 0x02, 0x00, 0x00,
+	0xFF, 0xFF
+    };
+    
+/************************************************* ***************************/
+
+void ss_main(void)
+{
+    Sint32ndir;
+    CDHN cdhn;
+    CDBUF buf[2];
+    CDKEY key[2];
+    Sint32 stat;
+
+    slInitSystem(TV_320x224, NULL, 1);
+    slInitSound(sddrvstsk, sizeof(sddrvstsk), sdmap, sizeof(sdmap));
+    slCDDAOn(127, 127, 0, 0);
+    ndir = slCdInit(MAX_FILE, dirwork);
+
+    key[0].cn = CDKEY_NONE;
+    key[0].sm = CDKEY_NONE;
+    key[0].ci = CDKEY_NONE;
+    key[1].cn = CDKEY_TERM;
+    cdhn = slCdOpen("cdda1", key);
+
+    buf[0].type = CDBUF_COPY;
+    buf[0].trans.copy.addr = NULL;
+    buf[0].trans.copy.unit = CDBUF_FORM1;
+    buf[0].trans.copy.size = 0;
+    buf[1].type = CDBUF_TERM;
+    slCdLoadFile(cdhn, buf);
+
+    while (1) {
+	slSynch();
+	stat = slCdGetStatus(cdhn, NULL);
+	if (stat == CDSTAT_COMPLETED) break;
+    }
+    while (1)
+	;
+}
+</PRE><A NAME="no12_26"></A><P><DT><H3>Other general matters</H3><P><DT> <B>●About read errors</b><DD> If a read error occurs during reading, the CD block is first recovered by hardware. If recovery is still not possible, the library will perform the recovery process a certain number of times. If recovery is ultimately not possible, the status acquisition function interrupts reading and returns a read error error code.</P>
+<P><DT> <B>●About path names</b><DD> Specify the directory as \ or /. Also, directory names and file names can be in both uppercase and lowercase letters.</P>
+<P><DT> <B>●Advanced usage of CD-ROM library</b><DD> SGL allows you to use functions from the file system library and stream system library. Use these functions, for example when using Cinepak or MPEG. For details, refer to each library's manual.<BR>
+ If you call the function “slCdInit”, there is no need to initialize the file system and stream system.<BR>
+ When using the file system or stream system while reading a file with SGL, call the function "slCdPause" and check that the status becomes "CDSTAT_PAUSE", or call the function "slCdAbort".<BR>
+ It is also necessary to stop reading when you finish reading by the file system or stream system and return to SGL.</P>
+<A NAME="z12_4"></A><P ALIGN=CENTER> <B>Figure 12-4 Internal structure of CD-ROM library</b> <BR>
+<img srcset="../grp/p12_21.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_30"><HR></a><H2> 12-3. CD library functions</H2><!------------------------------------------------------------------------------------------->
+<A NAME="no12_31"><HR NOSHADE></a> <B><FONT SIZE=5>CDHN</font> file handle</b><DL>
+<DT> <B>Explanation</b><DD> A file handle to read the file.</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_32"><HR NOSHADE></a> <B><FONT SIZE=5>CDKEY</font> Key for classifying sector data</b><DL>
+<P><DT> <B>structure</b><DD><PRE>
+typedef struct {
+    Sint16 cn;
+    Sint16 sm;
+    Sint16 ci;
+}CDKEY;
+</PRE><P><DT><B>member</b><DD><TABLE>
+<TR><TH><PRE> cn</TH><TD><PRE> channel number</TD></TR>
+<TR><TH><PRE> sm</TH><TD><PRE> submode</TD></TR>
+<TR><TH><PRE> ci</TH><TD><PRE> Coding information</TD></TR>
+</TABLE>
+<P><DT> <B>Explanation</b><DD> Specifies the key for classifying sector data using subheaders.<P><DT> <B>remarks</b><DD> If not selected, specify CDKEY_NONE.<BR>
+ Set CDKEY_TERM to the terminal cn.</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_33"><HR NOSHADE></a> <B><FONT SIZE=5>CDBUF</font> read area information</b><DL>
+<P><DT> <B>structure</b><DD><PRE>
+typedef struct {
+         void *addr;
+         Sint32 unit;
+         Sint32 size;
+         } TRANS_COPY;
+
+typedef struct {
+         Sint32 (*func) (void *obj, Uint32 *addr,
+                          Sint32 adinc, Sint32 nsct);
+         void *obj;
+         } TRANS_FUNC;
+
+typedef struct {
+     Sint32 type;
+         union {
+                 TRANS_COPY copy;
+                 TRANS_FUNC fucn;
+         }trans;
+}CDBUF;
+</PRE><P><DT><B>member</b><DD><PRE>
+type  CDBUF_COPY     Copy to work RAM
+      CDBUF_FUNC     Transfer function
+      CDBUF_TERM     Termination
+
+-------------------------------------------------------
+If type = CDBUF_COPY : copy
+-------------------------------------------------------
+addr                 Address of read area (NULL if not read)
+unit  CDBUF_FORM1    The size of the read area is 2048 bytes.
+      CDBUF_FORM2    The size of the read area is 2324 bytes.
+      CDBUF_BYTE     The size of the read area is in bytes.
+size                 Number of units for reading area (0 if not reading)
+
+-------------------------------------------------------
+If type = CDBUF_FUNC : func
+-------------------------------------------------------
+func                Transfer function
+obj                 object
+</PRE><P><DT> <B>Explanation</b><DD> Set the read area or transfer function.<P><DT> <B>remarks</b><DD> The read area must be on a 4-byte boundary.</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_34"><HR NOSHADE></a> <B><FONT SIZE=5>Sint32 slCdInit (Sint32 nfile, void *work)</font> initialization</b><DL>
+<P><DT> <B>parameters</b><DD><TABLE>
+<TR><TH><PRE> nfile</TH><TD><PRE> Maximum number of files in one directory</TD></TR>
+<TR><TH><PRE> work</TH><TD><PRE> work area</TD></TR>
+</TABLE>
+<P><DT> <B>function</b><DD> Perform the initial settings for using the CD.<P><DT> <B>Return value</b><DD> Number of files in root directory (error code if negative)<P><DT> <B>remarks</b><DD> The size of the area is determined by SLCD_WORK_SIZE(nfile).<BR>
+ nfile Maximum number of files in each directory<BR>
+ The work area must be on a 4-byte boundary.</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_35"><HR NOSHADE></a> <B><FONT SIZE=5>Sint32 slCdChgDir (Sint8 *pathname)</font> directory change</b><DL>
+<P><DT> <B>parameters</b><DD><TABLE>
+<TR><TH><PRE> pathname</TH><TD><PRE> Path name (relative path/absolute path can be specified)</TD></TR>
+</TABLE>
+<P><DT> <B>function</b><DD> Move directory.<P><DT> <B>Return value</b><DD> Number of files in directory (error code if negative)</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_36"><HR NOSHADE></a> <B><FONT SIZE=5>CDHN slCdOpen (Sint8 *pathname, CDKEY key[])</font> File open</b><DL>
+<P><DT> <B>parameters</b><DD><TABLE>
+<TR><TH><PRE> pathname</TH><TD><PRE> Path name (relative path/absolute path can be specified)</TD></TR>
+<TR><TH><PRE> key</TH><TD><PRE> Key information for classifying stream data</TD></TR>
+</TABLE>
+<P><DT> <B>function</b><DD> Open the file.<P><DT> <B>Return value</b><DD> File handle (NULL if cannot be opened)<P><DT> <B>remarks</b><DD> It will be automatically closed when loading is interrupted or completed.</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_37"><HR NOSHADE></a> <B><FONT SIZE=5>Sint32 slCdLoadFile (CDHN cdhn,CDBUF buf[])</font> Load file</b><DL>
+<P><DT> <B>parameters</b><DD><TABLE>
+<TR><TH><PRE> cdhn</TH><TD><PRE> file handle</TD></TR>
+<TR><TH><PRE> buf</TH><TD><PRE> Reading area information (corresponds to the key when opening)</TD></TR>
+</TABLE>
+<P><DT> <B>function</b><DD> Start playback and read data from the CD.<P><DT> <B>Return value</b><DD> Error code<P><DT> <B>remarks</b><DD> If you specify NULL for the read area and 0 for the number of units, read ahead will be executed.<BR>
+ If a read area is specified, transfer using CPUDMA.</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_38"><HR NOSHADE></a> <B><FONT SIZE=5>Sint32 slCdTrans (CDHN cdhn, CDBUF buf[], Sint32 ndata[])</font> Stream transfer</b><DL>
+<P><DT> <B>parameters</b><DD><TABLE>
+<TR><TH><PRE> cdhn</TH><TD><PRE> file handle</TD></TR>
+<TR><TH><PRE> buf</TH><TD><PRE> Reading area information</TD></TR>
+<TR><TH><PRE> data</TH><TD><PRE> Number of valid data in transfer area (NULL if unnecessary)</TD></TR>
+</TABLE>
+<P><DT> <B>function</b><DD> Only data transfer is performed while file loading is paused.<P><DT> <B>Return value</b><DD> Error code<P><DT> <B>remarks</b><DD> You can use “slCdLoadFile()” to transfer only to the key specified by NULL in the transfer area.<BR>
+ This function does not end until the transfer is completed.</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_39"><HR NOSHADE></a> <B><FONT SIZE=5>Bool slCdResetBuf (CDHN cdhn, CDKEY *key)</font> Reset transfer area</b><DL>
+<P><DT> <B>parameters</b><DD><TABLE>
+<TR><TH><PRE> cdhn</TH><TD><PRE> file handle</TD></TR>
+<TR><TH><PRE> key</TH><TD><PRE> Key information for classifying data</TD></TR>
+</TABLE>
+<P><DT> <B>function</b><DD> Initialize the destination pointer.<P><DT> <B>Return value</b><DD><TABLE>
+<TR><TH><PRE> TRUE</TH><TD><PRE> normal termination</TD></TR>
+<TR><TH><PRE> FLASE</TH><TD><PRE> A key that is not open was specified. </TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_3a"><HR NOSHADE></a> <B><FONT SIZE=5>Sint32 slCdAbort (CDHN cdhn)</font> Loading abort</b><DL>
+<P><DT> <B>parameters</b><DD><TABLE>
+<TR><TH><PRE> cdhn</TH><TD><PRE> file handle</TD></TR>
+</TABLE>
+<P><DT> <B>function</b><DD> Interrupt file loading<P><DT> <B>Return value</b><DD> Error code</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_3b"><HR NOSHADE></a> <B><FONT SIZE=5>Sint32 slCdPause (CDHN cdhn)</font> Pause reading</b><DL>
+<P><DT> <B>parameters</b><DD><TABLE>
+<TR><TH><PRE> cdhn</TH><TD><PRE> file handle</TD></TR>
+</TABLE>
+<P><DT> <B>function</b><DD> Pause file loading.<P><DT> <B>Return value</b><DD> Error code</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_3c"><HR NOSHADE></a> <B><FONT SIZE=5>Sint32 slCdGetStatus (CDHN cdhn, Sint32 ndata[])</font> Get status</b><DL>
+<P><DT> <B>parameters</b><DD><TABLE>
+<TR><TH><PRE> cdhn</TH><TD><PRE> file handle</TD></TR>
+</TABLE>
+ However, you can obtain the status of the CD block by specifying the following constant.<DL>
+<DD><TABLE>
+<TR><TH><PRE> CDREQ_FREECD</TH><TD><PRE> Get the number of free sectors in a block</TD></TR>
+<TR><TH><PRE> CDREQ_FAD</TH><TD><PRE> Current pickup position</TD></TR>
+<TR><TH><PRE> CDREQ_DRVCD</TH><TD><PRE> Drive status</TD></TR>
+</TABLE>
+</DL>
+<DD><TABLE>
+<TR><TH><PRE> data</TH><TD><PRE> If a file handle is specified, the number of valid data in the transfer area<BR> (NULL if not needed)</TD></TR>
+</TABLE>
+<P><DT> <B>function</b><DD> Get the status of the issued request.<P><DT> <B>Return value</b><DD> Status when specifying a file handle (if negative, error code)<TR><TH><PRE> CDSTAT_PAUSE</TH><TD><PRE> Loading stopped</TD></TR>
+<TR><TH><PRE> CDSTAT_DOING</TH><TD><PRE> Loading</TD></TR>
+<TR><TH><PRE> CDSTAT_WAIT</TH><TD><PRE> Transfer waiting state</TD></TR>
+<TR><TH><PRE> CDSTAT_COMPLETED</TH><TD><PRE> Loading completed</TD></TR>
+<TR><TH><PRE> If CDREQ_FREE is specified</TH><TD><PRE> Number of free sectors in CD block</TD></TR>
+<TR><TH><PRE> When specifying CDREQ_FAD</TH><TD><PRE> pickup position</TD></TR>
+<TR><TH><PRE> If CDREQ_DRV is specified</TH><TD><PRE> CD drive status</TD></TR>
+<TR><TH><PRE> CDDRV-BUSY</TH><TD><PRE> State transition in progress</TD></TR>
+<TR><TH><PRE> CDDRV_PAUSE</TH><TD><PRE> Pausing</TD></TR>
+<TR><TH><PRE> CDDRV_STDBY</TH><TD><PRE> stand-by</TD></TR>
+<TR><TH><PRE> CDDRV_PLAY</TH><TD><PRE> CD playing</TD></TR>
+<TR><TH><PRE> CDDRV_SEEK</TH><TD><PRE> Seeking in progress</TD></TR>
+<TR><TH><PRE> CDDRV_SCAN</TH><TD><PRE> Scan playback in progress</TD></TR>
+<TR><TH><PRE> CDDRV_OPEN</TH><TD><PRE> tray is open</TD></TR>
+<TR><TH><PRE> CDDRV_NODISC</TH><TD><PRE> no disc</TD></TR>
+<TR><TH><PRE> CDDRV_RETRY</TH><TD><PRE> Read retry processing in progress</TD></TR>
+<TR><TH><PRE> CDDRV_ERROR</TH><TD><PRE> Read error occurred</TD></TR>
+<TR><TH><PRE> CDDRV_FATAL</TH><TD><PRE> Fatal error occurred</TD></TR>
+</TABLE>
+</DL>
+<A NAME="no12_3d"></A><HR>
+<DL>
+<P><DT><H2> Error code</H2><DD> <B>Table 12-1 Error codes</b><TABLE BORDER=1>
+<TR><TH> constant name</TH><TH> meaning</TH><TH> constant value</TH></TR>
+<TR><TD> CDERR_OK</TD><TD> normal termination</TD><TD> (0)</TD></TR>
+<TR><TD> CDERR_RDERR</TD><TD> Read error</TD><TD> (-1)</TD></TR>
+<TR><TD> CDERR_NODISC</TD><TD> Disc is not set</TD><TD> (-2)</TD></TR>
+<TR><TD> CDERR_CDROM</TD><TD> Disk is not CR-ROM</TD><TD> (-3)</TD></TR>
+<TR><TD> CDERR_IPARA</TD><TD> Invalid initialization parameter</TD><TD> (-Four)</TD></TR>
+<TR><TD> CDERR_DIR</TD><TD> Move outside the directory</TD><TD> (-6)</TD></TR>
+<TR><TD> CDERR_NEXIST</TD><TD> File does not exist</TD><TD> (-9)</TD></TR>
+<TR><TD> CDERR_NUM</TD><TD> Negative number of bytes etc.</TD><TD> (-14)</TD></TR>
+<TR><TD> CDERR_PUINUSE</TD><TD> Pickup in operation</TD><TD> (-20)</TD></TR>
+<TR><TD> CDERR_ALIGN</TD><TD> The work area is not on a 4-byte boundary</TD><TD> (-twenty one)</TD></TR>
+<TR><TD> CDERR_TMOUT</TD><TD> timeout</TD><TD> (-twenty two)</TD></TR>
+<TR><TD> CDERR_OPEN</TD><TD> tray open</TD><TD> (-twenty three)</TD></TR>
+<TR><TD> CDERR_FATAL</TD><TD> CD drive&#65308; FATAL&#65310;</TD><TD> (-twenty five)</TD></TR>
+<TR><TD> CDERR_BUSY</TD><TD> State transition in progress</TD><TD> (-50)</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="demo_c.htm">Back</a> ｜ <A HREF="p13_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

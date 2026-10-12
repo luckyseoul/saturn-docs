@@ -1,0 +1,829 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/ 8&gt;CD communication I/F (MPEG part)/8.MPEG function specifications</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+ <B>▲ <A HREF="p07_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>CD communication I/F (MPEG part)</b><H2 ALIGN=CENTER> 8. MPEG function specifications</H2><HR NOSHADE>
+<DL>
+<P> Describe the function specifications of the MPEG communication interface.</P>
+<P><DT> <B>(1) Format</b><DD> In the figure, unused areas are represented by "-". The value of unused space is 0.</P>
+<P><DT> <B>(2) Retention of MPEG status information (status and MPEG report)</b><DD> The MPEG communication interface holds the status at the time of MPEG command issuance and the MPEG report. The initial value of the retained contents is all 0.<BR>
+ The functions that update the retention status/MPEG report are indicated by the following symbols.</P>
+<P><DD><PRE>
+    [SR]: Update status and MPEG report       ┐
+    [S-]: Update only the status              ├────┐
+    [--]: Do not update (do not issue command)┘    │
+                                                   │
+《Example of function title》                      ↓
+┌──────────────┬─────────────────┬──────────────────┬────┐
+│Title         │Function         │Function Name [SR]│No  │
+│Function      │MPEG playback    │CDC_MpPlay        │20.7│
+│specifications│                 │                  │    │
+└──────────────┴─────────────────┴──────────────────┴────┘
+</PRE></P>
+<P><DD>However, nothing is updated in the event of an error (when the error code is other than CDC_ERR_OK).</P>
+<P><DT> <B>(3) Function that generates WAIT</b><DD> Functions that generate WAIT are indicated by the following symbols in the function list.<BR>
+ For WAIT, see " <A HREF="p06_10.htm#no6_40">6.4 REJECT and WAIT for MPEG commands</a> ".</P>
+<P><DD><PRE>
+    [L]: LONG WAIT may occur        ┐
+    [S]: SHORT WAIT may occur       ├──┐
+    [LS] :LONG, SHORT WAIT may occur┘  │
+                                       │
+《Example of function list》           ↓
+┌────────────────────┬─────────────────┬────┐
+│Decoding method     │CDC_MpSetDec [LS]│20.8│
+│setting             │                 │    │
+└────────────────────┴─────────────────┴────┘
+</PRE></P>
+<P><DT><B>(5) Command end flag (in interrupt cause register)</b><DD> If there is an associated command exit flag,<DT> <B>end flag</b><DD> Describe it in the item field.</P>
+<P><DD> <B>"example"</b><DT> <B>end flag</b><DD> MPED flag</P>
+<P><DD> For details on the exclusive processing of command issuance, refer to "Table 3.5 Commands belonging to command end flag (MPEG part)" and the CD part manual.</P>
+<P><DT> <B>(6) MPCM flag (in interrupt factor register)</b><DD> Except for some functions, MPEG communication functions check the MPCM flag when issuing a command. If the command cannot be issued, error code CDC_ERR_MP_COMU is returned.<BR>
+ For details about the MPCM flag, refer to " <A HREF="p03_10.htm#no3_212">3.1.2 Operation Undefined Section</a> ".</P>
+<A NAME="no8_10"></A><P><DT><H3> 8.1 MPEG function list</H3><DD> A list of functions of the MPEG communication interface is shown in Table 8.1.</P>
+<A NAME="t8_1"></A><P><DD> <B>Table 8.1 List of MPEG communication interface functions</b><TABLE BORDER=1>
+<TR><TH COLSPAN=2 WIDTH=240> function</TH><TH WIDTH=180> function name</TH><TH WIDTH=040> number</TH></TR>
+<TR><TD COLSPAN=3> MPEG decoder</TD><TD> 20.0</TD></TR>
+<TR><TD ROWSPAN=11 WIDTH=10></TD><TD> Get current MPEG status information</TD><TD> <A HREF="#20.1">CDC_MpGetCurStat</a></TD><TD> 20.1</TD></TR>
+<TR><TD> Obtaining the previous MPEG status information</TD><TD> <A HREF="#20.2 ">CDC_MpGetLastStat</a></TD><TD> 20.2</TD></TR>
+<TR><TD> Obtaining MPEG interrupt factor</TD><TD> <A HREF="#20.3 ">CDC_MpGetInt</a></TD><TD> 20.3</TD></TR>
+<TR><TD> Setting MPEG interrupt mask</TD><TD> <A HREF="#20.4 ">CDC_MpSetIntMsk</a></TD><TD> 20.4</TD></TR>
+<TR><TD> Initializing MPEG decoder</TD><TD> <A HREF="#20.5 ">CDC_MpInit</a></TD><TD> 20.5</TD></TR>
+<TR><TD> Setting MPEG operation mode</TD><TD> <A HREF="#20.6 ">CDC_MpSetMode [S]</a></TD><TD> 20.6</TD></TR>
+<TR><TD> MPEG playback</TD><TD> <A HREF="#20.7 ">CDC_MpPlay [S]</a></TD><TD> 20.7</TD></TR>
+<TR><TD> Setting the decoding method</TD><TD> <A HREF="#20.8 ">CDC_MpSetDec [LS]</a></TD><TD> 20.8</TD></TR>
+<TR><TD> Sending decode synchronization signal</TD><TD> <A HREF="#20.9 ">CDC_MpOutDsync [LS]</a></TD><TD> 20.9</TD></TR>
+<TR><TD> Get video timecode</TD><TD> <A HREF="#20.10">CDC_MpGetTc [S]</a></TD><TD> 20.10</TD></TR>
+<TR><TD> Get audio timestamp</TD><TD> <A HREF="#20.11">CDC_MpGetPts</a></TD><TD> 20.11</TD></TR>
+<TR><TD COLSPAN=3> MPEG stream</TD><TD> 21.0</TD></TR>
+<TR><TD ROWSPAN=6 WIDTH=10></TD><TD> Setting the MPEG decoder connection destination</TD><TD> <A HREF="#21.1">CDC_MpSetCon [LS]</a></TD><TD> 21.1</TD></TR>
+<TR><TD> Obtaining the MPEG decoder connection destination</TD><TD> <A HREF="#21.2 ">CDC_MpGetCon</a></TD><TD> 21.2</TD></TR>
+<TR><TD> Switching the MPEG decoder connection destination</TD><TD> <A HREF="#21.3 ">CDC_MpChgCon [LS]</a></TD><TD> 21.3</TD></TR>
+<TR><TD> MPEG stream settings</TD><TD> <A HREF="#21.4 ">CDC_MpSetStm [LS]</a></TD><TD> 21.4</TD></TR>
+<TR><TD> Obtain MPEG stream</TD><TD> <A HREF="#21.5 ">CDC_MpGetStm</a></TD><TD> 21.5</TD></TR>
+<TR><TD> Get stream image size</TD><TD> <A HREF="#21.6 ">CDC_MpGetPictSiz [S]</a></TD><TD> 21.6</TD></TR>
+<TR><TD COLSPAN=3> MPEG display screen</TD><TD> 22.0</TD></TR>
+<TR><TD ROWSPAN=9 WIDTH=10></TD><TD> Displaying images</TD><TD> <A HREF="#22.1">CDC_MpDisp [S]</a></TD><TD> 22.1</TD></TR>
+<TR><TD> Setting the frame buffer window position</TD><TD> <A HREF="#22.2 ">CDC_MpSetWinFpos</a></TD><TD> 22.2</TD></TR>
+<TR><TD> Setting the frame buffer window magnification</TD><TD> <A HREF="#22.3 ">CDC_MpSetWinFrat</a></TD><TD> 22.3</TD></TR>
+<TR><TD> Setting the display window position</TD><TD> <A HREF="#22.4 ">CDC_MpSetWinDpos</a></TD><TD> 22.4</TD></TR>
+<TR><TD> Setting display window size</TD><TD> <A HREF="#22.5 ">CDC_MpSetWinDsiz</a></TD><TD> 22.5</TD></TR>
+<TR><TD> Setting the display window offset</TD><TD> <A HREF="#22.6 ">CDC_MpSetWinDofs</a></TD><TD> 22.6</TD></TR>
+<TR><TD> Border color settings</TD><TD> <A HREF="#22.7 ">CDC_MpSetBcolor</a></TD><TD> 22.7</TD></TR>
+<TR><TD> Setting the fade</TD><TD> <A HREF="#22.8 ">CDC_MpSetFade [S]</a></TD><TD> 22.8</TD></TR>
+<TR><TD> Screen special effect settings</TD><TD> <A HREF="#22.9 ">CDC_MpSetVeff [S]</a></TD><TD> 22.9</TD></TR>
+<TR><TD COLSPAN=3> MPEG frame buffer</TD><TD> 23.0</TD></TR>
+<TR><TD ROWSPAN=5 WIDTH=10></TD><TD> Extracting image data</TD><TD> <A HREF="#23.1">CDC_MpGetImg [L]</a></TD><TD> 23.1</TD></TR>
+<TR><TD> Setting the image data window position</TD><TD> <A HREF="#23.2 ">CDC_MpSetImgPos</a></TD><TD> 23.2</TD></TR>
+<TR><TD> Setting the image data window size</TD><TD> <A HREF="#23.3 ">CDC_MpSetImgSiz</a></TD><TD> 23.3</TD></TR>
+<TR><TD> Loading from image data window</TD><TD> <A HREF="#23.4 ">CDC_MpReadImg</a></TD><TD> 23.4</TD></TR>
+<TR><TD> Export to image data window</TD><TD> <A HREF="#23.5 ">CDC_MpWriteImg</a></TD><TD> 23.5</TD></TR>
+<TR><TD COLSPAN=3> MPEG sector buffer</TD><TD> 24.0</TD></TR>
+<TR><TD ROWSPAN=2 WIDTH=10></TD><TD> Reading sectors from MPEG sector buffer</TD><TD> <A HREF="#24.1">CDC_MpReadSct</a></TD><TD> 24.1</TD></TR>
+<TR><TD> Writing sectors to MPEG sector buffer</TD><TD> <A HREF="#24.2 ">CDC_MpWriteSct</a></TD><TD> 24.2</TD></TR>
+</TABLE>
+<A NAME="no8_20"></A><P><DT><H3> 8.2 MPEG function details</H3><A NAME="no8_821"></A><P><DT> <B>8.2.1 MPEG decoder</b></DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.1"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Get current MPEG status information</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpGetCurStat</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.1</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpGetCurStat(CdcMpStat *mpstat)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> mpstat: MPEG status information<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Get current MPEG status information.</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.2"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Obtaining the previous MPEG status information</H4></TD><TD WIDTH=200><PRE> Function Name [--]<BR><H3> CDC_MpGetLastStat</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.2</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpGetLastStat(CdcMpStat *mpstat)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> mpstat: MPEG status information<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Gets MPEG status information for the previous MPEG command.</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.3"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Obtaining MPEG interrupt factor</H4></TD><TD WIDTH=200><PRE> Function Name [S-]<BR><H3> CDC_MpGetInt</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.3</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpGetInt(Sint32 *intreq)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> intreq: Interrupt factor (lower 24 bits are valid)...See data specifications (Intreq)<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Get the interrupt factor of MPEG interrupt.<DT> <B>remarks</b><DD> The MPEG interrupt factor is cleared to 0 by executing this function.</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.4"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting MPEG interrupt mask</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetIntMsk</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.4</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetIntMsk(Sint32 intmsk)<DT> <B>input</b><DD> intmsk: Interrupt mask (lower 24 bits are valid)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Set the interrupt mask for MPEG interrupts.<BR>
+ The meaning of each bit in the interrupt mask is the same as for MPEG interrupt factors.<DT> <B>remarks</b><DD> Set the bits you want to mask to 0 and the others to 1.<BR>
+ When an interrupt factor unmasked by this function occurs, the MPST flag turns ON.</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.5"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Initializing MPEG decoder</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpInit</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.5</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpInit(Bool sw)<DT> <B>input</b><DD> sw: MPEG system switch<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> MPED flag (only cleared to 0)...Can be executed regardless of the MPED value<DT> <B>function</b><DD> Initializes the MPEG system and controls starting and stopping the MPEG system.<P><DT> <B>(1) MPEG system switch</b><DD> When the MPEG system is turned off, all other MPEG communication functions become REJECT until it is turned on.<BR>
+ The performance of the CD part is affected while the MPEG system is running. When using only the functions of the CD part, use this switch to stop the MPEG system.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=220> explanation</TH></TR>
+<TR><TD> OFF</TD><TD> Stop...Initial value</TD></TR>
+<TR><TD> ON</TD><TD> boot</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DD><DT><OL TYPE=a>
+<P><B><LI></b> This function waits about 3ms internally and then issues the command, ignoring the MPED and MPCM flags.</P>
+<P><B><LI></b> To determine whether initialization is complete, wait until 2 VSYNC or more have passed after executing this function and the MPED flag becomes 1.</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.6"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting MPEG operation mode</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetMode</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.6</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetMode(Sint32 actmod, Sint32 dectim, Sint32 out,Sint32 scnmod)<DT> <B>input</b><DD> actmod: MPEG operation mode dectim: Decoding timing out: Image data output destination scnmod: Scanning mode (lower 8 bits are valid)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Set the MPEG decoder operating mode.<P><DT> <B>(1) MPEG operation mode</b><DD> Before switching to MPEG sector buffer mode, be sure to execute the CDC_MpInit function.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPACT_NMOV</TD><TD> Video playback mode...Initial value</TD></TR>
+<TR><TD> CDC_MPACT_NSTL</TD><TD> Still image playback mode</TD></TR>
+<TR><TD> CDC_MPACT_HMOV</TD><TD> High-definition video playback mode (not supported)</TD></TR>
+<TR><TD> CDC_MPACT_HSTL</TD><TD> High-definition still image playback mode</TD></TR>
+<TR><TD> CDC_MPACT_SBUF</TD><TD> MPEG sector buffer mode</TD></TR>
+<TR><TD> CDC_PARA_NOCHG</TD><TD> Do not change settings</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(2) Decoding timing</b><DD> Specify the timing of the decode synchronization signal (DSYNC). Valid in video playback mode.<BR>
+ Host synchronization is valid when the MPEG playback mode of the CDC_MpPlay function is independent playback mode.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPDEC_VSYNC</TD><TD> Decoding by VSYNC synchronization...Initial value</TD></TR>
+<TR><TD> CDC_MPDEC_HOST</TD><TD> Decoding with host synchronization<BR>
+ (Sends DSYNC according to instructions from host)</TD></TR>
+<TR><TD> CDC_PARA_NOCHG</TD><TD> Do not change settings</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(3) Image data output destination</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPOUT_VDP2</TD><TD> Output to VDP2...Initial value</TD></TR>
+<TR><TD> CDC_MPOUT_HOST</TD><TD> Output to host (extract from MPEG register)</TD></TR>
+<TR><TD> CDC_PARA_NOCHG</TD><TD> Do not change settings</TD></TR>
+</TABLE>
+</p>
+<P><DT> <B>(4) Scanning mode</b><DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │−│−│−│−│−│ │ │ Initial value: 00H     Unchanged: CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴─┴┬┴┬┘
+    │           │ └─1: Non-interlace    0: Interlace
+    │           └───1: PAL              0: NTSC
+    └───────────────1: Do not change the settings   0: Change the settings</PRE></P>
+<P><DT> <B>remarks</b><DT><OL TYPE=a>
+<P><B><LI></b> Frame rate is automatically set.</P>
+<P><B><LI></b> Execute this function when the MPEG/Video operating state is stopped.</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.7"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> MPEG playback</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpPlay</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.7</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpPlay(Sint32 plymod, Sint32 tmod_a, Sint32 tmod_v,Sint32 dec_v)<DT> <B>input</b><DD><TABLE>
+<TR><TD> plymod</TD><TD> :MPEG playback mode</TD></TR>
+<TR><TD> tmod_a</TD><TD> :MPEG/Audio transfer mode</TD></TR>
+<TR><TD> tmod_v</TD><TD> :MPEG/Video transfer mode</TD></TR>
+<TR><TD> dec_v</TD><TD> :MPEG/Video decoding switch</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Set audio and video synchronous playback, each transfer mode, and video decoding switch.<P><DT> <B>(1) MPEG playback mode</b><DD> Synchronous playback mode is valid when the decoding timing of the CDC_MpSetMode function is VSYNC synchronized.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPPLY_SYNC</TD><TD> Synchronous playback mode...Initial value</TD></TR>
+<TR><TD> CDC_MPPLY_INDP</TD><TD> Independent playback mode</TD></TR>
+<TR><TD> CDC_PARA_NOCHG</TD><TD> Do not change settings</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(2) MPEG decoder transfer mode</b><DD> In automatic transfer mode, when the required amount of data is stored in the CD buffer, transfer to the decoder is automatically started.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPTRN_AUTO</TD><TD> Automatic transfer mode...Initial value</TD></TR>
+<TR><TD> CDC_MPTRN_FORCE</TD><TD> Forced transfer mode</TD></TR>
+<TR><TD> CDC_PARA_NOCHG</TD><TD> Do not change settings</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>(a) Video</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> Transfer mode</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> automatic transfer</TD><TD> When data of STD buffer size + 16KB is stored in the CD buffer,<BR>
+ Begins transfer to VBV buffer and decoding.</TD></TR>
+<TR><TD> forced transfer</TD><TD> Transfer/decode is started regardless of the state of the CD buffer.</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>(b) Audio</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> Transfer mode</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> automatic transfer</TD><TD> When two sectors worth of data are stored in the CD buffer, transfer/decoding is started.<BR>
+ When playing synchronously, decoding starts when the first picture of the video is displayed.</TD></TR>
+<TR><TD> forced transfer</TD><TD> Regardless of the CD buffer status or video status,<BR>
+ Start transfer/decoding.</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(3) MPEG/Video decoding switch</b><DD> Directly controls the MPEG/Video LSI decode switch.<BR>
+ Normally, be sure to specify CDC_PARA_NOCHG. (Do not change the settings.)<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> OFF</TD><TD> Stop decoding</TD></TR>
+<TR><TD> ON</TD><TD> Start decoding...Initial value</TD></TR>
+<TR><TD> CDC_PARA_NOCHG</TD><TD> Do not change settings...normally specified values</TD></TR>
+</TABLE>
+</P>
+<P><DT><TABLE>
+<TR><TH> Note<BR>
+<img srcset="../../../../what/atto.png 5x"></TH><TD> The MPEG decoder begins decoding by connecting to a buffer partition. The start and end of decoding must not be controlled by executing this function.<BR>
+ When a connection is made using the CDC_MpSetCon function or a forced switch is performed using the CDC_MpChgCon function, decoding starts regardless of this switch. (Even if decoding is stopped.)<BR>
+ To forcefully terminate decoding, use the CDC_MpChgCon function. </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.8"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting the decoding method</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetDec</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.8</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetDec(Sint32 mute, Sint32 pautim, Sint32 frztim)<DT> <B>input</b><DD><TABLE>
+<TR><TD> mute</TD><TD> : MPEG/Audio mute (lower 8 bits are valid)</TD></TR>
+<TR><TD> pautim</TD><TD> : MPEG/Video pause timing (lower 16 bits are valid)</TD></TR>
+<TR><TD> frztim</TD><TD> : MPEG/Video freeze timing (lower 16 bits are valid)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Set the decoding method of the MPEG decoder.<P><DT> <B>(1) MPEG/Audio mute</b><DD> Regardless of whether you mute or not, be sure to set bit2 = 1 and set the value.<BR>
+ Since the initial value of this parameter is 0, bit2=0 if no change is specified (CDC_PARA_NOCHG). Therefore, be sure to explicitly specify a fixed value (CDC_MPMUT_DFL) at first.<DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │−│−│−│−│ │ │ │ Initial value: 00H    Unchanged: CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴┬┴┬┴┬┘
+    │         │ │ └─CDC_MPMUT_R      1: Mute the right channel
+    │         │ └───CDC_MPMUT_L      1: Mute the left channel
+    │         └─────CDC_MPMUT_DFL    1: Fixed value (must be specified)
+    └──────────────────1: Do not change the settings    0: Change the settings</PRE></P>
+<P><DT> <B>(2) MPEG/Video pause timing</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> 0000H</TD><TD> Pause (re-pause during pause: frame-by-frame advance)...Initial value</TD></TR>
+<TR><TD> 0001H</TD><TD> Unpause</TD></TR>
+<TR><TD> 0002H～FFFEH</TD><TD> Frame interval until re-pause (slow playback interval)</TD></TR>
+<TR><TD> FFFFH</TD><TD> Do not change settings (CDC_PARA_NOCHG)</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(3) MPEG/Video freeze timing</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> 0000H</TD><TD> Freeze (refreeze while frozen)...Initial value</TD></TR>
+<TR><TD> 0001H</TD><TD> Unfreeze</TD></TR>
+<TR><TD> 0002H～FFFEH</TD><TD> Frame interval until refreeze (strobe playback interval)</TD></TR>
+<TR><TD> FFFFH</TD><TD> Do not change settings (CDC_PARA_NOCHG)</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DT><OL TYPE=a>
+<P><B><LI></b> Pause/Freeze is disabled in still image playback mode. (Effective in video playback mode)</P>
+<P><B><LI></b> If you set pause/freeze while the video is in the recovery process, it becomes WAIT.</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.9"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Sending decode synchronization signal</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpOutDsync</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.9</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpOutDsync(Sint32 fbn)<DT> <B>input</b><DD> fbn: Frame bank number (0 to 3)...Valid in still image playback mode<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Sends decode synchronization signal (DSYNC). The host can control the decoding timing of each frame.<P><DT> <B>(1) Frame bank number</b><DD> In the still image playback mode, the frame bank number (0 to 3) to be decoded can be specified.<BR>
+ Frame bank numbers are invalid in video playback mode.</P>
+<P><DT> <B>(2) Sending timing of decode synchronization signal</b><DD> The DSYNC transmission timing must be spaced at an interval of at least one frame's decoding time (2VSYNC). Normally, it is necessary to obtain synchronization timing using VSYNC, audio playback amount, etc.</P>
+<P><DT><TABLE BORDER=0>
+<TR><TH> Note<BR>
+<img srcset="../../../../what/atto.png 5x"></TH><TD> <B>Specification limitations regarding picture start code (PSC) detection</b><BR>
+ For video streams with picture period M≦3, PSC detection and DSYNC transmission can be synchronized except for the last 3 frames of the stream. In other words, PSC detection can be used as the DSYNC transmission timing.<BR>
+ (PSC detection is notified by video interrupt bit8 of the MPEG interrupt factor flag.)<BR>
+ However, in the case of the last three frames of the stream and M≧4, there is no one-to-one correspondence between PSC detection and DSYNC transmission. In this case, PSC detection cannot be used and it is necessary to obtain synchronization timing using the method (2) above.</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DT><UL TYPE=a>
+<P><B><LI></b> In video playback mode, the decoding timing of the CDC_MpSetMode function must be set to host synchronization. WAIT when set to VSYNC synchronization.</P>
+<P><B><LI></b> When this function is executed in host synchronized video playback mode or still image playback mode, the MPCM flag becomes 1.<BR>
+ For details, refer to " <A HREF="p03_10.htm#z3_1">Figure 3.1 Determination of unstable operation section</a> ".</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.10"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Get video timecode</H4></TD><TD WIDTH=200><PRE> Function Name [S-]<BR><H3> CDC_MpGetTc</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.10</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpGetTc(Sint32 *bnk, Sint32 *pictyp, Sint32 *tr, CdcMpTc *mptc)<DT> <B>input</b><DD> none<DT> <B>output</b><DD><TABLE>
+<TR><TD> bnk</TD><TD> :Currently displayed frame bank number (0 to 3)</TD></TR>
+<TR><TD> pictyp</TD><TD> :Picture type</TD></TR>
+<TR><TD> tr</TD><TD> : Temporal reference (lower 8 bits are valid)</TD></TR>
+<TR><TD> mptc</TD><TD> : Time code</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Get the timecode and temporal reference of the currently displayed frame.<BR>
+ In the still image playback state, this indicates a frame that is waiting to be decoded or is being decoded.<P><DT> <B>(1) Picture type</b><DD> This is the same as the picture information in MPEG status information. (Initial value: 0)<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPPICT_I</TD><TD> I picture</TD></TR>
+<TR><TD> CDC_MPPICT_P</TD><TD> P picture</TD></TR>
+<TR><TD> CDC_MPPICT_B</TD><TD> B picture</TD></TR>
+<TR><TD> CDC_MPPICT_D</TD><TD> D picture</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(2) Temporal reference</b><DD> Returns the temporal reference (lower 8 bits) of the currently displayed picture.</P>
+<P><DT> <B>(3) Time code</b><DD> Returns the timecode of the currently displayed picture. (This is not the timecode at the beginning of the GOP layer in the stream.)</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.11"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Get audio timestamp</H4></TD><TD WIDTH=200><PRE> Function Name [S-]<BR><H3> CDC_MpGetPts</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.11</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpGetPts(Sint32 *pts_a)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> pts: MPEG/Audio timestamp<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Get the audio timestamp (PTS: Presentation Time Stamp).<P><DT> <B>(1) MPEG/Audio timestamp</b><DD> The timestamp value is the value obtained by extracting the lower 32 bits of the 33-bit PTS (90KHz).<BR>
+ This value is the most recent value just before entering decoding. When MPEG/Audio is not operating, the previous value is retained.</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="no8_822"><HR NOSHADE SIZE=3></a><H3> 8.2.2 MPEG Stream</H3><!------------------------------------------------------------------------>
+<A NAME="21.1"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting the MPEG decoder connection destination</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetCon</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.1</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetCon(Sint32 next, CdcMpCon *mpcon_a, CdcMpCon *mpcon_v)<DT> <B>input</b><DD><TABLE>
+<TR><TD> next</TD><TD> :Next stream flag</TD></TR>
+<TR><TD> mpcon_a</TD><TD> : MPEG/Audio connection destination parameter</TD></TR>
+<TR><TD> mpcon_v</TD><TD> :MPEG/Video connection destination parameter</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Set and register the MPEG decoder connection destination (buffer partition and other parameters).<BR>
+ Specifying CDC_NUL_SEL for the buffer partition number cancels the connection destination settings.<P><DT> <B>(1) Next stream flag</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPSTF_CUR</TD><TD> Setting the current connection destination (first stream)</TD></TR>
+<TR><TD> CDC_MPSTF_NEXT</TD><TD> Registering the next connection destination (next stream)</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> Cancellation (disconnection) of a connection destination depends on the MPEG operating state. In particular, it is necessary to use the CDC_MpChgCon function to disconnect (forcefully terminate) the current connection destination during playback.<BR>
+ For details, refer to the data specification (CdcMpCon).</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.2"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Obtaining the MPEG decoder connection destination</H4></TD><TD WIDTH=200><PRE> Function Name [S-]<BR><H3> CDC_MpGetCon</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.2</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpGetCon(Sint32 next, CdcMpCon *mpcon_a, CdcMpCon *mpcon_v)<DT> <B>input</b><DD> next: next stream flag<DT> <B>output</b><DD><TABLE>
+<TR><TD> mpcon_a</TD><TD> : MPEG/Audio connection destination parameter</TD></TR>
+<TR><TD> mpcon_v</TD><TD> :MPEG/Video connection destination parameter</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Get the MPEG decoder connection destination (buffer partition and other parameters).<BR>
+ If not connected (unregistered), return CDC_NUL_SEL for the buffer partition number.<P><DT> <B>(1) Next stream flag</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPSTF_CUR</TD><TD> Obtaining the current connection destination (first stream)</TD></TR>
+<TR><TD> CDC_MPSTF_NEXT</TD><TD> Obtaining the next connection destination (next stream) </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.3"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Switching the MPEG decoder connection destination</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpChgCon</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.3</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpChgCon(Sint32 chg_a, Sint32 chg_v, Sint32 clr_a, Sint32 clr_v)<DT> <B>input</b><DD><TABLE>
+<TR><TD> chg_a</TD><TD> : MPEG/Audio connection switching flag</TD></TR>
+<TR><TD> chg_v</TD><TD> :MPEG/Video connection switching flag</TD></TR>
+<TR><TD> clr_a</TD><TD> :MPEG/Audio clearing method</TD></TR>
+<TR><TD> clr_v</TD><TD> :MPEG/Video clearing method</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Forcibly switch the MPEG decoder connection destination. Or forcibly disconnect the connection destination.<BR>
+ To forcefully terminate MPEG playback, specify detach with this function.<P><DT> <B>(1) MPEG decoder connection switching flag</b><DD> To specify switching, the stream to be played next must be registered in advance using the CDC_MpSetCon function.<BR>
+ When switching is specified, the clear method is valid. After the clearing process is completed, the connection destination will be switched.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPCOF_ABT</TD><TD> Disconnect (forced termination)</TD></TR>
+<TR><TD> CDC_MPCOF_CHG</TD><TD> Forced switch</TD></TR>
+<TR><TD> CDC_PARA_NOCHG</TD><TD> Do not change settings</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(2) MPEG/Audio clear method</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPCLA_OFF</TD><TD> Do not clear (1 sector worth of data is transferred)</TD></TR>
+<TR><TD> CDC_MPCLA_ON</TD><TD> Clear one sector buffer immediately</TD></TR>
+</TABLE>
+</p>
+<P><DT> <B>(3) MPEG/Video clear method</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPCLV_FRM</TD><TD> Instantly clear VBV and WBC (display waiting MPEG frame buffer)</TD></TR>
+<TR><TD> CDC_MPCLV_VBV</TD><TD> Clear VBV at next I or P picture start</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DD> This function can be executed only when the MPEG operating state is playing.<BR>
+ To disconnect the connection destination in other states, the CDC_MpSetCon function must be used.</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.4"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> MPEG stream settings</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetStm</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.4</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetStm(Sint32 next, CdcMpStm *mpstm_a, CdcMpStm *mpstm_v)<DT> <B>input</b><DD><TABLE>
+<TR><TD> next</TD><TD> :Next stream flag</TD></TR>
+<TR><TD> mpstm_a</TD><TD> :MPEG/Audio stream parameters</TD></TR>
+<TR><TD> mpstm_v</TD><TD> :MPEG/Video stream parameters</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Set the stream number (stream ID) and channel number to be decoded.<P><DT> <B>(1) Next stream flag</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPSTF_CUR</TD><TD> Setting the current stream (first stream)</TD></TR>
+<TR><TD> CDC_MPSTF_NEXT</TD><TD> Registering the next stream (next stream)</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DD> If the MPEG operating state is being switched, it will be WAIT.</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.5"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Obtain MPEG stream</H4></TD><TD WIDTH=200><PRE> Function Name [S-]<BR><H3> CDC_MpGetStm</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.5</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpGetStm(Sint32 next, CdcMpStm *mpstm_a, CdcMpStm *mpstm_v)<DT> <B>input</b><DD> next: next stream flag<DT> <B>output</b><DD><TABLE>
+<TR><TD> mpstm_a</TD><TD> :MPEG/Audio stream parameters</TD></TR>
+<TR><TD> mpstm_v</TD><TD> :MPEG/Video stream parameters</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Obtain the stream number (stream ID) and channel number to be decoded.<P><DT> <B>(1) Next stream flag</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> CDC_MPSTF_CUR</TD><TD> Get current stream (first stream)</TD></TR>
+<TR><TD> CDC_MPSTF_NEXT</TD><TD> Obtaining the next stream (next stream) </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.6"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Get stream image size</H4></TD><TD WIDTH=200><PRE> Function Name [S-]<BR><H3> CDC_MpGetPictSiz</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.6</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpGetPictSiz(Sint32 *siz_h, Sint32 *siz_v)<DT> <B>input</b><DD> none<DT> <B>output</b><DD><TABLE>
+<TR><TD> siz_h</TD><TD> :Horizontal image size (in pixels)</TD></TR>
+<TR><TD> siz_v</TD><TD> :Vertical image size (in pixels)</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Get the image size in the video stream. The initial value is 0 for both.</DL>
+<!------------------------------------------------------------------------>
+<A NAME="no8_823"><HR NOSHADE SIZE=3></a><H3> 8.2.3 MPEG display screen</H3><!------------------------------------------------------------------------>
+<A NAME="22.1"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Displaying images</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpDisp</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.1</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpDisp(Bool dspsw, Sint32 fbn)<DT> <B>input</b><DD><TABLE>
+<TR><TD> dspsw</TD><TD> :Display switch (display ON/OFF to VDP2)</TD></TR>
+<TR><TD> fbn</TD><TD> :Frame bank number (0 to 3)...Valid in still image playback mode</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Display the image according to the display switch.<P><DT> <B>(1) Display switch</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> OFF</TD><TD> Do not display on VDP2...Initial value</TD></TR>
+<TR><TD> ON</TD><TD> Display on VDP2</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(2) Frame bank number</b><DD> In the still image playback mode, the frame bank number (0 to 3) to be decoded can be specified.<BR>
+ Frame bank numbers are invalid in video playback mode.</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.2"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting the frame buffer window position</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetWinFpos</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.2</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetWinFpos(Bool chgflg, Sint32 fpx, Sint32 fpy)<DT> <B>input</b><DD><TABLE>
+<TR><TD> chgflg</TD><TD> : Setting change flag (OFF: Register the setting value, ON: Change the setting to the registered value)</TD></TR>
+<TR><TD> fpx</TD><TD> : Upper left X coordinate of frame buffer window</TD></TR>
+<TR><TD> fpy</TD><TD> : Upper left Y coordinate of the frame buffer window</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Sets the frame buffer window position in pixels.<P><DT> <B>(1) Top left coordinates of the frame buffer window</b><DD> The initial value is 0 for both fpx and fpy.<DD> If CDC_PARA_NOCHG is set for fpx and fpy, the previous values will be retained.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2> Coordinate</TH><TH WIDTH=180> Normal output mode</TH><TH WIDTH=180> High definition output mode</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> NTSC</TH><TD> fpx</TD><TD> 0-351 (CDC_MPNT_NPX)</TD><TD> 0-703 (CDC_MPNT_HPX)</TD></TR>
+<TR ALIGN=CENTER><TD> fpy</TD><TD> 0-239 (CDC_MPNT_NPY)</TD><TD> 0-479 (CDC_MPNT_HPY)</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> PAL</TH><TD> fpx</TD><TD> 0 to 351 (CDC_MPPL_NPX)</TD><TD> 0-703 (CDC_MPPL_HPX)</TD></TR>
+<TR ALIGN=CENTER><TD> fpy</TD><TD> 0 to 287 (CDC_MPPL_NPY)</TD><TD> 0 to 575 (CDC_MPPL_HPY)</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.3"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting the frame buffer window magnification</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetWinFrat</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.3</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetWinFrat(Bool chgflg, Sint32 frx, Sint32 fry)<DT> <B>input</b><DD><TABLE>
+<TR><TD> chgflg</TD><TD> : Setting change flag (OFF: Register the setting value, ON: Change the setting to the registered value)</TD></TR>
+<TR><TD> frx</TD><TD> : X-direction expansion rate of frame buffer window (lower 16 bits are valid)</TD></TR>
+<TR><TD> fry</TD><TD> : Y-direction expansion rate of frame buffer window (lower 16 bits are valid)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Sets the frame buffer window magnification.<P><DT> <B>(1) Enlargement ratio in each direction of the frame buffer window</b><DD> The initial value is 01H (enlargement rate = 1) for both frx and fry.<DD> If CDC_PARA_NOCHG is specified for frx and fry, the previous values will be retained.<DD><PRE>
+bit 15  13  11  9   7   5   3   1 
+      14  12  10  8   6   4   2   0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │C│ │←────────A────────→│D│←─B─→│
+   └┬┴┬┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴┬┴─┴─┴─┘
+    │ │          ↑          │   ↑ 
+    │ │ Enlargement ratio   │ Correction factor
+    │ │                     │
+    │ │                     └─Correction coefficient polarity
+    │ │
+    │ └────────────Keep previous value  1: Do not change settings  0: Change
+    └──────────────Reduction flag       1: Reduce                  0: Enlarge
+</PRE><P><DD> Each bit of A, B, C, and D is set so that the following relationship is satisfied.<BR>
+ However, A&#65308; 1024,B&#65310; Set to 0.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TD></TD><TH WIDTH=30> C</TH><TH WIDTH=30> D</TH><TH WIDTH=200> Expansion rate</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> Expansion<BR>
+ Big</TH><TD> 0</TD><TD> 0</TD><TD> A+2-1/B</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> A+1+1/B</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> shrinkage<BR>
+ small</TH><TD> 1</TD><TD> 0</TD><TD> 1/(A+1-1/B)</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1/(A+1/B)</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.4"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting the display window position</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetWinDpos</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.4</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetWinDpos(Bool chgflg, Sint32 dpx, Sint32 dpy)<DT> <B>input</b><DD><TABLE>
+<TR><TD> chgflg</TD><TD> : Setting change flag (OFF: Register the setting value, ON: Change the setting to the registered value)</TD></TR>
+<TR><TD> dpx</TD><TD> : Upper left X coordinate of display window</TD></TR>
+<TR><TD> dpy</TD><TD> : Upper left Y coordinate of display window</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Sets the display window position in pixels.<P><DT> <B>(1) Upper left coordinates of the display window</b><DD> The initial value is 0 for both dpx and dpy.<DD> If CDC_PARA_NOCHG is set for dpx and dpy, the previous values will be retained.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2> Coordinate</TH><TH WIDTH=180> Normal output mode</TH><TH WIDTH=180> High definition output mode</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> NTSC</TH><TD> dpx</TD><TD> 0-351 (CDC_MPNT_NPX)</TD><TD> 0-703 (CDC_MPNT_HPX)</TD></TR>
+<TR ALIGN=CENTER><TD> dpy</TD><TD> 0-239 (CDC_MPNT_NPY)</TD><TD> 0-479 (CDC_MPNT_HPY)</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> PAL</TH><TD> dpx</TD><TD> 0 to 351 (CDC_MPPL_NPX)</TD><TD> 0-703 (CDC_MPPL_HPX)</TD></TR>
+<TR ALIGN=CENTER><TD> dpy</TD><TD> 0 to 287 (CDC_MPPL_NPY)</TD><TD> 0-575 (CDC_MPPL_HPY)</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.5"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting display window size</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetWinDsiz</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.5</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetWinDsiz(Bool chgflg, Sint32 dsx, Sint32 dsy)<DT> <B>input</b><DD><TABLE>
+<TR><TD> chgflg</TD><TD> : Setting change flag (OFF: Register the setting value, ON: Change the setting to the registered value)</TD></TR>
+<TR><TD> dsx</TD><TD> : Display window size in X direction</TD></TR>
+<TR><TD> dsy</TD><TD> : Display window size in Y direction</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Sets the display window size in pixels.<P><DT> <B>(1) Display window size</b><DD> The initial values are dsx=352, dsy=240 regardless of NTSC/PAL, normal/high definition.<DD> If CDC_PARA_NOCHG is set for dsx and dsy, the previous values will be retained.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2> Coordinate</TH><TH WIDTH=180> Normal output mode</TH><TH WIDTH=180> High definition output mode</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> NTSC</TH><TD> dsx</TD><TD> 0-352 (CDC_MPNT_NSX)</TD><TD> 0 to 704 (CDC_MPNT_HSX)</TD></TR>
+<TR ALIGN=CENTER><TD> dsy</TD><TD> 0-240 (CDC_MPNT_NSY)</TD><TD> 0~480 (CDC_MPNT_HSY)</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> PAL</TH><TD> dsx</TD><TD> 0-352 (CDC_MPPL_NSX)</TD><TD> 0 to 704 (CDC_MPPL_HSX)</TD></TR>
+<TR ALIGN=CENTER><TD> dsy</TD><TD> 0-288 (CDC_MPPL_NSY)</TD><TD> 0 to 576 (CDC_MPPL_HSY)</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.6"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting the display window offset</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetWinDofs</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.6</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetWinDofs(Bool chgflg, Sint32 dox, Sint32 doy)<DT> <B>input</b><DD><TABLE>
+<TR><TD> chgflg</TD><TD> : Setting change flag (OFF: Register the setting value, ON: Change the setting to the registered value)</TD></TR>
+<TR><TD> dox</TD><TD> : Display window X direction offset</TD></TR>
+<TR><TD> doy</TD><TD> : Display window Y-direction offset</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Sets the display window offset in units of bright spots. (Not in pixel units.)<P><DT> <B>(1) Display window offset</b><DD> Both the initial value and setting range are independent of NTSC/PAL, normal/high definition.<DD> If CDC_PARA_NOCHG is set for dox and doy, the previous values will be retained.<DD><TABLE BORDER=1>
+<TR><TH> offset</TH><TH> initial value</TH><TH> Setting range</TH><TH> remarks</TH></TR>
+<TR><TD> dox</TD><TD> 150</TD><TD> 18~704</TD><TD> When dox≦17, border color is displayed on the entire surface.</TD></TR>
+<TR><TD> doy</TD><TD> 38</TD><TD> 8~480</TD><TD> When do≦7, border color is displayed on the entire surface.</TD></TR>
+</TABLE>
+<P><DT> <B>remarks</b><DD> For PAL, dox=150 and doy=45 are recommended as standard values for setting in the center of the screen.</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.7"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Border color settings</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetBcolor</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.7</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetBcolor(Sint32 bcolor)<DT> <B>input</b><DD> bcolor: Border color (lower 16 bits are valid)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Set the color data (RGB555 format) for the border color.<P><DT> <B>(1) Border color</b><DD><PRE>
+Initial value: 8000H (border color output)
+bit 15  13  11  9   7   5   3   1 
+      14  12  10  8   6   4   2   0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │←─B Data→│←─G Data→│←─R Data→│
+   └┬┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+    │
+    └──Transparent bit 1: Output border color   0: Do not output (transparent state)
+</PRE></P>
+<P><DT><B>remarks</b><DD> It only works when outputting images to VDP2.<BR>
+ If the output destination is the host (MPEG register), border color is not output.</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.8"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting the fade</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetFade</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.8</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetFade(Sint32 gain_y, Sint32 gain_c)<DT> <B>input</b><DD><TABLE>
+<TR><TD> gain_y</TD><TD> : Luminance signal gain (-8 to 7, initial value: 0)</TD></TR>
+<TR><TD> gain_c</TD><TD> : Color difference signal gain (-8 to 7, initial value: 0)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> The level of the luminance/color difference signal is changed in 1/8 steps.<BR>
+ Used for fade in and fade out.<P><DT> <B>(1) Luminance/color difference signal gain</b><DD> The setting value range is -8 to 7, and the initial value is 0. Specifying a value outside this range will result in a REJECT.<BR>
+ The gain settings and actual magnification are shown below.<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE> Gain setting value</TH><TD><PRE> -8</TD><TD><PRE> -7</TD><TD><PRE> -6</TD><TD><PRE> -5</TD><TD><PRE> -4</TD><TD><PRE> -3</TD><TD><PRE> -2</TD><TD><PRE> -1</TD><TH><PRE> 0</TH><TD><PRE> +1</TD><TD><PRE> +2</TD><TD><PRE> +3</TD><TD><PRE> +4</TD><TD><PRE> +5</TD><TD><PRE> +6</TD><TD><PRE> +7</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> Magnification</TH><TD> 0</TD><TD> 1/8</TD><TD> 2/8</TD><TD> 3/8</TD><TD> 4/8</TD><TD> 5/8</TD><TD> 6/8</TD><TD> 7/8</TD><TH> 1</TH><TD> 9/8</TD><TD> 10/8</TD><TD> 10/8</TD><TD> 12/8</TD><TD> 12/8</TD><TD> 2</TD><TD> 2</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.9"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Screen special effect settings</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetVeff</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.9</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetVeff(CdcMpVeff *mpvef)<DT> <B>input</b><DD> mpvef: Screen special effect parameters<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Set screen special effects.</DL>
+<!------------------------------------------------------------------------>
+<A NAME="no8_824"><HR NOSHADE SIZE=3></a><H3> 8.2.4 MPEG Frame Buffer</H3><!------------------------------------------------------------------------>
+<A NAME="23.1"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Extracting image data</H4></TD><TD WIDTH=200><PRE> Function Name [S-]<BR><H3> CDC_MpGetImg</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.1</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpGetImg(Sint32 *dwnum)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> dwnum: Number of words to transfer image data<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Extract the image data in the display window to the host.<BR>
+ It does not work if the image data output destination is VDP2. Be sure to set the output destination to the host.<DT> <B>remarks</b><DT><OL TYPE=a>
+<P><B><LI></b> After executing the function, we need to transfer and retrieve the data from the MPEG register.</P>
+<P><B><LI></b> The horizontal size dsx usually needs to be set to 5 or more (10 or more for high definition).</P>
+<P><B><LI></b> In high-definition still image mode, the sizes dsx and dsy must be set to integral multiples of 2.</P>
+<P><B><LI></b> Before executing, turn on the display switch of CDC_MpDisp function.</P>
+<P><B><LI></b> Please execute after the MPEG report output ready flag becomes 1.</P>
+<P><B><LI></b> During image data transfer, it is desirable to freeze the display window or otherwise fix it.</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="23.2"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting the image data window position</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetImgPos</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.2</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetImgPos(Sint32 fbn, Sint32 ipx, Sint32 ipy)<DT> <B>input</b><DD><TABLE>
+<TR><TD> fbn</TD><TD> :Frame bank number (0 to 3)</TD></TR>
+<TR><TD> ipx</TD><TD> : Upper left X coordinate of image data window</TD></TR>
+<TR><TD> ipy</TD><TD> : Upper left Y coordinate of the image data window</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Sets the position of the image data window in pixels for the specified frame bank.<P><DT> <B>(1) Upper left coordinates of the image data window</b><DD> The initial value is 0 for both ipx and ipy.<BR>
+ The specified value is rounded down to 2 pixels.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2> Coordinate</TH><TH WIDTH=180> Normal output mode</TH><TH WIDTH=180> High definition output mode</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> NTSC</TH><TD> ipx</TD><TD> 0-351 (CDC_MPNT_NPX)</TD><TD> 0-703 (CDC_MPNT_HPX)</TD></TR>
+<TR ALIGN=CENTER><TD> ipy</TD><TD> 0-239 (CDC_MPNT_NPY)</TD><TD> 0-479 (CDC_MPNT_HPY)</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> PAL</TH><TD> ipx</TD><TD> 0-351 (CDC_MPPL_NPX)</TD><TD> 0-703 (CDC_MPPL_HPX)</TD></TR>
+<TR ALIGN=CENTER><TD> ipy</TD><TD> 0-287 (CDC_MPPL_NPY)</TD><TD> 0-575 (CDC_MPPL_HPY)</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="23.3"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Setting the image data window size</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpSetImgSiz</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.3</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpSetImgSiz(Sint32 fbn, Sint32 isx, Sint32 isy)<DT> <B>input</b><DD><TABLE>
+<TR><TD> fbn</TD><TD> :Frame bank number (0 to 3)</TD></TR>
+<TR><TD> isx</TD><TD> : Image data window size in X direction</TD></TR>
+<TR><TD> isy</TD><TD> : Y-direction size of image data window</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Sets the size of the image data window in pixels for the specified frame bank.<P><DT> <B>(1) Image data window size</b><DD> The initial value is 0 for both isx and isy.<BR>
+ The specified value is rounded down to 2 pixels.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2> Coordinate</TH><TH WIDTH=180> Normal output mode</TH><TH WIDTH=180> High definition output mode</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> NTSC</TH><TD> isx</TD><TD> 0-352 (CDC_MPNT_NSX)</TD><TD> 0 to 704 (CDC_MPNT_HSX)</TD></TR>
+<TR ALIGN=CENTER><TD> isy</TD><TD> 0-240 (CDC_MPNT_NSY)</TD><TD> 0~480 (CDC_MPNT_HSY)</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> PAL</TH><TD> isx</TD><TD> 0-352 (CDC_MPPL_NSX)</TD><TD> 0 to 704 (CDC_MPPL_HSX)</TD></TR>
+<TR ALIGN=CENTER><TD> isy</TD><TD> 0-288 (CDC_MPPL_NSY)</TD><TD> 0 to 576 (CDC_MPPL_HSY)</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="23.4"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Loading from image data window</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpReadImg</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.4</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpReadImg(Sint32 srcfbn, Sint32 fln_y, Sint32 fln_cr, Sint32 fln_cb)<DT> <B>input</b><DD><TABLE>
+<TR><TD> srcfbn</TD><TD> : Reading source frame bank number (0 to 3)</TD></TR>
+<TR><TD> fln_y</TD><TD> : Aperture number for brightness data (Y)</TD></TR>
+<TR><TD> fln_cr</TD><TD> : Aperture number for color difference data (Cr)</TD></TR>
+<TR><TD> fln_cb</TD><TD> : Aperture number for color difference data (Cb)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> MPED flag<DT> <B>function</b><DD> Read image data (YCC) from the image data window in the frame bank through the aperture into the buffer compartment.<DT> <B>remarks</b><DT><OL TYPE=a>
+<P><B><LI></b> This function is valid only in still image playback mode.</P>
+<P><B><LI></b> Depending on the screen size, the amount of data may exceed the CD buffer capacity.<BR>
+ In such a case, process the data while retrieving it to the host side.</P>
+<P><B><LI></b> This function does not terminate even if the CD buffer becomes full. (MPED does not become 1.)<BR>
+ To cancel processing midway, execute the CDC_MpInit function (or soft reset using the CDC_CdInit function).</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="23.5"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Export to image data window</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpWriteImg</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.5</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpWriteImg(Sint32 bn_y, Sint32 bn_cr, Sint32 bn_cb,Sint32 dstfbn, Bool clrmod)<DT> <B>input</b><DD><TABLE>
+<TR><TD> bn_y</TD><TD> : Buffer section number for brightness data (Y)</TD></TR>
+<TR><TD> bn_cr</TD><TD> :Buffer section number for color difference data (Cr)</TD></TR>
+<TR><TD> bn_cb</TD><TD> :Buffer section number for color difference data (Cb)</TD></TR>
+<TR><TD> dstfbn</TD><TD> : Destination frame bank number (0 to 3)</TD></TR>
+<TR><TD> clrmod</TD><TD> : Erase mode of sectors in buffer partition</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> MPED flag<DT> <B>function</b><DD> Writes image data (YCC) from the buffer compartment to the image data window in the frame bank.<P><DT> <B>(1) Erase mode</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140> constant name</TH><TH WIDTH=340> explanation</TH></TR>
+<TR><TD> OFF</TD><TD> Keep (do not erase) sectors in the buffer partition</TD></TR>
+<TR><TD> ON</TD><TD> Erase sectors within the buffer partition</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DT><OL TYPE=a>
+<P><B><LI></b> This function is valid only in still image playback mode.</P>
+<P><B><LI></b> This function does not terminate even if the data in the buffer section becomes empty. (MPED does not become 1.) To cancel processing midway, execute the CDC_MpInit function (or soft reset using the CDC_CdInit function).</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="no8_825"><HR NOSHADE SIZE=3></a><H3> 8.2.5 MPEG sector buffer</H3> To use this function, be sure to execute the CDC_MpInit function and then switch to MPEG sector buffer mode with the CDC_MpSetMode function. The initial value in the MPEG sector buffer is undefined.<!------------------------------------------------------------------------>
+<A NAME="24.1"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Reading sectors from MPEG sector buffer</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpReadSct</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 24.1</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpReadSct(Sint32 srcmsp, Sint32 snum, Sint32 dstfln)<DT> <B>input</b><DD><TABLE>
+<TR><TD> srcmsp</TD><TD> : Source MPEG sector position</TD></TR>
+<TR><TD> snum</TD><TD> : Number of sectors</TD></TR>
+<TR><TD> dstfln</TD><TD> : Aperture number</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> MPED flag<DT> <B>function</b><DD> Read sector data from the MPEG sector buffer into the buffer section through the aperture.<BR>
+ The sector range to read is specified by the MPEG sector position and number of sectors.</P>
+<DT> <B>remarks</b><DT><OL TYPE=a>
+<P><B><LI></b> Depending on the number of designated sectors, the amount of data may exceed the CD buffer capacity.<BR>
+ In such a case, process the data while retrieving it to the host side.</P>
+<P><B><LI></b> This function does not terminate even if the CD buffer becomes full. (MPED does not become 1.)<BR>
+ To cancel processing midway, execute the CDC_MpInit function (or soft reset using the CDC_CdInit function).</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="24.2"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD> <A HREF="#t8_1">one</a><BR>
+ <A HREF="#t8_1">View</a><BR>
+ <A HREF="#t8_1">table</a></TD><TD WIDTH=060><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=280><PRE> Function<BR><H4> Writing sectors to MPEG sector buffer</H4></TD><TD WIDTH=200><PRE> Function Name [SR]<BR><H3> CDC_MpWriteSct</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 24.2</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 CDC_MpWriteSct(Sint32 srcbn, Sint32 sp, Sint32 snum, Sint32 dstmsp)<DT> <B>input</b><DD><TABLE>
+<TR><TD> srcbn</TD><TD> :Buffer section number</TD></TR>
+<TR><TD> sp</TD><TD> : Sector position (CDC_SPOS_END: indicates the last sector of the partition)</TD></TR>
+<TR><TD> snum</TD><TD> : Number of sectors (CDC_SNUM_END: Indicates the number of sectors from sp to the end of the partition)</TD></TR>
+<TR><TD> dstmsp</TD><TD> : Destination MPEG sector position</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> MPED flag<DT> <B>function</b><DD> Write sector data from the buffer section to the MPEG sector buffer.<BR>
+ The sector range to be written is specified by the sector position and number of sectors.<DT> <B>remarks</b><DT><OL TYPE=a>
+<P><B><LI></b> On writing, sectors of the buffer partition are erased.</P>
+<P><B><LI></b> This function does not terminate even if the data in the buffer section becomes empty. (MPED does not become 1.)<BR>
+ To cancel processing midway, execute the CDC_MpInit function (or soft reset using the CDC_CdInit function).</P>
+</OL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_10.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

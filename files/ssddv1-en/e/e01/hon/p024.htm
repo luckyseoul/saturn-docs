@@ -1,0 +1,65 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p023.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p025.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD> (2) Program example <BR>
+The following is an example of a program that plays a movie using the stream system. <P>
+<PRE>#define WORK_BUF_SIZE 200*1024L
+#define PCM_ADDR ((void*)0x25a20000)
+#define PCM_SIZE (4096L*16)<P>
+/ * Work buffer * /
+Uint32 movie_work[CPK_24WORK_DSIZE];
+/ * Ring buffer * /
+Uint32 movie_buf[WORK_BUF_SIZE/sizeof(Uint32)];
+StmHn stm;
+CpkHn cpk;
+Sint32 movie_x = 320; <P>
+/* Initialize */
+CPK_Init();<P>
+/ * Screen display settings * /
+Use INT _ ??? to set V blank IN interrupt.
+Call CPK_VblIn (); in the V blank IN interrupt.
+Set sprite commands. <P>
+/ * File initialization * /
+GFS_Init (…);
+STM_Init (……);
+STM_OpenGrp();
+STM_SetExecGrp (…);
+/ * Open stream * /
+stm = STM_OpenFid (…); <P>
+/ * Create movie handle * /
+CPK_PARA_WORK_ADDR(&para) = movie_work;
+CPK_PARA_WORK_SIZE(&para) = CPK_24WORK_BSIZE;
+CPK_PARA_BUF_ADDR(&para) = movie_buf;
+CPK_PARA_BUF_SIZE(&para) = WORK_BUF_SIZE;
+CPK_PARA_PCM_ADDR(&para) = PCM_ADDR;
+CPK_PARA_PCM_SIZE(&para) = PCM_SIZE;
+cpk = CPK_CreateStmMovie(&para, stm);<P>
+/ * Set the number of display colors * /
+CPK_SetColor(cpk, CPK_COLOR_15BIT);
+/ * Set destination address * /
+CPK_SetDecodeAddr(cpk, ADDR_VRAM, 2 * movie_x);
+/ * Start playing movie * /
+CPK_Start(cpk);
+While (TRUE) {
+/ * Movie playback process * /
+CPK_Task (cpk);
+If (CPK_IsDispTime (cpk) == TRUE) {
+* / Waiting to switch frame buffer * /
+SCL_DisplayFrame ();
+CPK_CompleteDisp (cpk);
+}
+/ * End of movie * /
+If (CPK_GetPlayStatus (cpk) == CPK_STAT_PLAY_END) break;
+}
+/ * Abandonment of movie * /
+CPK_DestroyStmMovie(cpk);
+/ * Close stream * /
+STM_Close(stm);</PRE>
+</DL><P><P><HR>
+<A HREF=p023.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p025.htm> Go to next page </A>
+</BODY>
+</HTML>

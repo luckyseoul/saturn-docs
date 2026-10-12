@@ -1,0 +1,98 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;45/86&gt;VDP2 User's Manual/6.3 Rotation Parameter Control-5</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no6">VDP2 User's Manual</a> ★ <A HREF="p06_10.htm">Chapter 6 Rotating scroll screen</a><HR>
+ <B>▲ <A HREF="p06_33.htm">Back</a> ｜ <A HREF="p06_35.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 6 Rotating scroll screen</b><HR NOSHADE>
+<DL>
+<A NAME="no6_34"></A><P><DT><H3> ●Switching rotation parameters</H3><DD> RBG0 allows you to specify which of two rotation parameter tables to use, or to partially switch rotation parameters on a single display screen. You can choose how to use rotation parameters from the following four rotation parameter modes.</P>
+<DL>
+<P><DT> <B>Mode 0:</b><DD> Use rotation parameter A</P>
+<P><DT> <B>Mode 1:</b><DD> Use rotation parameter B</P>
+<P><DT> <B>Mode 2:</b><DD> Switch images according to the coefficient data read from the coefficient table of rotation parameter A</P>
+<P><DT> <B>Mode 3:</b><DD> Switch by rotation parameter window</P>
+</DL>
+<P><DD> For modes 0 and 1, images obtained by one set of rotation parameter tables are displayed. In modes 2 and 3, the image obtained by rotation parameter A and the image obtained by rotation parameter B are displayed on one screen.</P>
+<P><DD> For mode 2, set the RAKTE bit in the coefficient table control register to 1 to use the coefficient table for rotation parameter A. When the value of the most significant bit of the coefficient data read from the coefficient table is 0, the image obtained by rotation parameter A is displayed, and when it is 1, the image obtained by rotation parameter B is displayed as the RBG0 image. If the coefficient data for rotation parameter A is set to be read dot by dot, switching between two images can also be done dot by dot, but the coefficient data for rotation parameter B cannot be read dot by dot. lose.</P>
+<P><DD> In mode 3, the rotation parameter window bit in the rotation window control register switches between the two images. When that window is used as a transparency processing window, the image obtained by rotation parameter B is displayed in the part of the screen that is cut and made transparent, and the image obtained by rotation parameter A is displayed in other parts of RBG0. Display as an image.</P>
+<P><DD> Figure 6.5 shows an example of image display in modes 0 to 3 above.</P>
+<A NAME="z6_5"></A><P><DD> <B>Figure 6.5 Switching rotation parameters</b>
+<PRE>
+<B>●For rotation parameter mode 0</B>
+┏━━━━━━━━━━━━━━┓
+┃              ┃
+┃Image obtained┃
+┃by rotation   ┃
+┃parameter A   ┃
+┃              ┃
+┃              ┃
+┗━━━━━━━━━━━━━━┛
+</PRE><PRE>
+<B>●For rotation parameter mode 1</B> 
+┏━━━━━━━━━━━━━━┓
+┃              ┃
+┃Image obtained┃
+┃by rotation   ┃
+┃parameter B   ┃
+┃              ┃
+┃              ┃
+┗━━━━━━━━━━━━━━┛
+</PRE><PRE>
+<B>●For rotation parameter mode 2</B>      
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┓     
+┃Image obtained /           ┃     
+┃by rotation   /            ┃     
+┃parameter A  /             ┃     
+┃            /Image obtained┃     
+┃           /by rotation    ┃     
+┃          /parameter B     ┃     
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━┛     
+ ↑              ↑                 
+ │  The part where the MSB of the 
+ │  coefficient data read from the
+ │  coefficient table for rotation
+ │  parameter B is "0"            
+ │                                
+The part where the MSB of the coefficient
+data read from the coefficient table for
+rotation parameter A is "1"
+</PRE><PRE>
+<B>●For rotation parameter mode 3</B>         
+ Switch and display by rotation parameter window
+┏━━━━━━━━━━━━━━━━┓                                
+┃┌──────────────┐┃                                
+┃│Image obtained│←─Part of the screen that is cut 
+┃│by rotation   │┃ and made transparent when using
+┃│parameter B   │┃ a transparent processing window
+┃└──────────────┘┃                                
+┃ Image obtained ┃                                
+┃ by rotation    ┃                                
+┃ parameter A    ┃                                
+┗━━━━━━━━━━━━━━━━┛                                
+</PRE>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p06_33.htm">Back</a> ｜ <A HREF="p06_35.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no6">VDP2 User's Manual</a> ★ <A HREF="p06_10.htm">Chapter 6 Rotating scroll screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

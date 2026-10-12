@@ -1,0 +1,158 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/29&gt;SCSP User's Manual/1. Sound System Overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p01_30.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/Chapter 1 Sound System Overview</b><HR NOSHADE>
+<DL>
+<A NAME="no2_2"></A><P><DT><H2> 1.2 Starting the sound system</H2><A NAME="no2_10"></A><P><DT><H3> ■1. Starting up from reset</H2><DD> The sound system is reset by "SMPC" immediately after power is turned on or after pressing the reset button.<BR>
+ In this state, the sound CPU "MC68EC000" and "SCSP" cannot operate.</P>
+<A NAME="no2_11"></A><P><DT> <B>●Reset cancellation</b><DD><UL TYPE=DISC>
+<P><LI> The sound system starts when "SMPC" releases the reset of "SCSP".<BR>
+ When the reset of SCSP is released, “SCSP” initializes its internal control registers over a period of approximately 30 μs. Access is prohibited during this 30 microsecond period.<BR>
+<P> By the way, it will not be reset by the "RESET" command of the sound CPU "MC68EC000".<BR>
+ Additionally, the use of the "RESET" command is prohibited as operation cannot be guaranteed in this system.</P>
+<P> After 30μ seconds or more have passed after the reset is released, the sound block can be accessed from the main block (SH2, etc.) side.</P>
+<P> At this point, it is finally possible to download the programs and data for the sound CPU, but before doing so, be sure to set "1b" to the "MEM4MB" bit of the control register shown in "Table 2.1" and "DAC18B". Please write “0b” to the “bit”.</P>
+</UL>
+<P><DT><TABLE>
+<TR><TH> Note<BR>
+<img srcset="../../../what/atto.png 5x"></TH><TD> <B>After resetting, write “0200H” to 25B00400H.</b></TD></TR>
+</TABLE>
+</P>
+<P><DD> Be <B>sure</b> to perform this task after resetting. Otherwise, operation cannot be guaranteed.</P>
+<A NAME="t1_2"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 1.2 Initialization setting data after reset</b></CAPTION>
+<TR><TD COLSPAN=17> Main side address 25B00400/1h (Sound CPU side address 100400/1h)</TD></TR>
+<TR ALIGN=CENTER><TD> address</TD><TD COLSPAN=8> 25B00400h/100400h</TD><TD COLSPAN=8> 25B00401h/100401h</TD></TR>
+<TR ALIGN=CENTER><TD> bit</TD><TD>15</TD><TD>14</TD><TD>13</TD><TD>12</TD><TD>11</TD><TD>10</TD><TD>９</TD><TD>８</TD><TD>７</TD><TD>６</TD><TD>５</TD><TD>４</TD><TD>３</TD><TD>２</TD><TD>１</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER><TD> register</TD><TD COLSPAN=6> −</TD><TD> M4</TD><TD> D18</TD><TD COLSPAN=4> VER[7:4]</TD><TD COLSPAN=4> MVOL[3:0]</TD></TR>
+<TR ALIGN=CENTER><TD> initial value</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TD> &H (hexadecimal)<TD COLSPAN=4> 0</TD><TD COLSPAN=4> 2</TD><TD COLSPAN=4> 0</TD><TD COLSPAN=4> 0</TD></TR>
+</TABLE>
+<DD><UL TYPE=DISC>
+<P><LI> If you write the data in the table above, you will be able to access the sound RAM, so please download the program, data, waveform data, etc. for the sound CPU.</P>
+<P> When the download is complete, cancel the sound CPU reset (sound reset) by SMPC.</P>
+<P><LI> Once released, the sound CPU will start operating according to the downloaded program. (The reset is controlled by SMPC.)</P>
+</UL>
+<A NAME="c1_1"></A><P><DT><TABLE>
+<TR><TH ROWSPAN=3> Note<BR>
+<img srcset="../../../what/atto.png 5x"></TD><TD> <B>The following commands are prohibited when programming with MC68EC000.</b></TD></TR>
+<TR ALIGN=CENTER><TD><PRE> <B>RESET command</b></TD></TR>
+<TR ALIGN=CENTER><TD><PRE> <B>TAS command</b></TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>reference:</b><DD> "SEGASATURN Developer's Information STN-51" <A HREF="../../../info/hon/stn51.htm">Instruction to prohibit use on 68000</a></P>
+<A NAME="no2_20"></A><P><DT><H3> ■2.About reset vector</H3><DD><UL TYPE=DISC>
+<P><LI> Regarding the files to be downloaded, please remember that the reset vector is always required to start up the sound CPU.<P><LI> The reset vector is 8 bytes of data starting from address 000000 on the sound RAM. See Table 2.2.</UL>
+<A NAME="t1_3"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 1.3 Reset vector</b></CAPTION>
+<TR ALIGN=CENTER><TD>　</TD><TD>MAIN/SOUND</TD><TD>D15　　　　　D８</TD><TD>D７　　　　　D０</TD><TD>MAIN/SOUND</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> RESET<BR>
+ VECTOR-0</TD><TD> 0(2)5A00000H/000000H</TD><TD COLSPAN=2><PRE> Stack address/upper word</TD><TD> 0(2)5A00001H/000001H</TD></TR>
+<TR ALIGN=CENTER><TD> 0(2)5A00002H/000002H</TD><TD COLSPAN=2><PRE> Stack address/lower word</TD><TD> 0(2)5A00003H/000003H</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> RESET<BR>
+ VECTOR-1</TD><TD> 0(2)5A00004H/000004H</TD><TD COLSPAN=2><PRE> Program counter/upper word</TD><TD> 0(2)5A00005H/000005H</TD></TR>
+<TR ALIGN=CENTER><TD> 0(2)5A00006H/000006H</TD><TD COLSPAN=2><PRE> Program counter/lower word</TD><TD> 0(2)5A00007H/000007H</TD></TABLE>
+</P>
+<DD><UL TYPE=DISC>
+<P><LI> After the reset is released, the sound CPU reads the reset vector and jumps to the same address as the program counter value.</P>
+</UL>
+<P><DD> The following figure 2.3 explains the reset procedure.</P>
+<A NAME="z2_3"></A><P ALIGN=CENTER> <B>Figure 2.3 Reset sequence (operation order diagram)</b> <BR>
+<img srcset="../grp/i001_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<!-- 図2.3で使用される主な単語 -->
+<!-- 時間 30μ秒 ＣＰＵリセット解除コマンド発行 プログラム等の転送時間 メイン側動作 リセット状態 -->
+<!-- ブート サウンド転送 MAIN-RESET SCSP-RESET  ＳＣＳＰ動作 リセット状態 初期化 通常動作 SOUND-CPU-RESET ＳＣＰＵ動作 リセット状態 ブート ＣＰＵ動作開始 -->
+<A NAME="no2_30"></A><P><DT><H3> ■3. Regarding communication between main block and sound block</H3><DD><UL TYPE=DISC>
+<P><LI> Regarding communication between the main block and the sound block, data is exchanged via the "SCU" in hardware.</P>
+<P> Regarding access, it is possible to read and write data from the main block (SH2, SCU) to the sound block, but please note that it is not possible to access the main block from the sound block.</P>
+</UL>
+<P><DT><TABLE>
+<TR><TH> Note<BR>
+<img srcset="../../../what/atto.png 5x"></TH><TD> <B>Direction of access</b><BR>
+ <B>It is possible to access the sound block from the main block (SH2, SCU).</b><BR>
+ <B>It is impossible to access the main block from the sound block.</b></TD></TR>
+</TABLE>
+</P>
+<DD><UL TYPE=DISC>
+<P><LI> The memory mapping is the same as <A HREF="p01_10.htm#t1_1">above</a> , so please refer to it.</P>
+</UL>
+<A NAME="no2_40"></A><P><DT><H3> ■4.About MIDI communication function</H3><DD><UL TYPE=DISC>
+<P><LI> Saturn allows you to use MIDI communication functions.<BR>
+ The serial signal line necessary for the MIDI interface is output to the "communication connector" on the back of the Saturn.</P>
+<P><LI> All MIDI transmission/reception data and related controls can be performed in the SCSP control registers, so if you are using MIDI, please refer to the MIDI register section below.</P>
+</UL>
+<P><DT> <B>reference:</b><DD> "SCSP User's Manual" 4.2 Sound source register/ <A HREF="p04_2a.htm">■MIDI register</a></P>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../what/atto.png 5x"></TD><TD> <B>The signal line output to the communication connector cannot be used as is for MIDI.</b><BR>
+ <B>If you want to use it, you will need an optional MIDI-I/F device, but such a product is not currently available.</b></TD></TR>
+</TABLE>
+</P>
+<A NAME="no2_50"></A><P><DT><H3> ■5.About interrupts</H3><DD><UL>
+<P><LI> Interrupts in the sound block are generated from the SCSP and can be used not only for the sound CPU but also for the main block (SH2).</P>
+<A NAME="z2_4"></A><P ALIGN=CENTER> <B>Figure 2.4 Interrupt relationship</b> <BR>
+<img srcset="../grp/i001_3.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<!-- 図2.4で使用される単語 	SH2 SCU 割り込み信号 割り込み制御ブロック メインシステムへの割り込み MC68EC000 SCSP 割り込み信号 割り込み制御ブロック -->
+<P><LI> The sound CPU interrupt uses the MC68EC000's autovector method.<BR>
+ For vectors, please <A HREF="#t2_2">refer</a> to the vector table in Table 2.2.</P>
+<P><LI> A total of 7 interrupt levels from 1 to 7 can be used, but since the development tool uses level 7 interrupts, there are 6 types of interrupt levels from 1 to 6 that the user can use. Please note that this will occur.</P>
+</UL>
+<P><DT><TABLE>
+<TR><TH> Note<BR>
+<img srcset="../../../what/atto.png 5x"></TH><TD> <B>Interrupt levels available to the user: 6 levels from 1 to 6</b></TD></TR>
+</TABLE>
+</P>
+<DD><UL TYPE=DISC>
+<P><LI> It is also possible to set the interrupt level for each interrupt source. See Interrupt Control Register for details.</P>
+</UL>
+<P><DT> <B>reference:</b><DD> "SCSP User's Manual" 4.2 Sound source register/ <A HREF="p04_2c.htm">■Interrupt control register</a></P>
+<P><DT><TABLE>
+<TR><TH> Note<BR>
+<img srcset="../../../what/atto.png 5x"></TH><TD> <B>Interrupt level priority 7: Highest ← Priority → Lowest: 1</b></TD></TR>
+</TABLE>
+</P>
+<A NAME="t1_4"></A><P><DT><TABLE BORDER=1>
+<CAPTION> <B>Table 1.4 Interrupt vector table for sound CPU</b></CAPTION>
+<TR ALIGN=CENTER><TD ROWSPAN=2> vector number</TD><TD COLSPAN=2> address</TD><TD ROWSPAN=2> Interrupt vector contents</TD></TR>
+<TR ALIGN=CENTER><TD> SH2</TD><TD> MC68EC000</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> 0</TD><TD> 0(2)5A00000H</TD><TD> 000000H</TD><TD> Reset vector initial SSP value</TD></TR>
+<TR ALIGN=CENTER><TD> 0(2)5A00004H</TD><TD> 000004H</TD><TD> Reset vector initial PC value</TD></TR>
+<TR ALIGN=CENTER><TD> :</TD><TD> :</TD><TD> :</TD><TD> :</TD></TR>
+<TR ALIGN=CENTER><TD> 25</TD><TD> 0(2)5A00064H</TD><TD> 000064H</TD><TD> Autovector level 1 interrupt</TD></TR>
+<TR ALIGN=CENTER><TD> 26</TD><TD> 0(2)5A00068H</TD><TD> 000068H</TD><TD> Autovector level 2 interrupt</TD></TR>
+<TR ALIGN=CENTER><TD> 27</TD><TD> 0(2)5A0006CH</TD><TD> 00006CH</TD><TD> Autovector level 3 interrupt</TD></TR>
+<TR ALIGN=CENTER><TD> 28</TD><TD> 0(2)5A00070H</TD><TD> 000070H</TD><TD> Autovector level 4 interrupt</TD></TR>
+<TR ALIGN=CENTER><TD> 29</TD><TD> 0(2)5A00074H</TD><TD> 000074H</TD><TD> Autovector level 5 interrupt</TD></TR>
+<TR ALIGN=CENTER><TD> 30</TD><TD> 0(2)5A00078H</TD><TD> 000078H</TD><TD> Autovector level 6 interrupt</TD></TR>
+<TR ALIGN=CENTER><TD> 31</TD><TD> 0(2)5A0007CH</TD><TD> 00007CH</TD><TD> Autovector level 7 interrupt</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>Reference:</b><DD> SSP in the table is the supervisor stack pointer value, which is the same as the stack pointer <A HREF="#t2_2">described above</a> .<BR>
+ Also, PC is the program counter value, which is also the same as <A HREF="#t2_2">above</a> .</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p01_30.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

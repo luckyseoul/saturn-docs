@@ -1,0 +1,112 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/ 8&gt;FAQ/SGL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#SOUND">SGL programming related</a><HR>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SGL programming related</b><H2 ALIGN=CENTER> sound</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_01"><HR></a><DL>
+<H3> I want to set stereo/monaural to CDDA.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> About stereo/mono settings in SGL</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Perform stereo/monaural settings for SGL's CD-DA and sequence data as follows.</P>
+<DD><OL>
+<P> <B><LI>CD-DA stereo/mono switching</li>
+</b><UL TYPE=DISC>
+<LI> For stereo: Set the left and right pan of the slCDDAOn function to<BR>
+ slCDDAOn( .. , .. , -127, 127 );<BR>
+ and set.<LI> For monaural: Pan left and right of the slCDDAOn function.<BR>
+ slCDDAOn( .. , .. , 0, 0 );<BR>
+ and set.</UL>
+<P> slCDDAOn function → SGL Reference Manual</P>
+<P> However, in order to execute this function, you must first execute the slInitSound function.<BR>
+ If you execute the slSynch function in the main program loop, you can use the above function to switch between stereo and monaural while playing a CD-DA.</P>
+<P> <B><LI>For changing sequence data</li>
+</b><BR>
+ Change the stereo/mono bits of the sound driver.<BR>
+ Be sure to perform this setting after configuring the sound driver.</P>
+<P> <B>(example)</b><PRE>
+Uint8 sndctrl;
+sndctrl = (*((volatile Uint8 *)(0x25a00483)));
+sndctrl &= 0x7f;
+if (stereo) {
+   sndctrl |= 0x80;
+}
+(*((volatile Uint8 *)(0x25a00483))) = (Uint8)sndctrl;
+</PRE></P>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_02"><HR></a><DL>
+<H3> I want to play 4-tone PCM.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> In the SGL PCM playback sample (sampsnd2), the PCM that should actually produce 4 sounds only produces at most 2 sounds.Why is that?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> It is true that SGL's slPCMOn function can play up to four notes, but the maximum number of notes varies depending on the type of PCM you are trying to play.<BR>
+ To give an example</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD> STEREO</TD><TD><PRE> 16 Bit</TD><TD> 1 note</TD><TD> Number of sound sources used: 4</TD></TR>
+<TR><TD> STEREO</TD><TD><PRE> 8 Bit</TD><TD> 2 sounds</TD><TD> Number of sound sources used: 2</TD></TR>
+<TR><TD> MONORAL</TD><TD><PRE> 16 Bit</TD><TD> 2 sounds</TD><TD> Number of sound sources used: 2</TD></TR>
+<TR><TD> MONORAL</TD><TD><PRE> 8 Bit</TD><TD> 4 sounds</TD><TD> Number of sound sources used: 1</TD></TR>
+</TABLE>
+</P>
+<P> It becomes.<BR>
+ If the number of sound sources used exceeds 4, slPCMOn returns error status -2 (channel over).<BR>
+ Therefore, by combining the types of PCM sounds described above, it is possible to play PCM data of 1 to 4 sounds.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_03"><HR></a><DL>
+<H3> Effect-related function parameters</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I don't really understand how to use the functions below, so the effects aren't going well.<BR>
+ Where are the values derived from each argument of the function below?<BR>
+ Could you please provide a sample?</P>
+<DL>
+<P><DT> <B>slSndEffect(Effect)</b><DD> Effect: Effect number</P>
+<P><DT> <B>slSndMixChange(Tbank,Mixno)</b><DD> Tbank: Tone bank number<DD> Mixno: Mixer number</P>
+<P><DT> <B>slSndMixParmChange(Effect,Level,Pan)</b><DD> Effect: Effect output channel<DD> Level: Effect return level<DD> Pan: Effect pan</P>
+<P><DT> <B>slDSPOff()</b></P>
+</DL>
+<P><DT> <FONT SIZE=5>A)</font><DD> In conclusion, the settings for these effect-related parameters are processed by receiving information from the sound data production side.<BR>
+ Let's briefly explain how to play sound data created with the following map configuration as an example.</P>
+<P><PRE>
+---------------------------------------
+BGM song data   : Sequence data 0
+SE song data    : Sequence data 1
+BGM tone data   : Tone bank data 0
+SE tone data    : Tone bank data 1
+Delay effect    : DSP program 0
+Reverb effect   : DSP program 1
+                : DSP work area
+---------------------------------------
+</PRE></P>
+<OL>
+<P><B><LI></b>First, for the "effect number" specified with "slSndEffect(Effect)", if there is only one effect, always specify "0", and if there are multiple effects, if you want to apply the above reverb, specify "1" from the above map information. To do.<P><B><LI></b> Next, use "slSndMixChange(Tbank,Mixno)" to determine the target to apply the effect to. If you want to apply an effect to the BGM, specify 0 for "Tone bank number". Also, if there are multiple mixers that specify the return level and pan from the effect, set the ``mixer number'' of the parameter you want to use. The details of this mixer are also information that we receive from the production side.<P><B><LI></b> Finally, "slSndMixParmChange(Effect,Level,Pan)" is used when you want to change the effect effect from the initial settings on the program side. For example, if you want to reduce the reverb effect, specify the effect you want to change in the ``DSP Effect Output Channel'' (again, get channel allocation information from the production side) and lower the ``Effect Return Level.''<P><B><LI></b> "slDSPOff()" issues a command to stop and initialize the sound DSP itself, and is a function that must be executed for sound initialization and termination processing when working with effects.</OL>
+<P> Unfortunately, there are no SGL sample programs that handle effects yet.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_04"><HR></a><DL>
+<H3> How to set mixer parameters in SGL</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What should I do in SGL to achieve R=15 sound data using mixer parameters in an actual program? Should I ignore the lower 3 bits of the PAN parameter?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> R=15 is 127 in terms of the argument of the slSndMixParmChange() function.<BR>
+ This value is shifted 3 bits to the right to specify 23 levels of effect output PAN.<BR>
+ The argument actually passed to the sound control command is 0F in hexadecimal.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#SOUND">SGL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

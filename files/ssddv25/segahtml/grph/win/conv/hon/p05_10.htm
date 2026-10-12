@@ -1,0 +1,187 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;p=5/5&gt;SEGA CONVERTER User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#win">Graphic Tools Guide</a> ★ <A HREF="../index.htm">SEGA CONVERTER User's Manual</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>SEGA CONVERTER User's Manual</b><H2 ALIGN=CENTER> 5. Function reference</H2><HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A><P><DT><H3> ■Function reference</H3><DL>
+<DT> "File I/O" module<DD><UL TYPE=DISC>
+<LI> <A HREF="#scvCheckFileFormat">scvCheckFileFormat</a><LI> <A HREF="#scvGetFileImageSize">scvGetFileImageSize</a><LI> <A HREF="#scvGetFileImageDepth">scvGetFileImageDepth</a><LI> <A HREF="#scvGetFileImageBits">scvGetFileImageBits</a><LI> <A HREF="#scvPutFileImageBits">scvPutFileImageBits</a><LI> <A HREF="#scvBeginCatalogSave">scvBeginCatalogSave</a><LI> <A HREF="#scvEndCatalogSave">scvEndCatalogSave</a></UL>
+<P><DT> "Effect" module<DD><UL TYPE=DISC>
+<LI> <A HREF="#scvEffectImageBits">scvEffectImageBits</a><LI> <A HREF="#scvBeginEffect">scvBeginEffect</a><LI> <A HREF="#scvEndEffect">scvEndEffect</a> </UL>
+</DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvCheckFileFormat"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvCheckFileFormat</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Check the format of the specified file.<DT> <B>Format:</b><DD> BOOL WINAPI scvCheckFileFormat(LPSTR libDLL, LPSTR filename);<DT> <B>Return value:</b><DD> BOOL type (Whether it matches the format.)<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> :DLL instance handle</TD></TR>
+<TR><TD><PRE> LPSTR filename</TD><TD><PRE> :Specified file name</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Open the file, check the format, and close it.<BR>
+ Returns "TRUE" if the format matches the desired format, otherwise returns "FALSE". </DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvGetFileImageSize"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvGetFileImageSize</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Register the vertical and horizontal sizes of the specified file.<DT> <B>Format:</b><DD> void WINAPI scvGetFileImageSize(LPSTR libDLL, LPSTR filename, LPSTR hsize, LPSTR vsize);<DT> <B>Return value:</b><DD> none.<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> :DLL instance handle</TD></TR>
+<TR><TD><PRE> LPSTR filename</TD><TD><PRE> :Specified file name</TD></TR>
+<TR><TD><PRE> LPSTR hsize</TD><TD><PRE> : Pointer to the horizontal size of the image.</TD></TR>
+<TR><TD><PRE> LPSTR vsize</TD><TD><PRE> : Pointer to the vertical size of the image.</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Open the file, check the length and width, and then close it.<BR>
+ Set the horizontal size of the long type to the hsize pointer.<BR>
+ Set the vertical size of the long type to the vsize pointer. </DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvGetFileImageDepth"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvGetFileImageDepth</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Register the color depth of the specified file.<DT> <B>Format:</b><DD> long WINAPI scvGetFileImageDepth(LPSTR libDLL, LPSTR filename);<DT> <B>Return value:</b><DD> long color depth<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> :DLL instance handle</TD></TR>
+<TR><TD><PRE> LPSTR filename</TD><TD><PRE> :Specified file name</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Open the file, check the color depth, and close it.<BR>
+ Returns the color depth (bits) as 1, 4, 8, 16, or 24 (32). </DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvGetFileImageBits"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvGetFileImageBits</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Register the bitmap of the specified file.<DT> <B>Format:</b><DD> int WINAPI scvGetFileImageBits(LPSTR libDLL, LPSTR filename, LPSTR buff);<DT> <B>Return value:</b><DD><TABLE>
+<TR><TD><PRE> In case of normal termination</TD><TD><PRE> :0 (zero)</TD></TR>
+<TR><TD><PRE> In case of error</TD><TD><PRE> :Other values</TD></TR>
+</TABLE>
+<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> :DLL instance handle</TD></TR>
+<TR><TD><PRE> LPSTR filename</TD><TD><PRE> :Specified file name</TD></TR>
+<TR><TD><PRE> LPSTR buff</TD><TD><PRE> :Memory to register bitmap</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Open the file and set the bitmap data to memory.<BR>
+ When finished, close the file and return 0.<BR>
+ If an error occurs during the process, a value other than 0 is returned.<DT> <B>remarks:</b><DD> <A HREF="p04_10.htm#no4_40">The bitmap memory</a> for registration is secured in a continuous area of "width x height x color depth (bits)", but the format differs slightly depending on the color depth. </DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvPutFileImageBits"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvPutFileImageBits</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Save the bitmap to the specified file.<DT> <B>Format:</b><DD> int WINAPI scvPutFileImageBits(LPSTR libDLL, LPSTR filename, LPSTR buff, LPSTR hs, LPSTR vs, LPSTR depth);<DT> <B>Return value:</b><DD><TABLE>
+<TR><TD><PRE> In case of normal termination</TD><TD><PRE> :0 (zero)</TD></TR>
+<TR><TD><PRE> In case of error</TD><TD><PRE> :Other values</TD></TR>
+</TABLE>
+<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> :DLL instance handle</TD></TR>
+<TR><TD><PRE> LPSTR filename</TD><TD><PRE> :Specified file name</TD></TR>
+<TR><TD><PRE> LPSTR buff</TD><TD><PRE> :Memory where the bitmap is registered</TD></TR>
+<TR><TD><PRE> LPSTR hs</TD><TD><PRE> : Pointer to the horizontal size of the image.</TD></TR>
+<TR><TD><PRE> LPSTR vs.</TD><TD><PRE> : Pointer to the vertical size of the image.</TD></TR>
+<TR><TD><PRE> LPSTR depth</TD><TD><PRE> : Pointer to the color depth of the image.</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Cast the hs/vs/depth pointer to a long type pointer and extract the value.<BR>
+ Open the file, reference the bitmap memory, and write out the information you need.<BR>
+ When finished, close the file and return 0.<BR>
+ If an error occurs during the process, a value other than 0 is returned.<DT> <B>remarks:</b><DD> <A HREF="p04_10.htm#no4_40">The bitmap memory</a> for registration is secured in a continuous area of "width x height x color depth (bits)", but the format differs slightly depending on the color depth. </DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvBeginCatalogSave"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvBeginCatalogSave</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Called before the catalog save processing loop.<DT> <B>Format:</b><DD> int WINAPI scvBeginCatalogSave(LPSTR libDLL, LPSTR filename, LPSTR num);<DT> <B>Return value:</b><DD><TABLE>
+<TR><TD><PRE> In case of normal termination</TD><TD><PRE> :0 (zero)</TD></TR>
+<TR><TD><PRE> In case of error</TD><TD><PRE> :Other values</TD></TR>
+</TABLE>
+<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> : DLL instance handle</TD></TR>
+<TR><TD><PRE> LPSTR filename</TD><TD><PRE> : Character string entered in the save dialog (file name)</TD></TR>
+<TR><TD><PRE> LPSTR num</TD><TD><PRE> : Pointer to the number of catalog registrations.</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Normally it does nothing and returns 0.<BR>
+ This is used when you want to save cataloged data in one file. </DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvEndCatalogSave"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvEndCatalogSave</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Called after the catalog save processing loop.<DT> <B>Format:</b><DD> int WINAPI scvEndCatalogSave(LPSTR libDLL, LPSTR filename);<DT> <B>Return value:</b><DD><TABLE>
+<TR><TD><PRE> In case of normal termination</TD><TD><PRE> :0 (zero)</TD></TR>
+<TR><TD><PRE> In case of error</TD><TD><PRE> :Other values</TD></TR>
+</TABLE>
+<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> : DLL instance handle</TD></TR>
+<TR><TD><PRE> LPSTR filename</TD><TD><PRE> : Character string entered in the save dialog (file name)</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Normally it does nothing and returns 0. </DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvEffectImageBits"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvEffectImageBits</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Apply effects to bitmaps.<DT> <B>Format:</b><DD> int WINAPI scvEffectImageBits(LPSTR libDLL, LPSTR buff, LPSTR hs, LPSTR vs, LPSTR depth)<DT> <B>Return value:</b><DD><TABLE>
+<TR><TD><PRE> In case of normal termination</TD><TD><PRE> :0 (zero)</TD></TR>
+<TR><TD><PRE> In case of error</TD><TD><PRE> :Other values</TD></TR>
+</TABLE>
+<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> : DLL instance handle</TD></TR>
+<TR><TD><PRE> LPSTR buff</TD><TD><PRE> :Memory where the bitmap is registered</TD></TR>
+<TR><TD><PRE> LPSTR hs</TD><TD><PRE> : Pointer to the horizontal size of the image.</TD></TR>
+<TR><TD><PRE> LPSTR vs.</TD><TD><PRE> : Pointer to the vertical size of the image.</TD></TR>
+<TR><TD><PRE> LPSTR depth</TD><TD><PRE> : Pointer to the color depth of the image.</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Cast the hs/vs/depth pointer to a long type pointer and extract the value.<BR>
+ Performs necessary effect processing by referring to <A HREF="p04_10.htm#no4_40">bitmap memory</a> .<BR>
+ Returns 0 when finished. If an error occurs during the process, a value other than 0 is returned.<DT> <B>remarks:</b><DD> <A HREF="p04_10.htm#no4_40">The bitmap memory</a> for registration is secured in a continuous area of "width x height x color depth (bits)", but the format differs slightly depending on the color depth. </DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvBeginEffect"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvBegineEffect</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Called before effect processing.<DT> <B>Format:</b><DD> int WINAPI scvBeginEffect(LPSTR libDLL);<DT> <B>Return value:</b><DD><TABLE>
+<TR><TD><PRE> In case of normal termination</TD><TD><PRE> :0 (zero)</TD></TR>
+<TR><TD><PRE> In case of error</TD><TD><PRE> :Other values</TD></TR>
+</TABLE>
+<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> :DLL instance handle</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Normally it does nothing and returns 0. </DL>
+<!-------------------------------------------------------------------------------------------------->
+<A NAME="scvEndEffect"><HR></a><TABLE BORDER=0 WIDTH="100%">
+<TR><TD WIDTH="85%" BGCOLOR="#a0a0a0"><H1> scvEndEffect</H1></TD><TH WIDTH="15%" BGCOLOR="#d0d0d0"> <A HREF="#no5_10">Function list</a></TH></TR>
+</TABLE>
+<DL>
+<DT> <B>function:</b><DD> Called after effect processing.<DT> <B>Format:</b><DD> int WINAPI scvEndEffect(LPSTR libDLL);<DT> <B>Return value:</b><DD><TABLE>
+<TR><TD><PRE> In case of normal termination</TD><TD><PRE> :0 (zero)</TD></TR>
+<TR><TD><PRE> In case of error</TD><TD><PRE> :Other values</TD></TR>
+</TABLE>
+<DT> <B>argument:</b><DD><TABLE>
+<TR><TD><PRE> LPSTR libDLL</TD><TD><PRE> :DLL instance handle</TD></TR>
+</TABLE>
+<DT> <B>Actions performed by the user:</b><DD> Normally it does nothing and returns 0.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#win">Graphic Tools Guide</a> ★ <A HREF="../index.htm">SEGA CONVERTER User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

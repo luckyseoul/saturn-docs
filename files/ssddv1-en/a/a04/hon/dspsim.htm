@@ -1,0 +1,236 @@
+<HTML>
+<HEAD>
+<TITLE> SCU DSP Simulator Instruction Manual </TITLE>
+</HEAD>
+
+<BODY bgcolor="FFFFFF">
+<A HREF=dspasm.htm> Return to previous page </A> | <A HREF=../mokuzi.htm> Return to menu </A>
+ <HR>
+<H1> SCU DSP Simulator Instruction Manual </H1>
+'94/08/25
+<HR>
+<H2> Contents </H2>
+<DIR>
+<DT> <A HREF="#1"> 1. Overview </A>
+<DT> <A HREF="#2"> 2. Execution environment </A>
+<DT> <A HREF="#3"> 3. Command List </A>
+<DT> <A HREF="#4"> 4. Command explanation </A>
+<DT> <A HREF="#5"> 5. Basic specifications </A>
+<DT> <A HREF="#6"> 6. User's Guide </A>
+</DIR>
+
+<H2> <A NAME="1"> 1. Overview </A> </H2>
+This simulator simulates DSP processing on MS-DOS or UNIX to improve DSP software development efficiency.
+<P>
+Each simulation function is executed in the command line format. The following is a list of supported functions.
+<OL>
+<LI> Program area and data area dump display and editing functions.
+File load and save function that supports the <LI> S format.
+<LI> Breakpoint setting and display function.
+<LI> Program execution and pause functions.
+<LI> Program single step execution function.
+<LI> Assemble and disassemble functions.
+<LI> All register display and setting functions.
+<LI> Input command history function.
+</OL>
+
+<H2> <A NAME="2"> 2. Execution environment </A> </H2>
+
+<H3> (A) MS-DOS version </H3>
+A model that can run MS-DOS and PC-DOS version 3.00 or higher.
+Memory can be executed with 640KB installed.
+
+<H3> (B) UNIX version </H3>
+SPARC station specification machine and HP machine.
+
+<H2> <A NAME="3"> 3. Command list </A> </H2>
+<DL>
+<DD> [A] Assemble
+<DD> [B] Setting / displaying breakpoints
+<DD> [D] Memory dump display
+<DD> [E] Rewrite memory
+<DD> [F] Fill memory
+<DD> [G] Run program
+<DD> [H] History setting / display
+<DD> [L] Reading file
+<DD> [M] Move memory data
+<DD> [Q] Program termination
+<DD> [R] Register setting / display
+<DD> [S] Program step execution
+<DD> [U] Disassemble
+<DD> [V] Development environment type setting
+<DD> [W] Save memory file
+</DL>
+
+<H2> <A NAME="4"> 4. Command explanation </A> </H2>
+
+<H3> A: Assemble </H3>
+<DL>
+<DT> Input format: <DD> A [Start address]
+<DT> function: <DD> Converts the input mnemonic from the specified address to a code and sets it. When finished, enter only a line break.
+</DL>
+
+<H3> B: Setting and displaying breakpoints </H3>
+<DL>
+<DT> input format: <DD> B &lt;address&gt;
+<DT> function: <DD> Breakpoint setting.
+</DL>
+<DL>
+<DT> Input format: <DD> B
+<DT> function: <DD> Breakpoint setting information display.
+</DL>
+<DL>
+<DT> input format: <DD> B- [address] or BX [setting number]
+<DT> Function: <DD> Breakpoint cancellation. <BR>
+Canceled when address or setting number is omitted.
+</DL>
+
+<H3> D: Memory dump display </H3>
+<DL>
+<DT> Input format: <DD> D [P | Rn | M] [[Start address [End address]]
+<DT> Function: <DD> Memory dump display. <BR>
+Specify “P” to specify the program area, “R0” to “R3” to specify the data area, and “M” to the external bus. <BR>
+If the start address is omitted, it will be displayed after the last address displayed.
+</DL>
+
+<H3> E: Memory rewrite </H3>
+<DL>
+<DT> Input format: <DD> E [P | Rn | M] &lt;address&gt; [Setting value]
+<DT> function: <DD> Rewrites memory. <BR>
+Specify “P” to specify the program area, “R0” to “R3” to specify the data area, and “M” to the external bus. <BR>
+If the set value is omitted, the address is displayed and data input is awaited. To advance the address, enter an empty number. To return, enter "^". To cancel, enter only ".".
+</DL>
+
+<H3> F: Memory Fill </H3>
+<DL>
+<DT> Input format: <DD> F [P | Rn | M] &lt;Start address&gt; &lt;End address&gt; &lt;Setting value&gt;
+<DT> function: <DD> Rewrites the range from the start address to the end address with the set value. <BR>
+Specify “P” to specify the program area, “R0” to “R3” to specify the data area, and “M” to the external bus.
+</DL>
+
+<H3> G: Program execution </H3>
+<DL>
+<DT> Input format: <DD> G [Start address [End address]]
+<DT> function: <DD> Executes the program from the specified address. If the address is omitted, execution starts from the address specified in the PC register. <BR>
+Enter CTRL-C to stop it during execution.
+</DL>
+
+<H3> H: History setting / display </H3>
+<DL>
+<DT> Input format: <DD> H +
+<DT> function: <DD> Allow import to history buffer. (Default)
+</DL>
+<DL>
+<DT> Input format: <DD> H-
+<DT> function: <DD> Do not import into the history buffer.
+</DL>
+<DL>
+<DT> Input format: <DD> H @
+<DT> function: <DD> Clear history buffer.
+</DL>
+<DL>
+<DT> Input format: <DD> H [Number of display]
+<DT> function: Displays the execution result immediately before <DD> for the specified number of steps. <BR>
+When the display number is omitted, it becomes 10 and the maximum is 512.
+</DL>
+    
+<H3> L: Read file </H3>
+<DL>
+<DT> Input format: <DD> L [P | Rn | M] [File name] [Transfer address]
+<DT> function: Reads the <DD> file into the memory area. <BR>
+Specify “P” to specify the program area, “R0” to “R3” to specify the data area, and “M” to the external bus. <BR>
+If the file name is omitted, the previous file name read with the L command is used. <BR>
+If you specify a forwarding address, it will be read based on that address.
+</DL>
+
+<H3> M: Move memory data </​​H3>
+<DL>
+<DT> Input format: <DD> M [P | Rn | M] &lt;Start&gt; &lt;End&gt; [P | Rn | M] &lt;Destination&gt;
+<DT> function: <DD> Moves the range from the start address to the end address to the transfer destination. <BR>
+Specify “P” to specify the program area, “R0” to “R3” to specify the data area, and “M” to the external bus. <BR>
+If the transfer destination program area is omitted, it is the same as the transfer source specification.
+</DL>
+
+<H3> P: Change program size </H3>
+<DL>
+<DT> Input format: <DD> P [R | E]
+<DT> function: <DD> Adjusts the size for storing the program code. <BR>
+If the parameter is omitted, the current setting status is displayed. <BR>
+When "E" is specified, it is expanded to a maximum of 2048 instructions. When "R" is specified, it is returned to a maximum of 256 instructions.
+</DL>
+
+<H3> Q: End of program </H3>
+<DL>
+<DT> Input format: <DD> Q
+<DT> function: <DD> Exits the simulator program.
+</DL>
+
+<H3> R: Register setting / display </H3>
+<DL>
+<DT> input format: <DD> R [&lt;register name | flag name&gt; &lt;setting value&gt;]
+<DT> Function: <DD> Sets a value to the specified register or flag. If the parameter is omitted, all register values ​​are displayed. <BR>
+PC TOP LOP CT0 CT1 Ct2 RX RY PH PL ACH ACLTN0 RA0 WA0 A1 can be specified as the register name, and PREP T1 T0 SZ C V E ES EX can be specified as the flag name.
+</DL>
+<DL>
+<DT> Input format: <DD> R @
+<DT> function: <DD> Sets all registers to 0.
+</DL>
+
+<H3> S: Step execution of program </H3>
+<DL>
+<DT> Input format: <DD> S [Number of steps]
+<DT> Function: <DD> Executes instructions for the specified number of steps from the address indicated by the PC register. <BR>
+If the parameter is omitted, only one step is executed.
+</DL>
+
+<H3> U: Disassemble </H3>
+<DL>
+<DT> input format: <DD> U [start address [end address]]
+<DT> function: <DD> Disassembles the specified range. <BR>
+If the start address is omitted, it will be displayed after the last address displayed.
+</DL>
+
+<H3> V: Development environment type setting </H3>
+<DL>
+<DT> Input format: <DD> V [S | M]
+<DT> function: <DD> When “M” is specified for MODEL-M and “S” is specified for MODEL-S according to the specified development environment, assemble, disassemble, and execution-related processing are supported. . (Default is “S”) If the model specification is omitted, the currently selected model is displayed.
+</DL>
+
+<H3> W: Save file in memory </H3>
+<DL>
+<DT> Input format: <DD> W [P | Rn | M] &lt;Start address&gt; &lt;End address&gt; &lt;File name&gt;
+<DT> function: <DD> Saves data from the specified start address to end address in a file. <BR>
+Specify “P” to specify the program area, “R0” to “R3” to specify the data area, and “M” to the external bus.
+</DL>
+
+<H3> ^: Command history display </H3>
+<DL>
+<DT> Input format: <DD> ^ [Number of display]
+<DT> function: <DD> The specified number of lines entered in the past are displayed. If the number of displays is omitted, the number is 20, and the maximum is 50. <BR>
+To repeat the command, enter "!!". To repeat the command on the specified line, enter the line number after "!".
+</DL>
+
+<H2> <A NAME="5"> 5. Basic specifications </A> </H2>
+<OL>
+The numerical value when <LI> is entered is a hexadecimal number except for the command count specification (decimal number).
+
+<LI> When the file name used for reading and saving data files with the L and W commands ends with ".s" or ".mot", it is treated as a Motorola S format and address information is also processed at the same time. Will be.
+
+When entering <LI> commands in a batch, specify the file that describes the commands to be entered as a parameter at startup or use the format "&lt;FILE" when accepting commands.
+
+<LI> When accessing the memory on the external bus, the address is in bytes. When specifying an internal address when entering a command, append "L" to the end of the address value to quadruple. Will be converted.
+
+<LI> D, S, and U commands can be displayed continuously by entering only the line feed key.
+</OL>
+
+<H2> <A NAME="6"> 6. User's Guide </A> </H2>
+<OL>
+When transferring data from the external memory to the inside when simulating <LI> DMA, input or transfer the data to the external bus memory of this simulator beforehand.
+
+<LI> The disassembly function of this simulator aligns the position according to the type of operation command, so it can be used as a guideline for optimization.
+</OL>
+that's all
+<HR>
+<A HREF=dspasm.htm> Return to previous page </A> | <A HREF=../mokuzi.htm> Return to menu </A>
+ </BODY>
+</HTML>

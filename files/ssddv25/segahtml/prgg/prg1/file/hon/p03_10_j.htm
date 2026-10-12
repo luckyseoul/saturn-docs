@@ -1,0 +1,249 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/17&gt;プログラマーズガイド/ファイルシステムライブラリ/3．ディレクトリ操作</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#intr">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>3．ディレクトリ操作</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A>
+<P><DT><H3>3.1　初期化</H3>
+<DD>　本ライブラリを使用する前にGFS_Initを実行しなければなりません。GFS_Initは以下の処理を行います。</P>
+
+<P><DD><UL TYPE="DISK">
+<LI>ライブラリの作業領域初期化
+<LI>マウント処理</UL></P>
+
+	<P><DT><B>　(1)初期化</B>
+		<DD>　ライブラリが使用する作業領域の設定と、その初期化を行います。作業領域とディレクトリ情報格納領域は、すべてアプリケーション側で用意する必要があります。<BR>
+　その領域の大きさは、同時に開くファイルの数によって変化するので、次のマクロで求めます。ここでopen_maxは同時に開くファイルの最大数です。</P>
+
+	<P><DD>　GFS_WORK_SIZE(open_max)</P>
+
+	<P><DT><B>　(2)マウント処理</B>
+		<DD>　CD-ROMからルートディレクトリを読み込んで、それをカレントディレクトリに設定します。またCDブロックを初期化し、CDバッファのセクタデータをすべて削除します。ファイルシステムはディレクトリ情報格納領域の先頭アドレスを保持するだけなので、アプリケーションは領域の内容を変更してはなりません。<BR>　次のようにディレクトリ情報管理構造体を初期化してGFS_Initを呼び出します。</P>
+
+	<P><DD><PRE>
+#define OPEN_MAX  20                       /* 同時に開くファイルの最大数　 */
+#define MAX_DIR   10                       /* ディレクトリ情報の最大数　　 */<P>
+Uint32 work[GFS_WORK_SIZE(OPEN_MAX)/4];    /* ライブラリ作業領域　　　　　 */
+GfsDirTbl dirtbl;                          /* ディレクトリ情報管理構造体　 */
+GfsDirId dir[MAX_DIR];                     /* ディレクトリ情報格納領域　　 */<P>
+GFS_DIRTBL_TYPE(&amp;dirtbl) = GFS_DIR_ID;     /* ディレクトリ情報格納領域の型 */
+GFS_DIRTBL_NDIR(&amp;dirtbl) = MAX_DIR;        /* ディレクトリ情報格納領域の　 */
+                                           /* 最大要素数　　　　　　　　　 */
+GFS_DIRTBL_DIRID(&amp;dirtbl) = dir;           /* ディレクトリ情報格納領域の　 */
+                                           /* アドレス　　　　　　　　　　 */
+GFS_Init(OPEN_MAX, work, &dirtbl);
+</PRE></P>
+
+	<P><DD>　CD-ROMを交換した場合には、GFS_Initを再び呼び出さなくてはなりません。</P>
+
+<A NAME="no3_20"></A>
+	<P><DT><H3>3.2　ファイル識別子</H3>
+		<DD>　本ライブラリでは、アクセスするファイルをファイル識別子で指定するものとします。<BR>
+　ファイル名でアクセスする場合は、ファイル名をファイル識別子に変換して行います。<BR>
+　ファイル識別子はカレントディレクトリに対して有効です。</P>
+
+	<P>	<DD>　［例］以下のFILE2.DATをアクセスする場合</P>
+
+<A NAME="z3_1"></A>
+	<P ALIGN=CENTER><B>図3.1　ファイル識別子によるアクセス</B><BR><img srcset="../grp/i008_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no3_30"></A>
+	<P><DT><H3>3.3　サブディレクトリ操作</H3>
+		<DD>　サブディレクトリにあるファイルをアクセスするには、以下の関数を呼び出すことによってカレントディレクトリ情報を設定する必要があります。</P>
+
+	<P><DD><UL TYPE="DISK">
+		<LI>ディレクトリ情報読み込み(GFS_LoadDir)
+		<LI>カレントディレクトリ設定(GFS_SetDir)</UL></P>
+
+	<P><DD>　あらかじめディレクトリ情報を読み込んでおき、ファイルをオープンする時点でのCD-ROMアクセスをなくす、といった使い方ができます。</P>
+
+	<P><DT><B>　(1)ディレクトリ情報の読み込み(GFS_LoadDir)</B>
+		<DD>　サブディレクトリファイルを指定して、ディレクトリ情報を読み込み、保持します。<BR>　この時、ディレクトリ情報保持領域として以下の２種類が選択できます。</P>
+
+	<P><DD><B>(a)GFS_DIR_ID</B>
+		<DD><UL TYPE="DISK">
+		<LI>ファイル名を保持しません。ファイル識別子によるアクセスのみ可能です。</UL></P>
+
+	<P><DD><B>(b)GFS_DIR_NAME</B>
+		<DD><UL TYPE="DISK">
+		<LI>ファイル名を保持するので、(a)より大きな領域を必要とします。
+		<LI>ファイル名によるアクセスが可能です。</UL></P>
+
+	<P><DT><B>　(2)カレントディレクトリの設定(GFS_SetDir)</B>
+		<DD>　GFS_LoadDirによって読み込んだディレクトリ情報領域をカレントディレクトリとします。</P>
+
+<A NAME="z3_2"></A>
+	<P ALIGN=CENTER><B>図3.2　ディレクトリ情報の設定</B><BR><img srcset="../grp/i009_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DD>　サブディレクトリにあるファイルをアクセスするには次の手順を踏まなければなりません。</P>
+
+	<P><CENTER><B>
+ディレクトリ情報の読み込み<BR>
+↓<BR>
+カレントディレクトリ設定<BR>
+↓<BR>
+ファイルのオープン<BR>
+↓<BR>
+ファイルに対するアクセス<BR>
+↓<BR>
+ファイルのクローズ<BR>
+</B></CENTER></P>
+
+	<P>	<DD>　この手順を二つの例によって示します。</P>
+
+	<P><DT><B>　［例］ルートディレクトリ以外のディレクトリにあるファイルのアクセス</B>
+		<DD>　サブディレクトリにあるファイルへのアクセス手順のプログラム例を示します。ここでアクセスしたいファイルがカレントディレクトリのdir_fidで指定されるディレクトリにあるとします。</P>
+
+	<P><DD><PRE>
+#define MAX_DIR    10         /* ディレクトリ情報の最大数　　　　　　　 */
+
+GfsDirTbl dirtbl;             /* ディレクトリ情報格納領域　　　　　　　 */
+GfsDirId dirid[MAX_DIR];      /* ディレクトリ情報格納領域　　　　　　　 */
+Sint32 dir_fid;               /* ディレクトリファイルの識別子が入る　　 */
+Sint32 fid;                   /* アクセスするファイルの識別子が入る　　 */
+GfsHn gfs;                    /* アクセスするファイルのファイルハンドル */
+
+GFS_DIRTBL_TYPE (&amp;dirtbl) = GFS_DIR_ID;
+GFS_DIRTBL_NDIR (&amp;dirtbl) = MAX_DIR;
+GFS_DIRTBL_DIRID(&amp;dirtbl) = dirid;
+
+GFS_LoadDir(dir_fid, &amp;dirtbl);	/* ディレクトリ情報の読み込み　　　　　　 */
+
+GFS_SetDir(&amp;dirtbl);          	/* カレントディレクトリ設定　　　　　　　 */
+
+/* fidにアクセスするファイルの識別子を設定 */
+gfs = GFS_Open(fid);
+/*
+ * ここでファイルアクセスを行う
+ */
+GFS_Close(gfs);
+</PRE></P>
+
+	<P><DT><B>　［例］異なるディレクトリにある複数のファイルに対する同時アクセス</B>
+		<DD>　異なるディレクトリにあるファイルにアクセスするには、カレントディレクトリを切り替えながら目的のファイルをオープンしなければなりません。<BR>
+　カレントディレクトリの直下にある二つのサブディレクトリにあるファイルを二つ同時にアクセスする例を示します。アクセスしたいファイルがある二つのサブディレクトリのファイル識別子はそれぞれdir_fid1、dir_fid2で指定されるとします。</P>
+
+	<P><DD><PRE>
+#define MAX_DIR1     10    /* dir_fid1 のディレクトリ情報の最大数   */
+#define MAX_DIR2     10    /* dir_fid2 のディレクトリ情報の最大数   */
+
+GfsDirTbl curdir;           /* この時点でのカレントディレクトリ       */
+GfsDirTbl dirtbl1, dirtbl2; /* ディレクトリ情報管理領域               */
+GfsDirId dirid1[MAX_DIR1];  /* ディレクトリ情報格納領域               */
+GfsDirId dirid2[MAX_DIR2];  /* ディレクトリ情報格納領域               */
+Sint32 dir_fid1, dir_fid2;  /* ディレクトリファイルの識別子が入る     */
+Sint32 fid1, fid2;          /* アクセスするファイルの識別子が入る     */
+GfsHn gfs1, gfs2;           /* アクセスするファイルのファイルハンドル */
+
+/* カレントディレクトリの dir_fid1 のディレクトリ情報を読み込む       */
+GFS_DIRTBL_TYPE (&amp;dirtbl1) = GFS_DIR_ID;
+GFS_DIRTBL_NDIR (&amp;dirtbl1) = MAX_DIR;
+GFS_DIRTBL_DIRID(&amp;dirtbl1) = dirid1;
+GFS_LoadDir(dir_fid1, &amp;dirtbl1);
+
+/* カレントディレクトリの dir_fid2 のディレクトリ情報を読み込む       */
+GFS_DIRTBL_TYPE (&amp;dirtbl2) = GFS_DIR_ID;
+GFS_DIRTBL_NDIR (&amp;dirtbl2) = MAX_DIR;
+GFS_DIRTBL_DIRID(&amp;dirtbl2) = dirid2;
+GFS_LoadDir(dir_fid2, &amp;dirtbl2);
+
+/* ディレクトリdir_fid1のファイル、fid1をオープン    */
+GFS_SetDir (&amp;dirtbl1);
+gfs1 = GFS_Open(fid1);
+
+/* ディレクトリdir_fid2のファイル、fid2をオープン    */
+GFS_SetDir (&amp;dirtbl2);
+gfs2 = GFS_Open(fid2);
+/*
+ * ここでファイルアクセスを行う
+ */
+GFS_Close(gfs1);
+GFS_Close(gfs2);
+</PRE></P>
+
+<A NAME="no3_40"></A>
+	<P><DT><H3>3.4  　ファイル名とファイル識別子の相互変換</H3>
+		<DD>　カレントディレクトリにファイル名を含んだディレクトリ情報を設定すると、ファイル名とファイル識別子の相互変換機能を利用できます。<BR>
+　ファイル名を含まないディレクトリ情報をカレントディレクトリに設定しているときに、これらの機能を呼び出すとエラーになります。<BR>
+　この機能を利用してファイル名でファイルを開く関数の定義例を示します。</P>
+
+<!-- +++ Update by CRI ：5.1 -->
+	<P><DD><PRE>
+［例］　　/* ファイル名で指定されたファイルを開く */
+　　　　　GfsHn OpenByName(Sint8 *fname)
+　　　　　{
+　　　　　   Sint32 fid = GFS_NameToId(fname);<P>
+　　　　　   if (fid ＜ 0) {
+　　　　　       return NULL;
+　　　　　   }
+　　　　　 　return GFS_Open(fid);
+　　　　　}
+</PRE></P>
+<!-- --- Update by CRI ：5.1 -->
+
+<A NAME="no3_50"></A>
+	<P><DT><H3>3.5　CDブロックファイルシステム</H3>
+	<DD>　CDブロックファイルシステム(CDブロックに内蔵されたファイルシステム。以下、CDBFSと略する)を利用してディレクトリ管理を行うことができます。<BR>
+　CDBFSを利用して、初期化、ディレクトリ情報読み込み、カレントディレクトリ設定を行うための処理を以下に示します。</P>
+
+	<P><DT><B>　(1)初期化</B>
+		<DD>　CDBFSの機能を利用するには、ディレクトリ管理構造体へのポインタにNULLを指定してGFS_Initを呼び出さなければなりません。GFS_Initの処理終了後、CDBFSにはルートディレクトリが設定されます。</P>
+
+	<P><DT><B>　(2)ディレクトリ情報読み込み</B>
+		<DD>　サブディレクトリ情報を読み込むには、ディレクトリ管理構造体へのポインタにNULLを指定してGFS_LoadDirを呼び出し、ディレクトリ情報の格納先がCDブロック内であることを指定します。</P>
+
+	<P><DT><B>　(3)カレントディレクトリ設定</B>
+		<DD>　CDブロック内に設定したディレクトリ情報をカレントディレクトリに設定するには、ディレクトリ管理構造体へのポインタにNULLを指定してGFS_SetDirを呼び出します。</P>
+
+	<P><DD>　CDBFSを使用する設定を行っても、部分的にディレクトリ管理を本ライブラリで行うことが可能です。その場合にはどのディレクトリ管理機能を利用しているのか、常に注意する必要があります。<BR>　CDBFSの利用による得失を表3.1に示します。</P>
+
+<A NAME="t3_1"></A>
+	<P>	<DD><B>表3.1　CDBFS利用による得失</B>
+	<TABLE BORDER=1>
+<TR><TH align="center" width=260><PRE>長所</TH><TH align="center" width=260><PRE>短所</TH></TR>
+<TR><TD align="left"><PRE>・ホストメモリの使用量が少ない。</TD><TD align="left"><PRE>・異なるディレクトリのファイルをアクセ<BR>スするたびにCD-ROMのアクセスが発生<BR>します。</TD></TR>
+<TR><td><pre> </td><TD align="left"><PRE>・アプリケーションが使用できるCDバッ<BR>ファが1区画減ります。</TD></TR>
+<TR><td><pre> </td><TD align="left"><PRE>・ファイル名を使用できません。</TD></TR></TABLE></P>
+
+	<P><DD>　ディレクトリ情報読み込みを行う関数GFS_InitとGFS_LoadDirは関数値として、読み込んだディレクトリ情報の個数を返します。CDBFS使用時、その個数はCDBFSが保持しているディレクトリ情報の個数となります。<BR>
+　CDBFSのカレントディレクトリを設定しているときにファイル名を使用するとエラーとなります。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#intr">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

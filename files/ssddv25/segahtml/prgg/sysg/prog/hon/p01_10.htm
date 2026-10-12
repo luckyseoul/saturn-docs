@@ -1,0 +1,112 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 3&gt;System Program User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">System program user's manual</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>System program user's manual</b><H2 ALIGN=CENTER> guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H2> ■Explanation</H2><A NAME="no1_111"></A><P><DT> <B>●Register/reference operations for interrupt processing routines</b><DD> After booting from BOOT ROM, the interrupt vector table of master SH2 is located at the beginning of work RAM, and VBR (vector base register) points to this address.<BR>
+ The slave SH2's interrupt vector table is at the beginning of work RAM + 400H, and the slave SH2's VBR points to that address.</P>
+<P><DD> By default, the interrupt vectors (programmable) for each SH2 built-in module are assigned as shown in the table below. Additionally, a dummy routine is set in the vector table that does nothing. (However, illegal instruction and address error exceptions are infinite loops.)</P>
+<P><DD> The FRT input capture interrupt is assigned for master-slave communication, and its initial priority is 15 (highest priority).</P>
+<P><DD> In the table below, the priority of each interrupt except the FRT input capture interrupt is set to 0, and interrupts are not allowed.<BR>
+ To change the interrupt priority of an on-chip module, the contents of the interrupt control register must be changed according to the needs of the application.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=210><PRE> Master SH2 vector initial setting</TH><TH WIDTH=210><PRE> Slave SH2 vector initial settings</TD></TR>
+<TR><TD><PRE> 40H~SCU interrupt vector<BR> 5FH (fixed by hardware)</TD><TD><PRE> 41H H Blank In <B>**</b><BR> 43H V blank In</TD></TR>
+<TR><TD><PRE> 60H SCI reception error<BR> 61H SCI receive buffer full<BR> 62H SCI transmit buffer empty<BR> 63H SCI transmission finished<BR> <B>*</b> 64H FRT input capture<BR> 65H FRT compare match<BR> 66H FRT overflow<BR> 67H unused<BR> 68H WDT interval<BR> 69H BSC compare match<BR> 6AH unused<BR> 6BH unused<BR> 6CH DMACH1 (Built-in SH2)<BR> 6DH DMACH0 (Built-in SH2)<BR> 6EH DIVU (division)<BR> 6FH Not used</TD><TD><PRE> 60H SCI reception error<BR> 61H SCI receive buffer full<BR> 62H SCI transmit buffer empty<BR> 63H SCI transmission completed<BR> <B>*</b> 64H FRT input capture<BR> 65H FRT compare match<BR> 66H FRT overflow<BR> 67H unused<BR> 68H WDT interval<BR> 69H BSC compare match<BR> 6AH unused<BR> 6BH unused<BR> 6CH DMACH1 (Built-in SH2)<BR> 6DH DMACH0 (Built-in SH2)<BR> 6EH DIVU (division)<BR> 6FH Not used</TD></TR>
+<TR><TD> <B>*</b> For slave <B>→</b> master passing</TD><TD> <B>*</b> For master <B>→</b> slave passing<BR>
+ <B>**</b> IRL2, IRL6 level interrupt</TD></TR>
+</TABLE>
+</P>
+<P><DD> Use this operation routine to register an interrupt processing routine to an interrupt vector or refer to the current processing routine address.<BR>
+ For SCU interrupts on the master side, an SCU interrupt routine is provided that implements interrupt processing by calling a subroutine of a C function, and you can also register a C function there and refer to its registered address. Masu.</P>
+<P><DD> The functions registered in the SCU interrupt routine will be called every time an interrupt occurs. Before and after that call, save and restore registers according to the SHC compiler's register saving rules. Therefore, any C function or routine that follows its rules can be registered and processed. However, it may not be suitable for interrupt processing that requires a fast response, such as H blank In.<BR>
+ If you register another interrupt handling routine to the SCU interrupt vector, the SCU interrupt handling routine will be bypassed and disabled.</P>
+<A NAME="no1_112"></A><P><DT> <B>●Set/reference/change operation of SCU interrupt mask</b><DD> The mask value set in the SCU interrupt mask register cannot be read, so if you change it, you will not be able to perform calculations on the value that is actually set.<BR>
+ To this end, we store this value separately in memory and provide a service routine that updates it consistently with the actual SCU interrupt mask register.<BR>
+ When used, libraries and applications must always set and change the SCU interrupt mask via these functions.<BR>
+ Furthermore, after setting or changing the SCU interrupt mask register, clear the SCU interrupt status register and, if necessary, clear the A-Bus interrupt acknowledge register.</P>
+<A NAME="no1_113"></A><P><DT> <B>●Simple semaphore operation</b><DD> We provide a service that allows you to use the memory (256 bytes) provided by BOOT ROM as 256 simple semaphores.<BR>
+ The first half of the semaphore (numbers 0 to 127) can be used freely. The second half (128-255) is for operations related to libraries.<BR>
+ When a library uses a particular feature, such as DMA, it sets the semaphore's MSB (80H) to 1 to indicate that it is in use. It also clears the MSB after use, indicating it is free.<BR>
+ Normally, in processes that take a relatively long time and require resources to be secured, procedures for manipulating and referencing semaphores should be determined to prevent interrupt processes that occur during the process from accessing those resources without permission.<BR>
+ The SH2 TAS instruction is used to set the MSB for semaphore memory. This instruction is atomic (does not release bus ownership), so only one process can acquire the semaphore.<BR>
+ Once you have completed the process that acquired the semaphore, you must release it.<BR>
+ At reset, all semaphore memory is released (cleared).</P>
+<A NAME="no1_114"></A><P><DT> <B>●System clock switching</b><DD> System clock switching cannot be done by issuing a single command to SMPC. Use of this system program is required.</P>
+<P><DD><UL TYPE=DISC>
+<LI> CPU clock 26MHz ←→ 28MHz<LI> Horizontal resolution 320/640 ←→ 352/704</UL>
+</P>
+<P><DD> Switching the system clock involves resetting some hardware.</P>
+<P><TABLE BORDER=1>
+<TR><TH><PRE> Device being reset</TH><TH><PRE> OFF or non-warranty device</TH><TH><PRE> Unaffected devices</TH></TR>
+<TR><TD><PRE> SCU<BR> VDP1<BR> VDP2<BR> SCSI/SCC (development machine only)</TD><TD><PRE> Slave SH (OFF)<BR> DRAM (previous contents destroyed)<BR> SCSP(OFF)<BR></TD><TD><PRE> Master SH <B>*Note</b><BR> SDRAM<BR> CD<BR> SIMM (development machine only)</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>*note</b><DD> Since the master SH goes into standby mode during clock switching, the FRT and SCI of the SH built-in modules will need to be reconfigured. Note that WDT is used in this process. Also, after processing, the state will be the same as the NMI, for example, DMAC control will be suspended due to the NMI. Please refer to the SH manual and take steps to restart processing if necessary.</P>
+<P><DT> <B>About reinitialization process after reset</b><DT> <B>SCU・</b>・・・・・<DD>Reinitialize bus, interrupt mask, etc. However, the value of SYS_GETSCUIM is used for the interrupt mask value.</P>
+<P><DT> <B>About post-processing required by the application</b><DT> <B>VDP2・・</b>・・・・<DD>You need to set the TV mode relatively quickly. Since the device itself will be in 320/640 mode after being reset, especially if you change the system clock to 352/704 mode, the synchronization signal may be out of sync with the TV and the screen may be distorted.</P>
+<P><DT> <B>VDP1,2&SCSP・・</b>・・・・<DD>All previous settings are invalid. Reconfiguration is required.</P>
+<P><DT> <B>SMPC・・</b>・・・・<DD>Hot reset is always enabled.</P>
+<P><DD> The processing time for clock change is approximately 110ms. This is because it includes device reset time.</P>
+<A NAME="no1_115"></A><P><DT> <B>●SCU interrupt routine priority change</b><DD> The BOOT ROM has an interrupt priority management table for the SCU interrupt processing service, and also allows it to be rewritten.</P>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/danger.png 5x"></TD><TD> <B>This is a dangerous service and can hang the system if there are priority conflicts in the table contents! ! !</b></TD><TR></TABLE>
+</P>
+<P><DD> This allows interrupt handling (using SYS_SETUINT) to be optimized for the application.<BR>
+ To do this, the application should prepare data with the same structure as the table and call <A HREF="p02_11.htm#no5_1">SYS_CHGUIPR</a> .<BR>
+ The table has 32 longwords, where 1 longword has the following content:</P>
+<TABLE BORDER CELLPADDING=5>
+<TD WIDTH=180><PRE> SH2 SR lower word value</TD><TD WIDTH=250><PRE> SCU interrupt mask lower word value</TD></TABLE>
+<P><TABLE>
+<TD WIDTH=180> Value set in SR when interrupt processing starts<BR>
+</TD><TD WIDTH=250> At the start of interrupt processing, the value that is ORed with the current mask setting value and written to the SCU interrupt mask register.</TD></TABLE>
+<P><P><DD> The position of this longword in the table corresponds to the 30 interrupt sources of the SCU.<BR>
+ (V-Blank In is the first, V-Blank Out is the second...However, including the two longword spaces corresponding to vectors 4EH and 4FH)<BR>
+ In reality, you must take the utmost care to create a table so that the SR and SCU interrupt masks and interrupt sources are consistent.<BR>
+ For example, BOOT ROM has the following table as its initial settings.</P>
+<TABLE>
+<TD><PRE> Uint32 PRITab[32]={<BR> 0x00F0FFFF, /*VBI SR=15 Totally prohibited (highest priority)<BR> 0x00E0FFFE, /*VBO SR=14 Only VBI allowed<BR> 0x00D0FFFC, /*HBI SR=13 Allow VBI, VBO<BR>・<BR>・<BR>0x0070FE00 /*External 15 SR=7 Masks all SCU interrupts with inherent priority of 7 and below<BR> /*The A bus interrupt specific priorities are 7, 4, and 1 for each factor, but they are shared and set to 7 for 1-bit masking.<BR> };</TD><TD><PRE><BR> */<BR> */<BR> */<BR><BR><BR> */<BR> */<BR></TD></TABLE>
+<P><P><DD> As a creation example, the SR value is always set to 0 and the priority (priority relationship) is described using only the SCU mask value. In this case, SH is always able to accept interrupts, and only the SCU mask controls whether to enable or disable them.</P>
+<TABLE>
+<TD><PRE>
+Uint32 PRITab[32]={<BR> 0x0000FFF9, /*VBI processing, HBI, VBO allowed<BR> 0x0000FFFB, /*While processing VBO, only HBI is allowed<BR> 0x0000FFFF, /*Prohibit all during HBI processing (highest priority)<BR>・<BR>・<BR>0x00000000 /*Allow all while processing external 15 (lowest priority)<BR> };</TD><TD><PRE><BR> */<BR> */<BR> */<BR><BR><BR> */ <BR></TD></TABLE>
+<P><P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>Contrary to the above example, masking interrupts at the SR value level without changing the SCU mask value is prohibited! ! ! (only 0 or 15 possible)</b></TD></TR>
+</TABLE>
+</P>
+<P><DD> In the example above, enabling and disabling interrupts for SH built-in modules requires manipulating the interrupt enable and disable registers for each built-in module.<P><P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>When an interrupt from a certain source in the SCU is enabled and that interrupt occurs, the SR mask of the SH is higher than the specific level of that interrupt (value determined by the SCU hardware), and the interrupt is rejected by the SH. It's OK if the situation you're in is never possible. (However, as an exception, it is possible to completely ban SR Mask 15)</b></TD></TR>
+</TABLE>
+</P>
+<A NAME="no1_116"></A><P><DT> <B>●Start CD multiplayer</b><DD> This is a service that starts and runs the CD multiplayer when the application closes. When this service is called, regardless of the state in which it is called, the CD multiplayer screen will be displayed and operations will be available, exactly the same as when starting the power-on sequence.<BR>
+ It does not return to the caller.</P>
+<A NAME="no1_117"></A><P><DT> <B>●Power-on clear memory operation</b><DD> Provides 8 bytes of memory on SDRAM managed by BOOT ROM.<BR>
+ These 8 bytes are initialized to 0 at power-on startup, but the contents are retained when the reset button (NMI) is pressed.</P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">DISC format standard specifications</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

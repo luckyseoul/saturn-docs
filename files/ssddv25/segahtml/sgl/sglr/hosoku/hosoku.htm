@@ -1,0 +1,664 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 1&gt;SGL Reference/Supplementary Manual</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN=MIDDLE></a>★ <A HREF="../../index.htm">SGL User's Manual</a> ★ <A HREF="index.htm">Supplementary manual</a><HR NOSHADE>
+ <B>SGL REFERENCE/SGL Supplementary Manual</b><HR NOSHADE>
+<A NAME="no1_10"></A><DL>
+<P><DT><H2> ■About event registration and execution</H2><DD> The execution list will be cleared when you execute <A HREF="../func/event.htm#slInitEvent"><I>slInitEvent</i></a> (), so you must register the events you want to execute in the list.<BR>
+ Use <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> () or <A HREF="../func/event.htm#slSetEventNext"><I>slSetEventNext</i></a> () to register events.</P>
+<DD><PRE>
+    void *eventtbl[] = {
+        init_camera ,
+        init_player1 ,
+        init_player2 ,
+        init_enemyctrl
+    };
+
+    void InitGame(){
+        void **evrdptr;
+        <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *evptr;
+        int cnt;
+
+        <A HREF="../func/event.htm#slInitEvent"><I>slInitEvent</i></a> (); /* Initialize event management variables */
+        evrptr = eventtbl;
+        for(cnt = sizeof(eventtbl) / sizeof(void *) ; cnt--&gt; 0 ;){
+            evptr = <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> (*evrptr++);
+        }
+        <A HREF="../func/init.htm#slSetSprTVMode"><I>slSetSprTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> );
+    }
+
+    void Game(){
+        <A HREF="../func/event.htm#slExecuteEvent"><I>slExecuteEvent</i></a> (); /* Execute event */
+        <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> (); /* Polygon data output and video display synchronization */
+    }
+</PRE></P>
+<P><DD>The event is executed each time you call <A HREF="../func/event.htm#slExecuteEvent"><I>the slExecuteEvent</i></a> () function.<BR>
+ Each event is basically executed in the order in which it is registered.<BR>
+ The first registered event is defined in the system's <A HREF="../mem/system01.htm#EventTop"><I>EventTop</i></a> variable, and from this point, the event pointer is defined in <A HREF="../mem/system01.htm#EventNow"><I>the EventNow</i></a> variable and the processing function for each event is called. Define the processing function in the following format.</P>
+<P><DD><PRE>
+  void function( <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *evptr){
+        ... /* Event processing */
+  }
+
+  When writing in assembly language, use _function:
+        ... ; Event processing ; Event pointer is set in r4 register rts
+        nop
+</PRE></P>
+<P><DD>When an event ends, we put the next pointer in the event's structure into the EventNow variable, and similarly execute the processing function. These are repeated until the next pointer is NULL.</P>
+<P><DD><PRE>
+  <a href="../mem/system01.htm#EventTop"><I>EventTop</I></A>: ----+
+                 |
+                 |   +------------------+
+                 +-->| *work = <a href="../struct/const.htm#NULL"><I>NULL</I></A>     |
+                     | *before = <a href="../struct/const.htm#NULL"><I>NULL</I></A>   |
+                +--  | *next            |
+                |    | *exad()          |
+                |    |  user[]          |
+                |    +------------------+
+                |
+                |    +------------------+       +------------------+
+                +--> | *work            |  ---> | *next            | -+
+                     | *before          |       |                  |  |
+                +--  | *next            |       |                  |  |
+                |    | *exad()          |       +------------------+  |
+                |    |  user[]          |   +-------------------------+
+                |    +------------------+   |
+                |                           |   +------------------+
+                |    +------------------+   +-> | *next = <a href="../struct/const.htm#NULL"><I>NULL</I></A>     | 
+  <a href="../mem/system01.htm#EventLast"><I>EventLast</I></A>: ---+--> | *work            |       |                  |
+                     | *before          |       |                  |
+                     | *next = <a href="../struct/const.htm#NULL"><I>NULL</I></A>     |       +------------------+
+                     | *exad()          |
+                     |  user[]          |
+                     +------------------+
+</PRE></P>
+<P><DD><A HREF="../mem/system01.htm#EventLast"><I>The EventLast</i></a> variable defines a pointer to the last event to be executed and is used when adding events.<BR>
+ For a user to use RAM, define a struct for the user and cast the event RAM's user[] to that struct.</P>
+<P><DT> <B>example)</b><DD><PRE>
+    typedef struct rob{
+        <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> posX , posY , posZ ;
+        <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> angX , angY , angZ ;
+        <A HREF="../struct/types.htm#PDATA"><I>PDATA</i></a> *pat;
+    } ROBOT ; /* This structure must not exceed 112 bytes */
+
+    void rob_control( <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *evptr){
+        ROBOT *rbptr ;
+
+        rbptr = (ROBOT *)evptr-&gt; user ;
+        rbptr-&gt; posX = to_fixed(0);
+        rbptr-&gt; posY = to_fixed(0);
+        rbptr-&gt; posZ = to_fixed(0);
+        rbptr-&gt; pat = &PD_Robot;
+    }
+</PRE><P><DD>Workpieces can be linked and held using a list of pointers.<BR>
+ When moving multiple characters in one event, use work to secure RAM.<P><DD><PRE>
+    typedef struct road{
+        struct road *next;
+        <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> posX , posY , posZ ;
+        <A HREF="../struct/types.htm#PDATA"><I>PDATA</i></a> *pat;
+    }ROAD;
+
+    typedef struct rdat{
+        <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> px , py , pz ;
+        <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> pn ;
+    } ROAD_DAT ;
+
+    ROAD_DAT roadtbl[] = {
+        { 0 , 0 , 0 , PN_ROAD} ,
+        { 0 , 0 , 100 , PN_ROAD} ,
+        { 0 , 0 , 200 , PN_ROAD}
+    };
+
+    void InitRoadControl( <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *evptr){
+        <A HREF="../struct/types.htm#WORK"><I>WORK</i></a> *wkptr;
+        ROAD *rdptr;
+        ROAD_DAT *rdtptr;
+        int cnt;
+
+        rdptr = (ROAD *)evptr ;
+        rdtptr = roadtbl;
+        for(cnt = sizeof(roadtbl) / sizeof(ROAD_DAT) ; cnt--&gt; 0 ;){
+            if((wkptr = <A HREF="../func/event.htm#slGetWork"><I>slGetWork</i></a> ()) == <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> ){
+                break ;
+            }
+            rdptr-&gt; next = (ROAD *)wkptr ; /* The first pointer is */
+                                                /* Enter work on event */
+            rdptr = (ROAD *)wkptr ;
+            rdptr-&gt; posX = rdtptr-&gt; px&lt;&lt; 16 ; /* position */
+            rdptr-&gt; posY = rdtptr-&gt; py&gt;&gt; 16;
+            rdptr-&gt; posZ = rdtptr-&gt; pz&gt;&gt; 16;
+            rdptr-&gt; pat = pattbl[rdptr-&gt; pn] ; /* Pattern data */
+            rdtptr++;
+        }
+        rdptr-&gt; next = <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> ; /* End mark */
+        evptr-&gt; exad = (void *)RoadControl;
+    }
+</PRE></DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_20"><HR></a><DL>
+<P><DT><H2> ■Precautions when changing the clock</H2><P><DD> <B>◆RAM guaranteed at clock change</b><UL TYPE=DISC>
+<LI> WORKRAM-HIGH<LI> VRAM</UL>
+<P><DD> <B>◆RAM not guaranteed during clock change</b><UL TYPE=DISC>
+<LI> WORKRAM-LOW<LI> VDP registers<LI> SOUND RAM</UL>
+<P><DD> Therefore, it is necessary to reinitialize memory which is not guaranteed after a clock change.<BR>
+ In particular, if there is data in LOW-RAM or SOUND RAM before the clock change, the validity of that data is not guaranteed, so be sure to reload the data.<BR>
+ From SGL 3.10, if a clock change occurs in <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> , a dummy empty loop will be registered to keep the MC68000 running, so be sure to reload the sound driver after the clock change.<BR>
+ Also, <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> returns each status and register to their initial state, so please reinitialize each parameter in the user program.</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_30"><HR></a><DL>
+<P><DT><H2> ■About initializing the BSS area and system variable area</H2><DD> When programming in C language, an area called BSS is always reserved. When using an uninitialized variable in a program, a part of this memory space called BSS is allocated for that variable.<BR>
+ Normally, when defining an uninitialized variable in a program, the prerequisite is to assign some value to it later, but in very rare cases, it may be used as is. (This kind of operation is usually a programming error) In that case, the operation is often performed assuming 0. If an undefined value is written in this area, the behavior will become undefined if you use the uninitialized variable as is, creating a breeding ground for bugs. Therefore, in the SGL sample program, the program link saturn/sample/common/cinit.c is used to clear the BSS area to 0.<BR>
+ This is why the SGL sample starts with ss_main, and the main function performs these initializations.<BR>
+ The same is true for the "system variable area" used within SGL; in this case, depending on the BOOT ROM, a stack may be set in a location that overlaps with this area, making the contents undefined. Some people may think that everything is initialized by the SGL function <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> , but in reality, not all areas are initialized by this function, and in some cases, the SGL function There is also a possibility that an undefined value may be referenced.<BR>
+ Since this "system variable area" is cleared to 0 in "cinit.c" above, the above two problems can be resolved by linking this file. If you do not link this file in your program, be sure to initialize these files.<BR>
+ Furthermore, this cinit.c had a bug until recently, and the "system variable area" could not be initialized, so your cinit.c<P><DD><PRE>
+        /* 3.SGL System Variable Clear */
+        for( dst = (Uint8 *)SystemWork, i = 0;i < SystemSize; i++) {
+                *dst = 0;
+        }
+</PRE>
+<P><DD>If so, please change it as shown below.<P><DD><PRE>
+        /* 3.SGL System Variable Clear */
+        for( dst = (Uint8 *)SystemWork, i = 0;i < SystemSize; i++) {
+                *dst++ = 0;
+                /* ^^ */
+        }
+</PRE>
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_40"><HR></a><DL>
+<P><DT><H2> ■ About blanking interrupt processing</H2><DD> The blanking start interrupt transfers scroll data, executes the DMA transfer table created by <A HREF="../func/int.htm#slTransferEntry"><I>slTransferEntry</i></a> , and executes the user function registered by slIntFunction[a]. Of these, scroll data transfer can be prohibited using the PauseFlag variable.<P><DD> <A HREF="../mem/system01.htm#PauseFlag"><I>PauseFlag</i></a> is a <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> type flag variable, and if it is other than 0, it works to prohibit the above transfer.<P><DD> The blanking end interrupt performs mode switching such as erase write and frame change of the sprite frame buffer, DMA transfer of sprite data, fetching of peripheral data, and subtraction of the interrupt wait counter. Of these, parts related to sprites can be prohibited using <A HREF="../mem/system01.htm#PauseFlag"><I>the PauseFlag</i></a> above.</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_50"><HR></a><DL>
+<P><DT><H2> ■ About FRT used in SGL</H2> SGL uses FRT (free running timer) to issue commands to SMPC. The FRT frequency division ratio at this time is 128, and changing this on the user side is prohibited.<BR>
+ This is because, in order to prevent SMPC requests from being made during the 300μs period after V-Blank In when access to the SMPC is prohibited, a wait for that time is applied to the FRT.</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_60"><HR></a><DL>
+<P><DT><H2> ■ About calculation libraries and system libraries</H2><DD> The numbers used in the library are based on the use of:<P><DD> <B>Fixed-point data such as position, trigonometric functions, etc.:</b><DD> Upper 16 bits are integer part, lower 16 bits are decimal part, total 32 bits (signed) Type name <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a><P><DT> <B>example)</b><DD> When representing 16.5<PRE>
+0x0010_8000
+  ━━━━ ━━━━
+   ↑     ↑  
+   │     └──Decimal part
+   └────────Integer part
+</PRE><P><DD> The coordinates are the X-axis in the left-right direction (plus means to the right), the Y-axis in the up-down direction (plus means down), and the Z-axis in the depth direction (plus means back).<P><DD> Angle: 360 degrees expressed in 16 bits<DD> Type name <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a><P><DT> <B>example)</b><DD><PRE>
+90.0゜ : 0x4000
+45.0゜ : 0x2000
+22.5゜ : 0x1000
+11.25°: 0x0800
+</PRE><P><DD>If you create a rotation matrix, the positive direction of the angle will be a right rotation about the axis.<P><DD> queue :<DD> <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> values are used. It is a 3 x 4 matrix, and its arrangement in memory is as follows.<PRE>
+    <A HREF="../struct/constenm.htm#M00"><I>M00</i></a> , <A HREF="../struct/constenm.htm#M01"><I>M01</i></a> , <A HREF="../struct/constenm.htm#M02"><I>M02</i></a> ,
+    <A HREF="../struct/constenm.htm#M10"><I>M10</i></a> , <A HREF="../struct/constenm.htm#M11"><I>M11</i></a> , <A HREF="../struct/constenm.htm#M12"><I>M12</i></a> ,
+    <A HREF="../struct/constenm.htm#M20"><I>M20</i></a> , <A HREF="../struct/constenm.htm#M21"><I>M21</i></a> , <A HREF="../struct/constenm.htm#M22"><I>M22</i></a> ,
+    <A HREF="../struct/constenm.htm#M30"><I>M30</i></a> , <A HREF="../struct/constenm.htm#M31"><I>M31</i></a> , <A HREF="../struct/constenm.htm#M32"><I>M32</i></a>
+</PRE></DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_70"><HR></a><DL>
+<P><DT><H2> ■Peripheral library overview</H2><DD><UL TYPE=DISC>
+<P><LI> Since exclusive control is performed, it can be used in a multi-process environment.<P><LI> It can be called from the application at any time.<BR>
+ If an interrupt back has already been issued in the frame that requested the SMPC command, it is queued in the command cache, and the command is appropriately issued to the SMPC in the next V blank.<P><LI> Interrupt back issuance and data collection are fully automatic.<BR>
+ When the user changes the data collection settings, an interrupt back is automatically issued and data collection starts from the next frame. Previous data can be referenced even while SMPC is collecting data, and the latest information is available during V blanks when frames change.<P><LI> Skip function for peripheral unconnected ports.<BR>
+ There is no need to be aware of multi-tap.</UL>
+<P><DD> <B>◆Now you can understand everything! Peripheral control sample program</b><DD><PRE>
+  void main()
+  {
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+    {
+      <A HREF="../func/per.htm#slSetLanguage"><I>slSetLanguage</i></a> ( <A HREF="../struct/constenm.htm#SMPC_JAPAN"><I>SMPC_JAPAN</i></a> );
+      <A HREF="../func/per.htm#slSetSoundOutput"><I>slSetSoundOutput</i></a> ( <A HREF="../struct/constenm.htm#SMPC_SOUND_STEREO"><I>SMPC_SOUND_STEREO</i></a> );
+      ( void ) <A HREF="../func/smpc_com.htm#slSetSmpcMemory"><I>slSetSmpcMemory</i></a> ();
+    }
+
+    {
+      <A HREF="../struct/types.htm#SmpcDateTime"><I>SmpcDateTime</i></a> *dt = &( <A HREF="../struct/constper.htm#Smpc_Status"><I>Smpc_Status</i></a> -&gt; rtc );
+
+      dt-&gt; year = 0x1999;
+      dt-&gt; month = <A HREF="../struct/constper.htm#SMPC_FRI"><I>SMPC_FRI</i></a> | <A HREF="../struct/constenm.htm#SMPC_DEC"><I>SMPC_DEC</i></a> ;
+      dt-&gt; date = 0x31;
+      dt-&gt; hour = 0x23;
+      dt-&gt; minute = 0x59;
+      dt-&gt; second = 0x59;
+      ( void ) <A HREF="../func/smpc_com.htm#slSetDateTime"><I>slSetDateTime</i></a> ();
+    }
+
+    ( void ) <A HREF="../func/smpc_com.htm#slResetDisable"><I>slResetDisable</i></a> ();
+
+    while( <A HREF="../struct/constenm.htm#TRUE"><I>TRUE</i></a> ) {
+      if( <A HREF="../func/per.htm#slCheckReset"><I>slCheckReset</i></a> () == <A HREF="../struct/constenm.htm#SMPC_RES_ON"><I>SMPC_RES_ON</i></a> ) {
+      ( void ) <A HREF="../func/per.htm#slClearReset"><I>slClearReset</i></a> ();
+      break;
+    }
+
+    if( <A HREF="../struct/constper.htm#Per_Connect1"><I>Per_Connect1</i></a> ) {
+      <A HREF="../struct/types.htm#PerDigital"><I>PerDigital</i></a> *pad;
+
+      pad = <A HREF="../struct/constper.htm#Smpc_Peripheral"><I>Smpc_Peripheral</i></a> + 0;
+      if( !( pad-&gt; data & <A HREF="../struct/constper.htm#PER_DGT_ST"><I>PER_DGT_ST</i></a> ) ) break;
+    }
+    <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> ();
+  }
+
+  ( void ) <A HREF="../func/smpc_com.htm#slResetEnable"><I>slResetEnable</i></a> ();
+  ( void ) <A HREF="../func/per.htm#slIntBackCancel"><I>slIntBackCancel</i></a> ();
+
+  while( <A HREF="../struct/constenm.htm#TRUE"><I>TRUE</i></a> ) <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> ();
+}
+</PRE></DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_80"><HR></a><DL>
+<P><DT><H2> ■Prohibited moves when using the library,<BR>
+ Example of execution failure due to function call procedure</H2><P><DD> ☆Calls from slave SH2 are prohibited.<BR>
+ Since the internal work area is not reserved for the cache-through area, the operation will be undefined.<BR>
+ In particular, exclusive control is not performed properly, causing problems such as SMPC deadlock.<P><DD> ☆ After executing " <A HREF="../func/per.htm#slGetPeripheral"><I>slGetPeripheral</i></a> " and " <A HREF="../func/per.htm#slGetStatus"><I>slGetStatus</i></a> ", if the following function is called and an Intoback command is being executed, the execution will fail.<BR>
+ This occurs because the SMPC command request in wait mode assumes that the command cache is not used.<DD><PRE>
+      <A HREF="../func/smpc_com.htm#slNMIRequestWait"><I>slNMIRequestWait</i></a>
+      <A HREF="../func/smpc_com.htm#slResetDisableWait"><I>slResetDisableWait</i></a>
+      <A HREF="../func/smpc_com.htm#slResetEnableWait"><I>slResetEnableWait</i></a>
+      <A HREF="../func/smpc_com.htm#slSetDateTimeWait"><I>slSetDateTimeWait</i></a>
+      <A HREF="../func/smpc_com.htm#slSetSmpcMemoryWait"><I>slSetSmpcMemoryWait</i></a>
+</PRE><P><DD>To avoid the above execution failure, call " <A HREF="../func/per.htm#slIntBackCancel"><I>slIntBackCancel</i></a> " and issue the command in the next frame.<P><DD> The following function will fail even if the intoback command is not being executed.<BR>
+ This is because SMPC prohibits issuing the Intoback command in any state other than the initial setting state.<P><DD><PRE>
+      <A HREF="../func/per.htm#slSetPortDir1"><I>slSetPortDir1</i></a> ,2
+      <A HREF="../func/per.htm#slSetPortExt1"><I>slSetPortExt1</i></a> ,2
+      <A HREF="../func/per.htm#slSetPortSelect1"><I>slSetPortSelect1</i></a> ,2
+</PRE><P><DD>To avoid the above execution failure, you can call " <A HREF="../func/per.htm#slIntBackCancel"><I>slIntBackCancel</i></a> ".<P><DD><PRE>
+  ◆ After executing " <A HREF="../func/per.htm#slIntBackCancel"><I>slIntBackCancel</i></a> ", if the following conditions are set,
+     Calling " <A HREF="../func/per.htm#slGetPeripheral"><I>slGetPeripheral</i></a> " fails.
+
+     For ports set to SMPC control mode with " <A HREF="../func/per.htm#slSetPortSelect1"><I>slSetPortSelect1</i></a> ,2", output settings were made with " <A HREF="../func/per.htm#slSetPortDir1"><I>slSetPortDir1</i></a> ,2".
+     External latch input was enabled with " <A HREF="../func/per.htm#slSetPortExt1"><I>slSetPortExt1,2</i></a> ".
+</PRE><P><DD>In any of the above cases, or if both are set.<P><DD> This is because SMPC prohibits issuing the Intoback command in any state other than the initial setting state.<BR>
+ Set both ports 1 and 2 to SH2 direct mode with " <A HREF="../func/per.htm#slSetPortSelect1"><I>slSetPortSelect1</i></a> ,2".<P><DD> This is because SMPC prohibits issuing an intoback command that returns only peripheral data when both port selects are in SH2 direct mode, regardless of port input/output settings.<P><DD><PRE>
+  ◆ After executing " <A HREF="../func/per.htm#slIntBackCancel"><I>slIntBackCancel</i></a> ", if the following conditions are set,
+     Calling " <A HREF="../func/per.htm#slGetStatus"><I>slGetStatus</i></a> " fails.
+
+     For ports set to SMPC control mode with " <A HREF="../func/per.htm#slSetPortSelect1"><I>slSetPortSelect1</i></a> ,2", output settings were made with " <A HREF="../func/per.htm#slSetPortDir1"><I>slSetPortDir1</i></a> ,2".
+     External latch input was enabled with " <A HREF="../func/per.htm#slSetPortExt1"><I>slSetPortExt1,2</i></a> ".
+</PRE><P><DD>In any of the above cases, or if both are set.<BR>
+ This is because SMPC prohibits issuing the Intoback command in any state other than the initial setting state.<P><DD> <B>◆ Limit performance</b><PRE>
+☆ Maximum number of caching commands... 31
+☆ Maximum peripheral data size... 15 bytes * 30 ports</PRE><P><DD> Supports data acquisition in 15-byte mode from peripheral devices released as of April 1, 1995 and peripheral devices released in the future.<BR>
+<P><DD> Data can be acquired in 255-byte mode by registering user-defined buffer addresses to the system variables " <A HREF="../struct/constper.htm#Smpc_Status"><I>Smpc_Status</i></a> " and " <A HREF="../struct/constper.htm#Smpc_Peripheral"><I>Smpc_Peripheral</i></a> ".<BR>
+ However, library support is required to perform device-specific data conversion operations.</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_90"><HR></a><DL>
+<P><DT><H2> ■About issuing sound function commands and success or failure.</H2><DD> The sound driver has 8 command buffers.<BR>
+ Each time a command is requested to be issued, SGL's sound functions first transfer it to the library's internal buffer instead of sending it to the driver's buffer.<BR>
+ When the <A HREF="../func/sound.htm#slSndFlush"><I>slSndFlush</i></a> function or <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> function is called, it is transferred to the command buffer using CPU-DMA.<BR>
+ Additionally, timing flag handshaking is used to communicate with the sound driver, and before DMA transfer of buffer data, the data is transferred after waiting until the timing flag of the sound driver becomes 0.<BR>
+ Generally, when a sound function does not succeed, it occurs when there are insufficient pronunciation management numbers or PCM channels.</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_a0"><HR></a><DL>
+<P><DT><H2> ■ About polygon data</H2><DD> The polygon data used by <A HREF="../func/polygon.htm#slPutPolygon"><I>slPutPolygon</i></a> () has the following format.<P><DD><PRE>
+    .data.l        point_tbl     ; Table of vertex coordinates
+    .data.l        NbPoint       ; Number of vertices to calculate
+    .data.l        polygon_tbl   ; Table of normal vectors and vertex numbers for each polygon
+    .data.l        NbPolygon     ; Number of polygons to calculate
+    .data.l        attribute_tbl ; Table of attributes for each polygon
+
+ point_tbl:
+    .data.l        X,Y,Z                ; Coordinate data of vertex number 0
+    .data.l        X,Y,Z                ; Coordinate data of vertex number 1
+        ...
+    .data.l        X,Y,Z                ; Coordinate data of vertex number NbPoint - 1
+</PRE><P><DD> When creating a table in C language, <A HREF="../struct/types.htm#POINT"><I>the POINT</i></a> type is declared and the above data table can be created by using the <A HREF="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</i></a> macro.<P><DT> <B>example)</b><DD><PRE>
+        static <a href="../struct/types.htm#POINT"><I>POINT</I></A> point_CUBE[] = {
+            <a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>(-80,-80,-80),
+            <a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>( 80,-80,-80),
+            <a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>( 80, 80,-80),
+            <a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>(-80, 80,-80),
+
+            <a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>( 80,-80, 80),
+            <a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>(-80,-80, 80),
+            <a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>(-80, 80, 80),
+            <a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>( 80, 80, 80)
+        } ;
+
+ polygon_tbl:
+    .data.l        Nx,Ny,Nz     ; Normal vector of polygon number 0
+    .data.w        P0,P1,P2,P3  ; Vertex number used for polygon number 0
+        (For triangular polygons, P2 and P3 will be the same number)
+        ...
+    .data.l        Nx,Ny,Nz     ; Normal vector of polygon number NbPolygon - 1
+    .data.w        P0,P1,P2,P3  ; Number of the vertex used in polygon number NbPolygon - 1
+</PRE><P><DD> When creating a table in C language, <A HREF="../struct/types.htm#POLYGON"><I>the POLYGON</i></a> type is declared and the above data table can be created by using the <A HREF="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</i></a> macro.<P><DT> <B>example)</b><DD><PRE>
+        static <a href="../struct/types.htm#POLYGON"><I>POLYGON</I></A> polygon_CUBE[] = {
+            {<a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>( 0 , 0 ,-1) , { 0 , 1 , 2 , 3}} ,
+                |__ |__
+            {<a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>( 1 , 0 , 0) , { 1 , 4 , 7 , 2}} ,
+            {<a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>(-1 , 0 , 0) , { 5 , 0 , 3 , 6}} ,
+            {<a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>( 0 ,-1 , 0) , { 4 , 1 , 0 , 5}} ,
+            {<a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>( 0 , 1 , 0) , { 2 , 7 , 6 , 3}} ,
+            {<a href="../struct/macro.htm#POStoFIXED"><I>POStoFIXED</I></A>( 0 , 0 , 1) , { 4 , 5 , 6 , 7}} ,
+        } ;
+
+ attribute_tbl:
+    .data.b        RevCheck     ; Specify either the flag <a href="../struct/constenm.htm#Single_Plane"><I>Single_Plane</I></A> or <a href="../struct/constenm.htm#Dual_Plane"><I>Dual_Plane</I></A>
+                                ; to indicate whether to display the face that has become the back side due to front/back determination.
+    .data.b        SortMode     ; Declare the calculation method for the position used as the sorting standard and the use of optional
+                                ; functions. One of <a href="../struct/constenm.htm#SORT_CEN"><I>SORT_CEN</I></A>, <a href="../struct/constenm.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constenm.htm#SORT_MAX"><I>SORT_MAX</I></A>, or <a href="../struct/constenm.htm#SORT_BFR"><I>SORT_BFR</I></A>.
+        <a href="../struct/constenm.htm#SORT_CEN"><I>SORT_CEN</I></A> : Uses the average of the four specified Z positions as the sorting criterion
+        <a href="../struct/constenm.htm#SORT_MIN"><I>SORT_MIN</I></A> : Use the smallest Z position among 4 points
+        <a href="../struct/constenm.htm#SORT_MAX"><I>SORT_MAX</I></A> : Use the largest Z position among 4 points
+        <a href="../struct/constenm.htm#SORT_BFR"><I>SORT_BFR</I></A> : Use the Z position of the most recently displayed polygon
+                                ; The polygon will always be displayed in front of the previous polygon. Specify the following options in addition to
+                                ; these. Specify multiple <a href="../struct/constspr.htm#UseTexture"><I>UseTexture</I></A>, <a href="../struct/constspr.htm#UseLight"><I>UseLight</I></A>, <a href="../struct/constspr.htm#UseClip"><I>UseClip</I></A> options. can do.
+        <a href="../struct/constspr.htm#UseTexture"><I>UseTexture</I></A> : Specify this when using a texture (deformed sprite).
+        <a href="../struct/constspr.htm#UseLight"><I>UseLight</I></A> : The color of the polygon is offset by the inner product of the light source
+                                ; vector and the normal vector to express brightness and darkness. Cannot be used at the same time as <a href="../struct/constspr.htm#UseTexture"><I>UseTexture</I></A>.
+        <a href="../struct/constspr.htm#UseClip"><I>UseClip</I></A> : When using large polygons, use this when the display position overflows and
+                                ; cannot be displayed correctly.
+    .data.w        TextNum      ; When using a texture, use it as a character registration number.
+    .data.w        DispMode  ; Specifies the polygon display mode. The display modes that can be specified are as follows:
+        <a href="../struct/constspr.htm#MSBon"><I>MSBon</I></A> : Set only the most significant bit to 1 when writing to the frame buffer. (Shadows to sprites usually use this)
+        <a href="../struct/constspr.htm#HSSon"><I>HSSon</I></A> : High speed shrink enabled
+        <a href="../struct/constspr.htm#HSSoff"><I>HSSoff</I></A>: High speed shrink disabled (default)
+        <a href="../struct/constspr.htm#Window_In"><I>Window_In</I></A> : Display inside the specified window.
+        <a href="../struct/constspr.htm#Window_Out"><I>Window_Out</I></A> : Display outside the window.
+        <a href="../struct/constspr.htm#No_Window"><I>No_Window</I></A> : (default) Displays without being affected by the window.
+        <a href="../struct/constspr.htm#MESHon"><I>MESHon</I></A> : Display as a mesh.
+        <a href="../struct/constspr.htm#MESHoff"><I>MESHoff</I></A> : (default) Normal display.
+        <a href="../struct/constspr.htm#ECdis"><I>ECdis</I></A> : Disable end code when using textures.
+        <a href="../struct/constspr.htm#ECenb"><I>ECenb</I></A> : (default) Enable end code when using textures.
+        <a href="../struct/constspr.htm#SPdis"><I>SPdis</I></A> : When using textures, disable spaces (display in palette 0 colors).
+                                ; However, if the data written to the frame buffer becomes 0000, it will not be displayed, so please
+                                ; adjust the priority etc. values so that it does not become 0000.
+        <a href="../struct/constspr.htm#SPenb"><I>SPenb</I></A> : (default) Enable spacing when using textures.
+
+        <a href="../struct/constspr.htm#CL16Bnk"><I>CL16Bnk</I></A>  : (default) Texture color mode is 16-color color bank method
+                  にします。
+        <a href="../struct/constspr.htm#CL16Look"><I>CL16Look</I></A> : 16-color lookup table method for texture color mode
+                   にします。
+        <a href="../struct/constspr.htm#CL64Bnk"><I>CL64Bnk</I></A>  : Set the texture color mode to 64-color color bank method.
+        <a href="../struct/constspr.htm#CL128Bnk"><I>CL128Bnk</I></A> : Set the texture color mode to 128-color color bank method.
+        <a href="../struct/constspr.htm#CL256Bnk"><I>CL256Bnk</I></A> : Set the texture color mode to 256-color color bank method.
+        <a href="../struct/constspr.htm#CL32KRGB"><I>CL32KRGB</I></A> : Set the texture color mode to RGB with 32000 colors.
+
+        <a href="../struct/constspr.htm#CL_Replace"><I>CL_Replace</I></A> : (default) Set to rewrite mode.
+        <a href="../struct/constspr.htm#CL_Trans"><I>CL_Trans</I></A>   : Display semi-transparent.
+        <a href="../struct/constspr.htm#CL_Half"><I>CL_Half</I></A>    : Displays at half brightness.
+        <a href="../struct/constspr.htm#CL_Shadow"><I>CL_Shadow</I></A>  : Displays shadow.
+        <a href="../struct/constspr.htm#CL_Gouraud"><I>CL_Gouraud</I></A> : Specifies Gouraud shading.
+
+        Specify one display mode for each group.
+
+    .data.w        Color         ; Specify the display color. If it is affected by the light source, or if you specify a display mode
+                                 ; other than <a href="../struct/constspr.htm#CL_Replace"><I>CL_Replace</I></A>, it must be in RGB mode. Also, when using a texture and
+                                 ; in <a href="../struct/constspr.htm#CL32KRGB"><I>CL32KRGB</I></A> mode, the specification here will be ignored.
+
+    .data.w        GouraudTable  ; Specifies the Gouraud shading table. If <a href="../struct/constspr.htm#CL_Gouraud"><I>CL_Gouraud</I></A> is specified, it specifies the offset
+                                 ; position of the Gouraud shading table. Specify the offset position by setting <a href="../struct/constspr.htm#SpriteVRAM"><I>SpriteVRAM</I></A> (0x25c00000) to 0 and
+                                 ; incrementing it by 1 every 8 bytes. For example, if you have data at 0x25c12000:
+                                 ;   ( 0x25c12000 - 0x25c00000 ) / 0x08 = 0x2400
+
+    .data.w        Function      ; Specifies the sprite display function. Specifies whether to display as polygons, textures, or
+                                 ; polylines. To specify, choose one from the following six options:
+        <a href="../struct/constspr.htm#sprNoflip"><I>sprNoflip</I></A>  : Show texture.
+        <a href="../struct/constspr.htm#sprHflip"><I>sprHflip</I></A>   : Displays the texture by flipping it horizontally.
+        <a href="../struct/constspr.htm#sprVflip"><I>sprVflip</I></A>   : Displays the texture by flipping it vertically.
+        <a href="../struct/constspr.htm#sprHVflip"><I>sprHVflip</I></A>  : Displays the texture flipped both vertically and horizontally.
+        <a href="../struct/constspr.htm#sprPolygon"><I>sprPolygon</I></A> : Display as polygons.
+        <a href="../struct/constspr.htm#sprPolyLine"><I>sprPolyLine</I></A>: Displays polylines (polygon outlines only).
+
+    When creating a table in C language, the <a href="../struct/types.htm#ATTR"><I>ATTR</I></A> type is declared and the above data table can be created by using
+    the <a href="../struct/macro.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A> macro.
+  example)
+        static <a href="../struct/types.htm#ATTR"><I>ATTR</I></A> attr_CUBE[] = {
+            <a href="../struct/macro.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const.htm#CD_MediumGreen"><I>CD_MediumGreen</I></A>,
+                      <a href="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const.htm#CD_MediumBlue"><I>CD_MediumBlue</I></A>,
+                      <a href="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const.htm#CD_MediumMagenta"><I>CD_MediumMagenta</I></A>,
+                      <a href="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const.htm#CD_MediumWhite"><I>CD_MediumWhite</I></A>,
+                      <a href="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const.htm#CD_MediumYellow"><I>CD_MediumYellow</I></A>,
+                      <a href="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const.htm#CD_MediumRed"><I>CD_MediumRed</I></A>,
+                      <a href="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr.htm#UseLight"><I>UseLight</I></A> )
+        };
+</PRE></DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_b0"><HR></a><DL>
+<P><DT><H2> ■ About attributes for sprite display functions</H2><DD> The attribute table used by <A HREF="../func/sprite.htm#slPutSprite"><I>slPutSprite</i></a> () and <A HREF="../func/sprite.htm#slDispSprite"><I>slDispSprite</i></a> () is almost the same as the one for polygons above, but the first two pieces of data are missing.<BR>
+ If you create this table in C, <A HREF="../struct/types.htm#SPR_ATTR"><I>the SPR_ATTR</i></a> type is declared and you can use the <A HREF="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</i></a> macro.<BR>
+<P><DD> <B>example)</b><PRE>
+        <A HREF="../struct/types.htm#SPR_ATTR"><I>SPR_ATTR</i></a> attr_AM2Logo = {
+            <A HREF="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</i></a> (PN_AM2_Logo,CL_AM2_Logo, <A HREF="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</i></a> , <A HREF="../struct/constspr.htm#Window_In"><I>Window_In</i></a> | <A HREF="../struct/constspr.htm#ECdis"><I>ECdis</i></a> ,
+                <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> | <A HREF="../struct/constspr.htm#_ZmCB"><I>_ZmCB</i></a> )
+        };
+</PRE><P><DD><A HREF="../struct/constspr.htm#_ZmCB"><I>_ZmCB</i></a> specifies which position of the sprite the position points to, and the following nine are defined.<PRE>
+     <a href="../struct/constspr.htm#_ZmLT"><I>_ZmLT</I></A>      <a href="../struct/constspr.htm#_ZmCT"><I>_ZmCT</I></A>        <a href="../struct/constspr.htm#_ZmRT"><I>_ZmRT</I></A>
+           +-------+-------+
+           |       |       |
+     <a href="../struct/constspr.htm#_ZmLC"><I>_ZmLC</I></A> +----<a href="../struct/constspr.htm#_ZmCC"><I>_ZmCC</I></A>------+ <a href="../struct/constspr.htm#_ZmRC"><I>_ZmRC</I></A>
+           |       |       |
+           +-------+-------+
+     <a href="../struct/constspr.htm#_ZmLB"><I>_ZmLB</I></A>      <a href="../struct/constspr.htm#_ZmCB"><I>_ZmCB</I></A>        <a href="../struct/constspr.htm#_ZmRB"><I>_ZmRB</I></A>
+</PRE></DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_c0"><HR></a><DL>
+<P><DT><H2> ■ Sprite display sample</H2><DD><PRE>
+ #define        CGtop                 0x10000
+ #define        <a href="../struct/macro.htm#TEXTBL"><I>TEXTBL</I></A>(hs,vs,cga)     {hs , vs , (cga)&gt;&gt;3 , ((hs)&0x1f8)&gt;&gt;5|(vs)}
+ #define        <a href="../struct/macro.htm#AdjCG"><I>AdjCG</I></A>(cga,hs,vs,col)  ((cga + (((hs)*(vs)*4)&gt;&gt;(col)) + 0x1f) & 0x7ffe0)
+ #define        <a href="../struct/macro.htm#PICTBL"><I>PICTBL</I></A>(txno,cmod,cga) {txno , cmod , cga}
+ #define        CL_Triangle           0x00
+
+ static const Uint16 triangle[] = {
+   0x0000,0x0001,0x1000,0x0000,        /* Sprite character data */
+   0x0000,0x0012,0x2100,0x0000,
+   0x0000,0x0123,0x3210,0x0000,
+   0x0000,0x1234,0x4321,0x0000,
+   0x0001,0x2344,0x4432,0x1000,
+   0x0012,0x3333,0x3333,0x2100,
+   0x0122,0x2222,0x2222,0x2210,
+   0x1111,0x1111,0x1111,0x1111
+ };
+
+ enum patn {
+   PN_Triangle,                        /* sprite pattern number       */
+   Max_Texture,                        /* Total number of patterns    */
+   Max_Picture = Max_Texture           /* Total number of characters  */
+ };
+
+ enum cga {                                /* character address */
+   CG_Triangle = CGtop,
+   CG_Next = AdjCG( CG_Triangle, 16, 8, <a href="../struct/constspr.htm#COL_16"><I>COL_16</I></A> )
+ };
+
+ <a href="../struct/types.htm#TEXTURE"><I>TEXTURE</I></A> form_tbl[] = {         /* pattern size data */
+   <a href="../struct/macro.htm#TEXTBL"><I>TEXTBL</I></A>( 16, 8, CG_Triangle )
+ };
+
+ <a href="../struct/types.htm#PICTURE"><I>PICTURE</I></A> pic_tbl[] = {                          /* character definition table */
+   PICTBL( PN_Triangle, <a href="../struct/constspr.htm#COL_16"><I>COL_16</I></A>, triangle )
+ };
+
+ static const <a href="../struct/types.htm#Sint16"><I>Sint16</I></A> Triangle_Color[] = {                   /* color data */
+                    <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0,31), <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 29 ), <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 27 ),
+   <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 25 ), <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0,23), <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 21 ), <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 19 ),
+   <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 17 ), <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0,15), <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 13 ), <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 11 ),
+   <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 9  ), <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0,7),  <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 5 ),  <a href="../struct/macro.htm#RGB"><I>RGB</I></A>( 0, 0, 3 )
+ };
+
+ typedef struct{                        /* Color definition structure */
+   <a href="../struct/types.htm#Sint16"><I>Sint16</I></A> *src;
+   void   *dst;
+   <a href="../struct/types.htm#Sint16"><I>Sint16</I></A>  size;
+ } COLMAP;
+
+ static const COLMAP ctrns_list[] = {  /* color definition table */
+   { Triangle_Color,
+     ( void* )( <a href="../struct/constscl.htm#VDP2_COLRAM"><I>VDP2_COLRAM</I></A> + ( CL_Triangle + 1 ) * 2 ),
+     sizeof( Triangle_Color )
+   }
+ };
+
+ extern <a href="../struct/types.htm#TEXTURE"><I>TEXTURE</I></A> * <a href="../mem/system01.htm#FormTbl"><I>FormTbl</I></A> ;
+
+ /*                                                */
+ /*  Character data transfer                       */
+ /*                                                */
+
+ void SetTexture( <a href="../struct/types.htm#PICTURE"><I>PICTURE</I></A> *pcptr, <a href="../struct/types.htm#Uint32"><I>Uint32</I></A> NbPicture ) {
+   <a href="../struct/types.htm#TEXTURE"><I>TEXTURE</I></A> *txptr;
+
+   for( ; NbPicture-- &gt; 0 ; pcptr++ ) {
+     txptr = <a href="../mem/system01.htm#FormTbl"><I>FormTbl</I></A> + pcptr-&gt;texno ;
+     <a href="../func/dma.htm#slDMACopy"><I>slDMACopy</I></A>( pcptr-&gt;pcsrc,
+                ( void * )( <a href="../struct/constspr.htm#SpriteVRAM"><I>SpriteVRAM</I></A> + ( ( txptr-&gt;CGadr ) &gt;&gt; 3 ) ),
+                ( txptr-&gt;Hsize * txptr-&gt;Vsize * 4 ) &gt;&gt; ( pcptr-&gt;cmode ) );
+   }
+ }
+
+ /*                                                */
+ /*  Color data transfer                           */
+ /*                                                */
+
+ void SetColor(){
+   COLMAP      *cmptr ;
+   <a href="../struct/types.htm#Sint16"><I>Sint16</I></A>       cnt ;
+
+   <a href="../func/scroll.htm#slTVOff"><I>slTVOff</I></A>() ;
+   cmptr= ctrns_list ;
+   for ( cnt = sizeof( ctrns_list ) / sizeof( COLMAP ) ; cnt-- &gt; 0 ; cmptr++ ){
+    <a href="../func/dma.htm#slDMACopy"><I>slDMACopy</I></A>( cmptr-&gt;src, cmptr-&gt;dst, cmptr-&gt;size );
+   }
+   <a href="../func/scroll.htm#slTVOn"><I>slTVOn</I></A>();
+ }
+
+ /*  Sample character display position */
+   <a href="../struct/types.htm#FIXED"><I>FIXED</I></A> tpos[] = { <a href="../struct/macro.htm#toFIXED"><I>toFIXED</I></A>(1.0), <a href="../struct/macro.htm#toFIXED"><I>toFIXED</I></A>(2.0), <a href="../struct/macro.htm#toFIXED"><I>toFIXED</I></A>(2.0), <a href="../struct/macro.htm#toFIXED"><I>toFIXED</I></A>(4.0)};
+ /*                 |             |             |             |_ Display scale (specify <a href="../struct/macro.htm#toFIXED"><I>toFIXED</I></A>(<a href="../struct/constspr.htm#ORIGINAL"><I>ORIGINAL</I></A>) for same size) */
+ /*              X position     Y position    Y position     */
+
+ /*  sample character data */
+   <a href="../struct/types.htm#SPR_ATTR"><I>SPR_ATTR</I></A> tattr = <a href="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>(PN_Triangle,CL_Triangle,<a href="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</I></A>,<a href="../struct/constspr.htm#CL16Bnk"><I>CL16Bnk</I></A>,<a href="../struct/constspr.htm#sprNoflip"><I>sprNoflip</I></A>|<a href="../struct/constspr.htm#_ZmCC"><I>_ZmCC</I></A>);
+ /*                               |           |           |          |       |         |__ Rotation center position */
+ /*                               |           |           |          |       |__ No character reversal */
+ /*                               |           |           |          |__ 16 colors color bank mode  */
+ /*                               |           |           |___ Do not use Gouraud shading */
+ /*                      pattern number   color bank number */
+
+ main() {
+   <a href="../struct/types.htm#ANGLE"><I>ANGLE</I></A>        ang = DEGtoANG (0.0);
+
+   *( <a href="../struct/types.htm#Uint32"><I>Uint32</I></A> * )( 0x06002500 ) = ( <a href="../struct/types.htm#Uint32"><I>Uint32</I></A> )( 0x060007f0 );
+   /* Apparently, during a clock change, the 68K for sound reads the switch data and prepares the data at the address set here,
+      but it doesn't seem to be working properly, so for now I'll put an address with unpressed data 0xFFFF. */
+
+   <a href="../func/init.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm.htm#TV_320x224"><I>TV_320x224</I></A>, form_tbl, 1 ); /* System initialization */
+   SetTexture( pic_tbl, Max_Picture );      /* Set of character data */
+   SetColor();                              /* Set of color data */
+   while( -1 ) {
+     <a href="../func/sprite.htm#slDispSprite"><I>slDispSprite</I></A>( tpos, &tattr, ang );     /* Registering sprites */
+     ang += <a href="../struct/macro.htm#DEGtoANG"><I>DEGtoANG</I></A> ( 3.0 );
+     <a href="../func/int.htm#slSynch"><I>slSynch</I></A>();                             /* Sprite output with synchronization to screen display */
+   }
+ }
+</PRE></DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_d0"><HR></a><DL>
+<P><DT><H2> ■Real-time Gouro usage procedure</H2><DD> The following four processes are required to realize real-time Gouraud.<P><DT> <B>(1) Add the following three to the attribute table</b><DD><OL TYPE=a>
+<B><LI></b> Specify " <A HREF="../struct/constspr.htm#CL_Gouraud"><I>CL_Gouraud</i></a> " for MODE.<B><LI></b> Specify the storage location of the glow table in GOURAUD.<B><LI></b> Specify " <A HREF="../struct/constspr.htm#UseGouraud"><I>UseGouraud</i></a> " in OPTION.</OL>
+<DD>&#65308; <B>example</b>&#65310;<PRE>
+     ATTRIBUTE( <A HREF="../struct/constenm.htm#Single_Plane"><I>Single_Plane</i></a> , <A HREF="../struct/constenm.htm#SORT_CEN"><I>SORT_CEN</i></a> , 0, 0xffa0, 0xe000,
+            <A HREF="../struct/constspr.htm#CL16Look"><I>CL16Look</i></a> | <A HREF="../struct/constspr.htm#MESHoff"><I>MESHoff</i></a> | <A HREF="../struct/constspr.htm#CL_Gouraud"><I>CL_Gouraud</i></a> , <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> , <A HREF="../struct/constspr.htm#UseGouraud"><I>UseGouraud</i></a> )
+</PRE><P><DT><B>(2) Specifying normal vector</b><DD> Specify the normal vector of each vertex and the polygon model data table called " <A HREF="../struct/types.htm#XPDATA"><I>XPDATA</i></a> "<DD>&#65308; <B>Example></b>&#65310;<PRE>
+         <A HREF="../struct/types.htm#VECTOR"><I>VECTOR</i></a> gr_point[] = { /* Vertex normal vector data */
+           <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> (-0.873), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.436), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.217),
+           <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> (-0.873), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> (-0.436), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> (0.217),
+                                :
+                                :
+         };
+         <A HREF="../struct/types.htm#XPDATA"><I>XPDATA</i></a> PD_BOX = {                            /* Model table specification */
+           point_BOX,                                 /* Vertex position data table */
+           sizeof( point_BOX ) / sizeof( <A HREF="../struct/types.htm#POINT"><I>POINT</i></a> ),     /* Number of vertices */
+           polygon_BOX,                               /* Polygon definition table */
+           sizeof( polygon_BOX ) /sizeof( <A HREF="../struct/types.htm#POLYGON"><I>POLYGON</i></a> ),  /* Number of polygons */
+           attribute_BOX2,                            /* Polygon attribute table */
+           gr_point                                   /* Vertex normal vector data */
+         };
+</PRE><P><DT><B>(3) Initialization of real-time Gouraud program</b><DD> (a) Specify the position and size of the Gouraud table to be used<DD>&#65308; <B>example</b>&#65310;<PRE>
+       <A HREF="../func/polygon.htm#slInitGouraud"><I>slInitGouraud</i></a> ( ( <A HREF="../struct/types.htm#GOURAUDTBL"><I>GOURAUDTBL</i></a> * ) gr_tab, ( <A HREF="../struct/types.htm#Uint32"><I>Uint32</i></a> )300, 0xe000, addr );
+</PRE><P><DD>(b) Register Gouraud program in V blank<DD>&#65308; <B>example</b>&#65310;<PRE>
+       <A HREF="../func/int.htm#slIntFunction"><I>slIntFunction</i></a> ( <A HREF="../func/polygon.htm#slGouraudTblCopy"><I>slGouraudTblCopy</i></a> );
+</PRE><P><DT><B>(4) Specifying light source vector</b><DD>&#65308; <B>example</b>&#65310;<PRE>
+         <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> light[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ];
+         light[ <A HREF="../struct/constenm.htm#X"><I>X</i></a> ] = <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 1.0 );
+         light[ <A HREF="../struct/constenm.htm#Y"><I>Y</i></a> ] = <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 );
+         light[ <A HREF="../struct/constenm.htm#Z"><I>Z</i></a> ] = <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 );
+         <A HREF="../func/polygon.htm#slPutPolygonX"><I>slPutPolygonX</i></a> ( &PD_BOXx, ( <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> * )light );
+</PRE><P><DT><B>(5) Actual program usage example</b><DD>&#65308; <B>example</b>&#65310;<PRE>
+ static <A HREF="../struct/types.htm#GOURAUDTBL"><I>GOURAUDTBL</i></a> gr_tab[300];
+
+ void ss_main( void )
+ {
+   FIXED light[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ];
+          :
+   /* Initialize real-time glow program */
+   <A HREF="../func/polygon.htm#slInitGouraud"><I>slInitGouraud</i></a> ( ( <A HREF="../struct/types.htm#GOURAUDTBL"><I>GOURAUDTBL</i></a> * ) gr_tab, ( <A HREF="../struct/types.htm#Uint32"><I>Uint32</i></a> )300, 0xe000, addr );
+   <A HREF="../func/polygon.htm#slGouraudTblCopy"><I>slGouraudTblCopy</i></a> ();
+   <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> ();
+               :
+   light[ <A HREF="../struct/constenm.htm#X"><I>X</i></a> ] = <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 1.0 );
+   light[ <A HREF="../struct/constenm.htm#Y"><I>Y</i></a> ] = <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 );
+   light[ <A HREF="../struct/constenm.htm#Z"><I>Z</i></a> ] = <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 );
+   while( 1 )
+   {
+           :
+     <A HREF="../func/matrix.htm#slPushMatrix"><I>slPushMatrix</i></a> ();
+     {
+        :
+       /**/
+       <A HREF="../func/polygon.htm#slPutPolygonX"><I>slPutPolygonX</i></a> ( &PD_BOX, ( <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> * )light );
+     }
+     <A HREF="../func/matrix.htm#slPopMatrix"><I>slPopMatrix</i></a> ();
+     <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> ();
+   }
+ }
+</PRE></DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_e0"><HR></a><DL>
+<P><DT><H2> ■Near clipping</H2><DD> If you specify " <A HREF="../struct/constspr.htm#UseNearClip"><I>UseNearClip</i></a> " in the OPTION of the attribute table, near clipping processing will be performed. " <A HREF="../struct/constspr.htm#UseClip"><I>UseClip</i></a> " has been replaced by " <A HREF="../struct/constspr.htm#UseNearClip"><I>UseNearClip</i></a> " since Ver3.0 due to the addition of the same function.<P><DD>&#65308; <B>example</b>&#65310;<PRE>
+  <A HREF="../struct/macro.htm#ATTRIBUTE"><I>ATTRIBUTE</i></a> ( <A HREF="../struct/constenm.htm#Single_Plane"><I>Single_Plane</i></a> , <A HREF="../struct/constenm.htm#SORT_CEN"><I>SORT_CEN</i></a> , 1, <A HREF="../struct/constspr.htm#No_Palet"><I>No_Palet</i></a> , <A HREF="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</i></a> , 
+              <A HREF="../struct/constspr.htm#CL32KRGB"><I>CL32KRGB</i></a> | <A HREF="../struct/constspr.htm#MESHoff"><I>MESHoff</i></a> , <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> , <A HREF="../struct/constspr.htm#UseNearClip"><I>UseNearClip</i></a> );
+</PRE></DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_f0"><HR></a><DL>
+<P><DT><H2> ■Differences between SGL Ver2.1x and SGL Ver3.00</H2><P><DT> <B>(1) Change of light source calculation method for flat shading</b><DD> The light source calculation method for flat shading has been changed as follows.<DD><PRE>
+&#65308;<B>Light source calculation method up to Ver2.1x</b>&#65310;
+Angle between light source and surface →0------45------90-----135-----180
+Gouraud table                          →31-----16-------0-------0-------0
+</PRE><DD><PRE>
+&#65308;<B>Light source calculation method from Ver3.0</b>&#65310;
+Angle between light source and surface →0------45------90-----135-----180
+Gouraud table                          →31-----24------16-------8-------0
+</PRE><P><DT><B>(2) Changing the size of the coloring data table due to the influence of the light source</b><DD> By adding a function to light source processing, the size of the color data table (CLOfsfBuf) area has been increased.<P><DL>
+<DD> 32×32 (0x400) to 32×32×3 (0xC00)</DL>
+<P><DD> It has been changed to.<P><DD> Therefore, change sglarea.o in the saturn/sgl/lib directory where the initial value was set, and change the user customization.<P><DL>
+<DD> saturn\sgl\sample\workarea</DL>
+<P><DD> Files such as workarea.c in the directory have also been changed in the calculation part. Be sure to change this when migrating from SGL Ver2.1x.<P><DT> <B>(3) Delete UseClip option</b><DD> The attribute option <A HREF="../struct/constspr.htm#UseClip"><I>UseClip</i></a> has been replaced with <A HREF="../struct/constspr.htm#UseNearClip"><I>UseNearClip</i></a> due to the addition of functions in SGL Ver3.0.<HR NOSHADE>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN=MIDDLE></a> ★ <A HREF="../../index.htm">SGL User's Manual</a> ★ <A HREF="index.htm">Supplementary manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

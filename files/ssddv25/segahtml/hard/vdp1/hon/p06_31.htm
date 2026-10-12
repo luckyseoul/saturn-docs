@@ -1,0 +1,95 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;28/54&gt;VDP1 User's Manual/6.3.1 High Speed Shrink</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p06_30.htm">Back</a> ｜ <A HREF="p06_32.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 6 Command Table</b><HR NOSHADE>
+<DL>
+<A NAME="no6_30"></A><P><DT><H3> ■High speed shrink</H3><DT> <B>High speed shrink:</b> high speed shrink(HSS), bit 12<BR>
+<DD> Select whether to give priority to speed or accuracy when drawing rectangular sprites and deformed sprites in reduced size.<BR>
+ This bit is valid only for drawing commands for rectangular sprites and deformed sprites. Please fix it to 0 for other drawing commands.<BR>
+ If this bit is set to 1, only pixels at even or odd coordinates of the original picture data will be sampled and drawn for the line that will be reduced. The selection of even or odd coordinates is made using the even/odd coordinate selection bit (EOS) of the frame buffer switching mode register (FBCR).<BR>
+ If you specify 1, the end code of the original picture will be ignored regardless of whether the sprite is enlarged or reduced.<BR>
+ If you specify 0, the original picture data will be sampled at any magnification, regardless of even or odd coordinates.<BR>
+ We recommend specifying 0 when movement is slow and priority is given to drawing accuracy, and 1 when movement is fast and priority is given to speed.</P>
+<TABLE BORDER CELLPADDING=5>
+<TD WIDTH=50><PRE> HSS</TD><TD><PRE> process</TD><TR><TD><PRE> 0</TD><TD><PRE> High speed shrink disabled</TD><TR><TD><PRE> 1</TD><TD><PRE> High speed shrink enabled</TD></TABLE>
+</P>
+<A NAME="z6_5"></A><P><DD> <B>Figure 6.5 High speed shrink</b>
+<FONT SIZE="2">
+<PRE>
+When HSS = 0
+┌──┬──┬──┬──┬──┬──┬──┬──┐× 3/8                      ┌──┬──┬──┐
+│00│01│02│03│04│05│06│07│────────────────→          │01│04│06│
+├──┼──┼──┼──┼──┼──┼──┼──┤× 4/8                      ├──┼──┼──┼──┐
+│10│11│12│13│14│15│16│17│────────────────→          │11│13│15│17│
+├──┼──┼──┼──┼──┼──┼──┼──┤× 5/8                   ┌──┼──┼──┼──┼──┤
+│20│21│22│23│24│25│26│27│────────────────→       │20│22│24│25│27│
+├──┼──┼──┼──┼──┼──┼──┼──┤× 6/8                   ├──┼──┼──┼──┼──┼──┐
+│30│31│32│33│34│35│36│37│────────────────→       │30│32│33│34│36│37│
+├──┼──┼──┼──┼──┼──┼──┼──┤× 7/8                ┌──┼──┼──┼──┼──┼──┼──┤
+│40│41│42│43│44│45│46│47│────────────────→    │40│41│42│44│45│46│47│
+├──┼──┼──┼──┼──┼──┼──┼──┤× 1                  ├──┼──┼──┼──┼──┼──┼──┼──┐
+│50│51│52│53│54│55│56│57│────────────────→    │50│51│52│53│54│55│56│57│
+├──┼──┼──┼──┼──┼──┼──┼──┤× 9/8             ┌──┼──┼──┼──┼──┼──┼──┼──┼──┤
+│60│61│62│63│64│65│66│67│────────────────→ │60│61│62│63│63│64│65│66│67│
+├──┼──┼──┼──┼──┼──┼──┼──┤×10/8             ├──┼──┼──┼──┼──┼──┼──┼──┼──┼──┐
+│70│71│72│73│74│75│76│77│────────────────→ │70│71│72│72│73│74│75│75│76│77│
+└──┴──┴──┴──┴──┴──┴──┴──┘                  └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+
+●When HSS = 1, EOS = 0           X coordinate = sampling only even numbers
+┌──┬──┬──┬──┬──┬──┬──┬──┐  ┌──┬──┬──┬──┐           ┌──┬──┬──┐
+│00│01│02│03│04│05│06│07│─→│00│02│04│06│─→         │00│04│06│
+├──┼──┼──┼──┼──┼──┼──┼──┤  ├──┼──┼──┼──┤           ├──┼──┼──┼──┐
+│10│11│12│13│14│15│16│17│─→│10│12│14│16│─→         │10│12│14│16│
+├──┼──┼──┼──┼──┼──┼──┼──┤  ├──┼──┼──┼──┤        ┌──┼──┼──┼──┼──┤
+│20│21│22│23│24│25│26│27│─→│20│22│24│26│─→      │20│22│22│24│26│
+├──┼──┼──┼──┼──┼──┼──┼──┤  ├──┼──┼──┼──┤        ├──┼──┼──┼──┼──┼──┐
+│30│31│32│33│34│35│36│37│─→│30│32│34│36│─→      │30│32│32│34│34│36│
+├──┼──┼──┼──┼──┼──┼──┼──┤  ├──┼──┼──┼──┤     ┌──┼──┼──┼──┼──┼──┼──┤
+│40│41│42│43│44│45│46│47│─→│40│42│44│46│─→   │40│40│42│42│44│44│46│
+├──┼──┼──┼──┼──┼──┼──┼──┤  └──┴──┴──┴──┘     ├──┼──┼──┼──┼──┼──┼──┼──┐
+│50│51│52│53│54│55│56│57│────────────────→   │50│51│52│53│54│55│56│57│
+├──┼──┼──┼──┼──┼──┼──┼──┤                 ┌──┼──┼──┼──┼──┼──┼──┼──┼──┤
+│60│61│62│63│64│65│66│67│────────────────→│60│61│62│63│63│64│65│66│67│
+├──┼──┼──┼──┼──┼──┼──┼──┤                 ├──┼──┼──┼──┼──┼──┼──┼──┼──┼──┐
+│70│71│72│73│74│75│76│77│────────────────→│70│71│72│72│73│74│75│75│76│77│
+└──┴──┴──┴──┴──┴──┴──┴──┘                 └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+
+●When HSS = 1, EOS = 1           X coordinate = sampling only odd numbers
+┌──┬──┬──┬──┬──┬──┬──┬──┐  ┌──┬──┬──┬──┐           ┌──┬──┬──┐
+│00│01│02│03│04│05│06│07│─→│01│03│05│07│─→         │01│05│07│
+├──┼──┼──┼──┼──┼──┼──┼──┤  ├──┼──┼──┼──┤           ├──┼──┼──┼──┐
+│10│11│12│13│14│15│16│17│─→│11│13│15│17│─→         │11│13│15│17│
+├──┼──┼──┼──┼──┼──┼──┼──┤  ├──┼──┼──┼──┤        ┌──┼──┼──┼──┼──┤
+│20│21│22│23│24│25│26│27│─→│21│23│25│27│─→      │21│23│23│25│27│
+├──┼──┼──┼──┼──┼──┼──┼──┤  ├──┼──┼──┼──┤        ├──┼──┼──┼──┼──┼──┐
+│30│31│32│33│34│35│36│37│─→│31│33│35│37│─→      │31│33│33│35│35│37│
+├──┼──┼──┼──┼──┼──┼──┼──┤  ├──┼──┼──┼──┤     ┌──┼──┼──┼──┼──┼──┼──┤
+│40│41│42│43│44│45│46│47│─→│41│43│45│47│─→   │41│41│43│43│45│45│47│
+├──┼──┼──┼──┼──┼──┼──┼──┤  └──┴──┴──┴──┘     ├──┼──┼──┼──┼──┼──┼──┼──┐
+│50│51│52│53│54│55│56│57│────────────────→   │50│51│52│53│54│55│56│57│
+├──┼──┼──┼──┼──┼──┼──┼──┤                 ┌──┼──┼──┼──┼──┼──┼──┼──┼──┤
+│60│61│62│63│64│65│66│67│────────────────→│60│61│62│63│63│64│65│66│67│
+├──┼──┼──┼──┼──┼──┼──┼──┤                 ├──┼──┼──┼──┼──┼──┼──┼──┼──┼──┐
+│70│71│72│73│74│75│76│77│────────────────→│70│71│72│72│73│74│75│75│76│77│
+└──┴──┴──┴──┴──┴──┴──┴──┘                 └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE></DL><HR NOSHADE><B>▲ <A HREF="p06_30.htm">Back</a> ｜ <A HREF="p06_32.htm">Forward</a> ▼</b><HR><A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

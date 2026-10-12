@@ -1,0 +1,155 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/19&gt;CD通信I/F(CDパート)/関数詳細-9</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(CDパート)</A>
+<HR>
+<B>▲
+<A HREF="p08_18.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル(CDパート)</B>
+<H2 ALIGN=CENTER>関数詳細-9</H2>
+<HR NOSHADE>
+<H3>8.2.9　レジスタアクセス</H3>
+　割り込み要因レジスタ・割り込みマスクレジスタのアクセス(値の取得、クリア、設定)は、いずれも下位16ビットが有効です。
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_1"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_9">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>データ転送レジスタポインタの取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［--］<BR><H3>CDC_GetDataPtr</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>9.1</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Uint32 *CDC_GetDataPtr(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>レジスタのポインタ(アドレス値)
+<DT><B>　機　能</B><DD>データ転送レジスタ(DATATRNS)のポインタを取得します。
+
+<P><DT><B>　(1)アクセス方法</B>
+<DD>データ転送レジスタとMPEGレジスタに対しては、次の3種類のデータ転送方法があります。
+<DD><UL TYPE=DISC>
+<LI>SCUによるDMA転送
+<LI>CPUによるDMA転送
+<LI>CPUによるソフトウェア転送</UL></P>
+
+<P><DD>　CPUによるDMA転送とソフトウェア転送では、レジスタをロングワード(32ビット)でアクセスしなければなりません。つまり、転送するデータはロングワード(偶数ワード)単位となります。<BR>
+ロングワードアクセスしたデータは、上位ワード・下位ワードの順に格納されます。奇数ワードのデータを転送する場合、最後のロングワードアクセスの下位ワードは不定です。</P>
+
+<P><DD><B>　(2)volatile宣言</B>
+<DD>　ポインタを変数に代入する場合、不正な最適化を防ぐため、volatile宣言が必要です。</P>
+
+<P><DT><B>　　例</B>
+<DD><PRE>
+volatile Uint32 *ptr;
+ptr=CDC_GetDataPtr();
+</PRE>
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_2"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_9">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>割り込み要因レジスタ値の取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［--］<BR><H3>CDC_GetHirqReq</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>9.2</H4></TD>
+</TR></TABLE></p>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_GetHirqReq(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>レジスタの値……ビット名はデータ仕様(Constant)を参照
+<DT><B>　機　能</B><DD>割り込み要因レジスタ(HIRQREQ)の値を取得します。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_3"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_9">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>割り込み要因レジスタのクリア</H4></TD>
+<TD WIDTH=160><PRE>Function Name［--］<BR><H3>CDC_ClrHirqReq</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>9.3</H4></TD>
+</TR></TABLE></p>
+
+<DT><B>　書　式</B><DD>void　CDC_ClrHirqReq(Sint32 bitpat)
+<DT><B>　入　力</B><DD>bitpat：クリアビットパターン(クリアしたいビットを0、その他を1にする)
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定したビットパターンにより、割り込み要因レジスタをクリアします。
+<DT><B>　備　考</B><DD>割り込み要因レジスタのCMOKフラグは、CD通信インタフェースが使用するので、アプリケーションプログラムによるクリアを禁止します。
+またDCHGフラグはディスクチェック時にBOOT ROMがクリアするので、アプリケーションプログラムの初期化時にクリアしないでください。(例外としてDCHG割り込み処理時のみクリア可)
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_4"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_9">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>割り込みマスクレジスタ値の取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［--］<BR><H3>CDC_GetHirqMsk</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>9.4</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_GetHirqMsk(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>レジスタの値……ビット名はデータ仕様(Constant)を参照
+<DT><B>　機　能</B><DD>割り込みマスクレジスタ(HIRQMSK)の値を取得します。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_5"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_9">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>割り込みマスクレジスタの設定</H4></TD>
+<TD WIDTH=160><PRE>Function Name［--］<BR><H3>CDC_SetHirqMsk</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>9.5</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void　CDC_SetHirqMsk(Sint32 bitpat)
+<DT><B>　入　力</B><DD>bitpat：マスクビットパターン(マスクしたいビットを0、その他を1にする)
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定したビットパターンにより、割り込みマスクレジスタを設定します。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_6"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_9">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>MPEGレジスタポインタの取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［--］<BR><H3>CDC_GetMpegPtr</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>9.6</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Uint32 *CDC_GetMpegPtr(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>レジスタのポインタ（アドレス値）
+<DT><B>　機　能</B><DD>MPEGレジスタ（MPEGRGB）のポインタを取得します。<BR>
+MPEGレジスタのアクセス方法は、データ転送レジスタと同じです。注意事項などは、データ転送レジスタポインタの取得（<A HREF="#no9_1">CDC_GetDataPtr</A>）を参照してください。
+</DL>
+
+<HR NOSHADE>
+<B>▲
+<A HREF="p08_18.htm">戻る</A>｜
+　　■</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

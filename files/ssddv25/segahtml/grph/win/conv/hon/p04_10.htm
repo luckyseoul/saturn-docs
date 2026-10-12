@@ -1,0 +1,83 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;p=4/5&gt;SEGA CONVERTER User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#win">Graphic Tools Guide</a> ★ <A HREF="../index.htm">SEGA CONVERTER User's Manual</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SEGA CONVERTER User's Manual</b><H2 ALIGN=CENTER> 4. How to create a plugin</H2><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H3> ■Resource file</H3><DD> The following resources are reserved in the SSSDK plugin module. When using resources in a module program, be careful not to overlap their uses.<P><DD><TABLE BORDER=1>
+<CAPTION> <B>STRING resource</b><BR>
+ <B>(Sample example)</b></CAPTION>
+<TR><TD><PRE>
+STRINGTABLE DISCARDABLE 
+BEGIN
+
+1 "READ WRITE"
+2 "dg2"
+3 "DGT2 Files"
+4 "4 8 16 24"
+
+END
+</PRE></TD></TR>
+</TABLE>
+</P>
+<DL>
+<P><DT><B>ID 1: Specifies the plugin function.</b><DD> "File I/O"<UL TYPE=DISC>
+<LI> "READ" for input only<LI> "WRITE" for output only<LI> For input/output "READ WRITE"</UL>
+<DD> "EFFECT"<P><DT> <B>ID 2: Specify the file extension (3 characters).</b><DD> Alphanumeric characters and lowercase letters are preferable.<DD> For "effect", specify "eff".<P><DT> <B>ID 3: Specify the plugin name to be displayed.</b><DD> For "File I/O"<DD> This will be the pop-up menu of the dialog.<P><DD> For "effect"<DD> This will be a submenu of the effect menu.<P><DT> <B>ID 4: Specifies the color depth (in bits) that this module supports.</b><DD> 1・4・8・16・24<DD> Specify one of them, separated by a half-width space (" ").</DL>
+<A NAME="no4_20"></A><P><DT><H3> ■“File I/O” module</H3><DL>
+<P><DT> <B>[1: Input module]</b><DD> Follow the steps below to load the file and display it in the window.<DD><OL>
+<B><LI></b> Select a file in the open dialog.<B><LI></b> <A HREF="p05_10.htm#scvCheckFileFormat">scvCheckFileFormat</a><B><LI></b> <A HREF="p05_10.htm#scvGetFileImageSize">scvGetFileImageSize</a><B><LI></b> <A HREF="p05_10.htm#scvGetFileImageDepth">scvGetFileImageDepth</a><B><LI></b> <A HREF="p05_10.htm#scvGetFileImageBits">scvGetFileImageBits</a><B><LI></b> Show window.</OL>
+<DD> Users who create input modules must prepare functions that correspond to steps 2) to 5) above.<P><DT> <B>[2: Output module]</b><DD> Save the file using the following steps.<DD><OL>
+<B><LI></b> Specify the file name in the save dialog.<B><LI></b> <A HREF="p05_10.htm#scvPutFileImageBits">scvPutFileImageBits</a><B><LI></b> The file is saved.</OL>
+<P><DD> If you use the catalog save function, save the file by following the steps below.<DD><OL>
+<B><LI></b> Specify the save directory in the save dialog.<B><LI></b> <A HREF="p05_10.htm#scvBeginCatalogSave">scvBeginCatalogSave</a><B><LI></b> <A HREF="p05_10.htm#scvPutFileImageBits">scvPutFileImageBits</a><B><LI></b> The file is saved. (Repeat 3) to 4) for the number of catalog registrations)<B><LI></b> <A HREF="p05_10.htm#scvEndCatalogSave">scvEndCatalogSave</a></OL>
+<DD> Users who create output modules must prepare functions that correspond to steps 2), 3, and 5) above.</DL>
+<A NAME="no4_30"></A><P><DT><H3> ■“Effect” module</H3><DL>
+<DD> Apply the effect to the window using the following steps.<DD><OL>
+<B><LI></b> Select the Effect menu item.<B><LI></b> <A HREF="p05_10.htm#scvBeginEffect">scvBeginEffect</a><B><LI></b> <A HREF="p05_10.htm#scvEffectImageBits">scvEffectImageBits</a><B><LI></b> <A HREF="p05_10.htm#scvEndEffect">scvEndEffect</a><B><LI></b> Refresh window.</OL>
+<DD> Users who create effect modules must prepare functions that correspond to steps 2) to 4) above.</DL>
+<A NAME="no4_40"></A><P><DT><H3> ■About bitmap memory</H3><DL>
+<P><DT> <B>Color depth: 1</b><DD> Arrange the bitmap at 1 bit/pixel.<BR>
+ However, in the horizontal direction, there is a 1-bite boundary.<BR>
+ 1 is displayed in black and 0 is displayed in white.</P>
+<P><DT> <B>Color depth: 4</b><DD> 16 color index format.<BR>
+ Arrange RGBQUAD structures for 16 colors.<BR>
+ After that, place the bitmap at 4 bits/pixel.<BR>
+ However, in the horizontal direction, there is a 1-bite boundary.</P>
+<P><DT> <B>Color depth: 8</b><DD> 256 color index format.<BR>
+<DD> Arrange RGBQUAD structures for 256 colors.<BR>
+ After that, place the bitmap at 8 bits/pixel.</P>
+<P><DT> <B>Color depth: 16</b><DD> Direct color format.<BR>
+ Arrange the bitmap at 16 bits/pixel.<BR>
+ Each color intensity is formatted as 0b|R5|G5|B5.</P>
+<P><DT> <B>Color depth: 24 (32)</b><DD> Direct color format.<BR>
+ Arrange the bitmap at 32 bits/pixel.<BR>
+ Each color intensity is formatted as 8b|R8|G8|B8.</P>
+</DL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#win">Graphic Tools Guide</a> ★ <A HREF="../index.htm">SEGA CONVERTER User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

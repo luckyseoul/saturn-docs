@@ -1,0 +1,172 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/17&gt;プログラマーズガイド/ファイルシステムライブラリ/5．アクセス方式</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p06_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>5．アクセス方式</H2>
+<HR NOSHADE>
+<DL>
+	<P><DD>　本ライブラリで提供するアクセス方式には以下の二通りがあります。</P>
+
+	<DD><UL TYPE="DISK">
+	<P><LI><B>完了復帰型アクセス</B><BR>アクセス処理が完了するまで、アプリケーションに制御を戻さない。</P>
+
+	<P><LI><B>即時復帰型アクセス</B><BR>アクセスリクエストを受け付けると、すぐに制御を戻す。</UL></P>
+
+<A NAME="no5_10"></A>
+	<P><DT><H3>5.1　完了復帰型アクセス</H3>
+		<DD>　完了復帰型アクセスは、標準Cライブラリのファイルアクセス関数に近い方式です。<BR>
+　完了復帰型アクセスのプログラム例を以下に示します。</P>
+
+	<P><DD><B>［例］</B><PRE>
+#define BUF_SIZE 2048<P>
+GfsHn gfs;                    /* ファイルハンドル　　*/
+Sint32 fid;                   /* ファイル識別子　　　*/
+Sint32 nsct = 1;              /* 読み込みセクタ数　　*/
+Uint32 buf[BUF_SIZE/4];       /* 読み込み領域　　　　*/
+
+gfs = GFS_Open(fid);                  /* ファイルオープン       　　*/
+
+GFS_Fread(gfs, nsct, buf, BUF_SIZE);  /* bufにnsctセクタ読み込む　　*/
+
+GFS_Close(gfs);                       /* ファイルクローズ       　　*/
+</PRE></P>
+
+<A NAME="no5_20"></A>
+	<P><DT><H3>5.2　即時復帰型アクセス</H3>
+		<DD>　即時復帰型アクセスは、リクエスト関数とサーバ関数を用いて行われます。リクエスト関数は、リクエスト受け付け処理のみを実行して、即時復帰します。入力の完了状態を監視しながら、サーバ関数を繰り返し呼び出すことで実際のアクセス処理が行われます。サーバ関数の呼び出しループの中でアプリケーションの処理を行うこともできます。一度リクエストを発行したファイルハンドルに対しては、そのアクセス処理が終了するまでリクエストを発行できません。</P>
+
+<A NAME="no5_20_1"></A>
+	<P><DT><B>　(1)単数ファイルに対する即時復帰型アクセス</B>
+		<DD>　単数ファイルのアクセスでは、GFS_NwExecOneがサーバ関数です。<BR>　一つのファイルを即時復帰型でアクセスするプログラム例を以下に示します。この例ではGFS_NwFreadがリクエスト関数です。</P>
+
+	<P><DD><B>例］</B><PRE>
+#define BUF_SIZE  2048*2
+
+GfsHn gfs;                              /* ファイルハンドル       　　*/
+Sint32 nsct = 2;                        /* 読み込みセクタ数       　　*/
+Sint32 stat;                            /* サーバの状態       　　　　*/
+Uint32 buf[BUF_SIZE/4];                 /* 読込み領域       　　　　　*/
+
+gfs = GFS_Open(fid);                    /* ファイルオープン       　　*/
+/* リクエスト関数     */
+GFS_NwFread(gfs, nsct, buf, BUF_SIZE);  /* bufにnsctセクタ読み込む　　*/
+                                        /* 即時復帰する       　　　　*/
+
+for (;;) {
+     /* サーバ関数     */
+     stat = GFS_NwExecOne(gfs);         /* 読み込みの実行       　　　*/
+     if (stat == GFS_SVR_COMPLETED) {   /* 読み込み完了か ?       　　*/
+          break;
+     }
+     user();                            /* 任意のユーザ処理       　　*/
+}<P>
+GFS_Close(gfs);                         /* ファイルクローズ       　　*/
+</PRE></P>
+
+<A NAME="no5_20_2"></A>
+	<P><DT><B>　(2)複数ファイルに対する即時復帰型アクセス</B>
+		<DD>　複数ファイルの連続アクセスでは、GFS_NwExecSererがサーバ関数となります。<BR>　リクエスト関数は単数ファイルのアクセスと共通です。<BR>　アプリケーションは、複数のファイルに対し、アクセス処理のリクエストを発行します。その後、定期的にサーバに制御権を渡すことによって、アクセス処理が順次実行されます。アクセス処理はリクエストがあった順に一つずつ行われます。<BR>　三つのファイルを読み込みながら、ユーザ処理を行うプログラム例を次に示します。</P>
+
+	<P><DD><B>［例］</B><PRE>
+/* 各ファイルからの読み込みセクタ数 */
+#define NSCT1  1
+#define NSCT2  2
+#define NSCT3  3
+
+/* 各ファイルのデータ格納領域の大きさ(単位はバイト) */
+#define BSIZE1 2048*NSCT1
+#define BSIZE2 2048*NSCT2
+#define BSIZE3 2048*NSCT3<P>
+
+Sint32 fid1, fid2, fid3;                   /* 各ファイルのファイル識別子　　*/
+GfsHn gfs1, gfs2, gfs3;                    /* 各ファイルのファイルハンドル　*/
+Uint32 buf1[BSIZE1/4];                     /* 各ファイルのデータ格納領域　　*/
+Uint32 buf2[BSIZE2/4];
+Uint32 buf3[BSIZE3/4];
+GfsHn now_gfs;                             /* アクセス中のファイルハンドル　*/
+Sint32 stat;                               /* サーバの状態　　　　　　　　　*/
+
+gfs1 = GFS_Open(fid1);                     /* ファイルオープン　　　　　　　*/
+gfs2 = GFS_Open(fid2);
+gfs3 = GFS_Open(fid3);
+GFS_NwFread(gfs1, NSCT1, buf1, BSIZE1);    /* 読み込み動作の開始　　　　　　*/
+GFS_NwFread(gfs2, NSCT2, buf2, BSIZE2);
+GFS_NwFread(gfs3, NSCT3, buf3, BSIZE3);
+for (;;) {
+    stat = GFS_NwExecServer(&now_gfs);     /* 読み込みの実行　　　　　　　　*/
+    if (stat == GFS_SVR_COMPLETED) {       /* 実行する仕事がないか？　　　　*/
+              break;
+    }
+    user();                                /* 任意のユーザ処理　　　　　　　*/
+}
+GFS_Close(gfs1);
+GFS_Close(gfs2);
+GFS_Close(gfs3);
+</PRE></P>
+
+<A NAME="no5_20_3"></A>
+	<P><DT><B>　(3) CDバッファへの先読み</B>
+		<DD>　大きなファイルを少しずつ連続して読み込むときには、GFS_NwCdReadでCDバッファへの先読みを指定すると、CDの読みとり速度を最大限に活かすことができます。<BR>　次に示すプログラム例では1000セクタのファイルを10セクタずつ連続して読み込みます。GFS_NwCdReadで1000セクタ先読みするよう指定しているので、目的のファイルが1000セクタ連続して再生され、バッファに格納されます。この処理と並行してCDバッファからデータを取り出しているので、バッファフルにならず、再生は中断されません。<BR>　この例で行っている処理を先読みを使わずに行うと、CD再生が10セクタごとに中断されるため、無駄な時間が発生します。</P>
+
+<!-- +++ Update by CRI ：1.1 -->
+	<P><DD><B>［例］</B><PRE>
+#define SECT_SIZE　   2048
+#define FILE_SECT     1000
+#define FILE_SIZE     (FILE_SECT*SECT_SIZE)
+#define RD_UNIT       10
+
+Uint8 *rd_bp, *proc_bp;            /* 読み込みバッファと処理バッファ        */
+Uint32 buf1[RD_UNIT*SECT_SIZE/4];  /* データ格納領域１        　　　　　　　*/
+Uint32 buf2[RD_UNIT*SECT_SIZE/4];  /* データ格納領域２        　　　　　　　*/
+GfsHn gfs;
+Sint32 i, stat, nbyte;<P>
+gfs = GFS_Open(fid);
+GFS_NwCdRead(gfs, FILE_SECT);      /* CDバッファへの先読み指示        　　　*/
+GFS_SetTransPara(gfs, RD_UNIT);    /* 最大RD_UNITセクタ1度に取り出す　　　　*/
+for (i = 0; i &lt; FILE_SECT / RD_UNIT; ++i) {
+    /*     読み込み、処理バッファの設定      */
+    if (i &amp; 1) {
+        rd_bp = buf1;
+        proc_bp = buf2;
+    } else {
+        rd_bp = buf2;
+        proc_bp = buf1;
+    }
+    /*     CDバッファからの取り出し実行      */
+    GFS_NwFread(gfs, RD_UNIT, rd_bp, RD_UNIT * SECT_SIZE);
+    do {
+        if (i &amp; 0) {
+            user_process(proc_bp); /* 読み込んだデータに対する処理　　　　　*/
+        } else {
+            user_process0();       /* データが読み込まれる前の処理　　　　　*/
+        }
+          GFS_NwExecOne(gfs);
+          GFS_NwGetStat(gfs, &amp;stat, &amp;nbyte);
+    ｝while (nbyte &lt; RD_UNIT * SECT_SIZE);
+}</PRE></P>
+<!-- --- Update by CRI ：1.1 -->
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p06_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

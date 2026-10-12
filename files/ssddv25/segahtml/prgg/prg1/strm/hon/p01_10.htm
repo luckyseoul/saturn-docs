@@ -1,0 +1,76 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/18&gt;Stream system library/1. overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">Stream system library</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>stream system library</b><H2 ALIGN=CENTER> 1. overview</H2><HR NOSHADE>
+<DL>
+<P><DD> The Stream System Library is a library for efficiently reading streams (such as interleaved files) on a CD.</P>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Library configuration</H3><DD> Figure 1.1 shows the CD-related library configuration.</P>
+<A NAME="z1_1"></A><P><DD> <B>Figure 1.1 CD-related library configuration</b><PRE>
+       ┌────────────────────────────────┐    
+       │                                │    
+       │          Application           │    
+       │                                │    
+       └────────────────────────────────┘    
+                                             
+       ┌───────┐ ┏━━━━━━━━━━━┓ ┌────────┐    
+       │MPEG   │ ┃Stream     ┃ │File    │    
+       │library│ ┃system     ┃ │system  │    
+       │       │ ┃library┏━━━┛ │library │    
+       │       │ ┃       ┃ ┌───┘        │    
+       │       │ ┃       ┃ │            │    
+       └───────┘ ┗━━━━━━━┛ └─────┐      │    
+                                 │      │    
+       ┌───────────────────────┐ │      │    
+       │   CD communication    │ │      │    
+       │       interface       │ │      │    
+       └───────────┬───────────┘ └──┬───┘    
+Software           │                │        
+━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━
+Hardware           │                │        
+            ┌──────┴─────┐   ┌──────┴────────┐ 
+            │  CD block  │   │SIMM, SCSI file│ 
+            └────────────┘   └───────────────┘ 
+</PRE><A NAME="no1_20"></A><P><DT><H3>1.2 Overview of stream system functions</H3><P><DT> <B>(1)Support CD-ROM XA level file access</b><DD><UL TYPE="DISK">
+<LI> Supports access to Mode 2 sectors using subheaders.<BR>
+ (Access to mode 1 sector is also possible)</P>
+</UL>
+<P><DT> <B>(2) Support various transfer methods</b><DD><UL TYPE="DISK">
+<P><LI> Stream data on the CD can be transferred to the main CPU area.</P>
+<P><LI> By registering functions, you can process data while reading stream data on a CD.</P>
+<P><LI> You can freely handle the stream data read into the CD buffer.</P>
+</UL>
+<P><DT> <B>(3)Support access by file identifier</b><DD><UL TYPE="DISK">
+<P><LI> It has the same directory management functionality as a file system, so it can be accessed using a file identifier (order number within the directory).</P>
+</UL>
+<A NAME="z1_2"></A><P ALIGN=CENTER> <B>Figure 1.2 Stream system overview diagram</b><BR>
+<img srcset="../grp/i052_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The stream system allows multiple interleaved streams to be treated as logical data. Each stream is distinguished by a subheader.<BR>
+ In the stream system, applications perform transfer processing by calling server functions. If you register a transfer function, the server function calls the transfer function instead of transferring to the buffer. Applications can transfer data while converting it using registered transfer functions.</P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">Stream system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

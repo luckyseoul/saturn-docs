@@ -1,0 +1,209 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 4&gt;SGL Tutorial DATA/3.CD-ROM Writing</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">データの受け渡し</A>
+<HR>
+<B>▲<a href="p002_j.htm">戻る</A>｜<a href="p004_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>データの受け渡し</B>
+<H2 ALIGN=CENTER>3.CD-ROMの焼き方</H2>
+<HR NOSHADE>
+<P>　この章では、ユーザが作成したゲームをCD-ROMに焼き付ける方法について説明します。</P>
+<DL>
+<A NAME="no3_10"></A>
+	<P>	<DT><H2>3-1.　作業の流れ</H2>
+		<DD>　CD-ROMはPC DOS英語モード環境で作成します。そのため、ファイル名はDOSの制約を受け、８文字+３文字以内になります。</P>
+
+	<P>	<DD>　ユーザーが作成したゲームをCD-ROMに焼き込むためには、バイナリ形式のIP、プログラム、データを用意する必要があります。</P>
+
+	<P>	<DD>　CD-ROM作成の基本的な流れを図3-1に、CD-ROM作成時に必要となるファイルを図3-2に示します。</P>
+
+<A NAME="z3_1"></A>
+	<P ALIGN=CENTER><H4>図3-1 CD-ROM作成の流れ</H4><BR>
+	<img srcset="../grp/p1_2_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z3_2"></A>
+	<P ALIGN=CENTER><B>図3-2　CD-ROM作成の流れとファイル</B><BR>
+	<img srcset="../grp/p1_3_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no3_20"></A>
+	<P>	<DT><H2>3-2.　IPの作成</H2>
+
+	<P>	<DT><H3>IPとは></H3>
+		<DD>　IPは、CD-ROMディスクのシステムエリアに書き込まれるものであり、アプリケーションがサターンのブートシステムを使用する際に使用されます。IPは全てのCD-ROMプログラムディスクに必要です。<BR>（データディスクには必要ありません）。<BR>
+		IPの詳細は、“プログラマーズガイドのDISCフォーマット規格、ブートシステム”に詳細が記載されています。</P>
+
+	<P>	<DT><H3>IPの構成</H3>
+		<DD>　IPはブートコードとアプリケーションイニシャルプログラムから構成されています。<BR>
+		ブートコードはゲーム名等のIDコード、セガから供給されるセキュリティコードとエリアコードから構成されます。<BR>
+		アプリケーションイニシャルプログラムはエリアコードのすぐ後ろに配置され、エリアコードの実行後ただちに実行されます。以後、アプリケーションの制御下でプログラムが進行します。</P>
+
+<A NAME="t3_1"></A>
+	<P>	<DD><H4>表3-1　IPの構成</H4>
+		<DD><TABLE BORDER=1>
+	<TR><TH COLSPAN=3>構　造</TH><TH>サイズ</TH><TH>備　考</TH></TR>
+	<TR><TD ROWSPAN=4>IP</TD><TD ROWSPAN=3><PRE>Boot Code</TD>
+								<TD><PRE>System ID</TD><TD>100H</TD><TD><PRE>ゲーム名、商品番号、バージョン等</TD></TR>
+	<TR>						<TD><PRE>Security Code</TD><TD>D00H</TD><TD><PRE>セキュリティコード</TD></TR>
+	<TR>						<TD><PRE>Area Code</TD><TD><PRE>20H〜100H</TD><TD><PRE>エリアコード</TD></TR>
+	<TR>				<TD COLSPAN=2>Aplication Initial<BR>Program</TD> 
+								<TD><PRE>20H〜71E0H</TD><TD>イニシャルプログラムやファイルシステム等</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　IPの詳しい作成方法は、
+	“プログラマーズガイドの<a href="../../../../prgg/sofg/disc/hon/p04_10_j.htm">ブートシステム</A>”
+		を参照してください。</P>
+
+<A NAME="no3_30"></A>
+	<P>	<DT><H2>3-3.　ビルド</H2>
+		<DD>　ユーザーが用意したバイナリ形式の全てのファイル（IP、プログラム、データ等）をCD-ROMに焼くために行う前処理を、ビルドといいます。ビルドにより、CD-ROMを焼くために必要なTOC情報ファイルとディスクイメージファイルが作成されます。<BR>
+		ビルドは次の手順で実行します。</P>
+
+	<P>	<DT><B>　1)　CD-ROMに焼きたいファイルの用意</B> 
+		<DD>　CD-ROMに書き込むすべてのファイルを、PCのディスク上に用意します。ファイル位置はスクリプトファイル中で指定するので、どこでもかまいません。ファイル名は８文字、拡張子３文字の１２文字（ピリオド含む）以内とします。
+		CDDAファイルはインテル形式（リトルエンディアン）で並んでいる必要があります。モトローラ形式（ビッグエンディアン）の場合はバイトスワップを行ってください。（DOS用のバイトスワッププログラムとしては、“SWAP.EXE”があります。）</P>
+
+	<P>	<DT><B>　2)　ワークエリアの確保</B>
+		<DD>　CD-ROMのディスクイメージを生成するワークエリアを用意します。総ファイル容量と同容量以上必要です。この後のファイルの作成や実行は、すべてこのエリアで行ってください。（カレントディレクトリを移動します。）</P>
+
+	<P>	<DT><B>　3)　プロジェクト名の決定</B> 
+		<DD>　MS-DOSのファイル名のボディとして使用するので、8文字以内としてください。<BR>
+		ここでは例として、<B>“sample”</B>とします。</P>
+
+	<P>	<DT><B>　4)　スクリプトファイルの作成</B>
+		<DD>　サンプルプログラム1（リスト3-1）を参考にしながら、適当なエディタを用いてスクリプトファイルを作成してください。ファイル名は、プロジェクト名に拡張子<B>“scr”</B>を付けたものにします。<BR>
+		ここでは、<B>“sample.scr”</B>となります。<BR>
+		スクリプトファイルを作成するディレクトリは、ディスク構成情報ファイルとディスクイメージファイルを生成するための<B>“VCDBUILD”</B>コマンドを実行するディレクトリとしてください。</P>
+
+	<P>	<DT><B>　5)　ディスク構成情報ファイルとディスクイメージファイルの生成</B>
+		<DD>　前処理プログラム“vcdbuild.exe”を起動します。<BR>
+		パラメータは、ここでは、<B>“vcdbuild sample”</B>となります。<BR>
+		この結果、ディスク構成情報ファイルとディスクイメージファイルが生成されます。<BR>
+		ここでは<B>“sample.rti”</B>と<B>“sample.dsk”</B>が生成されます。</P>
+
+	<P>	<DT><B>　6)　TOCファイルの生成</B>
+		<DD>　TOCファイルジェネレートプログラム<B>“vcdmktoc.exe”</B>を起動します。パラメータとして、RTIファイルのボディ部（プロジェクト名）を与えます。<BR>
+		ここでは<B>“vcdmktoc samle”</B>となります。<BR>
+		この結果、TOCファイルが生成されます。<BR>
+		ここでは、<B>“sample.toc”</B>が生成されます。</P>
+
+<A NAME="l3_1"></A>
+	<P>	<DD><H4>リスト3-1　サンプルプログラム1（スクリプトファイル“sample.scr”の作成）</H4>
+<PRE>
+Disc  <B>sample.dsk</B>
+    　Session CDROM
+            LeadIn MODE1
+            EndLeadIn
+            SystemArea <B>e:¥ip.bin</B>
+
+            Track MODE1
+                  Volume ISO9660 <B>sample.pvd</B>  ボリューム記述子集合の、指定部分です。
+                         PrimaryVolume 0:2:16   <B>太字</B>部分は出力される、基本ボリューム
+                         EndPrimaryVolume        記述子です。
+                   EndVolume
+
+                   File ASAMPLE.BIN
+                        FileSource <B>e:¥mode1¥asample.bin</B>   この４行で、１ファイル分です。
+                        EndFileSource
+                   EndFile
+                   File ASAMPLE1.BIN
+                        FileSource <B>e:¥mode1¥asample1.bin</B>
+                        EndFileSource
+                   EndFile
+                   File ASAMPLE2.BIN
+                        FileSource <B>e:¥mode1¥asample2.bin</B>
+                        EndFileSource
+                   EndFile
+
+                       ............   ファイルが続く場合は、同様に追加します。
+
+                   PostGap 150          EndTrack
+
+            Track CDDA                          この５行で、CDDA１曲分となります。
+                   Pause 150
+                   FileSource <B>e:¥cdda¥samp_cd1.dat</B>
+                   EndFileSource
+            EndTrack
+            Track CDDA
+                   Pause 150
+                   FileSource <B>e:¥cdda¥samp_cd2.dat</B>
+                   EndFileSource
+            EndTrack
+            Track CDDA
+                   Pause 150
+                   FileSource <B>e:¥cdda¥samp_cd2.dat</B>
+                   EndFileSource
+            EndTrack
+
+                       ............   曲が続く場合は、同様に追加します。
+
+            LeadOut <B>CDDA</B>      CDDAを入れない指定はできなせん。
+                   Empty 500
+            EndLeadOut
+    　EndSession
+EndDisc
+
+</PRE>
+
+<A NAME="no3_40"></A>
+	<P>	<DT><H2>3-4.　CD-ROMの焼き付け</H2>
+		<DD>　CD-ROMをCDライターに入れ、CDライターコマンドを次のように入力して起動します。</P>
+
+	<P>	<DD><B>“segacdw.exe”</B></P>
+
+	<P>	<DD>　設定するパラメータは以下の通りです。</P>
+
+	<P>	<DD>
+<PRE>
+    segacdw [-s #] [-i #] [-t] プロジェクト名
+
+　　　-s  …　書き込み速度を指定します。
+　　　　　　　１（等速）、２（倍速）、４（４倍速）のいずれかを指定します。
+　　　　　　　デフォルトは４倍速です。
+　　　-i　…   CDライターのSCSI ID番号を指定します。
+　　　　　　　デフォルトは５です。
+　　　-t   …　テストモードでは、書き込みテストを行います。
+　　　　　　　（実際のCD-ROMには書き込まれません。）
+</PRE>
+
+	<P>	<DD>　例えばパラメータ設定は、</P>
+
+	<P>	<DD><B>“segacdw -s 2 sample”</B></P>
+
+	<P>	<DD>　となります。この場合は、SCSI ID ５番のCDライターに、プロジェクト名“sample”が倍速で書き込まれます。<BR>
+		実際の書き込みは一旦テストモードで実行し、エラーがなければ実際に書き込むという手順を踏むことをお勧めします。<BR>
+		テストモードを実行する場合は、この例では、</P>
+
+	<P>	<DD><B>segacdw -s 2 -t sample</B>
+
+	<P>	<DD>　となります。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p002_j.htm">戻る</A>｜<a href="p004_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">データの受け渡し</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

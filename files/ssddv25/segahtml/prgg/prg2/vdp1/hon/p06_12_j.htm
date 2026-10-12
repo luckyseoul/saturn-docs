@@ -1,0 +1,434 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/11&gt;VDP1ライブラリ/6.3　関数仕様</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no6">VDP1ライブラリ</A>
+<HR>
+<B>▲
+<a href="p06_11_j.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>VDP1ライブラリ</B>
+<HR NOSHADE>
+
+<A NAME="no6_30"></A>
+<H3>6.3　関数仕様</H3>
+
+<DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_1"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>VDP1 3Dワークエリア定義マクロ</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3DefineWork</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>1</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B>
+	<DD>[#define SPR_3USE_DOUBLE_BUF]
+	<DD>[#define SPR_3NEED_WORLD_VERT]
+	<DD>　#include &quot;sega_spr.h&quot;
+	<DD>SPR_3DefineWork(WORK3D, OBJ_SURF_MAX,OBJ_VERT_MAX)
+<DT><B>　入　力</B>
+	<DD><TABLE>
+	<TR><TD><PRE>WORK3D </TD><TD><PRE>：ワークエリア名</TD></TR>
+	<TR><TD><PRE>OBJ_SURF_MAX</TD><TD><PRE>：オブジェクトの最大面数</TD></TR>
+	<TR><TD><PRE>OBJ_VERT_MAX</TD><TD><PRE>：オブジェクトの最大頂点数</TD></TR></TABLE>
+<DT><B>　機　能</B>
+	<DD>VDP1 3D表示で使用するワークエリアをAP内のデータエリアに定義します。<BR>
+#define SPR_3USE_DOUBLE_BUF は省略可能で、指定するとオブジェクトの頂点座標や面の輝度テーブルを２個使用してDSPによる座標変換等の処理とSHの処理を並列化し、実行スピードを上げます。<BR>
+#define SPR_3NEED_WORLD_VERT は省略可能で、指定すると座標変換結果の通知時に、ワールド座標系での頂点座標テーブルを通知します。<BR>
+#define SPR_3USE_DOUBLE_BUFと#definePR_3NEED_WORD_VERTHは#define &quot;sega_spr.h&quot;の定義前に定義する必要があります。
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_2"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>VDP1 3D表示の初期化</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3Initial</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>2</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_3Initial(Spr3WorkArea *workArea)
+<DT><B>　入　力</B><DD>workArea ： ワークエリア定義テーブル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>VDP1 3D表示を初期化します。
+<DT><UL TYPE="DISK"> 
+<LI>視点はワールド座標系の原点で視点アングルは (0,0,0)(Zの正方向)、回転操作はX→Y→Zの順番に設定されます。
+<LI>光源アングルは (0,0,0)(Zの正方向)です。
+<LI>クリッピングレベルは2で、視点座標系Z座標の表示範囲最大／最小値は-0.005から負の最小値までです。</UL>
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_3"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>クリッピングモードのセット</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3SetClipLevel</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>3</H4></TD>
+</TR></TABLE><P>
+<DL>
+<DT><B>　書　式</B><DD>void  SPR_3SetClipLevel(Uint16 clipLevel, Fixed32 clipZmin,Fixed32 clipZmax)
+<DT><B>　入　力</B>
+<DD>clipLevel：クリッピングのレベル番号
+<TABLE BORDER=1>
+<TR><TH>番号</TH><TH WIDTH=330>意　　味</TH></TR>
+<TR><TD ALIGN=CENTER>０</TD><TD>クリッピングなし。</TD></TR>
+<TR><TD ALIGN=CENTER>１</TD><TD>視点座標系のZ範囲でクリップポリゴンの代表点のZ値が指定Z値範囲外に出たものは描画されない。</TD></TR>
+<TR><TD ALIGN=CENTER>２以上</TD><TD>フレームバッファ全域をスクリーンとする視野ピラミッドでクリップを行う。<BR>1点でも視野ピラミッド外に出たポリゴンは描画されない。</TD></TR>
+</TABLE>
+<DD>clipZmin：視点座標系Z座標クリップ最小値
+<DD>clipZmax：視点座標系Z座標クリップ最大値
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>ポリゴンのクリッピングレベルをセットします。上位レベルは下位レベルの機能を含みます。レベル1の場合、ポリゴンの最大Z座標値で視点座標系内でクリッピングを行いますが、その範囲をSPR3_DrawModel()の実行前にclipZminとclipZmaxで設定する必要があります。
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_4"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>単位ピクセル数のセット</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3SetPixelCount</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>4</H4></TD>
+</TR></TABLE><P>
+<DL>
+<DT><B>　書　式</B><DD>void　 SPR_3SetPixelCount(Uint16 pixelCountX, Uint16 pixelCountY)
+<DT><B>　入　力</B>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE>pixelCountX　</TD><TD><PRE>：クリーンXの単位ピクセル数</TD></TR>
+<TR><TD><PRE>pixelCountY　</TD><TD><PRE>：スクリーンYの単位ピクセル数</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>スクリーンへの透視変換時のXY各々1.0に対するスクリーンのピクセル数を設定します。初期設定時には各々256に設定されています。
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_5"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>光源のセット</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3SetLight</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>5</H4></TD>
+</TR></TABLE><P>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_3SetLight(Uint16 moveKind, MthXyz *lightAngle)
+<DT><B>　入　力</B>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE>moveKind  </TD><TD><PRE>：移動量の種別</TD></TR>
+<TR><TD><PRE>b0        </TD><TD><PRE>：0 = 相対移動</TD></TR>
+<TR><TD><PRE></TD>          <TD><PRE>　1 = 絶対移動</TD></TR>
+<TR><TD><PRE>b1        </TD><TD><PRE>：0 = 回転移動量が角度</TD></TR>
+<TR><TD><PRE></TD>          <TD><PRE>　1 = 回転移動量が単位ベクトル</TD></TR>
+<TR><TD><PRE>lightAngle</TD><TD><PRE>：平行光源の回転移動量が角度の場合、移動量の指定範囲は次式のとおりです。</TD></TR>
+<TR><TD><PRE></TD>          <TD><PRE>　ベクトル指定の場合は角度に変換されます。</TD></TR>
+<TR><TD><PRE></TD>          <TD><PRE>　<B>FIXED(-180.0) ≦ 回転移動量 ≦ FIXED(180.0)</B></TD></TR>
+<TR><TD><PRE></TD>          <TD><PRE>　回転操作はX→Y→Zの順番に行われます。</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>光源アングルをセットします。</PRE><P>
+
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_6"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>視点のセット</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3SetView</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>6</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>voidSPR_3SetView(Uint16 moveKind, MthXyz *viewPoint,MthXyz *viewAngle, Uint16 angleSeq, MthXyz *viewCoordPoint)
+<DT><B>　入　力</B>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE>moveKind  </TD><TD><PRE>：移動量の種別</TD></TR>
+<TR><TD><PRE>b0        </TD><TD><PRE>：0 = 相対移動</TD></TR>
+<TR><TD><PRE>          </TD><TD><PRE>　1 = 絶対移動</TD></TR>
+<TR><TD><PRE>b1        </TD><TD><PRE>：0 = 回転移動量が角度</TD></TR>
+<TR><TD><PRE>          </TD><TD><PRE>　1 = 回転移動量がベクトル</TD></TR>
+<TR><TD><PRE>viewPoin  </TD><TD><PRE>：視点の位置または平行移動量。</TD></TR>
+<TR><TD><PRE>          </TD><TD><PRE>　ワールド座標系内の視点の回転位置で０の場合、無視されます。</TD></TR>
+<TR><TD><PRE>viewAngle </TD><TD><PRE>：視点の回転移動量が角度の場合、移動量の指定範囲は次式の通り。</TD></TR>
+<TR><TD><PRE>          </TD><TD><PRE>　ベクトル指定の場合は角度に変換される。</TD></TR>
+<TR><TD><PRE>          </TD><TD><PRE>　<B>FIXED(-180.0) ≦ 回転移動量 ≦ FIXED(180.0)</B></TD></TR>
+<TR><TD><PRE>          </TD><TD><PRE>　０の場合、無視されます。</TD></TR>
+<TR><TD><PRE>angleSeq  </TD><TD><PRE>：視点の回転操作</TD></TR>
+<TR><TD><PRE>viewCoordPoint</TD><TD><PRE>：視点座標系内での視点位置または平行移動量。</TD></TR>
+<TR><TD><PRE>          </TD><TD><PRE>　０の場合、無視されます。初期値は、(0,0,0)になっています。</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>視点位置をワールド座標系内で移動し、その位置を中心に回転します。<BR>
+viewCoordPointの指定があれば視点座標系内で視点位置を原点から指定位置に移動します。
+
+<P><DD><PRE>
+angleSeq = ROT_SEQ_ZYX : 視点の回転操作をＺ→Ｙ→Ｘの順番で行う
+         = ROT_SEQ_ZXY : 　　　”　　　　Ｚ→Ｘ→Ｙ　　”
+         = ROT_SEQ_YZX : 　　　”　　　　Ｙ→Ｚ→Ｘ　　”
+         = ROT_SEQ_YXZ : 　　　”　　　　Ｙ→Ｘ→Ｚ　　”
+         = ROT_SEQ_XYZ : 　　　”　　　　Ｘ→Ｙ→Ｚ　　”
+         = ROT_SEQ_XZY : 　　　”　　　　Ｘ→Ｚ→Ｙ　　”
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_7"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>クラスタの移動</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3MoveCluster</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>7</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_3MoveCluster(SprCluster *cluster, Uint16 moveKind,MthXyz *angle, MthXyz *point)
+<DT><B>　入　力</B>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE>cluster  </TD><TD><PRE>：移動すべきクラスタテーブルのポインタ</TD></TR>
+<TR><TD><PRE>moveKind </TD><TD><PRE>：移動量の種別</TD></TR>
+<TR><TD><PRE>b0       </TD><TD><PRE>：0 = 相対移動</TD></TR>
+<TR><TD><PRE></TD>         <TD><PRE>　1 = 絶対移動</TD></TR>
+<TR><TD><PRE>b1       </TD><TD><PRE>：0 = 回転移動量が角度</TD></TR>
+<TR><TD><PRE></TD>         <TD><PRE>　1 = 回転移動量が単位ベクトル</TD></TR>
+<TR><TD><PRE>angle    </TD><TD><PRE>：回転移動量が角度の場合、移動量の指定範囲は次式のとおりです。</TD></TR>
+<TR><TD><PRE></TD>         <TD><PRE>　ベクトル指定の場合は角度に変換されます。</TD></TR>
+<TR><TD><PRE></TD>         <TD><PRE>　<B>FIXED(-180.0) ≦ 回転移動量 ≦ FIXED(180.0)</B></TD></TR>
+<TR><TD><PRE>point    </TD><TD><PRE>：平行移動量</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>クラスタの移動を回転、平行移動の順番で行います。<BR>
+angle, pointがそれぞれ0の場合、その値は無視されます。
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_8"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>モデルの登録</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3DrawModel</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>8</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_3DrawModel(SprCluster *rootCluster)
+<DT><B>　入　力</B><DD>rootCluster：表示すべきモデルのルートクラスタテーブルのポインタ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>モデルを登録します。
+
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_9"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>モデルの描画</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3Flush</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>9</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_3Flush(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>モデルを描画します。<BR>
+SPR_3DrawMode()により登録されたポリゴン群の視点座標系におけるZソートを完了します。
+
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_10"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>テクスチャのセット</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3SetTexture</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>10</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_3SetTexture(SprTexture *texture)
+<DT><B>　入　力</B><DD>texture：テクスチャテーブルのポインタ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>テクスチャをセットします。
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_11"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>テクスチャエリアの解放</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3ClrTexture</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>11</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_3ClrTexture(SprTexture *texture)
+<DT><B>　入　力</B><DD>texture：テクスチャテーブルのポインタ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>テクスチャエリアを解放します。
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_12"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>全クラスタに対する<BR>ファンクションコール</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3CallAllCluster</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>12</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void SPR_3CallAllCluste(SprCluster *cluster, void (*userFunc)(SprCluster*))
+<DT><B>　入　力</B>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE>cluster </TD><TD><PRE>：ルートクラスタテーブルのポインタ</TD></TR>
+<TR><TD><PRE>userFunc</TD><TD><PRE>：ユーザファンクション</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>ルートクラスタにつながる全クラスタ毎にそのクラステーブルをパラメータとして指定ファンクションを呼び出します。
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_13"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>テクスチャカラーデータの変更</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3ChangeTexColor</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>13</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>voidSPR_3ChangeTexColor(Uint16 charNo, Uint16 color,SprLookupTbl *lookupTbl)
+<DT><B>　入　力</B>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE>charNo   </TR><TD><PRE>：キャラクタ番号</TD></TR>
+<TR><TD><PRE>color    </TR><TD><PRE>：カラーデータルックアップテーブル番号またはカラーバンクコード</TD></TR>
+<TR><TD><PRE>lookupTbl</TR><TD><PRE>：ルックアップテーブルのポインタ</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>キャラクタ番号で指定された登録済みテクスチャのカラーデータとカラールックアップテーブルの変更を行います。
+lookupTblが0の場合、colorの変更のみ行い、カラールックアップテーブルの登録は行いません。
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_14"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>Zソート範囲の最小最大値をセット</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3SetZSortMinMax</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>14</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>voidSPR_3SetZSortMinMaxl(Uint16 zSortMode,Fixed32 zSortMin,Fixed32 zSortMax)
+<DT><B>　入　力</B>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE>zSortMode</TD><TD><PRE>：ＺソートＺ座標値の採用モード</TD></TR>
+<TR><TD><PRE></TD>         <TD><PRE>　ZSORT_FLOAT_MODE=浮動モード</TD></TR>
+<TR><TD><PRE></TD>         <TD><PRE>　ZSORT_FIXED_MODE=固定モード</TD></TR>
+<TR><TD><PRE>zSortMin </TD><TD><PRE>：視点座標系ＺソートＺ座標最小値</TD></TR>
+<TR><TD><PRE>zSortMax </TD><TD><PRE>：視点座標系ＺソートＺ座標最大値</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>
+　zSortMinとzSortMaxは描画順番のブロック分けをするＺの範囲を指定するパラメータで、SPR3_DrawModel()ルーチンの実行前に設定します。<BR>
+　Ｚ座標値の採用モードとして浮動モードを指定すると指定されたzSortMinとzSortMaxを初期値とし、以後のZの範囲には前回描画時の視点座標系Z座標最大値と最小値を採用します。<BR>
+　固定モードの場合、指定されたzSortMinとzSortMaxを固定値として採用します。<BR>
+　SPR_3Initial()ルーチンの初期設定時にはzSortMinとして-10.0がzSortMaxとして0.0が設定されＺ座標値の採用モードは浮動モードとなっています。<BR>
+　視点座標系では、視点位置座標が0.0でZのマイナス方向を向いています。<BR>
+　Zソートで使用するブロックはVDP1拡張処理の描画プライオリティブロックを使用するので、Zソートを細かく行いたい場合、2Dワークエリア定義で描画プライオリティブロック数を大きく取る必要があります。<BR>
+　また、Zソートを行う場合はSPR_2OpenCommand()ルーチンでdrawPrtyFlag=SPR_2DRAW_PRTY_ONにしなければなりません。</P>
+
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_15"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>現3D環境データの取得</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3GetStatus</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>15</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void  SPR_3GetStatus(Spr3dStatus *spr3dStatus)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>spr3dStatus：3D環境データテーブルのポインタ
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>現3D環境データを取得します。</PRE><P>
+
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_16"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>オブジェクトの面法線ベクトル計算</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3SetSurfNormVect</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>16</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void  SPR_3SetSurfNormVect(SprObject3D *obj)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>obj：3Dオブジェクト
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定3Dオブジェクトの面の頂点テーブルから法線ベクトルを計算し面法線ベクトルテーブルに設定します。法線ベクトルは面の頂点順を右回りとしてそれに垂直になります。<BR>
+3Dオブジェクトの surfNormK パラメータを設定する必要があります。</P>
+
+</DL>
+<!----------------------------------------------------------------------------------->
+<A NAME="no63_17"><HR></A>
+<TABLE BORDER><TR>
+<TD><a href="p06_11_j.htm#no6_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=260><PRE>Function<BR><H4>VDP1の高速描画パラメータセット</H4></TD>
+<TD WIDTH=210><PRE>Function Name<BR><H3>SPR_3SetDrawSpeed</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>17</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>voidSPR_3SetDrawSpeed(Sint32 hssFlag, Sint32 eosFlag, Sint32 pclpFlag)
+<DT><B>　入　力</B>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE>hssFlag</TD> <TD><PRE>：ハイスピードシュリンクフラグ(テクスチャポリゴンの描画モード指定)</TD></TR>
+<TR><TD><PRE></TD>        <TD><PRE>　0 = 精度優先描画(デフォルト)</TD></TR>
+<TR><TD><PRE></TD>        <TD><PRE>　1 = 速度優先描画</TD></TR>
+<TR><TD><PRE>eosFlag</TD> <TD><PRE>：速度優先描画を指定した時の元絵テクスチャのサンプリング座標</TD></TR>
+<TR><TD><PRE></TD>        <TD><PRE>　0 = 偶数座標をサンプリング(デフォルト)</TD></TR>
+<TR><TD><PRE></TD>        <TD><PRE>　1 = 奇数座標をサンプリング</TD></TR>
+<TR><TD><PRE>pclpFlag</TD><TD><PRE>：プリクリッピング有効／無効フラグ</TD></TR>
+<TR><TD><PRE></TD>        <TD><PRE>　0 = 有効(デフォルト)</TD></TR>
+<TR><TD><PRE></TD>        <TD><PRE>　1 = 無効</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>VDP１スプライトコマンドの描画モードに埋め込む高速描画モードを設定します。ハイスピードシュリンク、プリクリッピングについてはVDP１ハードウェアマニュアルを参照してください。</PRE><P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p06_11_j.htm">戻る</A>｜
+　　■</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no6">VDP1ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

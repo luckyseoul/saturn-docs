@@ -1,0 +1,119 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/17&gt;Programmer's Guide/File System Library/8.Function Specification-4</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+ <B>▲ <A HREF="p08_13.htm">Back</a> ｜ <A HREF="p08_15.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><H2 ALIGN=CENTER> 8.Function specification-4</H2><HR NOSHADE>
+<A NAME="no8_40"></A><H3> 8.4 Read with immediate return</H3><!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_1"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Start loading data</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_NwFread</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_NwFread(GfsHn gfs, Sint32 nsct, void *buf, Sint32 bsize)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> nsct</TD><TD><PRE> : Number of sectors to read</TD></TR>
+<TR><TD><PRE> bsize</TD><TD><PRE> : Size of read area (unit: number of bytes)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> buf: Read area<DT> <B>function value</b><DD> Error code.<DT> <B>function</b><DD> Issue a request to read data to the server function. When the requested access operation is completed, the access pointer advances by nsct sectors.<!-- *** Update by CRI ：5.10 -->
+<DT> <B>remarks</b><DD> The same precautions as those for GFS_Fread are required regarding buf address boundaries.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_2"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Start reading ahead into CD buffer</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_NwCdRead</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_NwCdRead(GfsHn gfs, Sint32 nsct)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> nsct</TD><TD><PRE> : Number of sectors to read</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Error code.<DT> <B>function</b><DD> Issues a read-ahead request to the server function to read data into the CD buffer.<BR>
+ The access pointer does not change upon completion of the requested read process. If the following conditions are not met, the access operation for the specified file handle will not be completed.<DD><UL TYPE="DISK">
+<LI> The data in the nsct sector is transferred to the host area by the GFS_Fread function or GFS_NwFread function.<LI> The access operation is stopped by the GFS_NwStop function.</UL>
+<DT> <B>remarks</b><DD> To check that the transfer to the host area using the GFS_NwFread function after starting read ahead is complete, perform the following process.<DD><UL TYPE="DISK">
+<LI> Get the number of transferred bytes with GFS_NwGetStat.<LI> Check whether the number of bytes transferred is equal to the desired number of bytes.<BR>
+ (If it is equal to the desired number of bytes, the transfer is complete.)</UL>
+<!-- *** Update by CRI ：5.11 -->
+<DD> If you read ahead with the GFS_NwCdRead function, you must be careful because you cannot check whether the GFS_NwFread function has completed with the GFS_NwIsComplete function.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_3"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Checking for completion of access operation</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_NwIsComplete</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Bool GFS_NwIsComplete(GfsHn gfs)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Status of access operation.<DT> <B>function</b><DD> Checks whether the access operation of the server function is completed. Function values have the following meanings:<DD><TABLE>
+<TR><TD><PRE> TRUE</TD><TD><PRE> :Access completed</TD></TR>
+<TR><TD><PRE> FALSE</TD><TD><PRE> :in action </TD></TR>
+</TABLE>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_4"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Canceling access operation</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_NwStop</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_NwStop(GfsHn gfs)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Access pointer at the time of cancellation. Negative error code in case of error.<DT> <B>function</b><DD> Aborts the access operation of the server function. GFS_NwExecServer continues accessing the next file.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_5"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Get current access status</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_NwGetStat</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> void GFS_NwGetStat(GfsHn gfs, Sint32 *stat, Sint32 *ndata)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD><TABLE>
+<TR><TD><PRE> stat</TD><TD><PRE> :Current access status</TD></TR>
+<TR><TD><PRE> data</TD><TD><PRE> :The number of data</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Used to obtain access status of server functions.<BR>
+ The meaning of the data for each access state is shown below.<P><DT><TABLE BORDER>
+<TR><TH width=140><PRE> access status</TH><TH width=170><PRE> process</TH><TH width=180><PRE> Meaning of number of data</TH></TR>
+<TR><TD><PRE> GFS_NWSTAT_NOACT</TD><TD><PRE> none</TD><TD><PRE> meaningless</TD></TR>
+<TR><TD><PRE> GFS_NWSTAT_FREAD</TD><TD><PRE> Loading from CD to host area</TD><TD><PRE> Number of bytes read into host area</TD></TR>
+<TR><TD><PRE> GFS_NWSTAT_CDREAD</TD><TD><PRE> Read ahead to CD buffer</TD><TD><PRE> Number of sectors read into CD buffer </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_6"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Executing access operations on a file-by-file basis</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_NwExecOne</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_NwExecOne(GfsHn gfs)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Execution status (GFS_SVR_~). Negative error code in case of error.<DT> <B>function</b><DD> This is an access server function for a single file. Performs the following processing according to the most recently called access operation for the file handle.<DD><UL TYPE="DISK">
+<LI> <B>GFS_NwFread</b><BR>
+ Performs loading into the CD buffer and transferring to the host.<LI> <B>GFS_NwCdRead</b><BR>
+ Performs the loading process to the CD buffer. </UL>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_7"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Performing multiple file access operations</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_NwExecServer</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4.7</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32GFS_NwExecServer(GfsHn *now_gfs)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> now_gfs: File handle to be executed<DT> <B>function value</b><DD> Access server status (GFS_SVR_~). Negative error code in case of error.<DT> <B>function</b><DD> This is an access server function for multiple files. Actual access (GFS_NwExecOne) is performed in the order in which requests are issued.<BR>
+ After the access operation for one file is completed, it moves on to the next process.<BR>
+ When processing of multiple files is completed, it becomes GFS_SVR_COMPLETED.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_13.htm">Back</a> ｜ <A HREF="p08_15.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no7">File system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

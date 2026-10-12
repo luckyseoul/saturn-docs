@@ -1,0 +1,151 @@
+<HTML>
+<HEAD>
+<TITLE> System Rules </TITLE>
+</HEAD><BODY BGCOLOR="#ffffff">
+<P> <A HREF="betu1-1.htm"> Return to previous page </A> | <A HREF="index.htm"> Return to menu </A> | <A HREF = "betu1- 3.htm "> Go to next page </A> </BR> </P>
+
+
+<HR>
+
+<H3> 2> System Rules </H3>
+
+<P>
+Figure 1-1 shows the basic system flow. <B> <I> The processing, functions, and messages shown in this flow must be included. </I></B>
+</P>
+
+<H4>-Figure Separate volume 1-1. Basic backup system flow-</H4>
+<IMG SRC="bessatu2.gif">
+
+<P>
+ * The flow may vary depending on the application.
+</P>
+
+
+<H4> <A NAME="NO1"> Initialization check </A> </H4>
+<P>
+<I> Before starting the main game, be sure to check the initialization of the main unit RAM and cartridge RAM. </I><BR>
+<B> <I> Do not start the game if either one is not initialized. </I> </B> In this case, inform the user and do the initialization work directly in the application, or perform the initialization process on the saved data management screen in the BOOT ROM of the SEGA Saturn main unit. Encourage users to do it.
+</P>
+
+<P>
+* Be sure to use the BACKUPRAM BIOS when accessing the backup RAM. <BR>
+* Main body RAM, cartridge RAM, and extended memory must not be formatted other than SEGASATURN_BACKUP_FORMAT.
+</P>
+
+<H4> <A NAME="NO2"> Existence / capacity check </A> </H4>
+<P>
+<I> Before starting the main game, check the existence of data that can be used by the application and check the remaining capacity of each backup RAM. </B><BR>
+If your data does not exist or the remaining capacity is insufficient, a warning message is displayed according to the situation. (Specific message contents will be described later)
+</P>
+
+<H4> <A NAME="NO3"> Load </A> </H4>
+<P>
+<I> Always check for data corruption when loading data. </I><BR>
+If the data is unusable, the user must be notified and the data must be displayed in some form so that it can be seen that it is unusable.
+</P>
+
+<H4> <A NAME="NO4"> Save </A> </H4>
+</P>
+<I> Check the remaining capacity before saving data, and check whether it was able to be written normally after saving. </I><BR>
+If there is not enough space, or if writing is not successful, inform the user.
+</P>
+
+<P> <B> === Recording rules === </B> </P>
+<P>
+<B> <About format> </B>
+</P>
+
+<UL>
+<LI> <B> <I> Don't divide the record unnecessarily. </I> </B> (1 record per save)
+
+<LI> <B> <I> Don't use a format that makes it impossible to play completely if one of the recordings is missing </I> </B> Etc.)
+
+<LI> The maximum number of records per type is 99 (_01 to _99).
+</UL>
+*
+<P>
+<B> <About Name> </B>
+</P>
+
+<UL>
+<LI> In order not to use the same record name in different games, <I> "Record name" when saving is managed by SEGA (Second Design Department). </I>
+
+<LI> Only numbers, uppercase letters, and underscores can be used for record names. However, do not use numbers as the first character. (See Table Appendix 1-1)
+
+<LI> <I> Record names must use 11 characters. </I> If it is 11 characters or less, fill it with underscore (_) to 11 characters. Spaces are not allowed.
+
+<LI> When saving multiple records in one game, unify the first 8 characters, and use 3 under-scores (_) and numbers for changeable 3 characters.
+
+<LI> Up to 99 records can be recorded, and 3 characters whose record names can be changed are from _01 to the beginning_99.
+
+Do not use generic names that are difficult to distinguish, such as <LI> GM_DATA_000.
+<PRE>
+Example) In the case of “Panzer Lagoon” (3 places need to be saved)
+1st place: PANZER_D_01
+2nd place: PANZER_D_02
+3rd place: PANZER_D_03
+└ ────┬──┘└┬┘
+, 8 characters common, only 3 characters can be changed
+</PRE>
+</UL>
+
+<P>
+<B> <Use amount> </B>
+</P>
+
+<UL>
+<LI> <I> Use the value calculated according to the following formula to indicate the “usage” of the record (data). </I>
+
+<P> Used amount = ([Number of bytes used] +32) ÷ 64 </P>
+
+<LI> <I> In principle, we will not use the unit of consumption </I>, but use the word “block” when it is absolutely necessary.
+
+<LI> Record usage should not exceed 256K bytes. (Restrictions due to program specifications for copy function of BOOT ROM)
+
+<LI> If the usage of recording exceeds 256K bytes, make sure that the application can copy.
+</UL>
+
+<H4> <A NAME="NO5"> Comment support </A> </H4>
+<P>
+<B> <I> Make sure to include some comments. </I> </B> <I> Be sure to use ASCII characters (up to 10 half-width English / numbers / kana, see Table 1-1). </I><BR>
+Since comments are used to know the details of saved data in detail, use them effectively in each application. <I> If you can't find a usage, put the game name (information that can be identified) in katakana. </I>
+</P>
+<PRE>
+Example) Effective use of comments
+PANZER_D_01: 5 Men-Bouse (Continue information)
+PHANT_ST_01: Alfredo Nemachi (saved town name)
+SEGARACE_01: Time Attack M (Mode name)
+DERBY_ST_01: Mochika 69 (farm name)
+</PRE>
+<P>
+* The user can freely rewrite the comment content.
+</P>
+
+
+<H4> <A NAME="NO6"> Time stamp support </A> </H4>
+<P>
+<B> <I> Time stamp must be included </I> </B>, and <I> User rewriting is not allowed </I>.
+The display order of the records is in principle the youngest of the time stamps (the newest date of the saved date).
+</P>
+
+<H4> <A NAME="NO7"> Select RAM / cartridge RAM </A> </H4>
+<P>
+<B> <I> All applications that support backup must be able to save their records in either the main RAM or cartridge RAM. </I> </B> Even if the amount of recording used is too large to fit in the main unit RAM, the basic method is to support the main unit RAM with a simple storage method.
+</P>
+<P>
+* Excludes extremely insignificant recorded contents (only high scores of shooting games, etc.) <BR>
+* There is no particular rule on where to make this selection in the sequence.
+</P>
+<P>
+* All characters can be used for “comments”. Only the part of “Record” can be used.
+</P>
+
+<IMG SRC="bessatu6.gif">
+<H4> -Table Separate volume 1-1. ASCII name table of record names and comments that can be used-</H4>
+
+<HR>
+<P> <A HREF="betu1-1.htm"> Return to previous page </A> | <A HREF="index.htm"> Return to menu </A> | <A HREF = "betu1- 3.htm "> Go to next page </A> </BR> </P>
+
+
+</BODY>
+</HTML>

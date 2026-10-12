@@ -1,0 +1,100 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;28/86&gt;VDP2ユーザーズマニュアル/4.8マップ-1</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no4">VDP2ユーザーズマニュアル</A>★
+<a href="p04_10_j.htm">第４章　スクロール画面</A>
+<HR>
+<B>▲
+<a href="p04_70_j.htm">戻る</A>｜
+<a href="p04_81_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第４章　スクロール画面</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_80"></A>
+	<P><DT><H2>■4.8　マップ</H2>
+	<DD>　マップは、2×2または4×4プレーンで構成された正方形のパターンです。ノーマルスクロール画面のマップは2×2プレーン、回転スクロール画面のマップは4×4プレーンで構成されます。
+	パターンネームテーブル先頭アドレスを、それぞれのプレーンのレジスタに指定することで、プレーンの並べ方を指定します。</P>
+
+<A NAME="no4_81"></A>
+	<P><DT><H3>　●マップ指定レジスタ</H3>
+	<DD>　マップは、4プレーン(ノーマルスクロール画面)または16プレーン(回転スクロール画面)で構成されており、各画面は、それぞれのプレーン用のパターンネームテーブルの先頭アドレスを指定するための6ビットのマップレジスタをプレーン数ずつ持っています。また、マップレジスタの上位に付ける3ビットのマップオフセットレジスタを1本ずつ持っています。計9ビットのマップ指定レジスタは、パターンネームデータサイズとキャラクタサイズによって、使われるビットとそのレジスタが示すアドレス値が変わります。マップレジスタとマップオフセットレジスタの関係を図4.14に示します。</P>
+
+<A NAME="z4_14"></A>
+	<P><DD><B>図4.14　マップ指定レジスタ</B>
+<PRE>
+┌───────────┐　　┌───────────────────────┐
+│　　マップオフセット　│　　│　　　　　　　マップレジスタＡ　　　　　　　　│
+│　　　　レジスタ　　　│　　├───┬───┬───┬───┬───┬───┤
+├───┬───┬───┤　　│　５　│　４　│　３　│　２　│　１　│　０　│
+│　８　│　７　│　６　│　　└───┴───┴───┴───┴───┴───┘
+└───┴───┴───┘　　┌───────────────────────┐
+　　　　　　│　　　　　　　　│　　　　　　　マップレジスタＢ　　　　　　　　│
+　　　　　　│　　　　　　　　├───┬───┬───┬───┬───┬───┤
+　　　　　　│　　　　　　　　│　５　│　４　│　３　│　２　│　１　│　０　│
+　　　　　　│　　　　　　　　└───┴───┴───┴───┴───┴───┘
+　　　　　　└──┐　　　　　　　　　　　　　　　　　：　　　　　　　　　　　　
+　　　　　　　　　│　　　　　　　　　　　　　　　　　：　　　　　　　　　　　　
+　　　　　　　　　│　　　　　　　　　　　　　　　　　│　　　　　　　　　　　　
+　　　　　　　　　│　　　　　　　　　　　　　　　　　│　　　　　　　　　　　　
+　　　　　　　　　↓　　　　　　　　　　　　　　　　　↓　　　　　　　　　　　　
+　　　┌───────────┬───────────────────────┐
+　　　│　　マップオフセット　│　　　　　　　マップレジスタ　　　　　　　　　│
+　　　│　　　　レジスタ　　　│　　　　　　　　　　　　　　　　　　　　　　　│
+　　　├───┬───┬───┼───┬───┬───┬───┬───┬───┤
+　　　│　８　│　７　│　６　│　５　│　４　│　３　│　２　│　１　│　０　│
+　　　└───┴───┴───┴───┴───┴───┴───┴───┴───┘
+</PRE>
+	<P><DD>パターンネームデータサイズとキャラクタサイズによるマップ指定レジスタの使われるビットとレジスタのアドレス値を表4.8に示します。</P>
+
+<A NAME="t4_8"></A>
+	<P>	<DD><B>表4.8　設定によるマップ指定レジスタのアドレス値</B>
+		<DD><TABLE BORDER>
+	<TR><TH>プレーンサイズ</TH><TH>パターンネーム<BR>データサイズ</TH><TH>キャラクタサイズ</TH><TH>使用されるビットおよび実際の<BR>アドレス値</TH></TR>
+	<TR><TD ROWSPAN=4>横1ページ×縦1ページ</TD><TD ROWSPAN=2>1ワード</TD><TD>横1セル×縦1セル</TD><TD>（ビット6〜0の値）×2000H</TD></TR>
+	<TR><TD>横2セル×縦2セル</TD><TD>（ビット8〜0の値）×800H</TD></TR>
+	<TR><TD ROWSPAN=2>2ワード</TD><TD>横1セル×縦1セル</TD><TD>（ビット5〜0の値）×4000H</TD></TR>
+	<TR><TD>横2セル×縦2セル</TD><TD>（ビット7〜0の値）×1000H</TD></TR>
+	<TR><TD ROWSPAN=4>横2ページ×縦1ページ</TD><TD ROWSPAN=2>1ワード</TD><TD>横1セル×縦1セル</TD><TD>（ビット6〜1の値）×4000H</TD></TR>
+	<TR><TD>横2セル×縦2セル</TD><TD>（ビット8〜1の値）×1000H</TD></TR>
+	<TR><TD ROWSPAN=2>2ワード</TD><TD>横1セル×縦1セル</TD><TD>（ビット5〜1の値）×8000H</TD></TR>
+	<TR><TD>横2セル×縦2セル</TD><TD>（ビット7〜1の値）×2000H</TD></TR>
+	<TR><TD ROWSPAN=4>横2ページ×縦2ページ</TD><TD ROWSPAN=2>1ワード</TD><TD>横1セル×縦1セル</TD><TD>（ビット6〜2の値）×8000H</TD></TR>
+	<TR><TD>横2セル×縦2セル</TD><TD>（ビット8〜2の値）×2000H</TD></TR>
+	<TR><TD ROWSPAN=2>2ワード</TD><TD>横1セル×縦1セル</TD><TD>（ビット5〜2の値）×10000H</TD></TR>
+	<TR><TD>横2セル×縦2セル</TD><TD>（ビット7〜2の値）×4000H</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>VRAM容量を4Mビットと設定した場合には、使用されるビット内の最上位ビットは使用されません。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p04_70_j.htm">戻る</A>｜
+<a href="p04_81_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no4">VDP2ユーザーズマニュアル</A>★
+<a href="p04_10_j.htm">第４章　スクロール画面</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

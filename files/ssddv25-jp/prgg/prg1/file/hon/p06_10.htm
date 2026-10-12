@@ -1,0 +1,146 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/17&gt;プログラマーズガイド/ファイルシステムライブラリ/6.その他の機能</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no6">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p05_10.htm">戻る</A>｜
+<A HREF="p07_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>6.その他の機能</H2>
+<HR NOSHADE>
+<DL>
+
+<A NAME="no6_10"></A>
+	<P><DT><H3>6.1　開発サポート機能</H3>
+		<DD>　ファイルシステムは、デバッグ時のサポート機能としてメモリファイルとDOSファイルをアクセスする機能を提供します。この機能により、まだCD-ROM上に作成していないファイルや、CD-ROM作成後に変更のあったファイルを、CD-ROM上のファイルと同様にアクセスできます。ただし、CDBFSとともにこの機能を利用することはできません。<BR>　デバッグファイルをCD-ROM上のファイルと同様にアクセスできるようにする仕組みは、ディレクトリ情報読み込み処理にあります。<BR>　CD-ROMからディレクトリ情報を読み込むときに、デバッグファイルからもディレクトリ情報を読み込みます。そのデバッグファイルの情報がCD-ROMファイルの情報に対して、置き換え、または追加という形で処理されます。<BR>　CD-ROMの、あるディレクトリからディレクトリ情報を読み込んだ後、以下の処理が行われます。</P>
+
+	<P><DT><B>　(1)置き換え</B>
+		<DD>　CD-ROMファイルと同名のデバッグファイルは、対応するCD-ROMファイルの代わりにディレクトリ情報がディレクトリ情報格納領域に設定されます。</P>
+
+	<P><DT><B>　(2)追加</B>
+		<DD>　置き換えの行われなかったデバッグファイルはディレクトリ情報格納領域に追加されます。<BR>　デバッグファイルの置換えではメモリファイルの方がDOSファイルより高い優先順位を持ちます。<BR>　これらの処理の行われる例を次に示します。図6.1がそのファイル構成です。</P>
+
+<A NAME="z6_1"></A>
+	<P ALIGN=CENTER><B>図6.1　ファイル構成例</B><BR><IMG SRC="../grp/i019_01.gif"></P>
+
+	<P>	<DD>　そのファイル構成で、DIR1のディレクトリ情報を取得した結果が表6.1、DIR2のディレクトリ情報を取得した結果が表6.2です。</P>
+
+<A NAME="t6_1"></A>
+	<P><DD><B>表6.1　DIR1のディレクトリ情報</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH align="center" width=200><PRE>取得したディレクトリ情報</TH><TH align="center" width=100><PRE>CD-ROM</TH><TH align="center" width=100><PRE>DOS</TH><TH align="center" width=100><PRE>SIMM</TH></TR>
+	<TR><TD align="left"><PRE>.</TD><TD align="left"><PRE>.</TD><TD align="left"><PRE>  </TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>..</TD><TD align="left"><PRE>..</TD><TD align="left"><PRE>  </TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>FILE1</TD><TD align="left"><PRE>FILE1×</TD><TD align="left"><PRE>FILE1×</TD><TD align="left"><PRE>FILE1</TD></TR>
+	<TR><TD align="left"><PRE>FILE2</TD><TD align="left"><PRE>FILE2</TD><TD><PRE>  </TD><TD align="left"><PRE>  </TD></TR>
+	<TR><TD><PRE>FILE3</TD><TD align="left"><PRE>FILE3</TD><TD><PRE>  </TD><TD align="left"><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>FILE4</TD><TD><PRE>  </TD><td><PRE>FILE4</TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>DOS_FILE</TD><TD><PRE>  </TD><TD align="left"><PRE>DOS_FILE</TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>SIMMFILE</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD align="left"><PRE>SIMMFILE</TD></TR></TABLE>
+	<DD>×印は置換えられたことを表します。</>
+
+<A NAME="t6_2"></A>
+	<P><DD><B>表6.2　DIR2のディレクトリ情報</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH align="center" width=200><PRE>取得したディレクトリ情報</TH><TH align="center" width=100><PRE>CD-ROM</TH><TH align="center" width=100><PRE>DOS</TH><TH align="center" width=100><PRE>SIMM</TH></TR>
+	<TR><TD align="left"><PRE>.</TD><TD align="left"><PRE>.</TD><TD><PRE>  </TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>..</TD><TD align="left"><PRE>..</TD><TD><PRE>  </TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>FILE4</TD><TD><PRE align="left">FILE4×</TD><TD align="left"><PRE>FILE4</TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>FILE5</TD><TD><PRE>FILE5</TD><TD><PRE>  </TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>FILE6</TD><TD><PRE>FILE6</TD><TD><PRE>  </TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>FILE1</TD><TD><PRE>  </TD><TD align="left"><PRE>FILE1×</TD><TD><PRE>FILE1</TD></TR>
+	<TR><TD align="left"><PRE>DOS_FILE</TD><TD><PRE>  </TD><TD align="left"><PRE>DOS_FILE</TD><TD><PRE>  </TD></TR>
+	<TR><TD align="left"><PRE>SIMMFILE</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD align="left"><PRE>SIMMFILE</TD></TR></TABLE>
+	<DD>×印は置換えられたことを表します。</P>
+
+	<P><DD>　上の例で示したとおり、デバッグファイルによる置き換え、追加は、CD-ROMのすべてのディレクトリを対象に行われます。</P>
+
+<A NAME="no6_20"></A>
+	<P><DT><H3>6.2　エラー処理関数</H3>
+		<DD>　エラー処理関数を登録することによって、ライブラリ関数実行中にエラーが発生したら、エラー処理関数を呼び出すように指定できます。初期状態ではエラー処理関数は登録されていません。<BR>　エラーが発生すると次のような呼び出し形式でエラー処理関数が実行されます。</P>
+
+	<P><DD><PRE>
+void *(func)(void *obj, Sint32 err);   /* エラー処理関数　　　　　　　　　　 */
+void *obj;                             /* 登録されたオブジェクトへのポインタ */
+Sint32 err_code;                       /* 発生したエラーコード　　　　　　　 */
+(*func)(obj, err_code);                /* エラー処理関数呼び出し　　　　　　 */
+</PRE></P>
+
+	<P><DD>　エラー処理関数から戻ると、ライブラリ関数はエラーコードを関数値としてアプリケーション側に制御を戻す。</P>
+
+<A NAME="no6_30"></A>
+	<P><DT><H3>6.3　多重処理</H3>
+		<DD>　割り込み等による多重処理を禁止します。メイン処理と割り込み処理の両方で実行する場合、呼び出し側で排他処理をしてください。</P>
+
+	<P><DT><B>　(1)メイン処理中</B>
+		<DD>　呼び出した関数がGFS_ERR_BUSYを返さなくなるまで待つか、次の機会まで本ライブラリ関数の呼び出しを延期します。</P>
+
+	<P><DT><B>　(2)割り込み処理中</B>
+		<DD>　次の機会まで本ライブラリ関数の呼び出しを延期します。</P>
+
+<!-- +++ Update by CRI ：1.2 -->
+<A NAME="no6_40"></A>
+	<P><DT><H3>6.4　CD-DAファイル処理機能</H3>
+	<DD>　CD-DA ファイルの読み込みは、そのファイルで指定される音楽トラックの再生となります。<BR>
+ただし、音を出力させるにはアプリケーション側でSCSPを設定する必要があります。
+
+	<P><DT><B>　(1)ファイルに対する制御</B>
+	<DD>　CD-DA ファイルに対してファイルシステムが行う制御は再生と再生範囲の制御だけです。再生モードは省略値（リピートなし、ピックアップを移動する）です。
+
+	<P><DT><B>　(2)再生の仕方</B>
+	<DD>　CD-DAファイルを再生するには次の方法があります。
+	<P><DD><OL TYPE="a">
+	<B><LI></B><A HREF="p08_13.htm#no3_1">GFS_Load</A>
+	<B><LI></B><A HREF="p08_13.htm#no3_2">GFS_Fread</A>
+	<B><LI></B><A HREF="p08_14.htm#no4_1">GFS_NwFread</A>
+	<B><LI></B><A HREF="p08_14.htm#no4_2">GFS_NwCdRead</A>
+	</OL>
+	<P><DD>(a), (b)の方法では再生が終了するまで戻ってきません。<BR>
+(c), (d)の方法ではサーバ関数を呼び出す必要があります。CD-DAの再生が終了するとサーバ関数はGFS_SVR_COMPLETEDを返します。<BR>
+途中から再生するにはGFS_Seekを使用します。CD-DAファイルとCD-ROMファイルを同時にアクセスすることはできません。
+
+	<P><DT><B>　(3)ファイル操作に関するパラメータ</B>
+	<DD>　CD-DAファイルに対して、取り出しモード、転送モード、読み込みパラメータ、取り出しパラメータを変更することはできません。CD-DAファイルに対して次の関数を呼び出すとエラーを返します。
+	<P><DD><UL TYPE="DISC">
+	<LI><A HREF="p08_15.htm#no5_1">GFS_SetGmode</A>
+	<LI><A HREF="p08_15.htm#no5_2">GFS_SetTmode</A>
+	<LI><A HREF="p08_15.htm#no5_3">GFS_SetReadPara</A>
+	<LI><A HREF="p08_15.htm#no5_4">GFS_SetTransPara</A>
+	</UL>
+<!-- --- Update by CRI ：1.2 -->
+
+<!-- +++ Update by CRI ：4.1 -->
+<A NAME="no6_50"></A>
+	<P><DT><H3>6.5　DDSシステム対応</H3>
+	<DD>　ファイルシステムはDDS（Direct Dispatch System）用の機能をサポートします。<BR>
+　製品版として作成したプログラムを、そのままDDS版として実行できます。
+<!-- --- Update by CRI ：4.1 --><!-- +++ Update by CRI ：6.3 -->
+	<DD>　作成したプログラムをDDS版として実行させるには、以下の制限事項に考慮してコーディングする必要があります。
+	<P><DD><OL TYPE="a">
+	<B><LI></B>CD-DAの再生は、GFS_ConvTno関数でトラック番号を変換し、ＣＤ通信インタフェースのトラック番号指定によるCDC_CdPlay関数を使用する。<BR>即値のトラック番号や、CD-DAファイルを使用してはならない。
+	<B><LI></B>ＣＤにアクセスする場合、即値のFADを使用してはならない。
+	<B><LI></B>ディレクトリの深さの上限は、ルートディレクトリを含めて最大７までとする。
+	</OL>
+<!-- --- Update by CRI ：6.3 -->
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p05_10.htm">戻る</A>｜
+<A HREF="p07_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no6">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,285 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;41/86&gt;VDP2ユーザーズマニュアル/6.3回転パラメータ制御</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no6">VDP2ユーザーズマニュアル</A>★
+<a href="p06_10_j.htm">第６章　回転スクロール画面</A>
+<HR>
+<B>▲
+<a href="p06_20_j.htm">戻る</A>｜
+<a href="p06_31_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第６章　回転スクロール画面</B>
+<HR NOSHADE>
+<DL>
+	<P><DT><H2>■6.3　回転パラメータ制御</H2>
+	<DD>　回転スクロール画面を表示する場合には、その制御を行う回転パラメータをテーブルとして必ずVRAMに格納してください。回転スクロール画面は、VRAMに格納された回転パラメータテーブルをラインごとに読み込み、その値にしたがって画面を表示します。回転パラメータ<A NAME="t6_2"></A>
+
+<A NAME="t6_2"></A>
+	<P>	<DD><B>表6.2　回転パラメータ</B>
+		<DD><TABLE BORDER CELLPADDING=5>
+	<TR><TH COLSPAN=2>回転パラメータ</TH><TH>定　義</TH></TR>
+	<TR><TD ROWSPAN=3><A HREF="#t6_2_01">スクリーン画面スタート座標</A></TD><TH>Xst</TH><TD>スクリーン画面左上隅（または左端＊）のX座標</TD></TR>
+	<TR>	<TH>Yst</TH><TD>スクリーン画面左上隅（または左端＊）のY座標</TD></TR>
+	<TR>	<TH>Zst</TH><TD>スクリーン画面のZ座標</TD></TR>
+	<TR><TD ROWSPAN=2><A HREF="#t6_2_02">スクリーン画面垂直方向座標増分</A></TD><TH>△Xst</TH><TD>スクリーン画面座標のラインごとのX座標増分</TD></TR>
+	<TR>	<TH>△Yst</TH><TD>スクリーン画面座標のラインごとのY座標増分</TD></TR>
+	<TR><TD ROWSPAN=2><A HREF="#t6_2_03">スクリーン画面水平方向座標増分</A></TD><TH>△X</TH><TD>スクリーン画面座標のドットごとのX座標増分</TD></TR>
+	<TR>	<TH>△Y</TH><TD>スクリーン画面座標のドットごとのY座標増分</TD></TR>
+	<TR><TD ROWSPAN=6><A HREF="#t6_2_04">回転マトリクスパラメータ</A></TD><TH>A</TH><TD ROWSPAN=6>3×3の回転マトリクス<BR>　ABC<BR>　DEF<BR>　GHI<BR>のうちのA〜Fの6つのマトリクスパラメータ</TD></TR>
+	<TR>	<TH>B</TH></TR>
+	<TR>	<TH>C</TH></TR>
+	<TR>	<TH>D</TH></TR>
+	<TR>	<TH>E</TH></TR>
+	<TR>	<TH>F</TH></TR>
+	<TR><TD ROWSPAN=3><A HREF="#t6_2_05">視点座標</A></TD><TH>Px</TH><TD>視点のX座標</TD></TR>
+	<TR>	<TH>Py</TH><TD>視点のY座標</TD></TR>
+	<TR>	<TH>Pz</TH><TD>視点のZ座標</TD></TR>
+	<TR><TD ROWSPAN=3><A HREF="#t6_2_06">中心座標</A></TD><TH>Cx</TH><TD>中心点のX座標</TD></TR>
+	<TR>	<TH>Cy</TH><TD>中心点のY座標</TD></TR>
+	<TR>	<TH>Cz</TH><TD>中心点のZ座標</TD></TR>
+	<TR><TD ROWSPAN=2><A HREF="#t6_2_07">平行移動量</A></TD><TH>Mx</TH><TD>スクリーン画面と視点と中心点のX方向の平行移動量</TD></TR>
+	<TR>	<TH>My</TH><TD>スクリーン画面と視点と中心点のY方向の平行移動量</TD></TR>
+	<TR><TD ROWSPAN=2><A HREF="#t6_2_08">拡大縮小係数</A></TD><TH>kx</TH><TD>表示画面のX方向の拡大縮小係数</TD></TR>
+	<TR>	<TH>ky</TH><TD>表示画面のY方向の拡大縮小係数</TD></TR>
+	<TR><TD><A HREF="#t6_2_09">係数テーブルスタートアドレス</A></TD><TH>KAst</TH><TD>係数テーブルを使用する場合のテーブルのスタート<BR>アドレス</TD></TR>
+	<TR><TD><A HREF="#t6_2_10">係数テーブル垂直方向<BR>アドレス増分</A></TD><TH>△KAst</TH><TD>係数テーブルを使用する場合のラインごとのアドレス<BR>増分</TD></TR>
+	<TR><TD><A HREF="#t6_2_11">係数テーブル水平方向<BR>アドレス増分</A></TD><TH>△KAx</TH><TD>係数テーブルを使用する場合のドットごとのアドレス<BR>増分</TD>
+	</TABLE>
+	<DD><B>[注]</B>＊は、ラインごとに読み込んだ場合です。<P>
+
+	<P>	<DD>　回転パラメータのうち、Xst、Yst、KAstだけは、通常、表示画面の最初のラインでのみ読み込まれます。DXst、DYst、DX、DY、DKAst、DKAxが1画面中で変わらない場合のXst、Yst、KAstの値は、以下の式で表されます。</P>
+
+	<P>	<DD><PRE><B>
+(スクリーン画面X座標)
+          ＝ Xst ＋ △Xst × (Vカウンタ値) ＋ △X × (Hカウンタ値)
+
+(スクリーン画面Y座標)
+          ＝ Yst ＋ △Yst × (Vカウンタ値) ＋ △Y × (Hカウンタ値)
+
+(係数テーブルアドレス)
+          ＝ KAst ＋ △KAst × (Vカウンタ値) ＋ △KAx × (Hカウンタ値)
+</B></PRE></P>
+
+	<P>	<DD>　また、回転パラメータリードコントロールレジスタを設定することによって、Xst、Yst、KAstを最初のライン以外でも読み込ませることができます。DXst、DYst、DX、DY、DKAst、DKAxが1画面中で変わらない場合のXst、Yst、KAstの2ライン目以降の値は、以下の式で表されます。</P>
+
+	<P>	<DD><PRE><B>
+(スクリーン画面X座標)
+          ＝ Xst 
+          ＋ △Xst × {(Vカウンタ値)−(Xstを読み込んだときのVカウンタ値)}
+          ＋ △X × (Hカウンタ値)
+
+(スクリーン画面Y座標)
+       　 ＝ Yst
+　        ＋ △Yst × {(Vカウンタ値)−(Ystを読み込んだときのVカウンタ値)}
+          ＋ △Y × (Hカウンタ値)
+
+(係数テーブルアドレス)
+          ＝ KAst
+          ＋ △KAst × {(Vカウンタ値)−(KAstを読み込んだときのVカウンタ値)}
+          ＋ △KAx × (Hカウンタ値)
+</B></PRE></P>
+
+	<P>	<DD>　回転スクロール画面は、「回転パラメータA」、「回転パラメータB」と呼ばれる2組のパラメータテーブルを持っています。RBG1の画面表示は回転パラメータBによって行われます。RBG0は2組のパラメータテーブルのどちらを使用するか指定したり、表示画面中で切り替えたりすることができます。これによってRBG0は、1画面中に異なる2つの回転スクロール画面を同時に表示することもできます。<BR>
+　また、回転パラメータテーブルは、常に2組の回転パラメータテーブルを格納しなければならないのではなく、RBG0およびRBG1が使用する回転パラメータテーブルだけを格納するだけで動作します。</P>
+
+<A NAME="no6_31"></A>
+	<P>	<DT><H3>　●回転パラメータテーブルのデータ構成</H3>
+		<DD>　回転パラメータのそれぞれのビット構成を以下に示します。負の数は2の補数で指定します。<B>空欄部のビット</B>は無視されます。</P>
+</DL>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="z6_2"></A>
+	<P><DD><B>図6.2　回転パラメータのデータ構成</B>
+<A NAME="t6_2_01"><HR></A>
+	<DD>●スクリーン画面スタート座標(Xst,Yst,Zst)
+	<DD><TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=3><TH>符号<TH COLSPAN=12>整数部12ビット</TR></TABLE></P>
+	<P><TABLE BORDER><TR><TH ROWSPAN=2>+2
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=10>小数部10ビット<TH COLSPAN=6></TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_02"><HR></A>
+	<DD>●スクリーン画面垂直方向座標増分(ΔXst,ΔYst)
+	<DD><TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=13><TH>符号<TH COLSPAN=2>整数部</TR></TABLE></P>
+	<TABLE BORDER><TR><TH ROWSPAN=2>+2
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=10>小数部10ビット<TH COLSPAN=6></TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_03"><HR></A>
+	<DD>●スクリーン画面水平方向座標増分(ΔX,ΔY)
+	<DD><TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=13><TH>符号<TH COLSPAN=2>整数部</TR></TABLE></P>
+	<TABLE BORDER><TR><TH ROWSPAN=2>+2
+	<TR><TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=10>小数部10ビット<TH COLSPAN=6></TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_04"><HR></A>
+	<DD>●回転マトリクスパラメータ(A,B,C,D,E,F)
+	<DD><TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=12><TH>符号<TH COLSPAN=3>整数部</TR></TABLE></P>
+	<TABLE BORDER><TR><TH ROWSPAN=2>+2
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=10>小数部10ビット<TH COLSPAN=6></TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_05"><HR></A>
+	<DD>●視点座標(Px,Py,Pz)
+	<TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=2><TH>符号<TH COLSPAN=13>整数部 13ビット</TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_06"><HR></A>
+	<DD>●中心座標(Cx,Cy,Cz)
+	<DD><TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=2><TH>符号<TH COLSPAN=13>整数部 13ビット</TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_07"><HR></A>
+	<DD>●平行移動量(Mx,My)
+	<DD><TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=2><TH>符号<TH COLSPAN=13>整数部 13ビット</TR></TABLE></P>
+	<TABLE BORDER><TR><TH ROWSPAN=2>+2
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=10>小数部10ビット<TH COLSPAN=6></TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_08"><HR></A>
+	<DD>●拡大縮小係数(kx,ky)
+	<TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=8><TH>符号<TH COLSPAN=7>整数部 7ビット</TR></TABLE></P>
+	<TABLE BORDER><TR><TH ROWSPAN=2>+2
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=16>小数部16ビット</TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_09"><HR></A>
+	<DD>●係数テーブルスタートアドレス(kAst)
+	<DD><TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=16>整数部 16ビット</TR></TABLE></P>
+	<TABLE BORDER><TR><TH ROWSPAN=2>+2
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=10>小数部10ビット<TH COLSPAN=6></TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_10"><HR></A>
+	<DD>●係数テーブル垂直方向アドレス増分(ΔKAst)
+	<DD><TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=6><TH>符号<TH COLSPAN=9>整数部 9ビット</TR></TABLE></P>
+	<TABLE BORDER><TR><TH ROWSPAN=2>+2
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=10>小数部10ビット<TH COLSPAN=6></TR></TABLE>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="t6_2_11"><HR></A>
+	<DD>●係数テーブル水平方向アドレス増分(ΔKAx)
+	<TABLE BORDER><TR><TH ROWSPAN=2>+0
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=6><TH>符号<TH COLSPAN=9>整数部 9ビット</TR></TABLE>
+	<TABLE BORDER><TR><TH ROWSPAN=2>+2
+	<TD><PRE> 15 <TD><PRE> 14 <TD><PRE> 13 <TD><PRE> 12 <TD><PRE> 11 <TD><PRE> 10 <TD><PRE> ９ <TD><PRE> ８ <TD><PRE> ７ <TD><PRE> ６ <TD><PRE> ５ <TD><PRE> ４ <TD><PRE> ３ <TD><PRE> ２ <TD><PRE> １ <TD><PRE> ０ </TR>
+	<TR><TH COLSPAN=10>小数部10ビット<TH COLSPAN=6></TR></TABLE>
+<HR>
+<!-- -------------------------------------------------------------------------- -->
+<DL>
+
+<A NAME="no6_32"></A>
+	<P><DT><H3>　●回転パラメータテーブル</H3>
+	<DD>　回転パラメータテーブルは、1組が60Hの大きさのテーブルでVRAMに格納します。1組のテーブルの構成を、図6.3に示します。</P>
+
+<A NAME="z6_3"></A>
+	<P><DD><B>図6.3　回転パラメータテーブル</B>
+	<DD><TABLE BORDER=1>
+	<TR><TD>+00H<BR>+02H</TD><TD>スクリーン画面スタート座標　Ｘｓｔ　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+04H<BR>+06H</TD><TD>スクリーン画面スタート座標　Ｙｓｔ　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+08H<BR>+0AH</TD><TD>スクリーン画面スタート座標　Ｚｓｔ　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+0CH<BR>+0EH</TD><TD>スクリーン画面垂直方向増分　ΔＸｓｔ（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+10H<BR>+12H</TD><TD>スクリーン画面垂直方向増分　ΔＹｓｔ（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+14H<BR>+16H</TD><TD>スクリーン画面水平方向増分　ΔＸ　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+18H<BR>+1AH</TD><TD>スクリーン画面水平方向増分　ΔＹ　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+1CH<BR>+1EH</TD><TD>回転マトリクスパラメータ　Ａ　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+20H<BR>+22H</TD><TD>回転マトリクスパラメータ　Ｂ　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+24H<BR>+26H</TD><TD>回転マトリクスパラメータ　Ｃ　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+28H<BR>+2AH</TD><TD>回転マトリクスパラメータ　Ｄ　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+2CH<BR>+2EH</TD><TD>回転マトリクスパラメータ　Ｅ　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+30H<BR>+22H</TD><TD>回転マトリクスパラメータ　Ｆ　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+34H</TD><TD>視点座標　Ｐｘ　　　　　　　　　　　（整数部）</TD></TR>
+	<TR><TD>+36H</TD><TD>視点座標　Ｐｙ　　　　　　　　　　　（整数部）</TD></TR>
+	<TR><TD>+38H</TD><TD>視点座標　Ｐｚ　　　　　　　　　　　（整数部）</TD></TR>
+	<TR><TD>+3AH</TD><TH>このデータは無視されます</TH></TR>
+	<TR><TD>+3CH</TD><TD>中心座標　Ｃｘ　　　　　　　　　　　（整数部）</TD></TR>
+	<TR><TD>+3EH</TD><TD>中心座標　Ｃｙ　　　　　　　　　　　（整数部）</TD></TR>
+	<TR><TD>+40H</TD><TD>中心座標　Ｃｚ　　　　　　　　　　　（整数部）</TD></TR>
+	<TR><TD>+42H</TD><TH>このデータは無視されます</TH></TR>
+	<TR><TD>+44H<BR>+46H</TD><TD>平行移動量　Ｍｘ　　　　　　　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+48H<BR>+4AH</TD><TD>平行移動量　Ｍｙ　　　　　　　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+4CH<BR>+4EH</TD><TD>拡大縮小係数　ｋｘ　　　　　　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+50H<BR>+52H</TD><TD>拡大縮小係数　ｋｙ　　　　　　　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+54H<BR>+56H</TD><TD>係数テーブルスタートアドレス　ＫＡｓｔ　　　（整数部）<BR>　　　　　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+58H<BR>+5AH</TD><TD>係数テーブル垂直方向アドレス増分　ΔＫＡｓｔ（整数部）<BR>　　　　　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	<TR><TD>+5CH<BR>+5EH</TD><TD>係数テーブル水平方向アドレス増分　ΔＫＡｘ　（整数部）<BR>　　　　　　　　　　　　　　　　　　　　　　（小数部）</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　回転パラメータAと回転パラメータBの2組のテーブルを格納する場合には、回転パラメータテーブルの先頭アドレスから回転パラメータAのテーブルを格納し、その後に20H分の無効データを挿入して回転パラメータBのテーブルを格納します。回転パラメータテーブルは、常に2組格納しなければならないのではなく、必要なテーブルを格納するだけでかまいません。回転パラメータA、回転パラメータBの2組のテーブルの格納方法を図6.4に示します。</P>
+
+<A NAME="z6_4"></A>
+	<CENTER><B>図6.4　回転パラメータテーブルのVRAMへの格納方法</B>
+<PRE>
+回転パラメータテーブルの先頭アドレス　　　　　　　　　　　　　　
+　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　　└──→　＋００Ｈ┏━━━━━━━━━━━━━━━━┓
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　　　　　┃　回転パラメータＡのテーブル　　┃
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　＋５ＥＨ┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　＋６０Ｈ┣━━━━━━━━━━━━━━━━┫
+　　　　　　　　　　　　　　│この領域のデータは回転パラメータ│
+　　　　　　　　　　＋７ＥＨ│として使用されません　　　　　　│
+　　　　　　　　　　＋８０Ｈ┣━━━━━━━━━━━━━━━━┫
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　　　　　┃　回転パラメータＢのテーブル　　┃
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　＋ＤＥＨ┃　　　　　　　　　　　　　　　　┃
+　　　　　　　　　　＋Ｅ０Ｈ┣━━━━━━━━━━━━━━━━┫
+　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　┃
+</PRE></CENTER>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p06_20_j.htm">戻る</A>｜
+<a href="p06_31_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no6">VDP2ユーザーズマニュアル</A>★
+<a href="p06_10_j.htm">第６章　回転スクロール画面</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

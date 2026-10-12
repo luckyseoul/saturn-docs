@@ -1,0 +1,149 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/19&gt;CD communication I/F (CD part)/CD block structure</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual</b><H2 ALIGN=CENTER> CD block structure</H2><HR NOSHADE>
+<DL>
+<P><DD> The characteristics and logical structure of the CD block from the host's perspective are shown below.</P>
+<A NAME="no5_01"></A><P><DT> <B>(1)Data format</b><DD> The CD buffer manages streams in sectors of fixed length (2352 bytes) regardless of device.<BR>
+ However, when inputting and outputting data to and from a device, the effective data length within one sector does not necessarily match 2352 bytes. For hosts, variable length settings from 2048 to 2352 bytes are possible.</P>
+<A NAME="no5_02"></A><P><DT> <B>(2) Stream selection circuit</b><DD> The function of separating and storing streams is achieved using a mechanism called aperture and buffer partitions. Consider these functions as logical elements (selectors). By combining selectors, construct a circuit that selects the required stream.</P>
+<A NAME="no5_03"></A><P><DT> <B>(3) Device</b><DD> Consider CDs, MPEGs, etc. as logical devices that generate and absorb streams. Control the stream flow by connecting devices to the stream selection circuit.</P>
+<A NAME="no5_10"></A><P><DT><H3> 5.1 Data flow</H3><DD> The overall data flow for the CD block is shown in Figure 5.1.</P>
+<A NAME="z5_1"></A><P ALIGN=CENTER> <B>Figure 5.1 Data flow across CD block</b><BR>
+<img srcset="../grp/i071_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no5_20"></A><P><DT><H3> 5.2 Stream processing mechanism</H3><DD> Figure 5.2 shows the overall configuration of the CD block, focusing on the stream flow.</P>
+<A NAME="z5_2"></A><P ALIGN=CENTER> <B>Figure 5.2 Overall configuration diagram of CD block</b><BR>
+<img srcset="../grp/i072_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>[Explanation of each part]</b><DD><OL TYPE=a>
+<B><LI></b> Device: Generates and absorbs streams. (Stream outflow/inflow device)<B><LI></b> Selector: Consists of an aperture and buffer section and selects a stream.<B><LI></b> Aperture: Separates streams according to set conditions. (matches the condition/does not match)<B><LI></b> Buffer partition: stores streams and releases and erases data upon external requests.</P>
+</OL>
+<P><DD> Each device and selector has a connector to connect to. The device and selector input/output connectors are connected one-to-one. You can also connect between selectors.</P>
+<P><DD> Connections between connectors that do not pass through compartments have a constant flow of streams. It will stop when you enter the area. Sectors output from unconnected output connectors will be erased.</P>
+<P><DD> Always connect devices through the selector. Device output connectors can only be connected to aperture input connectors, and device input connectors can only be connected to compartment output connectors.</P>
+<A NAME="no5_30"></A><P><DT><H3> 5.3 Selector structure</H3><DD> A selector's processing capabilities are independent of the selector or device to which it is connected. It simply separates and stores the input stream, and outputs it on demand.<BR>
+ Figure 5.3 shows the structure of the selector.</P>
+<A NAME="t5_3"></A><P ALIGN=CENTER> <B>Figure 5.3 Selector structure (initial state)</b><BR>
+<img srcset="../grp/i073_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The initial state of the selector is that the aperture and compartment with the same number are connected through the true output connector and compartment input connector. Other connectors are not connected.</P>
+<A NAME="no5_3_10"></A><P><DT><H3> 5.3.1 Aperture</H3><DD> For the aperture, set the conditions for the sector (FAD range, subheader) that should be passed. Sectors that match the conditions are output to the true output connector and stored in the connected buffer section. Other sectors are output to the false output connector.<BR>
+ The false output connector can be connected to other aperture input connectors, and the same selection process will occur one after the other.<BR>
+ Sectors output from unconnected output connectors will be erased.</P>
+<A NAME="z5_4"></A><P ALIGN=CENTER> <B>Figure 5.4 Schematic diagram of stream selection processing</b><BR>
+<img srcset="../grp/i073_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no5_3_20"></A><P><DT><H3> 5.3.2 Buffer compartment</H3><A NAME="no5_3_21"></A><P><DT> <B>(1) Structure of buffer section</b><DD> The CD buffer is divided into multiple buffer compartments. The structure of the buffer compartment is shown in Figure 5.5.</P>
+<A NAME="z5_5"></A><P ALIGN=CENTER> <B>Figure 5.5 Structure of buffer compartment</b><BR>
+<img srcset="../grp/i074_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no5_3_22"></A><P><DT> <B>(2) Storing sectors in buffer partitions</b><DD> Sectors that enter a partition are stored at the end of the partition. The last sector position of the partition is equal to the buffer partition size - 1. After storing, the buffer partition size increases by 1.</P>
+<A NAME="no5_3_23"></A><P><DT> <B>(3) Release and erase sectors from the buffer partition</b><DD> When releasing sectors from a partition, there are two ways to do so: leave the sector in the source partition or delete it. (You can also instruct only deletion.)<BR>
+ For example, retrieval to the host corresponds to "retrieval" and "retrieval/erase", and inflow/output between selectors corresponds to "copy" and "move".</P>
+<A NAME="no5_3_24"></A><P><DT> <B>(4) CD 1-sector interrupt and storage location</b><DD> A 1-sector interrupt (CSCT flag in the interrupt factor register) during CD reading occurs for each sector when the sector is stored (or erased) in a partition. The CD block remembers the storage partition number of the last sector read, and the host can retrieve that value.<BR>
+ If the ECC count is set to multiple times, 1 sector interrupts may not occur at equal intervals. Multiple sectors may be stored at once for error correction.</P>
+<A NAME="no5_3_30"></A><P><DT><H3> 5.3.3 Connector</H3><A NAME="no5_3_31"></A><P><DT> <B>(1) Connection from buffer section to aperture (copying/moving sector data)</b><DD> Copying/moving sector data is possible by connecting the partition output connector to the aperture input connector and flowing sector data. The process of connection/inflow/output is executed by issuing a single command.</P>
+<A NAME="z5_6"></A><P ALIGN=CENTER> <B>Figure 5.6 Copying/moving sector data</b><BR>
+<img srcset="../grp/i075_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no5_3_32"></A><P><DT> <B>(2) Connecting selectors using OR conditions (many-to-one connection)</b><DD> You can connect the true output connectors of multiple apertures to the same compartment input connector. This allows sectors that match any of multiple conditions to be stored. (OR condition: logical sum condition)</P>
+<A NAME="z5_7"></A><P ALIGN=CENTER> <B>Figure 5.7 Connecting selectors using OR conditions</b><BR>
+<img srcset="../grp/i075_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no5_3_33"></A><P><DT> <B>(3) Type of connector and connection destination</b><DD> <B>Table 5.1 Connector types and connection destinations</b><BR>
+<DD><TABLE BORDER=1>
+<TR><TH><PRE>      input<BR> output</TH><th width=100><PRE> Aperture input</TH><th width=100><PRE> Parcel input</TH><th width=100><PRE> device input</TH></TR>
+<TR><td width=110><PRE> device output</TD><TD ALIGN=CENTER><PRE> ○</TD><TD ALIGN=CENTER><PRE> ×</TD><TD ALIGN=CENTER><PRE> ×</TD></TR>
+<TR><td width=110><PRE> true output</TD><TD ALIGN=CENTER><PRE> ×</TD><TD ALIGN=CENTER><PRE> △</TD><TD ALIGN=CENTER><PRE> ×</TD></TR>
+<TR><td width=110><PRE> false output</TD><TD ALIGN=CENTER><PRE> ○</TD><TD ALIGN=CENTER><PRE> ×</TD><TD ALIGN=CENTER><PRE> ×</TD></TR>
+<TR><td width=110><PRE> Partition output</TD><TD ALIGN=CENTER><PRE> ○</TD><TD ALIGN=CENTER><PRE> ×</TD><TD ALIGN=CENTER><PRE> ○</TD></TR>
+</TABLE>
+<DD> ○: Connection possible (1 to 1)...Only one output connector can be connected to one input connector<DD> △: Connectable (many to 1)...Multiple output connectors can be connected to the same input connector (OR condition)<DD> ×: Unable to connect</P>
+<P><DD> It depends on each device whether to perform a single connection (disconnection) process with one command or a complex process that combines the connection and inflow/output processes.<BR>
+ CD-ROM and MPEG decoders are processed independently, while others (host, copy/move, etc.) are processed in combination.</P>
+<A NAME="no5_3_40"></A><P><DT><H3> 5.3.4 Notes on selectors</H3><A NAME="no5_3_41"></A><P><DT> <B>(1) Error in stream processing</b><DD> Errors in stream processing generally occur when the following operations are performed: (However, this does not result in an error for CD-ROM devices.)</P>
+<P><DD><UL TYPE="DISK">
+<LI> If the connection is severed by another device etc. while the device is operating</P>
+<P><LI> If the CD buffer becomes full when reading or writing to the buffer section</P>
+</UL>
+<A NAME="no5_3_42"></A><P><DT> <B>(2) Selector setting valid timing</b><DD> The selector setting becomes effective when the selector setting command is issued and the ESEL flag in the interrupt factor register becomes 1.<BR>
+ If the selector setting command is issued during CD playback, the FAD for which the setting is valid is within +1 frame (FAD to FAD+1) of the FAD returned in the CD report. The host should consider the margin and issue the configuration command at least 10 sectors before the target FAD.</P>
+<A NAME="no5_3_43"></A><P><DT> <B>(3) Sector data when switching connections</b><DD> Even if you switch the connection to another selector while sector data is flowing, such as while reading a CD, data will not be dropped. This means that data flow is guaranteed during temporary disconnections due to connection switching.<BR>
+ If it is completely disconnected, the leaked data will be deleted.</P>
+<A NAME="no5_3_44"></A><P><DT> <B>(4) General access to buffer partitions (general commands that specify sector positions and sector ranges)</b><DD> If you make an invalid specification, such as a position or range that exceeds the number of data in the partition, the command will return WAIT.<BR>
+ Always returns WAIT if:</P>
+<P><DD><UL TYPE="DISK">
+<LI> If the number of sectors in the partition is 0<BR>
+</P>
+<P><LI> If the specified number of sectors is 0</P>
+</UL>
+<P><DD> Before accessing a partition, be sure to get the number of sectors in the buffer partition (CDC_GetSctNum) and make sure that the number of sectors is not 0.</P>
+<A NAME="no5_3_45"></A><P><DT> <B>(5) Elimination release from buffer compartment</b><DD> In the case of processing to erase and release sectors from a partition, all data in the initially specified sector range will be erased even if the processing is canceled due to an error etc. (Retrieving and erasing sector data, moving, etc.)</P>
+<A NAME="no5_40"></A><P><DT><H3> 5.4 Sector data format</H3><A NAME="no5_41"></A><P><DT> <B>(1) Basic format</b><DD> The sector data format basically conforms to the CD-ROM XA sector format.</P>
+<A NAME="z5_8"></A><P ALIGN=CENTER> <B>Figure 5.8 CD-ROM XA sector format</b><BR>
+<img srcset="../grp/i077_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no5_42"></A><P><DT> <B>(2) Handling of subheader and user data (2048 bytes)</b><P><DD><OL TYPE=a>
+<B><LI></b> Subheaders other than mode 2 (header mode part is 02H) are treated as 0.</P>
+<P><B><LI></b> Only in mode 1 (header mode part is 01H), there is user data immediately after the header. Otherwise, it is assumed that the user data is located in the same location as Mode 2 Form 1.</P>
+<P><B><LI></b> When storing user data in a partition from a source other than a CD-ROM device, treat it the same as Mode 2 Form 1. The first 24 bytes are 0, and the rest of the user data is undefined.</P>
+</OL>
+<A NAME="no5_43"></A><P><DT> <B>(3) Conversion of absolute time from BCD to FAD</b><DD> Convert the header absolute time BCD (minutes: seconds: frames) to FAD using the following formula.</P>
+<P><DD> FAD = {(M1×10+M2)×60+(S1×10+S2)}×75+(F1×10+F2)<DD> [M1 M2 S1 S2 F1 F2]: Absolute time BCD (6 digits, 3 bytes)</P>
+<P><DD> Absolute time is always converted using the above formula without checking the validity of the value.</P>
+<A NAME="no5_50"></A><P><DT><H3> 5.5 CD Block Initialization</H3><DD> The information content inside the CD block is initialized by each operation as shown in Table 5.2.</P>
+<A NAME="t5_2"></A><P><DD> <B>Table 5.2 CD block initialization contents</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> operation<BR> Information content</TH><th width=100><PRE> tray opens</TH><th width=100><PRE> tray closes</TH><th width=100><PRE> soft reset</TH></TR>
+<TR><TD><PRE> TOC/Session information</TD><TD><PRE> initialized</TD><TD><PRE> TOC lead</TD><TD><PRE> −</TD></TR>
+<TR><TD><PRE> File information</TD><TD><PRE> initialized</TD><TD><PRE> −</TD><TD><PRE> initialized</TD></TR>
+<TR><TD><PRE> host information</TD><TD><PRE> −</TD><TD><PRE> −</TD><TD><PRE> initialized</TD></TR>
+<TR><TD><PRE> CD block register</TD><TD><PRE> −</TD><TD><PRE> −</TD><TD><PRE> initialized</TD></TR>
+</TABLE>
+<DD> " <B>-</b> " means no change</P>
+<P><DD> If you execute CD block initialization (CDC_CdInit) without specifying a soft reset, none of the above information will be initialized.</P>
+<A NAME="no5_51"></A><P><DT> <B>(1)TOC/Session information</b><DD> This information is unique to the disc and is initialized only when the tray is opened.<BR>
+ Once initialized, no information will be entered.<BR>
+ When the tray is closed, the TOC is automatically read and the information is retained.</P>
+<A NAME="no5_52"></A><P><DT> <B>(2)File information</b><DD> Information about ISO9660 files held by the CD block file system.<BR>
+ Once initialized, no information will be entered.<BR>
+ Reading of file information is instructed by the host using a command.</P>
+<A NAME="no5_53"></A><P><DT> <B>(3)Host information</b><DD> Mainly host configuration information and buffer data.<BR>
+ When initialized, the initial value (as a general rule, equal to the default value) is set.</P>
+<P><DD><UL TYPE="DISK">
+<LI> Initialization information (CD block initialization parameters)</P>
+<P><LI> Playback information (playback range, maximum repeat count, current repeat notification count)</P>
+<P><LI> Selector information (host settings related to the selector, such as aperture and buffer section)</P>
+<P><LI> Data in buffer, buffer partition size, free size</P>
+<P><LI> Actual data size held, frame address search results, copy/move error information</P>
+<P><LI> Sector length setting value</P>
+<P><LI> MPEG related information (MPEG will be turned off)</P>
+</UL>
+<A NAME="no5_54"></A><P><DT> <B>(4) CD block register</b><DD> Information about CD block hardware.</P>
+<P><DD><UL TYPE="DISK">
+<LI> Interrupt factor registers (initialized except for DCHG flag)<BR>
+ For details, see " <B><A HREF="p03_10.htm#t3_3">Table 3.3 Bit Configuration of Interrupt Source Register</a></b> ".</P>
+<P><LI> Internal registers that control data transfer (data transfer ends when initialized)</P>
+</UL>
+<A NAME="no5_55"></A><P><DT> <B>(5) Opening and closing the tray</b><DD> When the tray is opened, the DCHG and EFLS flags in the interrupt factor register become 1. The timing is&lt;OPEN&gt; before the state.<BR>
+ The tray opening/closing operation is the same whether using command or manual operation. When opening a tray (CDC_CdOpen), the tray is initialized even if it is not actually opened.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

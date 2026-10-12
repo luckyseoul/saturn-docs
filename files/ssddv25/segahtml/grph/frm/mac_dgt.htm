@@ -1,0 +1,77 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>DGT data format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR NOSHADE>
+<CENTER>
+<H1> DGT data format</H1></CENTER>
+<HR>
+<DL>
+<P><DT><H3> ■File layout</H3><DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> $000</TD><TD><PRE> $100</TD><TD><PRE> <A HREF="#no1">header</a></TD></TR>
+<TR><TD><PRE> $100</TD><TD><PRE> $20</TD><TD><PRE> <A HREF="#no2">directory</a></TD></TR>
+<TR><TD><PRE> $120</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no3">CLUT</a> (color lookup table)</TD></TR>
+<TR><TD><PRE> Indeterminate</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no4">bitmap data</a></TD></TR>
+</TABLE>
+<A NAME="no1"></A><P><DT> <B>◆Header</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> Explanation</TH></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> word</TD><TD><PRE> Header size = $100</TD></TR>
+<TR><TD><PRE> $07</TD><TD><PRE> Part-Time Job</TD><TD><PRE> Number of directory entries = $01</TD></TR>
+<TR><TD><PRE> $08</TD><TD><PRE> long</TD><TD><PRE> File size excluding header</TD></TR>
+<TR><TD><PRE> $10</TD><TD><PRE> $10</TD><TD><PRE> Identifier = "DIGITIZER_3_Ver2" ("_" is a space = $20)</TD></TR>
+<TR><TD><PRE> $20</TD><TD><PRE> $E0</TD><TD><PRE> Dummy data, all $00</TD></TR>
+</TABLE>
+<A NAME="no2"></A><P><DT> <B>◆Directory</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> Explanation</TH></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> long</TD><TD><PRE> Directory size = $20+CLUT size (variable)</TD></TR>
+<TR><TD><PRE> $04</TD><TD><PRE> word</TD><TD><PRE> Horizontal display position (usually $0000)</TD></TR>
+<TR><TD><PRE> $06</TD><TD><PRE> word</TD><TD><PRE> Vertical display position (usually $0000)</TD></TR>
+<TR><TD><PRE> $08</TD><TD><PRE> word</TD><TD><PRE> Horizontal image size</TD></TR>
+<TR><TD><PRE> $0A</TD><TD><PRE> word</TD><TD><PRE> Vertical image size</TD></TR>
+<TR><TD><PRE> $10</TD><TD><PRE> $10</TD><TD><PRE> Dummy data (all $00)</TD></TR>
+</TABLE>
+<DD> ●The free address for "Directory Name" is $20.<DD> ●All empty addresses except for "directory name" are $00.<A NAME="no3"></A><P><DT> <B>◆CLUT</b><DD> Exists in palette mode and run length mode.<DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> Long x number of pallets</TD><TD><PRE> CLUT data</TD></TR>
+</TABLE>
+<DD> ●One palette consists of "long x 16 colors".<DD> ●If even one color is used, data for one palette will be reserved.<P><DD> <B>CLUT data</b><PRE>
+MSB　
+│ │       Palette number　
+┌─┼─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│*│E│D│C│B│A│9│8│7│6│5│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+│        Color data           LSB
+│ │B│G│R│   B   │   G   │   R   │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│*│0│0│0│4│3│2│1│4│3│2│1│4│3│2│1│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+*=Not used</PRE><DD> ●For palette numbers that are not used in bitmap data even if there is a CLUT, the color code will be $FFFF. This allows you to know the unused pallet numbers from the CLUT.<A NAME="no4"></A><P><DT> <B>◆Bitmap data</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> From $00</TH><TH><PRE> Word x image size</TH><TH><PRE> Palette number for each pixel</TH></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,479 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/22&gt; <!-- Number of pages/total number of pages -->
+ SGL function reference/init function <!-- Title name -->
+ </TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#init">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slInitSystem"><HR NOSHADE></a><H4> function</H4><H1> slInitSystem</H1><HR>
+<H3> Initializing the SGL system</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode;
+    <A HREF="../struct/types.htm#TEXTURE"><I>TEXTURE</i></a> *form_tbl;
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> cnt;
+
+    void slInitSystem( mode, form_tbl , cnt );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode - Screen mode.<BR>
+    <A HREF="../struct/types.htm#TEXTURE"><I>TEXTURE</i></a> *form_tbl - Texture definition table.<BR>
+    <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> cnt - count of frame switches.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Initialize the entire system, register the texture definition table, and set the frame switching count.<BR>
+    The screen mode "mode" has
+<PRE>        <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> , <A HREF="../struct/constenm.htm#TV_320x240"><I>TV_320x240</i></a> , <A HREF="../struct/constenm.htm#TV_320x256"><I>TV_320x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_352x224"><I>TV_352x224</i></a> , <A HREF="../struct/constenm.htm#TV_352x240"><I>TV_352x240</i></a> , <A HREF="../struct/constenm.htm#TV_352x256"><I>TV_352x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_640x224"><I>TV_640x224</i></a> , <A HREF="../struct/constenm.htm#TV_640x240"><I>TV_640x240</i></a> , <A HREF="../struct/constenm.htm#TV_640x256"><I>TV_640x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_704x224"><I>TV_704x224</i></a> , <A HREF="../struct/constenm.htm#TV_704x240"><I>TV_704x240</i></a> , <A HREF="../struct/constenm.htm#TV_704x256"><I>TV_704x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_320x448"><I>TV_320x448</i></a> , <A HREF="../struct/constenm.htm#TV_320x480"><I>TV_320x480</i></a> , <A HREF="../struct/constenm.htm#TV_320x512"><I>TV_320x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_352x448"><I>TV_352x448</i></a> , <A HREF="../struct/constenm.htm#TV_352x480"><I>TV_352x480</i></a> , <A HREF="../struct/constenm.htm#TV_352x512"><I>TV_352x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_640x448"><I>TV_640x448</i></a> , <A HREF="../struct/constenm.htm#TV_640x480"><I>TV_640x480</i></a> , <A HREF="../struct/constenm.htm#TV_640x512"><I>TV_640x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_704x448"><I>TV_704x448</i></a> , <A HREF="../struct/constenm.htm#TV_704x480"><I>TV_704x480</i></a> , <A HREF="../struct/constenm.htm#TV_704x512"><I>TV_704x512</i></a>
+</PRE>    is entered.<BR>
+    Also, the value of the argument form_tbl is set to the system variable " <A HREF="../mem/system01.htm#FormTbl"><I>FormTbl</i></a> ".<BR>
+    What is set when <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> () is executed.<BR>
+    Window size and vanishing point position for sprites and polygons
+<PRE>        Left             : 0
+        Top              : 0
+        Right            : ScreenXSize - 1
+        Bottom           : ScreenYSize - 1
+        Zlimit           : 0x7fff
+        CenterX          : ScreenXSize / 2
+        CenterY          : ScreenYSize / 2
+        PersAngle        : 90゜
+        ZdspLevel        : 1
+        ClipSizeX        : 320
+        ClipSizeY        : 512
+     Scroll related
+        Displayed scroll surface     : NBG0 , NBG1 , RBG0
+        Scroll priority:             : NBG0 NBG1 NBG2 NBG3 RBG0
+                                        7    7    2    1    4
+        Sprite 0 (polygon) priority  : 6
+        Other sprites                : 5
+        Number of scroll colors      : 256 colors on each side
+        Color RAM mode               : 1 (2048 out of 32768 colors)
+        VRAM division                : Both banks A and B are divided
+        Character data               : NBG0, NBG1 25E60000~
+                                        : RBG0 25E00000～
+        Character size               : 8x8 dots on each side
+        Pattern name data            : NBG0 25E76000~
+                                        : NBG1 25E78000～
+                                        : RBG0 PA 25E40000～
+                                        : RBG0PB 25E50000〜
+        Pattern name size            : NBG0 1 word
+                                        : 10-bit pattern name with inversion for each cell
+                                        : NBG1 and RGB0 1 word
+                                        : No inversion, 12-bit pattern name
+        Plane size                   : 64x64 cells on each side
+        Back screen color            : 25E3FFFE to black (R= 0, G=0, B=0)
+        Rotation parameters          : From 25E3FF00
+        Sprite data                  : Mixed mosaic with palette and RGB format, special effect functions such as color offset are not used
+        SCU interrupt priority (not the default of SCU)
+          High     Name            SCU Interrupt Mask Register
+           ^   H Blank In                FFFF
+           |   Level 2 DMA Ended         FFFB (Reserved with SGL)
+           |   Level 1 DMA Ended         FDFB (Reserved with SGL)
+           |   Level 0 DMA End           F9FB (Reserve with SGL)
+           |   DMA Illegal               F1FB
+           |   V Blank In                E1FB (Reserve with SGL)
+           |   V Blank Out               E1FA (Reserve with SGL)
+           |   Timer 0                   E1F8
+           |   Timer 1                   E1F0
+           |   DSP end                   E1E0
+           |   Sound Request             E1C0 (Reserve with SGL)
+           |   SMPC                      E180 (Reserved with SGL)
+           |   Pad                       E100
+          Low  Sprite drawing finished   E000
+</PRE>
+    Sound initialization is not performed, so when using sound-related functions,
+    Please initialize using the sound initialization function of each library.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    When not using textures (sprites). (Polygons can be used.)
+    ss_main() {
+      <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_352x224"><I>TV_352x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                        :
+
+    When using textures.<BR>
+    extern <A HREF="../struct/types.htm#TEXTURE"><I>TEXTURE</i></a> textbl[];
+
+    ss_main() {
+      <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_320x240"><I>TV_320x240</i></a> , textbl, 1 );
+                        :
+
+    When using dynamic frame (drawing waiting frame switching) mode.<BR>
+    ss_main() {
+      <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_320x240"><I>TV_320x240</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , -3 );
+                        :
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    Be sure to execute this function before executing all SGL functions.</i></b><BR><B><I>
+    If other SGL functions access uninitialized system areas, it becomes a breeding ground for bugs.</i></b><BR><B><I>
+    Since the system clock is switched depending on the resolution (TV mode), the contents of VRAM etc. may be corrupted,
+    so please execute this only once immediately after the system starts.</i></b><BR><B><I>
+    If a negative value is specified for the frame switching count, after the switching count has elapsed (2 blanking if -2),
+    the end of writing to the frame buffer of VDP1 is checked, and switching is performed after waiting for the writing
+    completion. however,
+    This specification is ignored if interlace mode is specified.</i></b><BR><B><I>
+
+    When executing <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> (), if the operating clock of SH2 is
+    changed due to a change in screen mode, a clock change will occur. At this time, depending on the model of your home TV,
+    synchronization may momentarily become impossible.</i></b><BR><B><I>
+    The operating clock of SH2 is 26MHz because
+       Horizontal resolution 320 or 640 DOT
+    This is the case.</i></b><BR><B><I>
+    The operating clock of SH2 is 28MHz because
+       Horizontal resolution 352 or 704 DOT
+    This is the case.</i></b><BR><B><I>
+    Of the devices affected by clock changes, caution is required:
+    It is as follows.</i></b><BR><B><I>
+
+    ・VDP1 VDP2
+      All registers and VRAM are not guaranteed.</i></b><BR><B><I>
+      The registers are reconfigured inside <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> (), but the user data needs to be loaded again.</i></b><BR><B><I>
+    ・WORKRAM-LOW(1M byte)
+      Memory contents are not guaranteed.</i></b><BR><B><I>
+      Be sure to reload all data.</i></b><BR><B><I>
+    ・Both Sound Block 68000 and SCSP will be reset.</i></b><BR><B><I>
+      Also, the contents of SOUND-RAM are not guaranteed, so as soon as <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> () finishes, you need to reload the sound driver, etc., and restart the 68000.</i></b><BR><B><I>
+    ・SCU
+      All settings will be initialized.</i></b><BR><B><I>
+    ・Slave SH
+      After the reset, it will be back under SGL control.</i></b><BR><B><I>
+      User registration functions must be re-registered.</i></b><BR><B><I>
+    Calling this function many times for purposes other than clock changes is
+    This is not very convenient when creating an application, so other than changing the clock, try to initialize using other functions as much as possible.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/init.htm#slDynamicFrame">slDynamicFrame</a></TD><TD><PRE> <A HREF="../func/init.htm#slSetTVMode">slSetTVMode</a></TD><TD><PRE> <A HREF="../func/init.htm#slSetScrTVMode">slSetScrTVMode</a></TD><TD><PRE> <A HREF="../func/init.htm#slSetSprTVMode">slSetSprTVMode</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/per.htm#slInitPeripheral">slInitPeripheral</a></TD><TD><PRE> <A HREF="../func/per.htm#slGetStatus">slGetStatus</a></TD><TD><PRE> <A HREF="../func/per.htm#slGetPeripheral">slGetPeripheral</a></TD><TD><PRE> <A HREF="../mem/system02.htm#SprbufBias">Sprbuf Bias</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#MsLightVector">MsLightVector</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenDist">MsScreenDist</a></TD><TD><PRE> <A HREF="../mem/system02.htm#SlScreenDist">SlScreenDist</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsZlimit">MsZlimit</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#WindowNumber">Window Number</a></TD><TD><PRE> <A HREF="../mem/system02.htm#TotalPolygons">TotalPolygons</a></TD><TD><PRE> <A HREF="../mem/system02.htm#TotalVertices">Total Vertices</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenLeft">MsScreenLeft</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#MsScreenTop">MsScreenTop</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenRight">MsScreenRight</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenBottom">MsScreenBottom</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MXPolygons">MXPolygons</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MXVertices">MXVertices</a></TD><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeX">FrameSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeY">FrameSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWinXAdder">MsWinXAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsWinYAdder">MsWinYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlWinXAdder">SlWinXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlWinYAdder">SlWinYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipXAdder">MsClipXAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsClipYAdder">MsClipYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMAEndFlag">DMAEndFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMASetFlag">DMASetFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#Resolution">Resolution</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#NbPCMBf">NbPCMBf</a></TD><TD><PRE> <A HREF="../mem/system03.htm#PCMBufFlag">PCMBufFlag</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_VRSIZE">VDP2_VRSIZE</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_HCNT">VDP2_HCNT</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system04.htm#VDP2_VCNT">VDP2_VCNT</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_RAMCTL">VDP2_RAMCTL</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CYCA0L">VDP2_CYCA0L</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CYCA0U">VDP2_CYCA0U</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CYCA1L">VDP2_CYCA1L</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CYCA1U">VDP2_CYCA1U</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CYCB0L">VDP2_CYCB0L</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CYCB0U">VDP2_CYCB0U</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CYCB1L">VDP2_CYCB1L</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CYCB1U">VDP2_CYCB1U</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_BGON">VDP2_BGON</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_MZCTL">VDP2_MZCTL</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system04.htm#VDP2_SFSEL">VDP2_SFSEL</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_SFCODE">VDP2_SFCODE</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CHCTLA">VDP2_CHCTLA</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_CHCTLB">VDP2_CHCTLB</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system04.htm#VDP2_BMPNA">VDP2_BMPNA</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_BMPNB">VDP2_BMPNB</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_PNCN0">VDP2_PNCN0</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_PNCN1">VDP2_PNCN1</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system04.htm#VDP2_PNCN2">VDP2_PNCN2</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_PNCN3">VDP2_PNCN3</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_PNCR">VDP2_PNCR</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_PLSZ">VDP2_PLSZ</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system04.htm#VDP2_MPOFN">VDP2_MPOFN</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_MPOFR">VDP2_MPOFR</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPABRA">VDP2_MPABRA</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPCDRA">VDP2_MPCDRA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPEFRA">VDP2_MPEFRA</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPGHRA">VDP2_MPGHRA</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPIJRA">VDP2_MPIJRA</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPKLRA">VDP2_MPKLRA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPMNRA">VDP2_MPMNRA</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPOPRA">VDP2_MPOPRA</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPABRB">VDP2_MPABRB</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPCDRB">VDP2_MPCDRB</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPEFRB">VDP2_MPEFRB</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPGHRB">VDP2_MPGHRB</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPIJRB">VDP2_MPIJRB</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPKLRB">VDP2_MPKLRB</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPMNRB">VDP2_MPMNRB</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_MPOPRB">VDP2_MPOPRB</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_SCXN0">VDP2_SCXN0</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_SCXIN0">VDP2_SCXIN0</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system05.htm#VDP2_SCXDN0">VDP2_SCXDN0</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_SCYN0">VDP2_SCYN0</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_SCYIN0">VDP2_SCYIN0</a></TD><TD><PRE> <A HREF="../mem/system05.htm#VDP2_SCYDN0">VDP2_SCYDN0</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system05.htm#VDP2_SCXN1">VDP2_SCXN1</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCXIN1">VDP2_SCXIN1</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCXDN1">VDP2_SCXDN1</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCYN1">VDP2_SCYN1</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCYIN1">VDP2_SCYIN1</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCYDN1">VDP2_SCYDN1</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCXN2">VDP2_SCXN2</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCYN2">VDP2_SCYN2</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCXN3">VDP2_SCXN3</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCXN3">VDP2_SCXN3</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_ZMCTL">VDP2_ZMCTL</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_SCRCTL">VDP2_SCRCTL</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system06.htm#VDP2_VCSTA">VDP2_VCSTA</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_LSTA0">VDP2_LSTA0</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_LSTA1">VDP2_LSTA1</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_LCTA">VDP2_LCTA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system06.htm#VDP2_BKTA">VDP2_BKTA</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_RPMD">VDP2_RPMD</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_RPRCTL">VDP2_RPRCTL</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_KTCTL">VDP2_KTCTL</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system06.htm#VDP2_KTAOF">VDP2_KTAOF</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_OVPNRA">VDP2_OVPNRA</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_OVPNRB">VDP2_OVPNRB</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_RPTA">VDP2_RPTA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WPSX0">VDP2_WPSX0</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WPSY0">VDP2_WPSY0</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WPEX0">VDP2_WPEX0</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WPEY0">VDP2_WPEY0</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WPSX1">VDP2_WPSX1</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WPEX1">VDP2_WPEX1</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WCTLA">VDP2_WCTLA</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WCTLB">VDP2_WCTLB</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WCTLC">VDP2_WCTLC</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_WCTLD">VDP2_WCTLD</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_LWTA0">VDP2_LWTA0</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_LWTA1">VDP2_LWTA1</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system07.htm#VDP2_SPCTL">VDP2_SPCTL</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_SDCTL">VDP2_SDCTL</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_CRAOFA">VDP2_CRAOFA</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_CRAOFB">VDP2_CRAOFB</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system07.htm#VDP2_LNCLEN">VDP2_LNCLEN</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_SFPRMD">VDP2_SFPRMD</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_SFCCMD">VDP2_SFCCMD</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_CCCTL">VDP2_CCCTL</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system07.htm#VDP2_PRISA">VDP2_PRISA</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_PRISB">VDP2_PRISB</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_PRISC">VDP2_PRISC</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_PRISD">VDP2_PRISD</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system07.htm#VDP2_PRINA">VDP2_PRINA</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_PRINB">VDP2_PRINB</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_PRIR">VDP2_PRIR</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CCRSA">VDP2_CCRSA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CCRSB">VDP2_CCRSB</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CCRSC">VDP2_CCRSC</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CCRSD">VDP2_CCRSD</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CCRNA">VDP2_CCRNA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CCRNB">VDP2_CCRNB</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CCRR">VDP2_CCRR</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CCRLB">VDP2_CCRLB</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CLOFEN">VDP2_CLOFEN</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#VDP2_CLOFSL">VDP2_CLOFSL</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_COAR">VDP2_COAR</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_COAG">VDP2_COAG</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_COAB">VDP2_COAB</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#VDP2_COBR">VDP2_COBR</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_COBG">VDP2_COBG</a></TD><TD><PRE> <A HREF="../mem/system08.htm#VDP2_COBB">VDP2_COBB</a></TD><TD><PRE> <A HREF="../mem/system08.htm#ScrRotPtr">ScrRotPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#nbg0_char_adr">nbg0_char_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#nbg1_char_adr">nbg1_char_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#nbg2_char_adr">nbg2_char_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#nbg3_char_adr">nbg3_char_adr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#nbg0_char_adr">nbg0_char_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#ra_char_adr">ra_char_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#rb_char_adr">rb_char_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#nbg0_page_adr">nbg0_page_adr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#nbg1_page_adr">nbg1_page_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#nbg2_page_adr">nbg2_page_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#nbg3_page_adr">nbg3_page_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#ra_page_adr">ra_page_adr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#rb_page_adr">rb_page_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#rpara_vram_adr">rpara_vram_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParA">RotScrParA</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParB">RotScrParB</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#Nbg2_PosX">Nbg2_PosX</a></TD><TD><PRE> <A HREF="../mem/system08.htm#Nbg2_PosY">Nbg2_PosY</a></TD><TD><PRE> <A HREF="../mem/system08.htm#Nbg3_PosX">Nbg3_PosX</a></TD><TD><PRE> <A HREF="../mem/system08.htm#Nbg3_PosY">Nbg3_PosY</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#init">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slSetTVMode"><HR NOSHADE></a><H4> function</H4><H1> slSetTVMode</H1><HR>
+<H3> Switch resolution</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slSetTVMode( mode );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode - TV mode (described later).<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Sets the specified TV mode.<BR>
+    Returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if the system clock is being switched.<BR>
+    There are two system clocks, which are switched depending on the horizontal resolution.<BR>
+<PRE>         320,640 dots <--> 352,704 dots
+         (26.84MHz)             (28.64MHz)                &lt;NTSC&gt;
+         (26.66MHz)             (28.44MHz)                &lt;PAL&gt;</PRE>
+
+    Therefore, although it is possible to switch from 320 dot mode to 640 dot mode, an error will occur if you try to switch
+    to 352 dot mode.<BR>
+    Also, if the vertical resolution is set to 448 or 480 lines, it will be interlaced, so 2 interrupts will result in 1 frame,
+    so the frame switching counter will be adjusted to be a multiple of 2. If you want to process interlaced mode with one
+    interrupt, after executing this function,
+    ( <A HREF="../struct/types.htm#Sint8"><I>Sint8</i></a> ) Set <A HREF="../mem/system01.htm#SynchConst"><I>SynchConst</i></a>
+    to 1 and execute the <A HREF="../func/int.htm#slInitSynch"><I>slInitSynch</i></a> function.<BR>
+    This function initializes the sprite window (full screen size), changes the perspective (angle of view 90°), and changes the
+    sprite data type according to the specified resolution.<BR>
+    Sprite data type changes only bit 3 out of 4 bits.<BR>
+    The screen mode "mode" has
+<PRE>        <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> , <A HREF="../struct/constenm.htm#TV_320x240"><I>TV_320x240</i></a> , <A HREF="../struct/constenm.htm#TV_320x256"><I>TV_320x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_352x224"><I>TV_352x224</i></a> , <A HREF="../struct/constenm.htm#TV_352x240"><I>TV_352x240</i></a> , <A HREF="../struct/constenm.htm#TV_352x256"><I>TV_352x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_640x224"><I>TV_640x224</i></a> , <A HREF="../struct/constenm.htm#TV_640x240"><I>TV_640x240</i></a> , <A HREF="../struct/constenm.htm#TV_640x256"><I>TV_640x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_704x224"><I>TV_704x224</i></a> , <A HREF="../struct/constenm.htm#TV_704x240"><I>TV_704x240</i></a> , <A HREF="../struct/constenm.htm#TV_704x256"><I>TV_704x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_320x448"><I>TV_320x448</i></a> , <A HREF="../struct/constenm.htm#TV_320x480"><I>TV_320x480</i></a> , <A HREF="../struct/constenm.htm#TV_320x512"><I>TV_320x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_352x448"><I>TV_352x448</i></a> , <A HREF="../struct/constenm.htm#TV_352x480"><I>TV_352x480</i></a> , <A HREF="../struct/constenm.htm#TV_352x512"><I>TV_352x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_640x448"><I>TV_640x448</i></a> , <A HREF="../struct/constenm.htm#TV_640x480"><I>TV_640x480</i></a> , <A HREF="../struct/constenm.htm#TV_640x512"><I>TV_640x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_704x448"><I>TV_704x448</i></a> , <A HREF="../struct/constenm.htm#TV_704x480"><I>TV_704x480</i></a> , <A HREF="../struct/constenm.htm#TV_704x512"><I>TV_704x512</i></a>
+</PRE>    is entered.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_352x224"><I>TV_352x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                     :
+    <A HREF="../func/init.htm#slSetTVMode"><I>slSetTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_352x480"><I>TV_352x480</i></a> );
+                             OK.
+
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_352x224"><I>TV_352x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                     :
+    <A HREF="../func/init.htm#slSetTVMode"><I>slSetTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> );
+                             NG.   
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function does not change the following settings. Set as necessary after executing this function.</i></b><BR><B><I>
+      ○ VDP2 cycle mode ○ Window for scroll screen ○ Sprite display forward limit value (ZdspLevel)
+    Also, noise may appear on the screen, so please turn off <A HREF="../func/scroll.htm#slTVOff"><I>slTVOff</i></a> as necessary.
+    Please run the function.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/init.htm#slInitSystem">slInitSystem</a></TD><TD><PRE> <A HREF="../func/init.htm#slSetScrTVMode">slSetScrTVMode</a></TD><TD><PRE> <A HREF="../func/init.htm#slSetSprTVMode">slSetSprTVMode</a></TD><TD><PRE> <A HREF="../func/scroll.htm#slTVOff">slTVOff</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/scroll.htm#slTVOn">slTVOn</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenDist">MsScreenDist</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#WindowNumber">Window Number</a></TD><TD><PRE> <A HREF="../mem/system02.htm#WinUseFlag">WinUseFlag</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenLeft">MsScreenLeft</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenTop">MsScreenTop</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#MsScreenRight">MsScreenRight</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenBottom">MsScreenBottom</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeX">MsScreenSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeY">MsScreenSizeY</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeX">MsWindowSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeY">MsWindowSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWinXAdder">MsWinXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWinYAdder">MsWinYAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#SlWinXAdder">SlWinXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlWinYAdder">SlWinYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipXAdder">MsClipXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipYAdder">MsClipYAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#SlClipXAdder">SlClipXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlClipYAdder">SlClipYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#Resolution">Resolution</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_TVSTAT">VDP2_TVSTAT</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system07.htm#VDP2_SPCTL">VDP2_SPCTL</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParA">RotScrParA</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParB">RotScrParB</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#init">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slSetScrTVMode"><HR NOSHADE></a><H4> function</H4><H1> slSetScrTVMode</H1><HR>
+<H3> VDP2 resolution switching</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slSetScrTVMode( mode );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode - TV mode (described later).<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Set the TV mode for the part related to scroll control (VDP2).<BR>
+    Similar to <A HREF="../func/init.htm#slSetTVMode"><I>the slSetTVMode</i></a> function above, it returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> when switching the system clock.<BR>
+    The screen mode "mode" has
+<PRE>        <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> , <A HREF="../struct/constenm.htm#TV_320x240"><I>TV_320x240</i></a> , <A HREF="../struct/constenm.htm#TV_320x256"><I>TV_320x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_352x224"><I>TV_352x224</i></a> , <A HREF="../struct/constenm.htm#TV_352x240"><I>TV_352x240</i></a> , <A HREF="../struct/constenm.htm#TV_352x256"><I>TV_352x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_640x224"><I>TV_640x224</i></a> , <A HREF="../struct/constenm.htm#TV_640x240"><I>TV_640x240</i></a> , <A HREF="../struct/constenm.htm#TV_640x256"><I>TV_640x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_704x224"><I>TV_704x224</i></a> , <A HREF="../struct/constenm.htm#TV_704x240"><I>TV_704x240</i></a> , <A HREF="../struct/constenm.htm#TV_704x256"><I>TV_704x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_320x448"><I>TV_320x448</i></a> , <A HREF="../struct/constenm.htm#TV_320x480"><I>TV_320x480</i></a> , <A HREF="../struct/constenm.htm#TV_320x512"><I>TV_320x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_352x448"><I>TV_352x448</i></a> , <A HREF="../struct/constenm.htm#TV_352x480"><I>TV_352x480</i></a> , <A HREF="../struct/constenm.htm#TV_352x512"><I>TV_352x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_640x448"><I>TV_640x448</i></a> , <A HREF="../struct/constenm.htm#TV_640x480"><I>TV_640x480</i></a> , <A HREF="../struct/constenm.htm#TV_640x512"><I>TV_640x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_704x448"><I>TV_704x448</i></a> , <A HREF="../struct/constenm.htm#TV_704x480"><I>TV_704x480</i></a> , <A HREF="../struct/constenm.htm#TV_704x512"><I>TV_704x512</i></a>
+</PRE>    is entered.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_352x224"><I>TV_352x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                     :
+    <A HREF="../func/init.htm#slSetScrTVMode"><I>slSetScrTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_352x480"><I>TV_352x480</i></a> );
+                             OK.
+
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_352x448"><I>TV_352x448</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                     :
+    <A HREF="../func/init.htm#slSetScrTVMode"><I>slSetScrTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_320x448"><I>TV_320x448</i></a> );
+                             NG.   
+
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_352x448"><I>TV_352x448</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                     :
+    <A HREF="../func/init.htm#slSetScrTVMode"><I>slSetScrTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_352x240"><I>TV_352x240</i></a> );
+                             NG.
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    If the sprite is displayed in interlaced mode, be sure to also scroll in interlaced mode.</i></b><BR><B><I>
+    This is because EvenFrame and OddFrame are obtained from the VDP2 status.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/init.htm#slInitSystem">slInitSystem</a></TD><TD><PRE> <A HREF="../func/init.htm#slSetSprTVMode">slSetSprTVMode</a></TD><TD><PRE> <A HREF="../func/init.htm#slSetTVMode">slSetTVMode</a></TD><TD><PRE> <A HREF="../func/scroll.htm#slTVOff">slTVOff</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/scroll.htm#slTVOn">slTVOn</a></TD><TD><PRE> <A HREF="../mem/system03.htm#Resolution">Resolution</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_TVSTAT">VDP2_TVSTAT</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#init">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slSetSprTVMode"><HR NOSHADE></a><H4> function</H4><H1> slSetSprTVMode</H1><HR>
+<H3> VDP1 resolution switching</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slSetSprTVMode( mode );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode - TV mode (described later).<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Set the TV mode for the part related to sprite control (VDP1).<BR>
+    Similar to <A HREF="../func/init.htm#slSetTVMode"><I>the slSetTVMode</i></a> function above, it returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> when switching the system clock.<BR>
+    Also, when switching to interlace mode, adjust the counter so that 2 interrupts equal 1 frame.<BR>
+    The sprite window will be initialized, the perspective setting (angle of view 90°), and the sprite data type will be changed.<BR>
+    Sprite data type changes only bit 3 out of 4 bits.<BR>
+    The screen mode "mode" has
+<PRE>        <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> , <A HREF="../struct/constenm.htm#TV_320x240"><I>TV_320x240</i></a> , <A HREF="../struct/constenm.htm#TV_320x256"><I>TV_320x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_352x224"><I>TV_352x224</i></a> , <A HREF="../struct/constenm.htm#TV_352x240"><I>TV_352x240</i></a> , <A HREF="../struct/constenm.htm#TV_352x256"><I>TV_352x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_640x224"><I>TV_640x224</i></a> , <A HREF="../struct/constenm.htm#TV_640x240"><I>TV_640x240</i></a> , <A HREF="../struct/constenm.htm#TV_640x256"><I>TV_640x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_704x224"><I>TV_704x224</i></a> , <A HREF="../struct/constenm.htm#TV_704x240"><I>TV_704x240</i></a> , <A HREF="../struct/constenm.htm#TV_704x256"><I>TV_704x256</i></a>
+        <A HREF="../struct/constenm.htm#TV_320x448"><I>TV_320x448</i></a> , <A HREF="../struct/constenm.htm#TV_320x480"><I>TV_320x480</i></a> , <A HREF="../struct/constenm.htm#TV_320x512"><I>TV_320x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_352x448"><I>TV_352x448</i></a> , <A HREF="../struct/constenm.htm#TV_352x480"><I>TV_352x480</i></a> , <A HREF="../struct/constenm.htm#TV_352x512"><I>TV_352x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_640x448"><I>TV_640x448</i></a> , <A HREF="../struct/constenm.htm#TV_640x480"><I>TV_640x480</i></a> , <A HREF="../struct/constenm.htm#TV_640x512"><I>TV_640x512</i></a>
+        <A HREF="../struct/constenm.htm#TV_704x448"><I>TV_704x448</i></a> , <A HREF="../struct/constenm.htm#TV_704x480"><I>TV_704x480</i></a> , <A HREF="../struct/constenm.htm#TV_704x512"><I>TV_704x512</i></a>
+</PRE>    is entered.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_352x448"><I>TV_352x448</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                     :
+    <A HREF="../func/init.htm#slSetSprTVMode"><I>slSetSprTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_352x240"><I>TV_352x240</i></a> );
+                             OK.   
+
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_352x224"><I>TV_352x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                     :
+    <A HREF="../func/init.htm#slSetSprTVMode"><I>slSetSprTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_352x480"><I>TV_352x480</i></a> );
+                             NG.
+
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_352x448"><I>TV_352x448</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                     :
+    <A HREF="../func/init.htm#slSetSprTVMode"><I>slSetSprTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_320x448"><I>TV_320x448</i></a> );
+                             NG.   
+
+    <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_320x448"><I>TV_320x448</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                     :
+    <A HREF="../func/init.htm#slSetScrTVMode"><I>slSetScrTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> );
+    <A HREF="../func/init.htm#slSetSprTVMode"><I>slSetSprTVMode</i></a> ( <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> );
+                             OK.   
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    You cannot put a sprite in interlaced mode if scrolling is not in interlaced mode.</i></b><BR><B><I>
+    This is because EvenFrame and OddFrame are obtained from the VDP2 status.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/init.htm#slInitSystem">slInitSystem</a></TD><TD><PRE> <A HREF="../func/init.htm#slSetScrTVMode">slSetScrTVMode</a></TD><TD><PRE> <A HREF="../func/init.htm#slSetTVMode">slSetTVMode</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenDist">MsScreenDist</a></TD><TD><PRE> <A HREF="../mem/system02.htm#WindowNumber">Window Number</a></TD><TD><PRE> <A HREF="../mem/system02.htm#WinUseFlag">WinUseFlag</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#MsScreenLeft">MsScreenLeft</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenTop">MsScreenTop</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenRight">MsScreenRight</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenBottom">MsScreenBottom</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeX">MsScreenSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeY">MsScreenSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeX">MsWindowSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeY">MsWindowSizeY</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsWinXAdder">MsWinXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWinYAdder">MsWinYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlWinXAdder">SlWinXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlWinYAdder">SlWinYAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsClipXAdder">MsClipXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipYAdder">MsClipYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlClipXAdder">SlClipXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlClipYAdder">SlClipYAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#Resolution">Resolution</a></TD><TD><PRE> <A HREF="../mem/system04.htm#VDP2_TVSTAT">VDP2_TVSTAT</a></TD><TD><PRE> <A HREF="../mem/system07.htm#VDP2_SPCTL">VDP2_SPCTL</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParA">RotScrParA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#RotScrParB">RotScrParB</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#init">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDynamicFrame"><HR NOSHADE></a><H4> function</H4><H1> slDynamicFrame</H1><HR>
+<H3> Setting the wait mode for drawing completion</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> flag;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slDynamicFrame( flag );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> flag - toggle dynamic frame mode</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - error status</PRE></P>
+<P><DT><H3> function</H3><DD><PRE>
+    Switches between a constant frame change and a dynamic frame change that waits for VDP1 to finish drawing.<BR>
+    Specify either <A HREF="../struct/constenm.htm#ON"><I>ON</i></a> or <A HREF="../struct/constenm.htm#OFF"><I>OFF</i></a> for flag.<BR>
+    Returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if in interlaced mode.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Fixed interval → Indeterminate interval /* Switch from 1 int fixed to 2 int base indeterminate mode */
+      extern <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> <A HREF="../mem/system01.htm#SynchConst"><I>SynchConst</i></a> ; /* unsigned int instead of signed int */
+                               /* ^^^^^^ ^^^^^^^^ */
+      <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , 1 );
+                  :
+                  :
+      /* Set indefinite interval mode-2 */
+      <A HREF="../func/init.htm#slDynamicFrame"><I>slDynamicFrame</i></a> ( <A HREF="../struct/constenm.htm#ON"><I>ON</i></a> );
+      <A HREF="../mem/system01.htm#SynchConst"><I>SynchConst</i></a> = 2; /* not -2 */
+      <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> ();
+
+    Indeterminate interval → Fixed interval /* Change from 1 int indeterminate interval to 1 int fixed interval */
+      <A HREF="../func/init.htm#slInitSystem"><I>slInitSystem</i></a> ( <A HREF="../struct/constenm.htm#TV_320x224"><I>TV_320x224</i></a> , <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> , -1 );
+                   :
+                   :
+      /* Set fixed interval mode 1 */
+      <A HREF="../func/init.htm#slDynamicFrame"><I>slDynamicFrame</i></a> ( <A HREF="../struct/constenm.htm#OFF"><I>OFF</i></a> );
+      /* No need to change <A HREF="../mem/system01.htm#SynchConst"><I>SynchConst</i></a> */
+      <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> ();
+
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    When changing from fixed interval to indefinite interval (dynamic frame mode), enter a positive number instead of a negative number in the system variable " <A HREF="../mem/system01.htm#SynchConst"><I>SynchConst</i></a> ".</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/init.htm#slInitSystem">slInitSystem</a></TD><TD><PRE> <A HREF="../mem/system01.htm#SynchConst">SynchConst</a></TD><TD><PRE> <A HREF="../mem/system01.htm#SynchCount">SynchCount</a></TD><TD><PRE> <A HREF="../mem/system03.htm#Resolution">Resolution</a></TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+ <A HREF="index.htm">return</a><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,164 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/54&gt;VDP1 User's Manual/4.2 Frame Buffer Switching Mode Register</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p04_11.htm">Back</a> ｜ <A HREF="p04_13.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 4 System Registers</b><HR NOSHADE>
+<DL>
+<A NAME="no4_20"></A><P><DT><H2> ■4.2 Frame buffer switching mode register</H2><DD> The Frame Buffer Change Mode Register (FBCR) controls switching between drawing and displaying the frame buffer and drawing double-dense interlacing. This is a 16-bit write-only register located at address 100002H. After the power is turned on or reset, the value becomes undefined, so be sure to set the switching mode. Set unused bits to 0.</P>
+<P><DT><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> FBCR<BR> 100002H<BR> (W)</TH><TH><PRE> bit15</TH><TH><PRE> bit14</TH><TH><PRE> bit13</TH><TH><PRE> bit12</TH><TH><PRE> bit11</TH><TH><PRE> bit10</TH><TH><PRE> bit9</TH><TH><PRE> bit8</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> EOS</TD><TD> DIE</TD><TD> DIL</TD><TD> FCM</TD><TD> FCT</TD></TR>
+</P>
+</TABLE>
+</P>
+<A NAME="fcb"></A><P><DT> <B>Frame buffer change mode bit:</b> frame buffer change mode (FCM), bit1<A NAME="fct"></A><DT> <B>Frame buffer change trigger bit:</b> frame buffer change trigger (FCT), bit0<P><DT><UL TYPE=DISC>
+<LI> Typically, two frame buffers are used, one as the front and the other as the back. Leave the front side visible and draw on the back side. Then, after one frame switching time has passed, the front and back sides are toggled. The front side that was displayed becomes the back side that is drawn, and the back side that was drawn becomes the front side that is displayed.</P>
+<P><LI> Frame buffer access can only be made on the drawing side. This is not possible on the display side.</P>
+<P><LI> There is a limit to the number of characters that can be drawn in one frame, so if you want to draw many characters, set it to manual mode and control erase and change from the CPU.</P>
+<P><LI> When any data is written from the CPU to FBCR, the values of FCM and FCT are updated inside VDP1 when the field changes.</P>
+<P><LI> In manual mode, the FCT bit setting is valid only for the next frame. When a frame changes, the contents of FCT are updated internally.</P>
+<P><LI> Set FCM and FCT immediately after the V blank OUT interrupt. Access is prohibited from the first H blank IN interrupt after the V blank OUT interrupt until the next H blank IN interrupt.</UL>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE> VBE</TH><TH><PRE> FCM</TH><TH><PRE> FCT</TH><TH><PRE> switching mode</TH><TH><PRE> switching time</TH></TR>
+<TR ALIGN=CENTER><TH><PRE> 0</TH><TH><PRE> 0</TH><TH><PRE> 0</TH><TD><PRE> 1 cycle mode</TD><TD><PRE> Changes every 1/60 seconds</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> 0</TH><TH><PRE> 0</TH><TH><PRE> 1</TH><TD><PRE> Setting prohibited</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> 0</TH><TH><PRE> 1</TH><TH><PRE> 0</TH><TD><PRE> Manual mode (erase)</TD><TD><PRE> Erase in next field</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> 0</TH><TH><PRE> 1</TH><TH><PRE> 1</TH><TD><PRE> Manual mode (change)</TD><TD><PRE> Change in next field</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> 1</TH><TH><PRE> 0</TH><TH><PRE> 0</TH><TD><PRE> Setting prohibited</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> 1</TH><TH><PRE> 0</TH><TH><PRE> 1</TH><TD><PRE> Setting prohibited</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> 1</TH><TH><PRE> 1</TH><TH><PRE> 0</TH><TD><PRE> Setting prohibited</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TH><PRE> 1</TH><TH><PRE> 1</TH><TH><PRE> 1</TH><TD><PRE> manual mode<BR> (Erase & Change)</TD><TD><PRE> Erase with V blank,<BR> Change in next field</TD></TR>
+</TABLE>
+</P>
+<A NAME="no4_20_0"></A><P><DT> <B>1 cycle mode</b><P><DT><UL TYPE=DISC>
+<LI> This is normal mode.</P>
+<P><LI> One frame changes automatically every 1/60 seconds.</P>
+<P><LI> Set the VBE and FCT bit values to 0.</UL>
+</P>
+<A NAME="no4_20_1"></A><P><DT> <B>Erase (manual mode)</b><P><DT><UL TYPE=DISC>
+<LI> Control one frame erase write from CPU.</P>
+<P><LI> Specify manual erase write of the frame buffer by writing to the registers with VBE=0, FCM=1, and FCT=0. Erase writes to the display frame buffer on the next specified field, clearing the display frame buffer.</P>
+<P><LI> There is no switching between drawing and display framebuffers. When you erase, the display frame buffer is cleared, so if you want to display it, you must specify change in the field after specifying erase to switch between drawing and display.</P>
+<P><LI> Use this mode when one frame consists of two or more fields, such as double-dense interlacing. Also, when switching from manual mode to 1 cycle mode, use this erase in the field before switching.</P>
+<P><LI> Erase is used when you know that a frame change will occur in the next field. If the frame change is unknown up to the previous field, use Erase & Change.</UL>
+</P>
+<A NAME="no4_20_2"></A><P><DT> <B>Change (manual mode)</b><P><DT><UL TYPE=DISC>
+<LI> The switching of one frame is controlled from the CPU.</P>
+<P><LI> Specify switching by writing to the registers with VBE=0, FCM=1, and FCT=1. The next specified field will be toggled between drawing and display.</P>
+<P><LI> Since no erase write is performed, it is necessary to specify erase in the field immediately before specifying change and erase write the frame buffer.</P>
+<P><LI> You can draw characters on the back side until you instruct to switch.</P>
+<P><LI> Normally, this change is used when switching from 1 cycle mode to manual mode. Also, use this change when switching frame buffers in manual mode.</UL>
+</P>
+<A NAME="no4_20_3"></A><P><DT> <B>Erase & Change (Manual mode)</b><P><DT><UL TYPE=DISC>
+<LI> Setting VBE = 1 in the register specifies V blank erase, and setting FCM = 1 and FCT = 1 specifies frame buffer switching after V blank.</P>
+<P><LI> Use this when the frame change is unknown up to the previous V blank, such as when not switching frame buffers until CPU processing is finished.</P>
+<P><LI> Once VBE is set to 1, erase writing will be performed automatically on the next V blank, so after a frame change, set VBE to 0 before the next V blank.</P>
+<P><LI> Perform erase and change settings immediately after the V blank IN interrupt. If you set it to anything else, it may change without being able to be erased.</P>
+<P><LI> If you are using normal or high resolution, and you know the frame change timing in advance, such as with interlace, specify erase and change and perform an erase write during the display period. In this case, it is possible to erase/write the entire display screen.</UL>
+</P>
+<A NAME="no4_21"></A><P><DT> <B>●Sequence when using erase & change</b></P>
+<P><DT><OL>
+<LI> Set VBE=0, FCM=1, FCT=1.</P>
+<P><LI> Wait for the CPU, etc. to finish processing without setting TV mode selection or FB switching mode.</P>
+<P><LI> If CPU processing is completed by the H blank IN interrupt immediately before the V blank (224th line when 224 lines are displayed, 240th line when 240 lines are displayed), VBE = 1, FCM = 1, FCT = 1 ( Erase & Change). Perform erase and change settings immediately after the V blank IN interrupt.</P>
+<P><LI> After the V blank IN interrupt ends, the V blank erase starts.</P>
+<P><LI> At the end of the V blank, the erase write is interrupted and a frame change is performed.</P>
+<P><LI> If the erase write is not completed, please erase the unerased area using polygons.</P>
+<P><LI> Immediately after the V blank OUT interrupt, return VBE to 0 to stop V blank erase.</P>
+<P><LI> Return to (2).</OL>
+</P>
+<A NAME="no4_22"></A><P><DT> <B>●Usage example</b><DD> Here is an example using framebuffer switching mode.</P>
+<A NAME="t4_3a"></A><P><DD> <B>Table 4.3(a) Example of using frame buffer switching mode (VBE=0 fixed)</b><DD><TABLE BORDER=1>
+<TR><TD COLSPAN=2><PRE> Setting value *1</TD><TD ROWSPAN=2><PRE> *2<BR> frame buffer 0</TD><TD ROWSPAN=2><PRE> *2<BR> frame buffer 1</TD><TD ROWSPAN=2><PRE> frame buffer<BR> switching mode</TD><TD ROWSPAN=2><PRE> switching<BR> time</TD></TR>
+<TR><TD><PRE> FCM</TD><TD><PRE> FCT</TD></TR>
+<TR><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> drawing</TD><TD><PRE> Display + erase write</TD><TD ROWSPAN=4><PRE> 1 cycle mode</TD><TD ROWSPAN=5><PRE> 60 frames/sec</TD></TR>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE> Display + erase write</TD><TD><PRE> drawing</TD></TR>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE> drawing</TD><TD><PRE> Display + erase write</TD></TR>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE> Display + erase write</TD><TD><PRE> drawing</TD></TR>
+<TR><TD><PRE> 1</TD><TD><PRE> 1</TD><TD><PRE> drawing</TD><TD><PRE> Display + erase write</TD><TD><PRE> Manual mode (change)*3</TD></TR>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE> display</TD><TD><PRE> drawing</TD><TD><PRE></TD><TD ROWSPAN=6><PRE> 20 frames/sec</TD></TR>
+<TR><TD><PRE> 1</TD><TD><PRE> 0</TD><TD><PRE> display</TD><TD><PRE> drawing</TD><TD><PRE> Manual mode (erase)*4</TD></TR>
+<TR><TD><PRE> 1</TD><TD><PRE> 1</TD><TD><PRE> Display + erase write</TD><TD><PRE> drawing</TD><TD><PRE> Manual mode (change) *4</TD></TR>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE> drawing</TD><TD><PRE> display</TD><TD><PRE></TD></TR>
+<TR><TD><PRE> 1</TD><TD><PRE> 0</TD><TD><PRE> drawing</TD><TD><PRE> display</TD><TD><PRE> Manual mode (erase)*5</TD></TR>
+<TR><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> drawing</TD><TD><PRE> Display + erase write</TD><TD ROWSPAN=3><PRE> 1 cycle mode</TD></TR>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE> Display + erase write</TD><TD><PRE> drawing</TD><TD ROWSPAN=2><PRE> 60 frames/sec</TD></TR>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE> drawing</TD><TD><PRE> Display + erase write</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>[note]</b><DD> <B>*1</b> This is the value written to the register immediately after the V blank OUT interrupt.<DD> <B>*2</b> Switches from the beginning of the field<DD> <B>*3</b> changes switches from 1 cycle mode to manual mode<DD> <B>*4Erase</b> and change must be specified consecutively.<DD> <B>*5</b> Please specify erase in the field immediately before switching to 1 cycle mode.</P>
+<A NAME="t4_3b"></A><P><DD> <b>Table 4.3(b) Example of using frame buffer switching mode (using VBE)</b><DD><img srcset="../grp/i042_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="die"></A><A NAME="dil"></A><P><DT> <B>Double interlace enable bit:</b> double interlace enable (DIE), bit3<DT> <B>Double interlace plot line:</b> double interlace plot line(DIL), bit2</P>
+<A NAME="dil_0"></A><P><DT><UL TYPE=DISC>
+<LI> Simple dense interlacing displays the same picture in even and odd fields. On the other hand, double-dense interlacing doubles the vertical resolution by displaying different pictures (drawing only even and odd lines, respectively) in even and odd fields.</P>
+<P><LI> DIE=1 enables double-dense interlacing.</P>
+<P><LI> The contents of the first display screen after changing DIE are not guaranteed.</P>
+<P><LI> For double-dense interlacing, set FCM=FCT=0 (1 cycle mode) to switch fields every 1/60 seconds.</UL>
+</P>
+<A NAME="t_dil_0"></A><P><DD><TABLE BORDER=1>
+<TR><TD><PRE> D.I.E.</TD><TD><PRE> DIL</TD><TD><PRE> interlaced mode</TD><TD><PRE> Drawing after next frame change</TD></TR>
+<TR><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> Non-interlaced/<BR> Single dense interlace</TD><TD><PRE> Full line drawing</TD></TR>
+<TR><TD><PRE> 0</TD><TD><PRE> 1</TD><TD><PRE> Setting prohibited</TD><TD><PRE> −</TD></TR>
+<TR><TD><PRE> 1</TD><TD><PRE> 0</TD><TD><PRE> double dense interlace</TD><TD><PRE> Draw only even numbered (EVEN) lines</TD></TR>
+<TR><TD><PRE> 1</TD><TD><PRE> 1</TD><TD><PRE> double dense interlace</TD><TD><PRE> Draw only odd number (ODD) lines</TD></TR>
+</TABLE>
+</P>
+<A NAME="z4_1"></A><P><DD> <B>Figure 4.1 Displaying single-dense and double-dense interlacing</b><PRE>
+●Single-dense interlace display                ●Double-dense interlace display　
+┌────────┐                                     ┌────────┐　
+│ 0 line ├────────┐                            │ 0 line ├────────┐
+├────────┤ 0 line │                            ├────────┤ 1 line │
+│ 1 line ├────────┤                            │ 2 lines├────────┤
+├────────┤ 1 line │                            ├────────┤ 3 lines│
+│ 2 lines├────────┤                            │ 4 lines├────────┤
+├────────┤ 2 lines│                            ├────────┤ 5 lines│
+│ 3 lines├────────┤                            │ 6 lines├────────┤
+└────────┤ 3 lines│                            └────────┤ 7 lines│
+         └────────┘                                     └────────┘
+・Appears to be 256 vertical lines              ・Appears to be 512 vertical lines　
+・Frame changes every 1/60 seconds              ・Only even (or odd) lines are drawn in each frame buffer.
+・Either change the frame every 1/60 seconds
+ and draw the same thing twice, or change
+ the frame every 1/30 seconds
+ (instructed by the CPU using a 1/60 second
+ signal)
+</PRE></P>
+<A NAME="_z4_1_0"></A><P><DT><B>Even/odd coordinate select bit:</b> even/odd coordinate select bit(EOS), bit4<P><DT><UL TYPE=DISC>
+<LI> This bit is enabled when High Speed Shrink (HSS) is set to 1 for a rectangular sprite or a deformed sprite. If HSS=1 is specified, lines where the drawing magnification is &lt;1 will be drawn by sampling only pixels at either even or odd coordinates of the original picture data. This bit specifies whether even or odd coordinates are to be sampled.</P>
+<P><LI> When EOS=0, only pixels with even coordinates are sampled. When EOS=1, only pixels at odd coordinates are sampled.</P>
+<P><LI> If HSS=0 is specified, this bit is not referenced.</P>
+<P><LI> For more information, please refer to " <B><A HREF="p06_31.htm">High Speed Shrink</a></b> " in " <B><A HREF="p06_30.htm">6.3 Drawing Mode Words</a></b> ".</UL>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR><TD><PRE> EOS</TD><TD><PRE> Even/odd coordinate selection bit</TD></TR>
+<TR><TD><PRE> 0</TD><TD><PRE> Sample only pixels with even coordinates</TD></TR>
+<TR><TD><PRE> 1</TD><TD><PRE> Sample only pixels with odd coordinates</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_11.htm">Back</a> ｜ <A HREF="p04_13.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,134 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/ 8&gt;CD communication I/F (MPEG part)/6.Other MPEG functions</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication I/F (MPEG part)</b><H2 ALIGN=CENTER> 6. Other MPEG features</H2><HR NOSHADE>
+<DL>
+<A NAME="no6_10"></A><P><DT><H3> 6.1 MPEG display screen<BR>
+ (framebuffer window and display window)</H3><DD> Screen display in the MPEG system is performed by outputting data in a frame buffer window to a display window. Figure 6.1 shows the relationship between each window.</P>
+<A NAME="z6_1"></A><P ALIGN=CENTER> <B>Figure 6.1 Frame buffer window and display window</b><BR>
+<img srcset="../grp/i026_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(1) Frame buffer window</b><DD> The display data rectangular area within the frame buffer is called a frame buffer window.<BR>
+ The following values can be set for frame buffer windows:</P>
+<DD><OL TYPE=a>
+<P> <B><LI>Position (fpx, fpy):</li>
+</b><BR>
+ Frame buffer window top left coordinate ( <A HREF="p08_10.htm#22.2">CDC_MpSetWinFpos</a> )</P>
+<P> <B><LI>Magnification rate (frx, fry):</li>
+</b><BR>
+ Frame buffer window magnification ( <A HREF="p08_10.htm#22.3">CDC_MpSetWinFrat</a> )</P>
+</OL>
+<P><DD> However, the actual formula for calculating the frame buffer window size is not a simple multiplication of the display window size and the magnification ratio.</P>
+<P><DT> <B>(2) Display window</b><DD> The rectangular area actually displayed on the TV monitor is called a display window.<BR>
+ The following values can be set for display windows:</P>
+<DD><OL TYPE=a>
+<P> <B><LI>Position (dpx, dpy):</li>
+</b><BR>
+ Display window top left coordinate ( <A HREF="p08_10.htm#22.4">CDC_MpSetWinDpos</a> )</P>
+<P> <B><LI>Size (dsx, dsy):</li>
+</b><BR>
+ Display window size ( <A HREF="p08_10.htm#22.5">CDC_MpSetWinDsiz</a> )</P>
+<P> <B><LI>Offset (dox, doy):</li>
+</b><BR>
+ Position of display area on TV monitor ( <A HREF="p08_10.htm#22.6">CDC_MpSetWinDofs</a> )</P>
+</OL>
+<P><DD> <B>"remarks"</b><DD> The window size and coordinate values set here are unrelated to the settings for VDP2.</P>
+<A NAME="no6_20"></A><P><DT><H3> 6.2 MPEG Frame Buffer</H3><A NAME="no6_621"></A><P><DT> <B>6.2.1 Extracting image data</b><DD> Image data generated in the MPEG frame buffer can be retrieved to the host through MPEG registers.<BR>
+ The image data retrieved is not the frame buffer window data itself, but the same data as the display window image.</P>
+<A NAME="z6_2"></A><P ALIGN=CENTER> <B>Figure 6.2 Extracting image data</b><BR>
+<img srcset="../grp/i027_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(1) Image data format</b><DD> The image data is reduced to 32K color data in 15-bit RGB555 format.</P>
+<P><DT> <B>(2) Retrieving image data (CDC_MpGetImg)</b><DD> Issue the command when the image output preparation is complete. After issuing the command, the host transfers and retrieves the data from the MPEG register.<BR>
+ The output destination of image data must be set to host output. (Invalid for VDP2 output)<BR>
+ This function is valid in both video playback mode and still image playback mode.</P>
+<A NAME="no6_622"></A><P><DT> <B>6.2.2 Reading and writing image data</b><BR>
+ <B>(Image data window)</b><DD> The MPEG frame buffer consists of four frame banks at normal resolution and one frame bank at high definition resolution.<BR>
+ In still image playback mode, image data can be read and written between the image data window defined in the frame bank and the buffer section.</P>
+<A NAME="z6_3"></A><P ALIGN=CENTER> <B>Figure 6.3 Reading and writing image data</b><BR>
+<img srcset="../grp/i028_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(1) Image data window</b><DD> The image data window can be set for any frame bank among frame banks 0 to 3. (Fixed frame bank to 0 when using high-definition resolution)<BR>
+ The following values can be set for image data windows:</P>
+<DD><OL TYPE=a>
+<P> <B><LI>Location (ipx, ipy):</li>
+</b><BR>
+ Top left coordinate of image data window (CDC_MpSetImgPos)</P>
+<P> <B><LI>Size (isx, isy):</li>
+</b><BR>
+ Image data window size (CDC_MpSetImgSiz)</P>
+</OL>
+<A NAME="z6_4"></A><P ALIGN=CENTER> <B>Figure 6.4 Image data window</b><BR>
+<img srcset="../grp/i028_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(2) Image data format</b><DD> Image data is decomposed into YCC4:2:0 format luminance/color difference data (the following three elements).</P>
+<DD><UL TYPE=DISC>
+<LI> Luminance data (Y): Number of data is (isx×isy) bytes<LI> Color difference data (Cr): Number of data is (isx×isy)/4 bytes<LI> Color difference data (Cb): Number of data is (isx×isy)/4 bytes</UL>
+</P>
+<P><DD> To read and write, it is necessary to assign a selector (aperture and buffer section) to each element.</P>
+<P><DT> <B>(3) Reading image data (CDC_MpReadImg)</b><DD> Loads image data from the image data window into the buffer section by specifying the destination aperture number.<BR>
+ Image data is treated as a mode 2 form 1 sector in the buffer section and stored in the user data area (2048 bytes). The first 24 bytes are filled with 0, and the area after the user data is undefined.</P>
+<A NAME="z6_5"></A><P ALIGN=CENTER> <B>Figure 6.5 Loading from the image data window</b><BR>
+<img srcset="../grp/i029_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(4) Exporting image data (CDC_MpWriteImg)</b><DD> Writes image data from the buffer section to the image data window by specifying the source buffer section number.</P>
+<A NAME="z6_6"></A><P ALIGN=CENTER> <B>Figure 6.6 Export to image data window</b><BR>
+<img srcset="../grp/i030_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(5) Selector settings</b><DD> The selector settings required when reading and writing image data must be done on the host side using the CD communication interface. (Clearing the buffer section, connecting the aperture and buffer section, etc.) No selector settings are made on the CD block side.</P>
+<A NAME="no6_30"></A><P><DT><H3> 6.3 MPEG sector buffer</H3> In MPEG sector buffer mode, the MPEG buffer is used as an MPEG sector buffer. This function allows the memory inside the MPEG cartridge to be freely used as a data storage area when the MPEG decoder is not in use.<BR>
+ Access to the MPEG sector buffer is performed by reading and writing sector data (2048 bytes) to and from the CD buffer.<BR>
+ The total number of MPEG sectors is 256. (Does not depend on NTSC/PAL.)</P>
+<P><DT> <B>(1) Reading sector data (CDC_MpReadSct)</b><DD> Specify the read destination aperture number and read sector data from an arbitrary MPEG sector position in the MPEG sector buffer into the buffer section.<BR>
+ MPEG sector data is handled as a mode 2 form 1 sector in the buffer section and is stored in the user data area (2048 bytes). The first 24 bytes are filled with 0, and the area after the user data is undefined.</P>
+<A NAME="z6_7"></A><P ALIGN=CENTER> <B>Figure 6.7 Reading from MPEG sector buffer</b><BR>
+<img srcset="../grp/i031_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(2) Writing sector data (CDC_MpWriteSct)</b><DD> Specify the write source buffer partition number and write sector data from the buffer partition to an arbitrary MPEG sector position in the MPEG sector buffer.</P>
+<A NAME="z6_8"></A><P ALIGN=CENTER> <B>Figure 6.8 Writing to MPEG sector buffer</b><BR>
+<img srcset="../grp/i031_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no6_40"></A><P><DT><H3> 6.4 REJECT and WAIT for MPEG commands</H3><P><DT> <B>(1) REJECT by operation mode</b><DD> Table 6.1 shows the conditions under which an MPEG command becomes REJECT depending on the MPEG operation mode and the output destination of image data.</P>
+<DD> <B>Table 6.1 Conditions for MPEG command to become REJECT</b><DD><TABLE BORDER=1>
+<TR><TH> function name</TH><TH> MPEG operation mode</TH><TH> Image data output destination</TH></TR>
+<TR><TD> <A HREF="p08_10.htm#23.1">CDC_MpGetImg</a></TD><TD> -</TD><TD> VDP2 output</TD></TR>
+<TR><TD> <A HREF="p08_10.htm#23.4">CDC_MpReadImg</a> , <A HREF="p08_10.htm#23.5">CDC_MpWriteImg</a><TD> Other than still image playback mode</TD><TD> -</TD></TR>
+<TR><TD> <A HREF="p08_10.htm#24.1">CDC_MpReadSct</a> , <A HREF="p08_10.htm#24.2">CDC_MpWriteSct</a></TD><TD> Other than MPEG sector buffer mode</TD><TD> -</TD></TR>
+</TABLE>
+<P><DT> <B>(2) LONG WAIT and SHORT WAIT</b><DD> WAIT for MPEG commands includes LONG WAIT and SHORT WAIT.<BR>
+ LONG WAIT occurs when a command that cannot be executed in the current MPEG operation mode or MPEG status is issued. The host should retry (re-execute) after these conditions have changed.<BR>
+ SHORT WAIT occurs when a specific command is issued while the internal state of the CD block is changing. The host should retry several times at intervals of 50 μsec or more.</P>
+<A NAME="t6_2"></A><P><DD> <B>Table 6.2 Factors that cause LONG WAIT</b><DL>
+<P><DT> <B><A HREF="p08_10.htm#20.8">CDC_MpSetDec</a></b><DD> Pause or freeze was set when the video was in the recovery process.</P>
+<P><DT> <B><A HREF="p08_10.htm#20.9">CDC_MpOutDsync</a></b><DD> The decode timing is VSYNC synchronized.</P>
+<P><DT> <B><A HREF="p08_10.htm#21.1">CDC_MpSetCon</a></b><DD> A connection destination buffer section was already set, but it was set again.<BR>
+ The current connection destination was canceled when the video or audio operating state was playback, switching, or restoration processing.<BR>
+ The next connection destination was canceled when the video or audio operating status was switched.</P>
+<P><DT> <B><A HREF="p08_10.htm#21.3">CDC_MpChgCon</a></b><DD> Switching was performed when the next destination buffer partition was not registered. The operating state is not playing.</P>
+<P><DT> <B><A HREF="p08_10.htm#21.4">CDC_MpSetStm</a></b><DD> The video or audio operating state is in a switching state.</P>
+<P><DT> <B><A HREF="p08_10.htm#23.1">CDC_MpGetImg</a></b><DD> The MPEG/Video status output ready flag is 0.</P>
+</DL>
+<P><DD> <B>Table 6.3 Functions that can cause SHORT WAIT</b><DD><UL TYPE=DISC>
+<LI> <A HREF="p08_10.htm#20.6">CDC_MpSetMode</a><LI> <A HREF="p08_10.htm#20.7">CDC_MpPlay</a><LI> <A HREF="p08_10.htm#20.8">CDC_MpSetDec</a><LI> <A HREF="p08_10.htm#20.9">CDC_MpOutDsync</a><LI> <A HREF="p08_10.htm#20.10">CDC_MpGetTc</a><LI> <A HREF="p08_10.htm#21.1">CDC_MpSetCon</a><LI> <A HREF="p08_10.htm#21.3">CDC_MpChgCon</a><LI> <A HREF="p08_10.htm#21.4">CDC_MpSetStm</a><LI> <A HREF="p08_10.htm#21.6">CDC_MpGetPictSiz</a><LI> <A HREF="p08_10.htm#22.1">CDC_MpDisp</a><LI> <A HREF="p08_10.htm#22.8">CDC_MpSetFade</a><LI> <A HREF="p08_10.htm#22.9">CDC_MpSetVeff</a></UL>
+</P>
+<P><DD> When a WAIT occurs, first remove the cause of the LONG WAIT, and if the WAIT still does not resolve, retry the SHORT WAIT.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

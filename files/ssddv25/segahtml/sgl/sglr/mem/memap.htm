@@ -1,0 +1,466 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<PRE>
+◎ Mapping of memory used by the system
+
+The system is in the WORK-HI area for controlling sprites and scrolling.
+It uses 0x40000 bytes. Also, the texture is affected by the light source.
+Since Gouraud shading is used when
+It uses 264 bytes of VRAM. Their division and default
+The settings are shown below.
+
+MAX_POLYGONS: 1700 Number of usable polygons
+MAX_VERTICES: 2500 Number of vertices that can be used
+MAX_TRANSFER: 20 Number of transfer requests during blanking
+MAX_NEST: 20 Number of matrix nests
+
+slPutPolygon() adds the number of polygons used in the specified model and the number of vertices.
+If the maximum number is exceeded, the model will not be processed.
+
+Also, slPutSprite(), slDispSprite(), and slSetSprite() change the number of polygons each time they are executed.
+are added one by one, and if the maximum number is exceeded, processing of that data is stopped.
+(However, if the specified Z position is outside the display range, it will not be added.)
+
+
+Work RAM:
+     060C0000: (SortList)
+         Table buffer for DMA transfer of sprite control data
+         (MAX_POLYGONS+6)*3*4 bytes = 0x5400
+         The reason for the +6 is that in addition to drawing sprites,
+         system clipping
+         user clipping
+         relative coordinates
+         window
+         end command
+         This is because system-related commands such as
+         For details, please see the command table in the VDP1 User's Manual.
+     060C4FF8: (Zbuffer)
+         Primary buffer for polygon sorting (for window 0)
+         128*4 = 0x200
+     060C51F8: (Zbuffer2)
+         Primary buffer 2 for polygon sorting (for window 1)
+         128*4 = 0x200
+     060C53F8: (Zbuf_nest)
+         Secondary buffer for polygon sorting
+         256*4 = 0x400
+     060C57F8: (Spritebuf)
+         sprite control data buffer
+         (MAX_POLYGONS+6)*36 = 0xFC00
+         The reason for adding +6 is for the same reason as SortList above.
+     060D53F8: (Spritebuf2)
+         Sprite control data buffer 2
+         (MAX_POLYGONS+6)*36 = 0xFC00
+         The reason for adding +6 is for the same reason as SortList above.
+     060E37C8: (Pbuffer)
+         Vertex position buffer for polygon calculation
+         MAX_VERTICES*16 = 0x9C40
+     060ECDC8: (CLOfstBuf)
+         Color data table due to the influence of light source
+         32*32*3=0xC00
+     060ED9C8: (CommandBuf)
+         Command passing buffer from master to slave
+     060FB800: (TransList)
+         DMA control table for transfer requests during blanking
+         MAX_TRANSFER*3*4 bytes = 0xF0
+     060FB8F0:
+         Stack area (0x4310)
+
+     060FFC00:
+         System variable area (GBR register always points here)
+         0x400 bytes
+The system variables are shown below and can be read with the same name from a C program.
+
+     system variables
+        000: (EventTop) (EVENT *) ; First registered event
+        004: (EventLast) (EVENT *) ; Event registered at the end
+        008: (EventNow) (EVENT *) ; Event being executed
+        00C: (EventCount) (Uint16) ; Remaining number of events
+        00E: (WorkCount) (Uint16) ; Remaining number of works
+        010: (MainMode) (Uint8) ; Main sequence mode
+        011: (SubMode) (Uint8) ; Subsequence mode
+        012: (SynchConst) (Sint8) ; Video synchronization count
+        013: (SynchCount) (Sint8) ; Video synchronization count
+        014: (UserFunction) (void (*)()) ; User function executed during blanking
+        018: (TransCount) (Uint16) ; Number of transfer entries during blanking
+        01A: (TransRequest) (Uint8) ; Request for transfer during blanking
+        01B: (PauseFlag) (Uint8) ; Sprite and scroll pause flag
+        
+        01C: (mtptr) (MATRIX *) ; Current matrix pointer
+        020: (MatrixCount) (Uint8) ; Matrix nest count
+        021: (PrintColor) (Uint8) ; Color palette for displaying text
+        022: (IntCount) (Uint16) ; Interrupt count
+        024: (MsPbufPtr) (Uint32 *) ; Vertex coordinate calculation buffer pointer (Master)
+        028: (SlPbufPtr) (Uint32 *) ; Vertex coordinate calculation buffer pointer (Slave)
+        02C: (SpritePtr) (Uint16 *) ; Sprite data transfer pointer
+        030: (MsSdataPtr) (Uint16 *) ; Sprite data set pointer (Master)
+        034: (SlSdataPtr) (Uint16 *) ; Sprite data set pointer (Master)
+        038: (ZbufPtr) (void **) ; Z buffer pointer
+        03C: (FormTbl) (TEXTURE *) ; Texture data table
+        040: (SprbufBias) (Uint32) ; Sprite data buffer switching
+        044: (ComRdPtr) (Uint32 *) ; Command read pointer
+        048: (ComWrPtr) (Uint32 *) ; Command set pointer
+        04C: (MsLightVector) (VECTOR) ; Light source vector (Master)
+        058: (SlLightVector) (VECTOR) ; Light source vector (Master)
+        064: (ColorOffset) (Uint8 *) ; Color offset table pointer
+        068: (MsScreenDist) (FIXED) ; Screen position (Master)
+        06C: (SlScreenDist) (FIXED); Screen position (Slave)
+        070: (MsZlimit) (Sint16) ; Display limit Z position (Master)
+        072: (WindowNumber) (Uint8) ; Number of windows used
+        073: (WinUseFlag) (Uint8) ; Window use flag
+        074: (TotalPolygons) (Uint16) ; Number of calculated polygons
+        076: (TotalVertices) (Uint16) ; Number of calculation vertices
+        078: (MsScreenLeft) (Sint16) ; Screen left position
+        07A: (MsScreenTop) (Sint16) ; Screen top position
+        07C: (MsScreenRight) (Sint16) ; Screen right position
+        07E: (MsScreenBottom) (Sint16) ; Screen bottom position
+        080: (MsScreenSizeX) (Uint16) ; Screen horizontal size (Master)
+        082: (MsScreenSizeY) (Uint16) ; Screen vertical size (Master)
+        084: (MsWindowSizeX) (Uint16) ; Window size (Master)
+        086: (MsWindowSizeY) (Uint16) ; Window size (Master)
+        088: (MXPolygons) (Uint16) ; Maximum number of polygons
+        08A: (MXVertices) (Uint16) ; Maximum number of vertices
+        08C: (FrameSizeX) (Uint16) ; Frame buffer size
+        08E: (FrameSizeY) (Uint16) ; Frame buffer size
+        090: (MsWinXAdder) (Sint16) ; Addition data for window check (Master)
+        092: (MsWinYAdder) (Sint16) ; Addition data for window check (Master)
+        094: (SlWinXAdder) (Uint16) ; Addition data for window check (Slave)
+        096: (SlWinYAdder) (Uint16) ; Addition data for window check (Slave)
+        098: (MsClipXAdder) (Sint16) ; Addition data for clipping (horizontal) (Master)
+        09A: (MsClipYAdder) (Sint16) ; Addition data for clipping (vertical) (Master)
+        09C: (SlClipXAdder) (Sint16) ; Addition data for clipping (horizontal) (Slave)
+        09E: (SlClipYAdder) (Sint16) ; Addition data for clipping (vertical) (Slave)
+        0A0: (SlZlimit) (Sint16) ; Display limit Z position (Slave)
+        0A2: (WinPtr) (Uint16) ; Window dataset offset
+        0A4: (DispPolygons) (Uint16) ; Number of display polygons
+        0A6: (DMAEndFlag) (Uint8) ; DMA transfer end flag (unused)
+        0A8: (DMASetFlag) (Uint8) ; DMA table set flag
+        0AA: (PutCount) (Uint16) ; Number of calls to slPutPolygon(),sl...Sprite()
+        0AC: (MsZdpsftcnt) (Uint8) ; Screen display limit shift counter (Master)
+        0AD: (SlZdpsftcnt) (Uint8) ; Screen display limit shift counter (Slave)
+        
+        0B0 : (Resolution) (Uint8) ; Screen mode
+        0B1: (NbPCMBf) (Uint8); Number of PCM buffers (in units of 2000H)
+        0B2 : (PCMBufFlag) (Sint16) ; PCM buffer free status flag
+        0B4: (SoundRdCount) (Uint8); Sound buffer read counter
+        0B5: (SoundWrCount) (Uint8); Sound buffer entry counter
+        0B6: (FRT_Count) (Sint16); FRT counter
+        0B7: (SCUMC_ID) (Uint8); SCU memory copy channel number
+        0B8: (DMASt_CPU0) (Uint8); CPU D.M.A. status (CH0)
+        0BA: (DMASt_CPU1) (Uint8); CPU D.M.A. status (CH1)
+        0BB: (DMASt_SCU0) (Uint8); SCU D.M.A. status (CH0)
+        0BC: (DMASt_SCU1) (Uint8); SCU D.M.A. status (CH1)
+        0BD: (DMASt_SCU2) (Uint8); SCU D.M.A. status (CH2)
+        0BE : (---------) (Uint16) ; System reservation
+        
+        0C0: (VDP2_TVMD) (Uint16) ; TV screen mode
+        0C2: (VDP2_EXTEN) (Uint16) ; External signal enable
+        0C4: (VDP2_TVSTAT) (Uint16) ; Screen status
+        0C6: (VDP2_VRSIZE) (Uint16) ; VRAM size
+        0C8: (VDP2_HCNT) (Uint16) ; H counter
+        0CA: (VDP2_VCNT) (Uint16) ; V counter
+        0CE: (VDP2_RAMCTL) (Uint16) ; RAM control
+        0D0: (VDP2_CYCA0L) (Uint16) ; VRAM cycle pattern (bank A0, T0-3)
+        0D2: (VDP2_CYCA0U) (Uint16) ; VRAM cycle pattern (bank A0, T4-7)
+        0D4: (VDP2_CYCA1L) (Uint16) ; VRAM cycle pattern (bank A1, T0-3)
+        0D6: (VDP2_CYCA1U) (Uint16) ; VRAM cycle pattern (Bank A1, T4-7)
+        0D8: (VDP2_CYCB0L) (Uint16) ; VRAM cycle pattern (bank B0, T0-3)
+        0DA: (VDP2_CYCB0U) (Uint16) ; VRAM cycle pattern (bank B0, T4-7)
+        0DC: (VDP2_CYCB1L) (Uint16) ; VRAM cycle pattern (Bank B1, T0-3)
+        0DE: (VDP2_CYCB1U) (Uint16) ; VRAM cycle pattern (Bank B1, T4-7)
+        0E0: (VDP2_BGON) (Uint16) ; Screen display enable
+        0E2: (VDP2_MZCTL) (Uint16) ; Mosaic control
+        0E4: (VDP2_SFSEL) (Uint16) ; Special function code selection
+        0E6: (VDP2_SFCODE) (Uint16) ; Special function code
+        0E8: (VDP2_CHCTLA) (Uint16) ; Character control (NBG0, NBG1)
+        0EA: (VDP2_CHCTLB) (Uint16) ; Character control (NBG2, NBG3, RBG0)
+        0EC: (VDP2_BMPNA) (Uint16) ; Bitmap palette number (NBG0, 1)
+        0EE: (VDP2_BMPNB) (Uint16) ; Bitmap palette number (RBG0)
+        0F0: (VDP2_PNCN0) (Uint16) ; Pattern name control (NBG0)
+        0F2: (VDP2_PNCN1) (Uint16) ; Pattern name control (NBG1)
+        0F4: (VDP2_PNCN2) (Uint16) ; Pattern name control (NBG2)
+        0F6: (VDP2_PNCN3) (Uint16) ; Pattern name control (NBG3)
+        0F8: (VDP2_PNCR) (Uint16) ; Pattern name control (RBG0)
+        0FA: (VDP2_PLSZ) (Uint16) ; Plane size
+        0FC: (VDP2_MPOFN) (Uint16) ; Map offset (NBG0-3)
+        0FE: (VDP2_MPOFR) (Uint16) ; Map offset (rotation parameters A, B)
+        100: (VDP2_MPABN0) (Uint16) ; Map (NBG0 plane A, B)
+        102: (VDP2_MPCDN0) (Uint16) ; Map (NBG0 plane C, D)
+        104: (VDP2_MPABN1) (Uint16) ; Map (NBG1 plane A, B)
+        106: (VDP2_MPCDN1) (Uint16) ; Map (NBG1 plane C, D)
+        108: (VDP2_MPABN2) (Uint16) ; Map (NBG2 plane A, B)
+        10A: (VDP2_MPCDN2) (Uint16) ; Map (NBG2 plane C, D)
+        10C: (VDP2_MPABN3) (Uint16) ; Map (NBG3 plane A, B)
+        10E: (VDP2_MPCDN3) (Uint16) ; Map (NBG3 plane C, D)
+        110: (VDP2_MPABRA) (Uint16) ; Map (rotation parameter A plane A, B)
+        112: (VDP2_MPCDRA) (Uint16) ; Map (rotation parameter A plane C, D)
+        114: (VDP2_MPEFRA) (Uint16) ; Map (rotation parameter A plane E, F)
+        116: (VDP2_MPGHRA) (Uint16) ; Map (rotation parameter A plane G, H)
+        118: (VDP2_MPIJRA) (Uint16) ; Map (rotation parameter A plane I, J)
+        11A: (VDP2_MPKLRA) (Uint16) ; Map (rotation parameter A plane K, L)
+        11C: (VDP2_MPMNRA) (Uint16) ; Map (rotation parameter A plane M, N)
+        11E: (VDP2_MPOPRA) (Uint16) ; Map (rotation parameter A plane O, P)
+        120: (VDP2_MPABRB) (Uint16) ; Map (rotation parameter B plane A, B)
+        122: (VDP2_MPCDRB) (Uint16) ; Map (rotation parameter B plane C, D)
+        124: (VDP2_MPEFRB) (Uint16) ; Map (rotation parameter B plane E, F)
+        126: (VDP2_MPGHRB) (Uint16) ; Map (rotation parameter B plane G, H)
+        128: (VDP2_MPIJRB) (Uint16) ; Map (rotation parameter B plane I, J)
+        12A: (VDP2_MPKLRB) (Uint16) ; Map (rotation parameter B plane K, L)
+        12C: (VDP2_MPMNRB) (Uint16) ; Map (rotation parameter B plane M, N)
+        12E: (VDP2_MPOPRB) (Uint16) ; Map (rotation parameter B plane O, P)
+        130: (VDP2_SCXN0) (FIXED) ; Screen scroll value (NBG0, horizontal fixed decimal)
+        130: (VDP2_SCXIN0) (Sint16) ; Screen scroll value (NBG0, horizontal integer part)
+        132: (VDP2_SCXDN0) (Uint16) ; Screen scroll value (NBG0, horizontal decimal part)
+        134: (VDP2_SCYN0) (FIXED) ; Screen scroll value (NBG0, vertical fixed decimal)
+        134: (VDP2_SCYIN0) (Uint16) ; Screen scroll value (NBG0, vertical integer part)
+        136: (VDP2_SCYDN0) (Uint16) ; Screen scroll value (NBG0, vertical decimal part)
+        138: (VDP2_ZMXN0) (FIXED) ; Coordinate increment (NBG0, horizontal fixed decimal)
+        138: (VDP2_ZMXIN0) (Uint16) ; Coordinate increment (NBG0, horizontal integer part)
+        13A: (VDP2_ZMXDN0) (Uint16) ; Coordinate increment (NBG0, horizontal decimal part)
+        13C: (VDP2_ZMYN0) (FIXED) ; Coordinate increment (NBG0, vertical fixed decimal)
+        13C: (VDP2_ZMYIN0) (Uint16) ; Coordinate increment (NBG0, vertical integer part)
+        13E: (VDP2_ZMYDN0) (Uint16) ; Coordinate increment (NBG0, vertical decimal part)
+        140: (VDP2_SCXN1) (FIXED) ; Screen scroll value (NBG1, horizontal fixed decimal)
+        140: (VDP2_SCXIN1) (Uint16) ; Screen scroll value (NBG1, horizontal integer part)
+        142: (VDP2_SCXDN1) (Uint16) ; Screen scroll value (NBG1, horizontal decimal part)
+        144: (VDP2_SCYN1) (FIXED) ; Screen scroll value (NBG1, vertical fixed decimal)
+        144: (VDP2_SCYIN1) (Uint16) ; Screen scroll value (NBG1, vertical integer part)
+        146: (VDP2_SCYDN1) (Uint16) ; Screen scroll value (NBG1, vertical decimal part)
+        148: (VDP2_ZMXN1) (FIXED) ; Coordinate increment (NBG1, horizontal fixed decimal)
+        148: (VDP2_ZMXIN1) (Uint16) ; Coordinate increment (NBG1, horizontal integer part)
+        14A: (VDP2_ZMXDN1) (Uint16) ; Coordinate increment (NBG1, horizontal decimal part)
+        14C: (VDP2_ZMYN1) (FIXED) ; Coordinate increment (NBG1, vertical fixed decimal)
+        14C: (VDP2_ZMYIN1) (Uint16) ; Coordinate increment (NBG1, vertical integer part)
+        14E: (VDP2_ZMYDN1) (Uint16) ; Coordinate increment (NBG1, vertical decimal part)
+        150: (VDP2_SCXN2) (Uint16) ; Screen scroll value (NBG2, horizontal direction)
+        152: (VDP2_SCYN2) (Uint16) ; Screen scroll value (NBG2, vertical direction)
+        154: (VDP2_SCXN3) (Uint16) ; Screen scroll value (NBG3, horizontal direction)
+        156: (VDP2_SCYN3) (Uint16) ; Screen scroll value (NBG3, vertical direction)
+        158: (VDP2_ZMCTL) (Uint16) ; Reduction enable
+        15A: (VDP2_SCRCTL) (Uint16) ; Line & vertical cell scroll control
+        15C: (VDP2_VCSTA) (Uint16 *) ; Vertical cell scroll table address
+        160: (VDP2_LSTA0) (Sint16 *) ; Line scroll table address for NBG0
+        164: (VDP2_LSTA1) (Sint16 *) ; Line scroll table address for NBG1
+        168: (VDP2_LCTA) (Uint16 *) ; Line color screen table address
+        16C: (VDP2_BKTA) (Uint16 *) ; Back screen table address
+        170: (VDP2_RPMD) (Uint16) ; Rotation parameter mode
+        172: (VDP2_RPRCTL) (Uint16) ; Rotation parameter read control
+        174: (VDP2_KTCTL) (Uint16) ; Coefficient table control
+        176: (VDP2_KTAOF) (Uint16) ; Coefficient table address offset
+        178: (VDP2_OVPNRA) (Uint16) ; Screen over pattern name
+        17A: (VDP2_OVPNRB) (Uint16) ; Screen over pattern name
+        17C: (VDP2_RPTA) (Sint32 *) ; Rotation parameter table address
+        180: (VDP2_WPSX0) (Uint16) ; Window position (H start)
+        182: (VDP2_WPSY0) (Uint16) ; Window position (V start)
+        184: (VDP2_WPEX0) (Uint16) ; Window position (H stop)
+        186: (VDP2_WPEY0) (Uint16) ; Window position (V stop)
+        188: (VDP2_WPSX1) (Uint16) ; Window position (H start)
+        18A: (VDP2_WPSY1) (Uint16) ; Window position (V start)
+        18C: (VDP2_WPEX1) (Uint16) ; Window position (H stop)
+        18E: (VDP2_WPEY1) (Uint16) ; Window position (V stop)
+        190: (VDP2_WCTLA) (Uint16) ; Window control
+        192: (VDP2_WCTLB) (Uint16) ; Window control
+        194: (VDP2_WCTLC) (Uint16) ; Window control
+        196: (VDP2_WCTLD) (Uint16) ; Window control
+        198: (VDP2_LWTA0) (Uint16 *) ; Line window table address
+        19C: (VDP2_LWTA1) (Uint16 *) ; Line window table address
+        1A0: (VDP2_SPCTL) (Uint16) ; Sprite control
+        1A2: (VDP2_SDCTL) (Uint16) ; Shadow control
+        1A4: (VDP2_CRAOFA) (Uint16) ; Color RAM address offset (NBG0-3)
+        1A6: (VDP2_CRAOFB) (Uint16) ; Color RAM address offset (RBG0, sprite)
+        1A8: (VDP2_LNCLEN) (Uint16) ; Line color screen enable
+        1AA: (VDP2_SFPRMD) (Uint16) ; Special priority mode
+        1AC: (VDP2_CCCTL) (Uint16) ; Color calculation control
+        1AE: (VDP2_SFCCMD) (Uint16) ; Special color calculation mode
+        1B0: (VDP2_PRISA) (Uint16) ; Priority number
+        1B2: (VDP2_PRISB) (Uint16) ; Priority number
+        1B4: (VDP2_PRISC) (Uint16) ; Priority number
+        1B6: (VDP2_PRISD) (Uint16) ; Priority number
+        1B8: (VDP2_PRINA) (Uint16) ; Priority number
+        1BA: (VDP2_PRINB) (Uint16) ; Priority number
+        1BC: (VDP2_PRIR) (Uint16) ; Priority number
+        1BE: (--------) (Uint16) ; System reservation
+        1C0: (VDP2_CCRSA) (Uint16) ; Color calculation ratio (sprite 0, 1)
+        1C2: (VDP2_CCRSB) (Uint16) ; Color calculation ratio (sprite 2, 3)
+        1C4: (VDP2_CCRSC) (Uint16) ; Color calculation ratio (sprite 4, 5)
+        1C6: (VDP2_CCRSD) (Uint16) ; Color calculation ratio (sprite 6, 7)
+        1C8: (VDP2_CCRNA) (Uint16) ; Color calculation ratio (NBG0, 1)
+        1CA: (VDP2_CCRNB) (Uint16) ; Color calculation ratio (NBG2, 3)
+        1CC: (VDP2_CCRR) (Uint16) ; Color calculation ratio (RGB0)
+        1CE: (VDP2_CCRLB) (Uint16) ; Color calculation ratio (line color screen, back screen)
+        1D0: (VDP2_CLOFEN) (Uint16) ; Color offset enable
+        1D2: (VDP2_CLOFSL) (Uint16) ; Color offset selection
+        1D4: (VDP2_COAR) (Uint16) ; Color offset A (Red)
+        1D6: (VDP2_COAG) (Uint16) ; Color offset A (Green)
+        1D8: (VDP2_COAB) (Uint16) ; Color offset A (Blue)
+        1DA: (VDP2_COBR) (Uint16) ; Color offset B (Red)
+        1DC: (VDP2_COBG) (Uint16) ; Color offset B (Green)
+        1DE: (VDP2_COBB) (Uint16) ; Color offset B (Blue)
+        
+        1E0: (ScrRotPtr) (ROTSCROLL *) ; Address of rotation parameter to be manipulated
+        1E4: (nbg0_char_adr) (void *) ; CG address for NBG0
+        1E8: (nbg1_char_adr) (void *) ; CG address for NBG1
+        1EC: (nbg2_char_adr) (void *) ; CG address for NBG2
+        1F0: (nbg3_char_adr) (void *) ; CG address for NBG3
+        1F4: (ra_char_adr) (void *) ; CG address for RBG0 (parameter A)
+        1F8: (rb_char_adr) (void *) ; CG address for RBG0 (parameter B)
+        1FC: (nbg0_page_adr) (void *) ; Pattern name address for NBG0
+        200: (nbg1_page_adr) (void *) ; Pattern name address for NBG1
+        204: (nbg2_page_adr) (void *) ; Pattern name address for NBG2
+        208: (nbg3_page_adr) (void *) ; Pattern name address for NBG3
+        20C: (ra_page_adr) (void *) ; Pattern name address for RBG0 (parameter A)
+        210: (rb_page_adr) (void *) ; Pattern name address for RBG0 (parameter B)
+        214: (rpara_vram_adr)(void *) ; Rotation parameter set address
+        218: (k_table_adr) (void *) ; Coefficient table set address
+        21C: (RotScrParA) (ROTSCROLL) ; Rotation parameter A
+        284: (RotScrParB) (ROTSCROLL) ; Rotation parameter B
+        2EC: (Nbg2_PosX) (FIXED) ; NBG2 display position (X)
+        2F0: (Nbg2_PosY) (FIXED) ; NBG2 display position (Y)
+        2F4: (Nbg3_PosX) (FIXED) ; NBG3 display position (X)
+        2F8: (Nbg3_PosY) (FIXED) ; NBG3 display position (Y)
+        
+        2FC: (Window_data) (Uint16[22]) ; Window control data buffer (2)
+        328: (Center_data) (Uint16[10]) ; Window center control data buffer (2)
+        33C: (RandWork) (Uint32) ; Random number generation work
+        340: (CDReadExec) (void*()) ; CD reading server function
+        344: (DMA_TRANS) (Uint32[10]) ; CPU D.M.A. parameter
+        36C: (SOUND) (void*[3]) ; Sound buffer pointer
+        378: (PERIPHERAL) (Uint32[12]) ; Peripheral control data
+
+
+○ VDP1_VRAM
+     The first and last areas of VDP1 VRAM starting from 0x25C00000 are determined by the system.
+   Unavailable to users because it is in use.
+
+   25C00000: Sprite control command
+(MAX_POLYGON + 6) * 32 = 0xE1C0
+   25C7FF00: Gouraud shading table
+2*4*33 = 0x108(264)
+
+○ VDP2_VRAM
+     The VDP2 VRAM starting from 0x25E00000 is set as follows during system initialization.
+   Separated.
+
+   25E00000: VDP2_VRAM_A0
+CG data for rotating scroll
+   25E20000: VDP2_VRAM_A1
+Rotating scroll coefficient data and rotation parameters
+   25E40000: VDP2_VRAM_B0
+Pattern name data for rotating scroll
+   25E60000: VDP2_VRAM_B1
+Normal scroll data
+This area is shared by CG and pattern name.
+     25E60000~25E67FFF (CG data for NBG0 and NBG1)
+     25E68000~25E75FFF (CG data for NBG1)
+     25E76000 to 25E77FFF (1 page of pattern name data for NBG0)
+     25E78000 to 25E7FFFF (4 pages of pattern name data for NBG1)
+
+   The CG is in 256 color mode for every scroll, and the pattern name is 1 word/cell.
+   NBG0 is a 10-bit mode with an inversion flag for each cell, and other surfaces have inversion flags for each cell.
+   12-bit mode is used.
+   The color RAM is in 16-bit 2048 color mode, and no offset is used.
+   The back side is monochrome, and color data (0000) is entered in 25E3FFFE.
+
+ 06000000: +--------------------------+
+           | Boot ROM BIOS functions  |
+ 06000800: +--------------------------+
+           | Slave CPU Stack Area     |
+ 06001000: +--------------------------+
+           | Master CPU default Stack |
+ 06002000: +--------------------------+
+           | ???                      |
+ 06004000: +--------------------------+
+           |                          |
+           | User Program & Data      |
+           |                          |
+ 060C0000: +--------------------------+
+           |                          |
+           | SortList (5400)          |
+           |                          |
+ 060C4FF8: +--------------------------+
+           | Zbuffer (200)            |
+ 060C51F8: +--------------------------+
+           | Zbuffer2 (200)           |
+ 060C53F8: +--------------------------+
+           | Zbuf_nest (400)          |
+ 060C57F8: +--------------------------+
+           |                          |
+           | Spritebuf (FC00)         |
+           |                          |
+ 060D53F8: +--------------------------+
+           |                          |
+           | Spritebuf2(FC00)         |
+           |                          |
+ 060E37C8: +--------------------------+
+           |                          |
+           | Pbuffer (9C40)           |
+           |                          |
+ 060ED408: +--------------------------+
+           | CLOfstBuf (C00)          |
+ 060EE008: +--------------------------+
+           |                          |
+           | CommandBuf(D7F8)         |
+           |                          |
+ 060FB800: +--------------------------+
+           | TransList(F0)            |
+ 060FB8F0: +--------------------------+
+           |                          |
+           | Stack Area(4310)         |
+           |                          |
+ 060FFC00: +--------------------------+
+           | SystemWork(400)          |
+ 06100000: +--------------------------+
+
+
+ 25C00000: +--------------------------+
+           |                          |
+           | SpriteCommand(E1C0)      |
+           |                          |
+ 25C0E1C0: +--------------------------+
+           |                          |
+           | Free (for User)          |
+           |                          |
+ 25C7FEF8: +--------------------------+
+           | Gouraud table(108)       |
+ 25C80000: +--------------------------+
+
+
+ 25E00000: +--------------------------+
+           |                          |
+           | RBG0 CG (2048chars)      |
+           |                          |
+ 25E20000: +--------------------------+
+           |                          |
+           | RBG0 K table             |
+           |                          |
+ 25E40000: +--------------------------+
+           |                          |
+           | RBG0 Map (16pages)       |
+           |                          |
+ 25E60000: +--------------------------+
+           | NBG0, NBG1 CG (512 chars)|
+ 25E68000: +- - - - - - - - - - - - - +
+           | NBG1 CG (+896chars)      |
+ 25E76000: +--------------------------+
+           | NBG0 Map (1page)         |
+ 25E78000: +--------------------------+
+           | NBG1 Map (4pages)        |
+ 25E80000: +--------------------------+
+</PRE></HTML>

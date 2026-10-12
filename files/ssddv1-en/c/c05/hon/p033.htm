@@ -1,0 +1,62 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p032.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p034.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 8.1 Directory management </H2>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150 align = "left"> <PRE> <B> Title </B> <BR> Function specifications </TD> <td width = 250 align = "left"> <PRE> <B> Function </B> <BR> Initialize / Mount File System </TD> <TD WIDTH = 120 align = "left"> <PRE> <B> Function Name </B> <BR> GFS_Init </TD> <TD WIDTH=120 align="left"><PRE><B>No</B><BR>1.1</TD>
+</TABLE><P>
+<DD> <UL> <PRE> <B> format </B> Sint32 GFS_Init (Sint32 open_max, void * work, GfsDirTbl * dirtbl)
+<B> Input </B> open_max: Maximum number of files opened simultaneously (1 to 24)
+<B> work </B> work: work area for the library
+<B> directory </B> dirtbl: Directory information management structure
+<B> Output </B> dirtbl: Directory information management structure (directory information storage area)
+<B> Function value </B> Number of directory information read. If an error occurs, a negative error code is returned.
+<B> </B>.
+<B> Function </B> Performs file system initialization and CD-ROM mount processing.
+<B> Directory management function is specified by specifying </B> dirtbl. </PRE><P>
+<UL><UL><TABLE BORDER CELLPADDING=5>
+<TH width = 200 align = "center"> <PRE> dirtbl </TH> <TH width = 320 align = "center"> <PRE> Directory management function to use </TH> <TR>
+<TD align = "left"> <PRE> Directory management structure </TD> <TD align = "left"> <PRE> Directory management for this library </TD> <TR>
+<TD align = "left"> <PRE> NULL </TD> <TD align = "left"> <PRE> CD block file system directory management </TD>
+</TABLE></UL></UL><P>
+<PRE> <B> Remarks </B> (a) work must be placed on a 4-byte boundary.
+<B>: </B> (b) The SCU level 0-DMA end interrupt is enabled by the INT_ChgMsk function.
+<B> </B> (c) Initialize the CD block as follows.
+<B> </B> (ECC count and retry count are set to the maximum values, otherwise the default is
+<B> </B>. )
+<B> </B> CD block soft reset: No
+<B>: </B>-Subcode decoding: No
+<B>. </B>-Mode 2 subheader recognition: Suru
+<B> </B> Form 2 lead retry: No
+<B>: </B>-CD-ROM data read: Maximum speed (currently double speed)
+<B> </B> Standby time: 180 seconds
+<B>. </B>. ECC count: 5 times.
+<B> </B> ・ Retry count: 15 times </PRE> </UL> <P>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150 align = "left"> <PRE> <B> Title </B> <BR> Function specifications </TD> <td width = 250 align = "left"> <PRE> <B> Function </B> <BR> Load directory information </TD> <TD WIDTH = 120 align = "left"> <PRE> <B> Function Name </B> <BR> GFS_LoadDir </TD> <TD WIDTH = 120 align="left"><PRE><B>No</B><BR>1.2</TD>
+</TABLE><P>
+<DD> <UL> <PRE> <B> format </B> Sint32 GFS_LoadDir (Sint32 fid, GfsDirTbl * dirtbl)
+<B> Input </B> fid: Directory file identifier
+<B>: </B> dirtbl: Directory information management structure
+<B> Output </B> dirtbl: Directory information management structure (directory information storage area)
+<B> Function value </B> Number of directories read. If an error occurs, a negative error code is returned.
+<B>. </B>
+<B> Function </B> Reads directory information from the specified directory file.
+<B> Directory location of directory information changes depending on the specification of </B> dirtbl. </PRE><P>
+<UL><UL><TABLE BORDER CELLPADDING=5>
+<TH width = 200 align = "center"> <PRE> dirtbl </TH> <TH width = 320 align = "center"> <PRE> Directory information storage area </TH> <TR>
+<TD align = "left"> <PRE> Directory management structure </TD> <TD align = "left"> <PRE> dirtbl directory information storage area </TD> <TR>
+<TD align = "left"> <PRE> NULL </TD> <TD> <PRE> File management information area in CD block </TD>
+</TABLE></UL></UL><P>
+<PRE> <B> </B> Uses CD block file system with GFS_Init when NULL is specified for dirtbl
+If you do not declare <B> </B>, an error will occur.
+<B>: </B> However, a pointer to an appropriate directory information management structure other than NULL in dirtbl
+It is always possible to pass <B> </B>. </PRE></UL><BR>
+</DL><P><P><HR>
+<A HREF=p032.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p034.htm> Go to next page </A>
+</BODY>
+</HTML>

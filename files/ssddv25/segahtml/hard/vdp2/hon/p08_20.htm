@@ -1,0 +1,216 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;56/86&gt;VDP2 User's Manual/8.2 Window Processing</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no8">VDP2 User's Manual</a> ★ <A HREF="p08_10.htm">Chapter 8 Window</a><HR>
+ <B>▲ <A HREF="p08_12.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 8 Window</b><HR NOSHADE>
+<DL>
+<A NAME="no8_20"></A><P><DT><H2> ■8.2 Window processing</H2><DD> There are three types of window processing:</P>
+<OL>
+<LI> Transparency processing window<LI> Rotation parameter window<LI> Color calculation window</P>
+</OL>
+ A transparent processing window is a window that forcibly makes the specified window effective area transparent, and can be used for each screen.</P>
+ The rotation parameter window is a window that specifies whether to display the image obtained by rotation parameter A or the image obtained by rotation parameter B when displaying the RBG0 screen. The image obtained using rotation parameter B is displayed in the specified window effective area, and the image obtained using rotation parameter A is displayed outside the window effective area.</P>
+ The color calculation window is a window that prevents color calculations from being performed in the specified window effective area, and is valid for screens that use the color calculation function.</P>
+ Window processing is shown in Figure 8.7.</P>
+<A NAME="z8_7_1"></A><P ALIGN=CENTER> <B>Figure 8.7.1 Window processing 1</b><BR>
+<img srcset="../grp/i191_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z8_7_2"></A><P ALIGN=CENTER> <B>Figure 8.7.2 Window processing 2</b><BR>
+<img srcset="../grp/i191_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z8_7_3"></A><P ALIGN=CENTER> <B>Figure 8.7.3 Window processing 3</b><BR>
+<img srcset="../grp/i192_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no8_21"></A><P><DT><H3> ●Window control register</H3><DD> Window control registers specify how windows are used for each screen. This is a 16-bit write-only register located at addresses 1800D0H to 1800D6H. The value is cleared to 0 after power-on or reset, so be sure to set it. <P><!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WCTLA_"></A><P><DD> <B><FONT SIZE=5>WCTLA</font> <FONT SIZE=4>1800D0H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#NxLOG_">N1LOG</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSWE_">N1SWE</a></TH><TH><PRE> <A HREF="#NxSWA_">N1SWA</a></TH><TH><PRE> <A HREF="#NxW1E_">N1W1E</a></TH><TH><PRE> <A HREF="#NxW1A_">N1W1A</a></TH><TH><PRE> <A HREF="#NxW0E_">N1W0E</a></TH><TH><PRE> <A HREF="#NxW0A_">N1W0A</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#NxLOG_">N0LOG</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSWE_">N0SWE</a></TH><TH><PRE> <A HREF="#NxSWA_">N0SWA</a></TH><TH><PRE> <A HREF="#NxW1E_">N0W1E</a></TH><TH><PRE> <A HREF="#NxW1A_">N0W1A</a></TH><TH><PRE> <A HREF="#NxW0E_">N0W0E</a></TH><TH><PRE> <A HREF="#NxW0A_">N0W0A</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WCTLB_"></A><P><DD> <B><FONT SIZE=5>WCTLB</font> <FONT SIZE=4>1800D2H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#NxLOG_">N3LOG</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSWE_">N3SWE</a></TH><TH><PRE> <A HREF="#NxSWA_">N3SWA</a></TH><TH><PRE> <A HREF="#NxW1E_">N3W1E</a></TH><TH><PRE> <A HREF="#NxW1A_">N3W1A</a></TH><TH><PRE> <A HREF="#NxW0E_">N3W0E</a></TH><TH><PRE> <A HREF="#NxW0A_">N3W0A</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#NxLOG_">N2LOG</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSWE_">N2SWE</a></TH><TH><PRE> <A HREF="#NxSWA_">N2SWA</a></TH><TH><PRE> <A HREF="#NxW1E_">N2W1E</a></TH><TH><PRE> <A HREF="#NxW1A_">N2W1A</a></TH><TH><PRE> <A HREF="#NxW0E_">N2W0E</a></TH><TH><PRE> <A HREF="#NxW0A_">N2W0A</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WCTLC_"></A><P><DD> <B><FONT SIZE=5>WCTLC</font> <FONT SIZE=4>1800D4H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#NxLOG_">SPLOG</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSWE_">SPSWE</a></TH><TH><PRE> <A HREF="#NxSWA_">SPSWA</a></TH><TH><PRE> <A HREF="#NxW1E_">SPW1E</a></TH><TH><PRE> <A HREF="#NxW1A_">SPW1A</a></TH><TH><PRE> <A HREF="#NxW0E_">SPW0E</a></TH><TH><PRE> <A HREF="#NxW0A_">SPW0A</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#NxLOG_">R0LOG</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSWE_">R0SWE</a></TH><TH><PRE> <A HREF="#NxSWA_">R0SWA</a></TH><TH><PRE> <A HREF="#NxW1E_">R0W1E</a></TH><TH><PRE> <A HREF="#NxW1A_">R0W1A</a></TH><TH><PRE> <A HREF="#NxW0E_">R0W0E</a></TH><TH><PRE> <A HREF="#NxW0A_">R0W0A</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WCTLD_"></A><P><DD> <B><FONT SIZE=5>WCTLD</font> <FONT SIZE=4>1800D6H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#NxLOG_">CCLOG</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSWE_">CCSWE</a></TH><TH><PRE> <A HREF="#NxSWA_">CCSWA</a></TH><TH><PRE> <A HREF="#NxW1E_">CCW1E</a></TH><TH><PRE> <A HREF="#NxW1A_">CCW1A</a></TH><TH><PRE> <A HREF="#NxW0E_">CCW0E</a></TH><TH><PRE> <A HREF="#NxW0A_">CCW0A</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#NxLOG_">RPLOG</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSWE_">RPSWE</a></TH><TH><PRE> <A HREF="#NxSWA_">RPSWA</a></TH><TH><PRE> <A HREF="#NxW1E_">RPW1E</a></TH><TH><PRE> <A HREF="#NxW1A_">RPW1A</a></TH><TH><PRE> <A HREF="#NxW0E_">RPW0E</a></TH><TH><PRE> <A HREF="#NxW0A_">RPW0A</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="NxLOG_">　</A><DT><B>Window logic bit</b> : Logic bit<DD> (N0LOG, N1LOG, N2LOG, N3LOG, R0LOG, SPLOG, RPLOG, CCLOG)<BR>
+ Specifies the window stacking method used for each screen.</P>
+<TABLE BORDER>
+<TR><TD> N0LOG</TD><TD> 1800D0H</TD><TD> bit 7</TD><TD> For NBG0 (or for RBG1) in the transparency processing window</TD></TR>
+<TR><TD> N1LOG</TD><TD> 1800D0H</TD><TD> bit 15</TD><TD> For NBG1 (or for EXBG) in the transparency processing window</TD></TR>
+<TR><TD> N2LOG</TD><TD> 1800D2H</TD><TD> bit 7</TD><TD> For NBG2 of transparent processing window</TD></TR>
+<TR><TD> N3LOG</TD><TD> 1800D2H</TD><TD> bit 15</TD><TD> For NBG3 of transparent processing window</TD></TR>
+<TR><TD> R0LOG</TD><TD> 1800D4H</TD><TD> bit 7</TD><TD> For RBG0 of transparency processing window</TD></TR>
+<TR><TD> SPLOG</TD><TD> 1800D4H</TD><TD> bit 15</TD><TD> For sprites in the transparency processing window</TD></TR>
+<TR><TD> RPLOG</TD><TD> 1800D6H</TD><TD> bit 7</TD><TD> For rotation parameter window</TD></TR>
+<TR><TD> CCLOG</TD><TD> 1800D6H</TD><TD> bit 15</TD><TD> For color calculation window</TD></TR>
+</TABLE>
+</P>
+<TABLE BORDER>
+<TR><TH> xxLOG</TH><TH> superposition logic</TH></TR>
+<TR><TH> 0</TH><TD ALIGN=CENTER> OR</TD></TR>
+<TR><TH> 1</TH><TD ALIGN=CENTER> AND</TD></TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, SP, RP, or CC.</P>
+ If the window enable bits of W0, W1, and SW are all 0, setting this bit to 0 will make the entire screen no longer a window valid area, and setting this bit to 1 will make the entire screen a window valid area.</P>
+<A NAME="NxW0E_">　</A><P><DT><B>Window enable bit (for W0)</b> : W0 enable bit<DD> (N0W0E, N1W0E, N2W0E, N3W0E, R0W0E, SPW0E, RPW0E, CCW0E)<BR>
+ Specify whether to use normal window W0 for each screen.</P>
+<TABLE BORDER>
+<TR><TD> N0W0E</TD><TD> 1800D0H</TD><TD> bit 1</TD><TD> For NBG0 (or for RBG1) in the transparency processing window</TD></TR>
+<TR><TD> N1W0E</TD><TD> 1800D0H</TD><TD> bit 9</TD><TD> For NBG1 (or for EXBG) in the transparency processing window</TD></TR>
+<TR><TD> N2W0E</TD><TD> 1800D2H</TD><TD> bit 1</TD><TD> For NBG2 of transparent processing window</TD></TR>
+<TR><TD> N3W0E</TD><TD> 1800D2H</TD><TD> bit 9</TD><TD> For NBG3 of transparent processing window</TD></TR>
+<TR><TD> R0W0E</TD><TD> 1800D4H</TD><TD> bit 1</TD><TD> For RBG0 of transparency processing window</TD></TR>
+<TR><TD> SPW0E</TD><TD> 1800D4H</TD><TD> bit 9</TD><TD> For sprites in the transparency processing window</TD></TR>
+<TR><TD> RPW0E</TD><TD> 1800D6H</TD><TD> bit 1</TD><TD> For rotation parameter window</TD></TR>
+<TR><TD> CCW0E</TD><TD> 1800D6H</TD><TD> bit 9</TD><TD> For color calculation window</TD></TR>
+</TABLE>
+</P>
+<TABLE BORDER>
+<TR><TH> xxW0E</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Don't use W0 window</TD></TR>
+<TR><TH> 1</TH><TD> Use W0 window</TD></TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, SP, RP, or CC.</P>
+<A NAME="NxW1E_"></A><P><DT> <B>Window enable bit (for W1)</b> : W1 enable bit<DD> (N0W1E, N1W1E, N2W1E, N3W1E, R0W1E, SPW1E, RPW1E, CCW1E)<BR>
+ Specify whether to use normal window W1 for each screen.</P>
+<TABLE BORDER>
+<TR><TD> N0W1E</TD><TD> 1800D0H</TD><TD> bit 3</TD><TD> For NBG0 (or for RBG1) in the transparency processing window</TD></TR>
+<TR><TD> N1W1E</TD><TD> 1800D0H</TD><TD> bit 11</TD><TD> For NBG1 (or for EXBG) in the transparency processing window</TD></TR>
+<TR><TD> N2W1E</TD><TD> 1800D2H</TD><TD> bit 3</TD><TD> For NBG2 of transparent processing window</TD></TR>
+<TR><TD> N3W1E</TD><TD> 1800D2H</TD><TD> bit 11</TD><TD> For NBG3 of transparent processing window</TD></TR>
+<TR><TD> R0W1E</TD><TD> 1800D4H</TD><TD> bit 3</TD><TD> For RBG0 of transparency processing window</TD></TR>
+<TR><TD> SPW1E</TD><TD> 1800D4H</TD><TD> bit 11</TD><TD> For sprites in the transparency processing window</TD></TR>
+<TR><TD> RPW1E</TD><TD> 1800D6H</TD><TD> bit 3</TD><TD> For rotation parameter window</TD></TR>
+<TR><TD> CCW1E</TD><TD> 1800D6H</TD><TD> bit 11</TD><TD> For color calculation window</TD></TR>
+</TABLE>
+</P>
+<TABLE BORDER>
+<TR><TH> xxW1E</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Don't use W1 window</TD></TR>
+<TR><TH> 1</TH><TD> Use W1 window</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, SP, RP, or CC.</P>
+<A NAME="NxSWE_"></A><P><DT> <B>Window enable bit (for SW)</b> : SW enable bit<DD> (N0SWE, N1SW, N2SWE, N3SWE, R0SWE, SPSWE, CCSWE)<BR>
+ Specify whether to use sprite window SW for each screen.</P>
+<TABLE BORDER>
+<TR><TD> N0SWE</TD><TD> 1800D0H</TD><TD> bit 5</TD><TD> For NBG0 (or for RBG1) in the transparency processing window</TD></TR>
+<TR><TD> N1SWE</TD><TD> 1800D0H</TD><TD> bit 13</TD><TD> For NBG1 (or for EXBG) in the transparency processing window</TD></TR>
+<TR><TD> N2SWE</TD><TD> 1800D2H</TD><TD> bit 5</TD><TD> For NBG2 of transparent processing window</TD></TR>
+<TR><TD> N3SWE</TD><TD> 1800D2H</TD><TD> bit 13</TD><TD> For NBG3 of transparent processing window</TD></TR>
+<TR><TD> R0SWE</TD><TD> 1800D4H</TD><TD> bit 5</TD><TD> For RBG0 of transparency processing window</TD></TR>
+<TR><TD> SPSWE</TD><TD> 1800D4H</TD><TD> bit 13</TD><TD> For sprites in the transparency processing window</TD></TR>
+<TR><TD> CCSWE</TD><TD> 1800D6H</TD><TD> bit 13</TD><TD> For color calculation window</TD></TR>
+</TABLE>
+</P>
+<TABLE BORDER>
+<TR><TH> xxSWE</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Do not use SW window</TD></TR>
+<TR><TH> 1</TH><TD> Use SW window</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, SP, or CC.</P>
+ When using the sprite window, set the sprite window enable bit (SPWINEN) in the sprite control register to 1.</P>
+<A NAME="NxW0A_"></A><P><DT> <B>Window area bit (for W0)</b> : W0 area bit<DD> (N0W0A, N1W0A, N2W0A, N3W0A, R0W0A, SPW0A, RPW0A, CCW0A)<BR>
+ Specify which area is the valid area of normal window W0 to be used for each screen.</P>
+<TABLE BORDER>
+<TR><TD> N0W0A</TD><TD> 1800D0H</TD><TD> bit 0</TD><TD> For NBG0 (or for RBG1) in the transparency processing window</TD></TR>
+<TR><TD> N1W0A</TD><TD> 1800D0H</TD><TD> bit 8</TD><TD> For NBG1 (or for EXBG) in the transparency processing window</TD></TR>
+<TR><TD> N2W0A</TD><TD> 1800D2H</TD><TD> bit 0</TD><TD> For NBG2 of transparent processing window</TD></TR>
+<TR><TD> N3W0A</TD><TD> 1800D2H</TD><TD> bit 8</TD><TD> For NBG3 of transparent processing window</TD></TR>
+<TR><TD> R0W0A</TD><TD> 1800D4H</TD><TD> bit 0</TD><TD> For RBG0 of transparency processing window</TD></TR>
+<TR><TD> SPW0A</TD><TD> 1800D4H</TD><TD> bit 8</TD><TD> For sprites in the transparency processing window</TD></TR>
+<TR><TD> RPW0A</TD><TD> 1800D6H</TD><TD> bit 0</TD><TD> For rotation parameter window</TD></TR>
+<TR><TD> CCW0A</TD><TD> 1800D6H</TD><TD> bit 8</TD><TD> For color calculation window</TD></TABLE>
+</P>
+<TABLE BORDER>
+<TR><TH> xxW0A</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Enable inside W0 window</TD></TR>
+<TR><TH> 1</TH><TD> Enable outside W0 window</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, SP, RP, or CC.</P>
+<A NAME="NxW1A_"></A><P><DT> <B>Window area bit (for W1)</b> : W1 area bit<DD> (N0W1A, N1W1A, N2W1A, N3W1A, R0W1A, SPW1A, RPW1A, CCW1A)<BR>
+ Specify the effective area of normal window W1 to be used for each screen.</P>
+<TABLE BORDER>
+<TR><TD> N0W1A</TD><TD> 1800D0H</TD><TD> bit 2</TD><TD> For NBG0 (or for RBG1) in the transparency processing window</TD></TR>
+<TR><TD> N1W1A</TD><TD> 1800D0H</TD><TD> bit 10</TD><TD> For NBG1 (or for EXBG) in the transparency processing window</TD></TR>
+<TR><TD> N2W1A</TD><TD> 1800D2H</TD><TD> bit 2</TD><TD> For NBG2 of transparent processing window</TD></TR>
+<TR><TD> N3W1A</TD><TD> 1800D2H</TD><TD> bit 10</TD><TD> For NBG3 of transparent processing window</TD></TR>
+<TR><TD> R0W1A</TD><TD> 1800D4H</TD><TD> bit 2</TD><TD> For RBG0 of transparency processing window</TD></TR>
+<TR><TD> SPW1A</TD><TD> 1800D4H</TD><TD> bit 10</TD><TD> For sprites in the transparency processing window</TD></TR>
+<TR><TD> RPW1A</TD><TD> 1800D6H</TD><TD> bit 2</TD><TD> For rotation parameter window</TD></TR>
+<TR><TD> CCW1A</TD><TD> 1800D6H</TD><TD> bit 10</TD><TD> For color calculation window</TD></TR>
+</TABLE>
+</P>
+<TABLE BORDER>
+<TR><TH> xxW1A</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Enable inside W1 window</TD></TR>
+<TR><TH> 1</TH><TD> Enable W1 outside window</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, SP, RP, or CC.</P>
+<A NAME="NxSWA_"></A><P><DT> <B>Window area bit (for SW)</b> : SW area bit<DD> (N0SWA, N1SWA, N2SWA, N3SWA, R0SWA, SPSWA, CCSWA)<BR>
+ Specify the effective area of the sprite window SW to be used for each screen.</P>
+<DD><TABLE BORDER>
+<TR><TD> N0SWA</TD><TD> 1800D0H</TD><TD> bit 4</TD><TD> For NBG0 (or for RBG1) in the transparency processing window</TD></TR>
+<TR><TD> N1SWA</TD><TD> 1800D0H</TD><TD> bit 12</TD><TD> For NBG1 (or for EXBG) in the transparency processing window</TD></TR>
+<TR><TD> N2SWA</TD><TD> 1800D2H</TD><TD> bit 4</TD><TD> For NBG2 of transparent processing window</TD></TR>
+<TR><TD> N3SWA</TD><TD> 1800D2H</TD><TD> bit 12</TD><TD> For NBG3 of transparent processing window</TD></TR>
+<TR><TD> R0SWA</TD><TD> 1800D4H</TD><TD> bit 4</TD><TD> For RBG0 of transparency processing window</TD></TR>
+<TR><TD> SPSWA</TD><TD> 1800D4H</TD><TD> bit 12</TD><TD> For sprites in the transparency processing window</TD></TR>
+<TR><TD> CCSWA</TD><TD> 1800D6H</TD><TD> bit 12</TD><TD> For color calculation window</TD></TR>
+</TABLE>
+</P>
+<TABLE BORDER>
+<TR><TH> xxSWA</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Enable inside SW window</TD></TR>
+<TR><TH> 1</TH><TD> Enable outside SW window</TD></TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, SP, or CC.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_12.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no8">VDP2 User's Manual</a> ★ <A HREF="p08_10.htm">Chapter 8 Window</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

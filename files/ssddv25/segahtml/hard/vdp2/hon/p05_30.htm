@@ -1,0 +1,539 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;38/86&gt;VDP2 User's Manual/5.3 Line & Vertical Cell Scroll Function</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no5">VDP2 User's Manual</a> ★ <A HREF="p05_10.htm">Chapter 5 Normal scroll screen</a><HR>
+ <B>▲ <A HREF="p05_20.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 5 Normal scroll screen</b><HR NOSHADE>
+<DL>
+<P><DT><H2> ■5.3 Line & vertical cell scrolling function</H2><DD> In the normal scroll screen, NBG0 and NBG1 have line scroll function and vertical cell scroll function. The line scroll function specifies the horizontal and vertical screen scroll values and horizontal coordinate increments in line units. The vertical cell scroll function specifies the vertical screen scroll value for each horizontal cell. Both functions can be used regardless of cell format or bitmap format.</P>
+<A NAME="no5_31"></A><P><DT><H3> ●Line scroll function</H3><DD> The line scroll function is a function that allows you to specify the horizontal and vertical screen scroll values and horizontal coordinate increments in line units, using a line scroll table stored in VRAM. Data values in the line scroll table are specified using relative values. The value specified in the screen scroll value register is added to the screen scroll value stored in the line scroll table to form the display coordinates. The interval for reading table data can be selected from four types: 1 line, 2 lines, 4 lines, and 8 lines. If you select an interval of 2 lines or more, the vertical coordinate calculation will be performed using the vertical coordinates. The value in the increment register is used.<BR>
+ Do not set the horizontal coordinate increment to a value that exceeds the reduction enable register setting. The line scroll function is shown in Figure 5.3.</P>
+<A NAME="z5_3"></A><CENTER>
+ <B>Figure 5.3 Line scroll function</b><PRE>
+Line scroll table (VRAM)     Horizontal coordinate
+                             increment            
+                           → → → →   Scroll screen
+┏━━━━━━━━━━━━━━━━━━━━┓     ┏━┯━┯━┯━┯━┯━┯━         
+┃1st line horizontal ┃┐┌──→┃ │ │ │ │ │ │ 1st line 
+┃screen scroll value ┃││   ┃ │ │ │ │ │ │          
+┠────────────────────┨││   ┣━┿━┿━┿━┿━┿━┿━         
+┃1st line vertical   ┃├┘┌─→┃ │ │ │ │ │ │ 2nd line 
+┃screen scroll value ┃│ │  ┃ │ │ │ │ │ │          
+┠────────────────────┨│ │  ┣━┿━┿━┿━┿━┿━┿━         
+┃1st line horizontal ┃┘ │  ┃ │ │ │ │ │ │ 3rd line 
+┃coordinate increment┃  │  ┃ │ │ │ │ │ │          
+┣━━━━━━━━━━━━━━━━━━━━┫  │  ┣━┿━┿━┿━┿━┿━┿━         
+┃2nd line horizontal ┃┐ │  ┃ │ │ │ │ │ │ 4th line 
+┃screen scroll value ┃│ │  ┃ │ │ │ │ │ │          
+┠────────────────────┨│ │  ┣━┿━┿━┿━┿━┿━┿━         
+┃2nd line vertical   ┃├─┘  ┃ │ │ │ │ │ │ 5th line 
+┃screen scroll value ┃│    ┃ │ │ │ │ │ │          
+┠────────────────────┨│    ┣━┿━┿━┿━┿━┿━┿━         
+┃2nd line horizontal ┃┘    ┃ │ │ │ │ │ │          
+┃coordinate increment┃     ┃ │ │ │ │ │ │          
+┣━━━━━━━━━━━━━━━━━━━━┫                            
+</PRE></CENTER>
+<P><DD>The line scroll table stores the horizontal screen scroll value, vertical screen scroll value, and horizontal coordinate increment in the order starting from the smallest address. The line scroll data to be stored consists only of the data required according to the settings of the line scroll register.<BR>
+ The configuration of each horizontal screen scroll value, vertical screen scroll value, and horizontal coordinate increment on the line scroll table is the same as the configuration of the data set in each register. Figure 5.4 shows the bit configuration of line scroll table data, and Figure 5.5 shows the line scroll table configuration.</P>
+<A NAME="z5_4"></A><CENTER>
+ <B>Figure 5.4 Bit configuration of line scroll table data</b><PRE>
+●Horizontal and vertical screen scroll value registers　
+Bit F E D C B A 9 8 7 6 5 4 3 2 1 0　
+   ┌─┬─┬─┬─┬─┰─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
++0H│−│−│−│−│−┃Integer part(11 bits)│
+   └─┴─┴─┴─┴─┸─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+　
+Bit F E D C B A 9 8 7 6 5 4 3 2 1 0　
+   ┌─┬─┬─┬─┬─┬─┬─┬─┰─┬─┬─┬─┬─┬─┬─┬─┐
++2H│Decimal part   ┃−│−│−│−│−│−│−│−│
+   │(8 bits)       ┃ │ │ │ │ │ │ │ │
+   └─┴─┴─┴─┴─┴─┴─┴─┸─┴─┴─┴─┴─┴─┴─┴─┘
+　
+●Horizontal coordinate increment　
+Bit F E D C B A 9 8 7 6 5 4 3 2 1 0　
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
++0H│−│−│−│−│−│−│−│−│−│−│−│−│−│Int  │
+   │ │ │ │ │ │ │ │ │ │ │ │ │ │part │
+   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+　
+Bit F E D C B A 9 8 7 6 5 4 3 2 1 0　
+   ┌─┬─┬─┬─┬─┬─┬─┬─┰─┬─┬─┬─┬─┬─┬─┬─┐
++2H│Decimal part   ┃−│−│−│−│−│−│−│−│
+   │(8 bits)       ┃ │ │ │ │ │ │ │ │
+   └─┴─┴─┴─┴─┴─┴─┴─┸─┴─┴─┴─┴─┴─┴─┴─┘
+　
+[Note] "-" is ignored　
+</PRE></CENTER>
+<A NAME="z5_5"></A><DD><CENTER>
+<B>Figure 5.5 Line scroll table example</b><PRE>
+<B>●When specifying horizontal and vertical screen scroll values and horizontal coordinate increments for each line</b>　
+                         Line scroll table (VRAM)    
+                    MSB                           LSB
+                   ┌────────────────────────────────┐
+Line scroll ─→ +00H│ 1st line horizontal screen     │
+table address      │ scroll value (integer part)    │
+                   ├────────────────────────────────┤
+               +02H│ 1st line horizontal screen     │
+                   │ scroll value (decimal part)    │
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +04H│ 1st line vertical screen       │
+                   │ scroll value (integer part)    │
+                   ├────────────────────────────────┤
+               +06H│ 1st line vertical screen       │
+                   │ scroll value (decimal part)    │
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +08H| 1st line horizontal coordinate |
+                   | increment (integer part)       |
+                   ├────────────────────────────────┤
+               +0AH│ 1st line horizontal coordinate │
+                   │ increment (decimal part)       │
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +0CH│ 2nd line horizontal screen     │
+                   │ scroll value (integer part)    │
+                   ├────────────────────────────────┤
+               +0EH│ 2nd line horizontal screen     │
+                   │ scroll value (decimal part)    │
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +10H| 2nd line vertical screen       |
+                   | scroll value (integer part)    |
+                   ├────────────────────────────────┤
+               +12H| 2nd line vertical screen       |
+                   | scroll value (decimal part)    |
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +14H| 2nd line horizontal coordinate |
+                   | increment (integer part)       |
+                   ├────────────────────────────────┤
+               +16H| 2nd line horizontal coordinate |
+                   | increment (decimal part)       |
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+</PRE><PRE>
+<B>●When specifying the vertical screen scroll value and horizontal coordinate increment every two lines</b> 
+                         Line scroll table (VRAM)    
+                    MSB                                LSB
+                   ┌─────────────────────────────────────┐
+Line scroll ─→ +00H│ 1st line vertical screen            │
+table address      │ scroll value (integer part)         │
+                   ├─────────────────────────────────────┤
+               +02H│ 1st line vertical screen            │
+                   │ scroll value (decimal part)         │
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +04H| 1st and 2nd line horizontal         |
+                   | coordinate increment (integer part) |
+                   ├─────────────────────────────────────┤
+               +06H│ 1st and 2nd line horizontal         │
+                   │ coordinate increment (decimal part) │
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +08H| 3rd line vertical screen            |
+                   | scroll value (integer part)         |
+                   ├─────────────────────────────────────┤
+               +0AH│ 3rd line vertical screen            │
+                   │ scroll value (decimal part)         │
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +0CH│ 3rd and 4th line horizontal         │
+                   │ coordinate increment (integer part) │
+                   ├─────────────────────────────────────┤
+               +0EH│ 3rd and 4th line horizontal         │
+                   │ coordinate increment (decimal part) │
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+ 
+[Note] The vertical display coordinates of lines other than the specified line are
+the vertical screen scroll value of the specified line plus the vertical coordinate increment.
+</PRE><PRE>
+<B>●When the horizontal screen scroll value and horizontal coordinate increment are specified every 4 lines (no vertical line scroll)</b>
+                         Line scroll table (VRAM)    
+                    MSB                                LSB
+                   ┌─────────────────────────────────────┐
+Line scroll ─→ +00H│ Horizontal screen scroll value for  │
+table address      │ 1st to 4th lines (integer part)     │
+                   ├─────────────────────────────────────┤
+               +02H| Horizontal screen scroll value for  |
+                   | 1st to 4th lines (decimal part)     |
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +04H| Horizontal coordinate increment of  |
+                   | 1st to 4th lines (integer part)     |
+                   ├─────────────────────────────────────┤
+               +06H| Horizontal coordinate increment for |
+                   | 1st to 4th lines (decimal part)     |
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +08H| Horizontal screen scroll value for  |
+                   | 5th to 8th lines (integer part)     |
+                   ├─────────────────────────────────────┤
+               +0AH| Horizontal screen scroll value for  |
+                   | 5th to 8th lines (decimal part)     |
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+               +0CH| Horizontal coordinate increment of  |
+                   | 5th to 8th lines (integer part)     |
+                   ├─────────────────────────────────────┤
+               +0EH| Horizontal coordinate increment of  |
+                   | 5th to 8th lines (decimal part)     |
+                   ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+</PRE></CENTER>
+<A NAME="no5_32"></A><P><DT><H3>●Vertical cell scrolling function</H3><DD> The vertical cell scroll function is a function that allows you to specify the vertical screen scroll value for each area divided vertically in units of horizontal cells, and is specified using the vertical cell scroll table stored in VRAM. Data values in the vertical cell scroll table are specified using relative values. The value specified in the screen scroll value register is added to the screen scroll value stored in the vertical cell scroll table to form the display coordinates. When displaying in bitmap format, you can specify in units of 8 dots in the horizontal direction.<BR>
+ Among the normal scroll screens, only NBG0 and NBG1 have a vertical cell scrolling function. This vertical cell scrolling function and the mosaic function cannot be used at the same time; the mosaic function takes priority.<BR>
+ The vertical cell scrolling function is shown in Figure 5.6.<P><A NAME="z5_6"></A><CENTER>
+ <B>Figure 5.6 Vertical cell scrolling function</b><PRE>
+ Vertical cell scroll table (VRAM)              
+┌─────────────────┐                             
+│Vertical screen  │──┐                          
+│scroll value of  │  │                          
+│1st cell         │  │                          
+├─────────────────┤  │                          
+│Vertical screen  │──┼─┐                        
+│scroll value of  │  │ │                        
+│2nd cell         │  │ │                        
+├─────────────────┤  │ │                        
+│Vertical screen  │──┼─┼─┐                      
+│scroll value of  │  │ │ │                      
+│3rd cell         │  │ │ │                      
+├─────────────────┤  │ │ │                      
+                  │  │ │ │                      
+                     ↓ ↓ ↓                      
+                    │ │ │ │ │ │ │ │ │           
+                   ─┼─┼─┼─┼─┼─┼─┼─┼─┼─          
+                    │┏┿━┿━┿━┿━┿━┿━┿━┿━━TV screen
+                   ─┼╂┼─┼─┼─┼─┼─┼─┼─┼─          
+                    │┃│ │ │ │ │ │ │ │           
+                   ─┼╂┼─┼─┼─┼─┼─┼─┼─┼─          
+                    │┃│ │ │ │ │ │ │ │           
+                   ─┼╂┼─┼─┼─┼─┼─┼─┼─┼─          
+                    │┃│ │ │ │ │ │ │ │           
+                   ─┼╂┼─┼─┼─┼─┼─┼─┼─┼─          
+                    │┃│ │ │ │ │ │ │ │           
+                   ─┼╂┼─┼─┼─┼─┼─┼─┼─┼─          
+                     ┃                          
+                    ├─┤                         
+                     ↑                          
+             1st cell vertical screen           
+             scroll value valid area            
+</PRE></CENTER>
+The bit configuration of the vertical screen scroll value is the same as when setting it in each register. Also, the data in the vertical cell scroll table is arranged in order from the data for the cells on the left side of the TV screen.<BR>
+ When using the vertical cell scroll function for both NBG0 and NBG1, store each vertical cell scroll table data alternately, one cell at a time, for NBG0 and NBG1.<P><DD> Figure 5.7 shows the bit configuration of vertical cell scroll table data, and Figure 5.8 shows the configuration of the vertical cell scroll table.<P><A NAME="z5_7"></A><CENTER>
+ <B>Figure 5.7 Data structure on vertical cell scroll table</b><PRE>
+●Vertical screen scroll value　
+Bit F E D C B A 9 8 7 6 5 4 3 2 1 0　
+   ┌─┬─┬─┬─┬─┰─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
++0H│−│−│−│−│−┃ Integer part        │
+   │ │ │ │ │ ┃ (11 bits)           │
+   └─┴─┴─┴─┴─┸─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+　
+Bit F E D C B A 9 8 7 6 5 4 3 2 1 0　
+   ┌─┬─┬─┬─┬─┬─┬─┬─┰─┬─┬─┬─┬─┬─┬─┬─┐
++2H│ Decimal part  ┃−│−│−│−│−│−│−│−│
+   │ (8 bits)      ┃ │ │ │ │ │ │ │ │
+   └─┴─┴─┴─┴─┴─┴─┴─┸─┴─┴─┴─┴─┴─┴─┴─┘
+　
+[Note] "-" is ignored　              
+</PRE></CENTER>
+<A NAME="z5_8"></A><DD><CENTER>
+<B>Figure 5.8 Vertical cell scroll table example</b><PRE>
+<B>●When performing vertical cell scrolling only on NBG0</b>　
+                       Vertical cell scroll table (VRAM)   
+                     MSB                                LSB
+                    ┌─────────────────────────────────────┐
+Vertical cell → +00H| Vertical screen scroll value of the |
+scroll table        | 1st cell of NBG0 / Integer part     |
+address             ├─────────────────────────────────────┤
+                +02H| Vertical screen scroll value of the |
+                    | 1st cell of NBG0 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +04H| Vertical screen scroll value of the |
+                    | 2nd cell of NBG0 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +06H| Vertical screen scroll value of the |
+                    | 2nd cell of NBG0 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +08H| Vertical screen scroll value of     |
+                    | 3rd cell of NBG0 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +0AH| Vertical screen scroll value of     |
+                    | 3rd cell of NBG0 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +0CH| Vertical screen scroll value of     |
+                    | 4th cell of NBG0 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +0EH| Vertical screen scroll value of     |
+                    | 4th cell of NBG0 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +10H| Vertical screen scroll value of     |
+                    | 5th cell of NBG0 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +12H| Vertical screen scroll value of     |
+                    | 5th cell of NBG0 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+</PRE><PRE>
+<B>●When vertical cell scrolling is performed only in NBG1</b>　
+                       Vertical cell scroll table (VRAM)   
+                     MSB                                LSB
+                    ┌─────────────────────────────────────┐
+Vertical cell → +00H| Vertical screen scroll value of the |
+scroll table        | 1st cell of NBG1 / Integer part     |
+address             ├─────────────────────────────────────┤
+                +02H| Vertical screen scroll value of the |
+                    | 1st cell of NBG1 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +04H| Vertical screen scroll value of the |
+                    | 2nd cell of NBG1 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +06H| Vertical screen scroll value of the |
+                    | 2nd cell of NBG1 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +08H| Vertical screen scroll value of the |
+                    | 3rd cell of NBG1 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +0AH| Vertical screen scroll value of the |
+                    | 3rd cell of NBG1 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +0CH| Vertical screen scroll value of the |
+                    | 4th cell of NBG1 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +0EH| Vertical screen scroll value of the |
+                    | 4th cell of NBG1 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +10H| Vertical screen scroll value of the |
+                    | 5th cell of NBG1 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +12H| Vertical screen scroll value of the |
+                    | 5th cell of NBG1 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+</PRE><PRE>
+<B>●When vertical cell scrolling of NBG0 and NBG1</b>　
+                       Vertical cell scroll table (VRAM)   
+                     MSB                                LSB
+                    ┌─────────────────────────────────────┐
+Vertical cell → +00H| Vertical screen scroll value of the |
+scroll table        | 1st cell of NBG0 / Integer part     |
+address             ├─────────────────────────────────────┤
+                +02H| Vertical screen scroll value of the |
+                    | 1st cell of NBG0 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +04H| Vertical screen scroll value of the |
+                    | 1st cell of NBG1 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +06H| Vertical screen scroll value of the |
+                    | 1st cell of NBG1 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +08H| Vertical screen scroll value of the |
+                    | 2nd cell of NBG0 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +0AH| Vertical screen scroll value of the |
+                    | 2nd cell of NBG0 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +0CH| Vertical screen scroll value of the |
+                    | 2nd cell of NBG1 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +0EH| Vertical screen scroll value of the |
+                    | 2nd cell of NBG1 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+                +10H| Vertical screen scroll value of the |
+                    | 3rd cell of NBG0 / Integer part     |
+                    ├─────────────────────────────────────┤
+                +12H| Vertical screen scroll value of the |
+                    | 3rd cell of NBG0 / Decimal part     |
+                    ┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+</PRE></CENTER>
+<A NAME="no5_33"></A><P><DT><H3>●Line & vertical cell scroll control register</H3><DD> The line & vertical cell scroll control register controls the line scroll function and vertical cell scroll function. This is a 16-bit write-only register located at address 18009AH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SCRCTL_"></A><P><DD> <B><FONT SIZE=5>SCRCTL</font> <FONT SIZE=4>18009AH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#N1LSS_">N1LSS1</a></TH><TH><PRE> <A HREF="#N1LSS_">N1LSS0</a></TH><TH><PRE> <A HREF="#N1LZMX_">N1LZMX</a></TH><TH><PRE> <A HREF="#N1LSCY_">N1LSCY</a></TH><TH><PRE> <A HREF="#N1LSCX_">N1LSCX</a></TH><TH><PRE> <A HREF="#N1VCSC_">N1VCSC</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#N0LSS_">N0LSS1</a></TH><TH><PRE> <A HREF="#N0LSS_">N0LSS0</a></TH><TH><PRE> <A HREF="#N0LZMX_">N0LZMX</a></TH><TH><PRE> <A HREF="#N0LSCY_">N0LSCY</a></TH><TH><PRE> <A HREF="#N0LSCX_">N0LSCX</a></TH><TH><PRE> <A HREF="#N0VCSC_">N0VCSC</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="N0LSS_">　</A><A NAME="N1LSS_">　</A><DT><B>Line scroll interval bit</b> : Line scroll select bit (N0LSS1, N0LSS0, N1LSS1, N1LSS0)<DD> Specify the interval at which line scroll table data is read from the table. The interval changes depending on the TV screen's interlace settings.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0LSS1,N0LSS0</TD><TD> 18009AH</TD><TD> bit 5,4</TD><TD> For NBG0</TD></TR>
+<TR><TD> N1LSS1,N1LSS0</TD><TD> 18009AH</TD><TD> bit 13,12</TD><TD> For NBG1</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH ROWSPAN=2> NxLSS1</TH><TH ROWSPAN=2> NxLSS0</TH><TH COLSPAN=3> Interlace settings</TH></TR>
+<TR><TH> non-interlaced</TH><TH> Single dense interlace</TH><TH> double dense interlace</TH></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TD> per line</TD><TD> every 2 lines</TD><TD> per line</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TD> every 2 lines</TD><TD> every 4 lines</TD><TD> every 2 lines</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TD> every 4 lines</TD><TD> every 8 lines</TD><TD> every 4 lines</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TD> every 8 lines</TD><TD> every 16 lines</TD><TD> every 8 lines</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> 0 or 1 is entered for x in the bit name.</P>
+<P><DD> When reading line scroll table data at intervals of two or more lines, the previously read line scroll data is used for the horizontal screen scroll value and horizontal coordinate increment of the line that is not read. Also, the vertical screen scroll value is calculated from the previously read line scroll data and the value of the vertical coordinate increment register.</P>
+<A NAME="N0LZMX_">　</A><A NAME="N1LZMX_">　</A><DT><B>Line</b> zoom X enable bit (N1LZMX, N0LZMX)<DD> Specifies whether to scale horizontally in units of lines.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0LZMX</TD><TD> 18009AH</TD><TD> bit 3</TD><TD> For NBG0</TD></TR>
+<TR><TD> N1LZMX</TD><TD> 18009AH</TD><TD> bit 11</TD><TD> For NBG1</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> NxLZMX</TH><TH> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD> Does not scale horizontally in units of lines</TD></TR>
+<TR><TH><PRE> 1</TH><TD> Scale horizontally in units of lines</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> 0 or 1 is entered for x in the bit name.</P>
+<P><DD> When using this feature, be sure to store the horizontal coordinate increments in the VRAM line scroll table. Make sure that the horizontal coordinate increment does not exceed the scale setting.</P>
+<A NAME="N0LSCY_">　</A><A NAME="N1LSCY_">　</A><DT><B>Line scroll enable bit (for vertical screen scroll value)</b> : Line scroll Y enable bit<DD> (N1LSCY, N0LSCY)<BR>
+ Specifies whether to scroll vertically by line.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0LSCY</TD><TD> 18009AH</TD><TD> bit 2</TD><TD> For NBG0</TD></TR>
+<TR><TD> N1LSCY</TD><TD> 18009AH</TD><TD> bit 10</TD><TD> For NBG1</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> NxLSCY</TH><TH> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD> Do not scroll vertically by line</TD></TR>
+<TR><TH><PRE> 1</TH><TD> Scroll vertically line by line</TD></TR>
+</TABLE>
+<DD> [Note] 0 or 1 is entered for x in the bit name.</P>
+<P><DD> When using this feature, be sure to store the vertical screen scroll value in the VRAM line scroll table.</P>
+<A NAME="N0LSCX_">　</A><A NAME="N1LSCX_">　</A><DT><B>Line scroll enable bit (for horizontal screen scroll value)</b> : Line scroll X enable bit<DD> (N1LSCX, N0LSCX)<BR>
+ Specifies whether to scroll horizontally by line.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0LSCX</TD><TD> 18009AH</TD><TD> bit 1</TD><TD> For NBG0</TD></TR>
+<TR><TD> N1LSCX</TD><TD> 18009AH</TD><TD> bit 9</TD><TD> For NBG1</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> NxLSCX</TH><TH> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD> Do not scroll horizontally by line</TD></TR>
+<TR><TH><PRE> 1</TH><TD> Scroll horizontally line by line</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> 0 or 1 is entered for x in the bit name.</P>
+<P><DD> When using this feature, be sure to store the horizontal screen scroll value in the VRAM line scroll table.</P>
+<A NAME="N0VCSC_">　</A><A NAME="N1VCSC_">　</A><P><DT><B>Vertical cell scroll enable bit</b> : Vertical cell scroll enable bit<DD> (N1VCSC, N0VCSC)<BR>
+ Specify whether to perform vertical cell scrolling.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0VCSC</TD><TD> 18009AH</TD><TD> bit 0</TD><TD> For NBG0</TD></TR>
+<TR><TD> N1VCSC</TD><TD> 18009AH</TD><TD> bit 8</TD><TD> For NBG1</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TD> NxVCSC</TD><TD> process</TD></TR>
+<TR><TH><PRE> 0</TH><TD> Does not perform vertical cell scrolling</TD></TR>
+<TR><TH><PRE> 1</TH><TD> Performs vertical cell scrolling</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> 0 or 1 is entered for x in the bit name.</P>
+<P><DD> When using the vertical cell scroll function, be sure to specify the vertical cell scroll table data read access command in the VRAM cycle pattern register. Also, be sure to store vertical cell scroll data in VRAM.<BR>
+ The vertical cell scrolling function cannot be used at the same time as the mosaic function, and the mosaic function takes precedence.</P>
+<A NAME="NxVCSC_0"></A><P><DT><TABLE>
+<TR><TH><img srcset="../../../what/atto.png 5x"><TD> <B>Limitations of vertical scrolling function</b></TD></TR>
+</TABLE>
+<DD> When changing the state in which the vertical cell scroll function is used (ON) to the state in which it is not used (OFF), that is, when changing <B>the vertical cell scroll enable bit (N0VCSC, N1VCSC)</b> from "1" to "0", the VRAM cycle pattern register The access command (Ch or Dh) for vertical cell scroll table data read for NBG0 or NBG1 that is set to , must also be changed to an access command (Fh) that says " <B>do not access</b> " during the same V blank period.</P>
+<P> This restriction must also be observed when changing from using the vertical cell scrolling functions of NBG0 and NBG1 at the same time to not using either of the vertical cell scrolling functions.</P>
+<!---------------------------------------------------------------------------------->
+<P><DT> <B>Examples of restrictions</b><!---------------------------------------------------------------------------------->
+<P><DT> <B>Example 1: When using NBG0's vertical cell scrolling function</b><P><DD> If the settings when using the vertical cell scrolling function are as follows:<P><DD>&#65308; <B>setting</b>&#65310;<UL TYPE=DISC>
+<LI> Vertical cell scroll enable bit for NBG0 (N0VCSC) = <B>1</b><LI> VRAM cycle pattern register (CYCA0L) = <B>C</b> 0FFh</UL>
+<P> To disable the vertical cell scrolling function of NBG0 from this state, change the settings as follows during the same V blank period.</P>
+<P><DD>&#65308; <B>setting</b>&#65310;<UL TYPE=DISC>
+<LI> Vertical cell scroll enable bit for NBG0 (N0VCSC) = <B>0</b><LI> VRAM cycle pattern register (CYCA0L) = <B>F</b> 0FFh</UL>
+<!---------------------------------------------------------------------------------->
+<P><DT> <B>Example 2: When using the vertical cell scrolling functions of NBG0 and NBG1 at the same time</b><P><DD> If the settings when using the vertical cell scrolling function are as follows:<P><DD>&#65308; <B>setting</b>&#65310;<UL TYPE=DISC>
+<LI> Vertical cell scroll enable bit for NBG0 (N0VCSC) = <B>1</b><LI> Vertical cell scroll enable bit for NBG1 (N1VCSC) = <B>1</b><LI> VRAM cycle pattern register (CYCA0L) = C <B>D</b> 01h</UL>
+<P> To change from this state to a state where only the vertical cell scroll function of NBG1 is not used, change the settings as follows during the same V blank period.</P>
+<P><DD>&#65308; <B>setting</b>&#65310;<UL TYPE=DISC>
+<LI> Vertical cell scroll enable bit for NBG0 (N0VCSC) = <B>1</b><LI> Vertical cell scroll enable bit for NBG1 (N1VCSC) = <B>0</b><LI> VRAM cycle pattern register (CYCA0L) = C <B>F</b> 01h</UL>
+<A NAME="no5_34"></A><P><DT><H3> ●Line scroll table address register</H3><DD> The line scroll table address register specifies the start address of the line scroll table. This is a 32-bit write-only register located at addresses 1800A0H to 1800A6H. The value is cleared to 0 after power-on or reset, so be sure to set it. <P><!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LSTA0U_"></A><P><DD> <B><FONT SIZE=5>LSTA0U</font> <FONT SIZE=4>1800A0H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA18</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA17</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA16</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LSTA0L_"></A><P><DD> <B><FONT SIZE=5>LSTA0L</font> <FONT SIZE=4>1800A2H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#N0LSTA_">N0LSTA15</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA14</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA13</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA12</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA11</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA10</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA9</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#N0LSTA_">N0LSTA7</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA6</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA5</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA4</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA3</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA2</a></TH><TH><PRE> <A HREF="#N0LSTA_">N0LSTA1</a></TH><TH><PRE> - </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LSTA1U_"></A><P><DD> <B><FONT SIZE=5>LSTA1U</font> <FONT SIZE=4>1800A4H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA18</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA17</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA16</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LSTA1L_"></A><P><DD> <B><FONT SIZE=5>LSTA1L</font> <FONT SIZE=4>1800A6H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#N1LSTA_">N1LSTA15</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA14</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA13</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA12</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA11</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA10</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA9</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#N1LSTA_">N1LSTA7</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA6</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA5</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA4</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA3</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA2</a></TH><TH><PRE> <A HREF="#N1LSTA_">N1LSTA1</a></TH><TH><PRE> -</TH></TR>
+</TABLE>
+</P>
+<A NAME="N0LSTA_">　</A><A NAME="N1LSTA_">　</A><DT><B>Line scroll table address bit</b> : Line scroll table address bit<BR>
+<DD> (N0LSTA18~N0LSTA16, N0LSTA15~N0LSTA1, N1LSTA18~N1LSTA16, N1LSTA15~N1LSTA1)<BR>
+ Specify the start address of the line scroll table on VRAM.<P><TABLE BORDER>
+<TD> N0LSTA18～N0LSTA16</TD><TD> 1800A0H</TD><TD> bits 2-0</TD><TD> For NBG0 (upper bit)</TD></TR>
+<TD> N0LSTA15～N0LSTA1</TD><TD> 1800A2H</TD><TD> bits 15 to 1</TD><TD> For NBG0 (lower bit)</TD></TR>
+<TD> N1LSTA18~N1LSTA16</TD><TD> 1800A4H</TD><TD> bits 2-0</TD><TD> For NBG1 (upper bit)</TD></TR>
+<TD> N1LSTA15～N1LSTA1</TD><TD> 1800A6H</TD><TD> bits 15 to 1</TD><TD> For NBG1 (lower bit)</TD></TABLE>
+<P> The actual first VRAM address is calculated using the following formula: If the VRAM capacity is 4Mbits, the most significant bit of the address is ignored.<P><PRE> (Line scroll table start address) = (Line scroll table address register value 18 bits) x 4H</PRE><P><A NAME="no5_35"></A><P><DT><H3> ●Vertical cell scroll table address register</H3><DD> The vertical cell scroll table address register specifies the start address of the vertical cell scroll table. This is a 32-bit write-only register located at addresses 18009CH to 18009EH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="VCSTAU_"></A><P><DD> <B><FONT SIZE=5>VCSTAU</font> <FONT SIZE=4>18009CH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#N1LSTA_">VCSTA18</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA17</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA16</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="VCSTAL_"></A><P><DD> <B><FONT SIZE=5>VCSTAL</font> <FONT SIZE=4>18009EH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#VCSTA_">VCSTA15</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA14</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA13</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA12</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA11</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA10</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA9</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#VCSTA_">VCSTA7</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA6</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA5</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA4</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA3</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA2</a></TH><TH><PRE> <A HREF="#VCSTA_">VCSTA1</a></TH><TH><PRE> -</TH></TR>
+</TABLE>
+</P>
+<A NAME="VCSTA_">　</A><DT><B>Vertical cell scroll table address bit</b> : Vertical cell scroll table address bit (VCSTA18 to VCSTA1)<DD> Specify the start address of the vertical cell scroll table on VRAM.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> VCSTA18~VCSTA16</TD><TD> 18009CH</TD><TD> bits 2-0</TD><TD></TD></TR>
+<TR><TD> VCSTA15~VCSTA1</TD><TD> 18009EH</TD><TD> bits 15 to 1</TD><TD></TD></TR>
+</TABLE>
+</P>
+<P><DD> The actual first VRAM address is calculated using the following formula: If the VRAM capacity is 4Mbits, the most significant bit of the address is ignored.</P>
+<P><DT><PRE><H3>
+(vertical cell scroll table start address)
+= (vertical cell scroll table address register value 18 bits) x 4H
+</H3></PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p05_20.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no5">VDP2 User's Manual</a> ★ <A HREF="p05_10.htm">Chapter 5 Normal scroll screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

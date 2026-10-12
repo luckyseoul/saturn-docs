@@ -1,0 +1,68 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/31&gt;SCU User's Manual/2.Operation Description</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p01_03.htm">Back</a> ｜ <A HREF="p02_11.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual</b><H1 ALIGN=CENTER> Chapter 2 Operation explanation</H1><HR NOSHADE>
+<DL>
+<A NAME="no1_30"></A><P><DT><H2> ■2.1 DMA transfer</H2><A NAME="no1_31"></A><P><DT><H3> ◆Basic operation of DMA</H3><DD> Figure 2.1 shows the basic operation of DMA. This DMA basically uses longword access via the DMA controller's buffer, but if the start address or end address is not on a longword boundary, the DMA transfer can be performed by reading or writing byte by byte. I can.<BR>
+ Figure 2.1 is an example of executing DMA transfer from transfer source address 1H to 50H to transfer destination address 6H to 55H. At the transfer source, the longword boundary is 4H, so 1H to 3H are read in bytes. Masu. On the other hand, at the transfer destination, the longword boundary is 8H, so the first 2 bytes of the read data are written to 6H to 7H in bytes. Furthermore, the transfer source end address is 50H, but the longword boundary is up to 4FH, so the data at 50H is read in bytes. On the other hand, the transfer destination end address is 55H, but the longword boundary is up to 53H, so the last 2 bytes read are written in bytes from 54H to 55H.</P>
+<A NAME="z2_1"></A><P ALIGN="CENTER"> <B>Figure 2.1 Basic DMA transfer operation</b><BR>
+<img srcset="../grp/i016_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> There are two startup methods for SCU DMA transfer control.</P>
+<P><DD><OL>
+<B><LI></b> DMA start from main CPU<B><LI></b> DMA activation from DSP</OL>
+</P>
+<P><DD> Figure 2.2 shows the DMA transferable area when activated from the main CPU, and Figure 2.3 shows the DMA transferable area when activated from the DSP.</P>
+<A NAME="z2_2"></A><P ALIGN="CENTER"> <B>Figure 2.2 DMA transferable area when started from the main CPU</b><BR>
+<img srcset="../grp/i017_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z2_3"></A><P ALIGN="CENTER"> <B>Figure 2.3 DMA transferable area when activated from DSP</b> <BR>
+<img srcset="../grp/i017_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no1_32"></A><P><DT><TABLE>
+<TR><TH><img srcset="../../../what/atto.png 5x"></TH><TD><H3> Notes on DMA</H3></TD></TR>
+</TABLE>
+</P>
+<A NAME="no1_32_01"></A><P><DT> <B>●Prohibition of writing to A-Bus by SCU-DMA</b><DD> SCU-DMA writes to A-Bus cannot be used.</P>
+<A NAME="no1_32_02"></A><P><DT> <B>●Prohibition of writing by SCU-DMA from VDP2 area</b><DD> Writing by SCU-DMA from the VDP2 area cannot be used.</P>
+<A NAME="no1_32_03"></A><P><DT> <B>●SCU-DMA cannot be used for WORKRAM-L</b><DD> Only WORKRAM-HI (SDRAM: 1Mbyte) can be used with SCU-DMA in WORKRRAM.</P>
+<A NAME="no1_32_04"></A><P><DT> <B>●Prohibition of access to A-Bub and B-Bus from the CPU during A-Bus←→B-Bus DMA operation</b><DD> During DMA operation from A-Bus to B-Bus or from B-Bus to A-Bus, access to A-Bus and B-Bus from the CPU is prohibited. This is because refresh may no longer occur to SDRAM during wait, resulting in a hang.</P>
+<A NAME="no1_32_05"></A><P><DT> <B>●Waiting for SCU-DMA startup of A-Bus←→B-Bus when writing to A-Bus and B-Bus by CPU</b><DD> Write processing by the CPU to A-Bus and B-Bus has priority over SCU-DMA activation of A-Bus and B-Bus.<BR>
+ For example, when the CPU is executing continuous write to VDP1 (B-Bus), if you start SCU-DMA from A-Bus to VDP2 (B-Bus), the continuous write will end. SCU-DMA will not be started until<BR>
+ However, while SCU-DMA is running, CPU access to A-Bus and B-Bus is put on hold.</P>
+<A NAME="no1_32_06"></A><P><DT> <B>●The number of channels that can be used simultaneously with DMA is 2.</b><DD> The number of channels that can be used simultaneously with guaranteed DMA priority is up to 2 channels.<BR>
+ If three channels are used at the same time, the priority order will be ignored. (DSP DMA command is also counted as one channel)</P>
+<A NAME="no1_32_07"></A><P><DT> <B>●Starting DMA level 2 is prohibited while DMA level 1 is running.</b><DD> If DMA level 2 is activated while DMA is activated at level 1, malfunction may occur.<BR>
+ As a countermeasure, please do not start DMA level 2 while starting at DMA level 1.</P>
+<A NAME="no1_32_08"></A><P><DT> <B>●Prohibit writing at the corresponding level while DMA is running</b><DD> The contents of the DMA mode, address update, activation factor selection register, and addition value register must not be rewritten while the DMA is activated at that level.<BR>
+ If you rewrite it, it will hang.</P>
+<!--追加1997/04/24あ-->
+<A NAME="no1_32_09"></A><P><DT> <B>●Prohibitions of SCU-DMA indirect mode</b><DD> Disables the use of SCU-DMA indirect mode for reading from the CD buffer.<BR>
+ Please use SCU-DMA direct mode, CPU-DMA or software to transfer.<BR>
+ For transfers using the A-BUS space as the source in addition to the CD buffer, only "4-byte addition" can be specified for the source read <A HREF="p03_02.htm#no3_214">address addition value</a> , and "no addition" cannot be set.<BR>
+ This restriction does not apply to SCU-DMA direct mode.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_03.htm">Back</a> ｜ <A HREF="p02_11.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

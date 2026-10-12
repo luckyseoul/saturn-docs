@@ -1,0 +1,131 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGASATURN Developer's Information STN-5</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ <A HREF="stn02.htm">STN-2</a> | <A HREF="stn03.htm">STN-3</a> | <A HREF="stn04.htm">STN-4</a> | <B>STN-5</b> | <A HREF="stn06.htm">STN-6</a> | <A HREF="stn09.htm">STN-9</a> | <A HREF="stn18.htm">STN-18</a> ▼<HR NOSHADE>
+<H1 ALIGN=CENTER> STN-5</H1><H2 ALIGN=CENTER> Read retry on Sega Saturn CD-ROM</H2><HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> issue number:</TH><TD> STN-5</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> date of issue:</TH><TD> 94/10/07</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> media:</TH><TD> ○Common</TD><TD> ●CD-ROM</TH><TD> ○Cartridge</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> connection:</TH><TD> ●Program</TD><TD> ○Hard</TD><TD> ○Manual</TD><TD> ○Tools</TD><TD> ○Game</TD><TD> ○ Bug</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Information distinction:</TH><TD> ●New</TD><TD> ○Change</TD><TD> ○Addition</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> importance:</TH><TD> ●Strict observance</TD><TD> ○Recommended</TD><TD> ○Reference</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> attached file:</TH><TD> ○No</TH><TD> ●Yes</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Subject supplement:</TH><TD COLSPAN=7></TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER> Contents</H3><DL>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../what/atto.png 5x"></TD><TD> <B>When creating a CD-ROM for Sega Saturn, be sure to perform a read retry in consideration of data errors.<B></b></TD></TR>
+</TABLE>
+</P>
+<P><DT><H3> ■Description</H3><DD><P> Although CD-ROMs have a high level of error correction ability, uncorrectable errors may occur due to drive deterioration, disc scratches, eccentricity, dust attached to the disc, etc.<BR>
+ Therefore, in consideration of data errors, be sure to perform read retries in addition to <A HREF="#NO1">"How to increase the number of ECCs" (see attached document)</a> .<BR>
+ However, please note that when debugging, etc., by performing a read retry, the cause of an error may not be known.</P>
+</DL>
+<HR>
+<H3 ALIGN=CENTER> <A NAME="NO1">attached file</a></H3><H2 ALIGN=CENTER> How to set ECC/retry count</H2><DL>
+<P><DT><H3> ■Purpose</H3><DD> If an error occurs when reading CD-ROM data, the default setting is to abort the read without retrying.<BR>
+ →[Return error status]</P>
+<P><DT><H3> ■Setting method</H3><DD> Set the retry count using the CDC_CdInit function. The settings will take effect if they are made before the desired CD is played. In fact, once set, the setting remains valid until it is set again or soft reset, so it is usually appropriate to execute it at the beginning of the program (initialization, etc.).</P>
+<P><DT> <B>◆Caution</b><DD> When you run the CDC_CdInit function, the CD drive will:&#65308; PAUSE&#65310; state. Therefore, if you change the retry count while playing a CD, the setting will be changed.&lt;PAUSE&gt; condition.</P>
+<P><DT> <B>◆Program example</b><PRE>
+	#include "sega_cdc.h"
+	#define ECC 5 /* ECC repetition count: 5 times */
+	#define RETRY 0x0f /* Number of retries: 15 times */
+
+	/* Setting ECC/retry count (initialization flag, standby time are default values) */
+	CDC_CdInit(0,0,ECC,RETRY);
+</PRE></P>
+<P><DT><B>◆Reference</b> CDC_CdInit() function<DD><LI> "PROGRAMMER'S GUIDE VOL.1" CD Communication Interface User's Manual<DD><LI> <A HREF="stn_19.htm">STN-19</a> : How to initialize CD block when using GFS</P>
+<P><DT> <B>◆ Others</b><DD> CD drive status&#65308; ERROR&#65310; If this occurs, please seek to the FAD where the data was read correctly and play again.<DD> To know the current FAD, issue the pause command once and then obtain the CD status information. in the same place over and over again&lt;ERROR&gt; If this happens, there may be some damage that cannot be repaired, so you may have no choice but to skip it.</P>
+<P><DT><H3> ■Sample program</H3><DD><PRE>
+#include "sega_cdc.h"
+
+#define STS_MSK 0x0f /* CD status mask pattern */
+
+Sint32 recovPlay(Sint32 fad);
+Sint32 waitStat(Sint32 sts);
+
+/* CD playback recovery process (resume playback from specified fad) */
+Sint32 recovPlay(Sint32 fad)
+{
+	Sint32 Ret;
+	CdcPos pos;
+	CdcPly ply;
+	
+	/* Seek to destination */
+	CDC_POS_PTYPE(&pos) = CDC_PTYPE_FAD;
+	CDC_POS_FAD(&pos) = fad;
+	ret = CDC_CdSeek(&pos);
+	if (ret != CDC_ERR_OK) {
+		return NG;
+	}
+	
+	/*&lt;PAUSE&gt; Wait until the state */
+	ret = waitStat(CDC_ST_PAUSE);
+	if (ret != OK) {
+		return ret;
+	}
+	
+	/* Resume CD playback */
+	CDC_PLY_STYPE(&ply) = CDC_PTYPE_NOCHG;
+	CDC_PLY_ETYPE(&ply) = CDC_PTYPE_NOCHG;
+	CDC_PLY_PMODE(&ply) = CDC_PM_NOCHG;
+	ret = CDC_CdPlay(&ply);
+	if (ret != CDC_ERR_OK) {
+		return NG;
+	}
+	return OK;
+}
+
+/* Wait until the specified drive status */
+Sint32 waitStat(Sint32 sts)
+{
+	Sint32 ret;
+	Sint32 stwk;
+	CdcStat stat;
+	
+	while (TRUE) { /* We actually need an upper limit on the number of loops */
+		/* Get periodic response */
+		ret = CDC_GetPeriStat(&stat);
+		if (ret == CDC_ERR_PERI) {
+			continue;
+		}
+		if (ret != CDC_ERR_OK) {
+			return NG;
+		}
+		stwk = (CDC_STAT_STATUS(&stat) & STS_MSK);
+		if (stwk == sts) {
+			brake;
+		}
+	}
+	return OK;
+}
+　
+</PRE></P>
+</DL>
+that's all<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ <A HREF="stn02.htm">STN-2</a> | <A HREF="stn03.htm">STN-3</a> | <A HREF="stn04.htm">STN-4</a> | <B>STN-5</b> | <A HREF="stn06.htm">STN-6</a> | <A HREF="stn09.htm">STN-9</a> | <A HREF="stn18.htm">STN-18</a> ▼<HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

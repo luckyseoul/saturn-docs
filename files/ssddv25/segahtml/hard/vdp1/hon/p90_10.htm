@@ -1,0 +1,53 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>VDP1 User's Manual/Word Explanation</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR NOSHADE>
+ <B>VDP1 User's Manual</b><H2 ALIGN=CENTER> explanation of words</H2><HR NOSHADE>
+<DL>
+ The terms used in this manual are explained below.<A NAME="no90_00"></A><P><DT> <B>VDP1</b><DD> VDP1 is an IC that controls drawing. VRAM and frame buffer (both DRAM) are connected to VDP1. Drawing commands are written from the CPU to VRAM via VDP1. VDP1 reads drawing commands from VRAM, writes (draws) drawing data to the frame buffer, and then transfers the drawing data from the frame buffer to a display device for display.<BR>
+ The frame buffer is a so-called bitmap memory, and there is a one-to-one correspondence between the data written to the frame buffer and the contents of the display screen. The frame buffer is a mapping of the display screen. There is a system register inside the VDP1, and the screen display is controlled by setting a value in this register.<A NAME="no90_01"></A><P><DT> <B>display</b><DD> The display uses a TV, which is a common display device. The domestic and American TV standard is the NTSC system. European TVs use the PAL system.<BR>
+ Hi-Res is a high-resolution image that doubles the horizontal resolution. 31KC is a method that doubles the horizontal frequency of the normal 15KC to increase vertical resolution. High-definition TV (HDTV) is a so-called high-definition TV that has twice the vertical and horizontal resolution of a regular TV.<BR>
+ TV displays have fields and frames. The field is the time it takes for a scan line to scan one screen. The NTSC format is 1/60 seconds, and the PAL format is 1/50 seconds. A frame is the period during which one image is displayed. One frame is from one frame buffer switch to the next frame buffer switch. When the frame buffer switching mode is 1 cycle mode, 1 frame is 1 field. If the frame buffer is switched every two fields with single-dense interlace, etc., one frame will consist of two fields. When switching only once per second in manual mode, one frame in the NTSC format is 60 fields, and in the PAL format, one frame is 50 fields.<BR>
+ The frame buffer is automatically erased before each frame is drawn. Erasing is performed by writing (filling) the code specified in the register to the frame buffer. This erasing and writing operation is called erase write.<A NAME="no90_02"></A><P><DT> <B>access</b><DD> Access refers to reading and writing data from the CPU, VDP1 to VRAM, system registers, and frame buffer. Accesses to VRAM, system registers, and frame buffers are arbitrated. Arbitration is the process of assigning priorities when there are simultaneous accesses from two or more devices. Writing usually takes precedence over reading for drawing.<BR>
+ Using a DMA controller, access to VRAM can be performed continuously and at high speed using burst transfers. However, do not perform burst access to registers.<A NAME="no90_02"></A><P><DT> <B>data</b><DD> A bit is the smallest unit of data that represents 0 or 1. 8 bits are collectively called a byte, and 16 bits (or 2 bytes) are called a word. When a byte is divided into four upper and lower bits, each bit is called a nibble.<A NAME="no90_03"></A><P><DT> <B>command</b><DD> Commands include drawing commands, clipping coordinate setting commands, and relative coordinate setting commands. Clipping cuts shapes outside the set area. Relative coordinates change the drawing position using the coordinates specified in the drawing command as relative coordinates.<BR>
+ Commands are defined in VRAM as a command table. In addition to the command table, the tables include a character pattern table, Gouraud shading table, and color lookup table.<BR>
+ The table is defined and stored on VRAM starting from an 8HByte boundary or 20HByte boundary address. Boundary means that when an address is divided by its value 8H or 20H, there is no remainder. The register has a 2HByte (word) boundary.<BR>
+ VDP1 fetches command tables one after another and draws according to the commands. Fetch refers to reading a command from VRAM in order to process it.<A NAME="no90_04"></A><P><DT> <B>parts</b><DD> The objects drawn using drawing commands are called parts. Parts are divided into texture parts and non-texture parts. Texture parts are sprites. Non-textured parts include polygons, polylines, and lines.<BR>
+ A sprite is a so-called character. The character color code is defined in VRAM as a character pattern table. A polygon is a filled rectangle, a polyline is an unfilled rectangle, and a line is a straight line connecting two points.<BR>
+ VDP1 processes drawing commands on VRAM and draws parts to the frame buffer. Drawing is done pixel by pixel. The data on the frame buffer represents color with 16 or 8 bits/pixel.<A NAME="no90_05"></A><P><DT> <B>Color</b><DD> There are two ways to express colors: the RGB code method and the color bank method using palette codes and color banks.<BR>
+ The RGB code method expresses colors by specifying the brightness of each of red (R), green (G), and blue (B) using 5 bits.<BR>
+ In the color bank method, select the VDP2 color palette in the color bank, and select a color from the color palette using the palette code.<BR>
+ Sprites can also be colored using a color lookup table method. Define 16 colors in the color lookup table and select a color from among them. The color code can be specified as either an RGB code or a color bank code.<A NAME="no90_06"></A><P><DT> <B>color calculation</b><DD> Color calculation is a special function of VDP1. Gouraud shading is a color operation. Change the brightness of the RGB code of the part using the 4-point RGB code defined in the Gouraud shading table.</DL>
+<HR NOSHADE>
+<A NAME="no002"></A><H2 ALIGN=CENTER> Manual conventions</H2><HR>
+<P> The notation used in this manual is as follows.<DL>
+<A NAME="no91_00"></A><P><DT> <B>binary, hexadecimal</b><DD> Binary numbers are written with a B at the end. For example, represent it as 100B. However, when it is 1 bit, B may be omitted.<BR>
+ Hexadecimal numbers are written with H at the end. For example, it is expressed as 00H, FFH.<A NAME="no91_01"></A><P><DT> <B>unit</b><DD> 1KByte represents 1024Byte. 1Mbit is 1,048,576bit.<A NAME="no91_02"></A><P><DT> <B>MSB, LSB</b><DD> The structure of bytes and words is such that the left side represents the most significant bit (MSB) and the right side represents the least significant bit (LSB).<A NAME="no91_03"></A><P><DT> <B>undefined bit</b><DD> Bits that are not defined in the command table or system registers are represented by a "-".<BR>
+ Write 0 to undefined bits in system registers.<BR>
+ Don't care if all one word is unused on the command table. Either 0 or 1 can be written. If there are used bits in one word, fill the remaining unused bits with 0.<A NAME="no91_04"></A><P><DT> <B>address, house number</b><DD> The addresses shown in this manual are relative addresses of VDP1. VDP1 is located at absolute address 5C00000H in the system.<BR>
+ Find the absolute address of each by adding 5C00000H.<BR>
+ For example, the absolute address of the VRAM of 000000H is address 5C00000H, and the absolute address of the system register of 180000H is 5D80000H.</DL>
+<HR NOSHADE>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

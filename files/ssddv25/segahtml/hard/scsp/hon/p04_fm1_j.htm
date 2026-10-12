@@ -1,0 +1,166 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;15/29&gt;SCSPユーザーズマニュアル/FM音源方式を使用するにあたって/1</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p04_23_j.htm">戻る</A>
+｜   <a href="p04_fm2_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCSPユーザーズマニュアル/4.2　音源部レジスタ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="fm2_00"></A>
+	<P><DT><H3>■ＦＭ音源方式を使用するにあたって</H3>
+	<DD>　ＦＭ音源方式とは、ある波形発生器の位相入力に、異なる波形発生器の出力を加えることで変調を行なう方式です。ＦＭ音声合成はスロットと呼ばれる波形演算ユニットで実現されます。<BR>図4.12にスロットのブロック図を示します。</P>
+
+<A NAME="z4_12"></A>
+	<P ALIGN=CENTER><B>図4.12　スロットのブロック図</B><BR><img srcset="../grp/i047_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　スロットから音を出力させるためには、スロットが発生するための波形データを波形RAM上に書いておきます。更に波形の読みだしアドレス、ループ開始アドレス、ループ終了アドレス、発音ピッチ、発音レベル、EGの各設定を行ない、
+		KEY_ONによって発音をスタートさせます。<BR>
+		　SCSPは全体的に22.68[μsec]を１つの大きなサイクルとして動作します。<BR>
+		　PG(Phase Generator)は、発音周波数の設定値によって決まる、波形データの読み出し速度を管理しています。発音周波数を変えない限り、PGは一定の値を1Fsサイクル(22.68[μsec]=1/44.1KHz)ごとに生成して、毎Fsサイクル累積加算を行ない出力します。
+		これを図4.13のようにアドレスポインタで各種アドレスと加算し、その結果得られた値を波形アドレスとしてアドレスバスに出力し、波形アドレスに対応する波形データをRAMから読み出します。</P>
+
+<A NAME="z4_13"></A>
+	<P ALIGN=CENTER><B>図4.13　波形アドレス生成演算部</B><BR><img srcset="../grp/i048_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z4_14"></A>
+	<P ALIGN=CENTER><B>図4.14　波形アドレス生成・波形データ読み出し</B><BR><img srcset="../grp/i048_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　発振周波数が一定の時(PGの内部生成がすべてのFsサイクルで一定の時)、アドレスポインタの出力は図4.14のように直線になり、波形RAM上の波形を変えることなく読み出すことができます。<BR>
+		　アドレスポインタは見かけ上は直線ですが、実際には1Fsサイクル毎に計算を行なうので、図4.15のように階段状の軌跡を描きます。この段差が、PGの内部生成値になります。</P>
+
+<A NAME="z4_15"></A>
+	<P ALIGN=CENTER><B>図4.15　アドレスポインタ出力拡大図</B><BR><img srcset="../grp/i049_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　周波数を上げた場合にはPGの生成値が増加するので、PG出力およびアドレスポインタの出力値(関数)は傾きが急になります。<BR>
+		　また逆に、周波数を下げた場合にはPGの生成値が減少するので、PG出力値およびアドレスポインタの出力値は図4.16のように傾きが緩やかになります。</P>
+
+<A NAME="z4_16"></A>
+	<A ALIGN=CENTER><B>図4.16　周波数アドレスポインタ出力値</B><BR><img srcset="../grp/i050_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　ＦＭ音声合成を行う時には、短い周期の波形をループして使用します。従って、アドレスポインタの出力値(関数)は、図4.17のようになります。</P>
+
+<A NAME="z4_17"></A>
+	<P ALIGN=CENTER><B>図4.17　ＦＭ音声合成実行時のアドレスポインタ出力値(1)</B><BR><img srcset="../grp/i050_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>	<P ALIGN=CENTER><B>図4.17　ＦＭ音声合成実行時のアドレスポインタ出力値(1)</B><BR><img srcset="../grp/i050_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　aのアドレスに、スタートアドレスを設定し、ループスタートアドレスの値を"0000H"に設定してしておき、波形読み出しアドレスと、波形ループ開始アドレスを同じアドレスに設定します。
+		更にbのアドレスが波形ループ終了アドレスとなるようにループエンドアドレスを設定すると、図4.17のような波形が得られます。</P>
+
+<A NAME="z4_18"></A>
+	<P ALIGN=CENTER><B>図4.18　ＦＭ音声合成実行時のアドレスポインタ出力値(2)</B><BR><img srcset="../grp/i051_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>	<P ALIGN=CENTER><B>図4.18　ＦＭ音声合成実行時のアドレスポインタ出力値(2)</B><BR><img srcset="../grp/i051_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　図4.18のようにアドレスポインタの出力値を線形にした場合(Aの波形)は、RAMの波形どおりに出力します（１の波形）。しかし、非線形関数（Bの波形）になると波形の読み出し方が変わり、２の波形を出力します。
+		このように波形が変形すると、音色が変わります。<BR>
+		　この位相値を時間的に変動させることで波形を歪ませることを応用したものが、ＦＭ音声合成方式です。ＦＭ音声合成方式はアドレスポインタ出力値(位相値)を非線形にする方法として、実際には他の（場合によっては自）
+		スロットの出力値を加算する方法をとっています。今までは、ノーマルモードを例にとって説明してきましたが、その他にも"LPCTL"レジスタの変更により、リバースループ、オルタネーティブループの設定が可能です。
+		"LPCTL"レジスタにより指定できるループデータは図4.19、図4.20、図4.21のようになります。</P>
+
+<A NAME="z4_19"></A>
+	<P ALIGN=CENTER><B>図4.19　ノーマルループ</B><BR><img srcset="../grp/i051_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z4_20"></A>
+	<P ALIGN=CENTER><B>図4.20　リバースループ</B><BR><img srcset="../grp/i052_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z4_21"></A>
+	<P ALIGN=CENTER><B>図4.21　オルタネーティブループ</B><BR><img srcset="../grp/i052_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　ノーマルループ、リバースループは、"LSA","LEA"に対応するデータが同じあることを前提としているため、"LSA"のデータを"LEA"にコピーしてループデータを作成してください。
+		オルタネーティブループの設定値は、必ず"LSA"＜"LEA"となるように設定してください(全てのループにおいて、"LSA"＞"LEA"にした場合の動作は保証できません)。また、ループスタートポイントとループエンドポイントに重複してデータを置くことによって、
+		オルタネーティブループの場合のピッチを他のループモードのピッチと一致させることができます。全ての波形のループモードをオルタネーティブループに限定した場合"LSA","LEA"に対応するデータは、同じ値である必要はありません。</P>
+
+	<P>	<DD>　実際のＦＭ音声合成の実現方法をブロック図で表すと、図4.22のようになります。</P>
+
+<A NAME="z4_22"></A>
+	<P ALIGN=CENTER><B>図4.22  ＦＭ音源構成図</B><BR><img srcset="../grp/i053_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　以下に、ＦＭ音源構成図の各ブロックについて、説明します。</P>
+
+<A NAME="4_22_0"></A>
+	<P>	<DT><B>SOUND STACK(サウンドスタック)</B>
+		<DD>　各スロットの出力を格納します。SCSPのスロットは、２つのスロットの出力値(サウンドスタック内データ)を入力することができます。</P>
+
+<A NAME="4_22_1"></A>
+	<P><DT><B>平均化演算部</B>
+	<DD>　各スロットにはXおよびYの２つの変調入力があります。この２つの入力を１つにまとめるために、加算を行なう必要があります。加算結果をオーバフローさせないようにするためには、２つの入力を１／２倍してから加算する方法があります。<BR>SCSPではこの方法を取り入れることにより、２本の入力データを１本の出力データに変換しています。<BR>入力データをXDおよびYD、出力データをZDとすると、次の式で表すことができます。</P>
+
+<A NAME="z4_23"></A>
+	<P ALIGN=CENTER>
+<PRE><B>平均化演算部の式</B><BR>
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃　　　　　　　　　　　　　　　　　　　　ＹＤ　　　　　ＸＤ　　┃
+┃　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　┃
+┃　　　　　　　ＸＤ　＋　ＹＤ　　　　　┌┴──────┴┐　　┃
+┃　ＺＤ　＝　─────────　　　　│　平均化演算部　│　　┃
+┃　　　　　　　　　　２　　　　　　　　└────┬───┘　　┃
+┃　　　　　　　　　　　　　　　　　　　　　　　　│　　　　　　┃
+┃　　　　　　　　　　　　　　　　　　　　　　　　ＺＤ　　　　　┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+</PRE></P>
+
+
+		<P>	<DD>　これは、平均値を求める式と同様であることから、この演算ブロックを平均化演算部と呼んでいます。</P>
+
+<A NAME="4_23_0"></A>
+	<P>	<DT><B>MDL［モジュレーションレベル(変化量)］</B>
+		<DD>　外部スロット入力によるＦＭのかかり具合(度合い)を調整するために用います。</P>
+
+<A NAME="4_23_1"></A>
+	<P>	<DT><B>位相加算器</B>
+		<DD>　PGで生成される位相値と、平均化演算部を経てMDL演算によって生成された位相値を加(減)算します。また、加算または減算の実行判断は、ループモードとループ状態によって決まります。</P>
+
+<A NAME="4_23_2"></A>
+	<P>	<DT><B>レベル乗算部</B>
+		<DD>　波形メモリから読み出された波形と、ALFO、TL(Total Level)、EGによって生成されるレベル係数を乗算します。更に、実際の波形出力レベル調整を行ないます。</P>
+
+<A NAME="4_23_3"></A>
+	<P>	<DT><B>波形RAM</B>
+		<DD>　サウンド用RAMです。</P>
+
+<A NAME="4_23_4"></A>
+	<P>	<DT><B>波形アドレスポインタ</B>
+		<DD>　各スロットに設定されたSA(スタートアドレス)値と、位相加算器から出力される波形位相値を加算または減算して、実際の波形メモリアドレスを生成するブロックです。</P>
+
+<A NAME="4_23_5"></A>
+	<P>	<DT><B>波形データバッファ</B>
+		<DD>　波形メモリから読み出された波形を、一時的に保存しておくためのメモリです。</P>
+
+<A NAME="4_23_6"></A>
+	<P>	<DT><B>PG(Phase Generator)</B>
+		<DD>　発音周波数の波形の読み出し速度を管理します。(実際は、波形の読み飛ばしを行なっています。)</P>
+
+<A NAME="PG_"></A>
+	<P>	<DT><B>EG(Envelope Generator)</B>
+		<DD>　各レイトやレベルの設定に従って、値の時間的な変化(エンベロープカーブ)を作り出すブロックです。ここで生成された値は、レベル演算部に送られた後に波形データと乗算されるので、波形の出力レベルが時間的に変化することになります。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p04_23_j.htm">戻る</A>
+｜   <a href="p04_fm2_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

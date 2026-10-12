@@ -1,0 +1,170 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/19&gt;CD communication I/F (CD part)/Communication with CD block</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual</b><H2 ALIGN=CENTER> Communication with CD block</H2><HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A><P><DT><H3> 3.1 Communication register</H3><DD> Table 3.1 shows a list of registers for communicating with the CD block and the corresponding access functions.</P>
+<A NAME="t3_1"></A><P><DD> <B>Table 3.1 List of communication registers</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> register name</TH><TH><PRE> R/W</TH><TH><PRE> explanation</TH><TH><PRE> access function</TH></TR>
+<TR><TD><PRE> DATATRNS</TD><TD><PRE> R/W</TD><TD><PRE> data transfer register</TD><TD><PRE> CDC_GetDataPtr</TD></TR>
+<TR><TD><PRE> HIRQREQ</TD><TD><PRE> R/W</TD><TD><PRE> Interrupt factor register</TD><TD><PRE> CDC_GetHirqReq<BR> CDC_ClrHirqReq</TD></TR>
+<TR><TD><PRE> HIRQMSK</TD><TD><PRE> R/W</TD><TD><PRE> interrupt mask register</TD><TD><PRE> CDC_GetHirqMsk<BR> CDC_SetHirqMsk</TD></TR>
+<TR><TD><PRE> MPEG GGB</TD><TD><PRE> R</TD><TD><PRE> MPEG register (RGB data)</TD><TD><PRE> CDC_GetMpegPtr</TD></TR>
+</TABLE>
+<DD> <B>*</b> All access widths are 16 bits (1 word)</P>
+<P><DD> Details of the communication registers are shown below.</P>
+<P><DD> In the figure, reserved bits are represented by "-". Always specify 0 for reserved bits.<BR>
+ The bit configuration is 15 for the most significant bit (MSB) and 0 for the least significant bit (LSB).</P>
+<A NAME="no3_11"></A><P><DT> <B>(1)Data transfer register (DATATRNS)</b><DD> This register inputs and outputs data between the host and CD block during data transfer.<BR>
+ The inside of the register is a FIFO, and when the host retrieves data, the CD block automatically sets the data. (The same applies when writing data)</P>
+<A NAME="t3_2"></A><P><DD> <B>Table 3.2 Bit configuration of data transfer register</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE> register name</TD><TD><PRE> R/W</TD><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> DATATRNS</TD><TD><PRE> R/W </TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD></TR>
+<TR></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2></TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0 </TD></TR>
+<TR ALIGN=CENTER><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR>
+</TABLE>
+</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> The initial value of the bit is undefined.</OL>
+</P>
+<A NAME="no3_12"></A><P><DT> <B>(2) Interrupt factor register (HIRQREQ)</b><DD> This is an interrupt factor register from the CD block to the host.<BR>
+ Each bit can only be set from the CD block, and each bit can only be cleared from the host. The host clears the target bit and waits for it to become 1.</P>
+<A NAME="t3_3"></A><P><DD> <B>Table 3.3 Bit configuration of interrupt factor register</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE> register name</TD><TD><PRE> R/W</TD><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> HIRQREQ</TD><TD><PRE> R/W</TD><TD><PRE> −</TD><TD><PRE> −</TD><TD><PRE> MPST</TD><TD><PRE> MPCM</TD><TD><PRE> MPED</TD><TD><PRE> SCDQ</TD><TD><PRE> EFLS</TD><TD><PRE> ECPY</TD></TR>
+<TR></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2><PRE></TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> EHST</TD><TD><PRE> ESEL</TD><TD><PRE> DCHG</TD><TD><PRE> PEND</TD><TD><PRE> BFUL</TD><TD><PRE> CSCT</TD><TD><PRE> DRDY</TD><TD><PRE> CMOK</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH><PRE> bit</TH><TH><PRE> Name</TH><TH><PRE> explanation</tH><TH><PRE> initial value</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> bit0</TD><TD ALIGN=CENTER><PRE> CMOK</TD><TD><PRE> 1: Command can be issued (response set completed)</TD><TD ALIGN=CENTER><PRE> 1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit1</TD><TD ALIGN=CENTER><PRE> DRDY</TD><TD><PRE> 1: Data transfer ready</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit2</TD><TD ALIGN=CENTER><PRE> CSCT</TD><TD><PRE> 1: 1 sector read completed<p> (One sector read from CD-ROM was stored or erased in a partition)</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit3</TD><TD ALIGN=CENTER><PRE> BFUL</TD><TD><PRE> 1: CD buffer full (CD buffer is full)</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit4</TD><TD ALIGN=CENTER><PRE> PEND</TD><TD><PRE> 1: End of CD playback (current FAD is out of playback range)</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit5</TD><TD ALIGN=CENTER><PRE> DCHG</TD><TD><PRE> 1: Disk replacement occurred (tray opened)</TD><TD ALIGN=CENTER><PRE> 0※</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit6</TD><TD ALIGN=CENTER><PRE> ESEL</TD><TD><PRE> 1: Soft reset, end of selector setting process</TD><TD ALIGN=CENTER><PRE> 1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit7</TD><TD ALIGN=CENTER><PRE> EHST</TD><TD><PRE> 1: End of host input/output processing</TD><TD ALIGN=CENTER><PRE> 1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit8</TD><TD ALIGN=CENTER><PRE> ECPY</TD><TD><PRE> 1: End of copy/move processing between buffer sections</TD><TD ALIGN=CENTER><PRE> 1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit9</TD><TD ALIGN=CENTER><PRE> EFLS</TD><TD><PRE> 1: End of CD block file system processing</TD><TD ALIGN=CENTER><PRE> 1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit10</TD><TD ALIGN=CENTER><PRE> SCDQ</TD><TD><PRE> 1: Subcode Q update completed (CD drive communication timing)</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit11</TD><TD ALIGN=CENTER><PRE> MPED</TD><TD><PRE> 1: End of MPEG related processing</TD><TD ALIGN=CENTER><PRE> 1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit12</TD><TD ALIGN=CENTER><PRE> MPCM</TD><TD><PRE> 1: End of MPEG operation undefined section</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit13</TD><TD ALIGN=CENTER><PRE> MPST</TD><TD><PRE> 1: MPEG interrupt status notification (MPEG-related interrupt occurrence)</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit14</TD><TD ALIGN=CENTER><PRE> −</TD><TD><PRE> reserved bit</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> bit15</TD><TD ALIGN=CENTER><PRE> −</TD><TD><PRE> reserved bit</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+</TABLE>
+<P><DD> <B>*</b> DCHG=1 at hard reset, but cleared to 0 in BOOT ROM.<DD> DCHG is not initialized at soft reset. (CDC function writes 0BE1H)<DD> As a general rule, DCHG shall clear the BOOT ROM to 0 when checking the disk.</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> Only 0 (clear) can be written to the bit.</P>
+<P><B><LI></b> The IRQ output to the host is the OR output of all factors.<BR>
+ When processing interrupts, clear the corresponding factor bit.</P>
+<P><B><LI></b> The ESEL, EHST, ECPY, EFLS, and MPED bits are collectively called the command end flag.<BR>
+ Notifies the end of execution of commands belonging to each flag.</P>
+<P><B><LI></b> The initial values of the bits are 1 for CMOK and command end flag, and 0 for others.<BR>
+ (Initial value bit pattern: 0BC1H)<BR>
+ In reality, bits other than 1 are undefined, so the CDC function clears them to 0.</P>
+</OL>
+<A NAME="no3_13"></A><P><DT> <B>(3) Interrupt mask register (HIRQMSK)</b><DD> This register is used to mask interrupts from the CD block to the host.</P>
+<A NAME="t3_4"></A><P><DD> <B>Table 3.4 Bit configuration of interrupt register</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE> register name</TD><TD><PRE> R/W</TD><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> HIRQMSK</TD><TD><PRE> R/W</TD><TD><PRE> −</TD><TD><PRE> −</TD><TD><PRE> MPST</TD><TD><PRE> MPCM</TD><TD><PRE> MPED</TD><TD><PRE> SCDQ</TD><TD><PRE> EFLS</TD><TD><PRE> ECPY</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2></TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> EHST</TD><TD><PRE> ESEL</TD><TD><PRE> DCHG</TD><TD><PRE> PEND</TD><TD><PRE> BFUL</TD><TD><PRE> CSCT</TD><TD><PRE> DRDY</TD><TD><PRE> CMOK</TD></TR>
+</TABLE>
+</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> The meaning of the bits is the same as the interrupt factor register.<BR>
+ (1: Interrupt enabled, 0: Masked)</P>
+<P><B><LI></b> When interrupts are masked, the following occurs when an interrupt signal is input.<BR>
+&#12539; Not reflected in IRQ output.<BR>
+&#12539; It is reflected in the interrupt factor register. (Polling processing possible)</P>
+<P><B><LI></b> The initial value of all bits is 0. (It will not be initialized by soft reset)</P>
+</OL>
+<A NAME="no3_"></A><P><DT> <B>(4)MPEG register (MPEGRGB)</b><DD> This register is used to transfer MPEG frame buffer image data to the host in RGB format.</P>
+<A NAME="t3_5"></A><P><DD> <B>Table 3.5 MPEG register bit configuration</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE> register name</TD><TD><PRE> R/W</TD><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> MPEG GGB</TD><TD><PRE> R </TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2></TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0 </TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR>
+</TABLE>
+</P>
+<P><DD> bit0 to bit15: RGB data (please refer to <B><A HREF="../../cdmp/index.htm">the MPEG part</a></b> for details)</P>
+<A NAME="no3_20"></A><P><DT><H3> 3.2 Communication method</H3><A NAME="no3_21"></A><P><DT> <B>(1) Communication time</b><DD> All interrupts are disabled during the command/response response time. Response time can be delayed if commands are issued consecutively.</P>
+<A NAME="no3_22"></A><P><DT> <B>(2) Communication error</b><DD> If the CD block does not respond (returns a response) within the specified time after issuing a command, a communication timeout error will occur. The presence or absence of a response is determined by polling a certain number of times using a software loop.</P>
+<A NAME="no3_23"></A><P><DT> <B>(3) Command issuance regulations</b><DD> Issuing commands must comply with the following regulations:</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> The maximum number of commands that can be issued in any 6.7ms is 30 times.</P>
+<P><B><LI></b> The maximum number of commands that can be issued in any 16.7ms is 60 times.</P>
+<P><B><LI></b> For subcode retrieval, the command can be issued up to 34 times in any 13.3ms.<BR>
+ (16 subcodes R to W + 1 subcode Q acquired: total 17 x 2 = 34 times)</P>
+<P><B><LI></b> Commands belonging to the same command end flag are issued after waiting for processing to complete.</P>
+</OL>
+<P><DD> <B>《Program guidelines》</b><DD> Polling processing by continuously issuing commands is prohibited.<BR>
+ Use periodic responses and interrupt factor registers to poll for changes in status. Also, commands are issued using timings such as SCDQ, CSCT flags, and VSYNC.</P>
+<A NAME="no3_24"></A><P><DT> <B>(4) Command end flag</b><DD> Notifies the end of processing for commands that cannot be completed with just the command/response (processing takes time). During command processing, commands belonging to the same end flag cannot be executed. (See <B><A HREF="../../cdmp/index.htm">MPEG part</a></b> for MPED flag)</P>
+<A NAME="t3_6"></A><P><DD> <B>Table 3.6 Commands belonging to command end flag (CD part)</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> flag</TH><TH><PRE> command</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> ESEL</TD><TD><PRE> - Setting the CD device connection destination (CDC_CdSetCon)<BR>&#12539; Setting the aperture frame address range (CDC_SetFiltRange)<BR>&#12539; Setting aperture subheader conditions (CDC_SetFiltSubh)<BR>&#12539; Setting the aperture mode (CDC_SetFiltMode)<BR>&#12539; Setting the aperture connection destination (CDC_SetFiltCon)<BR>&#12539; Reset selector (CDC_ResetSelector)<BR>&#12539; Calculating actual data size (CDC_CalActSiz)<BR>&#12539; Execute frame address search (CDC_ExeFadSearch)<BR>&#12539; Setting sector length (CDC_SetSctLen)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> EHST</TD><TD><PRE> - Retrieving sector data (CDC_GetSctData)<BR>&#12539; Erase sector data (CDC_DelSctData)<BR>&#12539; Retrieve and erase sector data (CDC_GetdelSctData)<BR>&#12539; Write sector data (CDC_PutSctData)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> ECPY</TD><TD><PRE>・Copy sector data (CDC_CopySctData)<BR>&#12539; Moving sector data (CDC_MoveSctData)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> EFLS</TD><TD><PRE>・Move directory (CDC_ChgDir)<BR>&#12539; Retaining file information (CDC_ReadDir)<BR>&#12539; Read file (CDC_ReadFile)</TD></TR>
+</TABLE>
+</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> The ESEL flag also notifies the end of soft reset (CDC_CdInit) processing.</P>
+<P><B><LI></b> The EFLS flag will also be 1 if you run the following command:<BR>
+&#12539; Open tray (CDC_CdOpen)<BR>
+&#12539; Abort file access (CDC_AbortFile)</P>
+</OL>
+<A NAME="no3_25"></A><P><DT> <B>(5) Exclusive processing of command issuance (in CD communication interface function)</b><!-- +++ Update by CRI ：6.2 DDC を　CDC 変更 -->
+<DD> The CDC function checks the flag after the command completes and performs the following exclusive processing.</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> If the command end flag is 0, an error is returned without issuing the command.</P>
+<P><B><LI></b> If it is 1, clear the command end flag to 0 and issue the command.</P>
+</OL>
+<P><DD> In exceptional cases, the command end flag may be cleared to 0 or only checked.</P>
+<A NAME="t3_7"></A><P><DD> <B>Table 3.7 Handling exceptional command termination flags</b><DD><TABLE BORDER=1>
+<TR><TH COLSPAN=2><PRE> flag</TH><TH><PRE> command</TH></TR>
+<TR><TD COLSPAN=3><PRE> Only clear 0 (do not check)</TD></TR>
+<TR><TD ROWSPAN=2 WIDTH=20><PRE></TD><TD><PRE> ESEL</TD><TD><PRE>・Soft reset (specified by CDC_CdInit parameter)</TD></TR>
+<TR><TD><PRE> EFLS</TD><TD><PRE>・Abort file access (CDC_AbortFile)</TD></TR>
+<TR><TD COLSPAN=3><PRE> Only check (do not clear to 0)</TD></TR>
+<TR><TD ROWSPAN=1><TD><PRE> ESEL</TD><TD><PRE>・Getting the actual data size (CDC_GetActSiz)<BR>&#12539; Obtain frame address search results (CDC_GetFadSearch)</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_26"></A><P><DT> <B>(6) Command end flag at REJECT, WAIT</b><DD> If REJECT or WAIT is returned in response to a command, the command end flag will not be set to 1. Therefore, the value of the command end flag is retained within CDC so that the command can be issued even after REJECT or WAIT. The CDC function checks this value and performs exclusive processing for issuing commands.</P>
+<A NAME="no3_27"></A><P><DT> <B>(7) Notes on CDC library</b><DD><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>The value of the command termination flag held by CDC will be inconsistent if separately linked CDC program code is executed. Therefore, if the command end flag is not initialized, it may not be possible to issue commands.</b><BR>
+ <B>Please note the following points when using the CDC library:</b></TD></TR>
+</TABLE>
+<B>	<DL><DD><OL TYPE="a"><B><LI></b> As a general rule, only one program code resides in memory and is used.<B><LI></b> When executing another program code, always execute a soft reset first to initialize the command end flag.</OL></DL></P><A NAME="no3_30"></A><P><DT><H3> 3.3 Response</H3><A NAME="no3_31"></A><P><DT> <B>(1)Response content</b><DD> The response consists of 1 byte status and 7 bytes report. Status is common, but reporting is command dependent. The most basic report is the CD report.</P><A NAME="no3_32"></A><P><DT> <B>(2)Status</b><DD> The following information is returned in the status:</P><P><DD><TABLE><TR><TD><PRE>・REJECT</TD><TD><PRE> : The command itself is invalid, such as because the command format is incorrect.</TD></TR><TR><TD><PRE>・WAIT (execution pending)</TD><TD><PRE> :The command cannot be accepted because it cannot be executed in the current state.</TD></TR><TR><TD><PRE>・Data transfer request</TD><TD><PRE> : Indicates that data transfer is necessary.</TD><TR><TR><TD><PRE>・Regular response</TD><TD><PRE> : Indicates whether it is a regular response or a response to a command.</TD></TR><TR><TD><PRE>・CD drive status</TD><TD><PRE> : Indicates the logical state of the CD drive as seen from the host.</TD></TR></TABLE></P><P><DD><OL TYPE=a><B><LI></b> The response when REJECT is invalid.</P><P><B><LI></b> Drive status and CD reports during WAIT are enabled, but other reports are disabled.</P></OL><A NAME="no3_33"></A><P><DT> <B>(3) Regular response</b><DD> Periodic responses are responses that the CD block returns when communicating with the CD drive, and the host can obtain information (status and CD report) without issuing a command.<BR> It is updated periodically according to the communication cycle with the CD drive. (SCDQ flag update timing is also the same)</P><P><DD><PRE>
+・Standard speed playback: 13.3ms
+Periodic response update cycle - During double speed playback: 6.7ms
+・Other than during playback: 16.7ms
+</PRE></P><P><DD>Periodic responses are not updated during command/response. After reading the response from the command, it will be updated and available for acquisition at the next CD drive communication timing.</P><P><DD> <B>Note:</b> The periodic response (SCDQ flag) update cycle shown here is the normal value. The update cycle may be extended depending on the communication status with the CD drive.<BR> (For example, when communication with the CD drive fails due to scratches on the disc, etc.)</P><A NAME="no3_40"></A><P><DT><H3> 3.4 Data transfer</H3><A NAME="no3_41"></A><P><DT> <B>(1) Data transfer procedure</b><DD> For commands that involve data transfer, the host must perform data transfer processing after the command/response. The steps are shown below.</P><P><DD><OL TYPE=a><B><LI></b> Executes commands that involve data transfer (extracting/writing data).</P><P><B><LI></b> Execute Waiting for data transfer preparation (CDC_DataReady). (Wait for DRDY to become 1)</P><P><B><LI></b> Data is input/output through the data transfer register.<BR> To obtain the register pointer, execute the CDC_GetDataPtr function.</P><P><B><LI></b> After transferring the necessary data, execute the end of data transfer (CDC_DataEnd).</P></OL><A NAME="no3_32"></A><P><DT> <B>(2) Termination of data transfer</b><DD> If the status is data transfer requested, you must always terminate the data transfer even if no data is actually transferred or an error occurs. Not required at REJECT, WAIT.<BR> If an error occurs while waiting for data transfer to be prepared, the application does not need to terminate the data transfer. It is automatically executed inside the ready function.</P><A NAME="no3_33"></A><P><DT> <B>(3)Data transfer error</b><DD> Table 3.8 shows the errors that occur while waiting for data transfer preparation.</P><A NAME="t3_8"></A><P><DD> <B>Table 3.8 Data transfer error</b><DD><TABLE BORDER=1><TR><TH><PRE> Data transfer error</TH><TH><PRE> explanation</TH></TR><TR><TD><PRE> Data transfer timeout</TD><TD><PRE> The CD block does not become ready for data transfer within the specified time.<BR> (DRDY flag does not become 1)</TD></TR><TR><TD><PRE> Unable to secure sector for writing</TD><TD><PRE> A free sector could not be secured when writing sector data.<BR> (DRDY flag remains 0, EHST flag becomes 1)</TD></TR></TABLE></P><A NAME="no3_"></A><P><DT> <B>(4) Prohibited matters</b><DD><TABLE><TR><TD><IMG srcset="../../../../what/atto_j.png 5x"></TD><TD> <B>When executing a command that involves data transfer, do not terminate the data transfer before the DRDY flag becomes 1. Even if no data is actually transferred, be sure to wait for the DRDY flag to become 1 before terminating.</b><BR> <B>(Execute wait for data transfer preparation and then terminate)</b></TD></TR></TABLE></P></DL><HR NOSHADE> <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><IMG srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>
+

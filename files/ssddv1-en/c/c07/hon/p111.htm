@@ -1,0 +1,57 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p110.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p112.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <B> (2) Program example </B> <BR>
+<DD> The following is an example of a program that uses the stream system to play an AIFF or APCM format file. <P>
+<PRE>#define RING_BUF_SIZE   (2048L*10)
+#define PCM_ADDR   ((void*)0x25a20000)
+#define PCM_SIZE   (4096L*2)<P>
+/* work     */
+PcmWork pcm_work;<P>
+/ * Ring buffer * /
+Uint32   ring_buf[RING_BUF_SIZE / sizeof(Uint32)]</H3>;
+StmHn     stm;
+PcmHn     pcm;<P>
+/* Initialize */
+PCM_Init();<P>
+/ * ADPCM usage declaration (required when using ADPCM) * /
+PCM_DeclareUseAdpcm();<P>
+/ * Set interrupt handling * /
+ Use INT _ ??? to set V blank IN interrupt.
+ Call PCM_VblIn (); in the V blank IN interrupt. <P>
+/ * File initialization * /
+GFS_Init(･･);
+STM_Init(･･);
+STM_OpenGrp();
+STM_SetExecGrp(･･);
+/ * Open stream * /
+stm = STM_OpenFid(･･);<P>
+/ * Create handle * /
+PCM_PARA_WORK(&para) = &pcm_work;
+PCM_PARA_RING_ADDR(&para) = ring_buf;
+PCM_PARA_RING_SIZE(&para) = RING_BUF_SIZE;
+PCM_PARA_PCM_ADDR(&para) = PCM_ADDR;
+PCM_PARA_PCM_SIZE(&para) = PCM_SIZE;
+pcm = PCM_CreateStmHandle(&para, stm);<P>
+/ * Start playback * /
+PCM_Start(pcm);
+while(TRUE) {
+     / * Replay task processing * /
+     PCM_Task(pcm);<P>
+     / * End judgment * /
+     if (PCM_GetPlayStatus(pcm) == PCM_STAT_PLAY_END) break;
+}
+/ * Abandon handle * /
+PCM_DestroyStmHandle(pcm);<P>
+/ * Close stream * /
+STM_Close(stm);<P>
+/* End processing */
+PCM_Finish();</PRE><P>
+</DL><P><P><HR>
+<A HREF=p110.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p112.htm> Go to next page </A>
+</BODY>
+</HTML>

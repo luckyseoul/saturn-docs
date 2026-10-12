@@ -1,0 +1,151 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;35/86&gt;VDP2ユーザーズマニュアル/4.11モザイク処理</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>★
+<A HREF="../index.htm#no4">VDP2ユーザーズマニュアル</A>★
+<A HREF="p04_10.htm">第４章　スクロール画面</A>
+<HR>
+<B>▲
+<A HREF="p04_a0.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第４章　スクロール画面</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_11"></A>
+	<P><DT><H2>■4.11　モザイク処理</H2>
+	<DD>　スクロール面はモザイク処理を画面ごとに行うことができ、そのときのモザイクサイズは水平方向と垂直方向それぞれについて設定できます。<BR>
+　モザイク処理は、各スクロール画面を、指定されたサイズのいくつかのエリアに分割し、それぞれのエリアの左上のドットのカラーをそのエリア内のすべてのドットに表示する機能です。異なるカラーのエリアを並べることでモザイクパターンが得られます。モザイクエリアのサイズは、水平方向と垂直方向を独立に指定することができます。水平方向のサイズは、1ドット単位で1〜16ドットまで指定できます。垂直方向のサイズは、ノンインタレースモードでは1ドット単位で1〜16ドットまで、インタレースモードでは2ドット単位で2〜32ドットまでを指定することができます。倍密インタレースモードのときにモザイク処理を行うようにレジスタを設定すると、画面は強制的に単密インタレースモードで表示されます。<BR>
+　NBG0またはNBG1においてモザイク処理を行うと、縦セルスクロール機能が使えなくなります。また、RBG0、RBG1のモザイク処理は、水平方向にしかできません。<BR>
+　モザイクパターンを図4.19に示します。</P>
+
+<A NAME="z4_19"></A>
+	<P ALIGN=CENTER><B>図4.19　モザイクパターン</B><BR><IMG SRC="../../intr/grp/i031_01.gif"></P>
+
+<A NAME="no4_b1"></A>
+	<P>	<DT><H3>　●モザイクコントロールレジスタ</H3>
+		<DD>　モザイクコントロールレジスタは、モザイク処理を行うかどうかを指定します。書き込み専用の16ビットのレジスタで、180022H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="MZCTL_"></A>
+<P>	<DD><B><FONT SIZE=5>MZCTL</FONT>　<FONT SIZE=4>180022H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#MZSZV_">MZSZV3 </A></TH>
+<TH><PRE><A HREF="#MZSZV_">MZSZV2 </A></TH>
+<TH><PRE><A HREF="#MZSZV_">MZSZV1 </A></TH>
+<TH><PRE><A HREF="#MZSZV_">MZSZV0 </A></TH>
+<TH><PRE><A HREF="#MZSZH_">MZSZH3 </A></TH>
+<TH><PRE><A HREF="#MZSZH_">MZSZH2 </A></TH>
+<TH><PRE><A HREF="#MZSZH_">MZSZH1 </A></TH>
+<TH><PRE><A HREF="#MZSZH_">MZSZH0 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#R0MZE_">R0MZE  </A></TH>
+<TH><PRE><A HREF="#N3MZE_">N3MZE  </A></TH>
+<TH><PRE><A HREF="#N2MZE_">N2MZE  </A></TH>
+<TH><PRE><A HREF="#N1MZE_">N1MZE  </A></TH>
+<TH><PRE><A HREF="#N0MZE_">N0MZE  </A></TH>
+</TR></TABLE></P>
+
+<A NAME="MZSZV_">　</A>
+<A NAME="MZSZH_">　</A>
+	<DT><B>モザイクサイズビット</B>：Mosaic size bit (MZSZV3〜MZSZV0, MZSZH3〜MZSZH0)
+	<DD>　水平方向と垂直方向のモザイクサイズを指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD>MZSZV3〜MZSZV0</TD><TD>180022H</TD><TD>ビット15〜12</TD><TD>垂直方向モザイクサイズ用</TD></TR>
+	<TR><TD>MZSZH3〜MZSZH0</TD><TD>180022H</TD><TD>ビット11〜8</TD><TD>水平方向モザイクサイズ用</TD></TR>
+	</TABLE></P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH ROWSPAN=2>MZSZV3</TH><TH ROWSPAN=2>MZSZV2</TH><TH ROWSPAN=2>MZSZV1</TH><TH ROWSPAN=2>MZSZV0</TH><TH COLSPAN=2>垂直方向モザイクサイズ</TH></TR>
+	<TR><TH>ノンインタレース</TH><TH>インタレース</TH></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD>1ドット</TD><TD>2ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD>2ドット</TD><TD>4ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD>3ドット</TD><TD>6ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD>4ドット</TD><TD>8ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD>5ドット</TD><TD>10ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD>6ドット</TD><TD>12ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD>7ドット</TD><TD>14ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD>8ドット</TD><TD>16ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD>9ドット</TD><TD>18ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD>10ドット</TD><TD>20ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD>11ドット</TD><TD>22ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD>12ドット</TD><TD>24ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD>13ドット</TD><TD>26ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD>14ドット</TD><TD>28ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD>15ドット</TD><TD>30ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD>16ドット</TD><TD>32ドット</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>MZSZH3</TD><TD>MZSZH2</TD><TD>MZSZH1</TD><TD>MZSZH0</TD><TD>水平方向モザイクサイズ</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD>1ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD>2ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD>3ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD>4ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD>5ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD>6ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD>7ドット</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD>8ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD>9ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD>10ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD>11ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD>12ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD>13ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD>14ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD>15ドット</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD>16ドット</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>インタレースの設定には関係ありません。</P>
+
+
+<A NAME="N0MZE_">　</A>
+<A NAME="N1MZE_">　</A>
+<A NAME="N2MZE_">　</A>
+<A NAME="N3MZE_">　</A>
+<A NAME="R0MZE_">　</A>
+	<P><DT><B>モザイクイネーブルビット</B>：Mosaic enable bit (N0MZE, N1MZE, N2MZE, N3MZE, R0MZE)
+	<DD>　モザイク処理を行う画面を指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD>N0MZE</TD><TD>180022H</TD><TD>ビット0</TD><TD>NBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1MZE</TD><TD>180022H</TD><TD>ビット1</TD><TD>NBG1用</TD></TR>
+	<TR><TD>N2MZE</TD><TD>180022H</TD><TD>ビット2</TD><TD>NBG2用</TD></TR>
+	<TR><TD>N3MZE</TD><TD>180022H</TD><TD>ビット3</TD><TD>NBG3用</TD></TR>
+	<TR><TD>R0MZE</TD><TD>180022H</TD><TD>ビット4</TD><TD>RBG0用</TD></TR>
+	</TABLE></P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD>xxMZE</TD><TD>処理</TD></TR>
+	<TR><TH><PRE>0</TH><TD>モザイク処理を行いません</TD></TR>
+	<TR><TH><PRE>1</TH><TD>モザイク処理を行います</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、またはR0が入ります。</P>
+
+	<P><DD>　回転スクロール面をモザイク処理する場合は、水平方向のモザイク処理しか行われません。<BR>
+　倍密インタレースモードの場合にモザイク処理を行うと、画面は強制的に単密インタレースモードで表示されます。<BR>
+　NBG0またはNBG1においてモザイク処理を行うと、モザイク処理した画面は縦セルスクロール機能が使用できなくなります。したがって、そのときの表示画面は、縦セルスクロールをしない場合の画面に対してモザイク処理を行ったものになります。</P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p04_a0.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>
+<A HREF="../index.htm#no4">VDP2ユーザーズマニュアル</A>★
+<A HREF="p04_10.htm">第４章　スクロール画面</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

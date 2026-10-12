@@ -1,0 +1,52 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p007.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p009.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 2.2 Function specification </H2>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD ALIGN = "LEFT" WIDTH = 150> <PRE> <B> Title </B> <BR> Function specifications <BR> </TD>
+<TD ALIGN = "LEFT"> <PRE> <B> Function </B> <BR> Register the interrupt processing routine <BR> to the interrupt vector </TD>
+<TD ALIGN="LEFT" WIDTH=180><PRE><B>Function Name</B><BR>SYS_SETSINT<BR> </TD>
+<TD ALIGN="LEFT" WIDTH=60><PRE><B>No</B><BR>1.1<BR> </TD>
+</TABLE><P>
+<DD><PRE>
+<B> format </B> void SYS_SETSINT (Uint32 Num, void * Hdr);
+<B> Input </B> Num: Vector number (0..7FH)
+<B>: </B> Hdr: Interrupt processing routine address (if 0, dummy routine or Num is SCU interrupt vector
+(If <B>. </B>, it will be the interrupt processing routine.)
+<B> Output </B> None
+<B> No function value </B>
+<B> Function </B> Hdr must be a processing routine that ends with register save, restore, and RTE instruction (C language
+<B> </B> Raba (with #pragma interrupt declaration).
+<B> </B> When HDR is 0, if Num is SCU interrupt (40H..4DH, 50H..5FH), SCU interrupt routine is re-registered
+<B> Record </B>, otherwise register a dummy routine.
+<B> </B> Range check is not performed. Do not specify a value outside the limit.
+<B> Remarks </B> This routine can be used for both master and slave SH2, and to each VBR based vector address
+<B> Register </B>. </PRE><P>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD ALIGN = "LEFT" WIDTH = 150> <PRE> <B> Title </B> <BR> Function specifications <BR> </TD>
+<TD ALIGN = "LEFT"> <PRE> <B> Function </B> <BR> Register the processing function <BR> in the SCU interrupt routine </TD>
+<TD ALIGN="LEFT" WIDTH=180><PRE><B>Function Name</B><BR>SYS_SETUINT<BR> </TD>
+<TD ALIGN="LEFT" WIDTH=60><PRE><B>No</B><BR>1.2<BR> </TD>
+</TABLE><P>
+<DD><PRE>
+<B> format </B> void SYS_SETUINT (Uint32 Num, void * Hdr);
+<B> Input </B> Num: Vector number (SCU vector number)
+<B>: </B> Hdr: Function routine address (if 0, dummy routine)
+<B> Output </B> None
+<B> No function value </B>
+<B> Function </B> Hdr must be an SHC function. If the routine was created by assembler, the SHC register
+<B> </B> Must comply with star storage rules.
+<B> </B> Num is limited to SCU interrupt vectors (40H..4DH, 50H..5FH).
+<B> </B> If Hdr is 0, register a dummy routine.
+<B> </B> Range check is not performed. Do not specify a value outside the limit.
+<B> Remarks </B> When a routine is registered in a vector with SYS_SETSINT, the SCU interrupt processing routine for that vector is invalid
+<B> </B> and the registration function is not called.
+<B> </B> If this routine is called on slave SH2, the results are not guaranteed. </PRE><BR>
+</DL><P><P><HR>
+<A HREF=p007.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p009.htm> Go to next page </A>
+</BODY>
+</HTML>

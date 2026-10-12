@@ -1,0 +1,70 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;39/54&gt;VDP1 User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p06_60.htm">Back</a> ｜ <A HREF="p06_80.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 6 Command Table</b><HR NOSHADE>
+<DL>
+<A NAME="no6_70"></A><P><DT><H2> ■6.7 CMDXA~CMDYD (vertex coordinate data)</H2><DD> Specify coordinates such as clipping area coordinates and sprite drawing vertex coordinates in CMDXA to CMDYD. Up to 4 vertex coordinates (X coordinate, Y coordinate) can be specified. Define 16 bytes (8 words) from the start address +0CH to +1AH of the command table.<P><DT><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD></TD><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXA<BR>
+ +0CH</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (A), X coordinate (XA)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYA<BR>
+ +0EH</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (A), Y coordinate (YA)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXB<BR>
+ +10H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (B), X coordinate (XB) or display, X width</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYB<BR>
+ +12H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (B), Y coordinate (YB) or display, Y width</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXC<BR>
+ +14H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (C), X coordinate (XC)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYC<BR>
+ +16H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (C), Y coordinate (YC)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXD<BR>
+ +18H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (D), X coordinate (XD)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYD<BR>
+ +1AH</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (D), Y coordinate (YD)</TD></TR>
+</TABLE>
+</P>
+<P><DD><UL TYPE="DISC">
+<P><LI> Specify the coordinates in CMDXA to CMDYD with 16 bits each. Specify negative numbers as two's complement numbers. The specifiable range is -1024 to 1023. The upper 5 bits are sign extended and write the same value as bit 10.<P><LI> The meanings of CMDXA to CMDYD differ depending on each command. The correspondence between commands and CMDXA to CMDYD is as follows. See each command for details.</UL>
+</P>
+<A NAME="t6_6"></A><P><DD> <B>Table 6.6 Correspondence between commands and CMDXA to CMDYD</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> command</TD><TD><PRE> CMDXA<BR> CMDYA</TD><TD><PRE> CMDXB<BR> CMDYB</TD><TD><PRE> CMDXC<BR> CMDYC</TD><TD><PRE> CMDXD<BR> CMDYD</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> Standard sprite drawing command</TD><TD><PRE> Vertex (A)</TD><TD><PRE> −</TD><TD><PRE> −</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2><PRE> Rectangle sprite drawing command<BR> (There are two ways)</TD><TD><PRE> Specify 2 coordinates</TD><TD><PRE> Vertex (A)</TD><TD><PRE> −</TD><TD><PRE> Vertex (C)</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Fixed point specification</TD><TD><PRE> fixed point coordinates</TD><TD><PRE> Display width</TD><TD><PRE> −</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> Transform sprite drawing commands</TD><TD><PRE> Vertex (A)</TD><TD><PRE> Vertex (B)</TD><TD><PRE> Vertex (C)</TD><TD><PRE> Vertex (D)</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> polygon drawing commands</TD><TD><PRE> Vertex (A)</TD><TD><PRE> Vertex (B)</TD><TD><PRE> Vertex (C)</TD><TD><PRE> Vertex (D)</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> Polyline drawing command</TD><TD><PRE> Vertex (A)</TD><TD><PRE> Vertex (B)</TD><TD><PRE> Vertex (C)</TD><TD><PRE> Vertex (D)</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> Line drawing command</TD><TD><PRE> Vertex (A)</TD><TD><PRE> Vertex (B)</TD><TD><PRE> −</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> User clipping coordinate setting command</TD><TD><PRE> top left coordinate</TD><TD><PRE> −</TD><TD><PRE> lower right coordinate</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> System clipping coordinate setting command</TD><TD><PRE> −</TD><TD><PRE> −</TD><TD><PRE> lower right coordinate</TD><TD><PRE> −</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> Relative coordinate setting command</TD><TD><PRE> relative coordinates</TD><TD><PRE> −</TD><TD><PRE> −</TD><TD><PRE> −</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> - is not used.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_60.htm">Back</a> ｜ <A HREF="p06_80.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,88 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;31/54&gt;VDP1ユーザーズマニュアル/</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p06_33_j.htm">戻る</A>｜
+     <a href="p06_35_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第６章　コマンドテーブル</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no6_34"></A>
+<DT><H3>■エンドコード無効</H3>
+<DT><B>エンドコード無効ビット：</B>　end-code disable(ECD)、ビット7<BR>
+<DD>　キャラクタパターンのエンドコードを無効にするかどうかを指定します。0のときエンドコードは有効で、1のときエンドコードは無効になります。<BR>
+　エンドコード無効ビットはキャラクタパターンのあるスプライト描画にのみ有効です。ポリゴン、ポリライン、ラインでは、このビットは1に設定してください。<BR>
+　エンドコードが有効(ECD=0)の場合、キャラクタパターン描画中、横方向で2度目のエンドコードを読み込んだとき、その行の描画はそこで終了し、描画は次の行の先頭に移ります。エンドコードは描画されず、そのピクセルは透明となります。<BR>
+　エンドコードを無効(ECD=1)にすると、エンドコードは他のカラーコードと同様に処理されます。<BR>
+　横方向の描画が終了するのは、エンドコードを2回読み込んだときで、またエンド処理が行われるのはキャラクタパターンの横方向のみであり、縦方向は影響ありません。<BR>
+　透明ピクセル無効ビット(SPD)とは関係なく処理されます。<BR>
+　エンドコードを有効(ECD=0)にすると、エンドコードはカラー表示に使えないので、使用できる色数は1色少なくなりますので、注意してください。<BR>
+　また、HSS=1で横方向に縮小するスプライトの場合、エンドコードは無効(ECD=1)にしてください。</P>
+<TABLE BORDER>
+<TD WIDTH=50><PRE>HSS</TD><TD WIDTH=50><PRE>ECD</TD><TD><PRE>エンドコード処理</TD><TR>
+<TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>エンドコード有効、2度目のエンドコードで横方向の描画が終了します、<BR>エンドコードは透明になります</TD><TR>
+<TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>エンドコード無効、エンドコードは処理されません、<BR>コードどおりの色が出ます</TD><TR>
+<TD><PRE>1かつ<BR>拡大</TD><TD><PRE>0</TD><TD><PRE>エンドコード有効、2度目のエンドコードで横方向の描画が終了します、<BR>エンドコードは透明になります</TD><TR>
+<TD><PRE>1かつ<BR>縮小</TD><TD><PRE>0</TD><TD><PRE>エンドコード無効、エンドコードは処理されません、<BR>コードどおりの色が出ます</TD><TR>
+<TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>エンドコード無効、エンドコードは処理されません、<BR>コードどおりの色が出ます</TD>
+</TABLE></P>
+　カラーモードとエンドコードの関係は次のとおりです。カラーモードでエンドコードのビット数が異なります。</P>
+<TABLE BORDER>
+<TD WIDTH=350 COLSPAN=2><PRE>カラーモード</TD><TD WIDTH=200><PRE>エンドコード</TD><TR>
+<TD WIDTH=50><PRE>0</TD><TD><PRE>16色（カラーバンクモード）</TD><TD><PRE>FH（4ビット）</TD><TR>
+<TD WIDTH=50><PRE>1</TD><TD><PRE>16色（ルックアップテーブルモード）</TD><TD><PRE>FH（4ビット）</TD><TR>
+<TD WIDTH=50><PRE>2</TD><TD><PRE>64色（カラーバンクモード）</TD><TD><PRE>FFH（8ビット）</TD><TR>
+<TD WIDTH=50><PRE>3</TD><TD><PRE>128色（カラーバンクモード）</TD><TD><PRE>FFH（8ビット）</TD><TR>
+<TD WIDTH=50><PRE>4</TD><TD><PRE>256色（カラーバンクモード）</TD><TD><PRE>FFH（8ビット）</TD><TR>
+<TD WIDTH=50><PRE>5</TD><TD><PRE>32768色（RGBモード）</TD><TD><PRE>7FFFH（16ビット）</TD>
+</TABLE></P>
+
+<DD>エンドコード処理の例は次のとおりです。</P>
+
+<A NAME="z6_10a"></A>
+	<P ALIGN=CENTER><B>図6.10(a)　エンドコード処理(その1)</B><BR><img srcset="../grp/i087_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+	
+	<P><DD>　エンドコードより外側は、左右どちらから読み出しても描画させないために、透明ピクセルだけを置いてください。そのため、ECD=0のときは必ずSPD=0にしてください。ECD=0、SPD=1の組み合わせは、使わないでください。<BR>　プリクリッピングで、描画方向が反転することがあります。<BR>　元絵にエンドコードを使う場合は、次のように使ってください。</P>
+
+<A NAME="z6_10b"></A>
+	<P ALIGN=CENTER><B>図6.10(b)　エンドコード処理(その2)</B><BR><img srcset="../grp/i087_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+	<DD><OL>
+	<B><LI></B>エンドコードより外側には透明ピクセルを置く
+	<B><LI></B>エンドコードは、透明ピクセルでできた絵の左右に１個ずつ置く
+	<B><LI></B>内部に透明ピクセルが含まれていても、エンドコードが置けるのは最も外側に1個ずつだけである
+	<B><LI></B>すべてが透明ピクセルのラインは、両端にエンドコードを２個ずつ置く
+	<B><LI></B>両端またはどちらか一方の端が透明ピクセルでないラインにはエンドコードを置かない
+	</OL>
+	
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p06_33_j.htm">戻る</A>｜
+     <a href="p06_35_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

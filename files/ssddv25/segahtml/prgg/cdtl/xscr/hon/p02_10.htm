@@ -1,0 +1,180 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/22&gt;CD Builder Script Grammar/2. Script Overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p02_11.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD Builder Script Grammar Manual</b><H2 ALIGN=CENTER> 2. Script overview</H2><HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A><P><DT><H3> 2.1 Disk structure and scripts</H3><DD> A CD-ROM has a physical structure consisting of discs, sessions, and tracks. Tracks are further divided into two types (MODE1/MODE2): data tracks and CDDA tracks, based on differences in sector structure.<BR>
+ For compatibility, the Sega Saturn Disc standard stipulates that the first track is the MODE1 track. Logical structures such as volume descriptors and directory records are recorded on this first track (volume descriptor track).<BR>
+ Interleaved files are recorded on the MODE2 track starting from the second track.</P>
+<P><DD> Figure 2.1 shows the correspondence between disk structure and script.</P>
+<P ALIGN=CENTER> <B>Figure 2.1 Correspondence between disk structure and script</b></P>
+<PRE><H5>
+Physical     Logical              Script
+structure    structure                  
+                                 
+─┬─┬─────┐──                     Disc
+ │ │     │ ┌─────────────────┐     Session
+ │ │     │ │Volume descriptor│      Track MODE1
+ │ │     │ └─────────────────┘        Volume
+ │ │     │ ┌─────────────────┐        Directory
+ │ │MODE1│ │Directory record │          Directory
+ │ │Track│ └─────────────────┘             ・
+ │ │     │                                 ・
+ │ │     │ ┌─────────────────┐            File
+ │S│     │ │File             ├┐           File
+ │ │     │ └┬────────────────┘│            ・
+ │E│     │  └─────────────────┘            ・
+ │ ├─────┤──                       Track  MODE2
+ │S│MODE2│ ┌─────────────────┐       Extent
+D│ │Track│ │Interleave file  ├┐        FileInterleave
+ │S│     │ └┬────────────────┘│            ・
+I│ ├─────┤┐ └─────────────────┘            ・
+ │I│  .  ││┌─────────────────┐       MpegMultiplex
+S│ │  .  │││MPEG Stream      ├┐        MpegStream
+ │O│  .  ││└┬────────────────┘│            ・
+C│ │  .  │└ └─────────────────┘            ・
+ │N│  .  │                       
+ │ ├─────┤                         Track CDDA
+ │ │CDDA │                       
+ │ │Track│                       
+ │ ├─────┤                         Track CDDA
+ │ │CDDA │                           ・
+ │ │Track│                           ・
+ ├─┼─────┤                           ・
+  S   .                              ・
+ │E│  .  │
+  S   .   
+ │S│  .  │
+  I   .   
+ │O│  .  │
+  N   .   
+─┴ ┴ ─ ─ ┘
+</PRE><P><DD><B>*</b> Currently does not support multi-session.</P>
+<A NAME="no2_20"></A><P><DT><H3> 2.2 Script writing example</H3><DD> An example of script description is shown below.</P>
+<P><DT> <B>(1) MODE1 track + CDDA track</b><DD><HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+  Disc SAMPLE1.DSK
+  Session CDROM   
+  LeadIn MODE1
+  EndLeadIn   
+  ;               
+  SystemArea IP.BIN                           
+  ;                                               
+      Track MODE1                                 ; 1st track
+          Volume ISO9660 SAMPLE1.PVD              ; Volume definition (Note)
+              PrimaryVolume    0:2:16             
+                  SystemIdentifier    "SAMPLE1"   
+              EndPrimaryVolume                    
+          EndVolume                               ; File definition
+          File FILE1.DAT;1                        
+              FileSource FILE1.DAT                ; Defining a file source
+              EndFileSource
+          EndFile
+  ;         :
+  ;         :
+  ;         :
+          PostGap 75
+      EndTrack
+  ;
+      Track CDDA                                  ; 2nd track
+          Pause 150                               ; pause 2 seconds
+          FileSource SOUND.DAT                    
+          EndFileSource                           
+      EndTrack                                    
+  ;                                               
+  LeadOut CDDA                                
+      Empty 300                               
+  EndLeadOut                                  
+  EndSession                                      
+  EndDisc                                         
+</PRE><DD><HR WIDTH=60% ALIGN=LEFT>
+<P><DT><B>note)</b><DD> For information on Sega Saturn Disc volume descriptors, please refer to <A HREF="../../../sofg/disc/hon/p05_20.htm">Appendix B</a> of the " <A HREF="../../../sofg/disc/index.htm">DISC Format Standard Specifications</a> ".</P>
+<P><DT> <B>(2) MODE1 track + MODE2 track + CDDA track</b><DD><HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+  Disc SAMPLE2.DSK
+  Session SEMIXA
+  LeadIn MODE1
+  EndLeadIn
+  ;
+  SystemArea IP.BIN
+  ;
+      Track MODE1                             ; 1st track
+          Volume ISO9660 SAMPLE2.PVD            
+              PrimaryVolume    0:2:16           
+                  SystemIdentifier    "SAMPLE2" 
+              EndPrimaryVolume                  
+          EndVolume                             
+          File FILE1.DAT;1                      
+              FileSource FILE1.DAT              
+              EndFileSource                     
+          EndFile                               
+  ;         :                                   
+  ;         :                                   
+          PostGap 75                            
+      EndTrack                                  
+  ;                                             
+      Track MODE2                             ; 2nd track
+          PreGap 150
+          Extent                              ; Interleave 3 files
+              FileInterleave 1 2              ; Place 1 sector and 2 gaps
+                  File INTFILE1.DAT;1             
+                      FileSource INTFILE1.DAT     
+                      EndFileSource               
+                  EndFile                         
+              EndFileInterleave                   
+              FileInterleave 1 2              ; Place 1 sector and 2 gaps
+                  File INTFILE2.DAT;1             
+                      FileSource INTFILE2.DAT     
+                      EndFileSource               
+                  EndFile                         
+              EndFileInterleave                   
+              FileInterleave 1 2              ; Place 1 sector and 2 gaps
+                  File INTFILE3.DAT;1             
+                      FileSource INTFILE3.DAT     
+                      EndFileSource               
+                  EndFile                         
+              EndFileInterleave                   
+          EndExtent                               
+          PostGap 75
+      EndTrack                                    
+  ;                                               
+      Track CDDA                              ; 3rd track
+          Pause 150                               
+          FileSource SOUND.DAT                    
+          EndFileSource                           
+      EndTrack                                    
+  ;                                               
+  LeadOut CDDA                                    
+      Empty 300                                   
+  EndLeadOut                                      
+  EndSession                                      
+  EndDisc
+</PRE><DD><HR WIDTH=60% ALIGN=LEFT>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p02_11.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

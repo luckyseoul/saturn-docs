@@ -1,0 +1,79 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/17&gt;Programmer's Guide/File System Library/Appendix A</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+ <B>▲ <A HREF="p08_16.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><CENTER>
+<H4> Appendix A</H4><H2> Use of development support functions</H2></CENTER>
+<A NAME="no9_10"><HR NOSHADE></a><DL>
+<P><DT><H2> A.1 Procedure for using memory files</H2><DD> To use memory files, you must perform the following tasks in the order listed.</P>
+<A NAME="no9_10_1"></A><P><DT><H4> ●File data creation</H4><DD> Create a file that will become a memory file and convert it to a memory file. Conversion to memory files is performed using MFCAT.EXE.</P>
+<A NAME="no9_10_2"></A><P><DT><H4> ●Memory file load</H4><DD> Set the memory file to the memory area. This is done using an ICE command. It must be done every time the contents of a memory area are destroyed.</P>
+<A NAME="no9_10_3"></A><P><DT><H4> ●Target program load</H4><DD> Loads the program files being developed into the target.</P>
+<A NAME="no9_10_4"></A><P><DT><H4> ●Memory file usage declaration</H4><DD> Before executing GFS_Init, set the memory start address in !gfsd_mmc/GFMC_base. This will get the SIMM directory information in GFS_Init. The initial value of !gfsd_mmc/GFMC_base is 0, and in this state SIMM directory information is not referenced.</P>
+<P><DD> GFMC_base is defined as:</P>
+<P ALIGN=CENTER> <FONT SIZE="5">Sint8 *GFMC_base = 0;</font></P>
+<!-- +++ Update by CRI ：1.8 -->
+<P><DD> The variable GFMC_base is defined in both sega_gfs.lib and segadgfs.lib.<BR>
+ GFMC_base in sega_gfs.lib exists only for compatibility with segadgfs.lib. It does not affect file system operation.</P>
+<!-- --- Update by CRI ：1.8 -->
+<P><DD> Please refer to the CD Tools manual for MFCAT.EXE. </P>
+</DL>
+<!------------------------------------------------------------------------------------------------>
+<A NAME="no9_20"><HR></a><DL>
+<P><DT><H2> A.2 Procedures for using DOS files</H2><DD> To use DOS files, you must perform the following tasks in the order listed:</P>
+<P><DT><H4> ●Create a correspondence table file</H4><DD> Create a file that will become a DOS file, and create a correspondence table file between the file name on the CD-ROM and the file name on DOS.</P>
+<P><DT><H4> ●Boot</H4><DD> Boot the target, making sure the DIP switches are set to enable SCSI.</P>
+<P><DT><H4> ●Target program load</H4><DD> After confirming that the IBM-PC recognizes the target as a SCSI device, BREAK the target and load the target program.</P>
+<P><DT><H4> ●Run CDSIM.EXE</H4><DD> Run CDSIM.EXE on the IBM-PC.<BR>
+ For information on the compatibility table file and CDSIM.EXE, please refer to the CD Tools manual. </P>
+</DL>
+<!------------------------------------------------------------------------------------------------>
+<A NAME="no9_30"><HR></a><DL>
+<P><DT><H2> A.3 Notes</H2><DD> The following are precautions when using the development support function.</P>
+<!-- *** Delete by CRI ：5.12 -->
+<A NAME="no9_30_1"></A><P><DT><H4> ●How to temporarily restrict access</H4><DD> If you normally access both memory files and DOS files, to temporarily stop accessing the DOS files, set the target's DIP switch to not use SCSI and reboot.<BR>
+ Conversely, to access only DOS files, set !gfsd_mmc/GFMC_base to 0.</P>
+<A NAME="no9_30_2"></A><P><DT><H4> ●Recommended file name access</H4><DD> When using debug files, it is recommended that you use file name access, since file identifiers may change due to changes in the file structure.</P>
+<A NAME="no9_30_3"></A><P><DT><H4> ●Debug file directory information</H4><DD> The debug file directory information is set as follows:</P>
+<P><DL>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE> F.A.D.</TD><TD> :File identifier on debug file</TD></TR>
+<TR><TD><PRE> file number</TD><TD> :0</TD></TR>
+<TR><TD><PRE> gap size</TD><TD> :0</TD></TR>
+<TR><TD><PRE> unit size</TD><TD> :0</TD></TR>
+</TABLE>
+</DL>
+</P>
+<A NAME="no9_30_4"></A><P><DT><H4> ●Restrictions when using DOS files</H4><DD> Due to processing reasons, the DOS file extraction parameters can only transfer one sector at a time. Setting the retrieval parameter to a value other than 1 has no effect.</P>
+<A NAME="no9_30_5"></A><P><DT><H4> ●Limitations on available functions</H4><DD> When the transfer mode is GFS_TMODE_SCU or when SCU-DMA is started in a transfer function, only the following functions can be used until the transfer is completed.<BR>
+ Since A-Bus access is prohibited during SCU_DMA transfer, use of other functions is prohibited.</P>
+<P><UL TYPE="DISK">
+<LI> <A HREF="p08_11.htm#no1_7">GFS_Reset</a><LI> <A HREF="p08_12.htm#no2_2">GFS_Close</a><LI> <A HREF="p08_14.htm#no4_3">GFS_NwIsComplete</a><LI> <A HREF="p08_14.htm#no4_6">GFS_NwExecOne</a><LI> <A HREF="p08_14.htm#no4_7">GFS_NwExecServer</a><LI> <A HREF="p08_16.htm#no6_3">GFS_GetErrStat</a></UL>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_16.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no7">File system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

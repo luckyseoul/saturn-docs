@@ -1,0 +1,74 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 2&gt;FAQ/Network/Modem/XBAND</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#net">FAQ</a> ★ <A HREF="index.htm#no1">Network/Modem</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Network/Modem</b><H2 ALIGN=CENTER> XBAND programming</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_01"><HR></a><DL>
+<H3> What should I do if both players have no pad input for a match?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What should I do if both players have no pad input for a match?<P><DT> <FONT SIZE=5>A)</font><DD> After the match is over, return to the XBAND menu. In this case, the result returned from the application to XBAND should be XBNetworkGameOver() instead of XBNetworkGameError() to indicate a tie between the two.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_02"><HR></a><DL>
+<H3> I would like to add a reset measure, but what should I do?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to add a reset measure, but what should I do?<P><DT> <FONT SIZE=5>A)</font><DD> Please refer to the sample software attached to XBAND_SDK_VER 1.01. By the way, to reset and open the CD tray, please send the predetermined reset code using XBExchangeGameData(), display a warning message, and then execute. The party receiving the reset code will</P>
+<P> <B>"My opponent has reset. I'm going back to XOS."</b><P> Please display a message like this and return to XOS.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_03"><HR></a><DL>
+<H3> What should I do if an error occurs when reading a CD and I cannot continue reading?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What should I do if my application encounters an error when reading a CD and cannot continue?<P><DT> <FONT SIZE=5>A)</font><DD> Perform the same procedure as the reset countermeasure on the Saturn on which the error occurred.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_04"><HR></a><DL>
+<H3> Once XBInitXBAND() is entered, the process will not return.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Once XBInitXBAND() is entered, the process will not return.<P><DT> <FONT SIZE=5>A)</font><DD> There are two possible causes:</P>
+<OL>
+<P><B><LI></b> XBLIBNET.BIN is loaded to the wrong destination.<P><B><LI></b> XBLIBNET.BIN has been overwritten with IP etc.</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_05"><HR></a><DL>
+<H3> When processing is transferred from XOS to the application side in SBL's SGL mode, it hangs.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am creating software in SGL mode of SBL6.0, but when processing is transferred from XOS to the application side, it hangs up.<P><DT> <FONT SIZE=5>A)</font><DD> Please change SEGA_SGL.A to the one attached to XBAND_SDK_VER 1.01.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_06"><HR></a><DL>
+<H3> Is it possible to call XOS once control is transferred to the application side?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it possible to call XOS once control is transferred to the application side?<P><DT> <FONT SIZE=5>A)</font><DD> you can't. Due to the specifications of the DiscDispatchSystem (also known as demo software) used in XBAND, the menu section and game section have a parent-child relationship. Games are always called from XOS. Therefore, the use of XBAllowReturnToXOS(), which is described in the manual, cannot be prohibited.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_07"><HR></a><DL>
+<H3> Regarding compatible application check item 4.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Compatible application check item 4 on the ROM delivery note: "DMA must not be activated while the function Is it okay not to take it into consideration?<P><DT> <FONT SIZE=5>A)</font><DD> The initial configuration of that function does not use DMA. Therefore, as long as you use the library as is, I don't think there will be any problems. However, please note that if you change the initial settings to put DMA into use and use SCL_OPEN and SCL_CLOSE, this may cause a problem.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_08"><HR></a><DL>
+<H3> How many bytes of data can be transferred with 1 int from the application's perspective?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How many bytes of data can be transferred with 1 int from the application's perspective?<P><DT> <FONT SIZE=5>A)</font><DD> The maximum value of GameDataSize that can be set in XBOpenSession() is 14 bytes. (The modem FIFO is 16 bytes, and 2 bytes are used for error checking.)</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_09"><HR></a><DL>
+<H3> If I use up the maximum 14 bytes, will there be any difference from when I use 4 bytes?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If I use up the maximum 14 bytes, will there be any difference from when I use 4 bytes?<P><DT> <FONT SIZE=5>A)</font><DD> I can think of the following two points.</P>
+<OL>
+<P> <B><LI>Increased processing time for XBAND library</li>
+</b><BR>
+ The time required for sending and receiving (the time for SH to read/write to the modem's FIFO) and the time required for subsequent library processing will increase.<BR>
+ Therefore, when transferring 4 bytes, for example, if the transfer was 1 int without any problems, processing may be delayed due to transfer of 14 bytes.</P>
+<P> <B><LI>About errors</li>
+</b><BR>
+ The probability of error occurrence is considered to be proportional to the amount of data transferred.<BR>
+ (Errors may occur due to line conditions on the way)<BR>
+ I also think that the time required for error correction (the screen will freeze momentarily) will increase.</P>
+</OL>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#net">FAQ</a> ★ <A HREF="index.htm#no1">Network/Modem</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

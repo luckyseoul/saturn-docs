@@ -1,0 +1,170 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;33/86&gt;VDP2 User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no4">VDP2 User's Manual</a> ★ <A HREF="p04_10.htm">Chapter 4 Scroll screen</a><HR>
+ <B>▲ <A HREF="p04_84.htm">Back</a> ｜ <A HREF="p04_a0.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 4 Scroll screen</b><HR NOSHADE>
+<DL>
+<A NAME="no4_90"></A><P><DT><H2> ■4.9 Bitmap</H2><DD> When displaying in bitmap format, choose from four sizes: 512 dots wide x 256 dots high, 512 dots wide x 512 dots high, 1024 dots wide x 256 dots high, or 1024 dots wide x 512 dots high. The bitmap pattern data of each dot that makes up the bitmap is stored in VRAM.</P>
+<A NAME="no4_91"></A><P><DT><H3> ●Bitmap size</H3><DD> The types of bitmap sizes that can be selected differ between the normal scroll screen and the rotary scroll screen.<BR>
+ On a normal scroll screen, if you specify a high resolution graphic mode with a horizontal resolution of more than 512 pixels and select a bitmap size of 512 dots horizontally, the same picture will be repeated horizontally. Also, if you specify a dedicated monitor mode or double-dense interlace mode with a vertical resolution of more than 256 pixels and select a bitmap size of 256 dots vertically, the same picture will be repeated vertically.<BR>
+ Table 4.9 shows the bitmap sizes.</P>
+<A NAME="t4_9"></A><P><DD> <B>Table 4.9 Bitmap size</b><DD><TABLE BORDER>
+<TR><TD> screen</TD><TD> Selectable bitmap sizes</TD></TR>
+<TR><TD ROWSPAN=4> Normal scroll screen</TD><TD> 512 dots horizontally x 256 dots vertically</TD></TR>
+<TR><TD> 512 dots horizontally x 512 dots vertically</TD></TR>
+<TR><TD> 1024 dots horizontally x 256 dots vertically</TD></TR>
+<TR><TD> 1024 dots horizontally x 512 dots vertically</TD></TR>
+<TR><TD ROWSPAN=2> rotating scroll screen</TD><TD> 512 dots horizontally x 256 dots vertically</TD></TR>
+<TR><TD> 512 dots horizontally x 512 dots vertically</TD></TR>
+</TABLE>
+</P>
+<A NAME="no4_92"></A><P><DT><H3> ●Number of bitmap colors</H3><DD> The color formats for displaying bitmap format screens include a palette format in which the color RAM address is specified by combining the bitmap palette number and the dot color code in the bitmap pattern data, and a palette format in which the RGB data to be displayed is directly specified. It has RGB format. Table 4.10 shows the number of colors per bitmap and the number of bits per dot of bitmap pattern data for each color format. Also, set the bitmap color number in the character color number bit of the character control register.</P>
+<A NAME="t4_10"></A><P><DD> <B>Table 4.10 Number of bitmap colors</b><DD><TABLE BORDER>
+<TR><TD> color format</TD><TD> bitmap<BR>
+ Number of colors</TD><TD> Number of bitmap pattern data bits per dot</TD></TR>
+<TR><TD ROWSPAN=3> palette</TD><TD ALIGN="RIGHT"> 16 colors</TD><TD> 4 bits</TD></TR>
+<TR><TD ALIGN="RIGHT"> 256 colors</TD><TD> 8 bit</TD></TR>
+<TR><TD ALIGN="RIGHT"> 2048 colors</TD><TD> 16 bits (only lower 11 bits are used)</TD></TR>
+<TR><TD ROWSPAN=2> RGB</TD><TD ALIGN="RIGHT"> 32768 colors</TD><TD> 16 bit</TD></TR>
+<TR><TD ALIGN="RIGHT"> 16.77 million colors</TD><TD> 32 bits (only MSB and lower 24 bits are used)</TD></TR>
+</TABLE>
+<DD> [Note] When the color RAM mode is Mode 0 or Mode 2, 2048 colors become 1024 colors.</P>
+<A NAME="no4_93"></A><P><DT><H3> ●Bitmap pattern</H3><DD> The VRAM capacity required per bitmap pattern varies depending on the bitmap size and number of bitmap colors (bitmap pattern data size). Additionally, the data structure of each bitmap pattern stored in VRAM changes as well. The bitmap size and number of bitmap colors can be set to exceed the VRAM capacity, but in that case the same picture will be repeated vertically. Table 4.11 shows the bitmap pattern capacity and Figure 4.17 shows the bitmap pattern configuration.<BR>
+ The boundary for storing bitmap patterns in VRAM is 20000H, regardless of the bitmap size or number of bitmap colors, and is specified using the map offset register.</P>
+<A NAME="t4_11"></A><P><DD> <B>Table 4.11 Bitmap pattern capacity per page</b><DT><TABLE BORDER>
+<TR><TH> bitmap<BR>
+ size</TH><TH> bitmap pattern<BR>
+ Data size</TH><TH> bitmap color count</TH><TH> Capacity per side</TH><TH> detail</TH></TR>
+<TR><TD ROWSPAN=4> 512 dots horizontally<BR>
+ Vertical 256 dots</TD><TD> 4 bits/dot</TD><TD ALIGN="RIGHT"> 16 colors</TD><TD ALIGN="RIGHT"> 64K bytes (512K bits)</TD><TD> <A HREF="p04_901.htm"><B>(1)→</b></a></TD></TR>
+<TR><TD> 8 bits/dot</TD><TD ALIGN="RIGHT"> 256 colors</TD><TD ALIGN="RIGHT"> 128K bytes (1M bit)</TD><TD> <A HREF="p04_902.htm"><B>(2)→</b></a></TD></TR>
+<TR><TD> 16 bits/dot</TD><TD ALIGN="RIGHT"> 2048 colors, 32768 colors</TD><TD ALIGN="RIGHT"> 256K bytes (2M bits)</TD><TD> <A HREF="p04_903.htm"><B>(3)→</b></a></TD></TR>
+<TR><TD> 32 bits/dot</TD><TD ALIGN="RIGHT"> 16.77 million colors</TD><TD ALIGN="RIGHT"> 512K bytes (4M bits)</TD><TD> <A HREF="p04_904.htm"><B>(4)→</b></a></TD></TR>
+<TR><TD ROWSPAN=4> 512 dots horizontally<BR>
+ Vertical 512 dots</TD><TD> 4 bits/dot</TD><TD ALIGN="RIGHT"> 16 colors</TD><TD ALIGN="RIGHT"> 128K bytes (1M bit)</TD><TD> <A HREF="p04_905.htm"><B>(5)→</b></a></TD></TR>
+<TR><TD> 8 bits/dot</TD><TD ALIGN="RIGHT"> 256 colors</TD><TD ALIGN="RIGHT"> 256K bytes (2M bits)</TD><TD> <A HREF="p04_906.htm"><B>(6)→</b></a></TD></TR>
+<TR><TD> 16 bits/dot</TD><TD ALIGN="RIGHT"> 2048 colors, 32768 colors</TD><TD ALIGN="RIGHT"> 512K bytes (4M bits)</TD><TD> <A HREF="p04_907.htm"><B>(7)→</b></a></TD></TR>
+<TR><TD> 32 bits/dot</TD><TD ALIGN="RIGHT"> 16.77 million colors</TD><TD ALIGN="RIGHT"> 1024K bytes (8M bits)</TD><TD> <A HREF="p04_908.htm"><B>(8)→</b></a></TD></TR>
+<TR><TD ROWSPAN=4> 1024 dots horizontally<BR>
+ Vertical 256 dots</TD><TD> 4 bits/dot</TD><TD ALIGN="RIGHT"> 16 colors</TD><TD ALIGN="RIGHT"> 128K bytes (1M bit)</TD><TD> <A HREF="p04_909.htm"><B>(9)→</b></a></TD></TR>
+<TR><TD> 8 bits/dot</TD><TD ALIGN="RIGHT"> 256 colors</TD><TD ALIGN="RIGHT"> 256K bytes (2M bits)</TD><TD> <A HREF="p04_910.htm"><B>(10)→</b></a></TD></TR>
+<TR><TD> 16 bits/dot</TD><TD ALIGN="RIGHT"> 2048 colors, 32768 colors</TD><TD ALIGN="RIGHT"> 512K bytes (4M bits)</TD><TD> <A HREF="p04_911.htm"><B>(11)→</b></a></TD></TR>
+<TR><TD> 32 bits/dot</TD><TD ALIGN="RIGHT"> 16.77 million colors</TD><TD ALIGN="RIGHT"> 1024K bytes (8M bits)</TD><TD> <A HREF="p04_912.htm"><B>(12)→</b></a></TD></TR>
+<TR><TD ROWSPAN=3> 1024 dots horizontally<BR>
+ Vertical 512 dots</TD><TD> 4 bits/dot</TD><TD ALIGN="RIGHT"> 16 colors</TD><TD ALIGN="RIGHT"> 256K bytes (2M bits)</TD><TD> <A HREF="p04_913.htm"><B>(13)→</b></a></TD></TR>
+<TR><TD> 8 bits/dot</TD><TD ALIGN="RIGHT"> 256 colors</TD><TD ALIGN="RIGHT"> 512K bytes (4M bits)</TD><TD> <A HREF="p04_914.htm"><B>(14)→</b></a></TD></TR>
+<TR><TD> 16 bits/dot</TD><TD ALIGN="RIGHT"> 2048 colors, 32768 colors</TD><TD ALIGN="RIGHT"> 1024K bytes (8M bits)</TD><TD> <A HREF="p04_915.htm"><B>(15)→</b></a></TD></TR>
+</TABLE>
+</P>
+<P><DD> Please click details in Table 4_11 for <B>reference</b> bitmap pattern configuration</P>
+<A NAME="no4_94"></A><P><DT><H3> ●Bitmap palette number</H3><DD> The bitmap palette number is 3-bit data specified by the bitmap palette number register, and specifies the start address of the palette used for the bitmap pattern. Bitmap palette numbers are used only when the color format is palette format, not when the color format is RGB format. The palette number is added to the dot color code of the bitmap pattern to create an 11-bit dot color code, so the number of bits used changes depending on the number of colors per page. Figure 4.18 shows dot color data based on bitmap color numbers.<P><A NAME="z4_18"></A><P><DD> <B>Figure 4.18 Dot color data by bitmap color number</b><DD><PRE>
+●Number of bitmap colors: 16 colors
+┌────────────────────┬───────────┐
+│ Palette number     │ Dot color │
+│                    │   code    │
+├──┬──┬──┬──┬──┬──┬──┼──┬──┬──┬──┤
+│ 6│ 5│ 4│ 3│ 2│ 1│ 0│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+└────────┘└──────────┘ 
+     ↑         ↑ 
+     │     Fixed to 0 
+     │ 
+Specified by bitmap
+palette number register 
+
+
+●Number of bitmap colors: 256 colors
+┌────────┬───────────────────────┐
+│Palette │     Dot color code    │
+│number  │                       │
+├──┬──┬──┼──┬──┬──┬──┬──┬──┬──┬──┤
+│ 6│ 5│ 4│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+└────────┘ 
+     ↑ 
+Specified by bitmap
+palette number register 
+
+
+●Number of bitmap colors: 16 colors
+┌────────────────────────────────┐
+│         Dot color code         │
+├──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┤
+│10│ 9│ 8│ 7│ 6│ 5│ 4│ 3│ 2│ 1│ 0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><A NAME="no4_95"></A><P><DT><H3>●Special function bit</H3><DD> The special function bit is 2-bit data that specifies whether to use special functions for the bitmap pattern. The special function bits include a special priority bit that controls the priority number and a special color calculation bit that controls color calculation. For details on special priority bits, see " <B><A HREF="p11_20.htm">11.2 Special Priority Function</a></b> ." For details on color calculation bits, please refer to " <B><A HREF="p12_20.htm">12.2 Special color calculation functions</a></b> ".</P>
+<A NAME="no4_96"></A><P><DT><H3> ●Bitmap palette number register</H4><DD> The bitmap palette number register specifies the palette number and special function bits when displaying the scroll screen in bitmap format. This is a 16-bit write-only register located at addresses 18002CH to 18002EH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="BMPNA_"></A><P><DD> <B><FONT SIZE=5>BMPNA</font> <FONT SIZE=4>18002CH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#N1BMPR_">N1BMPR</a></TH><TH><PRE> <A HREF="#N1BMCC_">N1BMCC</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#N1BMP6_">N1BMP6</a></TH><TH><PRE> <A HREF="#N1BMP5_">N1BMP5</a></TH><TH><PRE> <A HREF="#N1BMP4_">N1BMP4</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#N0BMPR_">N0BMPR</a></TH><TH><PRE> <A HREF="#N0BMCC_">N0BMCC</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#N0BMP6_">N0BMP6</a></TH><TH><PRE> <A HREF="#N0BMP5_">N0BMP5</a></TH><TH><PRE> <A HREF="#N0BMP4_">N0BMP4</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="BMPNB_"></A><P><DD> <B><FONT SIZE=5>BMPNB</font> <FONT SIZE=4>18002EH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#R0BMPR_">R0BMPR</a></TH><TH><PRE> <A HREF="#R0BMCC_">R0BMCC</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#R0BMP6_">R0BMP6</a></TH><TH><PRE> <A HREF="#R0BMP5_">R0BMP5</a></TH><TH><PRE> <A HREF="#R0BMP4_">R0BMP4</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="N0BMPR_">　</A><A NAME="N1BMPR_">　</A><A NAME="R0BMPR_">　</A><DT><B>Special priority bit (for bitmap)</b> : Bit map special priority bit<DD> (N0BMPR, N1BMPR, R0BMPR)<BR>
+ Specify the special priority bit when displaying the scroll screen in bitmap format.</P>
+<P><DD><TABLE BORDER>
+<TR><TD WIDTH=120> N0BMPR</TD><TD> 18002CH</TD><TD WIDTH=120> bit 5</TD><TD WIDTH=120> For NBG0</TD></TR>
+<TR><TD WIDTH=120> N1BMPR</TD><TD> 18002CH</TD><TD WIDTH=120> bit 13</TD><TD WIDTH=120> For NBG1</TD></TR>
+<TR><TD WIDTH=120> R0BMPR</TD><TD> 18002EH</TD><TD WIDTH=120> bit 5</TD><TD WIDTH=120> For RBG0</TD></TR>
+</TABLE>
+</P>
+<P><DD> For details on how to use this bit, see " <B><A HREF="p11_20.htm">11.2 Special Priority Function</a></b> ."</P>
+<A NAME="N0BMCC_">　</A><A NAME="N1BMCC_">　</A><A NAME="R0BMCC_">　</A><DT><B>Bit map special color calculation</b> bit<DD> (N0BMCC, N1BMCC, R0BMCC)<BR>
+ Specify the special color calculation bit when displaying the scroll screen in bitmap format.</P>
+<P><DD><TABLE BORDER>
+<TR><TD WIDTH=120> N0BMCC</TD><TD> 18002CH</TD><TD WIDTH=120> bit 4</TD><TD WIDTH=120> For NBG0</TD></TR>
+<TR><TD WIDTH=120> N1BMCC</TD><TD> 18002CH</TD><TD WIDTH=120> bit 12</TD><TD WIDTH=120> For NBG1</TD></TR>
+<TR><TD WIDTH=120> R0BMCC</TD><TD> 18002EH</TD><TD WIDTH=120> bit 4</TD><TD WIDTH=120> For RBG0</TD></TR>
+</TABLE>
+</P>
+<P><DD> For details on how to use this bit, see ` <B><A HREF="p12_20.htm">`12.2 Special color calculation function</a></b> ''.</P>
+<A NAME="N0BMP_">　</A><A NAME="N1BMP_">　</A><A NAME="R0BMP_">　</A><DT><B>Palette number bit (for bitmap)</b> : Bit map palette number bit<DD> (N0BMP6~N0BMP4, N1BMP6~N1BMP4, R0BMP6~R0BMP4)<BR>
+ Specify the upper 3 bits of the palette number when displaying the scroll screen in bitmap format.</P>
+<P><DD><TABLE BORDER>
+<TR><TD WIDTH=120> N0BMP6～N0BMP4</TD><TD> 18002CH</TD><TD WIDTH=120> bits 2-0</TD><TD WIDTH=120> For NBG0</TD></TR>
+<TR><TD WIDTH=120> N1BMP6～N1BMP4</TD><TD> 18002CH</TD><TD WIDTH=120> bits 10-8</TD><TD WIDTH=120> For NBG1</TD></TR>
+<TR><TD WIDTH=120> R0BMP6～R0BMP4</TD><TD> 18002EH</TD><TD WIDTH=120> bits 2-0</TD><TD WIDTH=120> For RBG0</TD></TR>
+</TABLE>
+</P>
+<P><DD> When the number of bitmap colors is 16, 0 is added to the lower 4 bits and used as a 7-bit palette number.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_84.htm">Back</a> ｜ <A HREF="p04_a0.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no4">VDP2 User's Manual</a> ★ <A HREF="p04_10.htm">Chapter 4 Scroll screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

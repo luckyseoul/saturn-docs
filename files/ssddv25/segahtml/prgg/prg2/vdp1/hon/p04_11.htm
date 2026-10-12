@@ -1,0 +1,54 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/11&gt;VDP1 library/4.3 Function specifications</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no4">VDP1 library</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 library</b><H2 ALIGN=CENTER> 4.3 Function specifications</H2></H2><HR NOSHADE>
+<A NAME="no4_20"></A><P><DT><H3> 4.2 Function list</H3><DD><TABLE BORDER>
+<TR><TH><PRE> function</TH><TH><PRE> Function name</TH><TH><PRE> number</TH></TR>
+<TR><TD><PRE> Initialization processing of VDP1 basic processing library</TD><TD><PRE> <A HREF="#no1">SPR_Initial</a></TD><TD ALIGN=CENTER><PRE> 1</TD></TR>
+<TR><TD><PRE> TV mode set</TD><TD><PRE> <A HREF="#no2">SPR_SetTvMode</a></TD><TD ALIGN=CENTER><PRE> 2</TD></TR>
+<TR><TD><PRE> Get current sprite control information</TD><TD><PRE> <A HREF="#no3">SPR_GetStatus</a></TD><TD ALIGN=CENTER><PRE> 3</TD></TR>
+<TR><TD><PRE> Frame buffer erase area, erase data set</TD><TD><PRE> <A HREF="#no4">SPR_SetEraseData</a></TD><TD ALIGN=CENTER><PRE> 4</TD></TR>
+<TR><TD><PRE> Frame buffer drawing completion check</TD><TD><PRE> <A HREF="#no5">SPR_WaitDrawEnd</a></TD><TD ALIGN=CENTER><PRE> 5</TD></TR>
+<TR><TD><PRE> Set sprite drawing source picture coordinate selection mode</TD><TD><PRE> <A HREF="#no6">SPR_SetEosMode</a></TD><TD ALIGN=CENTER><PRE> 6</TD></TR>
+<TR><TD><PRE> System register write macro</TD><TD><PRE> <A HREF="#no7">SPR_WRITE_REG</a></TD><TD ALIGN=CENTER><PRE> 7</TD></TR>
+<TR><TD><PRE> System register read macro</TD><TD><PRE> <A HREF="#no8">SPR_READ_REG</a></TD><TD ALIGN=CENTER><PRE> 8</TD></TR>
+</TABLE>
+</P>
+<HR NOSHADE>
+<A NAME="no4_30"></A><P><DT><H3> 4.3 Function specifications</H3><!-- --------------------------------------------------------------------------------- -->
+<A NAME="no1"><HR></a><TABLE BORDER>
+<TD><A HREF="#no4_20"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Initialization processing of VDP1 basic processing library</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> SSPR_Initial</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1</H4></TD></TR></TABLE><DL><DT> <B>Format</b><DD> void SPR_Initial(Uint8 **vram)<DT> <B>input</b><DD> vram: Pointer to VRAM address return area<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Set the following values as default values.<DD><UL TYPE="DISK"><LI> Erase data = 0x8000 (black)<LI> Erase area = (0, 0) - (319, 223)<LI> TV mode is normal, resolution is 320 x 224</UL></DL><!-- --------------------------------------------------------------------------------- --><A NAME="no2"><HR></a><TABLE BORDER><TR><TD><A HREF="#no4_20"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> TV mode set</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> SPR_SetTvMode</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2</H4></TD></TR></TABLE><DL><DT> <B>Format</b><DD> void Spr_SetTvMode(Uint16 mode, Uint16 screenSize, Unit16 doubleInterlace)<DT> <B>input</b><P><DD> mode：<DD> The following TV mode definition values can be set.<PRE>
+SPR_TV_NORMAL = Normal mode SPR_TV_HIREZO = High resolution mode SPR_TV_ROT16 = 16 rotation mode SPR_TV_ROT8 = 8 rotation mode SPR_TV_HDTV = HDTV mode</PRE></P><P><DD> screenSize:<DD> Select and set the screen resolution compatible with TV mode from the following definition values.<BR> Please refer to the VDP1 hardware manual for detailed combinations.<PRE>
+SPR_TV_320X224 = 320 × 224
+SPR_TV_320X240 = 320 × 240
+SPR_TV_352X224 = 352 × 224
+SPR_TV_352X240 = 352 × 240
+SPR_TV_640X224 = 640 × 224
+SPR_TV_640X240 = 640 × 240
+SPR_TV_704X224 = 704 × 224
+SPR_TV_704X240 = 704 × 240</PRE></P><P><DD> doubleInterlace:<DD> Sets the double-dense interlacing usage mode.<PRE>
+ON = Use double-dense interlacing mode OFF = Do not use double-dense interlacing mode</PRE></P><DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Set TV mode.</DL><!-- --------------------------------------------------------------------------------- --><A NAME="no3"><HR></a><TABLE BORDER><TR><TD><A HREF="#no4_20"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Get current sprite control information</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> SPR_GetStatus</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3</H4></TD></TR></TABLE></P><DL><DT> <B>Format</b><DD> void SPR_GetStatus(SprSpStatus *spStatus)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> SprSpStatus: Pointer to status return area<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Get sprite control information</DL><!-- --------------------------------------------------------------------------------- --><A NAME="no4"><HR></a><TABLE BORDER><TR><TD><A HREF="#no4_20"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> function specification<BR></H4></TD><TD WIDTH=270><PRE> Function<BR><H4> frame buffer erase area,<BR> erase data set</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> SPR_SetEraseData</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4</H4></TD></TR></TABLE><DL><DT> <B>Format</b><DD> void SPR_SetEraseData(Uint16 eraseData, Uint16 leftX, Uint16 topY, Uint16 rightX, Uint16 botY)<DT> <B>input</b><DD><PRE>
+eraseData: RGB erase data leftX: X coordinate of the left edge of the erase area topY: Y coordinate of the top edge of the erase area rightX: X coordinate of the right edge of the erase area botY: Y coordinate of the bottom edge of the erase area</PRE><DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Specify what color and what range to fill when performing the erase process.</DL><!-- --------------------------------------------------------------------------------- --><A NAME="no5"><HR></a><TABLE BORDER><TR><TD><A HREF="#no4_20"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Frame buffer drawing completion check</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> SPR_WaitDrawEnd</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 5</H4></TD></TR></TABLE><DL><DT> <B>Format</b><DD> void SPR_WaitDrawEnd(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Wait for VDP1 to finish drawing to the framebuffer. This routine is called from the V-BLANKVDP interrupt handling routine.</DL><!-- --------------------------------------------------------------------------------- --><A NAME="no6"><HR></a><TABLE BORDER><TR><TD><A HREF="#no4_20"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> function specification<BR></H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Select picture coordinates from which to draw sprites<BR> set of modes</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> SPR_SetEosMode</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6</H4></TD></TR></TABLE><DL><DT> <B>Format</b><DD> void SPR_SetEosMode(Sint32 eosFlag)<DT> <B>input</b><DD> eosFlag:<DD> 0=sample even coordinates (default)<DD> 1=sample odd coordinates<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Original picture when high-speed priority drawing is specified in the drawing mode word of the sprite command.<BR> Sets the texture sampling coordinate mode.</DL><!-- --------------------------------------------------------------------------------- --><A NAME="no7"><HR></a><TABLE BORDER><TR><TD><A HREF="#no4_20"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> System register write macro</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> SPR_WRITE_REG</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7</H4></TD></TR></TABLE><DL><DT> <B>Format</b><DD> SPR_WRITE_REG(Uint16 reg, Uint16 val)<DT> <B>input</b><DD> reg: Select and set the type of system register from the following definition values.<PRE>
+SPR_W_TVMR = TV mode selection SPR_W_FBCR = Frame buffer switching mode SPR_W_PTMR = Plot trigger SPR_W_EWDR = Erase write data SPR_W_EWLR = Erase write upper left coordinate SPR_W_EWRR = Erase write lower right coordinate SPR_W_ENDR = Forced termination of drawing</PRE><DD> val: Write value<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Write to the VDP1 write-only system register.</DL><!-- --------------------------------------------------------------------------------- --><A NAME="no8"><HR></a><TABLE BORDER><TR><TD><A HREF="#no4_20"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> System register read macro</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> SPR_READ_REG</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8</H4></TD></TR></TABLE><DL><DT> <B>Format</b><DD> Uint16 val = SPR_READ_REG(Uint16 reg)<DT> <B>input</b><DD> reg: Set the system register type from the following definition values.<PRE>
+SPR_R_EDSR = Transfer end status SPR_R_LOPR = Processing interruption table address SPR_R_COPR = Current processing table address SPR_R_MODR = Mode status</PRE><DT> <B>output</b><DD> none<DT> <B>function value</b><DD> val: Read value<DT> <B>function</b><DD> Reads the register value from the VDP1 read-only system register.</DL><HR NOSHADE> <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no4">VDP1 library</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

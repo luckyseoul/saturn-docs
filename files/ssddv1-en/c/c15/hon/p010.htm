@@ -1,0 +1,65 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p009.htm> Return to previous page </A> ｜ <A HREF=../../c05/mokuzi.htm> Return to menu </A> ｜ <A HREF=p011.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 5.2 Branch playback process </H2>
+<DD> A program example of branch playback is shown below. (See 5.1 for scenario) <P>
+<PRE>
+Sint32    work_gfs[GFS_WORK_SIZE(BSTM_MAX*KEY_MAX)/Sint32)];
+Sint32    work_stm[STM_WORK_SIZE(GRP_MAX,BSTM_MAX*KEY_MAX)/sizeof(Sint32)];
+Sint32 brno; / * Branch number * /
+StmHn stmtbl [KEY_MAX]; / * Stream handle table * /
+Sint32 bpl_stat; / * Branch playback status * /
+Sint32 decode_stat; / * Decoder operating status * /
+DecodeHn dc_hn = stat; / * Decoder handle * /
+Bool chgsw = OFF; / * Branch execution switch * /
+Bool      endflag=FALSE;
+Sint32    ret;<P>
+/ * Initialization of each library * /
+GFS_Int (…); / * File system initialization * /
+STM_Int (…); / * Initialization of stream system * /
+initDecoder (); / * Decoder initialization * /
+setScenario (); / * Set the scenario (see 5.1) * / <P>
+/ * Branch playback * /
+BPL_SetStart (BSTM1_ID); / * Specify playback start stream * /
+BPL_GetCurStm (KEY_MAX, stmtbl); / * Get the first branch stream * /
+dc_hn = createDecodeHn (stmtbl); / * Create decoder handle * /
+while (endflag == FALSE) {
+  bpl_stat = BPL_ExecServer (chgsw); / * Execution of branch playback server * /
+  chgsw=OFF;
+  STM_ExecServer (); / * Run stream server * /
+  decode_stat = exeDecoder (dc_hn); / * Execute the server function of the decoder * / <P>
+  switch (bpl_stat) {
+  case BPL_SVR_COMPLETED; / * Branch playback end state * /
+    endhlag=TRUE;
+    break;
+  case BPL_SVR_WAITSEL; / * Waiting for branch destination selection * /
+    / * Get pad input (0; A button, 1: B button, if negative: no input * /
+    brno=getPadEvent();
+    if (brno> = 0) {
+        BPL_SelectBranch (brno); / * Select branch destination * /
+    }
+    break;
+  case BPL_SVR_SELECT: / * Branch destination decision state * /
+  case BPL_SVR_NOBRN: / * No branch destination state * /
+    if (decode_stat! = COMPLETED) {/ * Decoding completion check * /
+      break;
+    }
+    chgsw = ON; / * Switch on branch execution ON * /
+    ret = BPL_GetNextStm (KEY_MAX, stmtbl); / * Get branch destination stream * /
+    if (ret> = 0) {/ * If there is a branch destination * /
+      destoroyDecodeHn (dc_hn); / * Erase decoder handle * /
+      dc_hn = createDecodeHn (stmtbl); / * Create decoder handle * /
+    }
+    break;
+  }
+}
+destoroyDecodeHn (stmtbl); / * Erase decoder handle * / </PRE> <P>
+Stream opening / closing is automatically performed by the branch playback library using the stream system. Refer to the manual of each library for the decoder.
+</DL><P><P><HR>
+<A HREF=p009.htm> Return to previous page </A> ｜ <A HREF=../../c05/mokuzi.htm> Return to menu </A> ｜ <A HREF=p011.htm> Go to next page </A>
+</BODY>
+</HTML>

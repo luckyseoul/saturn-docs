@@ -1,0 +1,103 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/86&gt;VDP2ユーザーズマニュアル/3.3表示期間中のVRAMアクセス方法-2</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<B>▲
+<a href="p03_30_j.htm">戻る</A>｜
+<a href="p03_32_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第３章　ＲＡＭ/■3.3　表示期間中のVRAMアクセス方法</B>
+</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_32"></A>
+	<P>	<DT><H3>　●画像データのアクセス</H3>
+		<DD>　ノーマルスクロール画面(NBG0〜NBG3)を表示するためには、必要な画像データをVRAMから読み出さなければいけません。表示形式がセル形式のときに必要な画像データは、パターンネ−ムデータとキャラクタパターンデ−タで、ビットマップ形式のときに必要な画像データは、ビットマップパターンデ−タです。これらの画像データを得るために1サイクル中に必要なVRAMアクセス回数は、条件によって決まっています。</P>
+
+
+	<P>	<DD>　1サイクル中のパタ−ンネ−ムデ−タリードアクセスは、VRAM-A0用かVRAM-B0用のどちらか一方と、VRAM-A1用かVRAM-B1用のどちらか一方の最大2バンクにしか設定してはいけません。VRAMを2分割しない場合には、VRAM-A0用のレジスタがVRAM-A用として、VRAM-B0用のレジスタがVRAM-B用として使用されるので、そのどちらか一方にしか設定してはいけません。アクセスタイミングは、各TV画面モードにおけるレジスタ有効範囲内であれば、どのタイミングに指定してもかまいません。アクセス回数は、条件によって決められた回数を過不足なく指定しなければいけませんが、連続したタイミングに指定する必要はありません。<BR>
+　パターンネームデータリードアクセス回数を表3.2に、パターンネームデータリードアクセス指定制限を図3.3に示します。</P>
+
+<A NAME="t3_2"></A>
+	<P>	<DD><B>表3.2　1サイクル中に必要なパターンネームテーブルデータのアクセス回数</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH><PRE>項目</TH><TH COLSPAN=3><PRE>NBG0〜NBG3</TH></TR>
+	<TR ALIGN=CENTER><TH><PRE>縮小設定</TH><TD WIDTH=50><PRE>1倍</TD><TD WIDTH=50><PRE>1／2倍</TD><TD WIDTH=50><PRE>1／4倍</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>1サイクル中に必要な<BR>VRAMアクセス回数</TH><TD><PRE>1</TD><TD><PRE>2</TD><TD><PRE>4</TD></TR>
+	</TABLE></P>
+
+<A NAME="z3_3"></A>
+	<P ALIGN=CENTER><B>図3.3　パタ−ンネ−ムテーブルデ−タのアクセス指定制限</B><BR><img srcset="../grp/i033_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　1サイクル中のキャラクタパターンデータリードアクセスは、原則として4つのバンクのどのタイミングでも指定できます。しかし、パタ−ンネ−ムデ−タアクセスタイミングによって、指定できるタイミングが制限されます。ただし、NBG0、NBG1のパタ−ンネ−ムデ−タアクセスをT0に指定した場合に限り、それぞれのキャラクタパターンデータリードアクセスは、4つのバンクのどのタイミングでも指定することができ、制限は有りません。アクセス回数は、条件によって決められた回数を過不足なく指定しなければいけませんが、連続したタイミングに指定する必要はありません。<BR>
+　キャラクタパターンデータリードアクセス回数を表3.3に、キャラクタパターンデータリードアクセス指定制限を表3.4に示します。</P>
+
+<A NAME="t3_3"></A>
+	<P>	<DD><B>表3.3　キャラクタパターンデータ(ビットマップパターンデータ)リードアクセス回数</B>
+		<DD><TABLE BORDER CELLPADDING=5>
+<TR ALIGN=CENTER><TH><PRE>項目</TH><TH COLSPAN=8><PRE>NBG0〜NBG3</TH></TR>
+<TR ALIGN=CENTER><TD><PRE>キャラクタ色数</TD><TD COLSPAN=3><PRE>16</TD><TD COLSPAN=2><PRE>256</TD><TD><PRE>2048</TD><TD><PRE>32768</TD><TD><PRE>1677万</TD></TR>
+<TR ALIGN=CENTER><TD><PRE>縮小設定</TD><TD WIDTH=50><PRE>1倍</TD><TD WIDTH=50><PRE>1／2倍</TD><TD WIDTH=50><PRE>1／4倍</TD><TD WIDTH=50><PRE>1倍</TD><TD WIDTH=50><PRE>1／2倍</TD><TD WIDTH=50><PRE>1倍</TD><TD WIDTH=50><PRE>1倍</TD><TD WIDTH=50><PRE>1倍</TD></TR>
+<TR ALIGN=CENTER><TD><PRE>1サイクル中に必要な<BR>VRAMアクセス回数</TD><TD><PRE>1</TD><TD><PRE>2</TD><TD><PRE>4</TD><TD><PRE>2</TD><TD><PRE>4</TD><TD><PRE>4</TD><TD><PRE>4</TD><TD><PRE>8</TD></TR>
+ </TABLE></P>
+
+<A NAME="t3_4"></A>
+	<P>	<DD><B>表3.4　キャラクタパターンデ−タリードアクセス指定制限</B>
+		<DD><TABLE BORDER CELLPADDING=5>
+	<TR><TH ROWSPAN=2><PRE>項目</TH><TH ROWSPAN=2><PRE>TV画面モード</TH><TH ROWSPAN=2><PRE>キャラクタサイズ</TH><TH COLSPAN=8><PRE>パターンネームテーブルデータのアクセスタイミング</TH></TR>
+	<TR><TH WIDTH=50><PRE>T0</TH><TH WIDTH=50><PRE>T1</TH><TH WIDTH=50><PRE>T2</TH><TH WIDTH=50><PRE>T3</TH><TH WIDTH=50><PRE>T4</TH><TH WIDTH=50><PRE>T5</TH><TH WIDTH=50><PRE>T6</TH><TH WIDTH=50><PRE>T7</TH></TR>
+
+	<TR ALIGN=CENTER><TD ROWSPAN=3><PRE>キャラクタパター<BR>ンテーブルデータ<BR>アクセスを指定で<BR>きるタイミング</TD>
+		<TD><PRE>ノーマル</TD>
+		<TD><PRE>横１セル×縦１セル<BR>横２セル×縦２セル</TD>
+			<TD><PRE>T0〜T2，<BR>T4〜T7</TD><TD><PRE>T0〜T3，<BR>T5〜T7</TD><TD><PRE>T0〜T3，<BR>T6〜T7</TD><TD><PRE>T0〜T3，<BR>T7</TD><TD><PRE>T0〜T3</TD><TD><PRE>T1〜T3</TD><TD><PRE>T2，T3</TD><TD><PRE>T3</TD></TR>
+
+	<TR ALIGN=CENTER>
+		<TD ROWSPAN=2><PRE>ハイレゾリューション，<BR>専用モニター</TD>
+		<TD><PRE>横１セル×縦１セル</TD>
+			<TD><PRE>T0〜T2</TD><TD><PRE>T1〜T3</TD><TD><PRE>T0，<BR>T2，T3</TD><TD><PRE>T0，T1，<BR>T3</TD><TD><PRE>−</TD><TD><PRE>−</TD><TD><PRE>−</TD><TD><PRE>−</TD></TR>
+
+	<TR ALIGN=CENTER>
+		<TD><PRE>横２セル×縦２セル</TD>
+			<TD><PRE>T0〜T2</TD><TD><PRE>T1〜T3</TD><TD><PRE>T2，T3</TD><TD><PRE>T3</TD><TD><PRE>−</TD><TD><PRE>−</TD><TD><PRE>−</TD><TD><PRE>−</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　縮小設定が1倍の場合に、キャラクタパターンデータリードアクセスが2回以上必要なときには、すべてのキャラクタパターンデータリードアクセスが指定制限を守るようにしなければいけません。縮小設定が1／2倍または1／4倍の場合は、縮小設定が1倍のときに必要なアクセス回数(キャラクタ色数が16色のときは1回、256色のときは2回)が、1回のパターンネームデータリードアクセスによる指定制限を守るようにしなければいけません。例えば、キャラクタ色数が256色、縮小設定が1／2倍のときに、パターンネームデータリードアクセスをT1とT3に指定した場合のキャラクタパターンデータリードアクセスの指定制限は、図3.4のようになります。</P>
+
+<A NAME="z3_4"></A>
+	<P ALIGN=CENTER><B>図3.4　キャラクタパタ−ンデ−タリードアクセス指定例</B><BR><img srcset="../grp/i034_03_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+	<DD><B>[注]</B>それぞれの指定可能範囲に２回ずつキャラクタパターンデータリードアクセスを指定しなければなりません</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p03_30_j.htm">戻る</A>｜
+<a href="p03_32_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

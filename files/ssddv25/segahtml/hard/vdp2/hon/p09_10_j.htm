@@ -1,0 +1,226 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;57/86&gt;VDP2ユーザーズマニュアル/9.1スプライトデータ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no9">VDP2ユーザーズマニュアル</A>
+<HR>
+<B>▲
+<a href="p08_20_j.htm">戻る</A>｜
+<a href="p09_20_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第９章　スプライトデータ</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DT><H2>■9.1　スプライトデータ</H2>
+		<DD>　VDP1から受け取るスプライトのフレームバッファデータには、1ドットあたり8ビットのときと16ビットのときがあります。1ドットあたり16ビットのときには、パレット形式で書き込まれたものとRGB形式で書き込まれたものがあり、それらの設定をVDP1側で行ったときと同じようにVDP2側にも設定してください。</P>
+
+<A NAME="no9_11"></A>
+	<P>	<DT><H3>　●スプライトタイプ</H3>
+		<DD>　VDP1がフレームバッファに書き込んだパレット形式のスプライトデータをVDP2が受け取る場合のビット構成は、1ドットあたり16ビットの場合に8種類、8ビットの場合に8種類の計16種類あり、これをスプライトタイプと呼びます。1ドットあたりのデータは、ドットカラーコードとパレットナンバーから構成されるドットカラーデータ、プライオリティ用ビット、カラー演算割合用ビット、シャドウ用ビットから構成され、それぞれのビット数はスプライトタイプによって変わります。それぞれのビットにおいて、足りない上位ビットの値は0とみなされます。</P>
+
+	<P>	<DD>　また、スプライトデータがRGB形式の場合は、RGB各5ビットずつのデータとカラー形式判別用ビットで構成され、プライオリティ用ビット、カラー演算割合用ビット、シャドウ用ビットは0とみなされます。<BR>
+　スプライトデータが1ドットあたり16ビットのときはタイプ0〜7を指定し、1ドットあたり8ビットのときはタイプ8〜Fを指定してください。また、タイプC〜Fを指定した場合は、プライオリティ用ビットおよびカラー演算割合用ビットとドットカラーデータのビットを共用しているビットがあります。共用ビットを表9.1に示します。</P>
+
+<A NAME="t9_1"></A>
+	<P>	<DD><B>表9.1　共用ビット</B>
+		<DD><TABLE BORDER CELLPADDING=5>
+	<TR><TH ROWSPAN=2>スプライトタイプ</TH><TH COLSPAN=4>共用ビット</TH></TR>
+	<TR><TH>SP1</TH><TH>SP0</TH><TH>SC1</TH><TH>SC0</TH></TR>
+	<TR><TH>タイプC</TH><TD>−</TD><TD>PR0とDC7</TD><TD>−</TD><TD>−</TD></TR>
+	<TR><TH>タイプD</TH><TD>−</TD><TD>PR0とDC7</TD><TD>−</TD><TD>CC0とDC6</TD></TR>
+	<TR><TH>タイプE</TH><TD>PR1とDC7</TD><TD>PR0とDC6</TD><TD>−</TD><TD>−</TD></TR>
+	<TR><TH>タイプF</TH><TD>−</TD><TD>−</TD><TD>CC1とDC7</TD><TD>CC0とDC6</TD></TR>
+	</TABLE>
+	<DD><B>SP：</B>プライオリティ用ビット、カラーRAMアドレス共用ビット
+	<DD><B>SC：</B>カラー演算割合用ビット、カラーRAMアドレス共用ビット
+	<DD><B>PR：</B>プライオリティ用ビット
+	<DD><B>DC：</B>ドットカラーデータ
+	<DD><B>CC：</B>カラー演算割合用ビット</P>
+
+	<P>	<DD>　スプライトタイプを図9.1に示します。</P>
+
+<A NAME="z9_1"></A>
+	<P>	<DD><B>図9.1　スプライトタイプ</B>
+		
+	<P>	<DD>◆タイプ０<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=2>PR1〜0</TD><TD COLSPAN=3>CC2〜0</TD><TD COLSPAN=11>DC10〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプ１<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=3>PR2〜0</TD><TD COLSPAN=2>CC1〜0</TD><TD COLSPAN=11>DC10〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプ２<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>SD</TD><TD>PR0</TD><TD COLSPAN=3>CC2〜0</TD><TD COLSPAN=11>DC10〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプ３<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>SD</TD><TD COLSPAN=2>PR1〜0</TD><TD COLSPAN=2>CC1〜0</TD><TD COLSPAN=11>DC10〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプ４<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>SD</TD><TD COLSPAN=2>PR1〜0</TD><TD COLSPAN=3>CC2〜0</TD><TD COLSPAN=10>DC9〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプ５<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>SD</TD><TD COLSPAN=3>PR2〜0</TD><TD>CC0</TD><TD COLSPAN=11>DC10〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプ６<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>SD</TD><TD COLSPAN=3>PR2〜0</TD><TD COLSPAN=2>CC1〜0</TD><TD COLSPAN=10>DC9〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプ７<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>SD</TD><TD COLSPAN=3>PR2〜0</TD><TD COLSPAN=3>CC2〜0</TD><TD COLSPAN=9>DC8〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプ８<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD>PR0</TD><TD COLSPAN=7>DC6〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプ９<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD>PR0</TD><TD>CC0</TD><TD COLSPAN=6>DC5〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプＡ<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD COLSPAN=2>PR0〜1</TD><TD COLSPAN=7>DC5〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプＢ<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD COLSPAN=2>CC0〜1</TD><TD COLSPAN=7>DC5〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプＣ<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD>SP0</TD><TD COLSPAN=7>DC6〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプＤ<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD>SP0</TD><TD>SC0</TD><TD COLSPAN=6>DC5〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプＥ<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD COLSPAN=2>SP0〜1</TD><TD COLSPAN=7>DC5〜0</TD></TR></TABLE></P>
+
+	<P>	<DD>◆タイプＦ<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD COLSPAN=2>SC0〜1</TD><TD COLSPAN=7>DC5〜0</TD></TR></TABLE></P>
+
+
+	<P>	<DD><TABLE><TR><TD>
+		<TABLE BORDER CELLSPACING=5><TR><TD></TD></TR></TABLE>
+		</TD><TD>部は無視されます。</TD></TR></TABLE>
+		<DD><B>SD：</B>シャドウ用ビット(または、スプライトウィンドウ用ビット)
+		<DD><B>PR：</B>プライオリティ用ビット
+		<DD><B>CC：</B>カラー演算割合用ビット
+		<DD><B>DC：</B>ドットカラーデータ</P>
+
+<A NAME="no9_12"></A>
+	<P>	<DT><H3>　●スプライトカラーモード</H3>
+		<DD>　スプライトのキャラクタデータにはスクロール画面と同じように、パレット形式のものとRGB形式のものがあります。1ドットあたりのビット数が16ビットの場合、フレームバッファ内のデータがパレット形式だけのときは、スプライトタイプで指定したビット構成で16ビットすべてを使用することができます。しかし、パレット形式とRGB形式のデータが混在するときは最上位ビットをそのカラー形式の判別に使うので、パレット形式のデータでは0に、RGB形式のデータでは1にしてください。そのとき、パレット形式のデータは、指定されたスプライトタイプの最上位ビット(プライオリティビットまたはシャドウビット)の値が0として処理されます。</P>
+
+	<P>	<DD>　パレット形式とRGB形式のデータが混在する場合のスプライトデータを図9.2に示します。</P>
+
+<A NAME="z9_2"></A>
+	<DD><B>図9.2　パレット形式とRGB形式のデータが混在する場合のスプライトデータ</B>
+
+	<P>	<DD>◆パレット形式<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>0</TD><TD COLSPAN=15>ドットカラーデータ他15ビット</TD></TD></TR></TABLE></P>
+
+	<P>	<DD>◆ＲＧＢ形式<TABLE BORDER=1">
+	<TR><TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	    <TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>1</TD><TD COLSPAN=5>BLUEデータ</TD><TD COLSPAN=5>GREENデータ</TD><TD COLSPAN=5>REDデータ</TD></TR></TABLE></P>
+
+<A NAME="no9_13"></A>
+	<P><DT><H3>　●ノーマルシャドウのスプライト</H3>
+	<DD>　パレット形式のスプライトを使用する場合、スプライトキャラクタのピクセルデータとカラーバンクの値（ＶＤＰ２ハードウェアマニュアルにおけるドットカラーデータ）の値によってはスプライトが表示されないことがあります。<BR>
+　これは、そのドットデータがＶＤＰ２のシャドウ機能用ドットデータ（ノーマルシャドウデータ）として判断されるためです。ＶＤＰ２のスプライトタイプ設定によって、ノーマルシャドウデータとして判断されるスプライトデータを表９．２に示します。<BR>
+　「<a href="p14_10_j.htm">14.1　シャドウ処理</A>」と、ＶＤＰ１ハードウェアマニュアルの「<a href="../../vdp1/hon/p06_40_j.htm">6.4　ＣＭＤＣＯＬＲ（カラー制御ワード）</A>」を参照してください。
+
+<A NAME="t9_2"></A>
+	<P><DD><B>表9.2　ノーマルシャドウデータとなるスプライトデータ
+	<DD><TABLE BORDER=1>
+	<TR><TH>スプライトタイプ</TH><TH>カラー数</TH><TH>パレットコード</TH><TH>  カラーバンク</TH></TR>
+	<TR ALIGN=CENTER><TD>タイプ０〜３，５</TD>
+	<TD><PRE>　１６<BR>　６４<BR>１２８<BR>２５６</TD>
+	<TD><PRE>     1110<BR>xx11 1110<BR>x111 1110<BR>1111 1110</TD>
+	<TD><PRE>xxxx x111 1111 0000<BR>xxxx x111 11xx 0000<BR>xxxx x111 1xxx 0000<BR>xxxx x111 xxxx 0000</TD></TR>
+	
+	<TR ALIGN=CENTER><TD>タイプ４，６</TD>
+	<TD><PRE>　１６<BR>　６４<BR>１２８<BR>２５６</TD>
+	<TD><PRE>     1110<BR>xx11 1110<BR>x111 1110<BR>1111 1110</TD>
+	<TD><PRE>xxxx xx11 1111 0000<BR>xxxx xx11 11xx 0000<BR>xxxx xx11 1xxx 0000<BR>xxxx xx11 xxxx 0000</TD></TR>
+	
+	<TR ALIGN=CENTER><TD>タイプ７</TD>
+	<TD><PRE>　１６<BR>　６４<BR>１２８<BR>２５６</TD>
+	<TD><PRE>    1110<BR>xx11 1110<BR>x111 1110<BR>1111 1110</TD>
+	<TD><PRE>xxxx xxx1 1111 0000<BR>xxxx xxx1 11xx 0000<BR>xxxx xxx1 1xxx 0000<BR>xxxx xxx1 xxxx 0000</TD></TR>
+	
+	<TR ALIGN=CENTER><TD>タイプＣ〜Ｆ</TD>
+	<TD><PRE>　１６<BR>　６４<BR>１２８<BR>２５６</TD>
+	<TD><PRE>     1110<BR>xx11 1110<BR>x111 1110<BR>1111 1110</TD>
+	<TD><PRE>xxxx xxxx 1111 0000<BR>xxxx xxxx 11xx 0000<BR>xxxx xxxx 1xxx 0000<BR>関係なし</TD></TR>
+	
+	<TR ALIGN=CENTER><TD>タイプ８</TD>
+	<TD><PRE>　１６<BR>　６４<BR>１２８<BR>２５６</TD>
+	<TD><PRE>     1110<BR>xx11 1110<BR>x111 1110<BR>1111 1110</TD>
+	<TD><PRE>xxxx xxxx x111 0000<BR>xxxx xxxx x1xx 0000<BR>関係なし<BR>関係なし</TD></TR>
+	
+	<TR ALIGN=CENTER><TD>タイプ９〜Ｂ</TD>
+	<TD><PRE>　１６<BR>　６４<BR>１２８<BR>２５６</TD>
+	<TD><PRE>     1110<BR>xx11 1110<BR>x111 1110<BR>1111 1110</TD>
+	<TD><PRE>xxxx xxxx xx11 0000<BR>関係なし<BR>関係なし<BR>関係なし</TD></TR>
+	</TABLE>
+
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p08_20_j.htm">戻る</A>｜
+<a href="p09_20_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no9">VDP2ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

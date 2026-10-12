@@ -1,0 +1,88 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/11&gt; P.S. Write Once 2. Basics</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">P.S. Write Once</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>P.S. Write Once System User's Manual</b><H2 ALIGN=CENTER> 2. Basics</H2><HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A><P><DT><H3> 2.1 Package composition</H3><DD> The ADDCDW package consists of the following files.</P>
+<A NAME="t2_1"></A><P><DD> <B>Table 2.1 ADDCDW package configuration file</b><DD><TABLE BORDER=1>
+<TR><TH> File</TD><TH> explanation</TH></TR>
+<TR><TD> ADDCDW.EXE</TD><TD> P.S. Write Once System (CD-R writing software)</TD></TR>
+<TR><TD> ADDGEN.EXE</TD><TD> ADDCDW subcommand file automatic generation tool</TD></TR>
+<TR><TD> SAMPLE.CDW</TD><TD> Sample ADDCDW subcommand file</TD></TR>
+<TR><TD> XAOTF.BAT</TD><TD> Sample on-the-fly write execution batch file</TD></TR>
+<TR><TD> MANADDCD.TXT</TD><TD> ADDCDW external specifications</TD></TR>
+</TABLE>
+</P>
+<A NAME="no2_20"></A><P><DT><H3> 2.2 Operating environment</H3><DD> This system operates in a DOS environment on IBM-PC. The required hardware and software are shown below.</P>
+<A NAME="z2_1"></A><P><DD> <B>Figure 2.1 System configuration</b><PRE><H3>
+┌────┐ ┌─────────┐ ┌──────┐        
+│    │ │    ┌────┤ │ CD-R │  ┌─┐   
+│ HD ├─┤ PC │SCSI├─┤drive ├─→│○│   
+│    │ │    │    │ │      │  └─┘   
+└────┘ └────┴────┘ └──────┘CD-R disc
+</H3></PRE><A NAME="t2_2"></A><P><DD> <B>Table 2.2 Operating environment</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=200 COLSPAN=2> Item</TH><TH WIDTH=200> Operating conditions/model etc.</TH></TR>
+<TR><TD COLSPAN=2> IBM-PC compatible machine</TD><TD> 80486/33MHz or higher</TD></TR>
+<TR><TD COLSPAN=2> memory</TD><TD> 8MB or more</TD></TR>
+<TR><TD COLSPAN=2> hard disk</TD><TD> 600Mbyte or more (VCD recommended model)</TD></TR>
+<TR><TD COLSPAN=2> SCSI I/F board</TD><TD> adaptec SCSI MASTER (recommended)</TD></TR>
+<TR><TD COLSPAN=2> CD-R drive</TD><TD> YAMAHA CDE100/CDE102/CDR400</TD></TR>
+<TR><TD COLSPAN=2> OS</TD><TD> MS-DOS<BR>
+ Windows95 (DOS window)</TD></TR>
+<TR><TD COLSPAN=2> driver</TD><TD ROWSPAN=2> ASPI driver (required)<BR>
+ EMM386.EXE etc.<BR>
+ SMARTDRV etc.</TD></TR>
+<TR><TD WIDTH=10></TD><TD> SCSI driver<BR>
+ EMS driver <B>*1</b><BR>
+ Disk cache <B>*2</b></TD></TR>
+<TR><TD COLSPAN=2> Other software</TD><TD> XBLD.EXE<BR>
+ VCDBUILD.EXE, VCDMKTOC.EXE</TD></TR>
+</TABLE>
+<P><DD> <B>*1</b> Writing performance is improved by allocating more EMS memory to the work area.<DD> <B>*2</b> Required when used under MS-DOS environment. Speed up file processing.</P>
+<A NAME="no2_30"></A><P><DT><H3> 2.3 Definition of terms</H3><DD> Defines terms used in this system.</P>
+<DL>
+<P><DT> <B>disk</b><DD> When simply written as a disk, in this manual it refers to a CD-R disk.</P>
+<P><DT> <B>CD Builder (Disc Builder)</b><DD> A tool for creating disk image files.<BR>
+ Refers to XBLD and VCDBUILD.</P>
+<P><DT> <B>Disk image file (DSK file)</b><DD> This is a file created on the hard disk that contains the same content that will be written on a CD-R disc.</P>
+<P><DT> <B>Additional image file</b><DD> This is a temporary file that ADDCDW creates for work.</P>
+<P><DT> <B>TOC file</b><DD> A file containing track information.<BR>
+ The main body of the file name excluding the extension is the same as the DSK file.</P>
+<P><DT> <B>path name</b><DD> A generic term for drive names, directory names, and file names.</P>
+<P><DT> <B>subcommand</b><DD> This is a command for ADDCDW.</P>
+<P><DT> <B>Master disk</b><DD> A disc with the same content as the commercial version disc.<BR>
+ It is not possible to add data to the master disk.</P>
+<P><DT> <B>debug disk</b><DD> Disk to create for debugging.<BR>
+ Multiple full and partial updates are possible.</P>
+<P><DT> <B>test mode</b><DD> Write mode using the CD-R drive test mode.<BR>
+ Simulates writing to a CD-R disc.</P>
+<P><DT> <B>write on the fly</b><DD> This method writes to a CD-R disc while creating a sector image of the disc (no need for a DSK file).</P>
+</DL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">P.S. Write Once</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

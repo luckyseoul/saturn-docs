@@ -1,0 +1,172 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/12&gt;FAQ/Sound related/Sound simulator</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no3">Sound related</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Sound related</b><H2 ALIGN=CENTER> sound simulator</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_01"><HR></a><DL>
+<H3> Standard MIDI file format 0 data cannot be converted.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am sometimes able to convert standard MIDI files (SMF) to format 0 using Sound Simulator, and sometimes not. Is there a reason why?<P><DT> <FONT SIZE=5>A)</font><DD> Sound Simulator does not support SMF format 0. Sound Simulator only supports format 1.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_02"><HR></a><DL>
+<H3> DSP is not applied on Sound Simulator</H3><P><DT> <FONT SIZE=5>Q)</font><DD> With CartDev, which I recently purchased, I can't hear the DSP-applied sound on Sound Simulator.<P><DT> <FONT SIZE=5>A)</font><DD> Please check whether the mixer's <FONT SIZE=5>"Effect Level"</font> and the tone editor's <FONT SIZE=5>"Effect Send Level"</font> are set properly.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_03"><HR></a><DL>
+<H3> Are there any restrictions on converting SMF?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> It seems that the velocity and pitch bend settings in the song data are no longer applied after converting from SMF to Sega Saturn.<BR>
+ Are there any restrictions on converting SMF?<P><DT> <FONT SIZE=5>A)</font><DD> There are no restrictions when converting, but please note the following when creating an SMF:</P>
+<OL>
+<P><B><LI></b> When outputting SMF from a sequencer, tracks on the same MIDI channel must be merged.</P>
+<P><B><LI></b> The maximum number of tracks is 16 (excluding tempo tracks).<BR>
+ Each sequencer handles SMF output slightly differently, with some sequencers automatically merging tracks on the same MIDI channel, and some sequencers inserting empty tracks if the MIDI channel is missing.<BR>
+ Please check your sequencer once.</P>
+<P> There are also sequencers that automatically output SMF type 0 when a sequence with only one track is output as SMF.<BR>
+ In that case, you will need to take measures such as creating another dummy track.</P>
+<P><B><LI></b> If the MIDI channel number is important, you must create data with the final track number in mind.<BR>
+ For example:</P>
+<P><PRE>
+   No. 17 Effect pan 
+   No. 71 Effect volume 
+   No. 80 Q-sound localization 
+</PRE></P>
+</OL>
+<P>As mentioned above, the problem of not being able to apply velocity or pitch bend should not occur due to a problem when converting.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_04"><HR></a><DL>
+<H3> What is "mode" and "status" in the "Sound Simulator" window?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What numbers appear in the mode and status of the sound simulator?<P><DT> <FONT SIZE=5>A)</font><DD> When a sound control command is executed, the execution status and necessary information are returned to the main system as a return status, which is displayed here.<BR>
+ (The return status is stored in the status area of the system area, so refer to it as necessary.)</P>
+<P> This information varies slightly depending on the driver version. In Ver2.10, it is as follows.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH COLSPAN=2> [Sequence playback mode]</TH></TR>
+<TR><TD> 0x00 :</TD><TD> initial state</TD></TR>
+<TR><TD> 0x01 :</TD><TD> Now playing</TD></TR>
+<TR><TD> 0x03 :</TD><TD> Pause during playback</TD></TR>
+<TR><TD> 0x05 :</TD><TD> Fade in progress</TD></TR>
+<TR><TH COLSPAN=2> [Sequence playback status]</TH></TR>
+<TR><TD> 0x00 :</TD><TD> normal</TD></TR>
+<TR><TD> 0x80:</TD><TD> Resolution exceeds SEGA SATURN's capabilities</TD></TR>
+<TR><TD> 0x81 :</TD><TD> There is no tempo data.</TD></TR>
+<TR><TD> 0x82 :</TD><TD> No event data.</TD></TR>
+<TR><TD> 0x83 :</TD><TD> Tempo data is set outside the range.</TD></TR>
+<TR><TD> 0x84 :</TD><TD> There are no controls in the sequence data.</TD></TR>
+<TR><TD> 0x85 :</TD><TD> A bank that does not exist was specified.</TD></TR>
+<TR><TD> 0x86:</TD><TD> You specified a program that does not exist.</TD></TR>
+<TR><TD> 0x87:</TD><TD> A program change was performed without a bank set.<BR>
+ When a 0x85 error occurs, this error often occurs in succession.</TD></TR>
+<TR><TD> 0x88:</TD><TD> Volume blas value is too large for Total level.</TD></TR>
+<TR><TD> 0x89:</TD><TD> A mixer change was performed on a bank that does not exist.</TD></TR>
+<TR><TD> 0x8A:</TD><TD> I used Mono Mode.</TD></TR>
+<TR><TD> 0x8B:</TD><TD> Layer is not set on the Tone editor.</TD></TR>
+<TR><TD> 0x8C:</TD><TD> Because the number of simultaneous pronunciations exceeded 32, the oldest key-on was forcibly crushed.</TD></TR>
+<TR><TD> 0x8D:</TD><TD> A layer that does not exist was specified.</TD></TR>
+<TR><TD> 0x8E:</TD><TD> Trouble occurred in DSP</TD></TR>
+<TR><TD> 0x8F:</TD><TD> An unsupported MIDI event was issued.</TD></TR>
+<TR><TD> 0x92 :</TD><TD> Some notes could not be played because there were too many FM sound source channels.</TD></TR>
+<TR><TD> 0x93 :</TD><TD> Double assignment of slot (program error)</TD></TR>
+<TR><TD> 0x94 :</TD><TD> An attempt was made to play on a MIDI channel other than 1-16.</TD></TR>
+<TR><TD> 0x99 :</TD><TD> NOTEON was canceled because all slots were filled with FM. </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_05"><HR></a><DL>
+<H3> Sound driver version recognition</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Why can't the sound simulator recognize the driver version?<BR>
+ Also, if the transferred drivers have different targets in the same folder, will they be transferred correctly?<P><DT> <FONT SIZE=5>A)</font><DD> If there is a driver matching the target in the same folder as the sound simulator, the driver will be transferred to the target at startup, and you can check the version in the Apple menu.<BR>
+ in the version</P>
+<P> <B>"Not transferred"</b><P> If this is displayed, the transfer has failed due to a SCSI communication error.</P>
+<P> Even if there are drivers for different targets in the same folder, there is no problem because the sound simulator determines the connected target and transfers the appropriate driver.<BR>
+ However, do not change the file name of the provided driver.<BR>
+ The following is the correspondence between targets and drivers.</P>
+<P><PRE>
+ “SDDRV.TSK + SYSTBL.TSK” → Sound BOX
+ “SDDRVS.TSK”             → Actual device and CartDev
+ "SDDRVT.TSK"             → ST-V (for business use)
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_06"><HR></a><DL>
+<H3> What kind of file is “Undo.TMP”?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I don't know if it's a logo mark, but sometimes something called ``Undo.TMP'' appears and disappears in the sound simulator's folder. What'll we do.<P><DT> <FONT SIZE=5>A)</font><DD> This is a temporary file created by the sound simulator, so there is no need to worry about it. However, if the sound simulator hangs up, this temporary file may not be deleted and may remain in the folder, so please delete it manually.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_07"><HR></a><DL>
+<H3> What is the maximum number that can be registered in a sequence bank?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What is the maximum number of songs that can be set in a sequence bank on the sound simulator?<P><DT> <FONT SIZE=5>A)</font><DD> The maximum is 256. By the way, the number at the beginning of the song title on the simulator is written in decimal. If there are 1000 SEs, they will be divided into 4 sequence banks.<BR>
+ At that time, SEs in different banks can be played simultaneously as long as they fit in the sound memory.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_08"><HR></a><DL>
+<H3> Older maps cannot be opened with the latest version</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I updated the sound simulator to the latest version 3.01, when I tried to open a map file created in the previous environment,</P>
+<P> <B>"A type 25 error has occurred"</b></P>
+<P> and the application will terminate.</P>
+<DL>
+<P><DT> <B>Current environment:</b><DD> Sound simulator...3.01<DD> Sound driver...2.10</P>
+<P><DT> <B>Previous environment:</b><DD> Sound simulator...2.04<DD> Sound driver ・・・2.00</P>
+</DL>
+<P><DT> <FONT SIZE=5>A)</font><DD> Since the application size has changed, select "File-" from the menu.&gt; Please try increasing the minimum size and usage size in the memory usage conditions under 'Information'. If that doesn't work, try unchecking the "Check aliases when loading map files" checkbox in the initial settings of the startup menu. This is a new addition in the latest version.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_09"><HR></a><DL>
+ <FONT SIZE=1>horse</font><H3> Conversion to SGL-PCM does not work with SndSim</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I convert an AIFF file with a size of 6.2M or 9.6M to SGL PCM format on a sound simulator, the size after conversion is always 17K.<P><DT> <FONT SIZE=5>A)</font><DD> The above command cannot be used.</P>
+ When playing a PCM stream on a Sega Saturn, the sound data used is an AIFF file with header information removed.<BR>
+ If you are using Sound Designer, the header information is stored on the resource side, so you can use the data as is.<BR>
+ For other waveform editing tools, use a binary editor or similar tool to remove the header.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_10"><HR></a><DL>
+<H3> Real-time panpot change during key-on is unnatural</H3><P><DT> <FONT SIZE=5>Q)</font><DD> There is no problem even if you swing the normal key-on from side to side.<BR>
+ There is no problem when playing the part in the part where the sequence is handled, but it comes out when playing the whole part.<BR>
+ The release is suddenly cut off.<BR>
+ This is avoided by preparing two types of panpot data.<BR>
+ Why can't I just import the data <FONT SIZE=1>from</font> <FONT SIZE=5>Play</font> <FONT SIZE=1>Station</font> and play it back on SS, which <FONT SIZE=5>has</font> more notes than PS?<P><DT> <FONT SIZE=5>A)</font><DD> These are the specifications of the latest version of the sound driver (Ver2.10).</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_11"><HR></a><DL>
+<H3> Petit noise on SndSimulator</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Small noise appears on SndSimulator.<P><DT> <FONT SIZE=5>A)</font><DD> Possible causes are listed below.</P>
+<UL TYPE=DISC>
+<P><LI> Is "Alternate" etc. set in the loop settings?<BR>
+ The maximum number of samples that can be played with SCSP is 0ffffh samples.<BR>
+ If you change the pitch with Reverse or Alternate, the read address may shift, resulting in a different sound or noise than the original.</P>
+<P><LI> If noise occurs when changing effects, it is because there is garbage from previous data left on the DSP work ram.<BR>
+ (Supported in driver Ver2.10)</P>
+<P><LI> If you are playing on a Sega Saturn, check that the data that matches the map contents is being sent to the sound memory when changing maps.</P>
+<P><LI> If you have a tone with a long release, hitting it continuously can cause noise, so try shortening it.</P>
+<P><LI> Set the MIXER level of Output channels not used by the DSP linker to the minimum setting of 0.<BR>
+ If it is other than "0", the correct effect may not be output (for example, the DC component is added to the original sound, resulting in a clipped sound).</P>
+</UL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_12"><HR></a><DL>
+<H3> Song data does not play on SndSim</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Song data does not play on the sound simulator.<BR>
+ The included sample data sounds fine.<BR>
+ Program changes and bank selects are included properly.<P><DT> <FONT SIZE=5>A)</font><DD> First, check that "Direct Level" is raised properly on the tone editor.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_13"><HR></a><DL>
+<H3> Error during SMF conversion</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The following error occurs when converting SMF.</P>
+<P> <B>Note on must be more than 2 clocks distant from same-pitch-note on. Or, gate time is too short.</b><P><DT> <FONT SIZE=5>A)</font><DD> Please set the gate time to 2 or more.<BR>
+ It is also possible that the resolution setting on the sequencer is too fine and conversion is failing, so try making the resolution coarser.<BR>
+ On the Sega Saturn, one clock is 2msec, and the corresponding sequencer resolution is 24 to 960.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_14"><HR></a><DL>
+<H3> There is no sound ("0x8A" appears in "status")</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I created tone bank data and tried playing it, the "status" showed "0x8A" and no sound was produced.<P><DT> <FONT SIZE=5>A)</font><DD> Only POLY mode is implemented as a sound driver function, and if MONO mode is used with tone bank data, the above error will be returned.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_15"><HR></a><DL>
+<H3> I want to lock the status of used memory.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am using ToneEditor/SoundSimulator, but even if <FONT SIZE=5>I change or lock</font> the memory usage in the information, it returns to the original state when I restart it.<P><DT> <FONT SIZE=5>A)</font><DD> Do not <FONT SIZE=5>lock</font> .</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no3">Sound related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,112 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 4&gt;Simple CD simulator/3.Command explanation</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Simple CD simulator</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ Simple CD simulator<H1> 3.Command explanation</H1><HR NOSHADE>
+<A NAME="no3_10"><HR></a><DL>
+<P><DT><H3> ■MFCAT</H3><P><DT> <B>●Memory file combination tool MFCAT</b><P><DT> <B>Format</b><DD> MFCAT [-o&lt; OUTFILE&gt; ] -f&lt; FLIST&gt;<BR>
+ or<BR>
+ MFCAT [-o&lt; OUTFILE&gt; ]&lt; file1&gt;&lt; file2&gt; ...</P>
+<P><DT> <B>option</b><DL>
+<P><DT> -o&lt; OUTFILE&gt;<DD> Change the output file name to [&lt; OUTFILE&gt; ]. If omitted, it will be output to [MFCAT.OUT].</P>
+<P><DT> -f&lt; FLIST&gt;<DD> Instead of input filenames from command parameters, list files [<FLIST>
+ ]. In the list file, write one file name per line. No line should contain any characters other than file names.</P>
+<P><DT>&lt; file1&gt;&lt; file2&gt; ...<DD> A sequence of input file names.</DL>
+<P><DT> <B>output</b><DD> A memory file is output.</P>
+<P><DT> <B>function</b><DD> Combine multiple files and create a memory file accessible by your CD library/file system. At this time, a header containing directory information (file name, size, etc.) is added to the beginning of each file.<BR>
+ In a file system, data in each file can be accessed by sequentially traversing this header from the beginning.</P>
+<P><DT> <B>remarks</b><DD> Input files are combined in the order specified.<BR>
+ File names are converted from lowercase to uppercase.<BR>
+ Wildcard expansion is not performed on input file names.</P>
+<P><DT> <B>Example of use</b><DD><OL>
+<P><B><LI></b> Generate [MFCAT.OUT] from [AFILE.DAT][BFILE.DAT].</P>
+<P><PRE>
+C:\&gt; MFCAT AFILE.DAT BFILE.DAT[RET]
+    <B>‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾</b>
+</PRE></P>
+<P><B><LI></b>Generate [TEST.ROM] from the file specified by [FILE.LST].</P>
+<P><PRE>
+C:\&gt; MFCAT -oTEST.ROM -fFILE.LST[RET]
+    <B>‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾</b>
+</PRE></P>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_20"><HR></a><DL>
+<P><DT><H3> ■CDSIM</H3><P><DT> <B>●CD simulator CDSIM</b><P><DT> <B>Format</b><DD> CDSIM [-f<FILE_NAME>
+ ]<BR>
+ CDSIM-i&lt; tty_dev_name&gt; -o&lt; SCSI_dev_name&gt; [-f&lt; FILE_NAME&gt; ]</P>
+<P><DT> <B>option</b><DL>
+<DT> -f&lt; FILE_NAME&gt;<DD> Definition file name for CD file name and DOS file name</P>
+</DL>
+<P><DT> <B>function</b><DD> After startup, it polls the target box's SCSI driver for requests regarding CD-ROM data.<BR>
+ If there is a request, it will respond to the request.</P>
+<P><DT> <B>How to exit</b><DD> To exit, press the [ESC] key.<BR>
+ For the workstation version, press [CTRL]+[C].</P>
+<P><DT> <B>Example of use</b><DD> Launch [CDSIM.DAT] as a definition file.</P>
+<P><PRE>
+C:\&gt; CDSIM -fCDSIM.DAT[RET]
+    <B>‾‾‾^‾‾‾‾‾‾‾‾‾‾‾‾‾‾</b>
+</PRE></P>
+<P><DD>Example of starting SUN (when using PORT-A/SCSI ID 2)</P>
+<P><PRE>
+CD SIM -i/dev/ttya -o/dev/rsd2a [RET]
+<B>‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾</b>
+</PRE></P>
+<P><DD>HP startup example (when using PORT-0/SCSI ID 5)</P>
+<P><PRE>
+CD SIM -i/dev/tty00 -o/dev/dsk/d201d5s0 [RET]
+<B>‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾</b>
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<HR>
+<DL>
+<P><DT><B>●Definition file format of CD file name and DOS file name</b><P><DT> <B>Format</b><DD>&lt; CD file name&gt;&lt; DOS file name&gt; [;&lt; comment&gt; ][\n]</P>
+<P><DD>&lt; CD file name&gt;&lt; UNIX file name&gt; [;&lt; comment&gt; ][\n]</P>
+<P><DD> The definition file is a text file in which one correspondence between a CD file name and a DOS file name is written in one line. File names are separated by spaces or tabs, and anything after a semicolon is a comment.<BR>
+ File identifiers 0, 1, 2, etc. are assigned from the beginning.</P>
+<P><DT> <B>remarks</b><DD> Character limit<TABLE BORDER=0>
+<TR><TD><PRE> CD file name</TD><TD><PRE> :12 characters or less</TD></TR>
+<TR><TD><PRE> DOS file name</TD><TD><PRE> :64 characters or less (including path name)</TD></TR>
+<TR><TD><PRE> Maximum number of digits in one line</TD><TD><PRE> :128 characters or less</TD></TR>
+</TABLE>
+<DD> <B>*</b> The file name must be in MS-DOS format of 8 characters + '.' + 3 characters.</P>
+<P><DT> <B>Reference example</b><DD> Definition of n files</P>
+<P><PRE>
+CDFileName	DOSFileName	;FileIdentifier0[\n]
+CDFileName	DOSFileName	;FileIdentifier1[\n]
+CDFileName	DOSFileName[\n]
+    ・
+    ・
+    ・
+CDFileName	DOSFileName	;FileIdentifierN-1[\n]
+[EOF]
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Simple CD simulator</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

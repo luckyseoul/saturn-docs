@@ -1,0 +1,103 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;71/86&gt;VDP2 User's Manual/12.2 Special color calculation function</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no12">VDP2 User's Manual</a> ★ <A HREF="p12_10.htm">Chapter 12 Color calculation</a><HR>
+ <B>▲ <A HREF="p12_14.htm">Back</a> ｜ <A HREF="p13_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 12 Color Calculation</b><HR NOSHADE>
+<DL>
+<A NAME="no12_20"></A><P><DT><H2> ■12.2 Special color calculation function</H2><DD> The special color calculation function is a function that specifies color calculation enable not only for the entire screen but also for each character or dot, and has the following four modes.</P>
+<P><DD><OL>
+<B><LI></b> Color calculation enable is specified for each screen.<B><LI></b> Color calculation enable is specified for each character.<B><LI></b> Color calculation enable is specified for each dot.<B><LI></b> Color calculation enable is specified by the most significant bit of color data.</OL>
+</P>
+<P><DD> When specifying color calculation enable for each screen, color calculation is performed when the value of the color calculation enable bit in the color calculation control register corresponding to each scroll screen is 1.<BR>
+ When specifying for each character, color calculation is performed only on character patterns whose special color calculation bit value in the pattern name data is 1 on the scroll screen where the color calculation enable bit is specified as 1. For details on the special color operation bits in pattern name data, please refer to " <B><A HREF="p04_60.htm">4.6 Pattern Name Table (Page)</a></b> ".</P>
+<P><DD> When specified for each dot, the dot specified in the special function code in the character pattern for which the value of the special color calculation bit in the pattern name data of the scroll screen whose color calculation enable bit is specified as 1 is specified. Color calculations are performed only on dots that match the color code. Do not set this mode when the scroll screen color format is RGB format. For special function codes, see <B><A HREF="p10_30.htm">10.3 Special Function Codes</a></b> .</P>
+<P><DD> When specifying using the most significant bit of color data, if the scroll screen with the color calculation enable bit set to 1 is in palette format, color calculation will be applied only to dots using color data with the most significant bit set to 1. I will do it. If this mode is specified when the scroll screen with the color calculation enable bit set to 1 is in RGB format, color calculation will always be performed.</P>
+<P><DD> If mode 1 or 2 is specified on a scroll screen where the display format is bitmap format, the special color calculation bits in the bitmap palette number register are used instead of the special color calculation bits in the pattern name data.<BR>
+ Table 12.3 shows the special color calculation modes.</P>
+<A NAME="t12_3"></A><P><DD> <B>Table 12.3 Special color calculation modes</b><DD><TABLE BORDER>
+<TR><TD><PRE> special color<BR> Calculation mode</TD><TD><PRE> Special color calculation<BR> Specified content</TD><TD><PRE> color format</TD><TD><PRE> Color calculation enable condition</TD></TR>
+<TR><TD> mode 0</TD><TD> Specify for each screen</TD><TD> pallet format<BR>
+ or RGB format</TD><TD> Color operation enable bit = 1</TD></TR>
+<TR><TD> mode 1</TD><TD> for each character<BR>
+ designation</TD><TD> pallet format<BR>
+ or RGB format</TD><TD> Color operation enable bit = 1<BR>
+ and<BR>
+ Special color calculation bits in pattern name data<BR>
+ t = 1</TD></TR>
+<TR><TD ROWSPAN=2> mode 2</TD><TD ROWSPAN=2> Specify for each dot</TD><TD> pallet format</TD><TD> Color operation enable bit = 1<BR>
+ and<BR>
+ Special color calculation bits in pattern name data<BR>
+ t = 1<BR>
+ and<BR>
+ Dot color code specified in special function code<BR>
+ dot that matches the code</TD></TR>
+<TR><TD> RGB format</TD><TD> Setting prohibited</TD></TR>
+<TR><TD ROWSPAN=2> mode 3</TD><TD ROWSPAN=2> Color data<BR>
+ Specified by upper bits</TD><TD> pallet format</TD><TD> Color calculation enable bit = 1<BR>
+ and<BR>
+ Using color data with the most significant bit = 1<BR>
+ Dot</TD></TR>
+<TR><TD> RGB format</TD><TD> Color calculation enable bit = 1</TD></TR>
+</TABLE>
+</P>
+<P><DD> Special color calculation mode can be specified only for the top image. Special color calculation modes other than the top image are fixed to mode 0.</P>
+<A NAME="no12_21">　</A><P><DT><H3>●Special color calculation mode register</H3><DD> The special color calculation mode register specifies the mode of the special color calculation function for each scroll screen. This is a 16-bit write-only register located at address 1800EEH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SFCCMD_"></A><P><DD> <B><FONT SIZE=5>SFCCMD</font> <FONT SIZE=4>1800EEH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#">-</a></TH><TH><PRE> <A HREF="#">-</a></TH><TH><PRE> <A HREF="#">-</a></TH><TH><PRE> <A HREF="#">-</a></TH><TH><PRE> <A HREF="#">-</a></TH><TH><PRE> <A HREF="#">-</a></TH><TH><PRE> <A HREF="#NxSCCM_">R0SCCM1</a></TH><TH><PRE> <A HREF="#NxSCCM_">R0SCCM0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#NxSCCM_">N3SCCM1</a></TH><TH><PRE> <A HREF="#NxSCCM_">N3SCCM0</a></TH><TH><PRE> <A HREF="#NxSCCM_">N2SCCM1</a></TH><TH><PRE> <A HREF="#NxSCCM_">N2SCCM0</a></TH><TH><PRE> <A HREF="#NxSCCM_">N1SCCM1</a></TH><TH><PRE> <A HREF="#NxSCCM_">N1SCCM0</a></TH><TH><PRE> <A HREF="#NxSCCM_">N0SCCM1</a></TH><TH><PRE> <A HREF="#NxSCCM_">N0SCCM0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="NxSCCM_"></A><DT> <B>Special color calculation mode</b> bit<DD> (N0SCCM1, N0SCCM0, N1SCCM1, N1SCCM0, N2SCCM1, N2SCCM0, N3SCCM1, N3SCCM0, R0SCCM1, R0SCCM0)<BR>
+ Specifies the mode of special color calculation function for each scroll screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0SCCM1,N0SCCM0</TD><TD> 1800EEH</TD><TD> bit 1,0</TD><TD> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD> N1SCCM1,N1SCCM0</TD><TD> 1800EEH</TD><TD> bit 3,2</TD><TD> For NBG1 (or for EXBG)</TD></TR>
+<TR><TD> N2SCCM1,N2SCCM0</TD><TD> 1800EEH</TD><TD> bit 5,4</TD><TD> For NBG2</TD></TR>
+<TR><TD> N3SCCM1,N3SCCM0</TD><TD> 1800EEH</TD><TD> bit 7,6</TD><TD> For NBG3</TD></TR>
+<TR><TD> R0SCCM1,R0SCCM0</TD><TD> 1800EEH</TD><TD> bit 9,8</TD><TD> For RBG0</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> xxSCCM1</TH><TH> xxSCCM0</TH><TH> mode</TH><TH> process</TH></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TH><PRE> 0</TH><TD> Color calculation enable is specified for each screen.</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TH><PRE> 1</TH><TD> Color calculation enable is specified for each character.</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TH><PRE> 2</TH><TD> Color calculation enable is specified for each dot.</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TH><PRE> 3</TH><TD> Color calculation enable is specified by the most significant bit of color data.<BR>
+ determine</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, or R0.</P>
+<P><DD> Specifying the special color calculation mode is valid only when each screen is the top image. For images other than the top image, the mode is fixed to 0.<BR>
+ If the color format of the scroll screen is RGB format, do not use mode 2. Also, if mode 3 is specified, color calculations are performed on all dots.<BR>
+ Do not specify mode 1 or mode 2 in EXBG.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p12_14.htm">Back</a> ｜ <A HREF="p13_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no12">VDP2 User's Manual</a> ★ <A HREF="p12_10.htm">Chapter 12 Color calculation</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

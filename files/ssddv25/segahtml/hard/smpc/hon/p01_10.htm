@@ -1,0 +1,62 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/19&gt;SMPC User's Manual/Chapter 1 Overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>■ ｜ <A HREF="p01_20.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual</b><H1 ALIGN=CENTER> Chapter 1 Overview</H1><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H2> ■1.1 System configuration</H2><DD> SMPC manages the reset control of the Saturn system when the power is turned on and the NMI request to the master SH-2 when the reset button is pressed. In addition, commands from the SH-2 turn each LSI on and off, set and acquire the calendar clock, and collect data from peripherals. Furthermore, the clock change command switches the horizontal resolution to 320 dots or 352 dots.</P>
+<A NAME="z1_1"></A><P ALIGN=CENTER> <B>Figure 1.1 SMPC system configuration</b><BR>
+<img srcset="../grp/i002_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The SMPC has two sets of 7-bit parallel I/O ports.<BR>
+ Access to the I/O port is controlled by firmware inside the SMPC, and there are two access methods: SMPC control mode, which outputs collected data to the SMPC output register (OREG), and SH-2 direct mode, which allows direct access from the SH-2. You can select. For details on SMPC control mode and SH-2 direct mode, see Chapter 3 " <A HREF="p03_10.htm">◆SMPC Control Mode</a> " and " <A HREF="p03_18.htm">◆SH-2 Direct Mode</a> " respectively.<BR>
+ When the power is turned on, each unit inside the Saturn is initialized to the following state.</P>
+<A NAME="no1_10_1"></A><DL>
+<P><DT>&#65308; <B>Initial state when power is turned on</b>&#65310;</p>
+<p><DT> <B>Sound CPU OFF state</b><DD> Sound CPU has been reset. The SNDON command starts operation from the power-on vector.</P>
+<P><DT> <B>VDP1,VDP2,SCU,SCSP ON state</b><DD> It is now accessible from SH-2.<P><DT> <B>Slave SH OFF state</b><DD> Slave SH-2 has a reset. The SSHON command starts the operation from the power-on vector.<P><DT> <B>DOT SEL OFF state</b><DD> The PLL oscillation frequency is 320 mode (NTSC: 26.8741MHz, PAL: 26.6875MHz), and VDP1, VDP2, and SH-2 operate at this frequency. Operates in 352 mode (NTSC: 28.6364MHz, PAL: 28.4375MHz) with CKCHG352 command.</P>
+<P><DT> <B>CD block ON status</b><DD> It is now accessible from SH-2.</P>
+</DL>
+<A NAME="no1_11"></A><P><DT><H3> ●Function</H3><DD> SMPC has three main functions: RTC (Real Time Clock), SM (System Management), and PC (Peripheral Control). The main features of SMPC are listed below.</P>
+<DL>
+<P><DT>&#65308; <B>Main features of SMPC</b>&#65310;</P>
+<A NAME="no1_11_0"></A><P><DT> <B>RTC(Real Time Clock)</b><DD>・Time setting and acquisition from SH-2<DD>・Automatically update year, month, day, day of the week, hour, minute, and second<DD> (Battery backup possible when main power is OFF)</P>
+<A NAME="no1_11_1"></A><P><DT> <B>SM(System Management)</b><DD>・Sound CPU ON/OFF<DD>・ON/OFF of master SH-2 and slave SH-2<DD>・System reset control<DD>・Clock switching (PLL control)<DD>・Power ON reset<DD>・Request NMI from master S-2 by pressing the front panel button</P>
+<A NAME="no1_11_2"></A><P><DT> <B>PC(Peripheral Control)</b><DD> - Supports peripherals with Saturn peripheral interface specifications.<DD>・Automatically collect peripheral data such as control pad and mouse<DD> - Also supports Mega Drive peripherals<DD> (3 buttons, 6 buttons, Sega Tap, etc. However, a conversion adapter is required)</P>
+</DL>
+<A NAME="no1_12"></A><P><DT><H3> ●Input peripheral</H3></P>
+<P><DD> <B>◆Sega Saturn standard pad</b><DD> Digital standard pad for Sega Saturn is equipped with up, down, left, right, A, B, C, X, Y, Z, L, R, and start buttons.</P>
+<P><DD> <B>◆Multi controller</b><DD> The multi-controller is equipped with analog keys and analog LR buttons while maintaining compatibility with the Sega Saturn standard pad.<DD> Reference: <A HREF="../../../info/hon/stn43.htm"><B>STN-43</b></a> "Multi-controller User's Manual Ver1.00"</P>
+<P><DD> <B>◆Mission stick</b><DD><DD> Reference: <A HREF="../../../info/hon/stn34.htm"><B>STN-34</b></a> “Analog Mission Stick Manual”</P>
+<P><DD> <B>◆Racing controller</b><DD><DD> Reference: <A HREF="../../../info/hon/stn38.htm"><B>STN-38</b></a> “Racing Controller Manual”</P>
+<P><DD> <B>◆Shuttle mouse</b><DD><DD> Reference: <A HREF="../../../info/hon/stn44.htm"><B>STN-44</b></a> “Supplementary explanation of shuttle mouse”</P>
+<P><DD> <B>◆Sega Saturn keyboard</b><DD><DD> Reference: <A HREF="../../../info/hon/stn45.htm"><B>STN-45</b></a> “Supplementary explanation of Saturn keyboard”</P>
+</P>
+<P><DD> <B>◆Virtua Gun</b><DD><DD> Reference: <A HREF="../../../info/hon/stn41.htm"><B>STN-41</b></a> "Virtual Gun User's Manual Ver1.00"</P>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p01_20.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,33 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/22&gt;CD Builder Script Grammar/1. Introduction</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>CD Builder Script Grammar Manual</b><H2 ALIGN=CENTER> 1. Introduction</H2><HR NOSHADE>
+<DL>
+<P> This document describes the external specifications of the script syntax for the CD builder "XBLD" for Sega Saturn.<BR>
+ This script complies with the following standards. Please refer to each standard for detailed description information.</P>
+<P><DD><TABLE BORDER=0><TR><TD><PRE> physical format</TD><TD><PRE> ...CD standard (RED BOOK, YELLOW BOOK), CD-ROM XA standard</TD></TR><TR><TD><PRE> logical format</TD><TD><PRE> ...ISO9660 standard, CD-ROM XA standard</TD></TR><TR><TD><PRE> MPEG format</TD><TD><PRE> ...ISO11172 standard</TD></TR><TR><TD><PRE> saturn format</TD><TD><PRE> ...SEGA Saturn DISC format standard specifications</TD></TR></TABLE></P><A NAME="no1_10"></A><P><DT><H3> 1.1 Features</H3><DD> Compatible with the Sega Saturn disc format, it has the following features:</P><P><DT> <B>(1) Physical format</b><DD> Compatible with CD-ROM and CD-ROM XA standards.<BR> The CD-ROM XA standard corresponds to a format called "SEMIXA".<BR> (In SEMIXA format, the first track is MODE1, and the second and subsequent tracks are MODE2.)</P><P><DT> <B>(2) Logical file format</b><DD> It complies with the ISO9660 standard and also supports expansion with the CD-ROM XA standard.</P><P><DT> <B>(3) Interleaving compatible</b><DD> Various interleaving structures can be described that correspond to file numbers and channel numbers.</P><P><DT> <B>(4) MPEG compatible</b><DD> It supports MPEG system layer streams, MPEG video, and MPEG audio streams that comply with the ISO11172 standard.</P><A NAME="no1_20"></A><P><DT><H3> 1.2 Basics</H3><P><DT> <B>(1) Command line format</b><DD> A script is a collection of command lines that specify the arrangement of data on a CD.<BR> A command line consists of a keyword followed by zero or more parameters.<BR> Keywords and parameters are separated by one or more whitespace characters (spaces or tabs).<BR> Also, keywords are not case sensitive.</P><P><DD><PRE><H3>
+┌────────────────────────────────┐
+│Keyword Parameter1 Parameter2 … │
+└────────────────────────────────┘
+</H3></PRE></P><P><DT><B>(2) Comments</b><DD> Anything from the semicolon (;) to the end of the line is treated as a comment.<BR> However, in order to distinguish it from the semicolon that precedes the version number of the ISO file name, one or more blank characters shall be placed. (excluding the semicolon at the beginning of the line)</P><P><DT> <B>" example "</b><DD><TABLE BORDER=0><TR><TD><PRE> File SAMPLE;1</TD><TD><PRE> ← "1" is interpreted as a file version number.</TD></TR><TR><TD><PRE> File SAMPLE ;1</TD><TD><PRE> ← "1" is interpreted as a comment.</TD></TR></TABLE></P><A NAME="no1_30"></A><P><DT><H3> 1.3 Definition of terms</H3><DD> The following terms are used in this document.</P><DD><DL><P><DT> <B>ISO file</b><DD> Files on ISO9660 disk image</P><P><DT> <B>DOS file</b><DD> Files on DOS used for build</P><P><DT> <B>file source</b><DD> DOS file that is the input source for the ISO file</P><P><DT> <B>file attributes</b><DD> Attributes of files on disk images</P><P><DT> <B>directory attributes</b><DD> Attributes of a file or directory recorded in a directory record<P><DT> <B>source attribute</b><DD> File source attributes</P><P><DT> <B>extent</b><DD> Shows a range of contiguous sectors on a disk.<BR> A sector arrangement made up of multiple interleaved files.</P><P><DT> <B>null data</b><DD> Data consisting of binary zeros (00H).</P><P><DT> <B>empty sector</b><DD> A sector whose user data area consists of null data.</P><P><DT> <B>volume descriptor track</b><DD> First track of the session. In addition to the normal file itself, file logical structures such as volume descriptors, path tables, and directory records are recorded.</P><P><DT> <B>Date Time</b><DD> Write in the format DD/MM/YYYY hh:mm:ss:cc:gg.</P><P><DD><TABLE BORDER=0><TR><TD><PRE> DD/MM/YYYY</TD><TD><PRE> …day/month/year</TD></TR><TR><TD><PRE> hh:mm:ss:cc:gg</TD><TD><PRE> …Hour: Minute: Second: 1/100th of a second: GMT time difference</TD></TR></TABLE></P><P><DD> GMT time difference is the time difference (in 15 minute units) from Greenwich Mean Time.<BR> In Japan, it is 36.</P><P><DT> <B>relative time</b><DD> Indicates the location of files and extents.<BR> Describe the position from the beginning of the session, extent, file, etc. in FAD or time format.</P><DD><TABLE><TR><TD> Number of sectors</TD><TD> ...FAD format</TD></TR><TR><TD> mm:ss:ff</TD><TD> …Time format (mm: minutes, ss: seconds, ff: frames)</TD></TR></TABLE></DL></DL><HR NOSHADE> <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS></BODY></HTML>

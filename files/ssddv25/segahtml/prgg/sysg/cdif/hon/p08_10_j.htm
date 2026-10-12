@@ -1,0 +1,185 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/19&gt;CD通信I/F(CDパート)/関数仕様</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<B>▲
+<a href="p07_12_j.htm">戻る</A>｜
+<a href="p08_11_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>関数仕様</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　CD通信インタフェースの関数仕様を記述します。</P>
+
+	<P>	<DT><B>　(1)書式</H4>
+		<DD>　図中、予約領域は「−」で表します。予約領域には必ず0を指定します。</P>
+
+	<P>	<DT><B>　(2)パラメータの初期値</B>
+		<DD>　CDブロックが保持するパラメータの初期値は、特に明記されない限り、ホストが指定する省略値(デフォルト値)に等しくなります。</P>
+
+	<P>	<DT><B>　(3)CDステータス情報（ステータスとCDレポート）の保持</B>
+		<DD>　CD通信インタフェースは、CDブロックコマンド発行時のステータスとCDレポートを保持しています。定期レスポンスによる情報は保持しません。保持内容の初期値は全て0です。<BR>
+　保持ステータス／CDレポートを更新する関数を以下の記号で示します。</P>
+
+	<P ALIGN=CENTER><img srcset="../grp/i099_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　ただし、エラー時(エラーコードがCDC_ERR_OK以外の時)には何も更新しません。</P>
+
+	<P>	<DT><B>　(4)関数内部でのデータ転送</B>
+		<DD>　情報を取得する関数のうち、関数内部でデータ転送をしているものは、関数名をTgetと表記します。データ転送の方法は、CPUによるソフトウェア転送です。</P>
+
+	<P>	<DD><B>《例》 TOC情報の取得(CDC_TgetToc)</B>
+	
+	<P>	<DD>　これらの関数は、内部で次の関数をコールしています。
+		<DD><UL TYPE="DISK">
+		<LI>データ転送の開始待ち(CDC_DataReady)
+		<LI>データ転送の終了(CDC_DataEnd)</UL></P>
+
+	<P>	<DT><B>　(5)コマンド終了フラグ（割り込み要因レジスタ内）</B>
+		<DD>　関連するコマンド終了フラグがある場合、終了フラグという項目欄に記述します。</P>
+
+	<P>	<DD><B>《例》 終了フラグESELフラグ</B></P>
+
+	<P>	<DD>　これらの関数は、コマンド発行時にコマンド終了フラグをチェックして0クリアします。発行できない場合、CDC_ERR_CMDBUSYエラーになります。例外的に、コマンド終了フラグを0クリアだけ、またはチェックだけする場合もあります。(コマンド発行の排他処理)<BR>　発行されたコマンドに対応する処理が終了すると、コマンド終了フラグが1になります。ただし、REJECT, WAIT時は1にならないので注意が必要です。<BR>
+　詳細は、「<B><a href="p03_10_j.htm#no3_20">3.2通信方法</A></B>」を参照してください。</P>
+
+<A NAME="no8_10"></A>
+	<P>	<DT><H2>8.1　関数一覧</H2>
+		<DD>　CD通信インタフェースの関数一覧を表8.1に示します。</P>
+
+<A NAME="t8_1"></A>
+	<P>	<DD><B>表8.1　CD通信インタフェースの関数一覧</B>
+
+<A NAME="t8_1_1"></A>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=250 colspan=2><PRE>機能</TH><TH WIDTH=150><PRE>関数名</TH><TH><PRE> 番号 </TH></TR>
+<TR><td colspan=3><PRE><a href="p08_11_j.htm">CDブロック共通</A></TD><TD ALIGN=CENTER><PRE>1.0</TD></TR>
+<TD WIDTH=10><PRE></TD><TD><PRE>現在のCDステータス情報の取得</TD>   <TD><PRE><a href="p08_11_j.htm#no1_1">CDC_GetCurStat</TD>      <TD ALIGN=CENTER><PRE>1.1</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>直前のCDステータス情報の取得</TD>        <TD><PRE><a href="p08_11_j.htm#no1_2">CDC_GetLastStat</TD>     <TD ALIGN=CENTER><PRE>1.2</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>定期CDステータス情報の取得</TD>          <TD><PRE><a href="p08_11_j.htm#no1_3">CDC_GetPeriStat</TD>     <TD ALIGN=CENTER><PRE>1.3</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>ハードウェア情報の取得</TD>              <TD><PRE><a href="p08_11_j.htm#no1_4">CDC_GetHwInfo</TD>       <TD ALIGN=CENTER><PRE>1.4</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>TOC情報の取得</TD>                       <TD><PRE><a href="p08_11_j.htm#no1_5">CDC_TgetToc</TD>         <TD ALIGN=CENTER><PRE>1.5</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セッション情報の取得</TD>                <TD><PRE><a href="p08_11_j.htm#no1_6">CDC_GetSes</TD>          <TD ALIGN=CENTER><PRE>1.6</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>CDブロックの初期化</TD>                  <TD><PRE><a href="p08_11_j.htm#no1_7">CDC_CdInit</TD>          <TD ALIGN=CENTER><PRE>1.7</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>トレイのオープン</TD>                    <TD><PRE><a href="p08_11_j.htm#no1_8">CDC_CdOpen</TD>          <TD ALIGN=CENTER><PRE>1.8</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>データ転送の準備待ち</TD>                <TD><PRE><a href="p08_11_j.htm#no1_9">CDC_DataReady</TD>       <TD ALIGN=CENTER><PRE>1.9</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>データ転送の終了</TD>                    <TD><PRE><a href="p08_11_j.htm#no1_10">CDC_DataEnd</TD>        <TD ALIGN=CENTER><PRE>1.10</TD></TR></TABLE>
+
+<A NAME="t8_1_2"></A>
+<TABLE BORDER>
+<TR><TH WIDTH=250 colspan=2><PRE>機能</TH><TH WIDTH=150><PRE>関数名</TH><TH><PRE> 番号 </TH></TR>
+<TR><td colspan=3><PRE><a href="p08_12_j.htm">CDドライブ</A></TD><TD ALIGN=CENTER><PRE>2.0</TD></TR>                                                                                            
+<TR><TD WIDTH=10><PRE></TD><TD><PRE>CD再生</TD>                              <TD><PRE><a href="p08_12_j.htm#no2_1">CDC_CdPlay</TD>          <TD ALIGN=CENTER><PRE>2.1</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>再生位置のシーク</TD>                    <TD><PRE><a href="p08_12_j.htm#no2_2">CDC_CdSeek</TD>          <TD ALIGN=CENTER><PRE>2.2</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>スキャン再生</TD>                        <TD><PRE><a href="p08_12_j.htm#no2_3">CDC_CdScan</TD>          <TD ALIGN=CENTER><PRE>2.3</TD></TR></TABLE>
+
+<A NAME="t8_1_3"></A>
+<TABLE BORDER>
+<TR><TH WIDTH=250 colspan=2><PRE>機能</TH><TH WIDTH=150><PRE>関数名</TH><TH><PRE> 番号 </TH></TR>
+<TR><td colspan=3><PRE><a href="p08_13_j.htm">サブコード</A></TD><TD ALIGN=CENTER><PRE>3.0</TD></TR>                                                                                            
+<TR><TD WIDTH=10><PRE></TD><TD><PRE>サブコードQの取得</TD>                   <TD><PRE><a href="p08_13_j.htm#no3_1">CDC_TgetScdQch</TD>      <TD ALIGN=CENTER><PRE>3.1</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>サブコードR〜Wの取得</TD>                <TD><PRE><a href="p08_13_j.htm#no3_2">CDC_TgetScdRwch</TD>     <TD ALIGN=CENTER><PRE>3.2</TD></TR></TABLE>
+
+<A NAME="t8_1_4"></A>
+<TABLE BORDER>
+<TR><TH WIDTH=250 colspan=2><PRE>機能</TH><TH WIDTH=150><PRE>関数名</TH><TH><PRE> 番号 </TH></TR>
+<TR><td colspan=3><PRE><a href="p08_14_j.htm">CD-ROMデバイス</A></TD><TD ALIGN=CENTER><PRE>4.0</TD></TR>                                                                                            
+<TR><TD WIDTH=10><PRE></TD><TD><PRE>CDデバイスの接続先の設定</TD>            <TD><PRE><a href="p08_14_j.htm#no4_1">CDC_CdSetCon</TD>        <TD ALIGN=CENTER><PRE>4.1</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>CDデバイスの接続先の取得</TD>            <TD><PRE><a href="p08_14_j.htm#no4_2">CDC_CdGetCon</TD>        <TD ALIGN=CENTER><PRE>4.2</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>最終リードセクタのバッファ区画の取得</TD><TD><PRE><a href="p08_14_j.htm#no4_3">CDC_CdGetLastBuf</TD>    <TD ALIGN=CENTER><PRE>4.3</TD></TR></TABLE>
+
+<A NAME="t8_1_5"></A>
+<TABLE BORDER>
+<TR><TH WIDTH=250 colspan=2><PRE>機能</TH><TH WIDTH=150><PRE>関数名</TH><TH><PRE> 番号 </TH></TR>
+<TR><td colspan=3><PRE><a href="p08_15_j.htm">セレクタ</A></TD><TD ALIGN=CENTER><PRE>5.0</TD></TR>                                                                                            
+<TR><TD WIDTH=10><PRE></TD><TD><PRE>絞りフレームアドレス範囲の設定</TD>      <TD><PRE><a href="p08_15_j.htm#no5_1">CDC_SetFiltRange</TD>    <TD ALIGN=CENTER><PRE>5.1</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>絞りフレームアドレス範囲の取得</TD>      <TD><PRE><a href="p08_15_j.htm#no5_2">CDC_GetFiltRange</TD>    <TD ALIGN=CENTER><PRE>5.2</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>絞りサブヘッダ条件の設定</TD>            <TD><PRE><a href="p08_15_j.htm#no5_3">CDC_SetFiltSubh</TD>     <TD ALIGN=CENTER><PRE>5.3</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>絞りサブヘッダ条件の取得</TD>            <TD><PRE><a href="p08_15_j.htm#no5_4">CDC_GetFiltSubh</TD>     <TD ALIGN=CENTER><PRE>5.4</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>絞りモードの設定</TD>                    <TD><PRE><a href="p08_15_j.htm#no5_5">CDC_SetFiltMode</TD>     <TD ALIGN=CENTER><PRE>5.5</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>絞りモードの取得</TD>                    <TD><PRE><a href="p08_15_j.htm#no5_6">CDC_GetFiltMode</TD>     <TD ALIGN=CENTER><PRE>5.6</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>絞りの接続先の設定</TD>                  <TD><PRE><a href="p08_15_j.htm#no5_7">CDC_SetFiltCon</TD>      <TD ALIGN=CENTER><PRE>5.7</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>絞りの接続先の取得</TD>                  <TD><PRE><a href="p08_15_j.htm#no5_8">CDC_GetFiltCon</TD>      <TD ALIGN=CENTER><PRE>5.8</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セレクタ（絞り、区画）のリセット</TD>    <TD><PRE><a href="p08_15_j.htm#no5_9">CDC_ResetSelector</TD>   <TD ALIGN=CENTER><PRE>5.9</TD></TR></TABLE>
+
+<A NAME="t8_1_6"></A>
+<TABLE BORDER>
+<TR><TH WIDTH=250 colspan=2><PRE>機能</TH><TH WIDTH=150><PRE>関数名</TH><TH><PRE> 番号 </TH></TR>
+<TR><td colspan=3><PRE><a href="p08_16_j.htm">バッファ情報</A></TD><TD ALIGN=CENTER><PRE>6.0</TD></TR>                                                                                            
+<TR><TD WIDTH=10><PRE></TD><TD><PRE>CDバッファサイズの取得</TD>              <TD><PRE><a href="p08_16_j.htm#no6_1">CDC_GetBufSiz</TD>       <TD ALIGN=CENTER><PRE>6.1</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>バッファ区画のセクタ数の取得</TD>        <TD><PRE><a href="p08_16_j.htm#no6_2">CDC_GetSctNum</TD>       <TD ALIGN=CENTER><PRE>6.2</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>実データサイズの計算</TD>                <TD><PRE><a href="p08_16_j.htm#no6_3">CDC_CalActSiz</TD>       <TD ALIGN=CENTER><PRE>6.3</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>実データサイズの取得</TD>                <TD><PRE><a href="p08_16_j.htm#no6_4">CDC_GetActSiz</TD>       <TD ALIGN=CENTER><PRE>6.4</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セクタ情報の取得</TD>                    <TD><PRE><a href="p08_16_j.htm#no6_5">CDC_GetSctInfo</TD>      <TD ALIGN=CENTER><PRE>6.5</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>フレームアドレス検索の実行</TD>          <TD><PRE><a href="p08_16_j.htm#no6_6">CDC_ExeFadSearch</TD>    <TD ALIGN=CENTER><PRE>6.6</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>フレームアドレス検索結果の取得</TD>      <TD><PRE><a href="p08_16_j.htm#no6_7">CDC_GetFadSearch</TD>    <TD ALIGN=CENTER><PRE>6.7</TD></TR></TABLE>
+
+<A NAME="t8_1_7"></A>
+<TABLE BORDER>
+<TR><TH WIDTH=250 colspan=2><PRE>機能</TH><TH WIDTH=150><PRE>関数名</TH><TH><PRE> 番号 </TH></TR>
+<TR><td colspan=3><PRE><a href="p08_17_j.htm">バッファ入出力</A></TD><TD ALIGN=CENTER><PRE>7.0</TD></TR>                                                                                            
+<TR><TD WIDTH=10><PRE></TD><TD><PRE>セクタ長の設定</TD>                      <TD><PRE><a href="p08_17_j.htm#no7_1">CDC_SetSctLen</TD>       <TD ALIGN=CENTER><PRE>7.1</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セクタデータの取り出し</TD>              <TD><PRE><a href="p08_17_j.htm#no7_2">CDC_GetSctData</TD>      <TD ALIGN=CENTER><PRE>7.2</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セクタデータの消去</TD>                  <TD><PRE><a href="p08_17_j.htm#no7_3">CDC_DelSctData</TD>      <TD ALIGN=CENTER><PRE>7.3</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セクタデータの取り出し消去</TD>          <TD><PRE><a href="p08_17_j.htm#no7_4">CDC_GetdelSctData</TD>   <TD ALIGN=CENTER><PRE>7.4</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セクタデータの書き込み</TD>              <TD><PRE><a href="p08_17_j.htm#no7_5">CDC_PutSctData</TD>      <TD ALIGN=CENTER><PRE>7.5</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セクタデータの複写</TD>                  <TD><PRE><a href="p08_17_j.htm#no7_6">CDC_CopySctData</TD>     <TD ALIGN=CENTER><PRE>7.6</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セクタデータの移動</TD>                  <TD><PRE><a href="p08_17_j.htm#no7_7">CDC_MoveSctData</TD>     <TD ALIGN=CENTER><PRE>7.7</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>セクタデータ複写／移動エラー取得</TD>    <TD><PRE><a href="p08_17_j.htm#no7_8">CDC_GetCopyErr</TD>      <TD ALIGN=CENTER><PRE>7.8</TD></TR></TABLE>
+
+<A NAME="t8_1_8"></A>
+<TABLE BORDER>
+<TR><TH WIDTH=250 colspan=2><PRE>機能</TH><TH WIDTH=150><PRE>関数名</TH><TH><PRE> 番号 </TH></TR>
+<TR><td colspan=3><PRE><a href="p08_18_j.htm">CDブロックファイルシステム</A></TD>              <TD ALIGN=CENTER><PRE>8.0</TD></TR>                                                                                            
+<TR><TD WIDTH=10><PRE></TD><TD><PRE>ディレクトリの移動</TD>                  <TD><PRE><a href="p08_18_j.htm#no8_1">CDC_ChgDir</TD>          <TD ALIGN=CENTER><PRE>8.1</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>ファイル情報の保持</TD>                  <TD><PRE><a href="p08_18_j.htm#no8_2">CDC_ReadDir</TD>         <TD ALIGN=CENTER><PRE>8.2</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>保持ファイル情報範囲の取得</TD>          <TD><PRE><a href="p08_18_j.htm#no8_3">CDC_GetFileScope</TD>    <TD ALIGN=CENTER><PRE>8.3</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>保持ファイル情報の取得</TD>              <TD><PRE><a href="p08_18_j.htm#no8_4">CDC_TgetFileInfo</TD>    <TD ALIGN=CENTER><PRE>8.4</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>ファイルの読み込み</TD>                  <TD><PRE><a href="p08_18_j.htm#no8_5">CDC_ReadFile</TD>        <TD ALIGN=CENTER><PRE>8.5</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>ファイルアクセスの中止</TD>              <TD><PRE><a href="p08_18_j.htm#no8_6">CDC_AbortFile</TD>       <TD ALIGN=CENTER><PRE>8.6</TD></TR></TABLE>
+
+<A NAME="t8_1_9"></A>
+<TABLE BORDER>
+<TR><TH WIDTH=250 colspan=2><PRE>機能</TH><TH WIDTH=150><PRE>関数名</TH><TH><PRE> 番号 </TH></TR>
+<TR><td colspan=3><PRE><a href="p08_19_j.htm">レジスタアクセス</A></TD><TD ALIGN=CENTER><PRE>9.0</TD></TR>                                                                                            
+<TR><TD WIDTH=10><PRE></TD><TD><PRE>データ転送レジスタポインタの取得</TD>    <TD><PRE><a href="p08_19_j.htm#no9_1">CDC_GetDataPtr</TD>      <TD ALIGN=CENTER><PRE>9.1</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>割り込み要因レジスタ値の取得</TD>        <TD><PRE><a href="p08_19_j.htm#no9_2">CDC_GetHirqReq</TD>      <TD ALIGN=CENTER><PRE>9.2</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>割り込み要因レジスタのクリア</TD>        <TD><PRE><a href="p08_19_j.htm#no9_3">CDC_ClrHirqReq</TD>      <TD ALIGN=CENTER><PRE>9.3</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>割り込みマスクレジスタ値の取得</TD>      <TD><PRE><a href="p08_19_j.htm#no9_4">CDC_GetHirqMsk</TD>      <TD ALIGN=CENTER><PRE>9.4</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>割り込みマスクレジスタの設定</TD>        <TD><PRE><a href="p08_19_j.htm#no9_5">CDC_SetHirqMsk</TD>      <TD ALIGN=CENTER><PRE>9.5</TD></TR>
+<TR><TD><PRE></TD><TD><PRE>MPEGレジスタポインタの取得</TD>          <TD><PRE><a href="p08_19_j.htm#no9_6">CDC_GetMpegPtr</TD>      <TD ALIGN=CENTER><PRE>9.6</TD></TR>
+</TABLE><P>                                                                                                                                                    
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p07_12_j.htm">戻る</A>｜
+<a href="p08_11_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

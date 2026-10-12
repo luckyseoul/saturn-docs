@@ -1,0 +1,89 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;26/29&gt;SCSP User's Manual/4.2.12 Interrupt Control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p04_2b.htm">Back</a> ｜ <A HREF="p04_2d.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/4.2 Sound source register</b><HR NOSHADE>
+<DL>
+<A NAME="no4_2c"></A><P><DT><H3> ■Interrupt control register</H3><DD> SCSP has a built-in interrupt controller that includes a function to control interrupt signals to the main CPU and a function to control interrupt signals to the sound CPU.</P>
+<A NAME="z4_55"></A><P ALIGN=CENTER> <B>Figure 4.55 Sound interrupt signal connection diagram</b><BR>
+<img srcset="../grp/i095_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The interrupt signal system of the sound block is connected to each CPU around the SCSP interrupt controller. Interrupt signals to the sound CPU are sent using autovector interrupts of levels 1 to 7. For interrupts to the main CPU, level settings and vector settings cannot be made from the sound CPU side.<BR>
+ Interrupts to the main CPU not only function as interrupts, but can also be used as triggers to start DMA transfers in the SCU. This function allows the sound CPU to control the timing of DMA transfer of huge amounts of data such as waveform data. When using this function, be sure to configure the main side (SCU, etc.) in advance so that DMA transfer is started by a sound interrupt. (For details, refer to <A HREF="../../scu_/index.htm">the SCU user's manual</a> .) please).</P>
+<P><DD> The registers are explained below.<BR>
+ There are two parts to interrupts: one that manages interrupts to the main (a register named MC~) and the other that manages interrupts to the sound CPU (a register named SC~).</P>
+<A NAME="SCIPD_"></A><P><DT> <B>SCIPD[10:0] ; Sound-Cpu Interrupt PenDing</b><DD> This is a register (interrupt flag) that monitors interrupts to the sound CPU. When an interrupt request occurs, the corresponding interrupt request flag is set to "1B", so by reading the "SCIPD" register on the CPU, you can find out which interrupt is occurring. In addition, interrupt requests are sequentially monitored regardless of the setting of the interrupt enable register ("SCIEB"). The corresponding flag can be reset by the interrupt reset register ("SCIRE"). Only bit 5 can be read and written; all others are read-only. Writing "1B" to bit 5 causes an interrupt to the sound CPU. However, writing "0B" is invalid.</P>
+<A NAME="SCIEB_"></A><P><DT> <B>SCIEB[10:0](R/W) ; Sound-Cpu Interrupt EnaBle</b><DD> This is the interrupt enable register for the sound CPU. Writing "1B" enables hardware interrupts for the corresponding bit. Whether or not an interrupt has occurred can also be determined by reading "SCIPD" regardless of the "SCIEB" setting. Setting "0B" disables interrupts.</P>
+<A NAME="SCIRE_"></A><P><DT> <B>SCIRE[10:0](W) ; Sound-Cpu Interrupt REset</b><DD> This is the interrupt request reset flag for the sound CPU. Writing "1B" resets the hardware interrupt request of the corresponding bit (by writing "1B" to "SCIRE" corresponding to the bit where an interrupt is generated, " SCIPD" will also change from "1B" to "0B").</P>
+<A NAME="MCIPD_"></A><P><DT> <B>MCIPD[10:0](R) ; Main Cpu Interrupty PenDing</b><DD> This is a register (interrupt flag) that monitors interrupts to the main CPU. When an interrupt request occurs, the corresponding interrupt request flag changes to "1B", so you can know which interrupt is occurring by reading the "MCIPD" register on the CPU. Additionally, interrupt requests are sequentially monitored regardless of the setting of the interrupt enable register ("MCIEB"). The corresponding flag can be reset by the interrupt reset register ("MCIRE"). Only bit 5 can be read and written; all others are read-only. Writing "1B" to bit 5 causes an interrupt to the main CPU. However, writing "0B" is invalid.</P>
+<A NAME="MCIEB_"></A><P><DT> <B>MCIEB[10:0](R) ; Main Cpu Interrupty EnaBle</b><DD> This is the interrupt enable register for the main CPU. Writing "1B" enables hardware interrupts for the corresponding bit. Whether or not an interrupt has occurred can be determined by reading "MCIPD" regardless of the "MCIEB" setting. Setting "0B" disables interrupts.</P>
+<A NAME="MCIRE_"></A><P><DT> <B>MCIRE[10:0](R) ; Main CPU Interrupt REset</b><DD> This is the interrupt request reset flag for the main CPU. Setting "1" resets the hardware interrupt request of the corresponding bit. (also changes from "1B" to "0B").</P>
+<A NAME="z4_56"></A><P ALIGN=CENTER> <B>Figure 4.56 Interrupt register bit correspondence</b><BR>
+<img srcset="../grp/i097_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="t4_31"></A><P><DD> <B>Table 4.31 Interrupt register bit factors</b><DD><TABLE BORDER=1>
+<TR><TD ALIGN=CENTER> bit</TD><TD ALIGN=CENTER> Interrupt factor</TD></TR>
+<TR><TD ALIGN=CENTER> 0</TD><TD> Supports interrupt input of external interrupt input "INT0N"</TD></TR>
+<TR><TD ALIGN=CENTER> 1</TD><TD> Supports interrupt input of external interrupt input "INT1N"</TD></TR>
+<TR><TD ALIGN=CENTER> 2</TD><TD> Supports interrupt input of external interrupt input "INT2N"</TD></TR>
+<TR><TD ALIGN=CENTER> 3</TD><TD> Supports MIDI input interrupts An interrupt is generated when data is imported from the empty FIFO buffer memory on the MIDI-IN side. When all data is read from the FIFO buffer and the buffer becomes free, it is automatically released.</TD></TR>
+<TR><TD ALIGN=CENTER> 4</TD><TD> Supports DMA transfer end interrupt Generates an interrupt when DMA transfer using the built-in SCSP DMA ends (when all data transfer of the block (length (amount)) set in "DLG" is completed).</TD></TR>
+<TR><TD ALIGN=CENTER> 5</TD><TD> Supports CPU manual interrupts You can interrupt the sound CPU or main by writing to the CPU (main and sound). Writing "1B" causes an interrupt ("0B" is invalid).</TD></TR>
+<TR><TD ALIGN=CENTER> 6</TD><TD> Supports timer A interrupt</TD></TR>
+<TR><TD ALIGN=CENTER> 7</TD><TD> Supports timer B interrupt</TD></TR>
+<TR><TD ALIGN=CENTER> 8</TD><TD> Supports timer C interrupt</TD></TR>
+<TR><TD ALIGN=CENTER> 9</TD><TD> Supports MIDI output interrupts Generates an interrupt request when the FIFO buffer memory on the MIDI-OUT side is empty. When data is written to the MIDI-OUT buffer memory (register) and it is no longer empty, the interrupt will be automatically canceled.</TD></TR>
+<TR><TD ALIGN=CENTER> 10</TD><TD> Supports interrupts for each sample (1 sample = 22.68μsec = 1/44.1K time interval).</TD></TR>
+<TR><TD ALIGN=CENTER> 11～15</TD><TD> invalid</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>*About SCILV0, 1, and 2</b><DD> This register sets the autovector interrupt level for the sound CPU. Each register is divided into bits for each interrupt source, so when making settings, you need to look at Figure 4.58 vertically.<BR>
+ Also, the bit 7 column sets the levels of timers B, C, MIDI output interrupts, and interrupts for each sample all at once.<BR>
+ Level settings are performed using a 3-bit code, and each bit is assigned to the SCILV0, 1, and 2 registers.</P>
+<A NAME="z4_57"></A><P ALIGN=CENTER> <B>Figure 4.57 Correspondence between 3-bit code and register</b><BR>
+<img srcset="../grp/i098_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The 3-bit code that sets the level is shown in Figure 4.57. For example, if you set it to 101B, the interrupt level will be 5. "000B" is a level 0 interrupt, so no interrupt is generated.<BR>
+ However, the format of the actual register is as shown in Figure 4.58, so be careful when making settings.</P>
+<A NAME="z4_58"></A><P ALIGN=CENTER> <B>Figure 4.58 Interrupt level setting register format</b><BR>
+<img srcset="../grp/i099_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="SCILV0_"></A><P><DT> <B>SCILV0[7:0](W) ; Sound-Cpu Interrupt LeVel bit0</b><DD> Specifies bit 0 of the interrupt level code for the sound CPU defined by bit correspondence.</P>
+<A NAME="SCILV1_"></A><P><DT> <B>SCILV1[7:0](W) ; Sound-Cpu Interrupt LeVel bit1</b><DD> Specifies bit 1 of the interrupt level code for the sound CPU defined by bit correspondence.</P>
+<A NAME="SCILV2_"></A><P><DT> <B>SCILV2[7:0](W) ; Sound-Cpu Interrupt LeVel bit2</b><DD> Specify bit 2 of the interrupt level code for the sound CPU defined by bit correspondence.</P>
+<P><DD> An example of interrupt settings is shown below.</P>
+<P><DT> <B>Interrupt setting example</b><DD> <B>Condition:</b> When interrupting the main CPU with an interrupt from timer A, and issuing a level 6 interrupt to the sound CPU</P>
+<P><DD> <B>Procedure:</b> Assuming that no interrupts are currently occurring, complete all interrupt settings and then set the timer.</P>
+<P><DD> <FONT SIZE=5>1</font> : Set the sound CPU interrupt level to 6.<DD> Level 6 is "110B" in 3-bit code. Also, the bit that manages timer A interrupts is bit 6, so</P>
+<P><DD> <B>"0B" in bit 6 of "SCILV0"</b><DD> ("00H" in byte at address 100425H, or "0000H" in word at address 100424H)</P>
+<P><DD> <B>"1B" in bit 6 of "SCILV0"</b><DD> ("40H" in byte at address 100427H or "0040H" in word at address 100426H)</P>
+<P><DD> <B>"1B" in bit 6 of "SCILV0"</b><DD> ("40H" in byte at address 100429H or "0040H" in word at address 100428H)</P>
+<P><DD> Set. This completes the interrupt level setting.</P>
+<P><DD> <FONT SIZE=5>2</font> : Set parameters in the "MCIEB" and "SCIEB" registers so that interrupts are applied to the main and sound CPUs.<BR>
+ So that timer A interrupts the main CPU,<P><DD> Write <B>"1B" to bit 6 of the "MCIEB" register</b> .<DD> ("40H" in byte at address 10042BH or "0040H" in word at address 10042AH)</P>
+<P><DD> Also, the sound CPU will also receive an interrupt,<DD> Write <B>"1B" to bit 6 of "SCIEB"</b> .<DD> ("40H" in byte at address 100421FH or "0040H" in word at address 10041EH)</P>
+<P><DD> Furthermore, by setting parameters to the timer, it will start counting immediately after that, and an interrupt will be generated if an overflow occurs.</P>
+<P><DD> <FONT SIZE=5>3</font> : To release interrupts, use the main and sound CPU reset registers.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_2b.htm">Back</a> ｜ <A HREF="p04_2d.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

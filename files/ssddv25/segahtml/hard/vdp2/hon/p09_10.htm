@@ -1,0 +1,112 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;57/86&gt;VDP2 User's Manual/9.1 Sprite Data</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no9">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p08_20.htm">Back</a> ｜ <A HREF="p09_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual</b><H2 ALIGN=CENTER> Chapter 9 Sprite data</H2><HR NOSHADE>
+<DL>
+<P><DT><H2> ■9.1 Sprite data</H2><DD> The sprite frame buffer data received from VDP1 is either 8 bits per dot or 16 bits per dot. When 16 bits per dot is used, there are two types: one written in palette format and the other written in RGB format. Set these settings on VDP2 side in the same way as you did on VDP1 side.</P>
+<A NAME="no9_11"></A><P><DT><H3> ●Sprite type</H3><DD> When VDP2 receives palette-format sprite data written to the frame buffer by VDP1, there are 16 bit configurations in total: 8 types when 16 bits per dot and 8 types when 8 bits per dot. It is called. The data per dot consists of dot color data consisting of the dot color code and palette number, priority bits, color calculation ratio bits, and shadow bits, and the number of each bit changes depending on the sprite type. For each bit, the value of the missing high-order bit is assumed to be 0.</P>
+<P><DD> In addition, if the sprite data is in RGB format, it consists of 5 bits each of RGB data and a bit for color format determination, and the priority bit, color calculation ratio bit, and shadow bit are assumed to be 0.<BR>
+ If the sprite data is 16 bits per dot, specify types 0 to 7, and if the sprite data is 8 bits per dot, specify types 8 to F. Also, when types C to F are specified, some bits are shared by the priority bits, color calculation ratio bits, and dot color data bits. Table 9.1 shows the shared bits.</P>
+<A NAME="t9_1"></A><P><DD> <B>Table 9.1 Shared bits</b><DD><TABLE BORDER CELLPADDING=5>
+<TR><TH ROWSPAN=2> sprite type</TH><TH COLSPAN=4> shared bit</TH></TR>
+<TR><TH> SP1</TH><TH> SP0</TH><TH> SC1</TH><TH> SC0</TH></TR>
+<TR><TH> Type C</TH><TD> −</TD><TD> PR0 and DC7</TD><TD> −</TD><TD> −</TD></TR>
+<TR><TH> Type D</TH><TD> −</TD><TD> PR0 and DC7</TD><TD> −</TD><TD> CC0 and DC6</TD></TR>
+<TR><TH> Type E</TH><TD> PR1 and DC7</TD><TD> PR0 and DC6</TD><TD> −</TD><TD> −</TD></TR>
+<TR><TH> Type F</TH><TD> −</TD><TD> −</TD><TD> CC1 and DC7</TD><TD> CC0 and DC6</TD></TR>
+</TABLE>
+<DD> <B>SP:</b> Priority bit, color RAM address shared bit<DD> <B>SC:</b> Color calculation ratio bit, color RAM address common bit<DD> <B>PR:</b> Priority bit<DD> <B>DC:</b> Dot color data<DD> <B>CC:</b> Color calculation ratio bit</P>
+<P><DD> Figure 9.1 shows the sprite types.</P>
+<A NAME="z9_1"></A><P><DD> <B>Figure 9.1 Sprite type</b><P><DD> ◆Type 0<TABLE BORDER=1"><TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR><TR ALIGN=CENTER><TD COLSPAN=2> PR1~0</TD><TD COLSPAN=3> CC2～0</TD><TD COLSPAN=11> DC10~0</TD></TR></TABLE></P><P><DD> ◆Type 1<TABLE BORDER=1">
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=3> PR2~0</TD><TD COLSPAN=2> CC1~0</TD><TD COLSPAN=11> DC10~0</TD></TR>
+</TABLE>
+</P>
+<P><DD> ◆Type 2<TABLE BORDER=1"><TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR><TR ALIGN=CENTER><TD> SD</TD><TD> PR0</TD><TD COLSPAN=3> CC2～0</TD><TD COLSPAN=11> DC10~0</TD></TR></TABLE></P><P><DD> ◆Type 3<TABLE BORDER=1">
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> SD</TD><TD COLSPAN=2> PR1~0</TD><TD COLSPAN=2> CC1~0</TD><TD COLSPAN=11> DC10~0</TD></TR>
+</TABLE>
+</P>
+<P><DD> ◆Type 4<TABLE BORDER=1"><TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR><TR ALIGN=CENTER><TD> SD</TD><TD COLSPAN=2> PR1~0</TD><TD COLSPAN=3> CC2～0</TD><TD COLSPAN=10> DC9~0</TD></TR></TABLE></P><P><DD> ◆Type 5<TABLE BORDER=1">
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> SD</TD><TD COLSPAN=3> PR2~0</TD><TD> CC0</TD><TD COLSPAN=11> DC10~0</TD></TR>
+</TABLE>
+</P>
+<P><DD> ◆Type 6<TABLE BORDER=1"><TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR><TR ALIGN=CENTER><TD> SD</TD><TD COLSPAN=3> PR2~0</TD><TD COLSPAN=2> CC1~0</TD><TD COLSPAN=10> DC9~0</TD></TR></TABLE></P><P><DD> ◆Type 7<TABLE BORDER=1">
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> SD</TD><TD COLSPAN=3> PR2~0</TD><TD COLSPAN=3> CC2～0</TD><TD COLSPAN=9> DC8~0</TD></TR>
+</TABLE>
+</P>
+<P><DD> ◆Type 8<TABLE BORDER=1"><TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR><TR ALIGN=CENTER><TD COLSPAN=8></TD><TD> PR0</TD><TD COLSPAN=7> DC6~0</TD></TR></TABLE></P><P><DD> ◆Type 9<TABLE BORDER=1">
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD> PR0</TD><TD> CC0</TD><TD COLSPAN=6> DC5~0</TD></TR>
+</TABLE>
+</P>
+<P><DD> ◆Type A<TABLE BORDER=1"><TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR><TR ALIGN=CENTER><TD COLSPAN=8></TD><TD COLSPAN=2> PR0~1</TD><TD COLSPAN=7> DC5~0</TD></TR></TABLE></P><P><DD> ◆Type B<TABLE BORDER=1">
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD COLSPAN=2> CC0~1</TD><TD COLSPAN=7> DC5~0</TD></TR>
+</TABLE>
+</P>
+<P><DD> ◆Type C<TABLE BORDER=1"><TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR><TR ALIGN=CENTER><TD COLSPAN=8></TD><TD> SP0</TD><TD COLSPAN=7> DC6~0</TD></TR></TABLE></P><P><DD> ◆Type D<TABLE BORDER=1">
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD> SP0</TD><TD> SC0</TD><TD COLSPAN=6> DC5~0</TD></TR>
+</TABLE>
+</P>
+<P><DD> ◆Type E<TABLE BORDER=1"><TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR><TR ALIGN=CENTER><TD COLSPAN=8></TD><TD COLSPAN=2> SP0~1</TD><TD COLSPAN=7> DC5~0</TD></TR></TABLE></P><P><DD> ◆Type F<TABLE BORDER=1">
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8></TD><TD COLSPAN=2> SC0~1</TD><TD COLSPAN=7> DC5~0 </TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE>
+<TR><TD><TABLE BORDER CELLSPACING=5>
+<TR><TD></TD></TR>
+</TABLE>
+</TD><TD> part is ignored.</TD></TR>
+</TABLE>
+<DD> <B>SD:</b> Shadow bit (or sprite window bit)<DD> <B>PR:</b> Priority bit<DD> <B>CC:</b> Color calculation ratio bit<DD> <B>DC:</b> Dot color data</P>
+<A NAME="no9_12"></A><P><DT><H3> ●Sprite color mode</H3><DD> Like the scroll screen, sprite character data comes in palette format and RGB format. If the number of bits per dot is 16 bits and the data in the frame buffer is only in palette format, all 16 bits can be used with the bit configuration specified by the sprite type. However, when palette format and RGB format data are mixed, the most significant bit is used to determine the color format, so set it to 0 for palette format data and 1 for RGB format data. At that time, the palette format data is processed as if the value of the most significant bit (priority bit or shadow bit) of the specified sprite type is 0.</P>
+<P><DD> Figure 9.2 shows sprite data when palette format and RGB format data are mixed.</P>
+<A NAME="z9_2"></A><DD> <B>Figure 9.2 Sprite data when palette format and RGB format data are mixed</b><P><DD> ◆Pallet format<TABLE BORDER=1"><TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR><TR ALIGN=CENTER><TD> 0</TD><TD COLSPAN=15> Dot color data and other 15 bits</TD></TD></TR></TABLE></P><P><DD> ◆RGB format<TABLE BORDER=1">
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD COLSPAN=5> BLUE data</TD><TD COLSPAN=5> GREEN data</TD><TD COLSPAN=5> RED data</TD></TR>
+</TABLE>
+</P>
+<A NAME="no9_13"></A><P><DT><H3> ●Normal shadow sprite</H3><DD> When using a palette format sprite, the sprite may not be displayed depending on the sprite character's pixel data and color bank value (dot color data in the VDP2 hardware manual).<BR>
+ This is because the dot data is judged as VDP2 shadow function dot data (normal shadow data). Table 9.2 shows the sprite data that is determined as normal shadow data depending on the VDP2 sprite type settings.<BR>
+ Please refer to " <A HREF="p14_10.htm">14.1 Shadow Processing</a> " and " <A HREF="../../vdp1/hon/p06_40.htm">6.4 CMDCOLR (Color Control Word)</a> " in the VDP1 Hardware Manual.<A NAME="t9_2"></A><P><DD> <B>Table 9.2 Sprite data as normal shadow data</b><TABLE BORDER=1>
+<TR><TH> sprite type</TH><TH> number of colors</TH><TH> pallet code</TH><TH> color bank</TH></TR>
+<TR ALIGN=CENTER><TD> Type 0~3,5</TD><TD><PRE> 16<BR> 64<BR> 128<BR> 256</TD><TD><PRE> 1110<BR> xx11 1110<BR> x111 1110<BR> 1111 1110</TD><TD><PRE> xxxx x111 1111 0000<BR> xxxx x111 11xx 0000<BR> xxxx x111 1xxx 0000<BR> xxxx x111 xxxx 0000</TD></TR>
+<TR ALIGN=CENTER><TD> Type 4, 6</TD><TD><PRE> 16<BR> 64<BR> 128<BR> 256</TD><TD><PRE> 1110<BR> xx11 1110<BR> x111 1110<BR> 1111 1110</TD><TD><PRE> xxxx xx11 1111 0000<BR> xxxx xx11 11xx 0000<BR> xxxx xx11 1xxx 0000<BR> xxxx xx11 xxxx 0000</TD></TR>
+<TR ALIGN=CENTER><TD> type 7</TD><TD><PRE> 16<BR> 64<BR> 128<BR> 256</TD><TD><PRE> 1110<BR> xx11 1110<BR> x111 1110<BR> 1111 1110</TD><TD><PRE> xxxx xxx1 1111 0000<BR> xxxx xxx1 11xx 0000<BR> xxxx xxx1 1xxx 0000<BR> xxxx xxx1 xxxx 0000</TD></TR>
+<TR ALIGN=CENTER><TD> Type C~F</TD><TD><PRE> 16<BR> 64<BR> 128<BR> 256</TD><TD><PRE> 1110<BR> xx11 1110<BR> x111 1110<BR> 1111 1110</TD><TD><PRE> xxxx xxxx 1111 0000<BR> xxxx xxxx 11xx 0000<BR> xxxx xxxx 1xxx 0000<BR> Not relevant</TD></TR>
+<TR ALIGN=CENTER><TD> type 8</TD><TD><PRE> 16<BR> 64<BR> 128<BR> 256</TD><TD><PRE> 1110<BR> xx11 1110<BR> x111 1110<BR> 1111 1110</TD><TD><PRE> xxxx xxxx x111 0000<BR> xxxx xxxx x1xx 0000<BR> Not relevant<BR> Not relevant</TD></TR>
+<TR ALIGN=CENTER><TD> Type 9~B</TD><TD><PRE> 16<BR> 64<BR> 128<BR> 256</TD><TD><PRE> 1110<BR> xx11 1110<BR> x111 1110<BR> 1111 1110</TD><TD><PRE> xxxx xxxx xx11 0000<BR> Not relevant<BR> Not relevant<BR> Not relevant</TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_20.htm">Back</a> ｜ <A HREF="p09_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no9">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

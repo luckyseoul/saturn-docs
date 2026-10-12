@@ -1,0 +1,118 @@
+﻿<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;22/54&gt;VDP1ユーザーズマニュアル/5.2　カラールックアップテーブル</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p05_10_j.htm">戻る</A>｜
+     <a href="p05_30_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第５章　テーブル</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no5_20"></A>
+	<P><DT><H2>■5.2　カラールックアップテーブル</H2>
+	<DD>　カラールックアップテーブルは、キャラクタパターンのピクセルのカラーをルックアップテーブルモードで指定するために使います。カラールックアップテーブルは16色のカラーコードをそれぞれ16ビットデータでVRAMに定義します。<BR>
+	　ルックアップテーブルモードでは、キャラクタパターンを4bit/pixelでキャラクタパターンテーブルに定義し、定義された4ビットデータでカラールックアップテーブルの16色の内の1色を選びます。
+	選ばれた色のカラーコード16bitがそのままピクセルのカラーコードとしてフレームバッファに書き込まれます。<BR>
+	　カラールックアップテーブルの大きさは20H(32)Byteです。テーブルはVRAMの20HByte単位のバウンダリアドレスから書き込んでください。ただし00000Hには定義できません。<BR>
+	　VRAMは7FFFFH番地までです。80000H番地を越えてカラールックアップテーブルを定義しないでください。<BR>
+	　カラールックアップテーブルに書き込むデータは、カラーバンクコード、RGBコードいずれも有効です。RGBコードはMSB=1とします。カラーバンクコードは、RGBコードが混在するときはMSB=0とし、RGBコードが混在しないときはMSBは任意(0または1)です。<BR>
+	　MSBは<a href="../../vdp2/hon/p09_10_j.htm#no9_12">VDP2のデータ処理</A>に合わせて設定してください。</P>
+
+<A NAME="z5_2"></A>
+	<P><DD><B>図5.2　カラールックアップテーブル</B>
+<PRE>
+
+　　　　　┌──────────┐　　　　　　　　　　　
+＋００Ｈ　│　１６ビットデータ　│（０Ｈのカラーコード）
+　　　　　├──────────┤　　　　　　　　　　　
+＋０２Ｈ　│　１６ビットデータ　│（１Ｈのカラーコード）
+　　　　　├──────────┤　　　　　　　　　　　
+＋０４Ｈ　│　１６ビットデータ　│（２Ｈのカラーコード）
+　　　　　├──────────┤　　　　　　　　　　　
+　　：　　│　　　　　：　　　　│　　　　　：　　　　　
+　　：　　│　　　　　：　　　　│　　　　　：　　　　　
+　　：　　│　　　　　：　　　　│　　　　　：　　　　　
+　　　　　├──────────┤　　　　　　　　　　　
+＋１ＣＨ　│　１６ビットデータ　│（ＥＨのカラーコード）
+　　　　　├──────────┤　　　　　　　　　　　
+＋１ＥＨ　│　１６ビットデータ　│（ＦＨのカラーコード）
+　　　　　└──────────┘　　　　　　　　　　　
+</PRE>
+
+
+<A NAME="no5_21"></A>
+	<P>	<DT><B>　●ルックアップテーブルモード</B>
+		<DD>　スプライト描画コマンドでカラーモードをルックアップテーブルモードに指定します。
+		この指定により4bit/pixelでVRAMに格納されたキャラクタパターンは、指定されたカラールックアップテーブルを参照して、カラーコードに変換されフレームバッファに書き込まれます。<BR>
+		　スプライト描画コマンドではキャラクタパターンの格納アドレスとサイズ、カラールックアップテーブルの格納アドレスを指定します。</P>
+
+<A NAME="no5_22"></A>
+	<P>	<DT><B>　●キャラクタパターン</B>
+		<DD>　ルックアップテーブルモードのときのキャラクタパターンは4bit/pixelでVRAMに格納します。</P>
+
+<A NAME="no5_23"></A>
+	<P>	<DT><B>　●コマンドテーブル</B>
+		<DD>　スプライトで参照するカラールックアップテーブルのアドレスを、コマンドテーブルのカラールックアップテーブルのアドレス(先頭アドレス+06H)に指定します。指定する値はアドレス/8Hとします。
+		カラールックアップテーブルは20HByte単位のバウンダリに格納されていますので下位2bitは00Hになります。<BR>
+		　コマンドテーブル、カラールックアップテーブル、キャラクタパターンテーブルの関係は次のとおりです。</P>
+
+<A NAME="z5_3"></A>
+	<CENTER><B>図5.3　ルックアップテーブル方式のテーブルの関係</B>
+<PRE>
+　　　　　　　　　コマンドテーブル　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　　┏━━━━━━━━━━━━━━┓　　　　　　　　　　　　　　　　　　　　　
+　　　　　┃　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　　　　　　
+　　　　　┠──────────────┨　　　　　　　　　　　　　　　　　　　　　
+┌────┨ルックアップテーブルアドレス┃　　　　　　　　　　　　　　　　　　　　　
+│　　　　┠──────────────┨　　　　　　　　　　　　　　　　　　　　　
+│┌───┨キャラクタアドレス　　　　　┃　　　　　　　　　　　　　　　　　　　　　
+││　　　┠──────────────┨　　　　　　　　　　　　　　　　　　　　　
+││　　　┃キャラクタサイズ　　　　　　┃　　　　　　　　　　　　　　　　　　　　　
+││　　　┠──────────────┨　　　　　　　　　　　　　　　　　　　　　
+││　　　┃　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　　　　　　
+││　　　┃　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　　　　　　
+││　　　┃　　　　　　　　　　　　　　┃　　　　　　　　　　　　　　　　　　　　　
+││　　　┗━━━━━━━━━━━━━━┛　　　　　┏━━━━━━━━━━━━━━┓
+││　　　　　　　　　　　　　　　　　　　　　　　　┃　　　フレームバッファ　　　┃
+│└──→┏━━━━━━━━━━━━━━┓　　　　　┃　　　　　　　　　　　　　　┃
+│アドレス┃キャラクタパターンテーブル　┃４ビット　┃　　　　　　　　　　　　　　┃
+│　　　　┃　　　　　　　：　　　　　　┃データ　　┃　　　　　　　　　　　　　　┃
+│　　　　┃　　　　　　　：　　　　　　┠─┐　　　┃　　　　　　　　　　　　　　┃
+│　　　　┗━━━━━━━━━━━━━━┛　│　　　┃　　　　　　　　　　　　　　┃
+└───→┏━━━━━━━━━━━━━━┓　│　　　┃　　　　　　　　　　　　　　┃
+　アドレス┃カラールックアップテーブル　┃←┘　　　┃　　　　　　　　　　　　　　┃
+　　　　　┃　　　　　　　：　　　　　　┃　　　　　┃　　　　　　　　　　　　　　┃
+　　　　　┃　　　　　　　：　　　　　　┃────→┃　　　　　　　　　　　　　　┃
+　　　　　┗━━━━━━━━━━━━━━┛　　　　　┗━━━━━━━━━━━━━━┛
+　　　　　　　　　　　　　　　　　　　　１６ビットデータ　　　　　　　　　　　　　　
+</PRE></CENTER>
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p05_10_j.htm">戻る</A>｜
+     <a href="p05_30_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

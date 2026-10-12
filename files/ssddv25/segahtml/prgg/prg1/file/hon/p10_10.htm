@@ -1,0 +1,125 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/17&gt;Programmer's Guide/File System Library/Appendix B</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+ <B>▲ <A HREF="p09_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>file system library</b><CENTER>
+<H4> Appendix B</H4><H2> How to deal with errors</H2></CENTER>
+<HR NOSHADE>
+<DL>
+<DT> We will explain the causes and solutions for the error codes below.<HR>
+<DL>
+<A NAME="GFS_ERR_CDRD"></A><DT><H4> GFS_ERR_CDRD</H4><DT> <B>Cause:</b><DD> A read error occurred in the CD block.<DT> <B>handle:</b><DD> If a read error occurs in <A HREF="p08_14.htm#no4_6">GFS_NwExecOne</a> or <A HREF="p08_14.htm#no4_7">GFS_NwExecServer</a> , GFS_ERR_CDRD is returned as the function value, but if you call the server function as is, recovery processing will be performed. Completion return type access only returns <A HREF="p07_11.htm#no2_7">GFS_ERR_CDRD</a> and does not perform recovery processing. In this case, try loading the file again.<BR>
+ If read errors occur frequently, check the CD-ROM hardware and media.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_CDNODISC"></A><DT><H4> GFS_ERR_CDNODISC</H4><DT> <B>Cause:</b><DD> CD-ROM is not set.<DT> <B>handle:</b><DD> Insert the CD-ROM and try again.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_CDROM"></A><DT><H4> GFS_ERR_CDROM</H4><DT> <B>Cause:</b><DD> A non-CD-ROM disc is inserted.<DT> <B>handle:</b><DD> Please insert the correct CD-ROM and try again.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_DIRTBL"></A><DT><H4> GFS_ERR_DIRTBL</H4><DT> <B>Cause:</b><DD> The contents of the directory management structure are invalid.<DT> <B>handle:</b><DD> Before calling <A HREF="p08_11.htm#no1_1">GFS_Init</a> and <A HREF="p08_11.htm#no1_2">GFS_LoadDir</a> , check whether any values have been forgotten or invalid values have been set for each member of the directory management structure.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_OPENMAX"></A><DT><H4> GFS_ERR_OPENMAX</H4><DT> <B>Cause:</b><DD> The maximum open count value is invalid.<DT> <B>handle:</b><DD> Check whether the maximum open number specified in <A HREF="p08_11.htm#no1_1">the GFS_Init</a> call does not exceed the range of 1 to 24.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_DIR"></A><DT><H4> GFS_ERR_DIR</H4><DT> <B>Cause:</b><DD> The specified file is not a directory.<DT> <B>handle:</b><DD> Check the correspondence between the file identifier and the file.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_CDBFS"></A><DT><H4> GFS_ERR_CDBFS</H4><DT> <B>Cause:</b><DD> An attempt was made to use the CD block file system even though the use has not been declared.<DT> <B>handle:</b><DD> If you use the CD block file system, call <A HREF="p08_11.htm#no1_1">GFS_Init</a> with NULL specified as the address of the directory management area.<BR>
+ If you do not use a CD block file system, do not specify NULL for <A HREF="p08_11.htm#no1_2">GFS_LoadDir</a> and <A HREF="p08_11.htm#no1_3">GFS_SetDir</a> .</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_NONAME"></A><DT><H4> GFS_ERR_NONAME</H4><DT> <B>Cause:</b><DD> Filenames cannot be handled in the current directory.<DT> <B>handle:</b><DD> Specify the directory management area with <A HREF="p07_11.htm#no3_2">GFS_DIR_NAME</a> set in <A HREF="p07_11.htm#no3_2">GFS_DIRTBL_TYPE</a> and call <A HREF="p08_11.htm#no1_1">GFS_Init</a> or <A HREF="p08_11.htm#no1_2">GFS_LoadDir</a> .</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_NEXIST"></A><DT><H4> GFS_ERR_NEXIST</H4><DT> <B>Cause:</b><DD> The specified file name does not exist.<DT> <B>handle:</b><DD> Please check whether the current directory setting or file name specification is correct.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_FID"></A><DT><H4> GFS_ERR_FID</H4><DT> <B>Cause:</b><DD> The file identifier specification is invalid.<DT> <B>handle:</b><DD> Check whether the specified file identifier does not exceed the range of <A HREF="p07_11.htm#no3_2">GFS_DIR_NDIR</a> of the directory management structure set for the current directory.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_HNDL"></A><DT><H4> GFS_ERR_HNDL</H4><DT> <B>Cause:</b><DD> Invalid file handle.<DT> <B>handle:</b><DD> Make sure that you have not forgotten to set <A HREF="p08_12.htm#no2_1">the GFS_Open</a> function value to the variable that stores the file handle, and that you have not destroyed the contents of that variable.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_SEEK"></A><DT><H4> GFS_ERR_SEEK</H4><DT> <B>Cause:</b><DD> Seek position is invalid.<DT> <B>handle:</b><DD> Check the seek position calculated from the reference position and offset.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_ORG"></A><DT><H4> GFS_ERR_ORG</H4><DT> <B>Cause:</b><DD> The reference position of <A HREF="p08_12.htm#no2_3">GFS_Seek</a> is invalid.<DT> <B>handle:</b><DD> Please confirm that the reference position is one of <A HREF="p07_11.htm#no2_4">GFS_SEEK_SET, GFS_SEEK_CUR, or GFS_SEEK_END</a> .</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_NUM"></A><DT><H4> GFS_ERR_NUM</H4><DT> <B>Cause:</b><DD> The number of bytes was specified as negative.<DT> <B>handle:</b><DD> Check the number of bytes specified in <A HREF="p08_12.htm#no2_6">GFS_ByteToSct</a> .</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_OFS"></A><DT><H4> GFS_ERR_OFS</H4><DT> <B>Cause:</b><DD> Offset is invalid.<DT> <B>handle:</b><DD> Check the read start sector position specified by <A HREF="p08_13.htm#no3_1">GFS_Load</a> .</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_FBUSY"></A><DT><H4> GFS_ERR_FBUSY</H4><DT> <B>Cause:</b><DD> Processing remains for the specified file handle.<DT> <B>handle:</b><DD> Either modify the program to access the target file again after it has finished accessing it, or reconsider the file structure.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_PARA"></A><DT><H4> GFS_ERR_PARA</H4><DT> <B>Cause:</b><DD> Invalid parameter.<DT> <B>handle:</b><DD> Make sure each of the following functions is given the correct arguments.<DD><UL TYPE=DISC>
+<LI> <A HREF="p08_14.htm#no4_1">GFS_NwFread</a><LI> <A HREF="p08_13.htm#no3_2">GFS_Fread</a><LI> <A HREF="p08_15.htm#no5_1">GFS_SetGmode</a><LI> <A HREF="p08_15.htm#no5_2">GFS_SetTmode</a><LI> <A HREF="p08_15.htm#no5_3">GFS_SetReadPara</a><LI> <A HREF="p08_15.htm#no5_4">GFS_SetTransPara</a></UL>
+</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_BUSY"></A><DT><H4> GFS_ERR_BUSY</H4><DT> <B>Cause:</b><DD> An attempt was made to perform multiple processing.<DT> <B>handle:</b><DD> See <A HREF="p06_10.htm#no6_30">6.3 Multiprocessing</a> .</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_NOHNDL"></A><DT><H4> GFS_ERR_NOHNDL</H4><DT> <B>Cause:</b><DD> There is no free space on the file handle.<DT> <B>handle:</b><DD> Increase the maximum number of files that can be opened simultaneously with <A HREF="p08_11.htm#no1_1">GFS_lnit</a> , or reduce the number of files that can be opened simultaneously.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_FATAL"></A><DT><H4> GFS_ERR_FATAL</H4><DT> <B>Cause:</b><DD> CD drive&lt;FATAL&gt; condition.<DT> <B>handle:</b><DT><OL TYPE=a>
+<P><B><LI></b> For <A HREF="p08_11.htm#no1_1">GFS_Init</a> , <A HREF="p08_11.htm#no1_2">GFS_LodDir</a> , please run again.</P>
+<P><B><LI></b> While reading a file, close the file, open it again, and read it again.</P>
+<P><B><LI></b> If an error occurs even after repeated executions, there may be a malfunction. Please display the message or go to multiplayer.</P>
+</OL>
+</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_PUINUSE"></A><DT><H4> GFS_ERR_PUINUSE</H4><DT> <B>Cause:</b><DD> <A HREF="p08_16.htm#no6_1">GFS_CdMovePickup</a> was called during pickup operation.<DT> <B>handle:</b><DD> Please call GFS_CdMovePikup when no file is being accessed.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_ALIGN"></A><DT><H4> GFS_ERR_ALIGN</H4><DT> <B>Cause:</b><DD> The file being read into is not aligned on a word boundary.<DT> <B>handle:</b><DD> Align the read area on word boundaries.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_TMOUT"></A><DT><H4> GFS_ERR_TMOUT</H4><DT> <B>Cause:</b><DD> No response was received from CD Block within the given time.<DT> <B>handle:</b><DD> There may be a hardware problem.</DL>
+<HR>
+<DL>
+<A NAME="GFS_ERR_CDOPEN"></A><DT><H4> GFS_ERR_CDOPEN</H4><DT> <B>Cause:</b><DD> CD drive tray is open.<!-- +++:Update by CRI ：1.6 -->
+<DT> <B>handle:</b><DD> Call <A HREF="../../../sysg/prog/hon/p02_11.htm#no6_1">SYS_EXECDMP()</a> to return to multiplayer.</P>
+<P><DD> Even when <A HREF="../../../sysg/cdif/hon/p03_10.htm#t3_3">the DCHG bit (bit5)</a> of the CD block interrupt factor register (HIRQREQ) is 1, the tray is treated as open.<BR>
+ During development, please check that the CD status is not open and clear the DCHG bit before calling <A HREF="p08_11.htm#no1_1">GFS_Init</a> .<BR>
+ In the retail version, the BOOT ROM clears the DCHG flag, so applications should not clear it.</P>
+</DL>
+<!-- --- Update by CRI ：1.6 -->
+<HR>
+<DL>
+<A NAME="GFS_ERR_BFUL"></A><DT><H4> GFS_ERR_BFUL</H4><DT> <B>Cause:</b><DD> When the eject mode is <A HREF="p07_11.htm#no2_5">GFS_GMODE_RESIDENT</a> , the CD buffer becomes full and reading is aborted.<DT> <B>handle:</b><DD> When the retrieval mode is GFS_GMODE_RESIDENT, adjust the access order and read amount so that the CD buffer does not become full.</DL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p09_10.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no7">File system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

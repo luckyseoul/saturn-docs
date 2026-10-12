@@ -1,0 +1,75 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGASATURN Developer's Information STN-19</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn06.htm">STN-6</a> | <A HREF="stn09.htm">STN-9</a> | <A HREF="stn18.htm">STN-18</a> | <B>STN-19</b> | <A HREF="stn21.htm">STN-21</a> | <A HREF="stn22.htm">STN-22</a> | <A HREF="stn23.htm">STN-23</a> ▼<HR NOSHADE>
+<H1 ALIGN=CENTER> STN-19</H1><H2 ALIGN=CENTER> How to initialize CD block when using GFS</H2><HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> issue number:</TH><TD> STN-19</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> date of issue:</TH><TD> 95/01/20</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> media:</TH><TD> ○Common</TD><TD> ●CD-ROM</TH><TD> ○Cartridge</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> connection:</TH><TD> ●Program</TD><TD> ○Hard</TD><TD> ○Manual</TD><TD> ○Tools</TD><TD> ○Game</TD><TD> ○ Bug</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Information distinction:</TH><TD> ○New</TD><TD> ●Change</TD><TD> ○Addition</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> importance:</TH><TD> ●Strict observance</TD><TD> ○Recommended</TD><TD> ○Reference</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> attached file:</TH><TD> ●No</TH><TD> ○ Yes</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Subject supplement:</TH><TD COLSPAN=7> Target library: GFS Ver1.13 or later</TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER> Contents</H3><P> The file system initialization function <A HREF="../../prgg/prg1/file/hon/p08_11.htm#no1_1">GFS_Init()</a> executes the CD block initialization function <A HREF="../../prgg/sysg/cdif/hon/p08_11.htm#no1_7">CDC_CdInit()</a> to set the ECC/retry count to the maximum value. The specific settings are as follows.</P>
+<CENTER>
+<TABLE BORDER=1>
+<CAPTION> <B>CDC_CdInit(0,0,5,0x0f);</b></CAPTION>
+<TR><TH ALIGN=LEFT> Initialization flag:</TH><TD ALIGN=CENTER> Default value</TD></TR>
+<TR><TH ALIGN=LEFT> Standby time:</TH><TD ALIGN=CENTER> Default value</TD></TR>
+<TR><TH ALIGN=LEFT> ECC number:</TH><TD ALIGN=CENTER> 5 times</TD></TR>
+<TR><TH ALIGN=LEFT> number of retries:</TH><TD ALIGN=CENTER> 15 times</TD></TR>
+</TABLE>
+</CENTER>
+<P> If you want to change these settings when using GFS, execute the CDC_CdInit function after calling GFS_Init.<BR>
+ It is also possible to specify without changing the settings, so you can change only the desired parameters.</P>
+<H3> ■Sample program</H3><PRE>
+	#include "sega_gfs.h"
+
+	#define STNBY 90 /*Standby time: 90 seconds*/
+	#define NOCHG -1 /*Unchanged specification*/
+
+	Sint32 sampleInit(void)
+	{
+		Sint32 ret;
+
+	/*File system initialization*/
+	ret = SGF_Init(......);
+	if (ret < 0){
+		return NG;
+	}
+
+	/*Change standby time (others remain unchanged)*/
+	ret = CDC_CdInit(NOCHG, STNBY, NOCHG);
+	if (ret! = CDC_ERR_OK) {
+		return NG;
+	}
+	return OK;
+</PRE>
+that's all<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn06.htm">STN-6</a> | <A HREF="stn09.htm">STN-9</a> | <A HREF="stn18.htm">STN-18</a> | <B>STN-19</b> | <A HREF="stn21.htm">STN-21</a> | <A HREF="stn22.htm">STN-22</a> | <A HREF="stn23.htm">STN-23</a> ▼<HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

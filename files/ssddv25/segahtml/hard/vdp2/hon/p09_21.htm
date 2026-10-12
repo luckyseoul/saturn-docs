@@ -1,0 +1,235 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;59/86&gt;VDP2 User's Manual/9.2 Priority and Color Calculation-2</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no9">VDP2 User's Manual</a> ★ <A HREF="p09_10.htm">Chapter 9 Sprite Data</a><HR>
+ <B>▲ <A HREF="p09_20.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 9 Sprite Data</b><HR NOSHADE>
+<DL>
+<A NAME="no9_24"></A><P><DT><H3> ●Sprite control register</H3><DD> The sprite control register controls sprite data. This is a 16-bit write-only register located at address 1800E0. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SPCTL_"></A><P><DD> <B><FONT SIZE=5>SPCTL</font> <FONT SIZE=4>1800E0H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SPCCCS_">SPCCCS1</a></TH><TH><PRE> <A HREF="#SPCCCS_">SPCCCS0</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SPCCN_">SPCCN2</a></TH><TH><PRE> <A HREF="#SPCCN_">SPCCN1</a></TH><TH><PRE> <A HREF="#SPCCN_">SPCCN0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SPCLMD_">SPCLMD</a></TH><TH><PRE> <A HREF="#SPWINEN_">SPWINEN</a></TH><TH><PRE> <A HREF="#SPTYPE_">SPTYPE3</a></TH><TH><PRE> <A HREF="#SPTYPE_">SPTYPE2</a></TH><TH><PRE> <A HREF="#SPTYPE_">SPTYPE1</a></TH><TH><PRE> <A HREF="#SPTYPE_">SPTYPE0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="SPCCCS_"></A><DT> <B>Sprite color calculation condition bit</b> : Sprite color calculation condition bit<DD> (SPCCCSI,SPCCSO), bits 13,12<BR>
+ Specify the sprite color calculation conditions.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> SPCCCS1</TH><TH> SPCCCS0</TH><TH> condition</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TD> Only when (priority number) ≦ (color calculation condition number)</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TD> Only when (priority number) = (color calculation condition number)</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TD> Only when (priority number) ≧ (color calculation condition number)</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TD> Only when the most significant bit of color data is 1</TD></TR>
+</TABLE>
+</P>
+<P> If the color format of the sprite is RGB, color calculations will always be performed if you set the condition to perform color calculations only when the most significant bit of the color data is 1.</P>
+<A NAME="SPCCN_"></A><DT> <B>Sprite color calculation condition number bit</b> : Sprite color calculation condition number bit<DD> (SPCCN2 to SPCCN0), bits 10 to 8<BR>
+ Specify the sprite's color calculation condition number. If the color calculation condition is set to perform color calculation only when the most significant bit of the color data is 1, this value will be ignored.</P>
+<A NAME="SPCLMD_"></A><DT> <B>Sprite color mode bit</b> : Sprite color mode bit (SPCLMD), bit 5<DD> Specifies the sprite color mode.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> SPCLMD</TH><TH> Sprite color data format</TH></TR>
+<TR><TH> 0</TH><TD> All sprite data is in palette format only</TD></TR>
+<TR><TH> 1</TH><TD> Sprite data is a mixture of palette format and RGB format</TD></TR>
+</TABLE>
+</P>
+<P><DD> Do not specify 1 if the sprite data is 8 bits per dot.</P>
+<A NAME="SPWINEN_"></A><DT> <B>Sprite window enable bit</b> : Sprite window enable bit (SPWINEN), bit 4<DD> See <B><A HREF="p08_10.htm">8.1 Window Area</a></b> .</P>
+<A NAME="SPTYPE_"></A><DT> <B>Sprite type bit</b> : SPrite type bit (SPTYPE3 to SPTYPE0), bits 3 to 0<DD> Specify the sprite type.</P>
+<P><DD><TABLE BORDER>
+<TR><TH><PRE> SPTYPE3</TH><TH><PRE> SPTYPE2</TH><TH><PRE> SPTYPE1</TH><TH><PRE> SPTYPE0</TH><TH> Sprite data type</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER> type 0</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER> type 1</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER> type 2</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER> type 3</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER> type 4</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER> type 5</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER> type 6</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER> type 7</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER> type 8</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER> type 9</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER> Type A</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER> Type B</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER> Type C</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER> Type D</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER> Type E</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER> Type F</TD></TR>
+</TABLE>
+</P>
+<P><DD> If the sprite data is 16 bits per dot, specify types 0 to 7, and if it is 8 bits, specify types 8 to F.</P>
+<A NAME="no9_25"></A><P><DT><H3> ●Priority number register</H3><DD> The priority number register specifies the priority number. This is a 16-bit write-only register located at addresses 1800F0H to 1800F6H. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRISA_"></A><P><DD> <B><FONT SIZE=5>PRISA</font> <FONT SIZE=4>1800F0H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxPRIN_">S1PRIN2</a></TH><TH><PRE> <A HREF="#SxPRIN_">S1PRIN1</a></TH><TH><PRE> <A HREF="#SxPRIN_">S1PRIN0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxPRIN_">S0PRIN2</a></TH><TH><PRE> <A HREF="#SxPRIN_">S0PRIN1</a></TH><TH><PRE> <A HREF="#SxPRIN_">S0PRIN0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRISB_"></A><P><DD> <B><FONT SIZE=5>PRISB</font> <FONT SIZE=4>1800F2H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxPRIN_">S3PRIN2</a></TH><TH><PRE> <A HREF="#SxPRIN_">S3PRIN1</a></TH><TH><PRE> <A HREF="#SxPRIN_">S3PRIN0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxPRIN_">S2PRIN2</a></TH><TH><PRE> <A HREF="#SxPRIN_">S2PRIN1</a></TH><TH><PRE> <A HREF="#SxPRIN_">S2PRIN0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRISC_"></A><P><DD> <B><FONT SIZE=5>PRISC</font> <FONT SIZE=4>1800F4H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxPRIN_">S5PRIN2</a></TH><TH><PRE> <A HREF="#SxPRIN_">S5PRIN1</a></TH><TH><PRE> <A HREF="#SxPRIN_">S5PRIN0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxPRIN_">S4PRIN2</a></TH><TH><PRE> <A HREF="#SxPRIN_">S4PRIN1</a></TH><TH><PRE> <A HREF="#SxPRIN_">S4PRIN0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRISD_"></A><P><DD> <B><FONT SIZE=5>PRISD</font> <FONT SIZE=4>1800F6H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxPRIN_">S7PRIN2</a></TH><TH><PRE> <A HREF="#SxPRIN_">S7PRIN1</a></TH><TH><PRE> <A HREF="#SxPRIN_">S7PRIN0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxPRIN_">S6PRIN2</a></TH><TH><PRE> <A HREF="#SxPRIN_">S6PRIN1</a></TH><TH><PRE> <A HREF="#SxPRIN_">S6PRIN0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="SxPRIN_"></A><P><DT> <B>Priority number bit (for sprites)</b> : Sprite priority number bit<DD> (S0PRIN2~S0PRIN0, S1PRIN2~S1PRIN0, S2PRIN2~S2PRIN0, S3PRIN2~S3PRIN0, S4PRIN2~S4PRIN0, S5PRIN2~S5PRIN0, S6PRIN2~S6PRIN0, S7PRIN2~S7PRIN0)<BR>
+ Specify the sprite's priority number.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> S0PRIN2～S0PRIN0</TD><TD> 1800F0H</TD><TD> bits 2-0</TD><TD> Sprite register 0</TD></TR>
+<TR><TD> S1PRIN2～S1PRIN0</TD><TD> 1800F0H</TD><TD> bits 10-8</TD><TD> Sprite register 1</TD></TR>
+<TR><TD> S2PRIN2～S2PRIN0</TD><TD> 1800F2H</TD><TD> bits 2-0</TD><TD> Sprite register 2</TD></TR>
+<TR><TD> S3PRIN2～S3PRIN0</TD><TD> 1800F2H</TD><TD> bits 10-8</TD><TD> Sprite register 3</TD></TR>
+<TR><TD> S4PRIN2～S4PRIN0</TD><TD> 1800F4H</TD><TD> bits 2-0</TD><TD> Sprite register 4</TD></TR>
+<TR><TD> S5PRIN2～S5PRIN0</TD><TD> 1800F4H</TD><TD> bits 10-8</TD><TD> Sprite register 5</TD></TR>
+<TR><TD> S6PRIN2～S6PRIN0</TD><TD> 1800F6H</TD><TD> bits 2-0</TD><TD> Sprite register 6</TD></TR>
+<TR><TD> S7PRIN2～S7PRIN0</TD><TD> 1800F6H</TD><TD> bits 10-8</TD><TD> Sprite register 7</TD></TR>
+</TABLE>
+</P>
+<P><DD> The higher the priority number, the higher the display priority. Also, sprite characters that use registers whose priority number is set to 0 are considered transparent and are not displayed.</P>
+<A NAME="no9_26"></A><P><DT><H3> ●Color calculation ratio register</H3><DD> The color calculation ratio register specifies the color calculation ratio. This is a 16-bit write-only register located at addresses 180100H to 180106H. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CCRSA_"></A><P><DD> <B><FONT SIZE=5>CCRSA</font> <FONT SIZE=4>180100H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxCCRT">S1CCRT4</a></TH><TH><PRE> <A HREF="#SxCCRT">S1CCRT3</a></TH><TH><PRE> <A HREF="#SxCCRT">S1CCRT2</a></TH><TH><PRE> <A HREF="#SxCCRT">S1CCRT1</a></TH><TH><PRE> <A HREF="#SxCCRT">S1CCRT0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxCCRT">S0CCRT4</a></TH><TH><PRE> <A HREF="#SxCCRT">S0CCRT3</a></TH><TH><PRE> <A HREF="#SxCCRT">S0CCRT2</a></TH><TH><PRE> <A HREF="#SxCCRT">S0CCRT1</a></TH><TH><PRE> <A HREF="#SxCCRT">S0CCRT0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CCRSB_"></A><P><DD> <B><FONT SIZE=5>CCRSB</font> <FONT SIZE=4>180102H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxCCRT">S3CCRT4</a></TH><TH><PRE> <A HREF="#SxCCRT">S3CCRT3</a></TH><TH><PRE> <A HREF="#SxCCRT">S3CCRT2</a></TH><TH><PRE> <A HREF="#SxCCRT">S3CCRT1</a></TH><TH><PRE> <A HREF="#SxCCRT">S3CCRT0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxCCRT">S2CCRT4</a></TH><TH><PRE> <A HREF="#SxCCRT">S2CCRT3</a></TH><TH><PRE> <A HREF="#SxCCRT">S2CCRT2</a></TH><TH><PRE> <A HREF="#SxCCRT">S2CCRT1</a></TH><TH><PRE> <A HREF="#SxCCRT">S2CCRT0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CCRSC_"></A><P><DD> <B><FONT SIZE=5>CCRSC</font> <FONT SIZE=4>180104H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxCCRT">S5CCRT4</a></TH><TH><PRE> <A HREF="#SxCCRT">S5CCRT3</a></TH><TH><PRE> <A HREF="#SxCCRT">S5CCRT2</a></TH><TH><PRE> <A HREF="#SxCCRT">S5CCRT1</a></TH><TH><PRE> <A HREF="#SxCCRT">S5CCRT0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxCCRT">S4CCRT4</a></TH><TH><PRE> <A HREF="#SxCCRT">S4CCRT3</a></TH><TH><PRE> <A HREF="#SxCCRT">S4CCRT2</a></TH><TH><PRE> <A HREF="#SxCCRT">S4CCRT1</a></TH><TH><PRE> <A HREF="#SxCCRT">S4CCRT0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CCRSD_"></A><P><DD> <B><FONT SIZE=5>CCRSD</font> <FONT SIZE=4>180106H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxCCRT">S7CCRT4</a></TH><TH><PRE> <A HREF="#SxCCRT">S7CCRT3</a></TH><TH><PRE> <A HREF="#SxCCRT">S7CCRT2</a></TH><TH><PRE> <A HREF="#SxCCRT">S7CCRT1</a></TH><TH><PRE> <A HREF="#SxCCRT">S7CCRT0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#SxCCRT">S6CCRT4</a></TH><TH><PRE> <A HREF="#SxCCRT">S6CCRT3</a></TH><TH><PRE> <A HREF="#SxCCRT">S6CCRT2</a></TH><TH><PRE> <A HREF="#SxCCRT">S6CCRT1</a></TH><TH><PRE> <A HREF="#SxCCRT">S6CCRT0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="SxCCRT_"></A><DT> <B>Color calculation ratio bit (for sprites)</b> : Sprite color calculation ratio bit<DD> (S0CCRT4~S0CCRT0, S1CCRT4~S1CCRT0, S2CCRT4~S2CCRT0, S3CCRT4~S3CCRT0, S4CCRT4~S4CCRT0, S5CCRT4~S5CCRT0, S6CCRT4~S6CCRT0, S7CCRT4~S7CCRT0)<BR>
+ Specifies the sprite color calculation ratio. The color calculation ratio is based on the value obtained by multiplying the RGB color data by 1/32.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> S0CCRT4〜S0CCRT0</TD><TD> 180100H</TD><TD> bits 4-0</TD><TD> Sprite register 0</TD></TR>
+<TR><TD> S1CCRT4～S1CCRT0</TD><TD> 180100H</TD><TD> bits 12-8</TD><TD> Sprite register 1</TD></TR>
+<TR><TD> S2CCRT4～S2CCRT0</TD><TD> 180102H</TD><TD> bits 4-0</TD><TD> Sprite register 2</TD></TR>
+<TR><TD> S3CCRT4～S3CCRT0</TD><TD> 180102H</TD><TD> bits 12-8</TD><TD> Sprite register 3</TD></TR>
+<TR><TD> S4CCRT4～S4CCRT0</TD><TD> 180104H</TD><TD> bits 4-0</TD><TD> Sprite register 4</TD></TR>
+<TR><TD> S5CCRT4～S5CCRT0</TD><TD> 180104H</TD><TD> bits 12-8</TD><TD> Sprite register 5</TD></TR>
+<TR><TD> S6CCRT4～S6CCRT0</TD><TD> 180106H</TD><TD> bits 4-0</TD><TD> Sprite register 6</TD></TR>
+<TR><TD> S7CCRT4～S7CCRT0</TD><TD> 180106H</TD><TD> bits 12-8</TD><TD> Sprite register 7</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH> xxCCRT4</TH><TH> xxCCRT3</TH><TH> xxCCRT2</TH><TH> xxCCRT1</TH><TH> xxCCRT0</TH><TH> Color calculation ratio<BR>
+ Top image: Second image</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 31:1</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 30:2</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 29:3</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 28:4</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 27:5</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 26:6</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 25:7</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 24:8</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 23:9</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 22:10</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 21:11</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 20:12</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 19:13</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 18:14</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 17:15</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 16:16</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 15:17</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 14:18</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 13:19</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 12:20</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 11:21</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 10:22</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 9:23</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 8:24</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 7:25</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 6:26</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 5:27</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 4:28</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 3:29</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 2:30</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 1:31</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 0:32</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> S0 to S7 are placed in xx of the bit name.</P>
+<P><DD> This register is valid only when the CCMD bit of the color calculation control register is 0, and is ignored when it is 1.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p09_20.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no9">VDP2 User's Manual</a> ★ <A HREF="p09_10.htm">Chapter 9 Sprite Data</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

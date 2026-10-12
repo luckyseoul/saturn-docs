@@ -1,0 +1,44 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p006.htm> Return to previous page </A> ｜ <A HREF=../../c05/mokuzi.htm> Return to menu </A> ｜ <A HREF=p008.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H3> 3.4 Branch execution (branch stream switching processing) </H3>
+<DT> <H4> (1) Branch execution </H4>
+<DD> When branching is executed in the branch destination determination state (turning on the branch execution switch of the branch playback server), the following branch stream switching processing is performed. <BR>
+<PRE> (a) The current stream A is closed.
+(The reading of A is stopped and data is deleted even if data remains in the CD buffer.)
+(b) The branch destination stream B becomes a new current stream.
+(c) The branch destination stream is undetermined. </PRE><P>
+<B> Table 3.2 Branch stream switching by branch execution </B> <BR>
+<TABLE BORDER CELLPADDING=5>
+<TH ALIGN = "CENTER"> <PRE> Branch stream </TH> <TH ALIGN = "CENTER"> <PRE> Before branch </TH> <TH ALIGN = "CENTER"> <PRE> After branch ( After switching process) </TH> <TR>
+<TD ALIGN = "LEFT"> <PRE> Current stream <BR> (obtained with BPL_GetCurStm function) </TD> <TD ALIGN = "LEFT"> <PRE> A </TD> <TD ALIGN = "LEFT" > <PRE> B <BR> (A is closed) </TD> <TR>
+<TD ALIGN = "LEFT"> <PRE> Branch stream <BR> (obtained with BPL_GetNextStm function) </TD> <TD ALIGN = "LEFT"> <PRE> B </TD> <TD ALIGN = "LEFT "> <PRE> Undecided until the next branch destination is selected <BR> (Selected / decided by BPL_SelectBranch function) </TD>
+</TABLE><P>
+[Branch destination selection always precedes branch execution (switching), but selection and switching operations are basically asynchronous. <P>
+<DT> <H4> (2) Open and close stream </H4>
+<DD> Streams opened by the branch playback library are the current stream and branch candidate streams. The open / close procedure is shown below. <BR>
+<PRE> (a) The playback start stream specified by the BPL_SetStart function is the current stream.
+Opened first.
+(b) When reading of the current stream starts, a branch candidate stream is opened.
+(c) When a branch destination is selected, other branch candidates are closed and only the branch destination is prefetched.
+(d) Executing a branch closes the current stream.
+The branch destination stream switches to the current stream and repeats (b) to (d).
+(e) When the branch reproduction ends, the stream group is closed. </PRE><P>
+<DT> <H4> (3) Branch stream switching timing </H4>
+<DD> Branch stream switching timing is classified as shown in Table 3.3. <P>
+<B> Table 3.3 Branch stream switching timing </B> <BR>
+<TABLE BORDER CELLPADDING=5>
+<TH ALIGN = "CENTER"> <PRE> Timing </TH> <TH ALIGN = "CENTER"> <PRE> Description </TH> <TR>
+<TD ALIGN = "LEFT"> <PRE> Natural switching </TD> <TD ALIGN = "LEFT"> <PRE> After decoding of stream A, switch to stream B as the branch destination. </TD><TR>
+<TD ALIGN = "LEFT"> <PRE> Forced switching </TD> <TD ALIGN = "LEFT"> <PRE> Forcibly switch to stream B, which is the branch destination, even while stream A is being decoded. </TD>
+</TABLE><P>
+Even if the branch destination is decided, the branch must not be executed until the decoder finishes processing the current stream. (To prevent the stream data being decoded from being interrupted). <BR>
+In both natural and forced switching, the switching process for the decoder is executed first, and after that is completed, the branch execution switch is turned ON. <P>
+</DL><P><P><HR>
+<A HREF=p006.htm> Return to previous page </A> ｜ <A HREF=../../c05/mokuzi.htm> Return to menu </A> ｜ <A HREF=p008.htm> Go to next page </A>
+</BODY>
+</HTML>

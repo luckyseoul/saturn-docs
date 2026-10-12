@@ -1,0 +1,48 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p106.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p108.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 4.2 Import MPEG system status </H2>
+<DD> The MPEG library needs to import the latest state of the MPEG system in the CD block and update the internal state. <BR>
+ Therefore, call the MPG_CaptStat function for each VSYNC at one of the following timings to capture the MPEG system status. <BR>
+(A) Clear MPMP flag with VBLANK-IN interrupt, and wait for it to turn on <BR>
+(B) Call with VBLANK-OUT interrupt <P>
+<B> Caution </B> While executing the following functions, it is prohibited to execute the MPG_CaptStat function in interrupt processing. <P>
+<MPEG system control> <BR>
+<UL TYPE="DISK"><LI>MPG_Init
+<LI>MPG_ResetMp
+<LI>MPG_CaptStat</UL>
+<Playback video> <BR>
+<UL TYPE="DISK"><LI>MPG_MvStart
+<LI>MPG_MvStopVideo
+<LI>MPG_MvGetVideoStat
+<LI>MPG_MvEntryNext
+<LI>MPG_MvStop
+<LI>MPG_MvStopAudio
+<LI>MPG_MvGetAudioStat
+<LI>MPG_MvChange</UL>
+《Still image playback》 <BR>
+<UL TYPE="DISK"><LI>MPG_SpStart
+<LI>MPG_SpGetVideoStat
+<LI>MPG_SpStop</UL><P>
+<DT> <H2> 4.3 VDP2 output mode </H2>
+<DD> When outputting directly to VDP2, each function of the MPEG library is enabled at the falling edge of VSYNC. Information such as time code can be obtained currently displayed information. <BR>
+Since it is difficult for the application software to obtain the VSYNC timing on this game machine, it is recommended to perform MPEG-related processing from the VBLANK-OUT timing. <BR>
+<IMG SRC="hyou/i107-01.gif"><BR>
+<B> Figure 4.2: Timing of processing during VDP2 output </B> <P>
+<B> Example of processing </B> <BR>
+<UL> (1) Wait for VBLANK-OUT. <BR>
+(2) Call the MPG_CaptStat function. <BR>
+(3) Get the time code. <BR>
+(4) Get collision data corresponding to the time code. <BR>
+(5) Perform hit judgment, etc., and make MPEG settings corresponding to the result. <BR>
+(6) The setting of (5) becomes effective at the next frame. </UL><P>
+<DT> <H2> 4.4 Host transfer mode </H2>
+<DD> Image data in the frame buffer is transferred to the host area by calling the MPG_WnTrans function. For example, you can turn a sprite's texture into a movie by opening a display window in the sprite's texture area and calling the MPG_WnTrans function periodically. <BR>
+</DL><P><P><HR>
+<A HREF=p106.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p108.htm> Go to next page </A>
+</BODY>
+</HTML>

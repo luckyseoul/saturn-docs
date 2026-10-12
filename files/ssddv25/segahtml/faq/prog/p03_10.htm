@@ -1,0 +1,278 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 7&gt;FAQ/General program</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Program General</b><H2 ALIGN=CENTER> CD access related</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_01"><HR></a><DL>
+<H3> How to do overlay programming?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to overlay (read and execute a subprogram on the CDROM with the main program).</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Please refer to the example below (for SGL GNU environment).<P><DT><H3> 1) Creation of resident department program</H3><DD> A resident program is used at least as a part to read files and store commonly used libraries.<BR>
+ The procedure is to load the non-resident program from the CD-ROM to the specified address, and then execute the non-resident program using one of the following two methods.</P>
+<DT><OL TYPE=a>
+<P><B><LI></b> How to call from a specified address<BR>
+ Write the address at which the non-resident program will be executed in advance, and after loading the non-resident program, execute it from this address.</P>
+<P>&#65308; <B>Program description example</b>&#65310;<PRE>
+fid = GFS_NameToId((Sint8 *)fname); /* fname is a non-resident program */
+GFS_Load(fid, 0, 0x6080000, GFS_BUFSIZ_INF);
+
+/* Get the start address from the map file of the non-resident program */
+((volatile void (*)())(0x6081000))();  
+</PRE></P>
+<P>&#65308;<B>Declaration when linking a program</b>&#65310;<PRE>
+GCC -m2 -Xlinker -Tkernal.cof -Xlinker -e -Xlinker ___Start ....
+</PRE></P>
+<P>In this example, if the address of the nonresident program's execution start function changes, the program must be recompiled.</P>
+<P><B><LI></b> Define a function using an external declaration, and set the address for the externally declared function using <B>the -defsym option</b> when linking. The function is executed after loading the non-resident program.</P>
+<P>&#65308; <B>Program description example</b>&#65310;<PRE>
+extern void SUB_main1( void );
+#define SUB_ADDR 0x06080000
+void main( void ) 
+{
+        :
+   /* Example of loading a non-resident program */
+   buf[0].type = CDBUF_COPY;
+   buf[0].trans.copy.addr = (Uint32)SUB_ADDR;
+        :
+   slCdLoadFile();
+   /* Execute non-resident program */
+   SUB_main1();
+        :
+}
+</PRE></P>
+<P>&#65308;<B>Declaration when linking a program</b>&#65310;<PRE>
+GCC -m2 -Xlinker -defsym -Xlinker _SUB_main1=0x06081000 ¥
+   -Xlinker -Tkernal.cof -Xlinker -e -Xlinker ___Start ....
+</PRE></P>
+<P>The address of the execution start function of the non-resident part will be undefined, so set the address temporarily, create the non-resident program, then obtain the real execution start address from the map file of the non-resident part and set the address again. You may need to fix it and link it.</P>
+</OL>
+<P><DT><H3> 2) How to create a non-resident department program</H3><DD> Non-resident programs run programs that are only used on a stage-by-stage basis, rather than programs or data that are always used.<BR>
+ It is okay to have multiple non-resident programs, but please note the following points when creating them.</P>
+<DT><OL TYPE=a>
+<P> <B><LI>Precautions when programming</li>
+</b><BR>
+ When programming, be careful not to create a function with the same name as the resident part in the object file. (For example, the main function may conflict.)</P>
+<P> <B><LI>Precautions when reading non-resident area</li>
+</b><BR>
+ Set the start address of the non-resident part to the same address as the reading start address of the resident part.</P>
+<P> <B><LI>Transfer of map information of resident program</li>
+</b><BR>
+ When creating the non-resident part, specify the linker's -R option and specify the executable file for the resident part (for example, Kernal.COF).</P>
+<P> <B>GCC -m2 -Xlinker -R -Xlinker kernal.cof .....</b></P>
+<P> With this specification, symbols from the resident part are extracted and included in the non-resident program.<BR>
+ If the same function exists even if the library to be used is linked in the same way as the resident part, the information in the COFF file specified with -R will take precedence.</OL>
+<P><DT><H3> 3) Re-registering the execution start address of the non-resident part called from the resident part</H3><DD> After creating a non-resident program, check the address of the function called from the resident part from the map file, and reset the address of the function to start execution using <B>the -defsym option</b> when linking.<BR>
+ There is no need to do this if the address is already the same as when the resident program was created.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_02"><HR></a><DL>
+<H3> How to check CD tray open?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to check the CD tray open, but how should I do it?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Be <B><FONT SIZE=5>sure</font></b> to use the following method when checking the CD tray open.</P>
+<DD><PRE>
+if ( CDC_GetHirqReq() & CDC_HIRQ_DCHG ) {
+   SYS_EXECDMP(); /* Call multiplayer */
+} 
+</PRE></P>
+<P>There is no problem with this process,<UL TYPE=DISC>
+<LI> inside the main loop<LI> V blank interrupt processing<LI> CD error exception handling routine</UL>
+</P>
+<P> only. Operation cannot be guaranteed if the tray open check is performed using any other method.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_03"><HR></a><DL>
+<H3> How to extract the stream resident in the CD buffer sector by sector?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to cut the stream resident in the CD buffer into sectors and extract them to the host area.<BR>
+ Also, please tell me how to use it in conjunction with other CD libraries and extract them in the same way.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> In the CD buffer resident mode ( <A HREF="../../prgg/prg1/file/hon/p08_15.htm#no5_1">GFS_SetGmode function</a> ), data in the CD buffer can be moved to the desired sector position using <A HREF="../../prgg/prg1/file/hon/p08_12.htm#no2_3">the GFS_Seek function</a> and retrieved using <A HREF="../../prgg/prg1/file/hon/p08_13.htm#no3_2">the GFS_Fread function</a> .<BR>
+ However, there is only a maximum of 200 sectors, so if you seek or read beyond this size, data will be read from the CD.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_04"><HR></a><DL>
+<H3> Is it possible that the return value of GFS_FRead is not returned correctly?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The return value of GFS_Fread() may not be returned correctly.<BR>
+ It seems that something goes wrong when the file is less than 1 sector and is about several hundred bytes.<BR>
+ please investigate.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is a bug up to GFS Ver2.00. Be sure to use GFS library <FONT SIZE=5>Ver. 2.01 or higher</font> , and SGL CD library version <FONT SIZE=5>2.0A or higher</font> (96/02/06 02:01) provided by SGL.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_05"><HR></a><DL>
+<H3> How to find frame address (FAD) using CDC function group.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to obtain the frame address (FAD) from any file (name) using the CD communication interface.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> For files that can be handled on the GFS library, the FAD (Frame ADress) at the beginning of the file can be obtained using GFS_DIR_FAD in the GfsDirName *dir structure.<BR>
+ You can also use the following methods to obtain the beginning of a CDDA track.</P>
+<P><PRE>
+/* Get the first frame address of the CDDA track specified by trackno */
+Sint32 GetCDStartFrame(Uint8 trackno)
+{
+  CdcPos Pos;
+  CdcStat stat;
+  CDC_POS_PTYPE(&pos) = CDC_PTYPE_TNO;
+  CDC_POS_TNO(&pos) = trackno;
+  CDC_POS_IDX(&pos) = 1;
+  CDC_CdSeek(&pos);
+  while(1) {
+    CDC_GetCurstat(&stat);
+    if ( CDC_STAT_STATUS(&stat) == CDC_ST_PAUSE ) {
+      break;
+    }
+  }
+  return CDC_STAT_FAD(&stat);
+}
+</PRE></P>
+<P>Another method is to refer to the TOC (Table Of Contents) of the disk and refer to the obtained table.<BR>
+ This table stores 4 bytes for each track from track 1 to the lead-out start frame address.</P>
+<P> Regarding the function CDC_TgetToc, which obtains the TOC,<BR>
+ "PROGRAMMER'S GUIDE CD Communication Interface User's Manual (CD Part)"<BR>
+ <A HREF="../../prgg/sysg/cdif/hon/p08_11.htm#no1_5">8.2 Function details No. 1.5</a></P>
+<P> For information on the acquired TOC<BR>
+ "PROGRAMMER'S GUIDE CD Communication Interface User's Manual (CD Part)"<BR>
+ 7.2 Data Details 7.2.3 <A HREF="../../prgg/sysg/cdif/hon/p07_11.htm#no3_0">TOC Information/Session Information No 3.0</a></P>
+<P> There is a description in.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_06"><HR></a><DL>
+<H3> Please tell me how to play CDDA.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Regarding CDDA playback using the CDC function group, I do not know how to "play CDDA", "stop CDDA", "repeat playback of CDDA", and "pause CDDA".</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Please see the attached sample program. </P>
+<!--サンプルって？-->
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_07"><HR></a><DL>
+<H3> What should I do if a CD-ROM read error occurs?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What should I do if a CD-ROM read error occurs?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> CD-ROM errors can occur under various conditions. If data that cannot be corrected appears due to dust etc. on the disk, an error will occur.<BR>
+ Additionally, the frequency of error occurrence varies depending on the disk and CD-ROM drive mechanism. To deal with this, instead of reading once, read again when an error occurs.</P>
+<P> If you are using the GFS library, repeating <A HREF="../../prgg/prg1/file/hon/p08_13.htm#no3_1">GFS_Load()</a> will accomplish your goal if the file is already open.<BR>
+ Normally, it is a good idea to perform retry processing several times. Avoid running the retry process in an infinite loop, and move the process to the multiplayer without displaying an error message.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_08"><HR></a><DL>
+<H3> Please tell me how to use CD buffer effectively.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to use CD buffer effectively.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The CD buffer has a size that can be used as a data area of 200 sectors (one sector is 2048 bytes for Mode1, Mode2 Form1, and 2324 bytes for Mode2 Form2).<BR>
+ The Sega Saturn allows you to use this CD buffer like memory.</P>
+<P> This is done by specifying the resident mode with the GFS_SetGmode function of the GFS library, reading the file once from the CD-ROM and making it resident, and then calling the GFS functions GFS_Seek, GFS_Fread, etc. in the same way as from the CD-ROM. It allows you to read from the CD buffer without accessing the CD-ROM again.</P>
+<P> In the GFS library, the default value of the mode specified by the GFS_SetGmode function above is destroyed (GFS_GMODE_ERASE), and by making it resident (GFS_GMODE_RESIDENT), for example, after reading data from a CD-ROM in resident mode, CDDA playback is possible. Let it run.<BR>
+ During execution, you can use GFS functions to read data from the CD buffer and use it like a data buffer.</P>
+<P> Please note that if you move (seek) or read (read) more than 200 sectors, the CD-ROM will be accessed, so please do so within the maximum 200 sectors.<BR>
+ Also, if you do not use this method, be sure to use the GFS_SetGmode function to return to discard mode.</P>
+<P>&#65308; <B>example</b>&#65310; CD<BR>
+ A sample program that makes data resident in a buffer and reads it during CDDA playback (However, since this program is only for explaining the flow, no error checking is performed. Be <B><FONT SIZE=5>sure</font></b> to add it when installing.)</P>
+<P><PRE>
+/* Set resident mode */
+GFS_SetGmode(gfs, GFS_GMODE_RESIDENT);
+
+/* Read file into CD buffer */
+fid = GFS_NameToId( "sample.dat");
+if ( fid&gt; = 0 ) {
+    GFS_Open( fid);
+    GFS_NwCdRead( gfs, 200 );
+}
+/* Play CDDA */
+CDC_PLY_STYPE(&ply) = CDC_PTYPE_TNO;
+CDC_PLY_STNO(&ply) = 2;
+CDC_PLY_SIDX(&ply) = 0;
+CDC_PLY_ETYPE(&ply) = CDC_PTYPE_TNO;
+CDC_PLY_ETNO(&ply) = 3;
+CDC_PLY_EIDX(&ply) = 0;
+CDC_PLY_PMODE(&ply) = CDC_PM_DFL;
+ret = CDC_CdPlay(&ply);
+
+/* CDDA Read from CD buffer during playback */
+GFS_Seek( gfs, GFS_SEEK_SET );
+GFS_Fread( gfs, 10, buf, 10*2048 );
+</PRE></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_09"><HR></a><DL>
+<H3> I want to stop CDDA playback in the middle of playback, retrieve other data from the CD, and then play CDDA from where it left off.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to stop the song during CDDA playback, read other CD data, and then restart the playback from the point where it was stopped earlier after the data has been read.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There are three points to keep in mind when temporarily reading CD-ROM data during CDDA playback and restarting playback from the original position.</P>
+<DT><OL>
+<P><B><LI></b> Use CDC I/F library.</P>
+<P><B><LI></b> Since CD-ROM access occurs midway through, set the CD-DA playback range and repeat count again.</P>
+<P><B><LI></b> To resume playback after seeking to the original position, set "Do not change pickup position".</P>
+</OL>
+<P><DD> This setting can be specified in the playback mode of the CD playback parameter (CdcPly).<BR>
+ (Refer to CDC Manual No. 6.4 CD playback parameters - CdcPly.)<BR>
+ The method to obtain the frame address during restart processing is to obtain the frame address after executing the pause command.&lt; PAUSE&gt; Wait for the state, then get the CD status information and eject it.<BR>
+ Below is a sample program that demonstrates the above steps.<BR>
+ (This sample is written with emphasis on the processing flow, so please <B><FONT SIZE=5>check the function values for errors</font></b> in your actual program.)</P>
+<P> Also, immediately before executing drive commands such as play and seek, the tray should be opened/closed (DCHG flag) and&lt; FATAL&gt; You should <B><FONT SIZE=5>check</font></b> the condition.</P>
+<P>&#65308; <B>example</b>&#65310;<BR>
+ A simple sample program showing how to play CDDA and obtain pose positions.</P>
+<P><DD><PRE>
+  /* Initialization */
+  Sint32 ret;
+  Sint32 fad;
+  CdcStat stat;
+  CdcPly ply;
+  CdcPos pos;
+  // Play track numbers 5-17 infinite times
+  CDC_PLY_STYPE(&ply)=CDC_PTYPE_TNO;
+  CDC_PLY_STNO (&ply)=5;
+  CDC_PLY_SIDX (&ply)=0;
+  CDC_PLY_ETYPE(&ply)=CDC_PTYPE_TNO;
+  CDC_PLY_ETNO (&ply)=17;
+  CDC_PLY_EIDX (&ply)=0;
+  CDC_PLY_PMODE(&ply)=0x0F;
+  // Start playing
+  CDC_CdPlay(&ply);
+  while (1)
+  {
+  /* Main loop */
+       :
+       :
+      /* CD access occurs using GFS or SGL */
+      if (access==TRUE){
+          CDC_POS_TYPE(&pos)=CDC_PTYPE_NOCHG; /* CD-CA PAUSE */
+          CDC_CdSeek(&pos); /* PAUSE execution */
+          /* Get the FAD of the pose position (with a few frames of error) */
+          ret = CDC_GetCurStat(&stat);
+          if (ret != CDC_ERR_OK) {
+             return NG;
+          }
+          fad = CDC_STAT_FAD(&stat); :
+          /* Perform CD access using GFS or SGL */
+                   :
+          /* CD-DA playback restart processing */
+          CDC_POS_TYPE(&pos)=CDC_PTYPE_FAD; /* Specify restart position */
+-&gt;        CDC_POS_FAD (&pos)=fad; /* Specified by FAD */
+          CDC_CdSeek(&pos); /* Execute seek */
+          /* Setting CD playback parameters */
+          /* ・5 to 17 tracks */
+          /* ・Repeat infinite times */
+          /* ・Do not change the pickup position */
+          CDC_PLY_STYPE(&ply)=CDC_PTYPE_TNO;
+          CDC_PLY_STNO (&ply)=5;
+          CDC_PLY_SIDX (&ply)=0;
+          CDC_PLY_ETYPE(&ply)=CDC_PTYPE_TNO;
+          CDC_PLY_ETNO (&ply)=17;
+          CDC_PLY_EIDX (&ply)=0;
+          CDC_PLY_PMODE(&ply)=(CDC_PM_PIC_NOCHG | 0x0F);
+          CDC_CdPlay(&ply); /* Resume execution */
+      }
+                :
+                :
+                :
+      slSynch(); /* etc. */
+  }
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,917 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;28/30&gt;SGL Programmer's Tutorial/12.CD-ROMライブラリ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<a href="demo_c_j.htm">戻る</A>｜<a href="p13_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PROGRAMMER'S TUTORIAL</B>
+<H2 ALIGN=CENTER>12.CD-ROMライブラリ</H2>
+<HR NOSHADE>
+<P>　本章では、ＣＤ−ＲＯＭライブラリを使ってＣＤ−ＲＯＭにアクセスする方法について解説します。ＣＤ−ＲＯＭライブラリを使うことにより、ＣＤ−ＲＯＭからのデータやプログラムの読み込み、および音楽の再生を行うことができます。
+またこの章では、ＣＤ−ＲＯＭライブラリの関数リファレンス一覧も載せています。</P>
+
+<DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_10"><HR></A>
+	<P>	<DT><H2>12-1.ＣＤ−ＲＯＭライブラリについて</H2>
+		<DD>　ＳＧＬでは、ＣＤ-ＲＯＭやバーチャルＣＤにアクセスするための関数を用意しています。
+			これらの関数を使用することによって、次の機能を実現することができます。</P>
+
+	<P><DD><UL TYPE=DISC>
+	<LI>ＣＤ−ＲＯＭからのプログラムやデータの読み込み
+	<LI>ＣＤ−ＲＯＭ　ＸＡ規格を使用したデータの読み込み
+	<LI>ＣＤＤＡファイルを使用した音楽再生
+	</UL></P>
+
+	<P><DT><TABLE><TR>
+	<TH><B><PRE>注　意</B><BR><img srcset="../../../../what/atto_j.png 5x"></TH>
+	<TD><B>CD-ROMライブラリ関数は、別冊の“<FONT SIZE="5">関数リファレンス</FONT>”に載せずに、<A HREF="#no12_30">本章の後半</A>に載せてあります。</B></TD></TR></TABLE></P>
+
+	<P>	<DD>　ＣＤ−ＲＯＭの焼き方については“データの受け渡しの第３章：ＣＤ−ＲＯＭの焼き方”を参照してください。</P>
+
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_20"><HR></A>
+	<P>	<DT><H2>12-2.　ＣＤ−ＲＯＭのアクセス</H2>
+		<DD>　ＣＤ−ＲＯＭからデータを読み込む流れは、以下のようになります。</P>
+
+<A NAME="z12_"></A>
+	<P ALIGN=CENTER><B>図12-1　CD-ROMアクセスの流れ</B><BR>
+	<img srcset="../grp/p12_03_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　ＣＤ−ＲＯＭのアクセスには機械的な動作が伴うため、読み込み要求をおこなった瞬間にデータがメモリに読み込まれるわけではありません。また、ＣＤ−ＲＯＭからデータが読み込まれる速度は、ＣＰＵの速度と比較すると非常に低速です。
+		ＳＧＬでは、この待ち時間にＣＤ−ＲＯＭアクセス以外のプログラムが実行できるよう、読み込みステータスを監視しながらＣＤ−ＲＯＭをアクセスする方法を採用しています。</P>
+
+<A NAME="no12_21"></A>
+	<P>	<DT><H3>ＣＤ−ＲＯＭの論理構造</H3>
+		<DD>　ＣＤ−ＲＯＭは、セクタと呼ばれる単位から構成されています。セクタは一般には、2048バイト（FORM1）ですが、音楽データのように若干間違って読み込まれても問題とならないような場合で、どうしても転送容量を確保したいときには、
+			2324バイト（FORM2）とすることもできます。同一ファイル内のそれぞれのセクタには、<A NAME="CHANNEL">チャンネル番号、</A>サブモード、<A NAME="KD">コーディング情報からなるサブヘッダと呼ばれる情報がついています。
+			セクタの構造を簡単に表すと以下のようになります。</P>
+
+<A NAME="z12_2"></A>
+	<P ALIGN=CENTER><B>図12-2　セクタの構造</B><BR>
+	<img srcset="../grp/p12_03_2_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　ＳＧＬでは、サブヘッダにしたがってデータを分類する機能をもっています。ＳＧＬでは、この情報を「キー」と呼びます。サブモードとコーディング情報は各ビット毎に意味があり、ＳＧＬでは指定したビットが1のセクタだけを選択して読み込みます。</P>
+
+<A NAME="no12_22"></A>
+	<P>	<DT><H3>ファイルの読み込み</H3>
+		<DD>　ファイルを読み込むには、関数“slCdOpen”、“slCdLoadFile”、“slCdGetStatus”を使用してください。</P>
+
+	<P>	<DD><B>【CDHN slCdOpen(Sint8 *pathname, CDKEY key[]);】</B>
+		<DD>　読み込むファイルを指定します。<BR>
+		“key”は読み込むセクタの種類です。複数の種類のセクタを指定することができます。セクタの種類をすべて指定したら最後のチャネル番号に“CDKEY_TERM”を指定します。<BR>
+		正しくファイルをオープンすることができたら、“NULL”以外のファイルハンドルを戻り値として返します。<BR>
+		ただし、オープンしているファイルのキーの総数が24以上になるとオープンに失敗します。
+		オープンしたファイルは、読み込み中断または、完了時に自動的にクローズ処理されます。</P>
+
+	<P>	<DD><B>【Sint32 slCdLoadFile (CDHN cdhn, CDBUF buf []) ;】</B>
+		<DD>　読み込み先の領域を指定します。<BR>
+		“buf”の順序は、関数“slCdOpen”での“key”の順序に対応します。
+
+	<P>	<DD>　CD-ROMのデータをワークRAMにコピーする場合には次のように指定します。
+<PRE>
+buf[ i ]. type = CDBUF_COPY;
+buf[ i ]. trans.copy.addr = 読み込み領域のアドレス;
+buf[ i ]. trans.copy.unit = 読み込み領域サイズの単位
+(CDBUF_FORM1/CDBUF_FORM2/CDBUF_BYTE);
+buf[ i ]. trans.copy.size = 読み込み領域のユニット数;
+</PRE>
+
+	<P>	<DD>“addr”にNULL、sizeに0を設定すると読み込まれません。“unit”は、読み込み領域のサイズの単位をCD-ROMのセクタの種類にあわせてください。これによって効率的にデータを読むことができます。
+		実際の読み込み領域は、4バイト境界に“unit”×“size”の大きさで取ってください。</P>
+
+	<P>	<DD>　データを加工しながら読み込む場合には、次のように関数を登録することができます。
+<PRE>
+buf[ i ]. type = CDBUF_FUNC;
+buf[ i ]. trans.func.func. = 関数ポインタ;
+buf[ i ]. trans.func.obj = 関数の第一引数に渡す値;
+</PRE>
+
+	<P>	<DD>登録関数は“ Sint32 (*func) (void *obj, Uint32 *addr, Sint32 adinc, Sint32 nsct)”です。<BR>
+“obj ”には、“buf [ i ]. trans.func.obj”の値がそのまま入ります。<BR>
+“addr”はデータのコピー元のアドレスです。<BR>
+“adinc”は、“addr”から4バイト取り出したときの“addr”に対する加算値を、4バイト単位で示した値です。<BR>
+“nsct”は読み込むことのできるセクタ数です。戻り値は実際に転送したセクタ数です。転送領域をすべて指定したら、最後の“buf[].type ”に“CDBUF_TERM”を指定してください。
+
+	<P>	<DD><B>【Sint32 slCdGetStatus (CDHN cdhn, Sint32 ndata[]); 】</B>
+		<DD>　メインループなどで関数“slCdGetStatus”を定期的に呼び出し、読み込み状態を監視してください。<BR>
+		関数値が“CDSTAT_COMPLETED”になったら、読み込み完了です。<BR>
+		“ndata”には、読み込んだバイト数が、関数“slCdOpen ”の“key”に対応する順で格納されます。</P>
+
+	<P>	<DD>　サンプルプログラム1に、ファイル読み込みのプログラム例を示します。</P>
+
+	<P>	<DD>　このサンプルプログラムはＣＤ−ＲＯＭ上のファイルを読み込むための処理であり、ＣＤ−ＲＯＭからファイルを読み込む基本的なライブラリの使用例です。フロー12-1に沿って手順を説明します。</P>
+
+	<P>	<DD><OL>
+		<LI>グラフィック等のシステムの初期化を行います。</P>
+
+	<P>	<LI>ＣＤ−ＲＯＭのシステムの初期化を行います。
+
+	<P>	<LI>ファイルのオープンを行います。<BR>
+		ファイルオープンを行う関数のインプットパラメータにデータを分類するためのキー情報があるので、この情報を必要に応じて設定してください。</P>
+
+	<P>	<LI>ファイルオープン関数の戻り値のファイルハンドルと読み込み領域情報をパラメータとし、ファイルの読み込みを行います。
+
+	<P>	<LI>グラフィックライブラリの実行（関数“slSynch()”）を行います。<BR>
+		ファイルの読み込みで指定されたファイルは、実際にはこの時に少しずつ読み込まれます。
+
+	<P>	<LI>ステータス情報を取得し、ファイルの読み込みが終了したかを確認します。<BR>
+		ファイルの読み込みが終了していなければ、ステータスが読み込み終了になるまでループします。<BR>
+		このループの中で、関数“slSynch()”を呼ぶようにします。
+	</OL></P>
+<A NAME="f12_1"></A>
+	<P ALIGN=CENTER><B>フロー12-1　サンプルプログラム1（ファイルの読み込み sample_cd1/main.c）</B>
+	<img srcset="../grp/p12_05_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="l12_1"></A>
+	<P>	<DD><B>リスト12-1　サンプルプログラム1（ファイルの読み込み sample_cd1/main.c）</B>
+<PRE>
+/*****************************************************************************
+ *
+ *	Copyright (c) 1994 SEGA
+ *
+ * File	  :main.c
+ * Date   :1995-02-20
+ * Version:0.00
+ * Auther :
+ ****************************************************************************/
+#include	"sgl.h"
+#include	"sgl_cd.h"
+
+/****************************************************************************/
+#define	MAX_FILE	128
+#define READSECT         50
+/****************************************************************************/
+Sint32	dirwork[SLCD_WORK_SIZE(MAX_FILE)];
+Sint32	readbuf[ READSECT * CDBUF_FORM1 / sizeof(Sint32)];
+    
+/****************************************************************************/
+void	ss_main(void)
+{
+    Sint32	ndir;
+    CDHN	cdhn;
+    CDKEY	key[2];
+    CDBUF	buf[2];
+    Sint32	stat;
+    Sint32	len[2];
+    Sint32	ypos = 1;
+
+    slInitSystem(TV_320x224, NULL, 1);		
+    ndir = slCdInit(MAX_FILE, dirwork);	
+    slPrint("slCdInit:", slLocate(1,ypos));
+    slPrintFX(toFIXED(ndir), slLocate(11, ypos));
+    ypos++;
+
+    key[0].cn = key[0].sm = key[0].ci = CDKEY_NONE;
+    key[1].cn = CDKEY_TERM;	
+    cdhn = slCdOpen("S2100D0_.M", key);	
+    slPrint("slCdOpen:", slLocate(1, ypos));
+    slDispHex((Uint32)cdhn, slLocate(11, ypos));
+
+    buf[0].type = CDBUF_COPY;	
+    buf[0].trans.copy.addr = readbuf;	
+    buf[0].trans.copy.unit = CDBUF_FORM1;
+    buf[0].trans.copy.size = READSECT;	
+    buf[1].type = CDBUF_TERM;
+    slCdLoadFile(cdhn, buf);		
+    ypos++;
+
+    while (1) {
+	slSynch();     			
+	stat = slCdGetStatus(cdhn, len);
+	slPrint("stat:", slLocate(1, ypos));
+	slDispHex((Uint32)stat, slLocate(7, ypos));
+	ypos++;
+	if (ypos >= 27)		ypos = 1;
+	if (stat == CDSTAT_COMPLETED)	break;
+    }
+    while (1) ;
+}
+</PRE>
+
+<A NAME="no12_23"></A>
+	<P>	<DT><H3>ファイルの分割読み込み</H3>
+		<DD>　動画等のように大量のデータを分割して読み込むには、関数“slCdResetBuf”を使用してください。</P>
+
+	<P>	<DD><B>【Bool slCdResetBuf (CDHN cdhn, CDKEY *key);】</B>
+		<DD>　ファイルハンドルの“key”に対応するデータの読み込み先を、関数“slCdLoadFile”で指定された領域の先頭に戻します。<BR>
+		関数“slCdGetStatus”によって読み込み領域の有効データ数を取得し、読み込み領域がいっぱいになったらデータを加工し、関数“slCdResetBuf”を呼び出します。
+
+	<P>	<DD>　サンプルプログラム2に、データを分割して読み込むプログラム例を示します。</P>
+
+	<P>このサンプルプログラムはＣＤ−ＲＯＭ上のファイルを分割して読み込むための処理であり、ＣＤ−ＲＯＭからファイルを読み込む基本的なライブラリの使用例です。フロー12-2に沿って手順を説明します。</P>
+
+	<P>	<DD><OL>
+		<LI>グラフィック等のシステムの初期化を行います。</P>
+
+	<P>	<LI>ＣＤ−ＲＯＭのシステムの初期化を行います。
+
+	<P>	<LI>ファイルのオープンを行います。<BR>
+		ファイルオープンを行う関数のインプットパラメータにデータを分類するためのキー情報があるので、この情報を必要に応じて設定してください。</P>
+
+	<P>	<LI>ファイルオープン関数の戻り値のファイルハンドルと読み込み領域情報をパラメータとし、ファイルの読み込みを行います。</P>
+
+	<P>	<LI>グラフィックライブラリの実行（関数“slSynch()”）を行います。<BR>
+		ファイルの読み込みで指定されたファイルは、実際にはこの時少しずつ読み込まれます。</P>
+
+	<P>	<LI>ステータス情報を取得し、ファイルの読み込みが終了したかを確認します。<BR>
+		また同時に、読み込み領域がいっぱいになっているかどうかを確認します。いっぱいになっていたら、必要に応じてデータを処理してから、読み込み領域をリセットします。<BR>
+		ファイルの読み込みが終了していなければ、ステータスが読み込み終了になるまでループします。<BR>
+		このループの中で、関数“slSynch()”を呼ぶようにします。</P>
+	</OL></P>
+<A NAME="f12_2"></A>
+	<P ALIGN=CENTER><B>フロー12-2　サンプルプログラム2（ファイルの分割読み込み sample_cd2/main.c）</B>
+	<img srcset="../grp/p12_09_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+
+<A NAME="l12_2"></A>
+	<P>	<DD><B>リスト12-2　サンプルプログラム2（ファイルの分割読み込み sample_cd2/main.c）</B>
+<PRE>
+/*****************************************************************************
+ *
+ *	Copyright (c) 1994 SEGA
+ *
+ * File	  :main.c
+ * Date   :1995-02-20
+ * Version:0.00
+ * Auther :
+ ****************************************************************************/
+#include "sgl.h"
+#include "sgl_cd.h"
+
+/****************************************************************************/
+#define MAX_OPEN	128	
+#define FNAME		"S2100D0_.M"
+#define slsize		2	
+
+/****************************************************************************/
+Sint32 lib_work[SLCD_WORK_SIZE(MAX_OPEN)];
+Sint32	readbuf[ (CDBUF_FORM1 * slsize) / sizeof(Sint32) ];
+
+/****************************************************************************/
+void ss_main(void)
+{
+    Sint32	ndir ;			
+    Sint32	ypos = 1 ;	
+    Sint32	ret ;		
+    Sint32	ndata[2] ;	
+    CDHN	cdhn ;		
+    CDKEY      	key[2] ;
+    CDBUF	buf[2] ;
+
+    slInitSystem(TV_320x224, NULL, 1) ;	
+    ndir = slCdInit(MAX_OPEN, lib_work);
+    slPrint("slCdInit:", slLocate(1,ypos));
+    slPrintFX(toFIXED(ndir), slLocate(11, ypos));
+    ypos++;
+
+    key[0].cn = key[0].sm = key[0].ci = CDKEY_NONE ;
+    key[1].cn = CDKEY_TERM ;	
+    cdhn = slCdOpen(FNAME, key);	
+    slPrint("slCdOpen:", slLocate(1, ypos));
+    slDispHex((Uint32)cdhn, slLocate(11, ypos));
+
+    buf[0].type = CDBUF_COPY ;
+    buf[0].trans.copy.addr = readbuf ;
+    buf[0].trans.copy.unit = CDBUF_FORM1 ;
+    buf[0].trans.copy.size = slsize ;	
+    buf[1].type = CDBUF_TERM ;
+    ypos++;
+
+    slCdLoadFile(cdhn, buf);	 
+    while( 1 ){
+
+	slSynch();			
+	ret = slCdGetStatus( cdhn, ndata ) ;
+	slPrint("stat:", slLocate(1, ypos));
+	slDispHex( (Uint32)ret, slLocate(7, ypos));
+	ypos++;
+	if (ypos >= 27)		ypos = 3 ;
+	if ( ret == CDSTAT_COMPLETED )	break;
+	if ( ndata[0] == CDBUF_FORM1 * slsize ){
+		slCdResetBuf(cdhn, &(key[0]));
+	} 
+   }
+    while( 1 ) ;          
+}
+</PRE>
+
+<A NAME="no12_24"></A>
+	<P>	<DT><H3>先読み機能について</H3>
+		<DD>　CD-ROMからデータを読み込む際には、CDドライブの機械的な動作が伴うため読み込みを開始した次の瞬間に、実際にデータが読み込まれるわけではありません。この待ち時間を最小限にする機能が先読み機能です。
+		セガサターンは、CD-ROMから読み込んだデータを一時的に蓄える領域をもっています。この領域をCDバッファと呼びます。次に読み込むファイルが決定したらCDバッファにデータを読み込み始め、データが必要になったらメモリに転送します。</P>
+
+<A NAME="z12_3"></A>
+	<P ALIGN=CENTER><B>図12-3　CDバッファ</B><BR>
+	<img srcset="../grp/p12_12_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P> <DD>　すでに説明した関数“slCdLoadFile”の読み込み領域のアドレスをNULLに、読み込み領域のサイズを0に設定し、関数“slCdGetStatus”の戻り値が“ CDSTAT_WAIT”になったら先読みは完了です。この後、関数“slCdLoadFile”で読み込み領域のアドレスとサイズ		を設定すると、すぐに転送が始まります。CDバッファへの先読みが完了する前に、読み込み領域のアドレスとサイズを設定することもできます。</P>
+
+	<P>	<DD><B>【 Sint32 slCdLoadFile (CDHN cdhn, CDBUF buf[]);】</B>
+		<DD>　CDバッファに、先読みするために次のように指定します。
+<PRE>
+buf[ i ]. type = CDBUF_COPY;
+buf[ i ]. trans.copy.addr = NULL;
+buf[ i ]. trans.copy.unit = CDBUF_FORM1;
+buf[ i ]. trans.copy.size = 0;
+</PRE>
+
+	<P><DD>　転送領域をすべて指定したら、最後の“type”に“CDBUF_TERM ”を指定してください。</P>
+
+	<P><DD>　サンプルプログラム3に、先読みのプログラム例を示します。</P>
+
+	<P><DD>　このサンプルプログラムはＣＤ−ＲＯＭ上のファイルを読み込むための処理であり、ＣＤ−ＲＯＭからファイルの先読みを行うライブラリ処理の基本的な使用例です。フロー12-3に沿って手順を説明します。</P>
+
+	<P>	<DD><OL>
+		<LI>グラフィック等のシステムの初期化を行います。</P>
+
+	<P>	<LI>ＣＤ−ＲＯＭのシステムの初期化を行います。</P>
+
+	<P>	<LI>ファイルのオープンを行います。<BR>
+		ファイルオープンを行う関数のインプットパラメータにデータを分類するためのキー情報があるので、この情報を必要に応じて設定してください。</P>
+
+	<P>	<LI>ファイルオープン関数の戻り値のファイルハンドルと読み込み領域情報をパラメータとし、ファイルの読み込みを行います。<BR>
+		この時の読み込み領域情報の読み込み先領域アドレスにＮＵＬＬを、サイズに0を設定し、ファイルの先読みを行います。</P>
+
+	<P>	<LI>グラフィックライブラリの実行（関数“slSynch()”）を行います。</P>
+
+	<P>	<LI>ステータス情報を取得し、転送待ち状態かどうかを確認します。<BR>
+		転送待ち状態ならば、ループを終了します。<BR>
+		このループの中で関数“slSynch()”を呼ぶようにします。</P>
+
+	<P>	<LI>再度ファイルの読み込みを行います。<BR>
+		この時、読み込み領域情報の読み込み先領域アドレスにアドレスを設定し、ファイルの読み込みを行います。</P>
+
+	<P>	<LI>グラフィックライブラリの実行（関数“slSynch()”）を行います。<BR>
+		ファイルの読み込みで指定されたファイルは、実際にはこの時読み込まれます。</P>
+
+	<P>	<LI>ステータス情報を取得し、ファイルの読み込みが終了したかを確認します。<BR>
+		ファイルの読み込みが終了していなければ、ステータスが読み込み終了になるまでループします。<BR>
+		このループの中で、関数“slSynch()”を呼ぶようにします。</P>
+	</OL></P>
+<A NAME="f12_3"></A>
+	<P ALIGN=CENTER><B>フロー12-3　サンプルプログラム3（先読み sample_cd3/main.c）</B>
+	<img srcset="../grp/p12_14_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="l12_3"></A>
+	<P>	<DD><B>リスト12-3　サンプルプログラム3（先読み sample_cd3/main.c）</B>
+<PRE>
+/*****************************************************************************
+ *	Copyright (c) 1994 SEGA
+ *
+ * File	  :main.c
+ * Date   :1995-02-20
+ * Version:0.00
+ * Auther :
+ *
+ ****************************************************************************/
+#include "sgl.h"
+#include "sgl_cd.h"
+
+/****************************************************************************/
+#define MAX_OPEN	128	
+#define FNAME		"S2100D0_.M"
+#define slsize		2
+
+/****************************************************************************/
+Sint32 lib_work[SLCD_WORK_SIZE(MAX_OPEN)];	
+Sint32	readbuf[ (CDBUF_FORM1 * slsize) / sizeof(Sint32)] ;
+	
+/****************************************************************************/
+void ss_main(void)
+{
+    Sint32	ndir ;		
+    Sint32	ypos = 1 ;	
+    Sint32	ret ;		
+    Sint32	ndata[2] ;	
+    CDHN	cdhn ;			
+    CDKEY      	key[2] ;	
+    CDBUF	buf[2] ;		
+
+    slInitSystem(TV_320x224, NULL, 1) ;		
+    ndir = slCdInit(MAX_OPEN, lib_work);
+    slPrint("slCdInit:", slLocate(1,ypos));
+    slPrintFX(toFIXED(ndir), slLocate(11, ypos));
+    ypos++;
+ 					
+    key[0].cn = key[0].sm = key[0].ci = CDKEY_NONE ;
+    key[1].cn = CDKEY_TERM ;	
+    cdhn = slCdOpen(FNAME, key);	
+    slPrint("slCdOpen:", slLocate(1, ypos));
+    slDispHex((Uint32)cdhn, slLocate(11, ypos));
+
+    buf[0].type = CDBUF_COPY ;	
+    buf[0].trans.copy.addr = NULL ;
+    buf[0].trans.copy.unit = CDBUF_FORM1 ;
+    buf[0].trans.copy.size = 0;	
+    buf[1].type = CDBUF_TERM ;	
+    slCdLoadFile( cdhn, buf );
+    ypos++;
+
+    while( 1 ){
+	slSynch();			
+	ret = slCdGetStatus( cdhn, NULL ) ;	
+	slPrint("stat1:", slLocate(1, ypos));
+	slDispHex( (Uint32)ret, slLocate(7, ypos));
+	ypos++;
+	if (ypos >= 27)		ypos = 3;
+	if ( ret == CDSTAT_WAIT ) {	
+		buf[0].trans.copy.addr = readbuf ; 
+    		buf[0].trans.copy.size = slsize; 
+		break ;
+	}
+    }
+
+    slCdLoadFile( cdhn, buf );	
+
+    while( 1 ){
+
+	slSynch();				
+	ret = slCdGetStatus( cdhn, ndata ) ;
+	slPrint("stat2:", slLocate(1, ypos));
+	slDispHex( ret, slLocate(7, ypos));
+	ypos++;
+	slPrint("ndata:", slLocate(1, ypos));
+	slDispHex( ndata[0], slLocate(7, ypos));
+	ypos++;
+	if (ypos >= 27)		ypos = 3 ;
+ 	if ( ret == CDSTAT_COMPLETED )	break;
+	if ( ndata[0] == CDBUF_FORM1 * slsize ){
+		slCdLoadFile(cdhn, buf);
+	}
+    }
+    while( 1 ) ;          
+}
+</PRE>
+
+<A NAME="no12_25"></A>
+	<P>	<DT><H3>CDDAファイルの再生</H3>
+		<DD>　CDDAファイルを再生するには、サウンドの初期化を行い、関数“slCdOpen”、“slCdLoadFile”、“slCdGetStatus”を使用してください。</P>
+
+	<P>	<DD><B>【Sint32  slCdLoadFile (CDHN cdhn, CDBUF buf[]);】</B>
+		<DD>　CDDAファイルを再生するために、次のように指定します。</P>
+<PRE>
+buf[ 0 ]. type = CDBUF_COPY;
+buf[ 0 ]. trans.copy.addr = NULL;
+buf[ 0 ]. trans.copy.unit = CDBUF_FORM1;
+buf[ 0 ]. trans.copy.size = 0;
+buf[ 1 ]. type = CDBUF_TERM;
+</PRE>
+
+	<P>	<DD>　サンプルプログラム4に、CDDAファイル再生のプログラム例を示します。</P>
+
+	<P><DD>　このサンプルプログラムはＣＤ−ＲＯＭ上のＣＤＤＡファイルを読み込むための処理であり、ＣＤ−ＲＯＭ上のＣＤＤＡファイルを再生する基本的なライブラリの使用例です。<BR>
+		フロー12-4に沿って手順を説明します。</P>
+
+	<P>	<DD><OL>
+		<LI>グラフィック等のシステムの初期化を行います。</P>
+
+	<P>	<LI>サウンドの初期化を行います。</P>
+
+	<P>	<LI>ＣＤ−ＲＯＭのシステムの初期化を行います。</P>
+
+	<P>	<LI>ファイルのオープンを行います。<BR>
+		ファイルオープンを行う関数のインプットパラメータにデータを分類するためのキー情報がありますが、この情報は不要のため、ここでは選択しない設定にしてください。</P>
+
+	<P>	<LI>ＣＤＤＡファイルの再生を行います。<BR>
+		ファイルオープン関数の戻り値のファイルハンドルと読み込み領域情報をパラメータとしＣＤＤＡファイルの再生を行います。</P>
+
+	<P>	<LI>グラフィックライブラリの実行（関数“slSynch()”）を行います。</P>
+
+	<P>	<LI>ステータス情報を取得し、ＣＤＤＡファイルの再生が終了したかを確認します。<BR>
+		再生が終了したならば、ループを終了します。<BR>
+		このループの中で関数“slSynch()”を呼ぶようにします。</P>
+	</OL>
+<A NAME="f12_4"></A>
+	<P ALIGN=CENTER><B>フロー12-4　サンプルプログラム4（CDDAファイルの再生 sample_cd4/main.c）</B>
+	<img srcset="../grp/p12_18_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="l12_4"></A>
+	<P><DD><B>リスト12-4　サンプルプログラム4（CDDAファイルの再生 sample_cd4/main.c）</B>
+<PRE>
+/*****************************************************************************
+ *
+ *	Copyright (c) 1994 SEGA
+ *
+ * File	  :main.c
+ * Date   :1995-02-20
+ * Version:0.00
+ * Auther :
+ *
+ ****************************************************************************/
+#include	"sgl.h"
+#include	"sgl_cd.h"
+#include	"sddrvs.dat"
+
+/****************************************************************************/
+#define	WIN_ORG_X	0		
+#define	WIN_ORG_Y	0		
+#define	WIN_SIZE_X	320		
+#define	WIN_SIZE_Y	240	
+#define	MAX_FILE	128
+Sint32	dirwork[SLCD_WORK_SIZE(MAX_FILE)];
+
+Uint8	sdmap[] = {
+	0x00, 0x00, 0xB0, 0x00, 0x00, 0x00, 0x80, 0x00,
+	0x10, 0x01, 0x30, 0x00, 0x00, 0x00, 0x10, 0x00,
+	0x11, 0x01, 0x40, 0x00, 0x00, 0x00, 0x20, 0x00,
+	0x20, 0x01, 0x60, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x21, 0x01, 0x68, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x22, 0x01, 0x70, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x23, 0x01, 0x78, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x24, 0x01, 0x80, 0x00, 0x00, 0x00, 0x06, 0x00,
+	0x01, 0x01, 0x86, 0x00, 0x00, 0x04, 0x00, 0x00,
+	0x30, 0x05, 0xA0, 0x00, 0x00, 0x02, 0x00, 0x00,
+	0xFF, 0xFF
+    };
+    
+/****************************************************************************/
+
+void	ss_main(void)
+{
+    Sint32	ndir;
+    CDHN	cdhn;
+    CDBUF	buf[2];
+    CDKEY	key[2];
+    Sint32	stat;
+
+    slInitSystem(TV_320x224, NULL, 1);
+    slInitSound(sddrvstsk, sizeof(sddrvstsk), sdmap, sizeof(sdmap));
+    slCDDAOn(127, 127, 0, 0);
+    ndir = slCdInit(MAX_FILE, dirwork);
+
+    key[0].cn = CDKEY_NONE;
+    key[0].sm = CDKEY_NONE;
+    key[0].ci = CDKEY_NONE;
+    key[1].cn = CDKEY_TERM;
+    cdhn = slCdOpen("cdda1", key);
+
+    buf[0].type = CDBUF_COPY;
+    buf[0].trans.copy.addr = NULL;
+    buf[0].trans.copy.unit = CDBUF_FORM1;
+    buf[0].trans.copy.size = 0;
+    buf[1].type = CDBUF_TERM;
+    slCdLoadFile(cdhn, buf);
+
+    while (1) {
+	slSynch();
+	stat = slCdGetStatus(cdhn, NULL);
+	if (stat == CDSTAT_COMPLETED)	break;
+    }
+    while (1)
+	;
+}
+</PRE>
+
+<A NAME="no12_26"></A>
+	<P>	<DT><H3>その他の一般的な事項</H3>
+
+	<P>	<DT><B>　●リードエラーについて</B>
+		<DD>　読み込み中にリードエラーが発生した場合、まずCDブロックがハード的にリカバリします。それでもリカバリできない場合は、ライブラリが一定回数リカバリ処理を行います。最終的にリカバリできないときは、ステータス取得関数は読み込みを中断し、
+			リードエラーのエラーコードを返します。</P>
+
+	<P>	<DT><B>　●パス名について</B>
+		<DD>　ディレクトリの指定は、¥または/とします。また、ディレクトリ名・ファイル名は、大文字・小文字とも使用可能です。</P>
+
+	<P>	<DT><B>　●CD-ROMライブラリの高度な使い方</B>
+		<DD>　SGLでは、ファイルシステムライブラリ、ストリームシステムライブラリの関数を使用することができます。CinepakやMPEGを使用する場合など、これらの関数を使用してください。詳しくは、各ライブラリのマニュアルを参照してください。<BR>
+		関数“slCdInit”を呼び出していれば、ファイルシステム及びストリームシステムを初期化する必要はありません。<BR>
+		SGLでファイルを読み込み中にファイルシステム、ストリームシステムを使用するときは、関数“slCdPause”を呼出し、ステータスが“CDSTAT_PAUSE”となることを確認するか、または関数“slCdAbort”を呼び出してください。<BR>
+		ファイルシステム、ストリームシステムによる読み込みを終了し、SGLに復帰する場合にも読み込みを停止させる必要があります。</P>
+
+<A NAME="z12_4"></A>
+	<P ALIGN=CENTER><B>図12-4　CD-ROMライブラリの内部構造</B><BR>
+	<img srcset="../grp/p12_21_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_30"><HR></A>
+<H2>12-3.　CDライブラリ関数</H2>
+
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_31"><HR NOSHADE></A>
+<B><FONT SIZE=5>CDHN</FONT>　ファイルハンドル</B>
+<DL>
+	<DT><B>解説</B><DD>　ファイルを読み込むためのファイルハンドルです。
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_32"><HR NOSHADE></A>
+<B><FONT SIZE=5>CDKEY</FONT>　セクタデータを分類するためのキー</B>
+<DL>
+<P><DT><B>構造</B>
+<DD><PRE>
+typedef	struct {
+    Sint16 cn;
+    Sint16 sm;
+    Sint16 ci;
+}CDKEY;
+</PRE>
+
+<P><DT><B>メンバー</B>
+<DD><TABLE>
+<TR><TH><PRE>cn  </TH><TD><PRE>チャネル番号</TD></TR>
+<TR><TH><PRE>sm  </TH><TD><PRE>サブモード</TD></TR>
+<TR><TH><PRE>ci  </TH><TD><PRE>コーディング情報</TD></TR>
+</TABLE>
+
+<P><DT><B>解説</B>
+<DD>サブヘッダを使用してセクタデータを分類するためのキーを指定します。
+
+<P><DT><B>備考</B>
+<DD>選択しない場合、CDKEY_NONEを指定します。<BR>終端のcnには、CDKEY_TERMを設定します。
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_33"><HR NOSHADE></A>
+<B><FONT SIZE=5>CDBUF</FONT>　読み込み領域情報</B>
+<DL>
+<P><DT><B>構造</B>
+<DD><PRE>
+typedef  struct {
+         void    *addr;
+         Sint32  unit;
+         Sint32  size;
+         } TRANS_COPY;
+
+typedef  struct {
+         Sint32  (*func) (void *obj, Uint32 *addr,
+                          Sint32  adinc,  Sint32 nsct);
+         void    *obj;
+         } TRANS_FUNC;
+
+typedef  struct {
+     　　Sint32  type;
+         union {
+                 TRANS_COPY  copy;
+                 TRANS_FUNC  fucn;
+         } trans;
+} CDBUF;
+</PRE>
+
+<P><DT><B>メンバー</B>
+<DD><PRE>
+type  CDBUF_COPY     ワークRAMへのコピー
+      CDBUF_FUNC     転送関数
+      CDBUF_TERM     終端
+
+-------------------------------------------------------
+type = CDBUF_COPYの場合 : copy
+-------------------------------------------------------
+addr                 読み込み領域のアドレス（読み込まない場合NULL ）
+unit  CDBUF_FORM1    読み込み領域のサイズは2048byte単位
+      CDBUF_FORM2    読み込み領域のサイズは2324byte単位
+      CDBUF_BYTE     読み込み領域のサイズはバイト単位
+size                 読み込み領域のユニット数（読み込まない場合0）
+
+-------------------------------------------------------
+type = CDBUF_FUNC の場合 : func
+-------------------------------------------------------
+func                転送関数
+obj                 オブジェクト
+</PRE>
+
+<P><DT><B>解説</B>
+<DD>読み込み領域または、転送関数を設定します。
+
+<P><DT><B>備考</B>
+<DD>読み込み領域は、4byte 境界である必要があります。
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_34"><HR NOSHADE></A>
+<B><FONT SIZE=5>Sint32 slCdInit (Sint32 nfile, void *work)</FONT>　初期化</B>
+<DL>
+<P><DT><B>パラメータ</B>
+<DD><TABLE>
+<TR><TH><PRE>nfile</TH><TD><PRE>1ディレクトリ中の最大ファイル数</TD></TR>
+<TR><TH><PRE>work </TH><TD><PRE>作業領域</TD></TR>
+</TABLE>
+
+<P><DT><B>機能</B>
+<DD>CDを使用するための初期設定を行います。
+
+<P><DT><B>戻り値</B>
+<DD>ルートディレクトリのファイル数（負の場合、エラーコード）
+
+<P><DT><B>備考</B>
+<DD>領域のサイズは、SLCD_WORK_SIZE(nfile)で求めます。<BR>
+nfile　各ディレクトリ内の最大ファイル数<BR>
+作業領域は、4byte 境界である必要があります。
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_35"><HR NOSHADE></A>
+<B><FONT SIZE=5>Sint32 slCdChgDir (Sint8 *pathname)</FONT>　ディレクトリ移動</B>
+<DL>
+<P><DT><B>パラメータ</B>
+<DD><TABLE>
+<TR><TH><PRE>pathname</TH><TD><PRE>パス名（相対パス/絶対パス指定可能）</TD></TR>
+</TABLE>
+
+<P><DT><B>機能</B>
+<DD>ディレクトリを移動します。
+
+<P><DT><B>戻り値</B>
+<DD>ディレクトリのファイル数（負の場合、エラーコード）
+
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_36"><HR NOSHADE></A>
+<B><FONT SIZE=5>CDHN slCdOpen (Sint8 *pathname, CDKEY key[])</FONT>　ファイルオープン</H3></B>
+<DL>
+<P><DT><B>パラメータ</B>
+<DD><TABLE>
+<TR><TH><PRE>pathname  </TH><TD><PRE>パス名（相対パス/絶対パス指定可能）</TD></TR>
+<TR><TH><PRE>key       </TH><TD><PRE>ストリームデータを分類するためのキー情報</TD></TR>
+</TABLE>
+
+<P><DT><B>機能</B>
+<DD>ファイルをオープンします。
+
+<P><DT><B>戻り値</B>
+<DD>ファイルハンドル（オープンできない場合はNULL）
+
+<P><DT><B>備考</B>
+<DD>読み込み中断または、完了時に自動的にクローズ処理されます。
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_37"><HR NOSHADE></A>
+<B><FONT SIZE=5>Sint32 slCdLoadFile (CDHN cdhn,CDBUF buf[]）</FONT>　ファイルの読み込み</B>
+<DL>
+<P><DT><B>パラメータ</B>
+<DD><TABLE>
+<TR><TH><PRE>cdhn  </TH><TD><PRE>ファイルハンドル</TD></TR>
+<TR><TH><PRE>buf   </TH><TD><PRE>読み込み領域情報（オープン時のキーに対応）</TD></TR>
+</TABLE>
+
+<P><DT><B>機能</B>
+<DD>再生を開始し、CD からデータを読み込みます。
+
+<P><DT><B>戻り値</B>
+<DD>エラーコード
+
+<P><DT><B>備考</B>
+<DD>読み込み領域にNULLを、ユニット数に0を指定した場合は、先読みを実行します。<BR>読み込み領域が指定された場合は、CPUDMAを使用して転送します。
+
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_38"><HR NOSHADE></A>
+<B><FONT SIZE=5>Sint32 slCdTrans (CDHN cdhn, CDBUF buf[], Sint32 ndata[])</FONT>　ストリームの転送</B>
+<DL>
+<P><DT><B>パラメータ</B>
+<DD><TABLE>
+<TR><TH><PRE>cdhn   </TH><TD><PRE>ファイルハンドル</TD></TR>
+<TR><TH><PRE>buf    </TH><TD><PRE>読み込み領域情報</TD></TR>
+<TR><TH><PRE>ndata  </TH><TD><PRE>転送領域の有効データ数（不要の場合NULL）</TD></TR>
+</TABLE>
+
+<P><DT><B>機能</B>
+<DD>ファイル読み込み一時停止中などにデータ転送だけを行います。
+
+<P><DT><B>戻り値</B>
+<DD>エラーコード
+
+<P><DT><B>備考</B>
+<DD>“slCdLoadFile（）”で転送領域にNULL を指定したキーにだけ転送することができます。<BR>本関数は、転送終了まで終了しません。
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_39"><HR NOSHADE></A>
+<B><FONT SIZE=5>Bool slCdResetBuf (CDHN cdhn, CDKEY *key)</FONT>　転送領域のリセット</H3></B>
+<DL>
+<P><DT><B>パラメータ</B>
+<DD><TABLE>
+<TR><TH><PRE>cdhn  </TH><TD><PRE>ファイルハンドル</TD></TR>
+<TR><TH><PRE>key   </TH><TD><PRE>データを分類するためのキー情報</TD></TR>
+</TABLE>
+
+<P><DT><B>機能</B>
+<DD>転送先のポインタを初期化します。
+
+<P><DT><B>戻り値</B>
+<DD><TABLE>
+<TR><TH><PRE>TRUE    </TH><TD><PRE>正常終了</TD></TR>
+<TR><TH><PRE>FLASE   </TH><TD><PRE>オープンされていないキーが指定された。</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_3a"><HR NOSHADE></A>
+<B><FONT SIZE=5>Sint32 slCdAbort (CDHN cdhn)</FONT>　読み込み中断</B>
+<DL>
+<P><DT><B>パラメータ</B>
+<DD><TABLE>
+<TR><TH><PRE>cdhn  </TH><TD><PRE>ファイルハンドル</TD></TR>
+</TABLE>
+
+<P><DT><B>機能</B>
+<DD>ファイルの読み込みを中断する
+
+<P><DT><B>戻り値</B>
+<DD>エラーコード
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_3b"><HR NOSHADE></A>
+<B><FONT SIZE=5>Sint32 slCdPause (CDHN cdhn)</FONT>　読み込み一時停止</B>
+<DL>
+<P><DT><B>パラメータ</B>
+<DD><TABLE>
+<TR><TH><PRE>cdhn   </TH><TD><PRE>ファイルハンドル</TD></TR>
+</TABLE>
+
+<P><DT><B>機能</B>
+<DD>ファイルの読み込みを一時停止します。
+
+<P><DT><B>戻り値</B>
+<DD>エラーコード
+</DL>
+<!------------------------------------------------------------------------------------------->
+<A NAME="no12_3c"><HR NOSHADE></A>
+<B><FONT SIZE=5>Sint32 slCdGetStatus (CDHN cdhn, Sint32 ndata[])</FONT>　ステータス取得</B>
+<DL>
+<P><DT><B>パラメータ</B>
+<DD><TABLE>
+<TR><TH><PRE>cdhn   </TH><TD><PRE>ファイルハンドル</TD></TR>
+</TABLE>
+ただし、以下の定数を指定することによってCDブロックの状態を取得することができます。　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+<DL><DD><TABLE>
+<TR><TH><PRE>CDREQ_FREECD  </TH><TD><PRE>ブロックの空きセクタ数取得</TD></TR>
+<TR><TH><PRE>CDREQ_FAD     </TH><TD><PRE>現在のピックアップの位置</TD></TR>
+<TR><TH><PRE>CDREQ_DRVCD   </TH><TD><PRE>ドライブ状態</TD></TR>
+</TABLE></DL>
+<DD><TABLE>
+<TR><TH><PRE>ndata   </TH><TD><PRE>ファイルハンドルが指定されている場合、転送領域の有効データ数<BR>（不要の場合NULL ）</TD></TR>
+</TABLE>
+
+<P><DT><B>機能</B>
+<DD>発行したリクエストに対するステータスを取得します。
+
+<P><DT><B>戻り値</B>
+<DD>ファイルハンドルを指定した場合のステータス（負の場合、エラーコード）
+<TR><TH><PRE>CDSTAT_PAUSE     </TH><TD><PRE>読み込み停止中</TD></TR>
+<TR><TH><PRE>CDSTAT_DOING     </TH><TD><PRE>読み込み中</TD></TR>
+<TR><TH><PRE>CDSTAT_WAIT      </TH><TD><PRE>転送待ち状態</TD></TR>
+<TR><TH><PRE>CDSTAT_COMPLETED </TH><TD><PRE>読み込み完了</TD></TR>
+<TR><TH><PRE>  CDREQ_FREEを指定した場合  </TH><TD><PRE>CDブロックの空きセクタ数</TD></TR>
+<TR><TH><PRE>  CDREQ_FADを指定した場合   </TH><TD><PRE>ピックアップの位置</TD></TR>
+<TR><TH><PRE>  CDREQ_DRVを指定した場合   </TH><TD><PRE>CDドライブ状態</TD></TR>
+<TR><TH><PRE>CDDRV-BUSY       </TH><TD><PRE>状態遷移中</TD></TR>
+<TR><TH><PRE>CDDRV_PAUSE      </TH><TD><PRE>ポーズ中</TD></TR>
+<TR><TH><PRE>CDDRV_STDBY      </TH><TD><PRE>スタンバイ</TD></TR>
+<TR><TH><PRE>CDDRV_PLAY       </TH><TD><PRE>CD 再生中</TD></TR>
+<TR><TH><PRE>CDDRV_SEEK       </TH><TD><PRE>シーク中</TD></TR>
+<TR><TH><PRE>CDDRV_SCAN       </TH><TD><PRE>スキャン再生中</TD></TR>
+<TR><TH><PRE>CDDRV_OPEN       </TH><TD><PRE>トレイが開いている</TD></TR>
+<TR><TH><PRE>CDDRV_NODISC     </TH><TD><PRE>ディスクがない</TD></TR>
+<TR><TH><PRE>CDDRV_RETRY      </TH><TD><PRE>リードリトライ処理中</TD></TR>
+<TR><TH><PRE>CDDRV_ERROR      </TH><TD><PRE>リードエラー発生</TD></TR>
+<TR><TH><PRE>CDDRV_FATAL      </TH><TD><PRE>致命的エラー発生</TD></TR>
+</TABLE>
+</DL>
+
+<A NAME="no12_3d"></A>
+<HR><DL>
+	<P>	<DT><H2>エラーコード</H2>
+		<DD><B>表12-1　エラーコード</B>
+	<TABLE BORDER=1>
+	<TR><TH>定数名</TH><TH>意味</TH><TH>定数値</TH></TR>
+	<TR><TD>CDERR_OK</TD><TD>正常終了</TD><TD>(0)</TD></TR>
+	<TR><TD>CDERR_RDERR</TD><TD>リードエラ−</TD><TD>(-1)</TD></TR>
+	<TR><TD>CDERR_NODISC</TD><TD>ディスクがセットされていない</TD><TD>(-2)</TD></TR>
+	<TR><TD>CDERR_CDROM</TD><TD>ディスクがCR-ROMでない</TD><TD>(-3)</TD></TR>
+	<TR><TD>CDERR_IPARA</TD><TD>初期化パラメータ不正</TD><TD>(-4)</TD></TR>
+	<TR><TD>CDERR_DIR</TD><TD>ディレクトリ以外へ移動</TD><TD>(-6)</TD></TR>
+	<TR><TD>CDERR_NEXIST</TD><TD>ファイルが存在しない</TD><TD>(-9)</TD></TR>
+	<TR><TD>CDERR_NUM</TD><TD>バイト数などが負</TD><TD>(-14)</TD></TR>
+	<TR><TD>CDERR_PUINUSE</TD><TD>ピックアップ動作中</TD><TD>(-20)</TD></TR>
+	<TR><TD>CDERR_ALIGN</TD><TD>作業領域が4byte境界にない</TD><TD>(-21)</TD></TR>
+	<TR><TD>CDERR_TMOUT</TD><TD>タイムアウト</TD><TD>(-22)</TD></TR>
+	<TR><TD>CDERR_OPEN</TD><TD>トレイオープン</TD><TD>(-23)</TD></TR>
+	<TR><TD>CDERR_FATAL</TD><TD>CDドライブが＜FATAL＞</TD><TD>(-25)</TD></TR>
+	<TR><TD>CDERR_BUSY</TD><TD>状態遷移中</TD><TD>(-50)</TD></TR>
+	</TABLE></P>
+</DL>
+<HR NOSHADE>
+<B>▲<a href="demo_c_j.htm">戻る</A>｜<a href="p13_10_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

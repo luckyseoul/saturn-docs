@@ -1,0 +1,62 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/17&gt;Programmer's Guide/File System Library/8.Function Specifications-3</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+ <B>▲ <A HREF="p08_12.htm">Back</a> ｜ <A HREF="p08_14.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><H2 ALIGN=CENTER> 8.Function specification-3</H2><HR NOSHADE>
+<A NAME="no8_30"></A><H3> 8.3 Read with return completion</H3><!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_1"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Batch loading files</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_Load</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_Load(Sint32 fid, Sint32 off, void *buf, Sint32 bsize)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> fid</TD><TD><PRE> :File identifier</TD></TR>
+<TR><TD><PRE> off</TD><TD><PRE> : Offset (in sector units)</TD></TR>
+<TR><TD><PRE> bsize</TD><TD><PRE> : Upper limit of number of data to read (unit: bytes)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> buf: data reading area<DT> <B>function value</b><DD> Number of data read (in bytes). Negative error code in case of error.<DT> <B>function</b><DD> Reads data from a file by specifying the file identifier. Opening and closing processing is done inside this function.<BR>
+ If the file size is less than bsize, data up to the end of the file is read. If you specify GFS_BUFSIZ_INF for bsize, data from the specified position to the end of the file will be read.<DT> <B>remarks</b><DD> buf must be aligned on a 4-byte boundary. Default values are used for retrieval mode, transfer mode, read parameters, and retrieval parameters.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_2"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Loading data</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_Fread</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_Fread(GfsHn gfs, Sint32 nsct, void *buf, Sint32 bsize)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> nsct</TD><TD><PRE> : Number of sectors to read</TD></TR>
+<TR><TD><PRE> bsize</TD><TD><PRE> : Upper limit of number of data to read (unit: bytes)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> buf: Read area<DT> <B>function value</b><DD> Number of bytes actually read<DT> <B>function</b><DD> Reads and processes file data by specifying the opened file handle.<BR>
+ Read the nsct sector data from the access pointer. Of the read data, up to bsize bytes are written to buf. The access pointer advances nsct sectors ahead.<DT> <B>remarks</b><DD> There are restrictions on buf address boundaries depending on the transfer mode.<DD><TABLE>
+<TR><TD><PRE>・When GFS_TMODE_SCU</TD><TD><PRE> :No limit</TD></TR>
+<TR><TD><PRE>・Other times</TD><TD><PRE> :Align on 4-byte boundary</TD></TR>
+</TABLE>
+<!-- *** Update by CRI ：5.10 -->
+<DD> Regardless of the value specified in GFS_SetReadPara, the default value will be used for the read parameter.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_12.htm">Back</a> ｜ <A HREF="p08_14.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no7">File system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

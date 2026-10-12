@@ -1,0 +1,336 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/5&gt;ＤＭＡライブラリ/2.2　データ仕様</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">ＤＭＡライブラリ</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p02_12_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ＤＭＡライブラリ/2.リファレンス</B>
+<HR NOSHADE>
+
+<A NAME="no2_20"></A>
+<H3>2.2　データ仕様</H3>
+
+<H2>[低水準 SCU]</H2>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><a href="p02_10_j.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=290><PRE>Data<BR><H4>DMAチャネル</H4></TD>
+<TD WIDTH=200><PRE>Data name<BR><H3>なし</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1</H4></TD>
+</TR></TABLE>
+
+	<P><DD>　SCUのDMAチャネルを指定するときは、以下の定数を使用してください。</P>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160><PRE>定数</TH><TH WIDTH=280><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_SCU_CH0</TD><TD><PRE>チャネル0</TD></TR>
+	<TR><TD><PRE>DMA_SCU_CH1</TD><TD><PRE>チャネル1</TD></TR>
+	<TR><TD><PRE>DMA_SCU_CH2</TD><TD><PRE>チャネル2</TD></TR></TABLE></P>
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><a href="p02_10_j.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=290><PRE>Data<BR><H4>転送パラメータ</H4></TD>
+<TD WIDTH=200><PRE>Data name<BR><H3>DmaScuPrm</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2</H4></TD>
+</TR></TABLE>
+
+	<P><DD>転送パラメータは以下のような構造体です。</P>
+	<DD><PRE>
+struct      {
+     Uint32     dxr;               /* 読み込みアドレス　　　　　　*/
+     Uint32     dxw;               /* 書き出しアドレス　　　　　　*/
+     Uint32     dxc;               /* 転送バイト数　　　　　　　　*/
+     Uint32     dxad_r;            /* 読み込みアドレス加算値　　　*/
+     Uint32     dxad_w;            /* 書き込みアドレス加算値　　　*/
+     Uint32     dxmod;             /* モードビット　　　　　　　　*/
+     Uint32     dxrup;             /* 読み込みアドレス更新ビット　*/
+     Uint32     dxwup;             /* 書き込みアドレス更新ビット　*/
+     Uint32     dxft;              /* 起動要因選択ビット　　　　　*/
+     Uint32     msk;               /* マスクビット　　　　　　　　*/
+}DmaScuPrm;
+</PRE></P>
+	<P><DD>　以下に、この各メンバで使用できる定数を示します。</P>
+	<DD><PRE>
+dxad_r     /* 読み込みアドレス加算値         */
+</PRE></P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_SCU_R0</TD><TD><PRE>加算しない</TD></TR>
+	<TR><TD><PRE>DMA_SCU_R4</TD><TD><PRE>4バイト加算する</TD></TR></TABLE></P>
+
+	<P><DD>dxad_w　　/* 書き込みアドレス加算値　　　*/
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_SCU_W0</TD><TD><PRE>加算しない</TD></TR>
+	<TR><TD><PRE>DMA_SCU_W2</TD><TD><PRE>2バイト加算する</TD></TR>
+	<TR><TD><PRE>DMA_SCU_W4</TD><TD><PRE>4バイト加算する</TD></TR>
+	<TR><TD><PRE>DMA_SCU_W8</TD><TD><PRE>8バイト加算する</TD></TR>
+	<TR><TD><PRE>DMA_SCU_W16</TD><TD><PRE>16バイト加算する</TD></TR>
+	<TR><TD><PRE>DMA_SCU_W32</TD><TD><PRE>32バイト加算する</TD></TR>
+	<TR><TD><PRE>DMA_SCU_W64</TD><TD><PRE>64バイト加算する</TD></TR>
+	<TR><TD><PRE>DMA_SCU_W128</TD><TD><PRE>128バイト加算する</TD></TR></TABLE></P>
+
+	<P><DD>dxmod 　　/* モードビット　　　　　　　　　*/
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_SCU_DIR</TD><TD><PRE>直接モード</TD></TR>
+	<TR><TD><PRE>DMA_SCU_IN_DIR</TD><TD><PRE>間接モード</TD></TR></TABLE></P>
+
+	<P><DD><PRE>
+dxrup　　/* 読み込みアドレス更新ビット　　*/
+dxwup　　/* 書き込みアドレス更新ビット　　*/
+</PRE><P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_SCU_KEEP</TD><TD><PRE>保持する</TD></TR>
+	<TR><TD><PRE>DMA_SCU_REN</TD><TD><PRE>更新する</TD></TR>
+	</TABLE></P>
+
+	<P><DD><PRE>
+dxft  　　/* 起動要因選択ビット　　　　　　　*/</PRE><P>
+
+	<P><DD><TABLE BORDER>
+<TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH><TR>
+<TD><PRE>DMA_SCU_F_VBLK_IN</TD><TD><PRE>V-ブランク-IN信号受信</TD><TR>
+<TD><PRE>DMA_SCU_F_VBLK_OUT</TD><TD><PRE>V-ブランク-OUT信号受信</TD><TR>
+<TD><PRE>DMA_SCU_F_HBLK_IN</TD><TD><PRE>H-ブランク-IN信号受信</TD><TR>
+<TD><PRE>DMA_SCU_F_TIM0</TD><TD><PRE>タイマ0信号受信</TD><TR>
+<TD><PRE>DMA_SCU_F_TIM1</TD><TD><PRE>タイマ1信号受信</TD><TR>
+<TD><PRE>DMA_SCU_F_SND</TD><TD><PRE>サウンド-Req信号受信</TD><TR>
+<TD><PRE>DMA_SCU_F_SPR</TD><TD><PRE>スプライト描画終了信号受信</TD><TR>
+<TD><PRE>DMA_SCU_F_DMA</TD><TD><PRE>DMA起動要因ビットのセット</TD>
+</TABLE><P>
+
+	<P><DD><PRE>
+mask       /* マスクビット                   */</PRE><P>
+
+	<P><DD>メンバの書き込みマスクビットです。以下の定数で指定したビット以外は書き込み(設定)しません。論理和による複数の指定が可能です。</P>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_SCU_M_DXR</TD><TD><PRE>読み込みアドレス</TD></TR>
+	<TR><TD><PRE>DMA_SCU_M_DXW</TD><TD><PRE>書き出しアドレス</TD></TR>
+	<TR><TD><PRE>DMA_SCU_M_DXC</TD><TD><PRE>転送バイト数</TD></TR>
+	<TR><TD><PRE>DMA_SCU_M_DXAD_R</TD><TD><PRE>読み込みアドレス加算値</TD></TR>
+	<TR><TD><PRE>DMA_SCU_M_DXAD_W</TD><TD><PRE>書き込みアドレス加算値</TD></TR>
+	<TR><TD><PRE>DMA_SCU_M_DXMOD</TD><TD><PRE>モードビット</TD></TR>
+	<TR><TD><PRE>DMA_SCU_M_DXRUP</TD><TD><PRE>読み込みアドレス更新ビット</TD></TR>
+	<TR><TD><PRE>DMA_SCU_M_DXWUP</TD><TD><PRE>書き込みアドレス更新ビット</TD></TR>
+	<TR><TD><PRE>DMA_SCU_M_DXFT</TD><TD><PRE>起動要因選択ビット</TD></TR></TABLE><P>
+</DL>
+
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><a href="p02_10_j.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=290><PRE>Data<BR><H4>ステータス</H4></TD>
+<TD WIDTH=200><PRE>Data name<BR><H3>DmaScuStatus</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3</H4></TD>
+</TR></TABLE>
+
+<P><DD>ステータスは以下のような構造体です。
+<P><DD><PRE>
+struct {
+    	Uint32 dxmv;
+        }
+</PRE></P>
+<P>以下に、この各メンバで使用できる定数を示します。
+
+<P>dxmv /* DMA動作フラグ */
+
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160><PRE>定数</TH><TH WIDTH=280><PRE>説明</TH></TR>
+	<TR><TD>DMA_SCU_MV </TD><TD>動作中</TD></TR>
+	<TR><TD>DMA_SCU_NO_MV </TD><TD>動作中でない </TD></TR>
+	</TABLE>
+</DL>
+
+<HR>
+<H2>[低水準 CPU]</H2>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><a href="p02_10_j.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=290><PRE>Data<BR><H4>DMAチャネル</H4></TD>
+<TD WIDTH=200><PRE>Data name<BR><H3>なし</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4</H4></TD>
+</TR></TABLE>
+
+	<P><DD>CPUのDMAチャネルを指定するときは、以下の定数を使用してください。</P>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_CH0</TD><TD><PRE>チャネル0</TD></TR>
+	<TR><TD><PRE>DMA_CPU_CH1</TD><TD><PRE>チャネル1</TD></TR></TABLE><P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no5"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><a href="p02_10_j.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=290><PRE>Data<BR><H4>共通転送パラメータ</H4></TD>
+<TD WIDTH=200><PRE>Data name<BR><H3>DmaCpuComPrm</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>5</H4></TD>
+</TR></TABLE>
+
+	<P><DD>共通転送パラメータは以下のような構造体です。</P>
+	<DD><PRE>
+struct     {
+     Uint32 pr;      /* プライオリティモード     */
+     Uint32 dme;     /* DMAマスタイネーブル      */
+     Uint32 msk;     /* マスクビット             */
+}DmaCpuComPrm;
+</PRE></P>
+	<P>	<DD>以下に、この各メンバで使用できる定数を示します。</P>
+
+	<P><DD><PRE>
+pr           /* プライオリティモード    */
+</PRE>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_FIX</TD><TD><PRE>優先順位は固定</TD></TR>
+	<TR><TD><PRE>DMA_CPU_ROR</TD><TD><PRE>優先順位はラウンドロビンによる</TD></TR></TABLE></P>
+
+	<P><DD><PRE>dme          /* DMAマスタイネーブル     */</PRE>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_DIS</TD><TD><PRE>全チャネルのDMA転送を禁止</TD></TR>
+	<TR><TD><PRE>DMA_CPU_ENA</TD><TD><PRE>全チャネルのDMA転送を許可</TD></TR></TABLE></P>
+
+	<P><DD><PRE>msk          /* マスクビット            */</PRE>
+	<DD>　メンバの書き込みマスクビットです。以下の定数で指定したビット以外は書き込み(設定)しません。論理和による複数の指定が可能です。</P>
+
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_M_PR</TD><TD><PRE>プライオリティモード</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_AE</TD><TD><PRE>アドレスエラーフラグ</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_NMIF</TD><TD><PRE>NMIフラグ</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_DME</TD><TD><PRE>DMAマスタイネーブル</TD></TR></TABLE></P>
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no6"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><a href="p02_10_j.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=290><PRE>Data<BR><H4>転送パラメータ</H4></TD>
+<TD WIDTH=200><PRE>Data name<BR><H3>DmaCpuPrm</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6</H4></TD>
+</TR></TABLE>
+
+	<P><DD>転送パラメータは以下のような構造体です。</P>
+	<DD><PRE>
+struct {
+     Uint32 sar;     /* DMAソースアドレス　　　　　　　　　　　*/
+     Uint32 dar;     /* DMAディスティネーションアドレス　　　　*/
+     Uint32 tcr;     /* DMAトランスファカウント　　　　　　　　*/
+     Uint32 dm;      /* ディスティネーションアドレスモード   　*/
+     Uint32 sm;      /* ソースアドレスモードビット　　　　　　 */
+     Uint32 ts;      /* トランスファサイズ　　　　　　　　　　 */
+     Uint32 ar;      /* オートリクエストモード　　　　　　　　 */
+     Uint32 ie;      /* インタラプトイネーブル　　　　　　　　 */
+     Uint32 drcr;    /* DMA要求／応答選択制御　　　　　　　　　*/
+     Uint32 msk;     /* マスクビット　　　　　　　　　　　　　 */
+}DmaCpuPrm;
+</PRE><P>
+	<P><DD>　以下に、この各メンバで使用できる定数を示します。<P>
+	<DD><PRE>
+dm     /* ディスティネーションアドレスモード　　 */
+sm     /* ソースアドレスモードビット　　　　　　 */</PRE><P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_AM_NOM</TD><TD><PRE>固定</TD></TR>
+	<TR><TD><PRE>DMA_CPU_AM_ADD</TD><TD><PRE>増加</TD></TR>
+	<TR><TD><PRE>DMA_CPU_AM_SUB</TD><TD><PRE>減少</TD></TR></TABLE><P>
+
+	<P><DD><PRE>
+ts     /* トランスファサイズ                     */</PRE></P>
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_1</TD><TD><PRE>バイト単位</TD></TR>
+	<TR><TD><PRE>DMA_CPU_2</TD><TD><PRE>ワード（2バイト）単位</TD></TR>
+	<TR><TD><PRE>DMA_CPU_4</TD><TD><PRE>ロングワード（4バイト）単位</TD></TR>
+	<TR><TD><PRE>DMA_CPU_16</TD><TD><PRE>16バイト単位</TD></TR></TABLE></P>
+
+	<P><DD><PRE>ar     /* オートリクエストモード                 */</PRE><P>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_MOD</TD><TD><PRE>モジュールリクエスト</TD></TR>
+	<TR><TD><PRE>DMA_CPU_AUTO</TD><TD><PRE>アートリクエスト</TD></TR></TABLE></P>
+
+	<P><DD><PRE>ie     /* インタラプトイネーブル                 */</PRE></P>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_INT_ENA</TD><TD><PRE>割り込み要求を許可</TD></TR>
+	<TR><TD><PRE>DMA_CPU_INT_DIS</TD><TD><PRE>割り込み要求を禁止</TD></TR></TABLE></P>
+
+	<P><DD><PRE>drcr     /* DMA要求／応答選択制御    */</PRE></P>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_DREQ</TD><TD><PRE>DREQ（外部リクエスト）</TD></TR>
+	<TR><TD><PRE>DMA_CPU_RXI</TD><TD><PRE>RXI（内蔵SCIの受信データフル割り込み転送<BR>要求）</TD></TR>
+	<TR><TD><PRE>DMA_CPU_TXI</TD><TD><PRE>TXI（内蔵SCIの送信データエンプティ割り込み<BR>転送要求）</TD></TR></TABLE></P>
+
+	<P><DD><PRE>msk     /* マスクビット              */</PRE></P>
+	<P><DD>メンバの書き込みマスクビットです。以下の定数で指定したビット以外は書き込み(設定)しません。論理和による複数の指定が可能です。</P>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=160 ALIGN="CENTER"><PRE>定数</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH></TR>
+	<TR><TD><PRE>DMA_CPU_M_SAR</TD><TD><PRE>DMAソースアドレス</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_DAR</TD><TD><PRE>DMAディスティネーションアドレス</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_TCR</TD><TD><PRE>DMAトランスファカウント</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_DM</TD><TD><PRE>ディスティネーションアドレスモード</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_SM</TD><TD><PRE>ソースアドレスモードビット</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_TS</TD><TD><PRE>トランスファサイズ</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_AR</TD><TD><PRE>オートリクエストモード</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_IE</TD><TD><PRE>インタラプトイネーブル</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_DRCR</TD><TD><PRE>DMA要求／応答選択制御</TD></TR>
+	<TR><TD><PRE>DMA_CPU_M_TE</TD><TD><PRE>トランスファエンドフラグ</TD></TR></TABLE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p02_12_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">ＤＭＡライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

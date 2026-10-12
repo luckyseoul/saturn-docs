@@ -1,0 +1,83 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/17&gt;MPEG Library/Appendix A</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no12">MPEG library</a><HR>
+ <B>▲ <A HREF="p12_13.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>MPEG library</b><CENTER>
+<H4> Appendix A</H4><H2> A.1 Supplementary information</H2></CENTER>
+<HR NOSHADE>
+<P> This is an addition to the main text of the manual.</P>
+<!-- +++ Add by CRI ：3. -->
+<HR>
+<DL>
+<A NAME="no13_10"></A><P><DT><H2> 1. Precautions for use</H2><P><DT> <B>(1) MPCM flag status</b><DD> When calling the functions of this library, be sure to call them with the MPCM flag set to ON.</P>
+<P><DT> <B>(2) Restrictions on the use of MPST flag</b><DD> If the application clears the MPST flag or sets the MPEG interrupt mask, the operation of the following functions is not guaranteed.</P>
+<DD><UL TYPE=DISC>
+<LI> MPG_IsDecReady<LI> MPG_CheckHng</UL>
+</P>
+<P><DT> <B>(3) How to change the display window offset</b><DD> If you want to change the display window offset in your application, use the CDC_MpSetWinDofs function of the CD communication interface.</P>
+<P><DT> <B>(4) Restrictions on the use of default transfer functions in host transfer mode</b><DD> When using the default transfer function, the MPEG library uses the DMA library to launch SCU-DMA. The level used is 0.<BR>
+ Therefore, you must enable level 0-DMA interrupts by running the INT_ChgMsk function as follows:<BR>
+ (Please refer to the DMA/interrupt related documentation for details.)</P>
+<P><DD><PRE>
+/* Enable SCU-DMA0 end interrupt */
+INT_ChgMsk(INT_MSK_DMA0, INT_MSK_NULL);
+</PRE></P>
+<P><DD>This process is executed within the GFS_Init function of the file system library (Ver. 1.11 or later), so there is usually no need to execute it in the application.</P>
+<P><DT> <B>(5) Precautions when using SCU-DMA</b><DD> Since A-Bus access is prohibited during SCU-DMA transfer, use of all MPEG library functions is prohibited. Please note that the default transfer function also uses SCU-DMA.</P>
+<P><DT> <B>(6) Function call by interrupt</b><DD> The use of MPEG library functions other than MPG_CaptStat is prohibited within interrupt processing. </P>
+</DL>
+<!-- --- Add by CRI ：3. -->
+<!-- +++ Add by CRI ：4.2 -->
+<HR>
+<DL>
+<A NAME="no13_20"></A><P><DT><H2>2. How to set MPEG audio output</H2><DD> To play MPEG audio and actually output audio, you need to make the same settings for SCSP as for CD-DA.<BR>
+ In terms of hardware, the MPEG audio decoding result is output as the same signal as CD-DA.</P>
+<P><DT> <B>(1) SCSP settings</b><DD> There are three methods to configure SCSP:</P>
+<DD><OL TYPE=a>
+<P><B><LI></b> Configure directly on the hardware (SCSP).</P>
+<P><DD><PRE>
+/* SCSP settings */
+*((Uint16 *)0x25b00216) = 0x00ff;
+*((Uint16 *)0x25b00236) = 0x00ef;
+*((Uint16 *)0x25b00400) = 0x000f;
+</PRE></P>
+<P><B><LI></b>Set using the sound I/F library.</P>
+<P><DD><PRE>
+/* Setting by SND I/F function */
+/* Note: In practice, set an upper limit on the number of loops */
+while (SND_SetCdDaLev(6, 6) == SND_RET_NSET);
+while (SND_SetCdDaPan(-15, 15) == SND_RET_NSET);
+while (SND_SetTlVl(15) == SND_RET_NSET);
+</PRE></P>
+</OL>
+<P><DT><B>(2) Sending level</b><DD> Please refer to the technical information below for the transmission level.</P>
+<P><DT> <B>Reference</b><DD> SEGASATURN Developer's Information STN-29<BR>
+ " <A HREF="../../../../info/hon/stn29.htm">About CD-DA volume settings</a> "</P>
+</DL>
+<!-- --- Add by CRI ：4.2 -->
+<HR NOSHADE>
+ <B>▲ <A HREF="p12_13.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no12">MPEG library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

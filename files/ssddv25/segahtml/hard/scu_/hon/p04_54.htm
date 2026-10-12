@@ -1,0 +1,188 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;24/31&gt;SCU User's Manual/5.DSP Instruction Details</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p04_53.htm">Back</a> ｜ <A HREF="p04_55.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 4 DSP Control</b><H2 ALIGN=CENTER> Arithmetic instruction</H2><H3 ALIGN=CENTER> D1-Bus control instructions</H3> D1-Bus control instructions control data exchange between memories connected to D1-Bus.<HR NOSHADE>
+<!-- --------------------------------------------------------- -->
+<A NAME="d1bus_nop"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#d1bus">List</a> | ▲ <A HREF="p04_53.htm#ybus_mov_sa">Back</a> | <A HREF="#d1bus_simm">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> NOP</H1><DD><H3> D1-Bus no operation</H3></P>
+<P><DT> <B>Operation details</b><DD> The D1-Bus section will be unprocessed.</P>
+<P><DT> <B>descriptive formula</b><DD> label: NOP</P>
+<P><DT> <B>instruction code</b>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>　</TD><TD>　</TD><TD>13</TD><TD>12</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+</TR></TABLE>
+<P><DT> <B>flag</b><DD> No change.</P>
+<P><DT> <B>remarks</b><DD> none.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="d1bus_simm"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#d1bus">List</a> | ▲ <A HREF="#d1bus_nop">Back</a> | <A HREF="#d1bus_mov_sd">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MOV SImm,[d]</H1><DD><H3> Transfer (SImm→[destination])</H3></P>
+<P><DT> <B>Operation details</b><DD> Transfers SIMm data to the RAM or register specified by [destination].<DD> SImm data is signed 8-bit data.</P>
+<P><DT> <B>descriptive formula</b><DD> label: MOV SImm,[Destination]<DD> Destination = MC0~MC3,RX,PL,RA0,WA0,LOP,TOP,TC0~TC3</P>
+<P><DT> <B>instruction code</b>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>　</TD><TH>　</TH><TH>　</TH><TH>　</TH><TD>　</TD><TD>　</TD><TD>　</TD><TH>　</TH>
+<!--15         14         13         12         11         10         09         08  -->
+<TH>　</TH><TH>　</TH><TD>13</TD><TD>12</TD><TH>11</TH><TH>10</TH><TH>９</TH><TH>８</TH>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>０</TD><TD>１</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD COLSPAN=8> SImm data</TD></TR>
+</TABLE>
+</P>
+<P><CENTER>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit11</TH><TH> bit10</TH><TH> bit9</TH><TH> bit8</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> [TOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [CT0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [CT1]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [CT2]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [CT3]</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<P><DT> <B>flag</b><DD> [d] Area selected by selection; Imm data.</P>
+<P><DT> <B>remarks</b><DD> [MCx(x=0~3)] specifies DATA RAMx(x0~3), and after transfer, increments [CTx(x=0~3)].</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="d1bus_mov_sd"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#d1bus">List</a> | ▲ <A HREF="#d1bus_simm">Back</a> | <A HREF="p04_55.htm#mvi_imm_d">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MOV [s],[d]</H1><DD> <B>Transfer ([source]→[destination])</b><P><DT> <B>Operation details</b><DD> Transfers the data in the RAM or register specified by [source] to the RAM or register specified by [destination].<P><DT> <B>descriptive formula</b><DD> label: MOV [source],[destination]<P ALIGN=CENTER> Source = MC0～MC3,MC0～MC3,ALH,ALL<BR>
+ Destination = MC0~MC3,RX,PL,RA0,WA0,LOP,TOP,TC0~TC3</P>
+<P><DT> <B>instruction code</b>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>　</TD><TH>　</TH><TH>　</TH><TH>　</TH><TD>　</TD><TD>　</TD><TD>　</TD><TH>　</TH>
+<!--15         14         13         12         11         10         09         08  -->
+<TH>　</TH><TH>　</TH><TD>13</TD><TD>12</TD><TH>11</TH><TH>10</TH><TH>９</TH><TH>８</TH>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>３</TH><TH>２</TH><TH>１</TH><TH>０</TH>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>０</TD><TD>１</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TR></TABLE>
+</P>
+<P><CENTER>
+<TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit11</TH><TH> bit10</TH><TH> bit9</TH><TH> bit8</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [RA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [WA0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [LOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> [TOP]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> [CT0]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> [CT1]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> [CT2]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> [CT3]</TD></TR>
+</TABLE>
+</TD><TD></TD><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4> bit data</TH><TH ROWSPAN=2> [d] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit13</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM3,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM3,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM3,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> unused</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> [ALU LOW]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> [ALU HIGHT]<BR>
+ Upper 32 bits of 48 bits</TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<P><DT> <B>flag</b><DD> [d] Area selected by the option; [s] Data for the area selected by the option.<P><DT> <B>remarks</b><DD> [Mx(x=0~3)] specifies DATA RAMx(x0~3).<DD> [MCx(x=0~3)] specifies DATA RAMx(x0~3), and increments [CTx(x=0~3)] after transfer.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_53.htm">Back</a> ｜ <A HREF="p04_55.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

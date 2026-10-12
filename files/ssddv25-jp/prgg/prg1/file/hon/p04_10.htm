@@ -1,0 +1,86 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/17&gt;プログラマーズガイド/ファイルシステムライブラリ/4．ファイルアクセス</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no4">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>4．ファイルアクセス</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P>	<DT><H3>4.1　アクセスモデル</H3>
+		<DD>　ファイルアクセスのモデル図を図4.1に示します。</P>
+
+<A NAME="z4_1"></A>
+	<P ALIGN=CENTER><B>図4.1　アクセス関数モデル</B><BR><IMG SRC="../grp/i013_01.gif"></P>
+
+	<P><DD>　CD-ROMからCDバッファへデータを転送することを「読み込み」と呼び、CDバッファからホスト領域にデータを転送することを「取り出し」と呼びます。<BR>
+　アプリケーションはGFS_Fread、GFS_NwFreadを使うことによって読み込み処理を意識せずにCD-ROMからデータを転送できます。<BR>
+　読み込み処理もアプリケーションで制御したい場合はGFS_NwCdReadを使用します。</P>
+
+<A NAME="no4_20"></A>
+	<P><DT><H3>4.2　アクセスポインタ</H3>
+		<DD>　アクセスポインタは読み込みによって更新されるため、セクタ単位で移動します。<BR>
+　次の式を実行して、ホスト領域bufへ5000バイト読み込む処理を実行したときのアクセスポインタの移動を図4.2に示します。実行後、アクセスポインタは、AP1からAP2へ移動しています。</P>
+
+	<P><DD>　GFS_Fread(gfs, 3, buf, 5000);</P>
+
+<A NAME="z4_2"></A>
+	<P ALIGN=CENTER><B>図4.2　アクセスポインタの移動</B><BR><IMG SRC="../grp/i013_02.gif"></P>
+
+
+	<P><DD>　ファイルの種類ごとのセクタの大きさを表4.1に示します。</P>
+
+<A NAME="t4_1"></A>
+	<P><DD><B>表4.1　ファイル種別ごとのセクタ長</B>
+		<DD><TABLE BORDER=1>
+<TR><TH align="center" width=260><PRE>ファイル種別</TH><TH align="center" width=260><PRE>セクタ長(byte)</TH></TR>
+<!-- *** Update by CRI ：7.4 --><TR><TD align="left"><PRE>CD-ROM Mode1</TD><TD align="center"><PRE>2048</TD></TR>
+<!-- *** Update by CRI ：7.4 --><TR><TD align="left"><PRE>CD-ROM Mode2 Form1のみ</TD><TD align="center"><PRE>2048</TD></TR>
+<!-- *** Update by CRI ：7.4 --><TR><TD align="left"><PRE>CD-ROM Mode2 Form2のみ</TD><TD align="center"><PRE>2324</TD></TR>
+<!-- *** Update by CRI ：7.4 --><TR><TD align="left"><PRE>CD-ROM Mode2混在</TD><TD align="center"><PRE>不定</TD></TR>
+<TR><TD align="left"><PRE>DOSファイル</TD><TD align="center"><PRE>2048</TD></TR>
+<TR><TD align="left"><PRE>メモリファイル</TD><TD align="center"><PRE>2048</TD></TR></TABLE></P>
+
+
+	<P><DD>　読み込みがセクタ単位で行われるのに対して、取り出しは４バイト単位で行われます。</P>
+
+<A NAME="no4_30"></A>
+	<P>	<DT><H3>4.3　ファイルごとに管理されるパラメータ</H3>
+		<DD>　オープンされた各ファイルについてライブラリが管理するパラメータのうち、アプリケーションは5個のパラメータを変更できます。それらのパラメータを表4.2に示します。</P>
+
+<A NAME="t4_2"></A>
+	<P><DD><B>表4.2　各ファイルのパラメータ</B>
+		<DD><TABLE BORDER=1>
+<TR><TH align="center"><PRE>パラメータ</TH><TH align="center"><PRE>説明</TH><TH align="center"><PRE>変更する関数</TH><TH align="center"><PRE>初期値</TH></TR>
+<TR><TD align="left"><PRE>アクセスポインタ</TD><TD align="left"><PRE>読み込みを開始<BR>するファイル上のオフ<BR>セット（単位はセクタ）</TD><TD align="left"><PRE>GFS_Seek</TD><TD align="left"><PRE>0</TD></TR>
+<!-- *** Update by CRI ：7.5 --><TR><TD align="left"><PRE>取り出しモード</TD><TD align="left"><PRE>取り出した後、CD<BR>バッファのセクタデータを<BR>削除するか、残して<BR>おくかを指定する</TD><TD align="left"><PRE>GFS_SetGmode</TD><TD align="left"><PRE>GFS_GMODE_ERASE</TD></TR>
+<TR><TD align="left"><PRE>転送モード</TD><TD><PRE>取り出し処理を行<BR>うデバイスを指定する</TD><TD><PRE>GFS_SetTmode</TD><TD align="left"><PRE>GFS_TMODE_CPU</TD align="left"></TR>
+<TR><TD align="left"><PRE>読み込みパラメータ</TD><TD align="left"><PRE>1回の読み込み<BR>処理で転送する<BR>最大セクタ数</TD><TD align="left"><PRE>GFS_SetReadPara</TD><TD align="left"><PRE>GFS_RPARA_DFL</TD></TR>
+<TR><TD align="left"><PRE>取り出しパラメータ</TD><TD align="left"><PRE>1回の取り出し<BR>処理で転送す<BR>るセクタ数</TD><TD align="left"><PRE>GFS_SetTransPara</TD><TD align="left"><PRE>1</TD></TR></TABLE></P>
+
+
+	<P><DD>　オープンされているファイルは、CDブロックの資源である絞りとバッファ区画をそれぞれ一つずつ専有します。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no4">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

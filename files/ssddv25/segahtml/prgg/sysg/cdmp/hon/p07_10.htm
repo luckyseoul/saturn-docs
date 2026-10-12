@@ -1,0 +1,290 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/ 8&gt;CD communication I/F (MPEG part)/7.MPEG data specifications</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication I/F (MPEG part)</b><H2 ALIGN=CENTER> 7. MPEG data specifications</H2><HR NOSHADE>
+<DL>
+<P> Describe constants, data types, access macros, etc. used in the MPEG communication interface.</P>
+<P><DT> <B>(1) Format</b><DD> In the figure, the reserved area is represented by "-". Be sure to specify 0 for the reserved area.</P>
+<A NAME="no7_10"></A><P><DT><H3> 7.1 MPEG data list</H3><DD> Table 7.1 shows the data list of the MPEG communication interface.</P>
+<A NAME="t7_1"></A><P><DD> <B>Table 7.1 MPEG data list</b><TABLE BORDER=1>
+<TR><TH COLSPAN=2 WIDTH=240> data</TH><TH WIDTH=180> data name</TH><TH WIDTH=040> number</TH></TR>
+<TR><TD COLSPAN=2> constant</TD><TD> <A HREF="#20.0">Constant</a></TD><TD> 20.0</TD></TR>
+<TR><TD COLSPAN=2> Status and MPEG report</TD><TD> <A HREF="#21.0">Status & MPEG Report</a></TD><TD> 21.0</TD></TR>
+<TR><TD ROWSPAN=5 WIDTH=10></TD><TD> MPEG operation status</TD><TD> <A HREF="#21.1">actst</a></TD><TD> 21.1</TD></TR>
+<TR><TD> Operation section counter</TD><TD> <A HREF="#21.2">vcnt</a></TD><TD> 21.2</TD></TR>
+<TR><TD> Picture information</TD><TD> <A HREF="#21.3">pict</a></TD><TD> 21.3</TD></TR>
+<TR><TD> MPEG/Audio status</TD><TD> <A HREF="#21.4">stat_a</a></TD><TD> 21.4</TD></TR>
+<TR><TD> MPEG/Video status</TD><TD> <A HREF="#21.5">stat_v</a></TD><TD> 21.5</TD></TR>
+<TR><TD COLSPAN=2> MPEG interrupt factor flag</TD><TD> <A HREF="#22.0">Intreq</a></TD><TD> 22.0</TD></TR>
+<TR><TD COLSPAN=3> data type</TD><TD> 23.0</TD></TR>
+<TR><TD ROWSPAN=5 WIDTH=10></TD><TD> MPEG status information</TD><TD> <A HREF="#23.1">CdcMpStat</a></TD><TD> 23.1</TD></TR>
+<TR><TD> time code</TD><TD> <A HREF="#23.2">CdcMpTc</a></TD><TD> 23.2</TD></TR>
+<TR><TD> MPEG decoder connection destination parameters</TD><TD> <A HREF="#23.3">CdcMpCon</a></TD><TD> 23.3</TD></TR>
+<TR><TD> MPEG stream parameters</TD><TD> <A HREF="#23.4">CdcMpStm</a></TD><TD> 23.4</TD></TR>
+<TR><TD> Screen special effect parameters</TD><TD> <A HREF="#23.5">CdcMpVeff</a></TD><TD> 23.5</TD></TR>
+</TABLE>
+<A NAME="no7_20"></A><P><DT><H3> 7.2 MPEG data details</H3><A NAME="no7_721"></A><P><DT> <B>7.2.1 Constants</b></DL>
+<A NAME="20.0"><HR></a><DL>
+<TABLE BORDER=1>
+<TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> constant</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> Constant</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 20.0</H4></TD></TR></TABLE><P><DT> <B>(1) Error code (MPEG part)</b><DD><TABLE BORDER=1><TR><TH WIDTH=160> constant name</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_ERR_MP_COMU</TH><TD> The MPCM flag is not set to 1 when issuing the command.</TD></TR></TABLE></P><P><DT> <B>(2) Next stream flag</b><DD> Used in the following functions to select the current and next stream.<DD><UL TYPE=DISC><LI> CDC_MpSetCon<LI> CDC_MpGetCon<LI> CDC_MpSetStm<LI> CDC_MpGetStm</UL></P><P><DD><TABLE BORDER=1><TR><TH WIDTH=160> constant name</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPSTF_CUR</TH><TD> Specifying the current connection destination/stream</TD></TR><TR><TD> CDC_MPSTF_NEXT</TH><TD> Specifying the next connection destination/stream</TD></TR></TABLE></P><P><DT> <B>(3) Maximum window size/coordinates</b><DD> Use the following functions to set the window size and coordinates.<DD><UL TYPE=DISC><LI> CDC_MpSetWinFpos<LI> CDC_MpSetWinDpos<LI> CDC_MpSetWinDsiz<LI> CDC_MpSetImgPos<LI> CDC_MpSetImgSiz</UL></P><P><DD> The maximum values are different for NTSC/PAL format, normal/high definition output.<DD><TABLE BORDER=1><TR><TH WIDTH=120> constant name</TH><TH WIDTH=040> value</TH><TH WIDTH=220 COLSPAN=4> explanation</TH></TR><TR ALIGN=CENTER><TD> CDC_MPNT_NSX</TD><TD> 352</TD><TD ROWSPAN=8> NTSC</TD><TD ROWSPAN=4> Ordinary</TD><TD ROWSPAN=2> size</TD><TD> X direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPNT_NSY</TD><TD> 240</TD><TD> Y direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPNT_NPX</TD><TD> 351</TD><TD ROWSPAN=2> Coordinate</TD><TD> X direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPNT_NPY</TD><TD> 239</TD><TD> Y direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPNT_HSX</TD><TD> 704</TD><TD ROWSPAN=4> High-definition</TD><TD ROWSPAN=2> size</TD><TD> X direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPNT_HSY</TD><TD> 480</TD><TD> Y direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPNT_HPX</TD><TD> 703</TD><TD ROWSPAN=2> Coordinate</TD><TD> X direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPNT_HPY</TD><TD> 479</TD><TD> Y direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPPL_NSX</TD><TD> 352</TD><TD ROWSPAN=8> PAL</TD><TD ROWSPAN=4> Ordinary</TD><TD ROWSPAN=2> size</TD><TD> X direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPPL_NSY</TD><TD> 288</TD><TD> Y direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPPL_NPX</TD><TD> 351</TD><TD ROWSPAN=2> Coordinate</TD><TD> X direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPPL_NPY</TD><TD> 287</TD><TD> Y direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPPL_HSX</TD><TD> 704</TD><TD ROWSPAN=4> High-definition</TD><TD ROWSPAN=2> size</TD><TD> X direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPPL_HSY</TD><TD> 576</TD><TD> Y direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPPL_HPX</TD><TD> 703</TD><TD ROWSPAN=2> Coordinate</TD><TD> X direction</TD></TR><TR ALIGN=CENTER><TD> CDC_MPPL_HPY</TD><TD> 575</TD><TD> Y direction</TD></TR></TABLE></DL><DL><A NAME="no7_722"></A><P><DT> <B>7.2.2 Status and MPEG Report (MPEG Status Information)</b></DL><!-------------------------------------------------------------------------><A NAME="21.0"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> Status and MPEG report</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> Status & MPEG Report</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.0</H4></TD></TR></TABLE><P><DT> <B>(1) MPEG status information</b><DD> A CD report is not returned in response to an MPEG command. Normally, an MPEG report is often returned. Whether to return an MPEG report or other information depends on the command. (Regular responses always return a CD report.)<BR> The status and MPEG report together are called MPEG status information.</P><PRE>
+byte     0        1        2        3        4         5        6         7    
+     +--------+--------+--------+--------+---------+--------+---------+---------+
+     | Status |                        Report                                   |
+     +--------+--------+--------+--------+---------+--------+---------+---------+
+</PRE><P><DT><B>(2) MPEG Report</b><DD> The MPEG report is disabled during REJECT and enabled during WAIT.</P><PRE>
+MPEG Report
+byte     1        2        3        4        5        6    
+     +--------+--------+--------+--------+--------+--------+
+     | actst  |       vcnt      |  pict  | stat_a | stat_v |
+     +--------+--------+--------+--------+--------+--------+
+     actst: MPEG operation status
+     vcnt: Operation interval (VSYNC) counter
+     pict: Picture information
+     stat_a: MPEG/Audio status
+     stat_v: MPEG/Video status
+</PRE></DL><!-------------------------------------------------------------------------><A NAME="21.1"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> MPEG operation status</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> actst</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.1</H4></TD></TR></TABLE><P><DT> <B>(1) MPEG operation status</b><DD><PRE>
+    bit 7 6 5 4 3 2 1 0
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+  actst│−│     │ │     │ Initial value: 19H
+       └─┴─┴─┴─┴─┴─┴─┴─┘
+            │   │   │
+            │   │   └────MPEG/Video operating status
+            │   │
+            │   └────────MPEG decoding status
+            │            CDC_MPASTD_STOP    1: Stopped  0: Decoding
+            │
+            └────────────MPEG/Audio operating status
+</PRE><P><DT> <B>(2) Operating status of MPEG decoder</b><DD> For state transitions, see " <A HREF="p05_10.htm#no5_512">5.1.2 Transfer block state transitions</a> ."</P><P><TABLE BORDER=1><TR><TH COLSPAN=2 WIDTH=220> MPEG/Video operating status</TH><TH COLSPAN=2 WIDTH=220> MPEG/Audio operating status</TH><TH ROWSPAN=2> explanation</TH></TR><TR><TH> constant name</TH><TH> value</TH><TH> constant name</TH><TH> value</TH></TR><TR><TD> CDC_MPSTV_STOP</TD><TD ALIGN=CENTER> 01H</TD><TD> CDC_MPSTA STOP</TD><TD ALIGN=CENTER> 10H</TD><TD> Stop</TD></TR><TR><TD> CDC_MPSTV_PREP1</TD><TD ALIGN=CENTER> 02H</TD><TD> CDC_MPSTA PREP1</TD><TD ALIGN=CENTER> 20H</TD><TD> Preparation 1</TD></TR><TR><TD> CDC_MPSTV_PREP2</TD><TD ALIGN=CENTER> 03H</TD><TD> CDC_MPSTA PREP2</TD><TD ALIGN=CENTER> 30H</TD><TD> Preparation 2</TD></TR><TR><TD> CDC_MPSTV_TRNS</TD><TD ALIGN=CENTER> 04H</TD><TD> CDC_MPSTA TRNS</TD><TD ALIGN=CENTER> 40H</TD><TD> Transfer (playback)</TD></TR><TR><TD> CDC_MPSTV_CHNG</TD><TD ALIGN=CENTER> 05H</TD><TD> CDC_MPSTA CHNG</TD><TD ALIGN=CENTER> 50H</TD><TD> switching</TD></TR><TR><TD> CDC_MPSTV_RCV</TD><TD ALIGN=CENTER> 06H</TD><TD> CDC_MPSTA RCV</TD><TD ALIGN=CENTER> 60H</TD><TD> Resurrection process</TD></TR></TABLE><P><DT> <B>(3) MPEG decoding status</b><DD> 1 represents a stopped state, and 0 represents a decoding state. The state transition diagram is shown below.</P><DD><PRE>
+
+                 Input picture start code
+        ┌───────┐────────────→┌────────┐
+Initial │Stopped│             │Decoding│
+state   └───────┘←────────────└────────┘
+                   Sequence end input
+</PRE></DL>
+<!-------------------------------------------------------------------------><A NAME="21.2"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> Operation section counter</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> vcnt</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.2</H4></TD></TR></TABLE><P><DD> This is a counter that increases by 1 for each VSYNC. It is cleared to 0 when the MPEG decoder initialization function (CDC_MpInit) is executed.<BR> When decoding by host synchronization, this value is increased by 2 when the CDC_MpOutDsync function is executed.</P></DL><!-------------------------------------------------------------------------><A NAME="21.3"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> Picture information</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> pict</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.3</H4></TD></TR></TABLE><P><DT> <B>(1) Picture information</b><DD><PRE>
+    bit 7 6 5 4 3 2 1 0
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   pict│−│−│−│−│−│     │ Initial value: 00H
+       └─┴─┴─┴─┴─┴─┴─┴─┘
+                 └──Picture type being decoded
+</PRE><P><DT> <B>(2) Picture type</b><DD> Picture type at the time the decoder detects the picture start code.<BR> If the decoder is stopped, the type of picture waiting to be decoded is obtained. </P><P><DD><TABLE BORDER=1
+<TR><TH WIDTH=160>constant name</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPPICT_I</TD><TD> I picture</TD></TR><TR><TD> CDC_MPPICT_P</TD><TD> P picture</TD></TR><TR><TD> CDC_MPPICT_B</TD><TD> B picture</TD></TR><TR><TD> CDC_MPPICT_D</TD><TD> D picture </TD></TR></TABLE></P></DL><!-------------------------------------------------------------------------><A NAME="21.4"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> MPEG/Audio status</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> stat_a</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.4</H4></TD></TR></TABLE><P><DT> <B>(1) MPEG/Audio status</b><DD><PRE>
+    bit 7 6 5 4 3 2 1 0
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+ stat_a│ │ │ │ │ │−│−│ │
+       └┬┴┬┴┬┴┬┴┬┴─┴─┴┬┘
+        │ │ │ │ │     └─CDC_MPSTA_DEC     1: Decoding in progress
+        │ │ │ │ └───────CDC_MPSTA_ILG     1: Audio illegal
+        │ │ │ └─────────CDC_MPSTA_BEMPTY  1: Buffer section is empty
+        │ │ └───────────CDC_MPSTA_ERR     1: Audio error occurred
+        │ └─────────────CDC_MPSTA_OUTL    1: Left channel is being output
+        └───────────────CDC_MPSTA_OUTR    1: Right channel is being output
+</PRE><P><DT> <B>(2) Meaning of each flag</b><DD><TABLE BORDER=1><TR><TH WIDTH=040> bit</TH><TH WIDTH=320> flag</TH><TH> explanation</TH></TR><TR><TD> 0</TD><TD> Audio decoding operation</TD><TD> Indicates that the audio decoder is operating. (0: Stopped)</TD></TR><TR><TD> 3</TD><TD> audio illegal</TD><TD> Indicates that there is an abnormality in the MPEG/Audio layer, sampling frequency, or bit rate.</TD></TR><TR><TD> 4</TD><TD> audio buffer section<BR> empty</TD><TD> Indicates that the audio buffer section is empty and there is no more stream data for audio playback.</TD></TR><TR><TD> 5</TD><TD> audio error</TD><TD> Indicates that an audio-related error has occurred. The error cause can be obtained using the CDC_MpGetInt function.</TD></TR><TR><TD> 6</TD><TD> left channel output</TD><TD> Indicates that the left channel is being output. (0: muted)</TD></TR><TR><TD> 7</TD><TD> right channel output</TD><TD> Indicates that the right channel is being output. (0: muted)</TD></TR></TABLE><DD> The value of each flag is updated every VSYNC.</P></DL><!-------------------------------------------------------------------------><A NAME="21.5"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> MPEG/Video status</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> stat_v</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 21.5</H4></TD></TR></TABLE><P><DT> <B>(1) MPEG/Video status</b><DD><PRE>
+    bit 7 6 5 4 3 2 1 0
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+ stat_v│ │ │ │ │ │ │ │ │
+       └┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┘
+        │ │ │ │ │ │ │ └─CDC_MPSTV_DEC     1: Decoding in progress
+        │ │ │ │ │ │ └───CDC_MPSTV_DISP    1: Picture displayed
+        │ │ │ │ │ └─────CDC_MPS TV_PAUSE  1: Pausing
+        │ │ │ │ └───────CDC_MPSTV_FREEZE  1: Freezing
+        │ │ │ └─────────CDC_MPSTV_LSTPIC  1: Displaying the last picture
+        │ │ └───────────CDC_MPSTV_FIELD   1: Odd field
+        │ └─────────────CDC_MPSTV_UPDPIC  1: Picture updated
+        └───────────────CDC_MPSTV_ERR     1: Video error occurred
+
+   bit  15  13  11  9
+          14  12  10  8
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+ stat_v│ │−│−│ │ │−│−│ │
+       └┬┴─┴─┴┬┴┬┴─┴─┴┬┘
+        │     │ │     └─CDC_MPSTV_RDY     1: Ready for output
+        │     │ └───────CDC_MPSTV_1STPIC  1: Displaying first picture
+        │     └─────────CDC_MPSTV_BEMPTY  1: Buffer section is empty
+        └───────────────Undefined
+</PRE></P><P><DT> <B>(2) Meaning of each flag</b><DD><TABLE BORDER=1><TR><TH WIDTH=040> bit</TH><TH WIDTH=320> flag</TH><TH> explanation</TH></TR><TR><TD> 0</TD><TD> Video decoding operation</TD><TD> Indicates that the video decoder is operating. (0: Stopped)<BR> When this flag is 1, if there is an empty frame bank, the decoder performs decoding using that bank.</TD></TR><TR><TD> 1</TD><TD> picture display</TD><TD> Indicates that a decoded picture is being displayed.</TD></TR><TR><TD> 2</TD><TD> Pause</TD><TD> Indicates that the video decoder is paused.</TD></TR><TR><TD> 3</TD><TD> Freeze</TD><TD> Indicates that the video decoder is frozen.</TD></TR><TR><TD> 4</TD><TD> Final picture display</TD><TD> Indicates that the currently displayed picture is the last picture of the stream.</TD></TR><TR><TD> 5</TD><TD> odd field<BR> (Frame synchronization signal)</TD><TD> Indicates that an odd field is being displayed. (1: even field)<BR> When outputting to VDP2, the frame starts with an odd field and consists of two fields.</TD></TR><TR><TD> 6</TD><TD> Picture update</TD><TD> Indicates that the picture has been updated.<BR> Changes in units of 2 operation sections (VSYNC x 2 or CDC_MpOutDsync).<BR> It becomes 1 when the display is updated and when a picture is discarded in a frozen state.</TD></TR><TR><TD> 7</TD><TD> video error</TD><TD> Indicates a video-related error. The error cause can be obtained using the CDC_MpGetInt function.</TD></TR><TR><TD> 8</TD><TD> Ready for output</TD><TD> Indicates that the image can now be output. It becomes 1 when the number of decoded frame banks becomes two (I, P). When decoding is started in the paused state, the output preparation completion flag becomes 1 without being displayed. If you move frame by frame in this state, the first image will be output immediately.</TD></TR><TR><TD> 11</TD><TD> First picture display</TD><TD> Indicates that the currently displayed picture is the first picture of the stream. "First" refers to the media or decoding order, not the display order.</TD></TR><TR><TD> 12</TD><TD> Video buffer section empty</TD><TD> Indicates that the video buffer section is empty and there is no more stream data for video playback.</TD></TR></TABLE><DD> The value of each flag is updated every VSYNC.</DL><A NAME="no7_723"></A><P><DT> <B>7.2.3 MPEG interrupt factor flag</b></DL><!-------------------------------------------------------------------------><A NAME="22.0"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> MPEG interrupt factor flag</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> Intreq</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 22.0</H4></TD></TR></TABLE><P><DD> The cause of the MPEG interrupt is notified in the following format (4 bytes) by the CDC_MpGetInt function.<BR> The same bit arrangement is used when masking interrupts using the CDC_MpSetIntMsk function.</p><DD><PRE>
+MPEG interrupt factor flag
+byte     0         1         2         3
+    ┌─────────┬─────────┬─────────┬─────────┐
+    │    −    │Audio    │       Video       │
+    │         │Interrupt│     Interrupt     │
+    └─────────┴─────────┴─────────┴─────────┘
+</PRE><P><DD>In the following explanatory diagrams, V/A represents video/audio, respectively.</P><P><DT> <B>(1) Video interrupt</b><A NAME="0byte"></A><DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │ │ │ │ │ │ │ │ Initial value: 00H
+   └┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┘
+    │ │ │ │ │ │ │ └─CDC_MPINT_VSRDY    1: <A HREF="#_00">V stream ready</a>
+    │ │ │ │ │ │ └───CDC_MPINT_VSCHG    1: <A HREF="#_01">V stream switching complete</a>
+    │ │ │ │ │ └─────CDC_MPINT_VORDY    1: <A HREF="#_02">Video output ready</a>
+    │ │ │ │ └───────CDC_MPINT_VOSTRT   1: <A HREF="#_03">Start video output</a>
+    │ │ │ └─────────CDC_MPINT_VDERR    1: <A HREF="#_04">Video decoding error</a>
+    │ │ └───────────CDC_MPINT_VSERR    1: <A HREF="#_05">V stream data error</a>
+    │ └─────────────CDC_MPINT_VBERR    1: <A HREF="#_06">V buffer partition connection error</a>
+    └───────────────CDC_MPINT_VNERR    1: <A HREF="#_07">Next V stream data error</a>
+
+<A NAME="1byte"></A>
+bit 15  13  11  9
+      14  12  10  8
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │ │ │ │ │ │ │ │ Initial value: 00H
+   └┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┘
+    │ │ │ │ │ │ │ └─CDC_MPINT_PSTRT    1: <A HREF="#_08">Picture start detection</a>
+    │ │ │ │ │ │ └───CDC_MPINT_GSTRT    1: <A HREF="#_09">GOP start detection</a>
+    │ │ │ │ │ └─────CDC_MPINT_SQEND    1: <A HREF="#_10">Sequence end detection</a>
+    │ │ │ │ └───────CDC_MPINT_SQSTRT   1: <A HREF="#_11">Sequence start detection</a>
+    │ │ │ └─────────CDC_MPINT_VTRG     1: <A HREF="#_12">V sector trigger bit detection</a>
+    │ │ └───────────CDC_MPINT_VEOR     1: <A HREF="#_13">V sector EOR bit detection</a>
+    │ └─────────────CDC_MPINT_ATRG     1: <A HREF="#_14">A sector trigger bit detection</a>
+    └───────────────CDC_MPINT_AEOR     1: <A HREF="#_15">A sector EOR bit detection</a>
+</PRE></P><P><DT><B>(2) Audio interrupt</b><A NAME="2byte"></A><DD><PRE>
+bit 23  21  19  17
+      22  20  18  16
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │ │ │ │ │ │ │ │ Initial value: 00H
+   └┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┘
+    │ │ │ │ │ │ │ └─CDC_MPINT_ASRDY    1: <A HREF="#_16">A stream ready</a>
+    │ │ │ │ │ │ └───CDC_MPINT_ASCHG    1: <A HREF="#_17">A stream switching complete</a>
+    │ │ │ │ │ └─────CDC_MPINT_AORDY    1: <A HREF="#_18">Audio output ready</a>
+    │ │ │ │ └───────CDC_MPINT_AOSTRT   1: <A HREF="#_19">Start audio output</a>
+    │ │ │ └─────────CDC_MPINT_ADERR    1: <A HREF="#_20">Audio decoding error</a>
+    │ │ └───────────CDC_MPINT_ASERR    1: <A HREF="#_21">A stream data error</a>
+    │ └─────────────CDC_MPINT_ABERR    1: <A HREF="#_22">A buffer partition connection error</a>
+    └───────────────CDC_MPINT_ANERR    1: <A HREF="#_23">Next A stream data error</a>
+</PRE><P><DT><B>(3) Video interrupt factor</b><DL><P><DT> <B>bit flag</b>
+<A NAME="_00"></A><P><DT> <B>
+<A HREF="#0byte">0</a> video stream ready</b><DD> Indicates that data exceeding (STD buffer size + 16KB) has been stored in the video buffer section. (In case of automatic transfer)</P>
+<A NAME="_01"></A><P><DT> <B>
+<A HREF="#0byte">1</a> Video stream switching completed</b><DD> Indicates that the next stream has started to be transferred to the VBV buffer.</P>
+<A NAME="_02"></A><P><DT> <B>
+<A HREF="#0byte">2</a> Video output ready</b><DD> This indicates that two pictures have been decoded into the frame buffer and can be output in the next operation section. Check with field interrupt and interrupt the host. (Valid only once before switching streams)</P>
+<A NAME="_03"></A><P><DT> <B>
+<A HREF="#0byte">3</a> Start video output</b><DD> Indicates that the first picture of the video stream has been output. (valid even after stream switching)</P>
+<A NAME="_04"></A><P><DT> <B>
+<A HREF="#0byte">4</a> video decoding error</b><DD> Indicates that a decoding error has occurred in the video LSI.</P>
+<A NAME="_05"></A><P><DT> <B>
+<A HREF="#0byte">5</a> Video stream data error</b><DD> Indicates that an error occurred in the stream being played. (Data other than video exists in the buffer section)</P>
+<A NAME="_06"></A><P><DT> <B>
+<A HREF="#0byte">6</a> Video buffer section connection error</b><DD> Indicates that the connection between the buffer partition and the decoder was broken while data was being transferred from the buffer partition.</P>
+<A NAME="_07"></A><P><DT> <B>
+<A HREF="#0byte">7</a> video stream data error</b><DD> Indicates that an error occurred in the next stream. (Data other than video exists in the next buffer section)</P>
+<A NAME="_08"></A><P><DT> <B>
+<A HREF="#1byte">8</a> Picture start detection</b><DD> Indicates that a picture start code (PSC) has been detected.</P>
+<A NAME="_09"></A><P><DT> <B>
+<A HREF="#1byte">9</a> GOP start detection</b><DD> Indicates that a GOP start code has been detected.</P>
+<A NAME="_10"></A><P><DT> <B>
+<A HREF="#1byte">10</a> sequence end detection</b><DD> Indicates that a sequence end code was detected.</P>
+<A NAME="_11"></A><P><DT> <B>
+<A HREF="#1byte">11</a> Sequence start detection</b><DD> Indicates that a sequence start code has been detected.</P>
+<A NAME="_12"></A><DT> <B>
+<A HREF="#1byte">12</a> Trigger bit detection for video sectors</b><DD> Indicates that the trigger bit in the video sector subheader was detected before the rear aperture.</P>
+<A NAME="_13"></A><P><DT> <B>
+<A HREF="#1byte">13</a> EOR bit detection for video sectors</b><DD> Indicates that the EOR bit in the video sector subheader was detected before the rear aperture.</P>
+<A NAME="_14"></A><P><DT> <B>
+<A HREF="#1byte">14</a> audio sector trigger bit detection</b><DD> Indicates that the trigger bit in the audio sector subheader was detected before the rear aperture.</P>
+<A NAME="_15"></A><P><DT> <B>
+<A HREF="#1byte">15</a> EOR bit detection for audio sectors</b><DD> Indicates that the EOR bit in the audio sector subheader was detected before the rear aperture.</P>
+<A NAME="_16"></A><P><DT> <B>
+<A HREF="#2byte">16</a> audio streams ready</b><DD> Indicates that one or more sectors of data has been stored in the audio buffer section.</P>
+<A NAME="_17"></A><P><DT> <B>
+<A HREF="#2byte">17</a> Audio stream switching completed</b><DD> Indicates that the next stream has started to be transferred to the audio decoder.</P>
+<A NAME="_18"></A><P><DT> <B>
+<A HREF="#2byte">18</a> audio output ready</b><DD> Indicates that stream data has started to be transferred to the audio decoder. (Valid only once before switching streams)</P>
+<A NAME="_19"></A><P><DT> <B>
+<A HREF="#2byte">19</a> Start audio output</b><DD> Indicates that stream data has started to be transferred to the audio decoder. (valid even after stream switching)</P>
+<A NAME="_20"></A><P><DT> <B>
+<A HREF="#2byte">20</a> audio decoding errors</b><DD> Indicates that a decoding error occurred in the audio LSI.</P>
+<A NAME="_21"></A><P><DT> <B>
+<A HREF="#2byte">21</a> Audio stream data error</b><DD> Indicates that an error occurred in the stream being played. (Data other than audio exists in the buffer section)</P>
+<A NAME="_22"></A><P><DT> <B>
+<A HREF="#2byte">22</a> Audio buffer compartment connection error</b><DD> Indicates that the connection between the buffer partition and the decoder was broken while data was being transferred from the buffer partition.</P>
+<A NAME="_23"></A><P><DT> <B><A HREF="#2byte">23</a> Next audio stream data error</b><DD> Indicates that an error occurred in the next stream. (Data other than audio exists in the next buffer section)</P></DL></DL><DL><A NAME="no7_724"></A><P><DT> <B>7.2.4 Data types</b></DL><!-------------------------------------------------------------------------><A NAME="23.1"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> MPEG status information</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> CdcMpStat</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.1</H4></TD></TR></TABLE><P><DD> The CD block status and MPEG report are collectively referred to as MPEG status information.</P><P><DT> <B>(1) MPEG status information...CDC_MpGetCurStat, CDC_MpGetLastStat functions</b><DD> CdcMpStat *mpstat<DD><TABLE BORDER=1><TR><TH WIDTH=180> access macro</TH><TH WIDTH=060> mold</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPSTAT_STS(mpstat)</TD><TD> Uint8</TD><TD> Status (see CD part)</TD></TR><TR><TD> CDC_MPSTAT_AST(mpstat)</TD><TD> Uint8</TD><TD> MPEG operation status</TD></TR><TR><TD> CDC_MPSTAT_VCNT(mpstat)</TD><TD> Uint16</TD><TD> Operating interval (VSYNC) counter</TD></TR><TR><TD> CDC_MPSTAT_PICT(mpstat)</TD><TD> Uint8</TD><TD> Picture information</TD></TR><TR><TD> CDC_MPSTAT_STA(mpstat)</TD><TD> Uint8</TD><TD> MPEG/Audio status</TD></TR><TR><TD> CDC_MPSTAT_STV(mpstat)</TD><TD> Uint16</TD><TD> MPEG/Video status</TD></TR></TABLE></P><P><DT> <B>(2) Related macros</b><DD><TABLE BORDER=1><TR><TH WIDTH=180> access macro</TH><TH WIDTH=360> explanation</TH></TR><TR><TD> CDC_MPGET_STC(mpstat)</TD><TD> Get status code from MPEG status information</TD></TR><TR><TD> CDC_MPGET_ASTV(mpstat)</TD><TD> Obtain MPEG/Video operating status from MPEG status information</TD></TR><TR><TD> CDC_MPGET_ASTA(mpstat)</TD><TD> Obtain MPEG/Audio operating status from MPEG status information</TD></TR></TABLE></DL><!-------------------------------------------------------------------------><A NAME="23.2"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> time code</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> CdcMpTc</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.2</H4></TD></TR></TABLE><P><DT> <B>(1) Time code...CDC_MpGetTc function</b><DD> CdcMpTc *mptc<DD><TABLE BORDER=1><TR><TH WIDTH=180> access macro</TH><TH WIDTH=060> mold</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPTC_HOUR(mptc)</TD><TD> Uint8</TD><TD> Time (0-23)</TD></TR><TR><TD> CDC_MPTC_MIN(mptc)</TD><TD> Uint8</TD><TD> Minutes (0-59)</TD></TR><TR><TD> CDC_MPTC_SEC(mptc)</TD><TD> Uint8</TD><TD> seconds (0-59)</TD></TR><TR><TD> CDC_MPTC_PIC(mptc)</TD><TD> Uint8</TD><TD> Picture (0-63)</TD></TR></TABLE></DL><!-------------------------------------------------------------------------><A NAME="23.3"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> MPEG decoder connection destination parameters</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> CdcMpCon</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.3</H4></TD></TR></TABLE><P><DT> <B>(1) MPEG decoder connection destination parameters...CDC_MpSetCon, CDC_MpGetCon functions</b><DD> CdcMpCon *mpcon<DD><TABLE BORDER=1><TR><TH WIDTH=180> access macro</TH><TH WIDTH=060> mold</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPCON_CMOD(mpcon)</TD><TD> Uint8</TD><TD> connection mode</TD></TR><TR><TD> CDC_MPCON_LAY(mpcon)</TD><TD> Uint8</TD><TD> Layer specification and picture search specification</TD></TR><TR><TD> CDC_MPCON_BN(mpcon)</TD><TD> Uint8</TD><TD> buffer partition number</TD></TR></TABLE><P><DT> <B>(2) MPEG/Audio connection mode</b><DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │−│−│−│−│ │ │ │ Initial value: 00H     Unchanged: CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴┬┴┬┴┬┘
+    │         │ │ └─CDC_MPCMOD_EOR    1: Switch by EOR detection
+    │         │ └───CDC_MPCMOD_SEC    1: Switch by SEC detection
+    │         └─────CDC_MPCMOD_DEL    1: Delete sectors within the partition
+    └────────────────1: Do not change settings     0: Change settings
+</PRE><P><DT> <B>(3) MPEG/Video connection mode</b><DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │ │   │ │ │ │ │ Initial value: 00H     Unchanged: CDC_PARA_NOCHG
+   └┬┴┬┴─┴─┴┬┴┬┴┬┴┬┘
+    │ │  │  │ │ │ └─CDC_MPCMOD_EOR    1: Switch by EOR detection
+    │ │  │  │ │ └───CDC_MPCMOD_SEC    1: Switch by SEC detection
+    │ │  │  │ └─────CDC_MPCMOD_DEL    1: Switch by sector within partition Erase
+    │ │  │  └───────CDC_MPCMOD_IGPTS  1: Do not identify PTS
+    │ │  └──────────Video decode buffer clearing method
+    │ │                  0 (00B): Do not clear
+    │ │                  1 (01B ): Clear VBV (CDC_MPCMOD_VCLR)
+    │ │                  2 (10B): Clear VBV+WBC (CDC_MPCMOD_VWCLR)
+    │ └─────────────CDC_MPCMOD_BEF (always specify 0 in GAME-CD)
+    └───────────────1: Do not change settings     0: Change the settings
+</PRE><DD><TABLE BORDER=1><TR><TH WIDTH=180> constant name</TH><TH WIDTH=360> explanation</TH></TR><TR><TD> CDC_MPCMOD_EOR<BR> CDC_MPCMOD_SEC</TD><TD> Specify conditions for natural switching. The EOR bit/SEC (system end code) detection bits can be combined using OR conditions.<BR> If the next stream is unregistered, this condition becomes the termination condition.</TD></TR><TR><TD> CDC_MPCMOD_DEL</TD><TD> During decoding, sectors within the buffer section are erased. (0: keep)</TD></TR><TR><TD> CDC_MPCMOD_IGPTS</TD><TD> Transfer the sector to the decoder without identifying the PTS. Sectors without PTS can also be transferred. However, an inconsistency occurs in the synchronization of audio and video.</TD></TR><TR><TD> CDC_MPCMOD_VCLR<BR> CDC_MPCMOD_VWCLR</TD><TD> Specifies the method for clearing the video decoding buffer when connecting to the first stream. It is not a clear method when switching. Valid only when setting the current connection destination.</TD></TR><TR><TD> CDC_MPCMOD_BEF</TD><TD> The termination condition is determined before the rear aperture. Be sure to specify 0 for normal GAME-CD. When getting a value, 0 is always returned. (Video CD only)</TD></TR></TABLE><P><DT> <B>(4) MPEG/Audio layer specification</b><DD><TABLE BORDER=1><TR><TH WIDTH=180> access macro</TH><TH WIDTH=060> mold</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPLAY_SYS</TD><TD> 00H</TD><TD> System layer...Initial value</DT></TR><TR><TD> CDC_MPLAY_AUDIO</TD><TD> 01H</TD><TD> video layer</DT></TR></TABLE><P><DT> <B>(5) MPEG/Video layer specification and picture search specification</b><DD> Picture search is a search for SHC (sequence header code) in a video stream.</P><DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │   │−│−│−│−│−│ │ Initial value: 00H
+   └─┴─┴─┴─┴─┴─┴─┴┬┘
+     │            └─Layer specification
+     └──────────────Picture search specification
+ </PRE></P><P><DD> <B>(a) Layer specification</b><DD><TABLE BORDER=1><TR><TH WIDTH=180> constant name</TH><TH WIDTH=060> value</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPLAY_SYS</TD><TD> 00H</TD><TD> System layer...Initial value</TD></TR><TR><TD> CDC_MPLAY_VIDEO</TD><TD> 01H</TD><TD> video layer</TD></TR></TABLE></P><P><DD> <B>(b) Picture search specification</b><DD> Specify the picture search when connecting to the first stream.<BR> It is not a picture search when switching. Valid only when setting the current connection destination.</P><DD><TABLE BORDER=1><TR><TH WIDTH=180> constant name</TH><TH WIDTH=060> value</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPSRCH_OFF</TD><TD> 00H</TD><TD> Do not search for pictures...Initial value</TD></TR><TR><TD> CDC_MPSRCH_VIDEO</TD><TD> 80H</TD><TD> Do a picture search</TD></TR><TR><TD> CDC_MPSRCH_AV</TD><TD> C0H</TD><TD> Discard audio data according to picture search</TD></TR></TABLE></P><P><DT> <B>(6) Buffer section number</b><DD> Specifies the buffer partition number to which the audio or video decoder is connected.<BR> Settings can be canceled by specifying CDC_NUL_SEL for the buffer partition. However, depending on the operating state of the MPEG decoder, the settings cannot be canceled. (It will become WAIT.)</P><P><DD><TABLE BORDER=1><TR><TH WIDTH=160> stream</TH><TH WIDTH=160> Cancellable state</TH><TH WIDTH=220> irrevocable condition</TH></TR><TR><TD> starting stream</TD><TD> Stop, Preparation 1, Preparation 2</TD><TD> Transfer (play), switch, restore</TD></TR><TR><TD> Next stream</TD><TD> Stop, Preparation 1, Preparation 2, Transfer</TD><TD> switching</TD></TR></TABLE></P><P><DD> Use the CDC_MpChgCon function to disconnect (forcibly terminate) the connection of the preceding stream in the transfer (playback) state.</P></DL><!-------------------------------------------------------------------------><A NAME="23.4"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> MPEG stream parameters</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> CdcMpStm</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.4</H4></TD></TR></TABLE><P><DD> Used when setting/obtaining the stream number and channel number of the stream to be decoded.</P><P><DT> <B>(1) MPEG stream parameters...CDC_MpSetStm, CDC_MpGetStm functions</b><DD> CdcMpStm *mpstm<DD><TABLE BORDER=1><TR><TH WIDTH=180> constant name</TH><TH WIDTH=060> value</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPSTM_SMOD(mpstm)</TD><TD> Uint8</TD><TD> stream mode</TD></TR><TR><TD> CDC_MPSTM_ID(mpstm)</TD><TD> Uint8</TD><TD> Stream number (stream ID)</TD></TR><TR><TD> CDC_MPSTM_CN(mpstm)</TD><TD> Uint8</TD><TD> channel number</TD></TR></TABLE></P><P><DT> <B>(2) Stream mode</b><DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │−│ │ │−│−│ │ │ Initial value: 00H    Unchanged: CDC_PARA_NOCHG
+   └┬┴─┴┬┴┬┴─┴─┴┬┴┬┘
+    │   │ │     │ └─CDC_MPSMOD_SNSET    1: Set the stream number
+    │   │ │     └───CDC_MPSMOD_SNIDF    1: Identify the stream number
+    │   │ └─────────CDC_MPSMOD_CNSET    1: Set the channel number Do
+    │   └───────────CDC_MPSMOD_CNIDF    1: Identify the channel number
+    └───────────────1: Do not change the settings    0: Change
+</PRE></DL><!-------------------------------------------------------------------------><A NAME="23.5"><HR></a><DL><TABLE BORDER=1><TR><TD><A HREF="#t7_1"><PRE> one<BR> View<BR> table</TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=280><PRE> Data<BR><H4> Screen special effect parameters</H4></TD><TD WIDTH=220><PRE> Data Name<BR><H3> CdcMpVeff</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 23.5</H4></TD></TR></TABLE><P><DT> <B>(1) Screen special effect parameters...CDC_MpSetVeff function</b><DD> CdcMpVef *mpvef<DD><TABLE BORDER=1><TR><TH WIDTH=180> constant name</TH><TH WIDTH=060> value</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPVEF_ITP(mpvef)</TD><TD> Uint8</TD><TD> Interpolation mode</TD></TR><TR><TD> CDC_MPVEF_TRP(mpvef)</TD><TD> Uint8</TD><TD> transparent bit mode</TD></TR><TR><TD> CDC_MPVEF_MOZH(mpvef)</TD><TD> Uint8</TD><TD> Horizontal mosaic mode</TD></TR><TR><TD> CDC_MPVEF_MOZV(mpvef)</TD><TD> Uint8</TD><TD> Vertical mosaic mode</TD></TR><TR><TD> CDC_MPVEF_SOFTH(mpvef)</TD><TD> Uint8</TD><TD> horizontal blur mode</TD></TR><TR><TD> CDC_MPVEF_SOFTV(mpvef)</TD><TD> Uint8</TD><TD> Vertical blur mode</TD></TR></TABLE><P><DT> <B>(2) Interpolation mode</b><DD> Specify whether to perform horizontal/vertical interpolation for luminance (Y) and color difference (C).</P><DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │−│−│−│ │ │ │ │ Initial value: 00H    Unchanged: CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴┬┴┬┴┬┴┬┘
+    │       │ │ │ └─CDC_MPITP_YH     1: Perform horizontal interpolation of Y
+    │       │ │ └───CDC_MPITP_CH     1: Perform horizontal interpolation of C
+    │       │ └─────CDC_MPITP_YV     1: Perform vertical interpolation of Y
+    │       └───────CDC_MPITP_CV     1: Perform vertical interpolation of C
+    └───────────────1: Do not change settings    0: Change
+</PRE><P><DT> <B>(3) Transparent bit mode</b><DD> If the brightness of each pixel is below the specified brightness level, set the transparency bit in the MPEG register to 1.<BR> The transparent area is also called a priority area.</P><DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │−│−│−│−│ │   │ Initial value: 00H    Unchanged: CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴┬┴─┴─┘
+    │         │  │
+    │         │  └──Brightness level
+    │         └─────CDC_MPTRP_MAG     1: Enlarge the transparent area
+    └─────────────────1: Do not change settings   0: Change
+</PRE><DD> <B>(a) Brightness level</b><DD><TABLE BORDER=1><TR><TH WIDTH=180> constant name</TH><TH WIDTH=060> value</TH><TH WIDTH=300> explanation</TH></TR><TR><TD> CDC_MPTRP_DFL</TD><TD> 00H</TD><TD> Normal (no transparent bit processing)</TD></TR><TR><TD> CDC_MPTRP_64</TD><TD> 01H</TD><TD> brightness 64</TD></TR><TR><TD> CDC_MPTRP_96</TD><TD> 02H</TD><TD> brightness 96</TD></TR><TR><TD> CDC_MPTRP_128</TD><TD> 03H</TD><TD> brightness 128</TD></TR></TABLE></p><P><DT> <B>(4) Mosaic mode (horizontal/vertical direction)</b><DD><TABLE BORDER=1><TR><TH WIDTH=180> value</TH><TH WIDTH=360> explanation</TH></TR><TR><TD> 00H</TD><TD> Normal (no mosaic applied)...Initial value</TD></TR><TR><TD> 01H～0AH(n)00H</TD><TD> 2 times the nth power (2,4,8,16,32,64,128,256,512,1024 times)</TD></TR><TR><TD> FFH</TD><TD> Do not change settings (CDC_PARA_NOCHG)</TD></TR></TABLE></P><P><DT> <B>(5) Blur mode (horizontal/vertical direction)</b><DD><PRE>
+bit 7 6 5 4 3 2 1 0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │ │−│−│−│−│−│−│ │ Initial value: 00H   Unchanged: CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴─┴─┴┬┘
+    │             └─CDC_MPSOFT_ON    1: Blur 
+    └───────────────1: Do not change settings   0: Change
+</PRE></DL><HR NOSHADE> <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

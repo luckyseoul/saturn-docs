@@ -1,0 +1,83 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/10&gt;FAQ/Development environment/CartDev+DevSaturn environment</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Development environment</b><H2 ALIGN=CENTER> CartDev + DevSaturn environment</H2><!----------------------------------------------------------------------------->
+<A NAME="no5_01"><HR NOSHADE></a><DL>
+<H3> What is CartDev?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What is CartDev?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> CartDev is a Dev Sega Saturn, which is a slightly modified version of the actual Sega Saturn, with the aim of providing an inexpensive development system, and CartDev, which is an adapter for debugging that connects through its cartridge slot terminal. It consists of two parts.</P>
+<P> Since it does not directly manipulate the CPU bus control lines, compared to ICE, it cannot perform operations that are highly dependent on hardware, such as completely stopping various control lines on the bus.</P>
+<P> Two types of hosts are supported: IBM-PC/AT compatible machines and Silicon Graphics INDY (Indigo2).<BR>
+ The software called SNASM/Codescape is available as a supported software for IBM-PC/AT compatible machines.</P>
+<P> This software reads COFF format files output by GNU tools provided by our company and allows source code debugging on a graphical interface.<BR>
+ gdb (GNU debugger) compatible with CartDev is available on INDY (Indigo2), and similarly powerful source code debugging is achieved.<BR>
+ CartDev←→The host-to-host interface is connected by a SCSI2 bus.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_02"><HR></a><DL>
+<H3> How to run a program that accesses a write-once CD in CartDev environment?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me the steps to run a program that accesses CDROM using CartDev.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> It depends on whether the CDROM is a retail version or a write-once CD.</P>
+<DL>
+<P><DT><B>・For write-once CDs</b><DD> <B>A-1.</b> Press CartDev RESET.<DD> <B>A-2.</b> Insert SYSTEM-DISK and power on DevSaturn.<DD> <B>A-3.</b> COMPLETE display.<DD> <B>A-4.</b> Insert the Write Once CD and wait until it recognizes that it is a Sega Saturn CD.<DD> <B>A-5.</b> Start the debugger.</P>
+</DL>
+<P><DD> Follow these steps.</P>
+<DL>
+<P><DT><B>・For product version CD</b><DD> Since there is no need to insert a system disk, <B>A-2</b> and <B>A-3</b> can be omitted.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_03"><HR></a><DL>
+<H3> PowerMemory is not recognized from the debugger in CartDev+DevSaturn.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When power memory is inserted in CartDev+DevSaturn, it is not recognized on the debugger (inside the program).<BR>
+ When the power is first turned on, the cartridge is displayed along with the built-in memory on the saved data management screen, but after the debugger is started and <B>"CARTDEV READY"</b> is displayed, it is not displayed on the saved data management screen. yeah.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> In the CartDev+DevSaturn environment, it is basically not possible to access backup cartridges from the debugger. (This is the same regardless of whether it is SNASM or a certdev-server + cartdev-gdb environment.) Therefore, basically, developing a program that accesses a backup cartridge is done by using a VCD or CD-R. The only way to check the program is to self-start the VCD or CD-R.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_04"><HR></a><DL>
+<H3> Direct DOS access or reading from a disk image is not possible with VCD.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> With the hardware configuration of VCD+DevSaturn+CartDev, direct DOS access and file loading from disk images are not possible.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> VCD has strict access timing, so if you are running unnecessary applications other than VCD, such as resident software or Windows, VCD often does not work properly. Also, regarding direct DOS access, we cannot guarantee its operation in the CartDev DevSaturn environment, so please refrain from using it.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_05"><HR></a><DL>
+<H3> How to run a sample that self-starts from a virtual CD in CartDev+DevSaturn?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to run a sample that self-starts from a virtual CD with CartDev+DevSaturn.</P>
+<P><DT> <FONT SIZE=5>A)</font><P><DD> <B>1: Preparation</b><DD><UL TYPE=DISC>
+<LI> Attach the virtual CD board to your PC.<LI> Install virtual CD related tools on the hard disk and register the path.<LI> Run the JVC sample program and test CDDA playback.</UL>
+</P>
+<P><DD> <B>2: Create a CD image of the VCD self-starting sample (sample game program).</b><DD><UL TYPE=DISC>
+<LI> Create a sample execution directory on the virtual CD hard disk.<LI> Copy the sample binary file and script file to the sample execution directory.<LI> Move the current directory to the sample execution directory.<LI> Execute the VCDBUILD script file name.</UL>
+</P>
+<P><DD> <B>3: Run the sample.</b><DD><UL TYPE=DISC>
+<LI> Turn on CartDev and DevSaturn.<LI> Set the DevSaturn CD switch to the CD side and boot the system disk.<LI> When the word 'COMPLETE' appears on the TV screen, remove the system disk and set the changeover switch to the VCD side.<LI> Run VCDEMU from the sample execution directory on the virtual CD host PC.<LI> Make sure that DevSaturn recognizes it as a Sega Saturn disc, then start it.</UL>
+</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_06"><HR></a><DL>
+<H3> Where does the tail coming out from the back of DevSaturn connect?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> DevSaturn has a tail in its ass. Is it some kind of accessory?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The short tail protruding from the back of the DevSaturn near the power connector is used to connect a "MIDI interface board" used for sound development.<BR>
+ It will not be used for any other purpose, so please do not connect it to anything.<BR>
+ The MIDI interface board is sold by Ado Electronics Industry.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

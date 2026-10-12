@@ -1,0 +1,59 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>Recommended specifications for smooth game connection</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><P> <A HREF="betu3-4.htm">Return to previous page</a> | <A HREF="index.htm">Return to menu</a></BR>
+</P>
+<HR>
+<H2> 5. Recommended specifications for smooth game connection</H2><P> If you create the specifications exactly according to the previous standards, you will have to go through the following screen even when you finish the game on ``Disc 1'' and move on to ``Disc 2.''</P>
+<OL>
+<LI> "Disk replacement message" on "Disc 1"<LI> “Multiplayer screen” on main unit BOOTROM<LI> “Licensed Sega logo screen” on “Disc 2”<LI> “Title screen” of “Disc 2”<LI> “Game recording selection screen” of “Disc 2”</OL>
+<P> In the context of a story that is connected, these screens are nothing but an annoyance to the user. Therefore, we recommend the following specifications to minimize these procedures.</P>
+<HR>
+<P> <B>《Recommended specifications》</b></P>
+<UL>
+<LI> Create "transition state data" to "Disk 2" in the save data when "Disk 1" is finished.<LI> If the application recognizes the existence of that "transition state data" in backup RAM, it reads it with priority over everything else (ignoring other records).<LI> When replacing disks using "migration state data", you can complete the following minimum procedures.<PRE>
+(Existence of recording as “normal data” on “Disc 1”)
+(Temporarily rewrite "normal data" to "transition state data")
+		 ↓
+1) “Disk swap message” on “Disk 1”
+2) “Multiplayer screen” on main unit BOOTROM
+3) “License Sega logo screen” on “Disc 2”
+        (Recognition of “transition state data”)
+                  ↓↓
+4) Immediately return to application (game play) ↓
+(Rewrite "transition state data" to "normal data" starting from "disk 2")
+</PRE><P>*You can skip the "title screen" and "game recording selection screen" of "Disc 2"</P>
+<P> However, please note the following points.</P>
+<BLOCKQUOTE>
+ ! ! Note! !<BR>
+ "Transition state data" is data in a special state and does not normally exist.</BLOCKQUOTE>
+<P> *After "Disk 2" is correctly inserted, rewrite to "normal data" starting from "Disk 2" as soon as possible.</P>
+<P> *Take measures in case two or more "migration status data" exist by mistake.<BR>
+ (Determine priorities based on timestamps, provide a selection screen, etc.)</P>
+<P> *When checking the backup capacity at the start of the game, be sure to secure enough capacity for the "transition state data" (as soon as the transition state is reached, it becomes clear that there is insufficient space, and the data cannot be transferred to the next disk... Be careful not to cause such a situation.)</P>
+<P> *If this specification is adopted, sufficient care must be taken to ensure that the user does not turn off the power while leaving the "transition state data" (make sure there is a break so that it is safe to turn off the power when "Disk 1" is finished). (Not in a good flow, etc.)</P>
+</UL>
+<P ALIGN="right"> that's all</P>
+<HR>
+<P> <A HREF="betu3-4.htm">Return to previous page</a> | <A HREF="index.htm">Return to menu</a></BR>
+</P>
+</BODY>
+</HTML>

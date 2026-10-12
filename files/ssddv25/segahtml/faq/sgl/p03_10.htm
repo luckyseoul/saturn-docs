@@ -1,0 +1,182 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 8&gt;FAQ/SGL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#SYSTEM">SGL programming related</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SGL programming related</b><H2 ALIGN=CENTER> system</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_01"><HR></a><DL>
+<H3> What exactly is going on inside slInitSystem?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me what specifically the slInitSystem function does.<BR>
+ I would appreciate it if you could also tell me the values and modes to be set.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> In addition to the contents specified by the arguments, the slInitSystem function also makes the following settings inside the function. If you want to make settings other than these, you must specify them using each setting function.</P>
+<P> slInitSystem also secures and initializes the work area used by other SGL functions.<BR>
+ If you use SGL functions, be sure to execute this function first. If you execute other SGL functions before executing slInitSystem, the operation cannot be guaranteed.</P>
+<DL>
+<P><DT> (0) Initialization of system variables<DD> If a value other than 0 is entered, the following data will be entered.</P>
+<P><DT> (1) Window size and vanishing point position for sprites and polygons<DD><TABLE>
+<TR><TD><PRE>Left      </TD><TD>: 0</TD></TR>
+<TR><TD><PRE>Top       </TD><TD>: 0</TD></TR>
+<TR><TD><PRE>Right     </TD><TD>: ScreenXSize - 1</TD></TR>
+<TR><TD><PRE>Bottom    </TD><TD>: ScreenYSize - 1</TD></TR>
+<TR><TD><PRE>Zlimit    </TD><TD>: 0x7fff</TD></TR>
+<TR><TD><PRE>CenterX   </TD><TD>: ScreenXSize / 2</TD></TR>
+<TR><TD><PRE>CenterY   </TD><TD>: ScreenYSize / 2</TD></TR>
+<TR><TD><PRE>PersAngle </TD><TD>: 90゜</TD></TR>
+<TR><TD><PRE>ZdspLevel </TD><TD>: 1</TD></TR></TABLE>
+</TABLE>
+<DD> <B>*</b> The contents of ScreenXSize and ScreenYSize change depending on the setting of the first argument.</P>
+<P><DT> (2) Initial settings related to scrolling<DD><PRE>
+Displayed scroll surface  : NBG0, NBG1, RBG0
+Scroll priority           : NBG0 NBG1 NBG2 NBG3 RBG0
+                          :  7    3    2    1    4
+Sprite 0                  : SPR0
+(Polygon) Priority        : 6
+Other sprites             : SPR1~SPR7
+                          :          5
+Number of scroll colors   : 256 color mode on each side
+Color RAM mode            : 1 (2048 out of 32768 colors)
+VRAM division             : Both banks A and B are divided
+Character data            : NBG0, NBG1 from 25E60000
+                          : RBG0 from 25E00000
+Character size            : 8x8 dots on each side
+Pattern name data         : NBG0 From 25E76000
+                          : NBG1 From 257E7800
+                          : RBG0 PA From 25E40000
+                          : RBG0 PB From 25E50000
+Pattern name size         : NBG0 10-bit pattern name with inversion per word cell
+                          : NBG1 and RBG0 12-bit pattern name with no inversion per word cell
+Plain size                : 64x64 cells on each side
+Back screen color         : Black on 25E3FFFE (R=0,G=0,B=0)
+Rotation parameters       : From 25E3FF00
+Sprite data               : Mixing palette and RGB format
+Special effect function   : Do not use mosaic, color offset, etc.
+Sprite type               : scnSPR3
+ASCII character set       : 0x25e00000(For RBG), 0x25e60000(For NBG)
+</PRE></DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_02"><HR></a><DL>
+<H3> I want to dynamically change the number of processed frames.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How to dynamically change the number of processed frames with slDynamicFrame?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The system variable SynchConst, which is set when using slDynamicFrame with SGL, always contains a positive integer.<BR>
+ The processing for the negative part of the third argument of slInitSystem is as follows:</P>
+<P> slDynamicFrame<P> will be in charge.</P>
+<P> Also, if the base interval number does not change, such as from 1 to -1, there is no need to reset SynchConst.</P>
+<P><DD> <B>(Example 1)</b><DD> Fixed interval → Indeterminate interval</P>
+<P><PRE>
+/* Switch from 1 int fixed to 2 int base undefined mode */
+extern Uint8 SynchConst; /* unsigned int instead of signed int */
+                         /* ^^^^^^                  ^^^^^^^^ */
+slInitSystem( TV_320x224, NULL, 1 );
+        :
+        :
+/* Set indefinite interval mode-2 */
+slDynamicFrame( ON );
+SynchConst = 2; /* not -2 */
+slSynch();
+</PRE></P>
+<P><DD><B>(Example 2)</b><DD> Indeterminate interval → Fixed interval</P>
+<P><PRE>
+/* Change from 1 int indefinite interval to 1 int fixed interval */
+slInitSystem( TV_320x224, NULL, -1 );
+         :
+         :
+/* Set fixed interval mode 1 */
+slDynamicFrame( OFF );
+/* No need to change SynchConst */
+slSynch();
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_03"><HR></a><DL>
+<H3> Please tell me the difference between slInitSynch and slSynch.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Regarding slInitSynch() and slSynch(), what exactly is the difference between slInitSynch() and slSynch()?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> slInitSynch always waits for the next drawing. In other words, if a processing delay occurs, the process will wait until that processing completes, but with slSynch, if a processing delay occurs, it immediately ends and proceeds to the next process. In other words, slSynch may drop frames.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_04"><HR></a><DL>
+<H3> How can I find out about processing delays using slSynch?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When using slSynch(), frames will be dropped if the previous process exceeds the drawing processing unit.<BR>
+ How should I perform this check?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> First, set the third argument of slInitSystem to a negative number to set it to dynamic frame mode.</P>
+<P> Then, just before running slSynch, look at the system variable SynchCount. If SynchCount is a negative number, you can tell that processing is slow.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_05"><HR></a><DL>
+<H3> When a program is placed in L-RAM, it runs out of control when the third argument of slInitSystem is negative.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to switch frames after waiting for the writing to the frame buffer of VDP1 to be completed, but the function</P>
+<P><DD> <B>slInitSystem(Uint16 TVMode, TEXTURE *txtbl, Sint8 Count)</b><P> When I changed the parameter "Count" (frame switching count) to a negative number, it went out of control.<BR>
+ This phenomenon occurs when the executable file is placed in LowRam.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Do not place executable programs in LowRAM.</P>
+<P> SGL does not consider placing programs in LowRAM because the transfer speed of LowRAM is slow and the SCU is outside of LowRAM's control.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_06"><HR></a><DL>
+<H3> About processing during Z sort.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Among the functions related to polygon and sprite registration in SGL, what kind of process is used in SGL's Z sort processing?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> In SGL, when displaying polygons and sprites, a FIXED type Z value is usually used as an argument, but only the upper 16 bits, or integer part, are used for actual sorting.</P>
+<P> When entering a sprite or polygon into the buffer, the clipping due to the Z limit and near limit is compared using the upper 16 bits of the Z value, and then primary sorting is performed using the upper 8 bits of the integer part.<BR>
+ Furthermore, for polygons and sprites of the same degree, secondary sorting is performed using the lower 8 bits of the integer part.<BR>
+ Therefore, it is never used for decimal parts.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_07"><HR></a><DL>
+<H3> I would like to freely switch frame buffers.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If there is a way to switch frame buffers on my own in SGL, please let me know.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Unfortunately, SGL does not allow the user to switch frame buffers arbitrarily.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_08"><HR></a><DL>
+<H3> I don't know how to specify the palette.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I don't know how to specify the scroll function slPageNbg0 to 3 (Rbg0) and the palette to use in the macro SPR_ATTRIBUTE.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> slPageNbg? The offset value given to gives the offset address from color RAM (0x25f00000).</P>
+<P> Also, the SPR_ATTRIBUTE argument contains information about the number of colors from the beginning of the color RAM, so the boundaries per color will differ between 24-bit color and 15-bit color. Therefore, it is different from address offset.<BR>
+ For example, in 24-bit mode, the 256th color is an offset of 400h, but in 15-bit mode, it is 200h. For slPageNbg, the values given are 0x400 and 0x200, respectively, but for SPR_ATTRIBUTE, both are 256 (0x100).</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_09"><HR></a><DL>
+<H3> I want to perform processing that waits for drawing.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> In SGL, I think that sprites that cannot be drawn in time are normally interrupted in the middle of drawing, but is it possible to control things like waiting for drawing to finish before switching frames?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There is a function in SGL called slInitSystem, and the third argument of this function specifies the number of frames. This is usually a positive number, but if you enter a negative number "-n", it will normally operate on a frame basis of "n" and will wait for drawing only when it cannot keep up with the drawing. can.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_10"><HR></a><DL>
+<H3> How do I perform processing that waits for the CPU to process?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> In SGL, I want to perform processing that is waiting for CPU processing.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Here is an example of how to perform processing that is waiting for CPU processing in SGL.</P>
+<OL>
+<P><B><LI></b> Set the maximum number of possible processes in the third argument of slInitSystem.<BR>
+ However, since it only supports indeterminate mode, it is necessary to set it as a negative number.</P>
+<P><B><LI></b> When CPU processing is finished (just before calling slSynch and slInitSynch), set the system variable SynchCount to the number of frames previously set in slInitSystem.<BR>
+ In this case, please note the following checks when changing this value.</P>
+<OL TYPE=a>
+<P><B><LI></b> Disable interrupts.<P><B><LI></b> Check that it is not during the VBlank period. To check, check the V counter register at bit 3 of the VDP2 screen status (address 25F80004).<BR>
+ If it is not the VBlank period, perform the above change process. If it is during the VBlank period, after performing the process c.), perform the processes a.) to c.) again.</P>
+<P><B><LI></b> Cancel interrupt.</P>
+</OL>
+</OL>
+<P><DD> SGL's slSynch and slInitSynch check the system variables SynchConst and SynchCount and when they match, process the next frame. And SynchCount is the current number of INTs and SynchConst is the number of INTs specified by the user.<BR>
+ In other words, this process tricks the SGL system.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_11"><HR></a><DL>
+<H3> Is it better to transfer texture data using DMA or for loop?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it better to transfer sprites in SGL using a for loop or using DMA?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Basically, it is better to transfer using DMA because it puts less load on the main program.<BR>
+ However, since CPU DMA requires several clocks of wait time at startup, if processing speed is a concern, memory copying using a For loop may be faster depending on the amount of data.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#SYSTEM">SGL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

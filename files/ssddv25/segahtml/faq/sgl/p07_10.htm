@@ -1,0 +1,113 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/ 8&gt;FAQ/SGL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#PRE">SGL programming related</a><HR>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SGL programming related</b><H2 ALIGN=CENTER> Peripherals/SMPC</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_01"><HR></a><DL>
+<H3> I want to use a mouse.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to use a mouse with SGL, but I couldn't find a pointing device data type, like the digital device data type.<BR>
+ What should I do if I want to use a mouse with SGL?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> A structure called PerPoint is provided. Using this structure, you can obtain peripheral information about a pointing device such as a mouse.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_02"><HR></a><DL>
+<H3> How to get SATURN peripheral port 2 data?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I tried changing controller 1 to controller 2, but it didn't work.<BR>
+ How can I make it work with controller 2 as well?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Assignment of peripheral data in SGL's Smpc_Peripheral structure is as follows:</P>
+<DD><PRE>
+0 :SATURN port 1 or multi-tap 1 connected to port 1
+|
+5: Port 1 multi-tap number 6
+|   (Reservation)
+14: Port 1 multi-tap number 15
+
+15: SATURN port 2 or multi tap 1 connected to port 2
+|
+19: Port 2 multi-tap number 6
+|   (Reservation)
+29: Port 2 multi-tap number 15</PRE></P>
+ It will be. <!--あ1997-04-14 「刺さっ」→「接続され」-->
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_03"><HR></a><DL>
+<H3> I would like to determine the type of connected peripheral.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to determine the type of connected peripheral.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Determine by referring to the structure member "id" of the SGL variable Smpc_peripheral. (Reference example: Smpc_peripheral[0].id)<BR>
+ You can determine the type of connected device by checking the value here.</P>
+<P> Peripheral data itself is referenced with the same variable regardless of the device type. For non-digital devices, please cast and use according to the type.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TD> PerAnalog:</TD><TD><PRE> For racing controller, mission stick</TD></TR>
+<TR><TD> PerPoint:</TD><TD><PRE> for mouse</TD></TR>
+<TR><TD> PerKeyBoard:</TD><TD><PRE> for keyboard</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>Supplement 1</b><DD> To identify the device, please refer to the following values defined in sl_def.h.</P>
+<P><DD><PRE>
+PER_ID_StnPad          0x02  /* Saturn standard pad */
+PER_ID_StnLacing       0x13  /* Saturn Racing Controller */
+PER_ID_StnAnalog       0x15  /* Saturn analog joystick */
+PER_ID_StnKeyBoard     0x34  /* Saturn keyboard */
+PER_ID_MD3BtnPad       0xe1  /* Mega Drive 3 Button Pad */
+PER_ID_MD6BtnPad       0xe2  /* Mega Drive 6 Button Pad */
+PER_ID_ShuttleMouse    0xe3  /* Shuttle Mouse */
+PER_ID_NotConnect      0xff  /* Not connected */
+</PRE></P>
+<P><DT><B>Supplement 2</b><DD> The peripheral ID of "Multi-controller" is 0x16.<BR>
+ To use it, prepare the following structure:</P>
+<P><DD><PRE>
+typedef struct {       /* marcon */
+  Uint8 id;            /* Peripheral ID */
+  Uint8 ext;           /* Extended data size */
+  Uint16 data;         /* Button current data */
+  Uint16 push;         /* Button press data */
+  Uint16 pull;         /* Button pull data */
+  Uint8 x;             /* X-axis data absolute value */
+  Uint8 y;             /* Y-axis data absolute value */
+  Uint8 r;             /* R-axis data absolute value */
+  Uint8 l;             /* L axis data absolute value */
+  Uint32 dummy2[3];    /* dummy2 */
+} PerMultiControler;
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_04"><HR></a><DL>
+<H3> How do I set the time information when saving?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How do I set the time information when saving?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The time information is stored in the SGL variable Smpc_Status-&gt; Obtain it by referencing rtc. Access rtc as a SmpcDateTime structure.<BR>
+ This value usually retains the value from the last time slInitSystem was executed.<BR>
+ If you want to get the latest time information, execute the slGetStatus() function and refer to it again two frames later.<BR>
+ To reflect the acquired time data in the save data, use the BUP_SetDate() function.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_05"><HR></a><DL>
+<H3> The backup date is returned as a different value.</H3><!--あ1997-04-14「帰」→「返」-->
+<P><DT> <FONT SIZE=5>Q)</font><DD> If you compress time data with BUP_SetDate() and expand it with BUP_GetDate(), the time data will change depending on the data.<BR>
+ Please tell me the cause.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There is a bug in the backup sample program in the SGL manual. The samples attached to the SGL currently provided are bug-fixed versions.<BR>
+ To explain the specifics of the bug, the day member specification is set using Hex. (Actually, it has to be BCD.)<BR>
+ Therefore, you may have registered 12 days more than you actually do.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#PRE">SGL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

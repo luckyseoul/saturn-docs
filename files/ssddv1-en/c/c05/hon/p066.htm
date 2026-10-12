@@ -1,0 +1,30 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p065.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p067.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD><IMG SRC="hyou/i066-01.gif"><BR>
+<B> Figure 5.3 Operation when using transfer function </B> <P>
+<DT> <H2> 5.2 Combined use with file system </H2>
+<DD> When reading from a CD using the file system while using the stream system, the drive must be paused. There are the following two methods. <BR>
+(a) Execute STM_SetExecGrp (NULL). (Return completed) <BR>
+(b) Execute STM_NwSetExecGrp (NULL) and the function value of STM_ExecServer is <BR>
+Call the server function until STM_EXEC_TSKEND. (Immediate return) After that, when reading by the file system is completed, reading of the stream is resumed by STM_SetExecGrp (grp). <P>
+<Example> Transfer prefetched stream data while reading in the file system <BR>
+<PRE>
+         ・
+         ・ / * Prefetch stream * /
+STM_SetExecGrp (NULL); / * Put the drive in a pause state * /
+GFS_NwFread(………);
+while (1) {
+        if (GFS_NwExecOne (gfs) == GFS_SVR_COMPLETED) / * Read file * /
+        break;
+    STM_ExecTrans (stm); / * Transfer stream data * /
+}
+STM_SetExecGrp (grp); / * Restart reading the stream * / </PRE> <BR>
+</DL><P><P><HR>
+<A HREF=p065.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p067.htm> Go to next page </A>
+</BODY>
+</HTML>

@@ -1,0 +1,94 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGASATURN Developer's Information STN-21</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn06.htm">STN-6</a> | <A HREF="stn09.htm">STN-9</a> | <A HREF="stn19.htm">STN-19</a> | <B>STN-21</b> | <A HREF="stn22.htm">STN-22</a> | <A HREF="stn23.htm">STN-23</a> | <A HREF="stn24.htm">STN-24</a> ▼<HR NOSHADE>
+<H1 ALIGN=CENTER> STN-21</H1><H2 ALIGN=CENTER> Recovery of GFS_Init,GFS_LoadDir functions</H2><HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> issue number:</TH><TD> STN-21</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> date of issue:</TH><TD> 95/01/20</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> media:</TH><TD> ○Common</TD><TD> ●CD-ROM</TH><TD> ○Cartridge</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> connection:</TH><TD> ●Program</TD><TD> ○Hard</TD><TD> ○Manual</TD><TD> ○Tools</TD><TD> ○Game</TD><TD> ○ Bug</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Information distinction:</TH><TD> ●New</TD><TD> ○Change</TD><TD> ○Addition</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> importance:</TH><TD> ●Strict observance</TD><TD> ○Recommended</TD><TD> ○Reference</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> attached file:</TH><TD> ●No</TH><TD> ○ Yes</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Subject supplement:</TH><TD COLSPAN=7> Target library: GFS Ver1.15</TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER> Contents</H3><DL>
+<P><DT><H3> ■Countermeasures</H3><DD> If an error occurs in the GFS_Init or GFS_LoadDir functions, take the following actions.</P>
+<P><DT> <B>●For GFS_ERR_CDRD,GFS_ERR_FATAL errors</b><DD> GFS_Init sets the ECC/read retry count to the maximum to avoid &lt;ERROR&gt; status as much as possible. Also,&lt;FATAL&gt; If this happens, issue a stop command (seek to home position) for recovery.<BR>
+ □If these errors occur, wait until the "PAUSE" state is reached after issuing the pause command as shown in the program example in the attached document, and then try again. The number of times the re-execution can be repeated is 3 or more.<BR>
+ □If an error occurs even after repeated executions, the disc may be scratched and cannot be repaired. Please display the message or switch to multiplayer.</P>
+<P><DT> <B>●For GFS_ERR_CDNODISC,GFS_ERR_CDOPEN errors</b><DD> Please move to multiplayer.</P>
+<P><DT> <B>●For other errors</b><DD> This is an error that should never occur. Please review your program.<BR>
+ There may be a problem with the GFS library or hardware, so if you cannot find the cause, please contact us.<BR>
+ In the retail version, the only option is to move to multiplayer.</P>
+<A NAME="no1"></A><P><DT><H3> ■Sample program</H3><DD><PRE>
+
+#include "sega_cdc.h"
+Sint32 recocGfsInit(void);
+Sint32 waitStat(Sint32sts);
+
+/*GFS_Init,GFS_LoadDir return processing*/
+Sint32 revovGfsInit(void)
+{
+	Sint32 ret;
+	CdcPos pos;
+	/*Issue pause command*/
+	CDC_POS_PTYPE(&pos) = CDC_PTYPE_NOCHG;
+	ret = CDC_CdSeek(&pos);
+	if(ret != CDC_ERR_OK){
+		return NG;
+	}
+	/*Wait until "PAUSE" state*/
+	ret = waitStat(CDC_ST_PAUSE);
+	return ret;
+}
+/*Wait until the specified drive status is reached*/
+Sint32 waitStat(Sint32 sts)
+{
+	Sint32 ret;
+	Sint32 stwk;
+	CdcStat stat;
+
+	while (TRUE) { /*Actually, we need an upper limit on the number of loops*/
+		/*Get periodic response*/
+		ret = CDC_GetPeriStat(&stat);
+		if(ret == CDC_ERR_PERI){
+			continue;
+		}
+		if(ret != CDC_ERR_OK){
+			return NG;
+		}
+		stwk = CDC_GET_STC(&stat);
+		if(stwk == sts){
+			brake;
+		}
+	}
+	return OK;
+}
+</PRE></DL>
+that's all<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn06.htm">STN-6</a> | <A HREF="stn09.htm">STN-9</a> | <A HREF="stn19.htm">STN-19</a> | <B>STN-21</b> | <A HREF="stn22.htm">STN-22</a> | <A HREF="stn23.htm">STN-23</a> | <A HREF="stn24.htm">STN-24</a> ▼<HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

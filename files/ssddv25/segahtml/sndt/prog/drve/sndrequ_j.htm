@@ -1,0 +1,143 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/17&gt;サウンドドライバVer2.10ガイド/４．サウンドリクエストの具体的な方法</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no4">サウンドドライバプログラマーズガイド</A>
+<HR>
+<B>▲
+<a href="sndcmd__j.htm">戻る</A>｜
+<a href="snderr_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>サウンドドライバプログラマーズガイド</B>
+<H2 ALIGN=CENTER>４．サウンドリクエストの具体的な方法</H2>
+<HR NOSHADE>
+<DL>
+　サウンドドライバの起動方法は、基本的にはサウンドドライバをサウンドメモリへ転送してリセット信号を解除するだけです。但し電源投入時のメモリの内容は保証されていませんので、ゼロクリア等の初期化が必要です。<br>
+　サウンドドライバの起動は下記の1から6の手順で行ってください。これでサウンドドライバが起動され、プログラムの先頭から走り出します。SCSP、リセット等ハードウェアの詳細については SCSP,SMPCのユーザーズマニュアルを参照してください。<p>
+<a name="colum1"></a>
+<h3>起動の手順</h3>
+<table border>
+<tr><th>順番</th><th>処理内容</th><th>説明</th></tr>
+<tr><td>1</td><td>68000を止める<br>
+ (サウンドCPUにリセットをかける)</td><td>ソフトウェアライブラリ「SMPCインターフェースライブラリ」の「サウンドOFF」を実行する。</td></tr>
+<tr><td>2</td><td>SCSPのレジスタを初期化する</td><td>SHアドレスの 25B00400 番地にバイトで 02hを書き込む。<br>
+（DAC18B=0、MEM4MB=1 の設定となります）</td></tr>
+<tr><td>3</td><td>システム領域をゼロクリアする</td><td>SHアドレスの 25A00000 番地から 25A0AFFF 番地までをオールゼロクリアする。</td></tr>
+<tr><td>4</td><td>サウンドプログラムをサウンドメモリに転送する</td><td>SHアドレスの 25A00000 番地からへサウンドプログラム (SDDRVS.TSK)を転送する。</td></tr>
+<tr><td>5</td><td>サウンドエリアマップをサウンドメモリに転送する</td><td>SHアドレスの 25A0A000 番地からへサウンドエリアマップを転送する。</td></tr>
+<tr><td>6</td><td>68000をスタートさせる<br>
+ (サウンドCPUのリセットを解除する)</td><td>ソフトウェアライブラリ「SMPCインターフェースライブラリ」の「サウンドON」を実行する。</td></tr>
+</table><p>
+備考）<br>
+　サウンドエリアマップのサイズは最大でも0x1000バイトですので、サイズがこれより大きくなるような場合には複数のサウンドエリアマップに分割して作成してもらってください。但し、その場合には必要に応じてマップチェンジ（サウンドの再生方法の項に説明があります）の前にサウンドエリアマップの入れ替えを行ってください。<p>
+　リクエストコマンドの詳細が把握できていても、実際にどのような手順でコマンドを発行すればよいのかわからないということがしばしば見受けられます。ここでは一般的なリクエスト手順を示しますが、その前にリクエストコマンドバッファの割り当てを決めておくことをお薦めします。SEGAで推奨するコマンドバッファ割り当ては次のようなものです（順番はともかく、役割を分担する）。<p>
+<table border>
+<tr><td>0x25A00700</td><td>サウンドイニシャル、マップチェンジなど重要なコマンド専用</td></tr>
+<tr><td>0x25A00710</td><td>ポーズのon/off専用</td></tr>
+<tr><td>0x25A00720</td><td>PCMストリーム再生のon/off専用</td></tr>
+<tr><td>0x25A00730</td><td>CD-DAコントロール専用</td></tr>
+<tr><td>0x25A00740</td><td>通常効果音の音量リクエスト専用</td></tr>
+<tr><td>0x25A00750</td><td>通常効果音の演奏on/offリクエスト専用</td></tr>
+<tr><td>0x25A00760</td><td>BGMの音量リクエスト専用</td></tr>
+<tr><td>0x25A00770</td><td>BGMの演奏on/offリクエスト専用</td></tr>
+</table><p>
+　一概にこれが良いとは言い切れませんが、少なくとも、効果音と他のリクエストはバッファを区別することを強く推奨します。なぜなら、サウンドリクエスト関係のトラブルは、そのほとんどが効果音なのです。これは効果音のリクエスト回数がほかに比べ極端に多いことと、コントロールパッドによるリアルタイムなリクエストなので予測できないケースが多いなどの原因によります。また、これを区別することは、他のリクエストに影響を与えないようにする目的以外に、デバッグに費やす時間の短縮にもなります。<p>
+　では、ゲームスタートからリクエスト手順の説明を行います。<p>
+<ol>
+<li>サウンドプログラムをロードした後、タイミングフラグを使用可能にするために0x25A004E1のビット７を立てます。<p>
+<li>68000をスタートさせます。<p>
+<li>サウンドイニシャライズを行います。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0700</td><td>10</td><td>--</td><td>01</td><td>01</td><td>01</td><td>01</td><td>01</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立てます。<p>
+<li>マップデータ、サウンドデータを0x25A0A000番地以降へロードし、転送済みフラグを立てます。<p>
+<li>マップチェンジを行います。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0700</td><td>08</td><td>--</td><td>nn</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立てます。<p>
+<li>エフェクトチェンジを行います（DSPを使用しないのであれば行う必要はありません）。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0700</td><td>83</td><td>--</td><td>nn</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立てます。<p>
+<li>ミキサチェンジを行います。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0700</td><td>87</td><td>--</td><td>nn</td><td>nn</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立てます。<p>
+以上を完了すれば、曲、効果音のリクエストが可能になります。では、次にバンク１にある曲番号２の曲を発音管理番号３でリクエストしてみます。この例ではサウンドクリエータから特に音量の指定がなかったものとします。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0760</td><td>05</td><td>--</td><td>03</td><td>80</td><td>00</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+<tr><td>0x0770</td><td>01</td><td>--</td><td>03</td><td>01</td><td>02</td><td>00</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立てます。<p>
+このように、通常はシーケンスボリュームコマンドとセットで同一INTに発行すると間違いがありません。では、今度はバンク２にある曲番号３の効果音を発音管理番号７でリクエストしてみます。曲は止めずに効果音を発声させるので、曲と効果音の発音管理番号は異なっていなければなりません。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0740</td><td>05</td><td>--</td><td>04</td><td>80</td><td>00</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+<tr><td>0x0750</td><td>01</td><td>--</td><td>04</td><td>02</td><td>03</td><td>00</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立てます。<p>
+では次に、現在発音管理番号３で演奏されている曲を止めます。終了モードは０を指定してください。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0770</td><td>02</td><td>--</td><td>03</td><td>00</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立てます。<p>
+演奏停止はこれ一発でOKです。コマンドリファレンスをみるとこれ以外にも音を止めるらしきコマンドがありますが、演奏停止はこれだけです。では、今度はフェードアウトして曲を終了させてみます。フェードアウトして行くスピードは0x0Aにしてみます。ほとんどのゲームが大体このくらいです。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0760</td><td>05</td><td>--</td><td>03</td><td>00</td><td>0A</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立てます。通常、曲のフェードアウトが完全に終了するまで待っていられないことが多いので、適当なところで演奏終了コマンドを発行します。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0770</td><td>02</td><td>--</td><td>03</td><td>00</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立てます。<p>
+ただいま曲を終了させましたが、このあとにオーバーレイ処理によるサウンドデータの入れ替えをするとします。この場合、念のため（ほかの発音管理番号で効果音などのシーケンスが演奏中かもしれないので）、全シーケンス停止を実行します。<p>
+<table border>
+<tr><td> </td><td>+0</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+5</td><td>+6</td><td>+7</td><td>+8</td><td>+9</td><td>+A</td><td>+B</td></tr>
+<tr><td>0x0700</td><td>06</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+</table><p>
+以上を書き込み、タイミングフラグを立て、さらにタイミングフラグがoffになるのを待って、最初に戻り、サウンドイニシャル発行、データロード、マップチェンジ発行、エフェクトチェンジ発行、ミキサチェンジ発行を行います。<p>
+</ol>
+　希に、メイン側が発行するリクエストを一旦吸収し、リクエストコマンドバッファを0x10バイトごとのリングバッファに見立てて、発行された順番に書き込んでゆくといったプログラムをＳＨ２で組んでしまうケースがあるようですが、これはゲームによっては大変危険ですので、絶対に行わないでください。コマンドバッファは役割分担するようお願いします！<p>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="sndcmd__j.htm">戻る</A>｜
+<a href="snderr_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no4">サウンドドライバプログラマーズガイド</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

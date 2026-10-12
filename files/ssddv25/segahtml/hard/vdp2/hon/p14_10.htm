@@ -1,0 +1,145 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;73/86&gt;VDP2 User's Manual/14.1 Shadow processing</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no14">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p13_10.htm">Back</a> ｜ <A HREF="p15_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual</b><H2 ALIGN=CENTER> Chapter 14 Shadow Function</H2><HR NOSHADE>
+<DL>
+<P><DD> The shadow function is a function that uses sprites to cast shadows on themselves or on the scroll screen. There are two types of sprites that act as shadows, depending on their data: normal shadows and MSB shadows. MSB shadows can only be used when the sprite type is type 2-7. Shadowing is only used when the shadowing sprite has the highest priority.</P>
+<P><DD> Shadow functions are processed after color calculation and color offset functions. The shadow function is shown in Figure 14.1.</P>
+<A NAME="z14_1"></A><P ALIGN=CENTER> <B>Figure 14.1 Shadow function</b><BR>
+<img srcset="../../intr/grp/i036_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no14_10"></A><DT><H2> ■14.1 Shadow processing</H2><DD> In shadow processing, when a normal shadow or MSB shadow sprite has the highest priority, that sprite is forcibly made transparent, and the brightness of the part where the sprite was in the top image determined on the screen excluding the sprite is is to be halved.</P>
+<A NAME="no14_11"></A><P><DT><H3> ●Normal shadow</H3><DD> For normal shadow sprites, only the least significant bit of the dot color data for the specified sprite type is 0, and all other dot color data are 1, and the number of bits to be determined changes depending on the sprite type.</P>
+<P><DD> For normal shadow sprite data, specify a color control word in which all bits of the dot color data except the dot color code are 1, with only the least significant bit being 0 and all remaining bits being 1. It is created by writing a dot color coded sprite character to the frame buffer. At this time, it will overwrite the frame buffer data that has already been written, so it will not be possible to add shadows to the sprite. Therefore, you should normally write to the frame buffer first. For information on color control words, please refer to the " <B>VDP1 User's Manual</b> ".</P>
+<P><DD> The scroll screen and back screen that are shaded by normal shadow sprites can be specified for each screen.</P>
+<P><DD> Normal shadow is shown in Figure 14.2, and normal shadow sprite data is shown in Figure 14.3.</P>
+<A NAME="z14_2"></A><P ALIGN=CENTER> <B>Figure 14.2 Writing normal shadow sprite data</b><BR>
+<img srcset="../grp/i257_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z14_3"></A><P><DD> <B>Figure 14.3 Normal shadow sprite data</b><DD><PRE>
+●For sprite types 0 to 3 and 5
+Bit15             8 7             0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │-│-│-│-│-│1│1│1│1│1│1│1│1│1│1│0│
+   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+●For sprite types 4 and 6
+Bit15             8 7             0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │-│-│-│-│-│-│1│1│1│1│1│1│1│1│1│0│
+   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+●For sprite type 7 Bits
+Bit15             8 7             0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │-│-│-│-│-│-│-│1│1│1│1│1│1│1│1│0│
+   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+●For sprite types C to F
+Bit15             8 7             0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │-│-│-│-│-│-│-│-│1│1│1│1│1│1│1│0│
+   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+●For sprite type 8
+Bit15             8 7             0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │−│−│−│−│−│−│−│−│−│1│1│1│1│1│1│0│
+   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+●For sprite types 9 to B
+Bit15             8 7             0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │−│−│−│−│−│−│−│−│−│−│1│1│1│1│1│0│
+   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+Note: The bits in the "-" part are not used to determine normal shadows.
+</PRE></P>
+<A NAME="no14_12"></A><P><DT><H3>●MSB Shadow</H3><DD> MSB shadow is valid only when the sprite type is type 2 to 7, and the most significant bit (MSB) of the sprite data is 1. Sprite shadow and transparent shadow are determined by the value of 15 bits other than MSB. There are two types. A sprite shadow has a MSB of 1 and all 15 bits other than the MSB are non-zero. A transparent shadow has an MSB of 1 and all 15 bits other than the MSB of 0. However, if the dot color data satisfies the conditions for a normal shadow, it will be determined as a normal shadow even if it satisfies the conditions for a sprite shadow.</P>
+<P><DD> MSB shadow sprite data is created by changing only the MSB to 1 in the form of an MSB shadow sprite from the frame buffer data in which VDP1 has already been written. (Please refer to " <B><A HREF="../../vdp1/hon/p06_38.htm">■MSB On</a></b> " in the "VDP1 User's Manual".) At this time, if all bits of the frame buffer data before changing the MSB are not 0, that is, if a normal sprite has already been written. If it is, it becomes a sprite shadow and casts a shadow on that sprite character.</P>
+<P><DD> If all bits of the frame buffer data before changing the MSB were 0, that is, if it was transparent, it becomes a transparent shadow, and the scroll screen whose priority is one level lower than the sprite of the transparent shadow. to add a shadow. Scroll screens and back screens that are shaded by transparent shadow sprites can be specified for each screen.<BR>
+<!--1997/07/29追加 -->
+ Please note that the priority number of the transparent shadow sprite uses the value set in sprite register 0 of the priority number register.<!--ここまで-->
+<P><DD> If you use a sprite window, you will no longer be able to use this MSB shadow. For information on sprite windows, see <B><A HREF="p08_10.htm">8.1 Window Area</a></b> .</P>
+<P><DD> Figure 14.4 shows sprite shadows and transparent shadows, and Figure 14.5 shows sprite data for MSB shadows.</P>
+<A NAME="z14_4"></A><P ALIGN=CENTER> <B>Figure 14.4 Sprite shadows and transparent shadows</b><BR>
+<img srcset="../grp/i258_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z14_5"></A><P><DD> <B>Figure 14.5 MSB shadow sprite data</b><DD><PRE>
+●Sprite shadow
+Bit15             8 7             0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │1│×│×│×│×│×│×│×│×│×│×│×│×│×│×│×│
+   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+× can be 0 or 1 as long as the dot color data for the specified sprite type does not meet the normal shadow conditions.
+
+
+●Transparent shadow
+Bit15             8 7             0
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │1│0│0│0│0│0│0│0│0│0│0│0│0│0│0│0│
+   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE></P>
+<A NAME="no14_13"></A><P><DT><H3>●Shadow control register</H3><DD> The shadow control register specifies whether to use the shadow function for the scroll screen and back screen. This is a 16-bit write-only register located at address 1800E2H. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SDCTL_"></A><P><DD> <B><FONT SIZE=5>SDSTL</font> <FONT SIZE=4>1800E2H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSDEN_">TPSDSL</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSDEN_">BKSDEN</a></TH><TH><PRE> <A HREF="#NxSDEN_">R0SDEN</a></TH><TH><PRE> <A HREF="#NxSDEN_">N3SDEN</a></TH><TH><PRE> <A HREF="#NxSDEN_">N2SDEN</a></TH><TH><PRE> <A HREF="#NxSDEN_">N1SDEN</a></TH><TH><PRE> <A HREF="#NxSDEN_">N0SDEN</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="NxSDEN_"></A><DT> <B>Shadow enable bit</b> : Shadow enable bit<DD> (N0SDEN, N1SDEN, N2SDEN, N3SDEN, R0SDEN, BKSDEN)<BR>
+ Specifies whether to use the shadow function for the scroll screen and back screen for normal shadow and transparent shadow sprites.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0SDEN</TD><TD> 1800E2H</TD><TD> Bit 0</TD><TD WIDTH=220> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD> N1SDEN</TD><TD> 1800E2H</TD><TD> Bit 1</TD><TD WIDTH=220> For NBG1 (or for EXBG)</TD></TR>
+<TR><TD> N2SDEN</TD><TD> 1800E2H</TD><TD> Bit 2</TD><TD WIDTH=220> For NBG2</TD></TR>
+<TR><TD> N3SDEN</TD><TD> 1800E2H</TD><TD> Bit 3</TD><TD WIDTH=220> For NBG3</TD></TR>
+<TR><TD> R0SDEN</TD><TD> 1800E2H</TD><TD> bit 4</TD><TD WIDTH=220> For RBG0</TD></TR>
+<TR><TD> BKSDEN</TD><TD> 1800E2H</TD><TD> Bit 5</TD><TD WIDTH=220> For BACK</TD></TR>
+</TABLE>
+</P>
+<P><DD> Sprite shadow sprites always use shadowing on themselves.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> xxSDEN</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Do not use the shadow function (do not add shadows)</TD></TR>
+<TR><TH> 1</TH><TD> Using the shadow function (adding a shadow)</TD></TR>
+</TABLE>
+</P>
+<A NAME="TPSDSL_"></A><P><DT> <B>Transparent shadow select bit</b> : Transparent shadow select bit (TPSDSL), bit 8<DD> Specifies whether transparent shadow sprites are enabled.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> TPSDSL</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Disable transparent shadow sprites</TD></TR>
+<TR><TH> 1</TH><TD> Enable transparent shadow sprites</TD></TR>
+</TABLE>
+</P>
+<P><DD> If you disable transparent shadow sprites, you will no longer be able to cast shadows on any screen with transparent shadow sprites.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p13_10.htm">Back</a> ｜ <A HREF="p15_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no14">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

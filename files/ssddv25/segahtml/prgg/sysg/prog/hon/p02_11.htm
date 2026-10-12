@@ -1,0 +1,122 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 3&gt; System Program User's Manual/Reference/Details</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">System program user's manual</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>SMPC Interface User's Manual</b><H2 ALIGN=CENTER> function specification </H2><HR NOSHADE>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no1_1"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR> function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR> to the interrupt vector,<BR> Register interrupt handling routine</TD><TD WIDTH=180><PRE> <B>Function name</b><BR> SYS_SETSINT</TD><TD WIDTH=060><PRE> <B>No</b><BR> 1.1</TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void SYS_SETSINT(Uint32 Num, void* Hdr);<DT> <B>input</b><DD> Num: Vector number (0..7FH)<DD> Hdr: Interrupt handling routine address<DD> (If 0, it will be a dummy routine or if Num is an SCU interrupt vector, it will be the interrupt handling routine)</P>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Hdr must be a processing routine that ends with a register save, restore, and RTE instruction (in C language, it must have a #pragma interrupt declaration).<DD> If Hdr is 0, the SCU interrupt routine will be re-registered if Num is within the SCU interrupt (40H..4DH, 50H..5FH), and a dummy routine will be registered otherwise.<BR>
+ No range checking was performed. Do not specify values outside the limits.<DT> <B>remarks</b><DD> This routine can be used with both master and slave SH2, and registers to the vector address based on each VBR. </P>
+</DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no1_2"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR> function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR> to the SCU interrupt routine,<BR> Register a processing function</TD><TD WIDTH=180><PRE> <B>Function name</b><BR> SYS_SETUINT</TD><TD WIDTH=060><PRE> <B>No</b><BR> 1.2</TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void SYS_SETUINT(Uint32 Num,void* Hdr);<DT> <B>input</b><DD> Num: Vector number (SCU vector number)<DD> Hdr: Function routine address (if 0, it becomes a dummy routine)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Hdr must be a function by SHC. Routines created in assembler must follow the SHC register saving rules.<DD> Num is limited to SCU interrupt vectors (40H..4DH, 50H..5FH).<DD> If Hdr is 0, register a dummy routine.<DD> No range checking was performed. Do not specify values outside the limits.<DT> <B>remarks</b><DD> If a routine is registered in a vector using SYS_SETSINT, the SCU interrupt handling routine for that vector will be disabled and the registered function will not be called.<DD> If this routine is called on slave SH2, the results are not guaranteed. </P>
+</DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no1_3"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR> function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR> Get the registered contents of the interrupt vector</TD><TD WIDTH=180><PRE> <B>Function name</b><BR> SYS_GETSINT</TD><TD WIDTH=060><PRE> <B>No</b><BR> 1.3</TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void(＊)() SYS_GETSINT(Uint32 Num);<DT> <B>input</b><DD> Num: Vector number (0..7FH)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Vector registration contents (interrupt processing routine address)<DT> <B>function</b><DD> Returns the contents of a vector of Num as a function value.<DD> No range checking was performed. Do not specify values outside the range.<DT> <B>remarks</b><DD> This routine can be used with both master and slave SH2, and refers to the vector address based on each VBR. </P>
+</DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no1_4"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR> function specification</TD><TD WIDTH=260><PRE> <B>Function</b><BR> Get the registered contents of SCU interrupt routine</TD><TD WIDTH=140><PRE> <B>Function name</b><BR> SYS_GETUINT</TD><TD WIDTH=060><PRE> <B>No</b><BR> 1.4</TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void(＊)() SYS_GETUINT(Uint32 Num);<DT> <B>input</b><DD> Num: Vector number (SCU vector number)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Registration contents (function routine address)<DT> <B>function</b><DD> NumReturns the registered contents of the corresponding SCU interrupt routine as a function value.<DD> No range checking was performed. Do not specify values outside the range.<DT> <B>remarks</b><DD> If this routine is called on slave SH2, the results are not guaranteed. </P>
+</DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_1"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR> function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR> Setting SCU interrupt mask</TD><TD WIDTH=180><PRE> <B>Function name</b><BR> SYS_SETSCUIM</TD><TD WIDTH=060><PRE> <B>No</b><BR> 2.1</TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void SYS_SETSCUIM(Uint32 MaskPat);<DT> <B>input</b><DD> MaskPat: SCU interrupt mask value<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Write the value of MaskPat to the mask storage memory, SCU interrupt mask register, and then write the same value to the SCU interrupt status register. However, if the A-Bus interrupt mask bit is enabled, it clears the upper word of the status register and also clears the A-Bus interrupt acknowledge register.<DT> <B>remarks</b><DD> This routine must not be used from interrupt processing (of SCU interrupts) (the value of <A HREF="#no2_3"><B>SYS_GETSCUIM</b></a> is undefined during SCU interrupt processing).<DD> If an SCU interrupt occurs during processing, the interrupt may disappear (SCU specifications). Avoid that possibility or use it in situations you don't care about.<DD> If this routine is called on slave SH2, the results are not guaranteed. </P>
+</DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_2"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR> function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR> Changing the SCU interrupt mask</TD><TD WIDTH=180><PRE> <B>Function name</b><BR> SYS_CHGSCUIM</TD><TD WIDTH=060><PRE> <B>No</b><BR> 2.2</TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void SYS_CHGSCUIM(Uint32 AndMask,Uint32 OrMask);<DT> <B>input</b><DD> AndMask: Mask value for permission<DD> OrMask: Rejection mask value<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> The contents of the mask storage memory are ANDed with AndMask, and the result of ORing with Or-Mask is written to the mask storage memory and the SCU interrupt mask register.<DD> Next, write the logical sum of AndMask and OrMask to the SCU status register. However, if the A-Bus interrupt mask bit is enabled, clear the upper word of the status register and clear the A-Bus interrupt acknowledge register. Perform these operations atomically.<DT> <B>remarks</b><DD> This routine must not be used from interrupt processing (of SCU interrupts) (the value of <A HREF="#no2_3"><B>SYS_GETSCUIM</b></a> is undefined during SCU interrupt processing).<DD> If an SCU interrupt occurs during processing, the interrupt may disappear (SCU specifications). Avoid that possibility or use it in situations you don't care about.<DD> If this routine is called on slave SH2, the results are not guaranteed. </PRE><P></DL><!-- ------------------------------------------------------------------------------------- --><HR><DL><P><A NAME="no2_3"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR>
+ function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR>
+ Reference to SCU interrupt mask value</TD><TD WIDTH=180><PRE> <B>Function name</b><BR>
+ SYS_GETSCUIM</TD><TD WIDTH=060><PRE> <B>No</b><BR>
+ 2.3</TD></TR></TABLE><DT> <B>Format</b><DD> Uint32 SYS_GETSCUIM;<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Mask storage memory value<DT> <B>function</b><DD> Reads the value of mask storage memory. This value is the same as the value actually set in the SCU interrupt mask register if the SCU interrupt mask register is set or changed using the above function.<DT> <B>remarks</b><DD> During SCU interrupt processing, the mask value for each interrupt factor (if the application uses SYS_CHGUIPR(), the corresponding value in the table) is added to the value set by the application using SYS_SETSCUIM() and SYS_CHGSCUIM(). Changes to logical sum. However, when multiple interrupts occur, the result changes further, such as the logical sum of the interrupts.<BR> Therefore, this value becomes undefined during SCU interrupt processing. During processing, do not perform any processing that depends on the referenced value. </P></DL><!-- ------------------------------------------------------------------------------------- --><HR><DL><P><A NAME="no3_1"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR>
+ function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR>
+ acquire a semaphore</TD><TD WIDTH=180><PRE> <B>Function name</b><BR>
+ SYS_TASSEM</TD><TD WIDTH=060><PRE> <B>No</b><BR>
+ 3.1</TD></TR></TABLE><DT> <B>Format</b><DD> Uint32 SYS_TASSEM(Uint32 Num);<DT> <B>input</b><DD> Num: Semaphore number (0 to FFH)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Result (1: Obtained, 0: Already obtained by others)<DT> <B>function</b><DD> Execute the TAS instruction on the memory (1 byte) associated with the number Num and return the result as a function value.<DD> No range checking was performed. Do not specify values outside the range.<DD> This routine can be used with both master and slave SH2. </P></DL><!-- ------------------------------------------------------------------------------------- --><HR><DL><P><A NAME="no3_2"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR>
+ function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR>
+ release a semaphore</TD><TD WIDTH=180><PRE> <B>Function name</b><BR>
+ SYS_CLRSEM</TD><TD WIDTH=060><PRE> <B>No</b><BR>
+ 3.2</TD></TR></TABLE><DT> <B>Format</b><DD> void SYS_CLRSEM(Uint32 Num);<DT> <B>input</b><DD> Num: Semaphore number (0 to FFH)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Clears the memory (1 byte) associated with the number Num.<DD> No range checking was performed. Do not specify values outside the range.<DD> This routine can be used with both master and slave SH2. </P></DL><!-- ------------------------------------------------------------------------------------- --><HR><DL><P><A NAME="no4_1"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR>
+ function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR>
+ Switch system clock</TD><TD WIDTH=180><PRE> <B>Function name</b><BR>
+ SYS_CHGSYSCK</TD><TD WIDTH=060><PRE> <B>No</b><BR>
+ 4.1</TD></TR></TABLE><DT> <B>Format</b><DD> void SYS_CHGSYSCK(Uint32 CkMode);<DT> <B>input</b><DD> CkMode:<DD> 0: CPU 26MHz, 320/640 mode<DD> 1: CPU 28MHz, 352/704 mode<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Switches the system clock to the value specified by CkMode.<DT> <B>remarks</b><DD> Please refer to the overview or SMPC manual regarding the devices that will be reset and the processing time.<DD> If this routine is called on slave SH2, the system will hang up. Be sure to call it from master SH2. </P></DL><!-- ------------------------------------------------------------------------------------- --><HR><DL><P><A NAME="no4_2"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR>
+ function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR>
+ See system clock value</TD><TD WIDTH=180><PRE> <B>Function name</b><BR>
+ SYS_GETSYSCK</TD><TD WIDTH=060><PRE> <B>No</b><BR>
+ 4.2</TD></TR></TABLE><DT> <B>Format</b><DD> Uint32 SYS_GETSYSCK;<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> 0 or 1: parameter value of last SYS_CHGSYSCK()<DT> <B>function</b><DD> Reads the system clock value. This is the parameter value when SYS_CHGSYSCK() was last called.<DT> <B>remarks</b><DD> Refer to this value on master SH2. </P></DL><!-- ------------------------------------------------------------------------------------- --><HR><DL><P><A NAME="no5_1"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR>
+ function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR>
+ Change SCU interrupt routine priority</TD><TD WIDTH=180><PRE> <B>Function name</b><BR>
+ SYS_CHGUIPR</TD><TD WIDTH=060><PRE> <B>No</b><BR>
+ 5.1</TD></TR></TABLE><DT> <B>Format</b><DD> void SYS_CHGUIPR(Uint32 *IprTab);<DT> <B>input</b><DD> IprTab: 32 longword data array<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Rewrites the priority table for SCU interrupt routines in BOOTROM with the values from the table specified in IprTab.<BR><BR><DD> Once rewritten, interrupt processing by the SCU interrupt routine will be executed with the priority of the corresponding table value for each cause.<P><DT><TABLE><TR><TD><img srcset="../../../../what/danger.png 5x"></TD><TD> <B>Table contents are not checked. If there is a priority relationship conflict in the table contents, the system may hang.</b></TD></TR></TABLE><P><DT> <B>remarks</b><DD> The table settings remain valid until the next time they are rewritten. During this time, the application does not need to maintain the table specified in the parameter. Please note that upon resetting, the BOOT ROM default settings will be restored.<DD> If this routine is called on slave SH2, the results are not guaranteed. </P></DL><!-- ------------------------------------------------------------------------------------- --><HR><DL><P><A NAME="no6_1"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR>
+ function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR>
+ Start and run CD Multiplayer</TD><TD WIDTH=180><PRE> <B>Function name</b><BR>
+ SYS_EXECDMP</TD><TD WIDTH=060><PRE> <B>No</b><BR>
+ 6.1</TD></TR></TABLE><DT> <B>Format</b><DD> void SYS_EXECDMP(void);<DT> <B>input</b><DD> none<DT> <B>output</b><DD> does not return to caller<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Start and run CD Multiplayer.<DT> <B>remarks</b><DD> If this routine is called on slave SH2, the system will hang. Be sure to call it from master SH2. </P></DL><!-- ------------------------------------------------------------------------------------- --><HR><DL><P><A NAME="no7_1"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR>
+ function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR>
+ Operating power-on clear memory</TD><TD WIDTH=180><PRE> <B>Function name</b><BR>
+ SYS_PCLRMEM</TD><TD WIDTH=060><PRE> <B>No</b><BR>
+ 7.1</TD></TR></TABLE><DT> <B>Format</b><DD> Uint8 *SYS_PCLRMEM<DT> <B>input</b><DD> Please perform normal memory access.<DT> <B>output</b><DD> Please perform normal memory access.<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> This is the address of 8 bytes of memory managed by BOOT ROM. This memory is initialized to 0 only at power-on startup, but the contents are retained when the reset button (NMI) is pressed.<DT> <B>remarks</b><DD> No range checking was performed. Please be careful not to access outside the scope.</P></DL><HR NOSHADE> <B>▲ <A HREF="p02_10.htm">Back</a> ｜■</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">System program user's manual</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

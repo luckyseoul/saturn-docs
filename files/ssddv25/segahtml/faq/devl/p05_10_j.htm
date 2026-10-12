@@ -1,0 +1,163 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/10&gt;FAQ/開発環境/CartDev+DevSaturn環境</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#devl">FAQ</A>
+★<a href="index_j.htm">開発環境</A>
+<HR>
+<B>▲
+<a href="p04_10_j.htm">戻る</A>｜
+<a href="p06_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/開発環境</B>
+<H2 ALIGN=CENTER>CartDev + DevSaturn 環境</H2>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_01"><HR NOSHADE></A><DL>
+<H3>CartDevって何?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CartDevは、どういうものなんでしょうか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>CartDevは、 安価な開発システムをご提供する事を主眼とし実機のセガサターンに
+若干の改造を施したDevセガサターンと、 そのカートリッジスロット端子を介して
+接続する、 デバッグのためのアダプタであるCartDevとの二つで構成されます。</P>
+
+<P>直接CPUのバス制御線を操作している訳ではありませんのでICEと比較すると、
+バス上各種制御線を完全に停止したりといった、ハードウェアへかなり依存した
+部分に関する操作はできません。</P>
+
+<P>このホストとして対応しているのは、IBM-PC/AT互換機、シリコングラフィックス社のINDY(Indigo2)の2種です。<BR>
+IBM-PC/AT互換機ではサポートするソフトウェアとして、SNASM(スナズム)/Codescapeというソフトウェアをご用意しています。</P>
+
+<P>このソフトウェアは弊社より提供するGNU ツールで出力されるCOFF形式のファイルを読み込み、グラフィカルなインターフェイス上でソースコードデバッグが可能となります。<BR>
+INDY(Indigo2)上ではCartDevに対応したgdb(GNU debugger)をご用意し、同様に強力なソースコードデバッグを実現しています。<BR>
+CartDev←→ホスト間インターフェースは、SCSI2バスで接続されます。</P>
+</DL>
+
+<!----------------------------------------------------------------------------->
+<A NAME="no5_02"><HR></A><DL>
+<H3>CartDev環境でライトワンスCDのアクセスをするプログラムを実行するには?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CartDevでCDROMアクセスを行なうプログラムの実行手順について教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>CDROMが製品版かライトワンスCDかによって変わってきます。</P>
+	<DL>
+	<P><DT><B>・ライトワンスCDの場合</B>
+	<DD><B>A-1.</B>CartDev RESET を押す。
+	<DD><B>A-2.</B>SYSTEM-DISK を入れて、DevSaturn の電源投入。
+	<DD><B>A-3.</B>COMPLETE の表示。
+	<DD><B>A-4.</B>ライトワンスCD入れセガサターン用CDである事を認識する迄待つ。
+	<DD><B>A-5.</B>デバッガを起動。</P>
+	</DL>
+<P><DD>という手順を踏みます。</P>
+	<DL>
+	<P><DT><B>・製品版CDの場合</B>
+	<DD>システムディスクを入れる必要がないので、<B>A-2</B>、<B>A-3</B>を省略出来ます。</P>
+	</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_03"><HR></A><DL>
+<H3>CartDev+DevSaturnでデバッガからPowerMemoryを認識しない。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CartDev+DevSaturnでパワーメモリを差した際、デバッガ上(プログラム内)で認識されません。<BR>
+最初に電源を入れたときの保存データ管理画面には本体内蔵メモリと共にカートリッジは表示されるのですが、デバッガを起動して<B>「CARTDEV READY」</B>
+と表示された後は保存データ管理画面でも表示されません。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>
+CartDev+DevSaturnの環境では基本的に、デバッガ上からバックアップ
+カートリッジにアクセスすることは出来ません。(これは、SNASMであっても、
+certdev-server + cartdev-gdbの環境であっても同じです) ですので基本的に
+バックアップカートリッジにアクセスするプログラムの開発は、VCD又は、
+CD-Rに焼いた上で、VCD又はCD-Rを自己起動させる方法でしかプログラムの確認は
+出来ません。
+</DL>
+
+<!----------------------------------------------------------------------------->
+<A NAME="no5_04"><HR></A><DL>
+<H3>VCDでダイレクトDOSアクセスやディスクイメージからの読み込みが出来ない。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>VCD+DevSaturn+CartDevというハード構成でダイレクトDOSアクセス及びディスクイメージからのファイルの読み込みができません。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>
+VCDは、アクセスタイミングがシビアですので、VCD以外の余計な
+      アプリケーション、例えば、常駐ソフトやWindowsなどを動かしていると、
+      VCDが正しく動作しない事が多いです。
+      又、ダイレクトDOSアクセスにつきましては、CartDev DevSaturn環境では、
+      動作保証しかねますので、御使用をお控えください。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_05"><HR></A><DL>
+<H3>CartDev+DevSaturnにてバーチャルCDから自己起動するサンプルの実行方法は?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>
+CartDev+DevSaturnでバーチャルCDから自己起動するサンプルの実行方法を教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+
+<P><DD><B>1: 準備</B>
+<DD><UL TYPE=DISC>
+	<LI>バーチャルCDボードをPCに装着する。
+	<LI>バーチャルCD関連のツールをハードディスクにインストールしパスを登録する。
+	<LI>JVCのサンプルプログラムを実行し、CDDA再生のテストを行う。</UL></P>
+
+<P><DD><B>2: VCD自己起動サンプル(サンプルゲームプログラム)のCDイメージを作成する。</B>
+<DD><UL TYPE=DISC>
+	<LI>バーチャルCD用ハードディスクにサンプル実行用ディレクトリを作成する。
+	<LI>サンプルのバイナリファイルとスクリプトファイルを、サンプル実行用ディレクトリにコピーする。
+	<LI>カレントディレクトリをサンプル実行用ディレクトリに移す。
+	<LI>VCDBUILD スクリプトファイル名を実行する。</UL></P>
+
+<P><DD><B>3: サンプルを実行する。</B>
+<DD><UL TYPE=DISC>
+	<LI>CartDev、DevSaturnの電源を入れる。
+	<LI>DevSaturnのCD切り替えスイッチをCD側にし、システムディスクを起動する
+	<LI>TVの画面に'COMPLETE'の文字が表示されたらシステムディスクを抜き、切り替えスイッチをVCD側にする。
+	<LI>バーチャルCD用ホストPCにてサンプル実行用ディレクトリから、VCDEMUを実行する。
+	<LI>DevSaturnがセガサターン用のディスクとして認識するのを確認し、スタートさせる。</UL></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_06"><HR></A><DL>
+<H3>DevSaturnの背面から出ている尻尾は、どこに接続するのでしょうか?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>DevSaturnには、お尻にしっぽがついています。何かのアクセサリなのでしょうか？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>
+DevSaturnの背面、電源コネクタのそばから出ている短いシッポは、
+サウンド開発に使用する「MIDIインタフェースボード」を接続するのに
+使用します。<BR>
+それ以外の用途では使用しませんので、どこにも接続しないでください。<BR>
+尚、MIDIインターフェイスボードは亜土電子工業にて販売しています。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p04_10_j.htm">戻る</A>｜
+<a href="p06_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#devl">FAQ</A>
+★<a href="index_j.htm">開発環境</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

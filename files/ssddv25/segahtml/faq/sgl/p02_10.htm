@@ -1,0 +1,111 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 8&gt;FAQ/SGL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#SCROLL">SGL programming related</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SGL programming related</b><H2 ALIGN=CENTER> scroll</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_01"><HR></a><DL>
+<H3> I want to create a rotation coefficient table.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to create a coefficient table for rotation BG...<BR>
+ Please tell me what happens when you use slMakeKtable.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> SGL's coefficient table has a reciprocal scroll table to match the sprite. It is linked with the rotation matrix, and SGL is passing the address position of the coefficient table.<BR>
+ Therefore, if the coefficient table is created by the user, SGL's 3D rotation processing cannot be guaranteed.<BR>
+ For the coefficient table normally used, it is best to refer to the method used in SBL.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_02"><HR></a><DL>
+<H3> I want to use RGB0 in a bitmap.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to use the function that uses RBG0 in a bitmap.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is possible by using the slBitMapRbg0 function.</P>
+<DL>
+<P><DT> <B>【declaration】</b><DD> void slMitMapRbg0( Uint16 type, Uint16 size, void *addr )<DD><TABLE>
+<TR><TD> type：</TD><TD> Type of number of colors (16 colors, 256 colors, 2048 colors, 32768 colors)</TD></TR>
+<TR><TD> size:</TD><TD> bitmap screen size<BR>
+ 512x256, 512x512, 1024x256, 1024x512</TD></TR>
+<TR><TD> addr:</TD><TD> VRAM address. 0x20000 boundary </TD></TR>
+</TABLE>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_03"><HR></a><DL>
+<!--松田修正1997-06-16-->
+<H3> I want to store RBG coefficients in color RAM.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me the settings to place RBG coefficients in Color RAM.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is possible by specifying the color RAM address (0x25F00000) with the slKtbleRA function and slKtableRB function.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_04"><HR></a><DL>
+<H3> To what extent can VDP2's image effect function be used with SGL?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Screen special effects in SGL include mosaic, line scrolling, and color calculations, but are there any other functions for screen special effects (currently not disclosed)?</P>
+<P> Please let me know if it exists.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Regarding scrolling, we provide functions for everything that can be done with hardware. There are no special functions that are not present in the hardware.<BR>
+ For the functions of special scrolling functions, please see scroll.txt in the SGL doc directory.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_05"><HR></a><DL>
+<H3> I want to use the line color of the rotating surface.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to combine the 3D scroll surface and line color to make it darker towards the back.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Please refer to the sample program in the archive.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_06"><HR></a><DL>
+<H3> slMap16RA does not work.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> sl16MapRA() does not work properly.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> It seems that the page number table passed to the sl16MapRA function does not match the actual VRAM, so it is not working correctly.</P>
+<P> The sl16MapRA and sl16MapRB functions assume that the page numbers in the table are serial numbers counted from the beginning of VRAM, and multiply the 0th element of the table by 0x800 and register it as an address.</P>
+<P> for example,<P><PRE>
+#define RBG0_CEL_ADR (VDP2_VRAM_A0)
+#define RBG0_MAP_ADR (VDP2_VRAM_B0)
+#define RBG0_COL_ADR (VDP2_COLRAM)
+#define RBG0_KTB_ADR (VDP2_VRAM_A1)
+#define RBG0_PRA_ADR (VDP2_VRAM_A1+ 0x1fe00)
+</PRE></P>
+<P>For example, if the pattern name is in bank B0 of VRAM, the table must be populated with values such as 128,132,136...<BR>
+ (There seem to be many cases where data such as 0,4,8... is set)</P>
+<P><PRE>
+#define MAPOFFSET (RBG0_MAP_ADR-VDP_VRAM_A0)/0x800
+#define DD 4+MAPOFFSET
+Uint8 map[16] = {
+    0*DD, 1*DD, 2*DD, 3*DD,
+    4*DD, 5*DD, 6*DD, 7*DD,
+    8*DD, 9*DD,10*DD,11*DD,
+   12*DD,13*DD,14*DD,15*DD,
+};
+#undef DD
+sl16MapRA(map);
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_07"><HR></a><DL>
+<H3> It seems that ASCII data is available for rotating surfaces.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> In SGL sample 8-11, ASCII characters appear to be displayed on the rotating surface, but as far as I look at the program, I can't find any such description.<BR>
+ Where exactly are ASCII characters set in VRAM?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is not described in the manual, but when slInitSystem is executed, ASCII data is transferred to 0x25e00000 in addition to 0x25e60000, which is mentioned in the manual.<BR>
+ The SGL sample uses this CG data.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_08"><HR></a><DL>
+<H3> When displaying 512 x 512 with 256 colors using rotary scrolling, only 256 vertical minutes can be displayed.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When displaying 512 x 512 with 256 colors using rotary scrolling, only 256 vertical minutes can be displayed.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> For 256 colors, you will be using all of VRAM-A or VRAM-B.<BR>
+ The most likely cause is that VRAM-A is still in split mode, and only VRAM-A0 is accessing the RBG0 character pattern, and VRAM-A1 is not being accessed.</P>
+<P> In this case, the easiest way is to display it by using the slVRAMMode function (see documentation) and setting Div_B (divides only VRAM-B) or NULL as the argument.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#SCROLL">SGL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

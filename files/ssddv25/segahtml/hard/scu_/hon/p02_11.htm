@@ -1,0 +1,47 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/31&gt;SCU User's Manual/2.Operation Description</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p02_12.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 2 Operation Description</b><HR NOSHADE>
+<DL>
+<A NAME="no1_33"></A><P><DT><H3> ◆DMA mode</H3><DD> There are two types of SCU DMA modes:</P>
+<P><OL>
+<LI> direct mode<LI> indirect mode</OL>
+</P>
+<P><DD> <B>●Direct mode</b><DD> Directly uses the address value of the level-specific DMA set register to read data from the memory at the address indicated by the address register to the memory at the address indicated by the write address register for the number of bytes indicated by the number of transfer bytes. Execute the transfer. It executes once and terminates DMA with one startup. Figure 2.4 shows details of DMA transfer operation in direct mode.</P>
+<A NAME="z2_4"></A><P ALIGN="CENTER"> <B>Figure 2.4 Direct mode DMA transfer operation details</b><BR>
+<img srcset="../grp/i018_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>●Indirect mode</b><DD> In contrast to the above-mentioned direct mode, the mode in which DMA transfer is executed indirectly using the level-specific DMA set register is called indirect mode. The address value and number of bytes stored in the set register in direct mode are stored in the indirect mode temporary buffer in indirect mode, and DMA transfer is executed repeatedly until the end code is detected in the temporary buffer. Therefore, a feature of indirect mode is that multiple DMA transfers can be performed with a single activation. Figure 2.5 shows the execution flow of indirect mode DMA.</P>
+<A NAME="z2_5"></A><P ALIGN="CENTER"> <B>Figure 2.5 Indirect mode DMA transfer flow</b><BR>
+<img srcset="../grp/i019_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> When indirect mode is activated, three long words of parameters are first read from the address written in the write address register (DxW) and stored in the temporary buffer. Next, execute the actual DMA based on those parameters. After DMA is finished, read the DxW+CH address ~ parameters and execute in the same way. This operation is repeated until the exit code is detected.<BR>
+ Also, addresses in indirect mode are incremented in units of 4 bytes.</P>
+<A NAME="z2_6"></A><P ALIGN="CENTER"> <B>Figure 2.6 Indirect mode DMA transfer operation details</b><BR>
+<img srcset="../grp/i020_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p02_12.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

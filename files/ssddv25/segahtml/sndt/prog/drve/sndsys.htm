@@ -1,0 +1,42 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/17&gt; Sound driver Ver2.10 guide/1. System overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no1">Sound Driver Programmer's Guide</a><HR>
+ <B>▲ <A HREF="readme1.htm">Back</a> ｜ <A HREF="sndctrl.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound Driver Programmer's Guide</b><H2 ALIGN=CENTER> 1. System overview</H2><HR NOSHADE>
+<P ALIGN=CENTER> <B>Sound System Hardware</b><BR>
+<img srcset="../image/sndsys.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P> The sound system is centered around the sound source LSI, connected to the sound CPU, 512KB sound memory, main system, CD interface, etc. The main system can access all of the sound memory and SCSP IO space through the SCU, and can control the stop (reset) and restart (cancellation of reset) of the sound CPU through the SMPC.<BR>
+ The most important part of this is the sound memory, where everything in the sound system is controlled, including running the sound driver, managing data, storing sound source data, and communicating between systems.</P>
+<P> A sound driver is a sound control program that allows you to pronounce songs and sound effects. Programs are stored in sound memory and operate independently of the main system. Therefore, you can play songs and sound effects just by issuing commands from the main system.<BR>
+ All sound drivers and sound data are stored in the sound memory, so once the power is turned off, all of them will be lost. Therefore, the main system must start the sound driver every time the power is turned on. When the power is turned on, the sound CPU is stopped by the reset signal, so first transfer the sound driver to the sound memory, and then release the reset signal. The sound driver will now start and you will be able to play songs and sound effects.</P>
+<P> Sound memory has a system area and a data area. The system area is a fixed area for sound driver operation and system management, and the data area is a variable area (mapping is variable) for storing sound source data and internal processing of the DSP.</P>
+<P ALIGN=CENTER> <B>sound memory</b><BR>
+<img srcset="../image/sndmem.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<DL>
+<DT> ● <B>System area</b><DD> This is the program storage area and work area for operating the sound driver. The work area includes program work for the sound driver and a system interface area for interfacing with the main system, sound development system, etc. This is a fixed area of 44KB in size and cannot be used for other purposes.<DT> ● <B>Data area</b><DD> This is an area for storing sound data. Three types of tone data, sequence data, and DSP programs are stored in various combinations (mappings). It is also used as a buffer for PCM stream playback when playing back PCM streams. The data stored in this area and its mapping constantly change depending on the game or scene. In other words, the sound data for each scene is mapped within this 4M bit range.<DT> ● <B>DSP work RAM area</b><DD> Area for DSP delay RAM and effect coefficients. Therefore, this area is not required if DSP is not used. Please note that the start address of this area must be on the 2000h boundary due to hardware constraints, and the sizes of the delay RAM and coefficient area will vary depending on the DSP microprogram used.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="readme1.htm">Back</a> ｜ <A HREF="sndctrl.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no1">Sound Driver Programmer's Guide</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

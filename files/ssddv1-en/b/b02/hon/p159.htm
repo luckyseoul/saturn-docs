@@ -1,0 +1,29 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p158.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p160.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <B> Rotation parameter table address bit </B>: Rotation parameters table address bit (RPTA18 to RPTA1) <BR>
+<DD> Specify the start address of the rotation parameter table. <P>
+<TABLE BORDER CELLPADDING = 5> <TD> RPTA18 to RPTA16 </TD> <TD ALIGN = "CENTER"> 1800BCH </TD> <TD> bits 2 to 0 </TD> <TD ALIGN = "CENTER"> <</TD><TR>
+<TD> RPTA15 to RPTA1 </TD> <TD ALIGN = "CENTER"> 1800BEH </TD> <TD> Bits 15 to 1 </TD> <TD ALIGN = "CENTER"> <TD>
+</TABLE><P>
+RP6 bit is ignored even if data is written. It is fixed to 0 for rotation parameter A and 1 for rotation parameter B. <P>
+The actual start address of the rotation parameter table is calculated using the following formula. When the VRAM capacity is 4M bits, the most significant bit of the address is ignored. <P>
+<PRE> (Start address of rotation parameter A)
+= (Rotation parameter table address register value upper 12 bits) x 100H
++ (Rotation parameter table address register lower 5 bits) x 4H <P>
+(Start address of rotation parameter B)
+= (Rotation parameter table address register value upper 12 bits) x 100H
+＋ (Rotation parameter table address register value lower 5 bits) × 4H + 80H </PRE> <P>
+For example, if you specify 00170H or 00130H, the start address of rotation parameter A will be 00260H, and the start address of rotation parameter B will be 002E0H. <BR>
+<DT> <H3> ■ Frame buffer rotation readout </H3>
+<DD> Frame buffer rotation readout uses rotation parameter A screen screen start coordinate (Xst, Yst), screen screen vertical coordinate increment (DXst, DYst), screen screen horizontal coordinate increment (DX, DY) Do. If the image specified by the rotation parameter A is displayed on the rotation scroll screen, the entire sprite and the rotation scroll screen can be rotated in the same way. If the image specified by the rotation parameter B is displayed on the rotation scroll screen, the entire sprite and the rotation scroll screen can be rotated separately. <BR>
+The display coordinate value of the frame buffer is calculated from the display coordinate at the left end of the line calculated for each line from the screen screen start coordinate and the screen screen vertical coordinate increment, and the horizontal coordinate increment of that line. At this time, from the coordinate range of the frame buffer, the display coordinate value at the left end of the line is 20 bits (sign + integer part 10 bits + decimal part 9 bits), horizontal coordinate increment is sign + integer part 2 bits + decimal part 9 bits It is calculated by rounding down the bits to 12 bits. <BR>
+* To perform frame buffer rotation reading using rotation parameter A, the TV mode of VDP1 must be set to rotation 16 or rotation 8. For details, see <P>
+</DL><P><P><HR>
+<A HREF=p158.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p160.htm> Go to next page </A>
+</BODY>
+</HTML>

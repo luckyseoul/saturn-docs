@@ -1,0 +1,41 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p047.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p049.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H1> Appendix C </H1>
+<DD> Additional items to the manual text. <P>
+<DT> <H2> C.1 Supplementary explanation </H2>
+<DT> <H4> (1) DOS file parameters </H4>
+<DD> 1 is the default value for the DOS file retrieval parameter. For processing reasons, only one sector can be transferred at a time, so it is invalid to set the extraction parameter to a value other than 1. <P>
+<DT> <H2> C.2 Changes from previous version </H2>
+<DT> <H4> (1) Change of CD prefetch processing </H4>
+<DD> <UL TYPE = "DISK"> <LI> <B> Change usage of GFS_NwCdRead </B> <BR>
+After calling GFS_NwCdRead, prefetching from CD is enabled without calling GFS_NwExecOne. <BR>
+Using read-ahead from a CD no longer completes until the specified number of sectors has been transferred to the host or access stopped. (GFS_NwIsComplete does not return TRUE) <P>
+<LI> <B> Access completion check [important] </B> <BR>
+GFS_NwCdRead does not complete until data transfer is completed or access is interrupted (except for access to CDDA files), so do not wait for it to complete. Note that an endless loop occurs when GFS_NwExecOne is completed as in the previous manual example. <BR>
+If GFS_NwFread is not prefetched with GFS_NwCdRead, you can check completion by the same procedure as the previous version. <BR>
+When pre-reading from the CD, use GFS_NwGetStat to monitor the number of transferred bytes and check for completion. An example is shown below. <BR>
+<PRE>     GfsHn     gfs;
+     Sint32 fid, stat, nbyte;
+     Uint32 buf[10*2048/4];<P>
+     gfs = GFS_Open(fid);
+     GFS_NwCdRead(gfs, 100);
+     for (i = 0; i <10; ++ i) {
+          GFS_NwFread(gfs, 10, buf, 10*2048);
+          while (GFS_NwExecOne(gfs) != GFS_SVR_COMPLETE) {
+          GFS_NwGetStat(gfs, &stat, &nbyte);
+          / * Check if the number of bytes specified by GFS_NwFread has been read * /
+          if (nbyte> = 10 * 2048) {
+              break;
+          }
+          user (); / * Application processing * /
+          }
+     }</PRE></UL><BR>
+</DL><P><P><HR>
+<A HREF=p047.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p049.htm> Go to next page </A>
+</BODY>
+</HTML>

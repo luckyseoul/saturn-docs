@@ -1,0 +1,343 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;72/86&gt;VDP2ユーザーズマニュアル/13.1カラーオフセット指定</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no13">VDP2ユーザーズマニュアル</A>
+<HR>
+<B>▲
+<a href="p12_20_j.htm">戻る</A>｜
+<a href="p14_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第13章　カラーオフセット機能</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　カラーオフセット機能は、スプライトおよび各スクロール画面のカラーデータを出力するときにオフセット値を加算することで、カラーRAMデータを変えずに画面のカラーを変化させる機能で、フェードイン、フェードアウトなどに使用します。</P>
+
+	<P>	<DT><H2>■13.1　カラーオフセット指定</H2>
+		<DD>　カラーオフセット値は、カラーオフセットAとカラーオフセットBの2つの値をRGBごとに設定することができ、画面ごとにこの2つのうちのどちらを使用するかを指定することができます。カラーオフセット値はRGBそれぞれに対応した9ビットデータで、RGBそれぞれに加算した結果のカラーデータが00Hより小さくなってしまうような場合にはすべて、そのカラーデータを00Hとし、FFHより大きくなってしまうような場合にはすべて、FFHとします。</P>
+
+	<P>	<DD>　カラーオフセット機能の処理はカラー演算機能の処理より後に行うので、カラーオフセット値はカラー演算をされた結果のカラーデータに対して加算されます。また、カラー演算の結果画面はトップ画像の画面とみなされているので、カラーオフセットイネーブルレジスタの指定は、そのトップ画像の画面用ビットで行います。</P>
+
+	<P>	<DD>　カラーオフセットデータを図13.1に示します。</P>
+
+<A NAME="z13_1"></A>
+	<P><DD><B>図13.1　カラーオフセットデータ</B>
+<DD><PRE>
+　　　７　６　５　４　３　２　１　０
+　　┌─┬─┬─┬─┬─┬─┬─┬─┐
+　　│　　カラーデータ　８ビット　　│
+　　└─┴─┴─┴─┴─┴─┴─┴─┘
+　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　＋　　　　　　　　
+　　　　　　　　　　　　　　　　　　　
+　８　７　６　５　４　３　２　１　０　
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│　│　　カラーデータ　８ビット　　│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┘
+　符号　　　　　　　　　　　　　　　　
+　　　　　　　　　　↓　　　　　　　　
+　　　　　　　　　　　　　　　　　　　
+　　　７　６　５　４　３　２　１　０　
+　　┌─┬─┬─┬─┬─┬─┬─┬─┐
+　　│　出力カラーデータ　８ビット　│
+　　└─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE>
+
+<A NAME="no13_11"></A>
+	<P>	<DT><H3>　●カラーオフセットイネーブルレジスタ</H3>
+		<DD>　カラーオフセットイネーブルレジスタは、各画面に対してカラーオフセット機能を使用するかどうかを指定します。書き込み専用の16ビットのレジスタで、180110H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CLOFEN_"></A>
+<P>	<DD><B><FONT SIZE=5>CLOFEN</FONT>　<FONT SIZE=4>180110H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxCOEN_">SPCOEN </A></TH>
+<TH><PRE><A HREF="#NxCOEN_">BKCOEN </A></TH>
+<TH><PRE><A HREF="#NxCOEN_">R0COEN </A></TH>
+<TH><PRE><A HREF="#NxCOEN_">N3COEN </A></TH>
+<TH><PRE><A HREF="#NxCOEN_">N2COEN </A></TH>
+<TH><PRE><A HREF="#NxCOEN_">N1COEN </A></TH>
+<TH><PRE><A HREF="#NxCOEN_">N0COEN </A></TH>
+</TR></TABLE></P>
+
+<A NAME="NxCOEN_"></A>
+	<DT><B>カラーオフセットイネーブルビット</B>：Color offset enable bit
+	<DD>(N0COEN, N1COEN, N2COEN, N3COEN, R0COEN, BKCOEN, SPCOEN)<BR>
+　カラーオフセット機能を使用するかどうかを指定します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>N0COEN</TD><TD>180110H</TD><TD>ビット0</TD><TD>NBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1COEN</TD><TD>180110H</TD><TD>ビット1</TD><TD>NBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2COEN</TD><TD>180110H</TD><TD>ビット2</TD><TD>NBG2用</TD></TR>
+	<TR><TD>N3COEN</TD><TD>180110H</TD><TD>ビット3</TD><TD>NBG3用</TD></TR>
+	<TR><TD>R0COEN</TD><TD>180110H</TD><TD>ビット4</TD><TD>RBG0用</TD></TR>
+	<TR><TD>BKCOEN</TD><TD>180110H</TD><TD>ビット5</TD><TD>BACK用</TD></TR>
+	<TR><TD>SPCOEN</TD><TD>180110H</TD><TD>ビット6</TD><TD>スプライト用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TH>xxCOEN</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>カラーオフセット機能を使用しない</TD></TR>
+	<TR><TH>1</TH><TD>カラーオフセット機能を使用する</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、BK、またはSPが入ります。</P>
+
+	<P>	<DD>　カラー演算機能を使用している場合は、トップ画像側の画面のカラーオフセットイネーブルビットで指定します。</P>
+
+<A NAME="no13_12"></A>
+	<P>	<DT><H3>　●カラーオフセットセレクトレジスタ</H3>
+		<DD>　カラーオフセットセレクトレジスタは、各画面に対して使用するカラーオフセットレジスタを指定します。書き込み専用の16ビットのレジスタで、180112H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CLOFSL_"></A>
+<P>	<DD><B><FONT SIZE=5>CLOFSL</FONT>　<FONT SIZE=4>180112H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxCOSL_">SPCOSL </A></TH>
+<TH><PRE><A HREF="#NxCOSL_">BKCOSL </A></TH>
+<TH><PRE><A HREF="#NxCOSL_">R0COSL </A></TH>
+<TH><PRE><A HREF="#NxCOSL_">N3COSL </A></TH>
+<TH><PRE><A HREF="#NxCOSL_">N2COSL </A></TH>
+<TH><PRE><A HREF="#NxCOSL_">N1COSL </A></TH>
+<TH><PRE><A HREF="#NxCOSL_">N0COSL </A></TH>
+</TR></TABLE></P>
+
+<A NAME="NxCOSL_"></A>
+	<P>	<DT><B>カラーオフセットセレクトビット</B>：Color offset select bit
+		<DD>(N0COSL, N1COSL, N2COSL, N3COSL, R0COSL, BKCOSL, SPCOSL)<BR>
+　カラーオフセット機能を使用する場合に使用するカラーオフセットレジスタを指定します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>N0COSL</TD><TD>180112H</TD><TD>ビット0</TD><TD>NBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1COSL</TD><TD>180112H</TD><TD>ビット1</TD><TD>NBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2COSL</TD><TD>180112H</TD><TD>ビット2</TD><TD>NBG2用</TD></TR>
+	<TR><TD>N3COSL</TD><TD>180112H</TD><TD>ビット3</TD><TD>NBG3用</TD></TR>
+	<TR><TD>R0COSL</TD><TD>180112H</TD><TD>ビット4</TD><TD>RBG0用</TD></TR>
+	<TR><TD>BKCOSL</TD><TD>180112H</TD><TD>ビット5</TD><TD>BACK用</TD></TR>
+	<TR><TD>SPCOSL</TD><TD>180112H</TD><TD>ビット6</TD><TD>スプライト用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TH>xxCOSL</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>カラーオフセットAの値を使用する</TD></TR>
+	<TR><TH>1</TH><TD>カラーオフセットBの値を使用する</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、BK、またはSPが入ります。</P>
+
+	<P>	<DD>　カラー演算機能を使用している場合は、トップ画像側の画面のカラーオフセットセレクトビットで指定します。</P>
+
+<A NAME="no13_13"></A>
+	<P>	<DT><H3>　●カラーオフセットレジスタ</H3>
+		<DD>　カラーオフセットレジスタは、カラーオフセット値のRGBそれぞれの値を指定します。書き込み専用の16ビットのレジスタで、180114H〜18011EH番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COAR_"></A>
+<P>	<DD><B><FONT SIZE=5>COAR</FONT>　<FONT SIZE=4>180114H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#COFAB_">COARD8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#COFAB_">COARD7 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COARD6 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COARD5 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COARD4 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COARD3 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COARD2 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COARD1 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COARD0 </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COAG_"></A>
+<P>	<DD><B><FONT SIZE=5>COAG</FONT>　<FONT SIZE=4>180116H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#COFAB_">COAGR8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#COFAB_">COAGR7 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COAGR6 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COAGR5 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COAGR4 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COAGR3 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COAGR2 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COAGR1 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COAGR0 </A></TH>
+</TR></TABLE></P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COAB_"></A>
+<P>	<DD><B><FONT SIZE=5>COAB</FONT>　<FONT SIZE=4>180118H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#COFAB_">COABL8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#COFAB_">COABL7 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COABL6 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COABL5 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COABL4 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COABL3 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COABL2 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COABL1 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COABL0 </A></TH>
+</TR></TABLE></P>
+
+
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COBR_"></A>
+<P>	<DD><B><FONT SIZE=5>COBR</FONT>　<FONT SIZE=4>18011AH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#COFAB_">COBRD8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#COFAB_">COBRD7 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBRD6 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBRD5 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBRD4 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBRD3 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBRD2 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBRD1 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBRD0 </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COBG_"></A>
+<P>	<DD><B><FONT SIZE=5>COBG</FONT>　<FONT SIZE=4>18011CH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#COFAB_">COBGR8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#COFAB_">COBGR7 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBGR6 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBGR5 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBGR4 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBGR3 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBGR2 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBGR1 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBGR0 </A></TH>
+</TR></TABLE></P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COBB_"></A>
+<P>	<DD><B><FONT SIZE=5>COBB</FONT>　<FONT SIZE=4>18011EH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#COFAB_">COBBL8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#COFAB_">COBBL7 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBBL6 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBBL5 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBBL4 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBBL3 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBBL2 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBBL1 </A></TH>
+<TH><PRE><A HREF="#COFAB_">COBBL0 </A></TH>
+</TR></TABLE></P>
+
+
+<A NAME="COFAB_"></A>
+	<P>	<DT><B>カラーオフセット値ビット</B>：Color offset data bit
+		<DD>(COARD8〜COARD0, COAGR8〜COAGR0, COABL8〜COABL0, COBRD8〜COBRD0, COBGR8〜COBGR0, COBBL8〜COBBL0)<BR>
+　カラーオフセットAとカラーオフセットBのRGBそれぞれの値を設定します。負の数は、2の補数で設定してください。<P/>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>COARD8〜COARD0</TD><TD>180114H</TD><TD>ビット8〜0</TD><TD>カラーオフセットAのREDデータ用</TD></TR>
+	<TR><TD>COAGR8〜COAGR0</TD><TD>180116H</TD><TD>ビット8〜0</TD><TD>カラーオフセットAのGREENデータ用</TD></TR>
+	<TR><TD>COABL8〜COABL0</TD><TD>180118H</TD><TD>ビット8〜0</TD><TD>カラーオフセットAのBLUEデータ用</TD></TR>
+	<TR><TD>COBRD8〜COBRD0</TD><TD>18011AH</TD><TD>ビット8〜0</TD><TD>カラーオフセットBのREDデータ用</TD></TR>
+	<TR><TD>COBGR8〜COBGR0</TD><TD>18011CH</TD><TD>ビット8〜0</TD><TD>カラーオフセットBのGREENデータ用</TD></TR>
+	<TR><TD>COBBL8〜COBBL0</TD><TD>18011EH</TD><TD>ビット8〜0</TD><TD>カラーオフセットBのBLUEデータ用</TD></TR>
+	</TABLE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p12_20_j.htm">戻る</A>｜
+<a href="p14_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no13">VDP2ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

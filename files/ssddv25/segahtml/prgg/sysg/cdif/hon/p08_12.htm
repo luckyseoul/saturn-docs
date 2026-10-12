@@ -1,0 +1,126 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/19&gt;CD communication I/F (CD part)/Function details-2</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>▲ <A HREF="p08_11.htm">Back</a> ｜ <A HREF="p08_13.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual (CD part)</b><H2 ALIGN=CENTER> Function details-2</H2><HR NOSHADE>
+<H3> 8.2.2 CD Drive</H3><!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no2_1"><HR></a><DL>
+<P><DD>&#12296; OPEN&#12297; ,&#12296; NODISC&#12297; For information on opening and closing the tray in this state, see Initializing the CD Block ( <B><A HREF="p08_11.htm#no1_7">CDC_CdInit</a></b> ).</P>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_2">one</a><BR> <A HREF="p08_10.htm#t8_1_2">View</a><BR> <A HREF="p08_10.htm#t8_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> CD playback</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_CdPlay</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_CdPlay(CdcPly *ply)<DT> <B>input</b><DD> ply: playback parameter<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Plays the CD according to the specified playback parameters.<BR>
+ The CD-DA area plays music, and the CD-ROM area reads sector data.<BR>
+ Do not play the gap/pause area at the boundary between CD-ROM and CD-DA.<BR>
+<P><DT> <B>Note</b><DD> To play CD-DA and actually output audio, separate SCSP settings are required. Please refer to the SCSP manual for the setting method.</P>
+<P><DT> <B>remarks</b><DD> When playing a CD-DA, muting is canceled 4 frames before the start position to prevent the beginning of the song from being cut off.<P><DT> <B>example</b><DD><DT> <B>(1) Frame address specification</b><DD><PRE>
+Sint32 ret;
+CdcPly plywk, *ply=&plywk; /* Definition of playback parameter variables */
+CDC_PLY_STYPE(ply)=CDC_PTYPE_FAD;
+CDC_PLY_SFAD(ply) =fad; /* Start frame address */
+CDC_PLY_ETYPE(ply)=CDC_PTYPE_FAD;
+CDC_PLY_EFAS(ply) =fasnum; /* Number of frame address sectors */
+CDC_PLY_PMODE(ply)=pmode; /* Play mode */
+ret = CDC_CdPlay(ply); /* Start playing */
+</PRE></P>
+<P><DT><B>(2) Track/index specification</b><DD><PRE>
+CdcPly plywk, *ply=&plywk;
+CDC_PLY_STYPE(ply)=CDC_PTYPE_TNO;
+CDC_PLY_STNO(ply) =tno1; /* Starting track number */
+CDC_PLY_SIDX(ply) =x1; /* Starting index number */
+CDC_PLY_ETYPE(ply)=CDC_PTYPE_TNO;
+CDC_PLY_ETNO(ply) =tno2; /* Ending track number */
+CDC_PLY_EIDX(ply) =x2; /* Ending index number */
+CDC_PLY_PMODE(ply)=pmode; /* Play mode */
+ret = CDC_CdPlay(ply);
+</PRE></P>
+<P><DT><B>(3) Specifying default values</b><DD><PRE>
+CdcPly plywk, *ply=&plywk;
+CDC_PLY_STYPE(ply)=CDC_PTYPE_DFL; /* Starting position is at the beginning of the disk */
+CDC_PLY_ETYPE(ply)=CDC_PTYPE_DFL; /* End position is at the end of the disk */
+CDC_PLY_PMODE(ply)=CDC_PM_DFL; /* No repeat, move pickup */
+ret = CDC_CdPlay(ply);
+</PRE></P>
+<P><DT><B>(4) Resume CD playback (unchanged specification: play from current position)...Cancel pause</b><DD><PRE>
+CdcPly plywk, *ply=&plywk;
+CDC_PLY_STYPE(ply)=CDC_PTYPE_NOCHG;
+CDC_PLY_ETYPE(ply)=CDC_PTYPE_NOCHG;
+CDC_PLY_PMODE(ply)=CDC_PM_NOCHG;
+ret = CDC_CdPlay(ply);
+</PRE></P>
+</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no2_2"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_2">one</a><BR> <A HREF="p08_10.htm#t8_1_2">View</a><BR> <A HREF="p08_10.htm#t8_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Seek playback position</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_CdSeek</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_CdSeek(CdcPos *pos)<DT> <B>input</b><DD> pos: positional parameter<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Moves (seeks) the playback position (pickup) according to the specified position parameters.<P><P><DT> <B>Note</b><DD> If you use the stop command at the end of CD playback, it will be slower when accessing the CD again. As long as you continue to access the CD, normally use the pause command.</P>
+<P><DT> <B>example</b><DT> <B>(1) Frame address specification</b><DD><PRE>
+Sint32 ret;
+CdcPos poswk, *pos=&poswk; /* Definition of positional parameter variable */
+CDC_POS_PTYPE(pos)=CDC_PTYPE_FAD;
+CDC_POS_FAD(pos) =fad; /* Frame address */
+ret = CDC_CdSeek(pos); /* Start seek */
+</PRE></P>
+<P><DT><B>(2) Track/index specification</b><DD><PRE>
+CdcPos poswk, *pos= &poswk;
+CDC_POS_PTYPE(pos)=CDC_PTYPE_TNO;
+CDC_POS_TNO(pos) =tno; /* Track number */
+CDC_POS_IDX(pos) =x; /* Index number */
+ret = CDC_CdSeek(pos);
+</PRE></P>
+<P><DT><B>(3) Stopping CD playback (default value: seek to home position)...stop</b><DD><PRE>
+CdcPosposwk, *pos=&poswk;
+CDC_POS_PTYPE(pos)=CDC_PTYPE_DFL;
+ret = CDC_CdSeek(pos);
+</PRE></P>
+<P><DT><B>(4) Pause CD playback (unchanged specification: seek to current position)...Pause</b><DD><PRE>
+CdcPosposwk, *pos=&poswk;
+CDC_POS_PTYPE(pos)=CDC_PTYPE_NOCHG;
+ret = CDC_CdSeek(pos);
+</PRE></P>
+</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no2_3"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_2">one</a><BR> <A HREF="p08_10.htm#t8_1_2">View</a><BR> <A HREF="p08_10.htm#t8_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> scan playback</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_CdScan</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_CdScan(Sint32 scandir)<DT> <B>input</b><DD> scandir: scan direction<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Scan and play the CD. Continue scanning until a CD drive command (CD play, seek, etc.) is issued. When it reaches outside the playback range, scanning is canceled and paused. The pose position at that time is undefined.<P><DT> <B>(1) Scan direction</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> constant name</TH><TH WIDTH=420><PRE> explanation</TH></TR>
+<TR><TD><PRE> CDC_SCAN_FWD</TD><TD><PRE> Fast forward playback (forward scan)</TD></TR>
+<TR><TD><PRE> CDC_SCAN_RVS</TD><TD><PRE> Fast rewind playback (reverse scan)</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(2) Audio output</b><DD>&#12296; PLAY&#12297; If you perform scan playback from this state, -12dB of sound will be output in the CD-DA area.<BR>
+ CD-ROM area and&#12296; PAUSE&#12297; If you perform scan playback in this state, the audio will be muted.</P>
+<P><DT> <B>remarks</b><DD> When scanning and playing the CD-ROM area, sector data is not read. If you try to reverse the scan direction near the playback range boundary, you may end up outside the playback range. When reversing, be careful near the boundary (within 3 to 6 seconds).</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_11.htm">Back</a> ｜ <A HREF="p08_13.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

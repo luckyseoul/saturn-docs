@@ -1,0 +1,114 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/10&gt;FAQ/Development environment</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Development environment</b><H2 ALIGN=CENTER> Programming BOX related</H2><!----------------------------------------------------------------------------->
+<A NAME="no2_01"><HR NOSHADE></a><DL>
+<H3> Power memory is not recognized by Programming BOX.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I inserted a commercially available power memory into the cartridge terminal of the SEGASATURN Programming Box, it was not recognized at all.<BR>
+ On the commercially available Sega Saturn and CartDev+DevSaturn, it is displayed properly on the saved data management screen, so I don't think there is a problem with the power memory itself, but on the two Programming Boxes I currently have, the saved data management screen is displayed properly. Even if you try to display it, it will not be displayed at all.<BR>
+ Do I need any special dip settings to handle power memory with the Programming Box? By the way, the current dip settings are all set to "OFF" except for the area settings.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Turn on the SIMMCART switch located at SW2 of the dip switch on the front of the target box.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_02"><HR></a><DL>
+<H3> I want to set the power memory to an uninitialized state.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to check the operation of the warning message when the backup RAM is uninitialized. Please tell me how to intentionally uninitialize the built-in backup RAM and power memory.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There are crushers that operate under the Programming Box environment.<BR>
+ However, this program (crusher) does not work under CartDev environment.<BR>
+ If you need it, please contact <A HREF="../../what/sega.htm">technical support</a> .</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_03"><HR></a><DL>
+<H3> About memory mapping when SIMM CART of Programming Box is turned on</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I turned SW2-5 (SIMM CART) on the Programming Box to "ON", the SIMM address I had been using was moved to another location, so I was no longer able to use the simple CD system. Until now, when using the simple CD system, data was read from 0x24020000, but when SW2-5 is turned "ON", this becomes a cartridge and can no longer be used.<BR>
+ Where should I read it if SW2-5 is set to "ON"?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> By changing the SW2-5 "SIMM CART" switch, the address map becomes as follows.</P>
+<P><DT><OL>
+<P> <B><LI>Set in BOOT ROM at power-on and reset (SIMM CART OFF)</li>
+</b><DD><PRE>
+22000000h  +-----------------------+
+           |                       |
+           |                       |
+           |                       |
+           |     External ROM      |
+           |                       |
+           |                       |
+           |                       |
+24000000h  +-----------------------+
+           |        S I M M        |
+           |      B  A  N  K  0    |
+           |       (16M byte)      |
+25000000h  +-----------------------+
+           |       reserved        |
+25800000h  +-----------------------+
+           |    External  I/O      |
+25FFFFFFh  +-----------------------+
+</PRE></P>
+<P><B><LI>When secured as a 32MB continuous area (SIMM CART ON)</li>
+</b><DD><PRE>
+22000000h  +-----------------------+
+           |        S I M M        |
+           |      B  A  N  K  0    |
+           |        (16MByte)      |
+           +-----------------------+
+           |        S I M M        |
+           |      B  A  N  K  1    |
+           |        (16MByte)      |
+24000000h  +-----------------------+
+           |                       |
+           |     External RAM      |
+           |                       |
+25000000h  +-----------------------+
+           |       reserved        |
+25800000h  +-----------------------+
+           |    External  I/O      |
+25FFFFFFh  +-----------------------+
+</PRE></P>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_04"><HR></a><DL>
+<H3> About communication between Programming Box and SCSI</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Based on the operating status here, it appears that the Programming Box only operates as a SCSI device when the Sega Saturn logo display part is running. Is that the case?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The Programming Box's BOOT ROM operates by responding to inquiries from the initiator as a SCSI drive under the control of the BOOT ROM after initializing to the SCSI controller.<BR>
+ After leaving the control of the BOOT ROM, it is now under the control of each application.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_05"><HR></a><DL>
+<H3> About programming box and PC settings.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Do I need to load the SCSI disk driver (ASPIDISK.SYS, etc.) separately from the SCSI host adapter?<BR>
+ If I load it, the Programming Box will be treated as a Fixed DISK, but is this a problem?</p>
+<P><DT> <FONT SIZE=5>A)</font><DD> Due to the nature of the device, it is not a removable drive, so I don't think there will be any problems even if it is not installed.<BR>
+ However, like normal SCSI devices, there is no guarantee that the Programming Box will be powered on again while the PC is running.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_06"><HR></a><DL>
+<H3> The image output of Programming Box may become monochrome.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I have a professional monitor that automatically recognizes PAL and NTSC connected to the Programming Box, but the monitor is black and white and no colors appear.<BR>
+ If you connect a commercially available Sega Saturn to this monitor, it will display normally.<BR>
+ Also, if you connect the programming box to Sony's Profile Pro, it will be displayed normally.<BR>
+ It seems that the video output (NTSC output) from the programming box is not properly recognized as NTSC on a professional monitor that automatically recognizes PAL and NTSC.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Generally, professional monitors have a tight image input signal range. In addition, it has been confirmed that in a small number of lots, the programming box's image output is out of sync with the normal NTSC signal.</P>
+<P> To explain in more detail, many monitors designed for professional use are also designed to monitor irregular signals, so in some lots of Programming Boxes, the frequency deviation of the color synchronization signal (chroma subcarrier) may occur. It has been confirmed that cases are black and white.<P><P> Of course, this does not occur with currently shipped models, but if you experience such symptoms with a previously purchased Programming Box, please contact <A HREF="../../what/sega.htm">Sega</a> . This may be corrected by adjusting the output circuit.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

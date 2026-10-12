@@ -1,0 +1,62 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ &gt;サウンドボックスチェック方法</TITLE>
+<script>
+  /*window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  */}</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prg2_">SOUND Manual</A>
+<HR NOSHADE>
+<CENTER>
+<H2>サウンドボックスチェック方法</H2></CENTER>
+<HR NOSHADE>
+<H3>サターンサウンドツールの基本的な動作チェック法</H3>
+<!------------------------------------------------------------------------------>
+<HR><OL START=1>
+<P><B><LI></B>　まず、ターゲット機（サターンサウンドボックス）とMacintoshに電源をいれます。電源投入後、サウンドボックス内のBOOT ROMが起動し、チップの初期化を行います。この初期化（通常1、2秒）が正常に終了すると、背面にあるLEDがLED1からLED8にむかって流れるように点滅する状態になります。<BR>　またこのとき、Macintosh上からSCSI Probe等のソフトを使用してSCSIの接続をみてみるとSCSIの6番に"SATURN DEVELOP-BOARD 1.00"が認識されます。</P>
+
+<P ALIGN=CENTER><img srcset="../image/scsiprob_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P></CENTER>
+
+<P>　すべてのセガサターン用サウンドツールはSCSIの通信によってサウンドボックスを制御していますので、SCSIの接続は重要です。ケーブルはなるべくMacintoshと最短でつなぎ、信頼性の高いものを使用してください。</P>
+
+<P>＊以上の状態に不具合がある場合、サウンドボックスあるいはMacintoshのハード的なトラブルが考えられます。</P>
+</OL>
+
+<!------------------------------------------------------------------------------>
+<HR><OL START=2>
+<P><B><LI></B>　次にMacintoshからサウンドツールのSndSimulatorを起動します。このときSndSimulatorは自動的に、サウンドドライバをターゲット機（サウンドボックス）にSCSIを通じて転送します。Fileメニューから「サウンドドライバの転送」を選択しても同様です。サウンドドライバとはSndSimulatorと同じフォルダにある"SDDRV.TSK"という名称のファイルでサウンドボックスのCPU、68000用のプログラムコードです（転送アドレスは01000hから）。また、同じく"SYSTBL.TSK"はサウンドドライバが参照するシステムテーブルで、サウンドドライバと同時に転送されます（転送アドレスは0400hから）。このふたつを合わせて、サウンドドライバのセガサターン実機には不要な処理（背面LEDの制御など）を省いたものが"SDDRVS.TSK"で、これがプログラミングボックス（MODEL-S）、あるいは実機用のサウンドドライバです（転送アドレスは0hから）。この"SDDRVS.TSK"はサウンドデータの制作には基本的に使用しないものですが、機能メニューから「S-ボックス用サウンドドライバの転送」を行って"SDDRVS.TSK"を転送することによって、実機と全く同じサウンドドライバで鳴らす状態をシミュレートすることができます。<BR>
+　SndSimulatorを起動したら、Fileメニューから「サウンドシステムの起動」を行ってみてください。これによって転送されたサウンドドライバが動作しはじめます。正常にサウンドドライバが動作していれば、背面のLEDのLED1とLED3が点滅する光りかたになります（MIDIキーボード等がサウンドボックスに接続してある場合、MIDIのアクティブセンシングによってLED7かLED8も点滅する場合があります）。</P>
+
+<P><B>＊</B>以上の状態に不具合がある場合、サウンドボックスとMacintosh間のSCSI通信が正常に動作してない可能性があります。</P>
+</OL>
+
+<!------------------------------------------------------------------------------>
+<HR><OL START=3>
+<P><B><LI></B>　サンプルのサウンドマップを開いてみてください。はじめてサウンドマップを開く場合は転送時に「ファイルがみつかりません」というエラーがでるはずですが、問題ありません。<BR>
+SndSimulatorはパス（どのディスク上のどのフォルダのなかのなんというファイル名か）に基づいて転送すべきデータ（データファイル）をさがして転送します。このパスが正しく設定されていないと「ファイルがみつかりません」というエラーをだします。この場合、SndSimulatorのマニュアルを参照して、正しくパスを設定しなおしてください。<BR>
+パスを設定したあと、ファイルメニューから「保存」を行えば、以後は新しいパスによってデータの転送を行います。サウンドマップに登録した転送データファイルをMacintoshのFinder上で移動したり消去した場合も同様にパスの設定をやりなおしてください。<BR>
+　SCSI通信中は背面のLEDの点滅が止まりますが、通信が正常に終了すればまた点滅がはじまります。LEDが点灯したままの状態になったら、SCSIの通信かサウンドドライバがハングアップした可能性がありますのでサウンドボックスをリセットしてサウンドドライバを転送しなおしてください。<BR>
+　次に機能メニューから「サウンドシミュレータ」を選んで、シーケンス0をクリックし黒く反転させ、スタートボタンを押してください。サンプル曲が再生されるはずです。</P>
+
+<P><B>＊</B>以上の状態に不具合がある場合、MacintoshのHD上に適切なファイルがコピーされていないか、あるいは、サウンドボックスとアンプ、スピーカ等の再生機器の接続に問題がある可能性があります。</P>
+</OL>
+<HR NOSHADE>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#sndt">SOUND Manual</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

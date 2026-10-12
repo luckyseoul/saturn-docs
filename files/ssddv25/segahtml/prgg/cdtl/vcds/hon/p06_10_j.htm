@@ -1,0 +1,149 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/13&gt;バーチャルCDシステム/3.CDエミュレータ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">バーチャルCDシステム</A>
+<HR>
+<B>▲
+<a href="p05_10_j.htm">戻る</A>｜
+<a href="p07_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>バーチャルCDシステムユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第3章　ＣＤエミュレータ VCDEMU</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A>
+<P><DT><H3>3.1　コマンド仕様</H3>
+
+	<P><DT><B>　コマンド:</B><DD>VCDEMU</P>
+	<P><DT><B>　コマンド名:</B><DD>バーチャルCDエミュレータ</P>
+	<P><DT><B>　書　式:</B>
+	<DD>VCDEMU　ファイル名のボディ部　[-l　ログファイル名]　[-f　RTIファイル名]<BR>
+ [-j　ジャンパー設定位置]　[-u　更新情報ファイル]<BR> [-ib　入力バッファサイズ]　[-vb　転送バッファサイズ]</P>
+
+	<P><DT><B>　引　数:</B><DD>ファイル名のボディ部：CDエミュレーション対象ファイルのボディ部</P>
+	<P><DT><B>　機　能:</B>
+	<DD><UL TYPE=DISC>
+	<P><LI>CDエミュレーション（CD擬似再生動作）を行います。<BR>
+オプションを指定しない場合のCDエミュレーション対象ファイルは次のようになります。</P>
+	<P><PRE>
+　ディスクイメージファイル：ファイル名ボディ部.DSK
+　スクリプトファイル　　　：ファイル名ボディ部.SCR
+　ディスク構成情報ファイル：ファイル名ボディ部.RTI
+　ログファイル　　　　　　：作成しない
+</PRE></P>
+
+	<P><LI>「-u」オプションを指定することで、CDイメージ部分更新によるCDエミュレーションが行えます。</P>
+	<P><LI>リアルタイムエミュレーションモードの場合、CDDAトラックの早送りスキャン再生／早戻しスキャン再生が可能です。マルチプレーヤなどの制御画面からコントロールします。<BR>（ダイレクトDOSアクセスモードでは正常なスキャン再生はできません）</P>
+	<P><LI>MODE1、MODE2データの転送中、バーチャルCD用PC互換機のキーボードから、Sキーを叩くことにより、故意にデータ転送エラーを発生させることができます。</P>
+	</UL>
+
+	<P><DT><B>　使用例:</B><DD>VCDEMU　TSTGAME</P>
+	<P><DT><B>　オプション指定:</B><DL>
+	<P><DT><B>-l：</B><DD>指定されたファイル名でログ情報ファイルが作成され、ログ情報が保存されます。</P>
+	<P><DT><B>-f：</B><DD>ディスク構成情報ファイル名が指定されたファイル名になります。</P>
+	<P><DT><B>-j：</B><DD>VCD I/Fボードのジャンパー番号を指定します。<BR>値は環境変数VCDIOと同じになります。</P>
+	<P><DT><B>-u：</B><DD>CDイメージ部分更新によるCDエミュレーションを行います。<BR>VCDUTL.EXEの出力した更新情報ファイルを指定します。</P>
+	<P><DT><B>-ib:</B><DD>入力バッファの大きさを指定します。<BR>指定可能な値は2〜8の範囲の整数で、１単位あたり4Kバイトのバッファが確保されます。<BR>デフォルトでは32Kバイト(指定値では8)の入力バッファが確保されます。</P>
+	<P><DT><B>-vb :</B><DD>転送バッファの大きさを指定します。<BR>指定可能な数値は14〜37の範囲の整数値で、確保する転送バッファの個数を指定します。（一つの転送バッファはセクタサイズ）<BR>デフォルトでは、転送バッファは37個確保されます。（システムのメモリ使用状況によってこれ以下になることもあります）<BR>割り当てられた入力バッファの大きさ、転送バッファ数は、プログラム起動後に画面の右下に以下のように表示されます。</P>
+
+	<P><DT><B>Buffer：02/07</B><DD>ここで、分子が入力バッファの大きさ(4K単位)、分母が転送バッファの個数を表します。なお、表示される転送バッファの個数は2で割った整数値となっています。</P>
+	</DL>
+
+
+	<P><DT><B>　●エミュレート可能なトラック数とインデックス数について</B>
+	<DD>　トラック数やトラック内のインデックス数が非常に多い場合、上記の二つのオプションを用いてバッファ量を減らす、あるいは入力バッファと転送バッファとのバランスを調整することにより、メモリを節約し、正しくエミュレーションを行うことができるようになります。</P>
+	<P>　ただし、実際にどのように設定すればよいかは使用しているPC互換機のコンベンショナルメモリの空き容量やファイル名の長さなどによって異なります。以下に参考例として、コンベンショナルメモリの空き容量が585KBの場合の目安を示します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR ALIGN=CENTER><TH WIDTH=150><PRE>総インデックス数</TH><TH WIDTH=150><PRE>-ib設定値</TH><TH WIDTH=150><PRE>-vb設定値</TH></TR>
+	<TR ALIGN=CENTER><TD><PRE>2000</TD><TD><PRE>設定不要</TD><TD><PRE>設定不要</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>3000</TD><TD><PRE>設定不要</TD><TD><PRE>設定不要</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>4000</TD><TD><PRE>設定不要</TD><TD><PRE>設定不要</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>4500</TD><TD><PRE>4</TD><TD><PRE>設定不要</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>5000</TD><TD><PRE>2</TD><TD><PRE>14</TD></TR></TABLE></P>
+
+	<P>　エミュレータプログラムを上記オプションを設定しないで起動すると、エミュレートできるトラック数×インデックス数の総量は約4000、-ib 2 -vb 14の最小設定の場合、約5000となります。これはデフォルトでは最大99の各トラックに各々約40インデックスまで、またバッファを最小設定した場合には各々約50インデックスまでのディスクイメージをエミュレートできる計算になります。<BR>
+CDビルダでは最大99トラック×99インデックス＝約10000トラック・インデックスのディスクイメージを作成することができますが、エミュレータプログラムVCDEMU.EXEを用いてエミュレートできるトラック・インデックスは約5000までに制限されることになります。</P>
+
+	<P><DT><B>　●VCDEMUのエラーメッセージ</B>
+	<DD>　以下にバーチャルCDエミュレータが表示するエラーメッセージとその意味を示します。**は任意の数字を、****は任意の文字列を意味します。エラーメッセージは画面上で赤い文字で表示されます。</P>
+	<DL>
+	<P><DT><B>Cannot allocate read buffer</B>
+	<DD>データファイルを読み込むためのバッファが確保できなかった</P>
+
+	<P><DT><B>Cannot find RTI file ****</B>
+	<DD>指定されたRTIファイルが見つからなかった</P>
+
+	<P><DT><B>Cannot find the beggining of TOC info.</B>
+	<DD>指定されたRTIファイル中にTOC情報の開始を示すキーワードが見つからなかった</P>
+
+	<P><DT><B>Cannot find the beggining of REL info.</B>
+	<DD>指定されたRTIファイル中に相関表情報の開始を示すキーワードが見つからなかった</P>
+
+	<P><DT><B>Cannot allocate memory for ISO9660 file info.</B>
+	<DD>ISO9660ファイル情報を格納するためのメモリが確保できなかった</P>
+
+	<P><DT><B>Cannot allocate memory for DOS file info.</B>
+	<DD>DOSファイル情報を格納するためのメモリが確保できなかった</P>
+
+	<P><DT><B>Illegal relation table</B>
+	<DD>相関表情報に不整合な箇所がある</P>
+
+	<P><DT><B>Cannot open log file = ****</B>
+	<DD>指定されたログファイルがオープンできない</P>
+
+	<P><DT><B>Cannot find DOS file in track **</B>
+	<DD>トラック**に、指定アドレスに対応するDOSファイルが見つからなかった</P>
+
+	<P><DT><B>No File at this LSA **</B>
+	<DD>指定された絶対時間に該当するDOSファイルが見つからなかった</P>
+
+	<P><DT><B>File &lt;****&gt; cannot be opened</B>
+	<DD>DOSファイル****がオープンできなかった</P>
+
+	<P><DT><B>Illegal offset</B>
+	<DD>リアルタイムエミュレーションにおいてディスクイメージファイルの大きさを超えたアドレスが指定された</P>
+
+	<P><DT><B>Not read</B>
+	<DD>DOSファイルからのデータ読み込みが失敗した</P>
+
+	<P><DT><B>Cannot read data from disk image file</B>
+	<DD>ディスクイメージファイルからデータを正しく読み込めない</P>
+
+	<P><DT><B>TOC is not loaded</B>
+	<DD>TOCが読み込まれていない状態で表示しようとした</P>
+
+	<P><DT><B>REL table is not loaded</B>
+	<DD>相関表情報が読み込まれていない状態で表示しようとした</P>
+	</DL>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p05_10_j.htm">戻る</A>｜
+<a href="p07_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">バーチャルCDシステム</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

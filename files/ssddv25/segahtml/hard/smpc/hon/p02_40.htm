@@ -1,0 +1,301 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/19&gt;SMPC User's Manual/2.4 Non-reset system management commands</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p02_30.htm">Back</a> ｜ <A HREF="p02_50.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/Chapter 2 SMPC Commands</b><HR NOSHADE>
+<DL>
+<A NAME="no2_40"></A><P><DT><H2> ■2.4 Non-reset system management commands</H2><DD> Details of non-reset system management commands are shown in table format. The table of each command and notes are as follows. In addition, by using status flags in all commands, you can manage double issuing of commands.</P>
+<A NAME="no2_41"></A><P><DT> <B>●SMPC interrupt</b><DD> Items marked as "occurrence" generate an SMPC interrupt to the SH-2 via the SCU at the end of the command. Additionally, interrupts can be enabled/disabled by setting the SCU.</P>
+<A NAME="no2_42"></A><P><DT> <B>●IREG, OREG</b></P>
+<DD><UL TYPE=DISC>
+<LI> Details of IREG and OREG used in the command are shown.<LI> Command parameters are parameters that are set in IREG before issuing the command.<LI> Result parameters are parameters set in OREG by command execution.<LI> Result parameter OREG31 is set by SMPC when command processing begins. The command code is output to OREG31. By using it together with status flag (SF),</UL>
+</P>
+<P><DD> By using it together with status flag (SF),<P><UL TYPE=DISC>
+<LI> Which command is being executed ( <B>SF=1</b> )<LI> Which command finished ( <B>SF=0</b> )</UL>
+</P>
+<P><DD> can be judged.</P>
+<A NAME="no2_43"></A><P><DT> <B>●Execution time</b><DD> The execution time is calculated from the number of steps in the SMPC internal firmware. If there is a conflict with an internal task such as RTC increment, the command execution time will change, so it is described in the range of minimum and maximum values.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c2_01"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_2">List</a> | ▲ <A HREF="p02_30.htm#c1_13">Back</a> | <A HREF="#c2_02">Next</a> ▼</b><DL>
+<P><DT> No.1<DT><H1> INTBACK</H1><DD><H2> interrupt back</H2><DD><H5> (SMPC status acquisition)</H5><P><DT><PRE>
+<B>Command code</b> 10H
+<B>SMPC interrupt</b> generation
+<B>IREG</b> 0~2
+<B>OREG</b> 0~31
+<B>Execution time</b> max=320msec
+<B>　　　　　　　　</B>min=xxx
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Get each status and peripheral data of SMPC. This section explains how to obtain SMPC status. For information on obtaining peripheral data, see <A HREF="p03_10.htm">Chapter 3</a> .</P>
+<P><DT> <B>command parameters</b><DD> The command parameters of the INTBACK command when acquiring peripheral data are shown below.</P>
+<A NAME="c2_01_ireg0"></A><P><DT> <B>●IREG0</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> IREG0</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100001H</TH><TD COLSPAN=8> SMPC status acquisition switch ( <B>00H</b> or <B>01H</b> )<BR>
+ Initial value undefined/Write Only</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>IREG0: SMPC status acquisition switch setting value</b><DD><TABLE BORDER=1>
+<TR><TH> IREG0 setting value</TH><TH> explanation</TH></TR>
+<TR><TH ALIGN=CENTER> 00H</TH><TD> date and time, cartridge code, area code, terminal status, SMEM,<BR>
+ Do not return reset button data</TD></TR>
+<TR><TH ALIGN=CENTER> 01H</TH><TD> date and time, cartridge code, area code, terminal status, SMEM,<BR>
+ Return each data of reset button</TD></TR>
+</TABLE>
+</P>
+<P><DD> When using the INTBACK command, be sure to set one of the above settings.<DD> IREG0 is also used to control peripherals. See <A HREF="p03_10.htm">Chapter 3</a> for usage instructions.</P>
+<A NAME="c2_01_ireg1"></A><P><DT> <B>●IREG1</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> IREG1</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> 20100003H</TH><TD> P2MD1</TD><TD> P2MD0</TD><TD> P1MD1</TD><TD> P1MD0</TD><TD> PEN</TD><TD> 0</TD><TD> OPE</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ -</TD><TD> Indeterminate<BR>
+ W</TD><TD> Indeterminate<BR>
+ -</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<CAPTION> <B>Bits 7,6: Port 2 mode</b></CAPTION>
+<TR><TH> bit 7</TH><TH> Bit 6</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> P2MD1</TH><TH> P2MD0</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TD> 15 byte mode</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TD> 255 byte mode</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TD> SEGA RESERVED ( <B>setting prohibited</b> )</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TD> 0 byte mode</TD></TR>
+</TABLE>
+</P>
+<TABLE BORDER=1>
+<CAPTION> <B>Bits 5,4: Port 1 mode</b></CAPTION>
+<TR><TH> bit 5</TH><TH> bit 4</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> P1MD1</TH><TH> P1MD0</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TD> 15 byte mode</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TD> 255 byte mode</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TD> SEGA RESERVED ( <B>setting prohibited</b> )</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TD> 0 byte mode</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<CAPTION> <B>Bit 3: Peripheral data enable</b></CAPTION>
+<TR><TH> bit 3</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> PEN</TH></TR>
+<TR><TH> 0</TH><TD> do not return peripheral data</TD></TR>
+<TR><TH> 1</TH><TD> return peripheral data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<CAPTION> <B>Bit 1: Optimization of peripheral data acquisition time</b></CAPTION>
+<TR><TH> Bit 1</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> OPE</TH></TR>
+<TR><TH> 0</TH><TD> Optimize</TD></TR>
+<TR><TH> 1</TH><TD> no optimization</TD></TR>
+</TABLE>
+</P>
+<A NAME="c2_01_ireg2"></A><P><DT> <B>●IREG2</b><DD> Initial value: undefined<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> IREG2</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100005H</TH><TD COLSPAN=8> F0H<BR>
+ Write Only</TD></TR>
+</TABLE>
+</P>
+<P><DD> When issuing the INTBACK command, be sure to set F0H to IREG2.</P>
+<P><DT> <B>Result parameters</b><DD> The result parameters limited to SMPC status acquisition are shown below.</P>
+<A NAME="c2_01_sr"></A><P><DT> <B>●SR</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> S.R.</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100061H</TH><TD> 0</TD><TD> 1</TD><TD> PDE</TD><TD> RESB</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD></TR>
+</TABLE>
+</P>
+<TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR><TH> bit 5</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> PDE</TH></TR>
+<TR><TH> 0</TH><TD> No peripheral data remaining</TD></TR>
+<TR><TH> 1</TH><TD> There is remaining peripheral data</TD></TR>
+</TABLE>
+</P>
+</TD><TD><TABLE BORDER=1>
+<TR><TH> bit 4</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> PRESB</TH></TR>
+<TR><TH> 0</TH><TD> Reset button OFF</TD></TR>
+<TR><TH> 1</TH><TD> Reset button ON</TD></TR>
+</TABLE>
+</P>
+</TD></TR>
+</TABLE>
+<A NAME="c2_01_oreg0"></A><P><DT> <B>●OREG0</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG0</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100021H</TH><TD> STE</TD><TD> RESD</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD></TR>
+</TABLE>
+</P>
+<P><TABLE BORDER=1>
+<TR><TH> bit 7</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> STE</TH></TR>
+<TR><TH> 0</TH><TD> SMPC not SETTIME after cold reset <B>Note 1</b></TD></TR>
+<TR><TH> 1</TH><TD> <B>Note 1</b> being SETTIME after SMPC cold reset</TD></TR>
+</TABLE>
+</P>
+<P><TABLE BORDER=1>
+<TR><TH> Bit 6</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> RESD</TH></TR>
+<TR><TH> 0</TH><TD> reset enable</TD></TR>
+<TR><TH> 1</TH><TD> Reset disabled (default)</TD></TR>
+</TABLE>
+</P>
+<A NAME="c2_01_cold"></A><P><DD> <B>Note 1</b><DD> SMPC cold reset occurs under the following conditions<DD><OL>
+<LI> When you press the reset switch inside the battery box on the back of Sega Saturn<LI> When the main power is turned on (ON) when the battery is not installed or when the battery is exhausted<LI> When the battery is inserted while the power is OFF</OL>
+</P>
+<A NAME="c2_01_oreg1"></A><P><DT> <B>●OREG1,OREG2,OREG3</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2></TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> OREG1</TH><TH> 20100023H</TH><TD COLSPAN=4> Year 1000 (BCD)</TD><TD COLSPAN=4> Year 100 (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG2</TH><TH> 20100025H</TH><TD COLSPAN=4> Year number 10 (BCD)</TD><TD COLSPAN=4> First place in the Western calendar (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG3</TH><TH> 20100027H</TH><TD COLSPAN=4> Day of the week (hexadecimal) <B>Note 2</b></TD><TD COLSPAN=4> Month (hexadecimal) <B>Note 3</b></TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>Note 2</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> day of week</TH><TH> Sunday</TH><TH> Monday</TH><TH> Tuesday</TH><TH> Wednesday</TH><TH> Thursday</TH><TH> Friday</TH><TH> Saturday</TH></TR>
+<TR ALIGN=CENTER><TH> value</TH><TD> 0H</TD><TD> 1H</TD><TD> 2H</TD><TD> 3H</TD><TD> 4H</TD><TD> 5H</TD><TD> 6H</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>Note 3</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> Month</TH><TH> January</TH><TH> February</TH><TH> March</TH><TH> April</TH><TH> May</TH><TH> June</TH><TH> July</TH><TH> August</TH><TH> September</TH><TH> October</TH><TH> November</TH><TH> December</TH></TR>
+<TR ALIGN=CENTER><TH> value</TH><TD> 1H</TD><TD> 2H</TD><TD> 3H</TD><TD> 4H</TD><TD> 5H</TD><TD> 6H</TD><TD> 7H</TD><TD> 8H</TD><TD> 9H</TD><TD> AH</TD><TD> BH</TD><TD> CH</TD></TR>
+</TABLE>
+</P>
+<A NAME="c2_01_oreg4"></A><P><DT> <B>●OREG4,OREG5,OREG6,OREG7,OREG8</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2></TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> OREG4</TH><TH> 20100029H</TH><TD COLSPAN=4> 10th place per day (BCD)</TD><TD COLSPAN=4> No. 1 per day (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG5</TH><TH> 2010002BH</TH><TD COLSPAN=4> 10th position (BCD)</TD><TD COLSPAN=4> 1st place (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG6</TH><TH> 2010002DH</TH><TD COLSPAN=4> Tenth place (BCD)</TD><TD COLSPAN=4> Minute 1st place (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG7</TH><TH> 2010002FH</TH><TD COLSPAN=4> Ten seconds (BCD)</TD><TD COLSPAN=4> Second place (BCD)</TD></TR>
+<TR ALIGN=CENTER><TH> OREG8</TH><TH> 20100031H</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> CTG1</TD><TD> CTG0</TD></TR>
+</TABLE>
+<DD> <B>CTG0:</b> Cartridge code 0<DD> <B>CTG1:</b> Cartridge code 1</P>
+<DT> <B>●OREG9</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG9</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100033H</TH><TD COLSPAN=8> Area code (00H~0FH)</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH> code</TH><TH> region</TH><TH> Main country names etc.</TH></TR>
+<TR><TD ALIGN=CENTER> 0H</TD><TD> Do not use</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> <B>1H</b></TD><TD> <B>Japan region</b></TD><TD> <B>Japan</b></TD></TR>
+<TR><TD ALIGN=CENTER> <B>2H</b></TD><TD> <B>Asia NTSC region</b></TD><TD> <B>Taiwan, Korea, Philippines</b></TD></TR>
+<TR><TD ALIGN=CENTER> 3H</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> <B>4H</b></TD><TD> <B>North America region</b></TD><TD> <B>United States, Canada, Latin America NTSC region (Brazil only)</b></TD></TR>
+<TR><TD ALIGN=CENTER> 5H</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> 6H</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> 7H</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> 8H</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> 9H</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> AH</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> BH</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> <B>CH</b></TD><TD> <B>Europe PAL region</b></TD><TD> <B>Europe, Australia, South Africa, Latin America PAL region</b></TD></TR>
+<TR><TD ALIGN=CENTER> DH</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> EH</TD><TD> SEGA RESERVED</TD><TD></TD></TR>
+<TR><TD ALIGN=CENTER> FH</TD><TD> Do not use</TD><TD></TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>●OREG10</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG10</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100035H</TH><TD> 0</TD><TD> DOTSEL</TD><TD> 1</TD><TD> 1</TD><TD> MSHNMI</TD><TD> 1</TD><TD> SYSRES</TD><TD> SNDRES</TD></TABLE>
+</P>
+<P><DD>・System status 1 (Status of each control signal output from SMPC <B>0: OFF 1: ON</b> )<DD> - <B>The DOTSEL signal</b> indicates the current screen mode (horizontal resolution). ( <B>0:320 1:352</b> )</P>
+<P><DT> <B>●OREG11</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG11</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 20100037H</TH><TD> −</TD><TD> CDRES</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD></TABLE>
+</P>
+<P><DD>・System status 2 (Status of each control signal output from SMPC <B>0: OFF 1: ON</b> )<DD>・" <B>-</b> " means RESERVED.</P>
+<P><DT> <B>●OREG12,OREG13,OREG14,OREG15</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2></TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> OREG12</TH><TH> 20100039H</TH><TD COLSPAN=8> SMEM1 retained data</TD></TR>
+<TR ALIGN=CENTER><TH> OREG13</TH><TH> 2010003BH</TH><TD COLSPAN=8> SMEM2 retained data</TD></TR>
+<TR ALIGN=CENTER><TH> OREG14</TH><TH> 2010003DH</TH><TD COLSPAN=8> SMEM3 retained data</TD></TR>
+<TR ALIGN=CENTER><TH> OREG15</TH><TH> 2010003FH</TH><TD COLSPAN=8> SMEM4 retained data</TD></TR>
+</TABLE>
+<P><DT> <B>●OREG31</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<P><DD> Note: The command code (OREG31) may be overwritten by peripheral data.</P>
+<P><DT> <B>remarks</b><P><DT> <B>■How to use the INTBACK command</b><DD> This section describes how to use the INTBACK command to obtain SMPC status.<BR>
+ There are three ways to use the INTBACK command:</P>
+<P><DD><OL>
+<LI> Get SMPC status only<LI> Following SMPC status acquisition, acquire peripheral data<LI> Get only peripheral data</OL>
+</P>
+<P><DD> In this chapter, we will mainly explain how to obtain SMPC status. Here, we will explain steps <B>1.</b> and <B>2.</b> to obtain the status, <B>and 3.</b> will be explained in Chapter 3.</P>
+<P><DT> <B>1. How to get only SMPC status</b><DD> To obtain only the status, set the command parameters as below and issue the INTBACK command.</P>
+<P><DT> <B>IREG0 setting value=01H</b><DD>・Returns date and time, cartridge code, area code, terminal status, SMEM, and reset button mode data<P><DT> <B>IREG1 setting value=00H</b><DD>・Terminal 2 mode (P2MD1, P2MD0) = 00B → 15 byte mode<DD>・Terminal 1 mode (P1MD1, P1MD0) = 00B → 15 byte mode<DD>・Peripheral data enable (PEN) = 0B → Do not return peripheral data<DD>・Optimize peripheral acquisition time (OPE) = 0B → Optimize</P>
+<P><DT> <B>IREG2 setting value=F0H</b><DD>・Please set F0H unconditionally.</P>
+<P><DD> With the above settings, SF will be cleared, the INTBACK command will end, and the result parameters will be obtained. It also requests an SMPC interrupt when the command ends. Execution time is from minimum TBD to maximum TBD.</P>
+<P><DT> <B>2. How to get peripheral data after getting SMPC status</b><DD> Following SMPC status acquisition, when acquiring peripheral data, set the command parameters as shown below and issue the INTBACK command. The setting value of IREG1 can be set to the desired value on the application side.</P>
+<P><DT> <B>IREG0 setting value=01H</b><DD>・Returns date and time, cartridge code, area code, terminal status, SMEM, and reset button mode data<P><DT> <B>IREG1 setting value=08H</b><DD>・Terminal 2 mode (P2MD1, P2MD0) = 00B → 15 byte mode<DD>・Terminal 1 mode (P1MD1, P1MD0) = 00B → 15 byte mode<DD>・Peripheral data enable (PEN) = 1B → Return peripheral data<DD>・Optimize peripheral acquisition time (OPE) = 0B → Optimize</P>
+<P><DT> <B>IREG2 setting value=F0H</b><DD>・Please set F0H unconditionally.</P>
+<P><DD> With the above settings, SMPC requests an SMPC interrupt when the command is executed and the result parameters are set.<BR>
+ SF is "1" at the time the SMPC interrupt is requested. The time from command issuance to completion of result parameter setting is from minimum TBD to maximum TBD.<BR>
+ After obtaining the result parameters related to the status, by inverting bit 7 of IREG0, SMPC considers it to be a continuation and continues to obtain peripheral data.</P>
+<P><DD> This method is useful for applications that retrieve various status and peripheral data every frame.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c2_02"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_2">List</a> | ▲ <A HREF="#c2_01">Back</a> | <A HREF="p02_50.htm#c3_01">Next</a> ▼</b><DL>
+<P><DT> No.2<DT><H1> SETSMEM</H1><DD><H2> SMPC memory settings</H2></P>
+<P><DT><PRE>
+<B>Command code</b> 17H
+<B>SMPC interrupt</b> generation disabled
+<B>IREG</b> 0 to 3
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=40μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> SMPC provides 4 bytes of battery-backed memory (SMEM). This command sets data to SMEM.</P>
+<P><DT> <B>command parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2></TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> OREG0</TH><TH> 20100001H</TH><TD COLSPAN=8> Data settings to SMEM1</TD></TR>
+<TR ALIGN=CENTER><TH> OREG1</TH><TH> 20100003H</TH><TD COLSPAN=8> Data settings to SMEM2</TD></TR>
+<TR ALIGN=CENTER><TH> OREG2</TH><TH> 20100005H</TH><TD COLSPAN=8> Data settings to SMEM3</TD></TR>
+<TR ALIGN=CENTER><TH> OREG3</TH><TH> 20100007H</TH><TD COLSPAN=8> Data settings to SMEM4</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DD> ●The contents of SMEM are cleared to 0 at SMPC cold reset.<P><DD> SMPC cold reset occurs under the following conditions<DD><OL>
+<LI> When you press the reset switch inside the battery box on the back of Sega Saturn<LI> When the main power is turned on (ON) when the battery is not installed or when the battery is exhausted<LI> When the battery is inserted while the power is OFF</OL>
+</P>
+<P><DD> ●The SETEMEM command sets 4 bytes at the same time. To update the contents, use the INTBACK command to read the currently held data and write it to the demo file.</P>
+<P><DD> ●If the power is turned OFF while the SETEMEM command is being issued,</P>
+<P><DD><OL>
+<LI> If the internal processing of the SETSMEM command can be executed before the power OFF sequence, all data will be updated.<LI> If the power OFF sequence is executed first, the data before the command is issued will be retained.</OL>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_30.htm">Back</a> ｜ <A HREF="p02_50.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

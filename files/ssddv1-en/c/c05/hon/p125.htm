@@ -1,0 +1,46 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p124.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p126.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H1> 12. Function details </H1>
+<DT> <H2> 12.1 MPEG system control </H2>
+<DT><table border cellpadding=5>
+<td width = 150 align = "left"> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220 align = "left"> <pre> <B> Function </B> <br> MPEG system initialization </td> <td width = 160 align = "left"> <pre> <B> Function Name </B> <br> MPG_Init </td> <td width = 60 align="left"><pre><B>No</B><br>1.1</td>
+</table><p>
+<DD> <UL> <PRE> <B> format </B> Sint32 MPG_Init (Sint32 dscn)
+<B> Input </B> dscn: Display scanning method
+<B> Output </B> None
+<B> Function value </B> Error code
+<B> Function </B> Initializes the MPEG system. MPEG audio is always replayed when this initialization is performed.
+<B> </B> will be live.
+<B> </B> When using the MPEG library, this function must be called only once at the beginning.
+<B> Not </B>. <P>
+<UL> <UL> (1) Display scanning method
+<UL TYPE = "DISK"> <LI> MPG_DSCN_NITL: NTSC non-interlace mode
+<LI> MPG_DSCN_ITL: NTSC interlace mode
+<LI> MPG_DSCN_PLNITL: PAL non-interlace mode
+<LI> MPG_DSCN_PLITL: PAL interlace mode </UL> </UL> </UL> <P>
+<B> Remarks </B> (a) Execute the following procedure within this function and return an error code. </PRE>
+<UL><UL><TABLE BORDER CELLPADDING=5>
+<TD> </TD> <TH ALIGN = CENTER> <PRE> Procedure </TH> <TH ALIGN = CENTER> <PRE> Error code </TH>
+<TR>
+<TD> <PRE> 1 </TD> <TD> <PRE> Perform a soft reset of the CD block (CDC_CdInit function). </TD> <TD> <PRE> If an error occurs, return <BR> MPG_ERR_CDINIT </TD>
+<TR>
+Use the <TD> <PRE> 2 </TD> <TD> <PRE> CDC_GetHwInfo function to check if the MPEG cartridge is installed. </TD> <TD> <PRE> If not installed, return <BR> MPG_ERR_NOMC. </TD>
+<TR>
+<TD> <PRE> 3 </TD> <TD> <PRE> If MPEG cannot be used, <BR> MPEG check (SYS_CHKMPEG) of the service routine in BOOT ROM is executed. </TD> <TD> <PRE> If the check fails, return <BR> MPG_ERR_MPNG. </TD>
+<TR>
+<TD> <PRE> 4 </TD> <TD> <PRE> MPEG decoder initialization (CDC_MpInit function) is executed. </TD> <TD> <PRE> If an error occurs, return <BR> MPG_ERR_MPINIT. </TD>
+<TR>
+<TD> <PRE> 5 </TD> <TD> <PRE> MPEG interrupt mask setting (CDC_MpSetIntMsk function) is executed, and <BR> picture start detection and sequence end detection interrupts are enabled. </TD> <TD> <PRE> If an error occurs, return <BR> MPG_ERR_NG. </TD>
+<TR>
+<TD> <PRE> 6 </TD> <TD> <PRE> If a constant for PAL is specified for the display scan method, <BR> CDC_MpSetWinDofs function is used to set the display window offset <BR> to (150, Set to 45). </TD> <TD> <PRE> If an error occurs, return <BR> MPG_ERR_NG. </TD>
+</TABLE></UL></UL><P>
+</PRE> (b) Call the GFS_Init function and STM_Init function after executing this function. </PRE></UL><P>
+</DL><P><P><HR>
+<A HREF=p124.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p126.htm> Go to next page </A>
+</BODY>
+</HTML>

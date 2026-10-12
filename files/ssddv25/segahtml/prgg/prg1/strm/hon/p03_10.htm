@@ -1,0 +1,100 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/18&gt;Stream system library/3.Basics</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">Stream system library</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>stream system library</b><H2 ALIGN=CENTER> 3.Basics</H2><HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A><P><DT><H3> 3.1 Definition of terms and abbreviations</H3><DD> <B>Table 3.1 List of terms</b><DD><TABLE BORDER>
+<TR><TH width=180><PRE> term</TH><TH width=340><PRE> meaning</TH></TR>
+<TR><TD><PRE> stream</TD><TD><PRE> Logically contiguous data separated by subheaders<BR> Flow of.</TD></TR>
+<TR><TD><PRE> stream key</TD><TD><PRE> Key to read stream into CD buffer. flame<BR> address range, file number (FN), channel number (CN),<BR> It consists of submode (SM) and coding information (CI).<BR> Submode (SM) and coding information (CI) are mask patterns<BR> A comparison pattern can be specified,<BR> ({SM|CI}&mask pattern==comparison pattern)<BR> Read the sector.</TD></TR>
+<TR><TD><PRE> stream group</TD><TD><PRE> A collection of multiple streams.</TD></TR>
+<TR><TD><PRE> final stream</TD><TD><PRE> The last replayed stream among the streams belonging to the stream group.<BR> stream that is generated.</TD></TR>
+<TR><TD><PRE> loop start stream</TD><TD><PRE> Return after playing the last stream in a stream group<BR> destination stream.</TD></TR>
+<TR><TD><PRE> Number of loops</TD><TD><PRE> After playing the last stream, go to the loop start stream.<BR> Number of times to move the pickup.</TD></TR>
+<TR><TD><PRE> Transfer start FAD</TD><TD><PRE> The data read into the CD buffer is stored in the buffer within the program.<BR> The position of the pickup that starts transferring to F, etc.</TD></TR>
+<TR><TD><PRE> transfer gate</TD><TD><PRE> The data read into the CD buffer is stored in the buffer within the program.<BR> Gate for transferring to F, etc. to close this<BR> Therefore, store the stream data in the CD buffer.<BR> I can.</TD></TR>
+</TABLE>
+</P>
+<A NAME="z3_2"></A><P ALIGN=CENTER> <B>Figure 3.1 Stream system data flow</b><PRE>
+┌─────────┐              
+│CD drive │              
+└────┬────┘              
+     │ Load  ──┐         
+     ↓         │         
+┌─────────┐    │         
+│CD buffer│    ├Stream access
+└────┬────┘    │         
+     │Retrieval│         
+     │/Transfer│         
+     ↓       ──┘         
+┌─────────┐              
+│Main CPU │              
+│area     │              
+└─────────┘              
+</PRE></P>
+<A NAME="t3_2"></A><P><DD><B>Table 3.2 List of abbreviations</b><DD><TABLE BORDER>
+<TR><TH width=100><PRE> Abbreviation</TH><TH width=200><PRE> meaning</TH><TH width=320><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS</TD><TD><PRE> general file system</TD><TD><PRE> file system</TD></TR>
+<TR><TD><PRE> STM</TD><TD><PRE> stream</TD><TD><PRE> stream</TD></TR>
+<TR><TD><PRE> StmGrpHn</TD><TD><PRE> stream group handle</TD><TD><PRE> Stream group operation handle</TD></TR>
+<TR><TD><PRE> StmHn</TD><TD><PRE> stream handle</TD><TD><PRE> Handle for stream operation</TD></TR>
+<TR><TD><PRE> TrMode</TD><TD><PRE> transfer mode</TD><TD><PRE> Transfer mode</TD></TR>
+<TR><TD><PRE> bn</TD><TD><PRE> buffer number</TD><TD><PRE> buffer partition number</TD></TR>
+<TR><TD><PRE> ci</TD><TD><PRE> coding information</TD><TD><PRE> Coding information</TD></TR>
+<TR><TD><PRE> cn</TD><TD><PRE> chanel number</TD><TD><PRE> channel number</TD></TR>
+<TR><TD><PRE> fad</TD><TD><PRE> frame address</TD><TD><PRE> frame address</TD></TR>
+<TR><TD><PRE> fid</TD><TD><PRE> file ID</TD><TD><PRE> file identifier</TD></TR>
+<TR><TD><PRE> fn</TD><TD><PRE> file number</TD><TD><PRE> file number</TD></TR>
+<TR><TD><PRE> fname</TD><TD><PRE> file name</TD><TD><PRE> file name</TD></TR>
+<TR><TD><PRE> frange</TD><TD><PRE> fad range</TD><TD><PRE> Playback range (frame address range)</TD></TR>
+<TR><TD><PRE> loopstm</TD><TD><PRE> loop stream</TD><TD><PRE> loop start stream</TD></TR>
+<TR><TD><PRE> sinfo</TD><TD><PRE> sector information</TD><TD><PRE> Sector information</TD></TR>
+<TR><TD><PRE> sm</TD><TD><PRE> sub mode</TD><TD><PRE> submode</TD></TR>
+</TABLE>
+</P>
+<DD><UL TYPE="DISK">
+<P><LI> Other terms follow the CD communication interface and file system.</P>
+<P><LI> For more information about directories, see <A HREF="../../file/hon/p03_10.htm">the Directory Operations</a> chapter in <A HREF="../../file/index.htm">the File System Library</a> .</P>
+</UL>
+<A NAME="no3_20"></A><P><DT><H3> 3.2 Name restrictions</H3><DD> The stream system library uses the following names for function names, variable names, type names, and macro names.</P>
+<DD><TABLE>
+<TR ALIGN=CENTER><TD><PRE> Function name, variable name</TD><TD><PRE> ST~ and st~</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Model name</TD><TD><PRE> St〜</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> macro name</TD><TD><PRE> ST~</TD></TR>
+</TABLE>
+<P><DD> The libraries required to use the stream system library use the following global symbols.</P>
+<A NAME="t3_3"></A><P><DD> <B>Table 3.3 Symbol names of each library</b><DD><TABLE BORDER>
+<TR><TH width=260><PRE> library name</TH><TH width=260><PRE> Symbols used</TH></TR>
+<TR><TD><PRE> file system</TD><TD><PRE> GF~,gf~,Gf~</TD></TR>
+<TR><TD><PRE> CD communication interface</TD><TD><PRE> CD~,cd~,Cd~</TD></TR>
+</TABLE>
+</P>
+<P><DD> Application programs must not use these symbols.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">Stream system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

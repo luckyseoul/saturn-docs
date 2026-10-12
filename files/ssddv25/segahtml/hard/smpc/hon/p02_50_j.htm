@@ -1,0 +1,141 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/19&gt;SMPCユーザーズマニュアル/2.5　RTCコマンド</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p02_40_j.htm">戻る</A>｜
+     <a href="p03_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SMPCユーザーズマニュアル/第２章　SMPCコマンド</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_50"></A>
+	<P>	<DT><H2>■2.5　RTCコマンド</H2>
+		<DD>　RTCコマンドの詳細を表形式で示します。各コマンドの表の見方および注意事項は以下の通りです。また、全てのコマンドにおいてステータスフラグを使用することで、コマンドの二重発行が管理できます。</P>
+
+<A NAME="no2_51"></A>
+	<P>	<DT><B>　●SMPC割り込み</B>
+     <DD>　"発生"と記述されているものは、コマンド終了時にSCU経由にてSH-2に対してSMPC割り込みを発生します。また、SCUの設定により、割り込みのイネーブル／ディセーブルが可能です。</P>
+
+<A NAME="no2_52"></A>
+	<P>	<DT><B>　●IREG、OREG</B></P>
+		<DD><UL TYPE=DISC>
+		<LI>コマンドで使用しているIREG、OREGの詳細を示しています。
+		<LI>コマンドパラメータは、コマンド発行前にIREGに設定するパラメータです。
+		<LI>リザルトパラメータは、コマンド実行によりOREGにセットされるパラメータです。
+		<LI>リザルトパラメータOREG31は、SMPCがコマンド処理開始時にセットします。OREG31には、コマンドコードが出力されます。ステータスフラグ(SF)と併用することにより、
+	</UL></P>
+	
+	<P>	<DD>　ステータスフラグ(SF)と併用することにより、</P>
+		<UL TYPE=DISC>
+		<LI>どのコマンドを実行中か (<B>SF=1</B>)
+		<LI>どのコマンドが終了したか(<B>SF=0</B>)
+		</UL></P>
+
+	<P>	<DD>　を判断することができます。</P>
+
+<A NAME="no2_53"></A>
+	<P>	<DT><B>　●実行時間</B>
+		<DD>　SMPC内部ファームウェアのステップ数から計算した実行時間を示しています。RTCインクリメント等の内部タスクと衝突した場合は、コマンド実行時間が変化するので、最小値および最大値の範囲で記述しています。</P>
+</DL>
+
+
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c3_01"><HR></A>
+<!-- --------------------------------------------------------------------------------- -->
+<B><a href="p02_10_j.htm#t2_3">一覧表</A>
+|▲<a href="p02_40_j.htm#c2_02">戻る</A>
+|　　■</B>
+<DL>
+	<P>	<DT>No.1
+		<DT><H1>SETTIME</H1>
+		<DD><H2>時刻設定</H2></P>
+
+	<P>	<DT><PRE>
+<B>コマンドコード　</B>16H
+<B>ＳＭＰＣ割込　　</B>発生不可
+<B>ＩＲＥＧ　　　　</B>0〜6
+<B>ＯＲＥＧ　　　　</B>31
+<B>実行時間　　　　</B>max=xxx
+<B>　　　　　　　　</B>min=70μsec
+</PRE></P>
+
+	<P>	<DT><B>機能内容</B>
+		<DD>RTC時刻を設定します。</P>
+
+	<P>	<DT><B>コマンドパラメータ</B>
+		<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>　</TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>OREG0</TH><TH>20100001H</TH><TD COLSPAN=4>西暦年号千位(BCD)</TD><TD COLSPAN=4>西暦年号百位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG1</TH><TH>20100003H</TH><TD COLSPAN=4>西暦年号十位(BCD)</TD><TD COLSPAN=4>西暦年号一位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG2</TH><TH>20100005H</TH><TD COLSPAN=4>曜日(16進)　<B>注1</B></TD><TD COLSPAN=4>月(16進)　<B>注2</B></TD></TR>
+<TR ALIGN=CENTER><TH>OREG3</TH><TH>20100007H</TH><TD COLSPAN=4>日十位(BCD)</TD><TD COLSPAN=4>日一位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG4</TH><TH>20100009H</TH><TD COLSPAN=4>時十位(BCD)</TD><TD COLSPAN=4>時一位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG5</TH><TH>2010000BH</TH><TD COLSPAN=4>分十位(BCD)</TD><TD COLSPAN=4>分一位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG6</TH><TH>2010000DH</TH><TD COLSPAN=4>秒十位(BCD)</TD><TD COLSPAN=4>秒一位(BCD)</TD></TR>
+</TABLE></P>
+
+	<P>	<DD><B>注1</B>
+		<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>曜日</TH><TH>日曜</TH><TH>月曜</TH><TH>火曜</TH><TH>水曜</TH><TH>木曜</TH><TH>金曜</TH><TH>土曜</TH></TR>
+<TR ALIGN=CENTER><TH>　値　</TH><TD>0H</TD><TD>1H</TD><TD>2H</TD><TD>3H</TD><TD>4H</TD><TD>5H</TD><TD>6H</TD></TR>
+</TABLE></P>
+
+	<P>	<DD><B>注2</B>
+		<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>　月　</TH><TH>１月</TH><TH>２月</TH><TH>３月</TH><TH>４月</TH><TH>５月</TH><TH>６月</TH><TH>７月</TH><TH>８月</TH><TH>９月</TH><TH>10月</TH><TH>11月</TH><TH>12月</TH></TR>
+<TR ALIGN=CENTER><TH>　値　</TH><TD>1H</TD><TD>2H</TD><TD>3H</TD><TD>4H</TD><TD>5H</TD><TD>6H</TD><TD>7H</TD><TD>8H</TD><TD>9H</TD><TD>AH</TD><TD>BH</TD><TD>CH</TD></TR>
+</TABLE></P>
+
+	<P>	<DT><B>リザルトパラメータ</B>
+		<DD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>OREG31   </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>2010005FH</TH><TD>０</TD><TD>０</TD><TD>０</TD><TD>１</TD><TD>０</TD><TD>１</TD><TD>１</TD><TD>０</TD></TR>
+</TABLE></P>
+
+	<P>	<DT><B>備考</B>
+		<DD>●時刻はSMPCコールドリセット時「<B>1993年12月31日金曜日23時59分59秒</B>」に初期化され、カウントを開始します。</P>
+	<P>	<DD>SMPCコールドリセットは、以下の条件で発生します
+		<DD><OL>
+		<LI>セガサターン背面電池ボックス内リセットスイッチを押したとき
+		<LI>バッテリ未装着時または消耗時に主電源を投入(ON)したとき
+		<LI>電源OFF中に電池が投入されたとき</OL></P>
+
+	<P>	<DD>●実際に存在しないデータ、7以上の<B>曜日</B>、13以上の<B>月</B>、月に対応しない<B>日付</B>(閏年補正は2099年まで補正)、24以上の<B>時刻</B>、60以上の<B>分</B>および<B>秒</B>を設定した場合には、設定値およびその後のカウントが不定となります。</P>
+ 
+	<P>	<DD>●SETTIMEコマンド発行中に電源が切断(OFF)されると、</P>
+	<P>	<DD><OL>
+		<LI>SETTIMEコマンドの内部処理が電源OFFシーケンスより先に実行できた場合は、全データが更新されます。
+		<LI>電源OFFシーケンスが先に実行された場合は、コマンド発行前のデータが保持されます。</OL></P>
+</DL>
+
+<HR NOSHADE>
+<B>▲<a href="p02_40_j.htm">戻る</A>｜
+     <a href="p03_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

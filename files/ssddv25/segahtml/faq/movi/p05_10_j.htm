@@ -1,0 +1,102 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 5&gt;FAQ/Movie関連/MPEG</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#movi">FAQ</A>
+★<a href="index_j.htm#mpeg">Movie関連</A>
+<HR>
+<B>▲
+<a href="p04_10_j.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>FAQ/Movie関連</B>
+<H2 ALIGN=CENTER>MPEG</H2>
+<HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_01"><HR></A><DL>
+<H3>MPEGのデータってどうやって作成するの?</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>MPEGデータの作成について教えてください。
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>市販のMPEGエンコーダボードは近年安価なものが増えていますが、
+      ほとんどの製品で生成される画像品位は、お世辞にも良いものとは
+      言えないようです。<BR>エンコードされる品位は実際のエンコーダLSIの内部処理
+      アルゴリズムにも依存しますが、入力されたアナログビデオ信号をA/D変換
+      するフロントエンド回路の品質に最も大きく依存します。<BR>高価な製品ほど、
+      業務用のビデオ機器と接続することを考慮しているために良くなっていますし、
+      外部機器からのタイムコードを見ることにより、指定時間範囲だけを
+      エンコードし出力することが可能な製品もあります。<BR>
+      安価な製品を使用してエンコードデータを得ることは可能ですが、
+      イメージサイズが大きいとフレームレートが15fpsに制限されたり、
+      他の機器との連動が出来ないためにかなり手間を要することも確かです。<BR>
+      安価なものは、その分人件費を要することは事実です。<BR>
+      確実な作業を行うならば、オーサリングを実際に請け負っている
+      スタジオへ依頼する方法もあります。<BR>
+      実際にオーサリングを行うには、最終形態がどんな形を必要とするのか
+      (イメージサイズや、ビデオCDとするのか、MPEGストリームとして
+      プログラムから呼び出すか)等を含めて検討が必要ですので
+      当方へ一度ご相談ください。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_02"><HR></A><DL>
+<H3>MPEGの再生で音声の再生が遅れるのですが。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>VCDBUILDでMPEG audio/MPEG videoをインターリーブ処理したデータを
+      再生したところ、videoの再生はすぐに始まるのですが、audioデータが
+      遅れて再生が始まります。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>これは、VCDBUILDで確認されている既知の不具合です。<BR>
+      MPEG-1システムストリームでは、audio/video同期を容易なものとする目的で
+      インターリーブ処理を行う際にデコードに時間を要するvideoストリームを
+      ダミーデータを挿入することによって後方へ配置し、マージンを設けた上で
+      audio/videoストリームへ記録されているタイムスタンプをもとに同期処理
+      を行います。<BR>
+      しかし、一部のエンコーダではGOP(Group Of Picture:画像集合、MPEGでは、
+      ひと区切りの画像の集合いってみれば小さいムービー、をひとまとまりとして
+      扱います。というのもMPEGが前後の画像を元に圧縮を掛けているためです。)
+      がclosed GOP(閉じたGOP:前後のGOP間に依存関係のないGOP、MPEGは前後の
+      データとの緊密な関係から生成されるため、自分のグループ中にない、つまり
+      自分の前にあるデータから自分の画像を生成出来ます。Closed GOPはその様な
+      前後での依存のないデータスタイルの事です。)のとなっている
+      ストリームを出力するものが標準となっているものがあり、
+      これはVCDBUILDでのGOPをまたぐ際の「つじつま」合わせに不具合が
+      生じています。<BR>
+      現状での対策としては、non-closed GOPでのビデオストリームのエンコード
+      を行っていただくことになります。<BR>
+      すでにエンコードされてしまったストリームの場合はGOPレイヤのGOP flag
+      を強制的に下げる方法もありますが、大変面倒な処理ですのであまりお勧め
+      しません。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p04_10_j.htm">戻る</A>｜
+　　■</B>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#movi">FAQ</A>
+★<a href="index_j.htm#mpeg">Movie関連</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

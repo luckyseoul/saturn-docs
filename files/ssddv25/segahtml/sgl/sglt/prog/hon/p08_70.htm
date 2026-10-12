@@ -1,0 +1,130 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/30&gt;SGL Programmer's Tutorial/8-7. Scroll drawing</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+ <B>▲ <A HREF="p08_60.htm">Back</a> ｜ <A HREF="p08_80.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>8.Scroll</b><HR NOSHADE>
+<DL>
+<A NAME="no8_70"></A><P><DT><H2> 8-7. Drawing scrolls</H2><DD> Here, we will explain the flow from the scroll function settings and scroll registration to the actual drawing of the scroll screen, step by step using the library functions used.</P>
+<A NAME="no8_71"></A><P><DT><H3> Back screen settings</H3><P><DT> <B>●Back screen settings</b><DD> Select the color of the back screen.<BR>
+ The back screen refers to the monochrome display surface that is drawn at the very back of the monitor and is displayed in areas where nothing is drawn (in dot units).<BR>
+ The library function “slBack1ColSet” is used to set the back screen.</P>
+<P><DD> <B>[void slBack1ColSet ( void *back_col_adr , Uint16 RGB_col ) ;]</b><DD> Specify the color of the monochrome back screen.<BR>
+ Assign the start address in VRAM that stores the color data of the back screen and the 1-word RGB value (#define value) that indicates the color of the back screen to the parameters.<BR>
+ The values used to specify RGB colors are defined in the header file "sl_def.h", so please refer to them.</P>
+<A NAME="z8_15"></A><P><DD> <B>Figure 8-15 RGB color mode sample (RGB_Flag)</b><P><DD><PRE>
+● RGB mode color sample ●
+#define	CD_Blank	(0&lt&lt10)  | (0&lt&lt5)  | (0)  | RGB_Flag
+#define	CD_DarkRed	(0&lt&lt10)  | (0&lt&lt5)  | (8)  | RGB_Flag
+#define	CD_DarkGreen	(0&lt&lt10)  | (8&lt&lt5)  | (0)  | RGB_Flag
+		:
+		:
+#define	CD_Purple	(31&lt&lt10) | (0&lt&lt5)  | (31) | RGB_Flag
+#define	CD_Magenta	(31&lt&lt10) | (31&lt&lt5) | (0)  | RGB_Flag
+#define	CD_White	(31&lt&lt10) | (31&lt&lt5) | (31) | RGB_Flag
+</PRE>
+<P><DD><B>Note)</b> The above values are defined in “sl_def.h”.<A NAME="no8_72"></A><P><DT><H3> Display position setting</H3><P><DT> <B>●Normal scroll screen</b><DD> Determines the display position of the normal scroll screen with the function set.<BR>
+ Library functions “slScrPosNbg0 to 3” are used to determine the display position of the normal scroll screen.</P>
+<P><DD> <B>[void slScrPosNbg0~3 ( FIXED posx , FIXED posy ) ;]</b><DD> Set the display coordinates of the normal scroll screen.<BR>
+ Assign the XY coordinate values (scroll coordinate system) to the parameters to determine where on the scroll map the monitor should be placed.<BR>
+ The placement reference point for the normal scroll screen is the upper left corner of the monitor.<P><DT> <B>●Rotating scroll screen</b><DD> Function Determines the placement coordinates and rotation center coordinates of the set rotating scroll surface.<BR>
+ The function “slLookR” is used to determine the display position of the rotating scroll screen, and the function “slDispCenterR” is used to determine the rotation center coordinates.</P>
+<P><DD> <B>[void slLookR ( FIXED posx, FIXED posy) ;]</b><DD> Sets the placement coordinates of the rotation scroll screen and saves the information in the current rotation parameter<BR>
+ . Assign the scroll XY coordinate values with the origin at the top left of the scroll map to the parameters.<BR>
+ The display position of the rotating scroll is determined by the placement coordinates and rotation center coordinates.</P>
+<P><DD> <B>[void slDispCenterR ( FIXED posx , FIXED posy ) ;]</b><DD> Set the rotation center coordinates (vanishing point) of the rotation scroll screen and save the information in the current rotation parameter.<BR>
+ Assign the screen XY coordinate values where the rotating scroll screen will be placed to the parameters.<BR>
+ The display position of the rotating scroll is determined by the placement coordinates and rotation center coordinates.</P>
+<A NAME="z8_16"></A><P ALIGN=CENTER> <B>Figure 8-16 Relationship between display position and rotation center position</b><img srcset="../grp/p08_28.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>Note)</b> The front of the screen is the positive direction of the Z axis of the scroll surface.</P>
+<P><DD> In addition, the functions "slLookR" and "slDispCenterR" can be set for each rotation parameter A and B, and the rotation parameter to be set (currently used rotation parameter) can be switched using the function "slCurRpara". Among the functions used for rotational scrolling, for all functions whose names end with "R", the function performed by the function can be set separately for rotation parameters A and B.</P>
+<A NAME="no8_73"></A><P><DT><H3> scroll registration</H3><DD> After storing the scroll data and setting the scroll function, it is necessary to register the scroll screen using the SGL library function "slScrAutoDisp".<BR>
+ Scroll registration refers to setting cycle patterns and drawing settings for each scroll screen for which function settings have been completed.</P>
+<P><DD> Additionally, scroll registration may fail depending on the function settings of the scroll to be registered, the number of scroll pages, and the VRAM bank in which the scroll data is stored.<BR>
+ This is due to several scrolling limitations, including the scrolling limitation due to the number of colors on the normal scroll screen mentioned above (limitations are discussed in the next section).</P>
+<P><DD> <B>[Bool slScrAutoDisp ( Uint32 disp_bit );]</b><DD> Register the scroll screen with function settings.<BR>
+ Assign the values in the table below that correspond to the scroll screen to be registered to the parameters.<BR>
+ The function returns a return value of 0 if the scroll registration is successful, and -1 if it fails. </P>
+<A NAME="t8_18"></A><P><DD<B>
+ Table 8-18 Scroll registration parameter substitution value (disp_bit)<P><DD><TABLE BORDER=1>
+<TR><TH ROWSPAN=2></TH><TH COLSPAN=5> Scroll image to register</TH></TR>
+<TR><TH> NBG0</TH><TH> NBG1</TH><TH> NBG2</TH><TH> NBG3</TH><TH> RBG0</TH></TR>
+<TR><TH> Assignment value</TH><TD> NBG0ON</TD><TD> NBG1ON</TD><TD> NBG2ON</TD><TD> NBG3ON</TD><TD> RBG0ON</TD></TR>
+</TABLE>
+</P>
+<DD> <B>Note)</b> The values in the table above are defined in “sl_def.h” that comes with the system.</P>
+<P><DD> When registering multiple scroll screens, it is convenient to combine the #define values corresponding to each scroll with the or operator "|" for the parameter assignment value of the library function "slScrAutoDisp" (an example is shown below). indicate).</P>
+<A NAME="z8_17"></A><P><DD> <B>Figure 8-17 Registering multiple scroll surfaces</b><P><DD><PRE>
+● Multiple scroll plane registration●
+<H3>
+Uint16 slScrAutoDisp(NBG0ON|NBG1ON|RBG0ON);
+           ↑   ↑   ↑
+           ｜   ｜   RBG0 registration
+           ｜   NBG1 registration
+           NBG0 registration</H3>
+ (｜ = or operator)
+</PRE></P>
+<DD><B>Note)</b> Parameter substitution values are defined in “sl_def.h”.</P>
+<A NAME="no8_74"></A><P><DT><H3> Notes on scroll registration</H3><DD> When registering scrolling using the SGL library function "slScrAutoDisp", the function may return a return value of -1 in some cases. This means that the function “slScrAutoDisp” failed to register the scroll.<BR>
+ If scroll registration fails, the reasons can be summarized into the following four reasons.</P>
+<P><DT> <B>●Cause of scroll registration failure</b><P><DD> <B>1) Scroll restrictions based on the number of colors on the normal scroll screen</b><DD><DD> An attempt was made to register a scroll surface that should not be usable due to the color number settings of NBG0 and NBG1.</P>
+<P><DD> <B>2) Bank occupancy by rotating scroll data</b><DD> Scroll data for the rotary scroll screen and normal scroll screen are stored in the same VRAM bank.</P>
+<P><DD> <B>3) Pattern name data storage bank limit</b><DD> Pattern name data is stored in both VRAM banks with the same end number.</P>
+<P><DD> <B>4) Allowable deviations in scrolling functionality</b><DD> The scroll surface you attempted to register exceeds the scroll function and number of surfaces that can be selected at the same time.</P>
+<P><DD> To resolve this, please do the following:</P>
+<P><DT> <B>●What to do when scroll registration fails</b><P><DD> <B>What to do in case 1)</b><DD> Reduce the number of colors in NBG0 or NBG1, or give up on registering NBG2 or NBG3.</P>
+<P><DD> <B>What to do in case 2)</b><DD> Scroll data for the rotating scroll screen and normal scroll screen are stored in separate VRAM banks.</P>
+<P><DD> <B>What to do in case 3)</b><DD> Observe VRAM bank storage restrictions for pattern name data.</P>
+<P><DD> <B>What to do in case of 4)</b><DD> Reduce the number of scroll screens to be registered, reduce the number of colors of character patterns during function settings, increase the value of the reduction setting, avoid cramming scroll data from too many scroll screens into one VRAM bank, etc. please look.</P>
+<P><DT><H3> About VRAM access restrictions</H3><DD> The reason for 4) is the restriction of access to VRAM banks. However, it is very difficult to explain VRAM access restrictions and understand the accompanying contents. Therefore, here we will provide a solution/workaround by simply reducing the scrolling function and the number of pages.<BR>
+ For details on VRAM access, refer to “HARDWARE MANUAL vol.2: VDP2 User's Manual”.</P>
+<A NAME="no8_75"></A><P><DT><H3> Start drawing</H3><P><DT> <B>●Drawing declaration</b><DD> In SGL, the process of drawing the scroll screen to the monitor begins when the library function "slTVOn" is executed.<BR>
+ After that, the scroll screen continues to draw in synchronization with the scan line according to the stored scroll information (position, scale, rotation angle, graphic data, etc.).<BR>
+ Additionally, there is a function "slTVOff" as a companion function to this function "slTVOn". This is to stop the scroll drawing process.</P>
+<P><DD> <B>[void slTVOn ( void );]</b><DD> Starts the drawing process for the scroll screen that has been set to draw.</P>
+<P><DD> <B>[void slTVOff ( void );]</b><DD> Cancels the drawing process for the scroll screen that has been set to draw.</P>
+<P><DT> <B>●Drawing settings</b><DD> Configure whether to actually draw the scroll screen with the function settings on the monitor.<BR>
+ For scroll planes that have been registered using the function "slScrAutoDisp," the drawing settings are turned on at the time of registration, so drawing will be executed as is, but you can prevent drawing by turning off the drawing settings. It is also possible to In addition, you can draw on a scroll surface whose drawing settings have been turned off by turning it on.</P>
+<P><DD> <B>[void slScrDisp ( Uint32 mode );]</b><DD> Configure the drawing settings for the scroll screen with the function settings.<BR>
+ The values in the table below that correspond to the drawing settings for each scroll surface are assigned to the parameters.</P>
+<A NAME="t8_19"></A><P><DD> <B>Table 8-19 List of parameter substitution values for “slScrDisp” (mode)</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2></TH><TH COLSPAN=2> NBG0</TH><TH COLSPAN=2> NBG1</TH><TH COLSPAN=2> NBG2</TH><TH COLSPAN=2> NBG3</TH><TH COLSPAN=2> RBG0</TH></TR>
+<TR ALIGN=CENTER><TH> ON</TH><TH> OFF</TH><TH> ON</TH><TH> OFF</TH><TH> ON</TH><TH> OFF</TH><TH> ON</TH><TH> OFF</TH><TH> ON</TH><TH> OFF</TH></TR>
+<TR ALIGN=CENTER><TH><PRE> Assignment value</TH><TD> NBG0ON</TD><TD> NBG0OFF</TD><TD> NBG1ON</TD><TD> NBG1OFF</TD><TD> NBG2ON</TD><TD> NBG2OFF</TD><TD> NBG3ON</TD><TD> NBG3OFF</TD><TD> RBG0ON</TD><TD> RBG0OFF</TD></TR>
+</TABLE>
+ <B>ON:</b> Draw scroll surface<BR>
+ <B>OFF:</b> Do not draw scroll surface</P>
+<DD> <B>Note)</b> The values in the table above are defined in “sl_def.h” that comes with the system.</P>
+<P><DT> <B>●Screen synchronization (scroll rewriting)</b><DD> Rewrites the scroll drawing data according to the scan line status.</P>
+<P><DD> <B>[void slSynch ( void );]</b><DD> Rewrites the drawing data while the monitor is not rewriting the screen.</P>
+<A NAME="no8_76"></A><P><DT><H3> Flow of scroll drawing</H3><DD> Here, we will summarize the steps from scroll function settings to drawing by showing the flowchart from initializing scroll data to actual drawing.</P>
+<A NAME="f8_2"></A><P ALIGN=CENTER> <B>Flow 8-2 Flow up to scroll drawing</b><BR>
+<img srcset="../grp/p08_32.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT><H3> About accessing VRAM and color RAM</H3><DD> Any access to VRAM or color RAM during the monitor's display period will cause noise on the monitor.<BR>
+ Therefore, these two RAM areas can be accessed using the function "slSynch" during the monitor's non-display period (during blanking), or by using the function "slTVOff" to interrupt the scroll drawing process. Either do this after you do this, or turn off the drawing settings using the function “slScrDisp” and access the VRAM bank that will not be accessed.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_60.htm">Back</a> ｜ <A HREF="p08_80.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

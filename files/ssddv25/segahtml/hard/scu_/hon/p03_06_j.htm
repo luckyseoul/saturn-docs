@@ -1,0 +1,598 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;14/31&gt;SCUユーザーズマニュアル/第３章/■3.6　A-Bus制御レジスタ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCUユーザーズマニュアル</A>
+★<a href="p03_01_j.htm">3.1　レジスタ一覧</A>
+<HR>
+<B>▲<a href="p03_05_j.htm">戻る</A>｜
+     <a href="p03_07_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCUユーザーズマニュアル／第３章　レジスタ詳細</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_60"></A>
+  <P><DT><H2>■3.6　A-Bus制御レジスタ</H2>
+
+<A NAME="no3_61"></A>
+  <P><DT><H3>　◆A-Bus割り込みアクノリッジレジスタ</H3>
+     <DD>図3.23に、A-Bus割り込みアクノリッジレジスタの詳細を示します。</P>
+
+<A NAME="z3_23"></A>
+  <P><DT><B>図3.23　A-Bus割り込みアクノリッジレジスタ</B>(レジスタ：AIAK)初期値 00000000H
+	<TABLE BORDER=1><TR><TD ALIGN=RIGHT>bit</TD>
+<TD><PRE>31</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>24</TD>
+<TD><PRE>23</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>16</TD>
+<TD><PRE>15</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR><TD>25FE00BC</TD>
+  <TD>−</TD>	<!-- 31 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 28 -->
+  <TD>−</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD>−</TD>	<!-- 19 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 16 -->
+  <TD>−</TD>	<!-- 15 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 12 -->
+  <TD>−</TD>	<!-- 11 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 8 -->
+  <TD>−</TD>	<!-- 7 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 4 -->
+  <TD>−</TD>	<!-- 3 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD><A HREF="#z3_23_1">１</A></TD>	<!-- 0 -->
+  </TR></TABLE></P>
+
+<A NAME="z3_23_1"></A>
+  <P><DT><B>　A-Bus割り込みアクノリッジ</B>(<A HREF="#z3_23">図3.23中、1［bit 0］</A>)
+     <DD><B>AIACK(Ｒ／Ｗ)　　A-Bus Interrupt ACKnowledge</B>
+     <DD>　A-Bus上に存在するデバイスからの割り込みの有効／無効を表します。このビットは、読み書き可能なビットです。
+         表3.9に、ビットの意味を示します。割り込みが要求されると、A-Bus割り込みアクノリッジサイクルを発生し、
+         割り込み種別データ(16bit)を取り込み、その内容で現在の割り込みの状態を認識できます。このサイクルが発生すると、
+         AIACKのビットは0になり、A-Bus割り込みが無効になるので、さらにA-Busからの割り込みを受け付けるには、
+         AIACKビットの再設定が必要です。</P>
+
+<A NAME="t3_9"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.9　A-Bus割り込みアクノリッジ内容</B></CAPTION>
+  <TD ALIGN="CENTER"><PRE>アクセス</TD><TD ALIGN="CENTER"><PRE>状態</TD><TD WIDTH=350 ALIGN="CENTER"><PRE>内　　　　　容</TD><TR>
+  <TD ROWSPAN=2 ALIGN="CENTER"><PRE>読み込み</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>A-Bus割り込み無効</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>A-Bus割り込み有効</TD><TR>
+  <TD ROWSPAN=2 ALIGN="CENTER"><PRE>書き出し</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>A-Bus割り込み無効</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>A-Bus割り込み有効</TD>
+  </TABLE></P>
+
+<A NAME="no3_62"></A>
+  <P><DT><H3>　◆A-Bus設定レジスタ</H3>
+     <DD>　A-Busに接続する空間として、チップセレクト(以後、CSと表記します)0-2の3種類の出力される空間とCSが出力されない予備空間1種類の、合計4種類の空間が用意されています。<BR>
+       　A-Busに関するレジスタは、接続するデバイスによって決定されるので、すべてのデバイスを包含するよう設定されなければなりません。設定後は、むやみにその値を変更しないようにしてください。</P>
+
+<A NAME="no3_620"></A>
+  <P><DT><B>　●CS0,1,2,予備空間のA-Bus設定レジスタ</B>
+     <DD>　図3.24にCS0空間とCS1空間、図3.24にCS2空間と予備空間のA-Bus設定レジスタ詳細を示します。</P>
+
+<A NAME="z3_24"></A>
+  <P><DT><B>図3.24　A-Bus設定レジスタ［CS0,1空間］</B>(レジスタ：ASR0)初期値 00000000H
+	<TABLE BORDER=1><TR><TD ALIGN=RIGHT>bit</TD>
+<TD><PRE>31</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>24</TD>
+<TD><PRE>23</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>16</TD>
+<TD><PRE>15</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR><TD>25FE00B0</TD>
+  <TD>−</TD>	<!-- 31 -->
+  <TD><A HREF="#z3_24_2">２</A></TD>
+  <TD><A HREF="#z3_24_3">３</A></TD>
+  <TD><A HREF="#z3_24_4">４</A></TD>	<!-- 28 -->
+  <TD><A HREF="#z3_24_5">５</A></TD>	<!-- 27 -->
+  <TD><A HREF="#z3_24_5">６</A></TD>
+  <TD><A HREF="#z3_24_5">７</A></TD>
+  <TD><A HREF="#z3_24_5">８</A></TD>	<!-- 24 -->
+  <TD><A HREF="#z3_24_9">９</A></TD>	<!-- 23 -->
+  <TD><A HREF="#z3_24_9">10</A></TD>
+  <TD><A HREF="#z3_24_9">11</A></TD>
+  <TD><A HREF="#z3_24_9">12</A></TD>	<!-- 20 -->
+  <TD><A HREF="#z3_24_13">13</A></TD>	<!-- 19 -->
+  <TD><A HREF="#z3_24_13">14</A></TD>
+  <TD>−</TD>
+  <TD><A HREF="#z3_24_15">15</A></TD>	<!-- 16 -->
+  <TD>−</A></TD>	<!-- 15 -->
+  <TD><A HREF="#z3_24_17">17</A></TD>
+  <TD><A HREF="#z3_24_18">18</A></TD>
+  <TD><A HREF="#z3_24_19">19</A></TD>	<!-- 12 -->
+  <TD><A HREF="#z3_24_20">20</A></TD>	<!-- 11 -->
+  <TD><A HREF="#z3_24_20">21</A></TD>
+  <TD><A HREF="#z3_24_20">22</A></TD>
+  <TD><A HREF="#z3_24_20">23</A></TD>	<!-- 8 -->
+  <TD><A HREF="#z3_24_24">24</A></TD>	<!-- 7 -->
+  <TD><A HREF="#z3_24_24">25</A></TD>
+  <TD><A HREF="#z3_24_24">26</A></TD>
+  <TD><A HREF="#z3_24_24">27</A></TD>	<!-- 4 -->
+  <TD><A HREF="#z3_24_28">28</A></TD>	<!-- 3 -->
+  <TD><A HREF="#z3_24_28">29</A></TD>
+  <TD>−</TD>
+  <TD><A HREF="#z3_24_30">30</A></TD>	<!-- 0 -->
+  </TR></TABLE></P>
+
+
+<A NAME="z3_25"></A>
+  <P><DT><B>図3.25　A-Bus設定レジスタ［CS2,予備空間］</B>(レジスタ：ASR1)初期値 00000000H
+	<TABLE BORDER=1><TR><TD ALIGN=RIGHT>bit</TD>
+<TD><PRE>31</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>24</TD>
+<TD><PRE>23</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>16</TD>
+<TD><PRE>15</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR><TD>25FE00B4</TD>
+  <TD>−</TD>	<!-- 31 -->
+  <TD><A HREF="#z3_25_2">２</A></TD>
+  <TD><A HREF="#z3_25_3">３</A></TD>
+  <TD><A HREF="#z3_25_4">４</A></TD>	<!-- 28 -->
+  <TD>−</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD><A HREF="#z3_25_5">５</A></TD>	<!-- 19 -->
+  <TD><A HREF="#z3_25_5">６</A></TD>
+  <TD>−</TD>
+  <TD><A HREF="#z3_25_7">７</A></TD>	<!-- 16 -->
+  <TD>−</A></TD>	<!-- 15 -->
+  <TD><A HREF="#z3_25_9">９</A></TD>
+  <TD><A HREF="#z3_25_10">10</A></TD>
+  <TD><A HREF="#z3_25_11">11</A></TD>	<!-- 12 -->
+  <TD><A HREF="#z3_25_12">12</A></TD>	<!-- 11 -->
+  <TD><A HREF="#z3_25_12">13</A></TD>
+  <TD><A HREF="#z3_25_12">14</A></TD>
+  <TD><A HREF="#z3_25_12">15</A></TD>	<!-- 8 -->
+  <TD><A HREF="#z3_25_16">16</A></TD>	<!-- 7 -->
+  <TD><A HREF="#z3_25_16">17</A></TD>
+  <TD><A HREF="#z3_25_16">18</A></TD>
+  <TD><A HREF="#z3_25_16">19</A></TD>	<!-- 4 -->
+  <TD><A HREF="#z3_25_20">20</A></TD>	<!-- 3 -->
+  <TD><A HREF="#z3_25_20">21</A></TD>
+  <TD>−</TD>
+  <TD><A HREF="#z3_25_22">22</A></TD>	<!-- 0 -->
+  </TR></TABLE></P>
+
+<A NAME="z3_24_2"></A>
+  <P><DT><B>　CS0空間のライト後プリチャージ挿入ビット</B>(<A HREF="#z3_24">図3.24中、2［bit 30］</A>)
+     <DD><B>A0WPC(Ｗ)　A-Bus CS0 after Write Pre-Charge insert bit </B>
+     <DD>　CS0空間にデータを書き出した後、1クロック分の無処理状態を挿入することができます。
+    その処理を有効にするか無効にするか決定するビットがこのビットです。1で有効、0で無効を表します。
+    このビットは、CS0の空間の読み込み後の動作には影響しません。
+    図3.27に、このビットをセットしたときの動作を示します。</P>
+
+<A NAME="z3_27"></A>
+  <P ALIGN=CENTER><B>図3.27　ライト後プリチャージ挿入ビット設定時のタイミング</B><BR><img srcset="../grp/i063_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+	<P><DD><B>※</B>図中のクロック(CLK)はSCUの内部クロック</P>
+
+<A NAME="z3_24_3"></A>
+  <P><DT><B>　CS0空間のリード後プリチャージ挿入ビット</B>(<A HREF="#z3_24">図3.24中、3［bit 29］</A>)
+     <DD><B>A0RPC(Ｗ)　　A-Bus CS0 Read Pri-Charge insert bit</B>
+     <DD>　CS0空間のデータを読み込んだ後、1クロック分の無処理状態を挿入することができます。
+         その処理を有効にするか無効にするか決定するビットがこのビットです。1で有効、0で無効を表します。
+         このビットは、CS0空間の書き出し後の動作には影響しません。図3.28に、このビットをセットしたとき
+         の動作を示します。<br>
+         　デバイスの種類によっては、CSをHighにした後に次のCSをLowにするまでに一定期間必要なものがあるため、
+           このbitをsetします。書き込みも同様にします。
+
+<A NAME="z3_28"></A>
+  <P ALIGN=CENTER><B>図3.28　リード後プリチャージ挿入ビット設定時のタイミング</B><BR><img srcset="../grp/i063_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P><!-- 図は同じ -->
+	<P><DD><B>※</B>図中のクロック(CLK)はSCUの内部クロック</P>
+
+<A NAME="z3_24_4"></A>
+  <P><DT><B>　CS0空間の外部ウェイト有効ビット</B>(<A HREF="#z3_24">図3.24中、4［bit 28］</A>)
+     <DD><B>A0EWT(Ｗ)　　A-Bus CS0 External WaiT effective bit</B>
+     <DD>　A-Busを介して、CS0空間をアクセスするときに、外部信号によって強制的にウェイトを入れることができますが、その処理を有効にするか無効にするか決定するビットです。1で有効、0で無効を表します。有効のとき、SCUのウェイトサンプリングの点で外部ウェイト         信号がLowの間はウェイトし続けます。図3.29に、外部ウェイトが無効のときと有効のときとのタイミングチャートの違いを示します。</P>
+
+<A NAME="z3_29"></A>
+	<P ALIGN=CENTER><B>図3.29　外部ウェイト有効ビット設定によるタイミングの違い</B><BR><img srcset="../grp/i064_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+	<P><DD><B>※</B>図中のクロック(CLK)はSCUの内部クロック</P>
+
+<A NAME="z3_24_5"></A>
+  <P><DT><B>　CS0空間のバーストサイクルウェイト数設定ビット</B>(<A HREF="#z3_24">図3.24中、5〜8［bit 27〜24］</A>)
+     <DD><B>A0BW3-0(Ｗ)　　A-Bus CS0 Burst sycle Wait bit3-0</B>
+     <DD>　CS0空間において、バーストアクセスを行う際の、1サイクルに対するウェイト数の設定を行います。表3.10に設定値を示します。</P>
+
+<A NAME="t3_10"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.10　CS0空間バーストサイクル設定値</B></CAPTION>
+  <TD COLSPAN=4 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE>ウェイト数</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A0BW3</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A0BW2</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A0BW1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A0BW0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>ウェイトしない(ウェイトをサンプルしない)</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>1サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD><PRE>　</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>14サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>15サイクルウェイト</TD>
+  </TABLE></P>
+
+<A NAME="z3_24_9"></A>
+  <P><DT><B>　CS0空間のノーマルサイクルウェイト数設定ビット</B>(<A HREF="#z3_24">図3.24中、9〜12［bit 23〜20］</A>)
+     <DD><B>A0NW3-0(Ｗ)　　A-Bus CS0 Normal cycle Wait bit3-0</B>
+     <DD>　CS0空間において、ノーマルアクセスを行う際の、1サイクルに対するウェイト数の設定を行います。表3.11に設定値を示します。</P>
+
+<A NAME="t3_11"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.11　CS0空間ノーマルサイクル設定値</B></CAPTION>
+  <TD COLSPAN=4 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE>ウェイト数</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A0NW3</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A0NW2</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A0NW1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A0NW0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>ウェイトしない(ウェイトをサンプルしない)</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>1サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD><PRE>　</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>14サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>15サイクルウェイト</TD>
+  </TABLE></P>
+
+<A NAME="z3_24_13"></A>
+  <P><DT><B>　CS0空間のバーストレングス設定ビット</B>(<A HREF="#z3_24">図3.24中、13〜14［bit 19〜18］</A>)
+     <DD><B>A0LN1-0(Ｗ)　　A-Bus CS0 burst LeNgth bit1-0</B>
+     <DD>　CS0空間において、バーストアクセスする際、アクセスするレングス(境界)を指定します。表3.12にレングスの設定値を示します。</P>
+
+<A NAME="t3_12"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.12　CS0空間バーストレングス設定値</B></CAPTION>
+  <TD COLSPAN=2 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 WIDTH=400 ALIGN="CENTER"><PRE>アクセス設定値</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A0LN1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A0LN0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>バーストアクセスしない</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>4アドレスバーストアクセス</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>256アドレスバーストアクセス</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>境界なし</TD>
+  </TABLE></P>
+
+<A NAME="z3_24_15"></A>
+  <P><DT><B>　CS0空間のバスサイズ設定ビット</B>(<A HREF="#z3_24">図3.24中、15［bit 16］</A>)
+     <DD><B>A0SZ(Ｗ)　　A-Bus CS0 bus SiZe bit</B>
+     <DD>　CS0空間において、A-Busのバスサイズを設定します。表3.13に設定値を示します。</P>
+
+<A NAME="t3_13"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.13　CS0空間バスサイズ設定値</B></CAPTION>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A0SZ</TD><TD WIDTH=460 ALIGN="CENTER"><PRE>バスサイズ設定値</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>16 bit バスを指定</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>8 bit バスを指定</TD>
+  </TABLE></P>
+
+<A NAME="z3_24_17"></A>
+  <P><DT><B>　CS1空間のライト後プリチャージ挿入ビット</B>(<A HREF="#z3_24">図3.24中、17［bit 14］</A>)
+     <DD><B>A1WPC(Ｗ)　　A-Bus CS1 after Write Pre-Charge insert bit</B>
+     <DD>CS1空間にデータを書き出した後、1クロック分の無処理状態を挿入することができます。その処理を有効にするか無効にするか決定するビットがこのビットです。1で有効、0で無効を表します。このビットは、読み込み後の動作には影響しません。このビットをセットしたときの動作は図3.27を参照してください。</P>
+
+<A NAME="z3_24_18"></A>
+  <P><DT><B>　CS1空間のリード後プリチャージ挿入ビット</B>(<A HREF="#z3_24">図3.24中、18［bit 13］</A>)
+     <DD><B>A1RPC(Ｗ)　　A-Bus CS1 Read Pre-Charge insert bit</B>
+     <DD>　CS1空間のデータを読み込んだ後、1クロック分の無処理状態を挿入することができます。その処理を有効にするか無効にするか決定するビットがこのビットです。1で有効、0で無効を表します。このビットは、書き出し後の動作には影響しません。
+	このビットをセットしたときの動作は図3.28を参照してください。</P>
+
+<A NAME="z3_24_19"></A>
+  <P><DT><B>　CS1空間の外部ウェイト有効ビット</B>(<A HREF="#z3_24">図3.24中、19［bit 12］</A>)
+     <DD><B>A1EWT(Ｗ)　　A-Bus CS1 External WaiT effective bit</B>
+     <DD>　A-Busを介して、CS1空間をアクセスするときに、外部信号によって強制的にウェイトを入れることができますが、その処理を有効にするか無効にするか決定するビットです。1で有効、0で無効を表します。有効のとき、外部信号がLowの間はウェイトし続けます。
+	外部ウェイトが無効のときと有効のときとのタイミングチャートの違いは図3.29を参照してください。</P>
+
+<A NAME="z3_24_20"></A>
+  <P><DT><B>　CS1空間のバーストサイクルウェイト数設定ビット</B>(<A HREF="#z3_24">図3.24中、20〜23［bit 11〜8］</A>)
+     <DD><B>A1BW3-0(Ｗ)　　A-Bus CS1 Burst sycle Wait bit3-0</B>
+     <DD>　CS1空間において、バーストアクセスを行う際の、1サイクルに対するウェイト数の設定を行います。表3.14に設定値を示します。</P>
+
+<A NAME="t3_14"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.14　CS1空間バーストサイクル設定値</B></CAPTION>
+  <TD COLSPAN=4 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE>ウェイト数</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A1BW3</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A1BW2</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A1BW1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A1BW0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>ウェイトしない(ウェイトをサンプルしない)</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>1サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD><PRE>　</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>14サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>15サイクルウェイト</TD>
+  </TABLE></P>
+
+<A NAME="z3_24_24"></A>
+  <P><DT><B>　CS1空間のノーマルサイクルウェイト数設定ビット</B>(<A HREF="#z3_24">図3.24中、24〜27［bit 7〜4］</A>)
+     <DD><B>A1NW3-0(Ｗ)　　A-Bus CS1 Normal cycle Wait bit3-0</B>
+     <DD>　CS1空間において、ノーマルアクセスを行う際の、1サイクルに対するウェイト数の設定を行います。表3.15に設定値を示します。</P>
+
+<A NAME="t3_15"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.15　CS1空間ノーマルサイクル設定値</B></CAPTION>
+  <TD COLSPAN=4 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE>ウェイト数</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A1NW3</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A1NW2</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A1NW1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A1NW0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>ウェイトしない(ウェイトをサンプルしない)</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>1サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD><PRE>　</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>14サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>15サイクルウェイト</TD>
+  </TABLE></P>
+
+<A NAME="z3_24_28"></A>
+  <P><DT><B>　CS1空間のバーストレングス設定ビット</B>(<A HREF="#z3_24">図3.24中、28〜29［bit 3〜2］</A>)
+     <DD><B>A1LN1-0(Ｗ)　　A-Bus CS1 burst LeNgth bit1-0</B>
+     <DD>　CS1空間において、バーストアクセスする際、アクセスするレングス(境界)を指定します。表3.16にレングスの設定値を示します。</P>
+
+<A NAME="t3_16"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.16　CS1空間バーストレングス設定値</B></CPTION>
+  <TD COLSPAN=2 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 WIDTH=400 ALIGN="CENTER"><PRE>アクセス設定値</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A1LN1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A1LN0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>バーストアクセスしない</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>4アドレスバーストアクセス</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>256アドレスバーストアクセス</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>境界なし</TD>
+  </TABLE></P>
+
+<A NAME="z3_24_30"></A>
+  <P><DT><B>　CS1空間のバスサイズ設定ビット</B>(<A HREF="#z3_24">図3.24中、30［bit 0］</A>)
+     <DD><B>A1SZ(Ｗ)　　A-Bus CS1 bus SiZe bit</B>
+     <DD>CS1空間において、A-Busのバスサイズを設定します。表3.17に設定値を示します。</P>
+
+<A NAME="t3_17"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.17　CS1空間バスサイズ設定値</B></CAPTION>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A1SZ</TD><TD WIDTH=460 ALIGN="CENTER"><PRE>バスサイズ設定値</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>16 bit バスを指定</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>8 bit バスを指定</TD>
+  </TABLE></P>
+
+<A NAME="z3_25_2"></A>
+  <P><DD><B>CS2空間のライト後プリチャージ挿入ビット</B>(<A HREF="#z3_25">図3.25中、2［bit 30］</A>)
+     <DD><B>A2WPC(Ｗ)　　A-Bus CS2 after Write Pri-Charge insert bit</B>
+     <DD>　CS2空間にデータを書き出した後、1クロック分の無処理状態を挿入することができます。その処理を有効にするか無効にするか決定するビットがこのビットです。1で有効、0で無効を表します。このビットは、読み込み後の動作には影響しません。
+	このビットをセットしたときの動作は図3.27を参照してください。</P>
+
+<A NAME="z3_25_3"></A>
+  <P><DT><B>　CS2空間のリード後プリチャージ挿入ビット</B>(<A HREF="#z3_25">図3.25中、3［bit 29］</A>)
+     <DD><B>A2RPC(Ｗ)　　A-Bus CS2 Read Pri-Charge insert bit</B>
+     <DD>　CS2空間のデータを読み込んだ後、1クロック分の無処理状態を挿入することができます。その処理を有効にするか無効にするか決定するビットがこのビットです。1で有効、0で無効を表します。このビットは、書き出し後の動作には影響しません。このビットをセットしたときの動作は図3.28を参照してください。</P>
+
+<A NAME="z3_25_4"></A>
+  <P><DT><B>　CS2空間の外部ウェイト有効ビット</B>(<A HREF="#z3_25">図3.25中、4［bit 28］</A>)
+     <DD><B>A2EWT(Ｗ)　　A-Bus CS2 External WaiT effective bit</B>
+     <DD>　A-Busを介して、CS2空間をアクセスするときに、外部信号によって強制的にウェイトを入れることができますが、その処理を有効にするか無効にするか決定するビットです。1で有効、0で無効を表します。有効のとき、外部信号がLowの間はウェイトし続けます。、外部ウェイトが無効のときと有効のときとのタイミングチャートの違いは図3.29を参照してください。</P>
+
+<A NAME="z3_25_5"></A>
+  <P><DT><B>　CS2空間のバーストレングス設定ビット</B>(<A HREF="#z3_25">図3.25中、5〜6［bit 19〜18］</A>)
+     <DD><B>A2LN1-0(Ｗ)　　A-Bus CS2 burst LeNgth bit1-0</B>
+     <DD>　CS2空間において、バーストアクセスする際、アクセスするレングス(境界)を指定します。表3.18にレングスの設定値を示します。</P>
+
+<A NAME="t3_18"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.18　CS2空間バーストレングス設定値</B></CAPTION>
+  <TD COLSPAN=2 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 WIDTH=400 ALIGN="CENTER"><PRE>アクセス設定値</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A2LN1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A2LN0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>バーストアクセスしない</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>4アドレスバーストアクセス</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>256アドレスバーストアクセス</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>境界なし</TD>
+  </TABLE></P>
+
+<A NAME="z3_25_7"></A>
+  <P><DT><B>　CS2空間のバスサイズ設定ビット</B>(<A HREF="#z3_25">図3.25中、7［bit 16］</A>)
+     <DD><B>A2SZ(Ｗ)　　A-Bus CS2 bus SiZe bit</B>
+     <DD>　CS2空間において、A-Busのバスサイズを設定します。表3.19に設定値を示します。</P>
+
+<A NAME="t3_19"></A>
+	<P><DD><TABLE BORDER=1><CAPTION><B>表3.19　CS2空間バスサイズ設定値</B></CAPTION>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A2SZ</TD><TD WIDTH=460 ALIGN="CENTER"><PRE>バスサイズ設定値</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>16 bit バスを指定</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>8 bit バスを指定</TD>
+  </TABLE></P>
+
+ 
+<A NAME="z3_25_9"></A>
+  <P><DT><B>　予備空間のライト後プリチャージ挿入ビット</B>(<A HREF="#z3_25">図3.25中、9［bit 14］</A>)
+     <DD><B>A3WPC(Ｗ)　　A-Bus CS3 after Write Pri-Charge insert bit</B>
+     <DD>　予備空間にデータを書き出した後、1クロック分の無処理状態を挿入することができます。その処理を有効にするか無効にするか決定するビットがこのビットです。1で有効、0で無効を表します。このビットは、読み込み後の動作には影響しません。このビットをセットしたときの動作は図3.27を参照してください。</P>
+
+<A NAME="z3_25_10"></A>
+  <P><DT><B>　予備空間のリード後プリチャージ挿入ビット</B>(<A HREF="#z3_25">図3.25中、10［bit 13］</A>)
+     <DD><B>A3RPC(Ｗ)　　A-Bus CS3 Read Pri-Charge insert bit</B>
+     <DD>　予備空間のデータを読み込んだ後、1クロック分の無処理状態を挿入することができます。その処理を有効にするか無効にするか決定するビットがこのビットです。1で有効、0で無効を表します。このビットは、書き出し後の動作には影響しません。このビットをセットしたときの動作は図3.28を参照してください。</P>
+
+<A NAME="z3_25_11"></A>
+  <P><DT><B>　予備空間の外部ウェイト有効ビット</B>(<A HREF="#z3_25">図3.25中、11［bit 12］</A>)
+     <DD><B>A3EWT(Ｗ)　　A-Bus CS3 External WaiT effective bit</B>
+     <DD>　A-Busを介して、予備空間をアクセスするときに、外部信号によって強制的にウェイトを入れることができますが、その処理を有効にするか無効にするか決定するビットです。1で有効、0で無効を表します。有効のとき、外部信号がLowの間はウェイトし続けます。、外部ウェイトが無効のときと有効のときとのタイミングチャートの違いは図3.29を参照してください。</P>
+
+<A NAME="z3_25_12"></A>
+  <P><DT><B>　予備空間のバーストサイクルウェイト数設定ビット</B>(<A HREF="#z3_25">図3.25中、12〜15［bit 11〜8］</A>)
+     <DD><B>A3BW3-0(Ｗ)　　A-Bus CS3 Burst sycle Wait bit3-0</B>
+     <DD>予備空間において、バーストアクセスを行う際の、1サイクルに対するウェイト数の設定を行います。表3.20に設定値を示します。</P>
+  
+<A NAME="t3_20"></A>
+	<P><DD><TABLE BORDER=1><CAPTION><B>表3.20　予備空間バーストサイクル設定値</B></CAPTION>
+  <TD COLSPAN=4 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE>ウェイト数</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A3BW3</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A3BW2</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A3BW1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A3BW0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>ウェイトしない(ウェイトをサンプルしない)</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>1サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD><PRE>　</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>14サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>15サイクルウェイト</TD>
+  </TABLE></P>
+
+<A NAME="z3_25_16"></A>
+  <P><DT><B>　予備空間のノーマルサイクルウェイト数設定ビット</B>(<A HREF="#z3_25">図3.25中、16〜19［bit 7〜4］</A>)
+     <DD><B>A3NW3-0(Ｗ)　　A-Bus CS3 Normal cycle Wait bit3-0</B>
+     <DD>予備空間において、ノーマルアクセスを行う際の、1サイクルに対するウェイト数の設定を行います。表3.21に設定値を示します。</P>
+
+<A NAME="t3_21"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.21　予備空間ノーマルサイクル設定値</B></CAPTION>
+  <TD COLSPAN=4 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE>ウェイト数</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A3NW3</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A3NW2</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A3NW1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A3NW0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>ウェイトしない(ウェイトをサンプルしない)</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>1サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD><PRE>　</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>14サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>15サイクルウェイト</TD>
+  </TABLE></P>
+
+<A NAME="z3_25_20"></A>
+  <P><DT><B>　予備空間のバーストレングス設定ビット</B>(<A HREF="#z3_25">図3.25中、20〜21［bit 3〜2］</A>)
+     <DD><B>A3LN1-0(Ｗ)　　A-Bus CS3 burst LeNgth bit1-0</B>
+     <DD>　予備空間において、バーストアクセスする際、アクセスするレングス(境界)を指定します。表3.22にレングスの設定値を示します。</P>
+
+<A NAME="t3_22"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.22　予備空間バーストレングス設定値</B></CAPTION>
+  <TD COLSPAN=2 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 WIDTH=400 ALIGN="CENTER"><PRE>アクセス設定値</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A3LN1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>A3LN0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>バーストアクセスしない</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>4アドレスバーストアクセス</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>256アドレスバーストアクセス</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>境界なし</TD>
+  </TABLE></P>
+
+<A NAME="z3_25_22"></A>
+  <P><DT><B>　予備空間のバスサイズ設定ビット</B>(<A HREF="#z3_25">図3.25中、22［bit 0］</A>)
+     <DD><B>A3SZ(Ｗ)　　A-Bus CS3 bus SiZe bit</B>
+     <DD>　予備空間において、A-Busのバスサイズを設定します。表3.23に設定値を示します。</P>
+
+<A NAME="t3_23"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.23　予備空間バスサイズ設定値</B></CAPTION>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>A3SZ</TD><TD WIDTH=460 ALIGN="CENTER"><PRE>バスサイズ設定値</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>16 bit バスを指定</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE> 8 bit バスを指定</TD>
+  </TABLE></P>
+
+<A NAME="no3_63"></A>
+  <P><DT><H3>　◆A-Busリフレッシュレジスタ</H3>
+     <DD>　図3.30に、A-Busリフレッシュレジスタの詳細を示します。
+
+<A NAME="z3_30"></A>
+  <P><DT><B>図3.30　A-Busリフレッシュレジスタ</B>(レジスタ：AREF)初期値 00000010H
+	<TABLE BORDER=1><TR><TD ALIGN=RIGHT>bit</TD>
+<TD><PRE>31</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>24</TD>
+<TD><PRE>23</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>16</TD>
+<TD><PRE>15</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR><TD>25FE00A0</TD>
+  <TD>−</TD>	<!-- 31 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 28 -->
+  <TD>−</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD>−</TD>	<!-- 19 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 16 -->
+  <TD>−</TD>	<!-- 15 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 12 -->
+  <TD>−</TD>	<!-- 11 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 8 -->
+  <TD>−</TD>	<!-- 7 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD><A HREF="#z3_30_1">１</A></TD>	<!-- 4 -->
+  <TD><A HREF="#z3_30_2">２</A></TD>	<!-- 3 -->
+  <TD><A HREF="#z3_30_2">３</A></TD>
+  <TD><A HREF="#z3_30_2">４</A></TD>
+  <TD><A HREF="#z3_30_2">５</A></TD>	<!-- 0 -->
+  </TR></TABLE></P>
+
+
+<A NAME="z3_30_1"></A>
+  <P><DT><B>　A-Busリフレッシュ出力有効ビット</B>(<A HREF="#z3_30">図3.30中、1［bit 4］</A>)
+     <DD><B>ARFEN(Ｗ)　　A-Bus ReFresh ENable bit</B>
+     <DD>　A-Busのリフレッシュサイクルの出力を有効にします。「1」で有効。
+	　なお、パワーオンリセット時のこのビットの初期値は「１」です。</P>
+  <P><DT><TABLE><TR>
+  <TD><img srcset="../../../what/atto_j.png 5x"></TD>
+  <TD><B>A-Busリフレッシュ出力有効ビットのユーザーによる変更を禁止します。</B></TD></TABLE></P>
+
+<A NAME="z3_30_2"></A>
+  <P><DT><B>　A-Busリフレッシュウェイト数設定ビット</B>(<A HREF="#z3_30">図3.30中、2〜5［bit 3〜0］</A>)
+     <DD><B>ARWT3-0(Ｗ)　　A-Bus Refresh WaiT bit3-0</B>
+     <DD>　A-Busのリフレッシュサイクルのウェイト数を設定します。表3.24に詳細を示します。</P>
+
+<A NAME="t3_24"></A>
+  <P><DD><TABLE BORDER=1><CAPTION><B>表3.24　A-Busリフレッシュウェイト数</B></CAPTION>
+  <TD COLSPAN=4 ALIGN="CENTER"><PRE>ビット</TD><TD ROWSPAN=2 WIDTH=274 ALIGN="CENTER"><PRE>ウェイト数</TD><TR>
+  <TD WIDTH=50 ALIGN="CENTER"><PRE>ARWT3</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>ARWT2</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>ARWT1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE>ARWT0</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>ウェイトしない</TD><TR>
+  <TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>1サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD ALIGN="CENTER"><PRE>：</TD><TD><PRE>　</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>14サイクルウェイト</TD><TR>
+  <TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>15サイクルウェイト</TD>
+  </TABLE></P>
+
+<A NAME="no3_64"></A>
+<P><DT><H3>　◆A-Bus使用時の制限事項</H3>
+<P><DT><B>　A-Bus上にフラッシュメモリを使用した場合の注意事項</B>
+<DD> A-Bus上にフラッシュメモリを使用した場合、ソフトウェアでライト−ライト間にウェイト
+を場合、途中で割り込みありいはDMAが発生しライト−ライト間がフラッシュメモリの規定を
+オーバーし長くなると動作が保証されなくなります。<BR>
+このため、上記のような条件下でフラッシュメモリを使用している場合は、割り込みおよびDMA
+を禁止する必要があります。</P>
+<P>パワーメモリの使用についても同様の注意が必要です。</P>
+
+<P><DT><B>　A-BusのACS2以外のエリアを８ビットバスとして使用する場合の制限事項</B>
+<DD>　A-BusのCS2以外のエリアを８ビットバスとして使用する場合、８ビットバスエリアに
+バスライトすると、ACSのみがアクティブになるという異常なサイクルが発生する場合があります。<BR>
+これは、１６ビットバスのエリアをリードあるいはライトした後に８ビットのバスエリアの
+アドレス　4n+2　(nは整数)番地にバイトライトした場合に発生し、こときの出力状態は、ACSは「アクティブ」
+、ARDおよびAWRO、AWR1は「非アクティブ」、データバスは「出力」という状態です。<BR>
+このような異常状態の発生を防止するため、A-BusのCS2以外のエリアを８ビットバスに割り当てた場合は、以下の
+いずれかの制限事項が必要になります。</P>
+<DD><OL>
+<P><B><LI></B><!--1-->
+８ビットバスのエリアへのバイトライトと、１６ビットバスのエリアへのリードあるいはライトを交互に行う場合、割り込み
+DMA等が不意に発生しないという条件が必要である。<BR>
+<B>→</B>割り込みおよびDMAの禁止</P>
+
+<P><B><LI></B><!--2-->
+８ビットバスのエリアへのライトは、ワードライトのみとする。
+
+<P><B><LI></B><!--3-->
+８ビットバスのエリアへは、ライトリードオンリーとする。
+
+<P><B><LI></B><!--4-->
+８ビットバスへの４ｎ＋２（ｎは整数）の番地へのライトは禁止。
+	</OL>
+</DL>
+
+<HR NOSHADE>
+<B>▲<a href="p03_05_j.htm">戻る</A>｜
+     <a href="p03_07_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCUユーザーズマニュアル</A>
+★<a href="p03_01_j.htm">3.1　レジスタ一覧</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

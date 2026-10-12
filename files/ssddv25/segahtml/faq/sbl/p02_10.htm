@@ -1,0 +1,169 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 4&gt;FAQ/SBL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sbl">FAQ</a> ★ <A HREF="index.htm#SOUND">SBL programming related</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SBL programming related</b><H2 ALIGN=CENTER> SOUND</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_01"><HR></a><DL>
+<H3> How to obtain stereo/monaural information set in multiplayer.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How can I obtain the stereo/monaural information set in multiplayer?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Audio output (stereo, monaural) information set in multiplayer is backed up in SMPC. There is an access macro in the SMPC I/F library as a way to obtain this information, so please obtain it as follows.</P>
+<P><DD> ret = PER_GS_SM(data) & PER_MSK_STEREO;</P>
+<P> Before execution, it is necessary to perform SMPC system information acquisition processing (issue the insertback type PER_KD_SYS using the PER_LInit function). Use of the PER_Init function is prohibited.</P>
+<P> After obtaining this information, you need to configure your sound driver for stereo/mono. For settings, use the SND_SET_SND_CTRL macro. (Described in SEGALIB\MAN\MANSND.DOC of the sound I/F library)<BR>
+ For more details, please refer to</P>
+<P><DT> <B>reference</b><DD> "Hardware Manual SMPC User's Manual"<BR>
+ Chapter 2 SMPC commands <A HREF="../../hard/smpc/hon/p02_30.htm#c1_04">NO.4 SNDON</a> , <A HREF="../../hard/smpc/hon/p02_30.htm#c1_05">NO.5 SNDOFF</a> and<BR>
+ See <A HREF="../../hard/smpc/hon/p02_40.htm">2.4 Non-reset system management commands</a> .</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_02"><HR></a><DL>
+<H3> How do I set up STEREO/MONO?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me which flag should I operate on the MAIN side to switch between STEREO/MONO at the start of the game.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> You can switch by operating the stereo/monaural bit of the sound driver. (SystemInterfacework 483H) As for the switching method,</P>
+<DL>
+<P><DT> <B>Format</b><DD> void SND_SET_SND_CTRL(Uint8 snd_ctrl)<P><DT> <B>input</b><DD> sound control value<DD> SND_CTRL_OUTPUT_STEREO: Stereo<DD> SND_CTRL_OUTPUT_MONO: Mono<P><DT> <B>output</b><DD> none<P><DT> <B>function value</b><DD> none<P><DT> <B>function</b><DD> Set sound control values. Currently, you can select and set stereo/monaural mode.<BR>
+ There is a macro called, so please use it.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_03"><HR></a><DL>
+<H3> How to set "fade" in "SND_SetSeqVl"</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to change the volume using SND_SetSeqVl, but I don't know the fade value. The manual says 1 is the longest and 255 is the shortest, but how long is it exactly? (lengths and shorts are reversed) Please let me know if it is based on frame units or something else.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The number 1 is the sound CPU.Depending on the state of the 68000, the fastest time is 2ms, and after the specified time, the volume will change one by one. Accurate synchronization is difficult to achieve, so adjustments are usually made by issuing a stop command during the fade.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_04"><HR></a><DL>
+<H3> Loop at the end when playing PCM stream</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I'm playing a PCM stream on my Sega Saturn, but even when I try to stop it, it keeps looping at the end.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Due to a bug in SBL's PCM library, the above symptoms occur if the data is not aligned on 4-byte boundaries. Please use version 1.16 or later, which has bugs fixed.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_05"><HR></a><DL>
+<H3> How to switch tone banks during sequence playback</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How can I switch both sequence data and tone bank data for a sequence sound at the same time?</P>
+<P> We are currently trying to place multiple sequence data and tone bank data in sound memory and switch songs.<BR>
+ Switching of sequence data is done by specifying the argument of SND_StartSeq, and switching of tone banks is done by SND_ChgMix, but in reality only the sequence is switched, and the tone bank does not change.<BR>
+ How do I switch tone banks?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> "SND_ChgMix" switches the mixer (output destination from the DSP that has volume and localization) in the tone bank, and does not change the tone bank data in memory.<BR>
+ Tone bank data is specified using a control command within the sequence data and cannot be changed programmatically.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_06"><HR></a><DL>
+<!--@-->
+<H3> Please tell me how to use SND_CtrlDirMidi().</H3><P><DT> <FONT SIZE=5>Q)</font><DD> PROGRAMMER'S GUIDE VOL.1<BR>
+ MIDI direct control of "Sound I/F Library" <A HREF="../../prgg/prg3/sund/hon/p02_13.htm#no19">SND_CtrlDirMidi()</a><BR>
+ Could you please tell me the details? </P>
+<!--あ1997-04-15「プログラムライブラリ ユーザーズガイド3/Ver.1.0 Rel.3」の23ページの」→「『サウンドI/Fライブラリ』」-->
+<P> I think the eight MIDI commands are functions that can be directly controlled, but I don't know the details of the settings for each parameter.<BR>
+ I looked at the sound driver documentation, but I couldn't find anything about the MIDI commands themselves. (Also converted to bank)<BR>
+ It will stop ringing.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Direct MIDI allows the 68000 to control on/off of sound without having sequence data on the 68000.<BR>
+ It is also possible to create a sequencer with SH2 and use the 68000 sound driver only to generate SCSP sounds. You can also load only the waveform into sound RAM and turn the sound on/off using SH2.</P>
+<P> The data sent to the 68000 uses MIDI data transformed for the Sega Saturn. The format looks like this:</P>
+<HR>
+<P><DD> Table 1<TABLE BORDER=1>
+<TR><TH> bit</TH><TH> 7</TH><TH> 6</TH><TH> 5</TH><TH> 4</TH><TH> 3</TH><TH> 2</TH><TH> 1</TH><TH> 0</TH></TR>
+<TR><TH> 0</TH><TD COLSPAN=5> <B>*</b> Priority</TD><TD COLSPAN=3> CMD</TD></TR>
+<TR><TH> 1</TH><TD COLSPAN=3> KNo</TD><TD COLSPAN=5> MIDI Ch</TD></TR>
+<TR><TH> 2</TH><TD COLSPAN=8> MIDI Data #1</TD></TR>
+<TR><TH> 3</TH><TD COLSPAN=8> MIDI Data #2</TD></TR>
+</TABLE>
+<DD> <B>*</b> Priority (level) is not used. Always 0.</P>
+<P><DD> Table 2<TABLE BORDER=1>
+<TR><TD> Priority level</TD><TH><PRE> 0-31</TH><TD> Pronunciation priority at Sequence Start</TD></TR>
+<TR><TD> CMD</TD><TH><PRE> 0-7</TH><TD> MIDI command</TD></TR>
+<TR><TD> Kno</TD><TH><PRE> 0-7</TH><TD> Pronunciation control number</TD></TR>
+<TR><TD> MIDI Ch</TD><TH><PRE> 0-31</TH><TD> MIDI channel</TD></TR>
+<TR><TD> MIDI data #1</TD><TH><PRE> 0-127</TH><TD> MIDI data byte #1</TD></TR>
+<TR><TD> MIDI data #2</TD><TH><PRE> 0-127</TH><TD> MIDI data byte #2</TD></TR>
+</TABLE>
+</P>
+<HR>
+<P><DD> Correspondence with actual MIDI Event</P>
+<DD> Table 3<TABLE BORDER=1>
+<TR><TH> CMD value</TH><TH> Corresponding MIDI Event</TH></TR>
+<TR><TH> 0</TH><TD> (80-8Fh) Note Off Event</TD></TR>
+<TR><TH> 1</TH><TD> (90-9Fh) Note On Event</TD></TR>
+<TR><TH> 2</TH><TD> (A0-AFh) After Touch</TD></TR>
+<TR><TH> 3</TH><TD> (B0-BFh) Control Change</TD></TR>
+<TR><TH> 4</TH><TD> (C0-CFh) Program Change</TD></TR>
+<TR><TH> 5</TH><TD> (D0-DFh) Channel Pressure</TD></TR>
+<TR><TH> 6</TH><TD> (E0-EFh) Pitch Wheel</TD></TR>
+<TR><TH> 7</TH><TD> (F0-FFh) System Message</TD></TR>
+</TABLE>
+</P>
+<HR>
+<P><DD> It will be easier to understand if you give a concrete example, so I will explain the simple steps below.<BR>
+ Now, let's play the 0th sound effect of bank 0 using a direct MIDI command.</P>
+<P> First, the basic processing required before starting play, such as sound initialization, map changes, effect changes, and mixer changes, is completed using normal requests. Please refer to the programmer's guide for these matters.</P>
+<P> Now, let's play the 0th sound effect of bank 0 with pronunciation control number 1 and MIDI channel 0. Set Note on as the 1st byte for "Table 1". Note on means the beginning of pronunciation, so you can select 1 as the value of CMD from Table 3. Since priority is not used, the 1st byte will be 0x01.</P>
+<P> Similarly, the 2nd byte is 0x20 because the pronunciation control number = 1 and the MIDI channel = 0.</P>
+<P> The 3rd byte sets the note number. A note number is data that represents musical scale data in 7 bits. For more information, please refer to a MIDI textbook. Here we will set it to 0x40.</P>
+<P> The 4th byte is velocity. Velocity is 7-bit data that represents strength.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_07"><HR></a><DL>
+<H3> How can I set PAN to a sequence in SBL?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How can I set PAN to a sequence in SBL?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Please use the following sound I/F library functions.</P>
+<P><DD> <B>SndRet SND_SetSeqPan(SndSeqNum P1, Uint8 P2, Uint8 P3);</b><DL>
+<DT> P1:<DD> Pronunciation control number (0-7)<DT> P2:<DD> 00h→PAN Control ON<DD> 80h→PAN Control OFF<DT> P3:<DD> MIDI PAN data (00h-7Fh)</DL>
+<P><DD> Please refer to the table below when setting parameter 3 (P3).</P>
+<P><DD> <B>Table 1 Details of MIDI PAN data (correspondence with SCSP PAN)</b><TABLE BORDER=1>
+<TR><TH> MIDI PAN</TH><TH><pre> 0</TH><TH><pre> 1</TH><TH><PRE> 2</TH><TH><PRE> 3</TH><TH><pre> 4</TH><TH><pre> 5</TH><TH><PRE> 6</TH><TH><PRE> 7</TH><TH><pre> 8</TH><TH><pre> 9</TH><TH><PRE> A</TH><TH><PRE> B</TH><TH><pre> C</TH><TH><pre> D</TH><TH><PRE> E</TH><TH><PRE> F</TH></TR>
+<TR><TH> 00h - 0Fh</TH><TD> 1F</TD><TD> 1F</TD><TD> 1F</TD><TD> 1F</TD><TD> 1E</TD><TD> 1E</TD><TD> 1E</TD><TD> 1E</TD><TD> 1D</TD><TD> 1D</TD><TD> 1D</TD><TD> 1D</TD><TD> 1C</TD><TD> 1C</TD><TD> 1C</TD><TD> 1C</TD></TR>
+<TR><TH> 10h - 1Fh</TH><TD> 1B</TD><TD> 1B</TD><TD> 1B</TD><TD> 1B</TD><TD> 1A</TD><TD> 1A</TD><TD> 1A</TD><TD> 1A</TD><TD> 19</TD><TD> 19</TD><TD> 19</TD><TD> 19</TD><TD> 18</TD><TD> 18</TD><TD> 18</TD><TD> 18</TD></TR>
+<TR><TH> 20h - 2Fh</TH><TD> 17</TD><TD> 17</TD><TD> 17</TD><TD> 17</TD><TD> 16</TD><TD> 16</TD><TD> 16</TD><TD> 16</TD><TD> 15</TD><TD> 15</TD><TD> 15</TD><TD> 15</TD><TD> 14</TD><TD> 14</TD><TD> 14</TD><TD> 14</TD></TR>
+<TR><TH> 30h - 3Fh</TH><TD> 13</TD><TD> 13</TD><TD> 13</TD><TD> 13</TD><TD> 12</TD><TD> 12</TD><TD> 12</TD><TD> 12</TD><TD> 11</TD><TD> 11</TD><TD> 11</TD><TD> 11</TD><TD> 10</TD><TD> 10</TD><TD> 10</TD><TD> 10</TD></TR>
+<TR><TH> 40h - 4Fh</TH><TD> 00</TD><TD> 00</TD><TD> 00</TD><TD> 00</TD><TD> 01</TD><TD> 01</TD><TD> 01</TD><TD> 01</TD><TD> 02</TD><TD> 02</TD><TD> 02</TD><TD> 02</TD><TD> 03</TD><TD> 03</TD><TD> 03</TD><TD> 03</TD></TR>
+<TR><TH> 50h - 5Fh</TH><TD> 04</TD><TD> 04</TD><TD> 04</TD><TD> 04</TD><TD> 05</TD><TD> 05</TD><TD> 05</TD><TD> 05</TD><TD> 06</TD><TD> 06</TD><TD> 06</TD><TD> 06</TD><TD> 07</TD><TD> 07</TD><TD> 07</TD><TD> 07</TD></TR>
+<TR><TH> 60h - 6Fh</TH><TD> 08</TD><TD> 08</TD><TD> 08</TD><TD> 08</TD><TD> 09</TD><TD> 09</TD><TD> 09</TD><TD> 09</TD><TD> 0A</TD><TD> 0A</TD><TD> 0A</TD><TD> 0A</TD><TD> 0B</TD><TD> 0B</TD><TD> 0B</TD><TD> 0B</TD></TR>
+<TR><TH> 70h - 7Fh</TH><TD> 0C</TD><TD> 0C</TD><TD> 0C</TD><TD> 0C</TD><TD> 0D</TD><TD> 0D</TD><TD> 0D</TD><TD> 0D</TD><TD> 0E</TD><TD> 0E</TD><TD> 0E</TD><TD> 0E</TD><TD> 0F</TD><TD> 0F</TD><TD> 0F</TD><TD> 0F</TD></TR>
+</TABLE>
+<UL TYPE=DISC>
+<LI> The numbers in the table are SCSP PAN data (00h-1Fh: 32 levels).<LI> Since MIDI PAN data has 128 levels, the lower 2 bits are ignored when converting to SCSP PAN data.</UL>
+</P>
+<P><DD> <B>Image diagram of MIDI PAN data</b><PRE>
+Left                    Center                     Right
+00h  &lt;-----------------&gt; 40h &lt;--------------------&gt; 7Fh
+</PRE><P><DD><B>Table 2 Correspondence between SCSP PAN and MIDI PAN</b><TABLE BORDER=1>
+<TR><TH> PAN</TH><TH> L(db)</TH><TH> R(db)</TH><TH> Localization</TH><TH></TH><TH> PAN</TH><TH> L(db)</TH><TH> R(db)</TH><TH> Localization</TH></TR>
+<TR><TD> 00h</TD><TD> -00.0</TD><TD> -00.0</TD><TD> C</TD><TD></TD><TD> 10h</TD><TD> -00.0</TD><TD> -00.0</TD><TD> C</TD></TR>
+<TR><TD> 01h</TD><TD> -03.0</TD><TD> -00.0</TD><TD> R1</TD><TD></TD><TD> 11h</TD><TD> -00.0</TD><TD> -03.0</TD><TD> L1</TD></TR>
+<TR><TD> 02h</TD><TD> -06.0</TD><TD> -00.0</TD><TD> R2</TD><TD></TD><TD> 12h</TD><TD> -00.0</TD><TD> -06.0</TD><TD> L2</TD></TR>
+<TR><TD> 03h</TD><TD> -09.0</TD><TD> -00.0</TD><TD> R3</TD><TD></TD><TD> 13h</TD><TD> -00.0</TD><TD> -09.0</TD><TD> L3</TD></TR>
+<TR><TD> 04h</TD><TD> -12.0</TD><TD> -00.0</TD><TD> R4</TD><TD></TD><TD> 14h</TD><TD> -00.0</TD><TD> -12.0</TD><TD> L4</TD></TR>
+<TR><TD> 05h</TD><TD> -15.0</TD><TD> -00.0</TD><TD> R5</TD><TD></TD><TD> 15h</TD><TD> -00.0</TD><TD> -15.0</TD><TD> L5</TD></TR>
+<TR><TD> 06h</TD><TD> -18.0</TD><TD> -00.0</TD><TD> R6</TD><TD></TD><TD> 16h</TD><TD> -00.0</TD><TD> -18.0</TD><TD> L6</TD></TR>
+<TR><TD> 07h</TD><TD> -21.0</TD><TD> -00.0</TD><TD> R7</TD><TD></TD><TD> 17h</TD><TD> -00.0</TD><TD> -21.0</TD><TD> L7</TD></TR>
+<TR><TD> 08h</TD><TD> -24.0</TD><TD> -00.0</TD><TD> R8</TD><TD></TD><TD> 18h</TD><TD> -00.0</TD><TD> -24.0</TD><TD> L8</TD></TR>
+<TR><TD> 09h</TD><TD> -27.0</TD><TD> -00.0</TD><TD> R9</TD><TD></TD><TD> 19h</TD><TD> -00.0</TD><TD> -27.0</TD><TD> L9</TD></TR>
+<TR><TD> 0Ah</TD><TD> -30.0</TD><TD> -00.0</TD><TD> R10</TD><TD></TD><TD> 1Ah</TD><TD> -00.0</TD><TD> -30.0</TD><TD> L10</TD></TR>
+<TR><TD> 0Bh</TD><TD> -33.0</TD><TD> -00.0</TD><TD> R11</TD><TD></TD><TD> 1Bh</TD><TD> -00.0</TD><TD> -33.0</TD><TD> L11</TD></TR>
+<TR><TD> 0Ch</TD><TD> -36.0</TD><TD> -00.0</TD><TD> R12</TD><TD></TD><TD> 1Ch</TD><TD> -00.0</TD><TD> -36.0</TD><TD> L12</TD></TR>
+<TR><TD> 0Dh</TD><TD> -39.0</TD><TD> -00.0</TD><TD> R13</TD><TD></TD><TD> 1Dh</TD><TD> -00.0</TD><TD> -39.0</TD><TD> L13</TD></TR>
+<TR><TD> 0Eh</TD><TD> -42.0</TD><TD> -00.0</TD><TD> R14</TD><TD></TD><TD> 1Eh</TD><TD> -00.0</TD><TD> -42.0</TD><TD> L14</TD></TR>
+<TR><TD> 0Fh</TD><TD> -infinite</TD><TD> -00.0</TD><TD> R15</TD><TD></TD><TD> 1Fh</TD><TD> -00.0</TD><TD> -infinite</TD><TD> L15</TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sbl">FAQ</a> ★ <A HREF="index.htm#SOUND">SBL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

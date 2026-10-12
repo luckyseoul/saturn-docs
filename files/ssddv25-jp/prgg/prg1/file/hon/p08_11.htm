@@ -1,0 +1,207 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/17&gt;プログラマーズガイド/ファイルシステムライブラリ/8.関数仕様-1</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p08_10.htm">戻る</A>｜
+<A HREF="p08_12.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>8.関数仕様-1</H2>
+<HR NOSHADE>
+
+<A NAME="no8_10"></A>
+<H3>8.1　ディレクトリ管理</H3>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_1"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ファイルシステムの初期化・マウント</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_Init</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.1</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 GFS_Init(Sint32 open_max, void *work, GfsDirTbl *dirtbl)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>open_max</TD><TD><PRE>：同時に開くファイルの最大数(1から24まで)</TD></TR>
+<TR><TD><PRE>work</TD><TD><PRE>：ライブラリのための作業領域</TD></TR>
+<TR><TD><PRE>dirtbl</TD><TD><PRE>：ディレクトリ情報管理構造体</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>dirtbl　    ：ディレクトリ情報管理構造体(ディレクトリ情報格納領域)
+<DT><B>　関数値</B><DD>読み込んだディレクトリ情報数。エラーが発生したときは負のエラーコードを返します。
+<!-- +++ Update by CRI ：1.4 -->
+<PRE>引数のディレクトリ情報管理構造体へのポインタにNULLを指定すると、ＣＤブロック
+ファイルシステムが保持しているディレクトリ情報の個数を関数値として返します。
+</PRE>
+<!-- --- Update by CRI ：1.4 -->
+
+<DT><B>　機　能</B><DD>ファイルシステムの初期化とCD-ROMのマウント処理を行います。<BR>dirtblの指定によりディレクトリ管理機能を指定します。
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH width=200 align="center"><PRE>dirtbl</TH><TH width=320 align="center"><PRE>使用するディレクトリ管理機能</TH></TR>
+<TD><PRE>ディレクトリ管理構造体</TD><TD><PRE>本ライブラリのディレクトリ管理</TD></TR>
+<TD><PRE>NULL</TD><TD><PRE>CDブロックファイルシステムのディレクトリ管理</TD></TR></TABLE>
+
+<DT><B>　備　考</B>
+<DD><OL TYPE=a>
+<P><LI>workは４バイト境界に配置しなければなりません。</P>
+<P><LI>INT_ChgMsk関数により、SCUのレベル0-DMA終了割り込みを許可します。
+<P><LI>ＣＤブロックを以下のように初期設定します。</P></OL>
+<DD>(ECC回数とリトライ回数が最大値に設定され、それ以外はデフォルトのままです。)
+<DD><TABLE BORDER=0>
+	<TR><TD>・ＣＤブロックソフトリセット</TD><TD>：しない</TD></TR>
+	<TR><TD>・サブコードデコード</TD><TD>：しない</TD></TR>
+	<TR><TD>・モード２サブヘッダ認識</TD><TD>：す　る</TD></TR>
+	<TR><TD>・フォーム２リードリトライ</TD><TD>：しない</TD></TR>
+	<TR><TD>・ＣＤ−ＲＯＭデータリード</TD><TD>：最高速（現在は２倍速）</TD></TR>
+	<TR><TD>・スタンバイタイム</TD><TD>：180秒</TD></TR>
+	<TR><TD>・ＥＣＣ回数</TD><TD>：5回</TD></TR>
+	<TR><TD>・リトライ回数</TD><TD>：15回</TD></TR></TABLE>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_2"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ディレクトリ情報の読み込み</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_LoadDir</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.2</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 GFS_LoadDir(Sint32 fid, GfsDirTbl *dirtbl)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>fid</TD><TD><PRE>：ディレクトリファイルの識別子</TD></TR>
+<TR><TD><PRE>dirtbl</TD><TD><PRE>：ディレクトリ情報管理構造体</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>dirtbl：ディレクトリ情報管理構造体(ディレクトリ情報格納領域)
+<DT><B>　関数値</B><DD>読み込んだディレクトリ数。エラーが発生したときは負のエラーコードを返します。
+<!-- +++ Update by CRI ：1.4 -->
+<PRE>引数のディレクトリ情報管理構造体へのポインタにNULLを指定すると、ＣＤブロック
+ファイルシステムが保持しているディレクトリ情報の個数を関数値として返します。
+</PRE>
+<!-- --- Update by CRI ：1.4 -->
+<DT><B>　機　能</B><DD>指定されたディレクトリファイルからディレクトリ情報を読み込みます。<BR>dirtblの指定によりディレクトリ情報の格納先が変わります。
+
+<TABLE BORDER=1>
+	<TR><TH width=200 align="center" ><PRE>dirtbl</TH><TH width=320 align="center"><PRE>ディレクトリ情報格納領域</TH></TR>
+	<TR><TD><PRE>ディレクトリ管理構造体</TD><TD><PRE>dirtblのディレクトリ情報格納領域</TD></TR>
+	<TR><TD><PRE>NULL</TD><TD><PRE>CDブロック内のファイル管理情報領域</TD></TR></TABLE></P>
+
+	<DD>dirtblにNULLを指定したとき、GFS_InitでCDブロックファイルシステムを使用すると宣言しなければ、エラーとなります。ただし、dirtblにNULL以外の適切なディレクトリ情報管理構造体へのポインタを渡すことは常に可能です。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_3"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>カレントディレクトリの設定</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_SetDir</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.3</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint 32GFS_SetDir(GfsDirTbl *dirtbl);
+<DT><B>　入　力</B><DD>dirtbl   ：ディレクトリ情報管理構造体
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコード。
+<DT><B>　機　能</B><DD>指定されたディレクトリ情報をカレントディレクトリに設定します。<BR>dirtblの指定により使用するディレクトリ情報が変わります。
+
+	<DD><TABLE BORDER=1>
+<TR><TH width=200 align="center" ><PRE>dirtbl</TH><TH width=320 align="center"><PRE>使用するディレクトリ情報</TH></TR>
+<TR><TD><PRE>ディレクトリ管理構造体</TD><TD><PRE>dirtblの内容</TD></TR>
+<TR><TD><PRE>NULL</TD><TD><PRE>CDブロック内のファイル管理情報</TD></TR></TABLE>
+
+	<DD>dirtblにNULLを指定したとき、GFS_InitでCDブロックファイルシステムを使用すると宣言しなければエラーとなります。ただし、dirtblにNULL以外の適切なディレクトリ情報管理構造体へのポインタを渡すことは常に可能です。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_4"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>名前からファイル識別子への変換</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_NameToId</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.4</H4></TD>
+</TR></TABLE></P>
+
+<!-- *** Update by CRI ：5.6 --><DT><B>　書　式</B><DD>Sint 32GFS_NameToId(Sint8 *fname)
+<DT><B>　入　力</B><DD>fname：ファイル名
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>ファイル識別子。エラーが発生したときは負のエラーコード。
+<DT><B>　機　能</B><DD>ファイル名に対応するファイル識別子を返します。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_5"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>識別子からファイル名への変換</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_IdToName</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.5</H4></TD>
+</TR></TABLE></P>
+
+<!-- *** Update by CRI ：5.7 --><DT><B>　書　式</B><DD>const Sint8 *GFS_IdToName(Sint32 fid)
+<DT><B>　入　力</B><DD>fid：ファイル識別子
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>ファイル名へのポインタ。エラーが発生したときはNULL。
+<DT><B>　機　能</B><DD>ファイル識別子に対応するファイル名へのポインタを返します。このポインタは、本ライブラリが使用している変換テーブル領域を指しています。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_6"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ディレクトリ情報の取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_GetDirInfo</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.6</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　GFS_GetDirInfo(Sint32 fid, GfsDirId *dirrec)
+<DT><B>　入　力</B><DD>fid   ：ファイル識別子
+<DT><B>　出　力</B><DD>dirrec：ディレクトリ情報
+<DT><B>　関数値</B><DD>エラーコード
+<DT><B>　機　能</B><DD>ファイル識別子からディレクトリ情報を取得します。
+
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_7"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ファイルシステムのリセット</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_Reset</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.7</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void　GFS_Reset(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>オープンしているファイルを全てクローズし、ファイルシステムをリセットします。<BR>（ディレクトリ情報以外を初期化します。）
+<DT><B>　備　考</B><DD>ストリームシステムを使用している場合、ストリームをクローズしてから本関数を実行してください。
+</DL>
+
+
+
+<HR NOSHADE>
+<B>▲
+<A HREF="p08_10.htm">戻る</A>｜
+<A HREF="p08_12.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no7">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

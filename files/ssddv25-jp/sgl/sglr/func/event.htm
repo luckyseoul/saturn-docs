@@ -1,0 +1,702 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/22&gt;          <!-- 何ページ目／総ページ数 -->
+SGL関数リファレンス/event関数  <!-- タイトルネーム　-->
+</TITLE>
+</HEAD>
+<BODY>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★イベント</H1><BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="slInitEvent"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slInitEvent</H1>
+<HR><H3>イベント、ワーク管理用のバッファを初期化</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void slInitEvent( void );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も与えません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    イベント、ワーク管理用のバッファを初期化します。イベントは64個、
+    ワークは256個が用意されます。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    void *eventtbl[] = {
+        init_camera,
+        init_player1,
+        init_player2,
+        init_enemyctrl
+    };
+
+    void InitGame(){
+        void  **evrdptr;
+        <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>  *evptr;
+        int        cnt;
+
+        <A HREF="../func/event.htm#slInitEvent"><I>slInitEvent</I></A>();           /* イベント管理用変数の初期化 */
+        evrptr = eventtbl;
+        for( cnt = sizeof( eventtbl ) / sizeof( void * ) ; cnt-- > 0 ; ) {
+            evptr = <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</I></A>( *evrptr++ );
+        }
+        <A HREF="../func/init.htm#slSetSprTVMode"><I>slSetSprTVMode</I></A>( TV_320x224 );
+    }
+
+    void Game(){
+        <A HREF="../func/event.htm#slExecuteEvent"><I>slExecuteEvent</I></A>();       /* イベントの実行 */
+        <A HREF="../func/int.htm#slSynch"><I>slSynch</I></A>();              /* ポリゴンデータの出力とビデオ表示同期 */
+    }    
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    イベント、ワーク用のRAM自体は初期化されないので、領域を取り出した時に、
+    ユーザープログラムが初期化してください。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slGetEvent">slGetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEvent">slSetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEventNext">slSetEventNext</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slCloseEvent">slCloseEvent</A></TD>
+</TR>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slReturnEvent">slReturnEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slExecuteEvent">slExecuteEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slGetWork">slGetWork</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slReturnWork">slReturnWork</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="slGetEvent"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slGetEvent</H1>
+<HR><H3>イベント用RAMの取得</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *slGetEvent( void );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も与えません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>* - 取得したイベント用RAMのアドレスを示すポインタ。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    イベント用に割り付けられたRAM領域を取り出し、そのポインタを返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    void func() {
+      /* This is executed in event loop. */
+    }
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt1, *evnt2;
+
+    evnt1 = <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</I></A>();
+
+    evnt2 = <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</I></A>( func );
+    evnt2->user = ( <A HREF="../struct/types.htm#Uint8"><I>Uint8</I></A> * )evnt1;    
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    128バイトの領域で、ユーザーが自由に使用できます。64個分用意されていますが、
+    使い切っている場合には<A HREF="../struct/const.htm#NULL"><I>NULL</I></A>コードを返します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slInitEvent">slInitEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEvent">slSetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEventNext">slSetEventNext</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slCloseEvent">slCloseEvent</A></TD>
+</TR>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slReturnEvent">slReturnEvent</A></TD>
+<TD><PRE><A HREF="../mem/system01.htm#EventTop">EventTop</A></TD>
+<TD><PRE><A HREF="../mem/system01.htm#EventCount">EventCount</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="slSetEvent"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slSetEvent</H1>
+<HR><H3>イベントの追加</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void *( func )( void );
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *slSetEvent( func );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void *( func )( void ) - イベントに登録する実行関数。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>* - 取得したイベントへの <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>型ポインタ。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    イベントを取り出し、実行リストの末尾に追加します。この際、指定された関数を
+    実行関数として登録します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <A HREF="../func/event.htm#slInitEvent"><I>slInitEvent</I></A>();
+
+    <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</I></A>( user_func1 );
+    <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</I></A>( user_func2 );
+         :
+    while( -1 ) {
+         :
+      <A HREF="../func/event.htm#slExecuteEvent"><I>slExecuteEvent</I></A>();
+      <A HREF="../func/int.htm#slSynch"><I>slSynch</I></A>();
+    }
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    128バイトの領域ですが、先頭の16バイトはシステムにより使用されます。<BR>
+    イベントが残っていない場合には <A HREF="../struct/const.htm#NULL"><I>NULL</I></A>コードを返します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slInitEvent">slInitEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEvent">slSetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEventNext">slSetEventNext</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slCloseEvent">slCloseEvent</A></TD>
+</TR>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slReturnEvent">slReturnEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slExecuteEvent">slExecuteEvent</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="slSetEventNext"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slSetEventNext</H1>
+<HR><H3>イベントの次候補の登録</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt;
+    void *( func )( void );
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *slSetEventNext( evnt, func );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt            - 登録するイベントの前のイベント。<BR>
+    void *( func )( void ) - 登録する実行関数。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>* - 取り出されたイベントを示す、 <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>型構造体へのポインタ。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    イベントを取り出し、指定されたイベントの次に実行されるように、実行リスト
+    に追加します。この際、指定された関数を実行関数として登録します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    void func() {
+      /* This is executed in event loop. */
+    }
+
+    ss_main() {
+      <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt;
+
+      evnt = <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</I></A>();
+      evnt->work = ...
+              :
+      <A HREF="../func/event.htm#slSetEventNext"><I>slSetEventNext</I></A>( evnt, func );
+              :
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    128バイトの領域ですが、先頭の16バイトはシステムにより使用されます。<BR>
+    イベントが残っていない場合には <A HREF="../struct/const.htm#NULL"><I>NULL</I></A>コードを返します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slInitEvent">slInitEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEvent">slSetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slGetEvent">slGetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slCloseEvent">slCloseEvent</A></TD>
+</TR>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slReturnEvent">slReturnEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slExecuteEvent">slExecuteEvent</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="slReturnEvent"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slReturnEvent</H1>
+<HR><H3>未登録イベントの検索</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt;
+
+    void slReturnEvent( evnt );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt - 解放を要求するイベントを表す <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>型構造体へのポインタ。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    実行リストに登録されていないイベントをシステムに返す。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt;
+
+    evnt = <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</I></A>();
+    <A HREF="../func/event.htm#slReturnEvent"><I>slReturnEvent</I></A>( evnt );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    実行リストに登録されているイベントに対して、この関数を実行するとリストに
+    登録されたままになるため、実行は継続されます。戻されたポインタはシステムの
+    バッファに再登録されますが、この際に登録済みであってもチェックされません
+    ので、同じポインタを複数回返却すると、この後実行される、
+    <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</I></A>()、<A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</I></A>()、<A HREF="../func/event.htm#slSetEventNext"><I>slSetEventNext</I></A>()
+    において不具合が発生します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slInitEvent">slInitEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slGetEvent">slGetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEvent">slSetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEventNext">slSetEventNext</A></TD>
+</TR>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slCloseEvent">slCloseEvent</A></TD>
+<TD><PRE><A HREF="../mem/system01.htm#EventLast">EventLast</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="slCloseEvent"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slCloseEvent</H1>
+<HR><H3>イベントの削除</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt;
+
+    void slCloseEvent( evnt );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt - 削除するイベントを表す <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>型構造体へのポインタ。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    実行リストに登録されたイベントをリストから切り離し、システムに返します。<BR>
+    また、ワークがセットされている場合、これらも戻します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt;
+
+    evnt = <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</I></A>( user_func );
+                 :
+    <A HREF="../func/event.htm#slCloseEvent"><I>slCloseEvent</I></A>( evnt );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    実行リストに登録されていないイベントを指定すると、リスト情報が正しくない
+    ため、不当なイベントに対して、リスト変更処理をすることになり、予測できない
+    アドレスに対する書き込みが発生し、最悪の場合、CPUが停止する場合があります。<BR>
+    戻されたポインタはシステムのバッファに再登録されますが、この際に登録済みで
+    あってもチェックされないので、同じポインタを複数回返却すると、この後
+    実行される、
+    <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</I></A>()、<A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</I></A>()、<A HREF="../func/event.htm#slSetEventNext"><I>slSetEventNext</I></A>()
+    において不具合が発生します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slInitEvent">slInitEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slGetEvent">slGetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEvent">slSetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEventNext">slSetEventNext</A></TD>
+</TR>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slReturnEvent">slReturnEvent</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="slExecuteEvent"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slExecuteEvent</H1>
+<HR><H3>イベントの実行</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void slExecuteEvent( void );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も与えません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    実行リストに登録されたイベントを先頭から順に実行します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <A HREF="../func/event.htm#slInitEvent"><I>slInitEvent</I></A>();
+
+    <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</I></A>( ... );
+        :
+    while( -1 ) {
+      <A HREF="../func/event.htm#slExecuteEvent"><I>slExecuteEvent</I></A>();
+      <A HREF="../func/int.htm#slSynch"><I>slSynch</I></A>();
+    }
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    メインループごとに実行してください。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slInitEvent">slInitEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEvent">slSetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEventNext">slSetEventNext</A></TD>
+<TD><PRE><A HREF="../func/int.htm#slSynch">slSynch</A></TD>
+</TR>
+<TR>
+<TD><PRE><A HREF="../func/int.htm#slInitSynch">slInitSynch</A></TD>
+<TD><PRE><A HREF="../mem/system01.htm#EventTop">EventTop</A></TD>
+<TD><PRE><A HREF="../mem/system01.htm#EventNow">EventNow</A></TD>
+<TD><PRE><A HREF="../mem/system01.htm#EventCount">EventCount</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★ワーク</H1><BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="slGetWork"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slGetWork</H1>
+<HR><H3>イベント用ワークRAMの取得</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#WORK"><I>WORK</I></A> *slGetWork( void );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も与えません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#WORK"><I>WORK</I></A>* - 割り当てられたワークエリアを示す <A HREF="../struct/types.htm#WORK"><I>WORK</I></A>型構造体へのポインタ。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    ワーク用に割り付けられたRAM領域を取り出し、そのポインタを返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#WORK"><I>WORK</I></A>  *work;
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A> *evnt;
+
+    work = <A HREF="../func/event.htm#slGetWork"><I>slGetWork</I></A>();
+    evnt = <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</I></A>();
+    evnt->work = work;
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    ワークは64バイトの領域で、先頭の4バイトをリスト用のポインタとして、
+    システムで使用します。残りの60バイトはユーザーが自由に使用できます。<BR>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>構造体のWORKに ポインタをセットしていればイベントをクローズする
+    場合に、システムに返却されます。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slInitEvent">slInitEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slReturnWork">slReturnWork</A></TD>
+<TD><PRE><A HREF="../mem/system01.htm#WorkCount">WorkCount</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="slReturnWork"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slReturnWork</H1>
+<HR><H3>イベント用ワークRAMの解放</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#WORK"><I>WORK</I></A> *wk;
+
+    void slReturnWork( wk );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#WORK"><I>WORK</I></A> *wk - 解放するワークRAMを表す、WORK構造体のポインタ。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    ワークとして使用していたRAM領域をシステムに戻す。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <A HREF="../struct/types.htm#WORK"><I>WORK</I></A> *work;
+
+    work = <A HREF="../func/event.htm#slGetWork"><I>slGetWork</I></A>();
+               :
+    <A HREF="../func/event.htm#slReturnWork"><I>slReturnWork</I></A>( work );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    戻されたポインタはシステムのバッファに再登録されますが、この際に登録済みで
+    あってもチェックされないので、同じポインタを複数回返却すると、この後に
+    実行される <A HREF="../func/event.htm#slGetWork"><I>slGetWork</I></A>() において不具合が発生します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slInitEvent">slInitEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slGetWork">slGetWork</A></TD>
+<TD><PRE><A HREF="../mem/system01.htm#WorkCount">WorkCount</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★イベント用グローバル変数</H1><BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="EventBuf"><HR NOSHADE></A>
+<H4>グローバル変数</H4>
+<H1>EventBuf</H1>
+<HR><DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    extern <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>  EventBuf [];          /* buffer for Event use */
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slInitEvent">slInitEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slGetEvent">slGetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slReturnEvent">slReturnEvent</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="WorkBuf"><HR NOSHADE></A>
+<H4>グローバル変数</H4>
+<H1>WorkBuf</H1>
+<HR><DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    extern <A HREF="../struct/types.htm#WORK"><I>WORK</I></A>   WorkBuf [];           /* buffer for Work use */
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slGetWork">slGetWork</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="RemainEvent"><HR NOSHADE></A>
+<H4>グローバル変数</H4>
+<H1>RemainEvent</H1>
+<HR><DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    extern <A HREF="../struct/types.htm#EVENT"><I>EVENT</I></A>* RemainEvent[] ;       /* Remain Event address buffer */
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slSetEvent">slSetEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slSetEventNext">slSetEventNext</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slReturnEvent">slReturnEvent</A></TD>
+<TD><PRE><A HREF="../func/event.htm#slExecuteEvent">slExecuteEvent</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><A HREF="index.htm#event">一覧表</A>｜<A HREF="../index.htm">リファレンス</A><BR>
+<A NAME="RemainWork"><HR NOSHADE></A>
+<H4>グローバル変数</H4>
+<H1>RemainWork</H1>
+<HR><DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    extern <A HREF="../struct/types.htm#WORK"><I>WORK</I></A>*  RemainWork[] ;        /* Remain Work address buffer */
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><A HREF="../func/event.htm#slReturnWork">slReturnWork</A></TD>
+</TR>
+</TABLE>
+</DL>
+
+<HR NOSHADE>
+<A HREF=index.htm>戻る</A><ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

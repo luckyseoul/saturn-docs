@@ -1,0 +1,95 @@
+﻿<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/54&gt;VDP1ユーザーズマニュアル/1.VDP1の機能</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p01_12_j.htm">戻る</A>｜
+     <a href="p01_20_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第１章　VDP1の機能</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_13"></A>
+	<P>	<DT><H3>　●カラー</H3>
+		<DD>　カラーに関する機能および特殊機能は次のとおりです。</P>
+		<DD><UL TYPE=DISC>
+		<LI>テクスチャパーツ単位の色数は16、64、128、256、32768色
+		<LI>RGBモード時、半輝度、半透明、グーローシェーディング、シャドウ(影付け)の色演算が可能
+		<LI>メッシュ(タイリング)</UL><P>
+
+	<P>	<DD>　フレームバッファに描画される(書き込まれる)ピクセルのカラーの表現方法には、カラーバンク方式とRGBコード方式があります。
+		カラーバンク方式では1キャラクタ内で16、64、128、256色が表現でき､RGBコード方式では1キャラクタ内で32768色が表現できます。</P>
+
+<A NAME="no1_13_1"></A>
+	<P>	<DT><B>　◆カラーバンク方式</B>
+		<DD>　カラーバンク方式は、16、64、128、256色のパレットコードにカラーバンクを組み合わせて、
+		VDP2のカラーRAMに格納したカラーを参照します。16色のときキャラクタパターンのピクセルデータは4bitでパレットコードを表し、上位12bitがカラーバンクから付加されて16bitデータがフレームバッファに書き込まれます。
+		8bit/pixelのときは下位8bitが書き込まれます。64、128、256色の場合はキャラクタパターンは8bit/pixelで、64、128、256色のときはそれぞれ下位6、7、8bitが有効となります。カラーバンクの上位10、9、8bitが付加されます。<BR>
+		　カラーバンク方式で書き込まれたデータは、VDP2側で以下の機能ビットに分けられて処理されます。詳細については<a href="../../vdp2/hon/p010_j.htm">VDP2マニュアル</A>/を参照してください。</P>
+
+<A NAME="z1_10"></A>
+	<P><DD><B>図1.10　カラーバンク方式のビット構成</B>
+<PRE><B>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　ＬＳＢ
+┌──┬──┬──────┬───────────┐
+│　　│　　│カラーバンク│　　パレットコード　　│
+└──┴──┴──────┴───────────┘
+　│　　│　　　　　　　　　　　　　　　　　　　　　
+　│　　└→プライオリティー　　　　　　　　　　　　
+　↓　　　　　　　　　　　　　　　　　　　　　　　　
+　色演算　　　　　　　　　　　　　　　　　　　　　　
+</B></PRE></P>
+
+<A NAME="no1_13_2"></A>
+	<P>	<DT><B>　◆RGBコード方式</B>
+		<DD>　RGBコード方式はRGB(赤、緑、青)のそれぞれ5ビットの輝度でカラーを表します。RGBそれぞれの輝度は、00H〜1FHで表し、00Hに近づくほど暗く、1FHに近づくほど明るくなります。RGBコードで表現できる色は32768色あります。
+		RGBコードは16ビットデータで、その最上位ビット(MSB)は1です。</P>
+
+<A NAME="no1_13_3"></A>
+	<P>	<DT><B>　◆パーツのカラー</B>
+		<DD>　スプライトは、カラーバンク方式、カラールックアップテーブル方式、またはRGBコード方式でカラーを設定します。ポリゴン、ポリライン、ラインのノンテクスチャは、ノンテクスチャカラーを設定します。1パーツごとに設定します。</P>
+
+<A NAME="no1_13_4"></A>
+	<P>	<DT><B>　◆カラールックアップテーブル</B>
+		<DD>　カラールックアップテーブルは、キャラクタパターンの4bitデータを16色のカラールックアップテーブルを参照し、16bitのデータに交換するものです。<BR>
+		　テーブル上の16bitのデータがそのままフレームバッファに書き込まれますので、テクスチャデータとしてはカラーバンクコード、RGBコードの区別がありません。<BR>
+		　VDP2に読み出された場合、16bitのMSBが0のときカラーバンクコードで、1のときRGBコードとして扱われます。</P>
+
+<A NAME="no1_13_5"></A>
+	<P>	<DT><B>　◆ノンテクスチャカラー</B>
+		<DD>　ノンテクスチャカラーはそのままピクセルのデータとして扱われます。カラーバンク、カラールックアップテーブルは使いません。</P>
+
+<A NAME="no1_13_6"></A>
+	<P>	<DT><B>　◆8bit/pixelのカラー</B>
+		<DD>　ハイレゾリューションのとき、またはフレームバッファを回転させビット幅を8bit/pixelに指定したとき、フレームバッファには8bit/pixelで書き込まれます。
+		このとき、カラールックアップテーブル方式、またはノンテクスチャーカラーの場合は、16bitの下位8bitがフレームバッファに書き込まれます。<BR>
+		　以下、8bit/pixel(ハイレゾリューションまたは回転8)と省略します。</P>
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p01_12_j.htm">戻る</A>｜
+     <a href="p01_20_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

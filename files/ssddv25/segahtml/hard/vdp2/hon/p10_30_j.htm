@@ -1,0 +1,181 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;62/86&gt;VDP2ユーザーズマニュアル/10.3特殊機能コード</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no10">VDP2ユーザーズマニュアル</A>★
+<a href="p10_10_j.htm">第10章　ドットカラーデータ</A>
+<HR>
+<B>▲
+<a href="p10_20_j.htm">戻る</A>｜
+<a href="p11_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第10章　ドットカラーデータ</B>
+<HR NOSHADE>
+<DL>
+	<P><DT><H2>■10.3　特殊機能コード</H2>
+	<DD>　特殊機能は、各スクロール画面に対して行われる機能で、特殊プライオリティ機能と特殊カラー演算機能の2つがあります。これらをドットごとに使用する場合に、特殊機能を有効にするドットカラーコードは、2個の特殊機能コードレジスタに指定することができ、また、各スクロール画面は2個のどちらの特殊機能コードレジスタを使用するか指定することもできます。</P>
+
+	<P><DD>　特殊機能コードレジスタには、特殊機能コードAと特殊機能コードBの各8ビットのレジスタが2個あり、各ビットには特殊機能を使用するドットカラーコード下位4ビットの値が2つずつ対応しています。ドットカラーコードは、各スクロール画面のキャラクタ色数によってビット数が変わりますが、特殊機能コードレジスタの各ビットは常にドットカラーコードの下位4ビットの値に対応しています。また、特殊機能コードはスクロール画面のカラー形式がパレット形式のときのみに使用してください。</P>
+
+	<P><DD>　特殊機能の使用方法については、「<B><a href="p11_20_j.htm">11.2　特殊プライオリティ機能</A></B>」と「<B><a href="p12_20_j.htm">12.2　特殊カラー演算機能</A></B>」を参照してください。</P>
+
+	<P><DD>　特殊機能コードに対応しているドットカラーコードを図10.7に示します。</P>
+
+<A NAME="z10_7"></A>
+	<P><DD><B>図10.7　特殊機能コードに対応しているドットカラーコード</B>
+	<DD><PRE>
+●キャラクタ色数が１６色の場合
+ビット　　３　２　１　０
+　　　　┌─┬─┬─┬─┐
+　　　　│　対応ビット　│（４ビット）
+　　　　└─┴─┴─┴─┘
+
+●キャラクタ色数が２５６色の場合
+ビット　　７　６　５　４　３　２　１　０
+　　　　┌─┬─┬─┬─┬─┬─┬─┬─┐
+　　　　│−│−│−│−│　対応ビット　│（４ビット）
+　　　　└─┴─┴─┴─┴─┴─┴─┴─┘
+
+●キャラクタ色数が２０４８色の場合
+ビット　１５　　　　　　　　　　　　　８　７　　　　　　　３　２　１　０
+　　　　┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+　　　　│−│−│−│−│−│−│−│−│−│−│−│−│　対応ビット　│（４ビット）
+　　　　└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE></P>
+
+<A NAME="no10_31"></A>
+	<P>	<DT><H3>　●特殊機能コードセレクトレジスタ</H3>
+		<DD>　特殊機能コードセレクトレジスタは、各スクロール画面に対して有効にする特殊機能コードを指定します。書き込み専用の16ビットのレジスタで、180024H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SFSEL_"></A>
+<P>	<DD><B><FONT SIZE=5>SFSEL</FONT>　<FONT SIZE=4>180024H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE><A HREF="#NxSFCS_">R0SFCS </A></TH>
+<TH><PRE><A HREF="#NxSFCS_">N3SFCS </A></TH>
+<TH><PRE><A HREF="#NxSFCS_">N2SFCS </A></TH>
+<TH><PRE><A HREF="#NxSFCS_">N1SFCS </A></TH>
+<TH><PRE><A HREF="#NxSFCS_">N0SFCS </A></TH>
+</TR></TABLE></P>
+
+<A NAME="NxSFCS_"></A>
+	<DT><B>特殊機能コードセレクトビット</B>：Special function code select bit (N0SFCS, N1SFCS, N2SFCS, N3SFCS, R0SFCS)
+	<DD>　各スクロール画面に対して有効にする特殊機能コードを指定します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>N0SFCS</TD><TD>180024H</TD><TD>ビット0</TD><TD>NBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1SFCS</TD><TD>180024H</TD><TD>ビット1</TD><TD>NBG1用</TD></TR>
+	<TR><TD>N2SFCS</TD><TD>180024H</TD><TD>ビット2</TD><TD>NBG2用</TD></TR>
+	<TR><TD>N3SFCS</TD><TD>180024H</TD><TD>ビット3</TD><TD>NBG3用</TD></TR>
+	<TR><TD>R0SFCS</TD><TD>180024H</TD><TD>ビット4</TD><TD>RBG0用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TH>xxSFCS</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>特殊機能コードAを有効にする</TD></TR>
+	<TR><TH>1</TH><TD>特殊機能コードBを有効にする</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、またはR0が入ります。</P>
+
+<A NAME="no10_32"></A>
+	<P>	<DT><H3>　●特殊機能コードレジスタ</H3>
+		<DD>　特殊機能コードレジスタは、特殊機能コードAおよび特殊機能コードBを指定します。書き込み専用の16ビットのレジスタで、180026H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SFCODE_"></A>
+<P>	<DD><B><FONT SIZE=5>SFCODE</FONT>　<FONT SIZE=4>180026H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#SFCDx_">SFCDB7 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDB6 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDB5 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDB4 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDB3 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDB2 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDB1 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDB0 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#SFCDx_">SFCDA7 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDA6 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDA5 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDA4 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDA3 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDA2 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDA1 </A></TH>
+<TH><PRE><A HREF="#SFCDx_">SFCDA0 </A></TH>
+</TR></TABLE></P>
+
+<A NAME="SFCDx_"></A>
+	<DT><B>特殊機能コードビット</B>：Special function code bit
+	<DD>(SFCDA7〜SFCDA0, SFCDB7〜SFCDB0)<BR>　特殊機能コードAおよびBを指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD>SFCDA7〜SFCDA0</TD><TD>180026H</TD><TD>ビット7〜0</TD><TD>特殊機能コードA用</TD></TR>
+	<TR><TD>SFCDB7〜SFCDB0</TD><TD>180026H</TD><TD>ビット15〜8</TD><TD>特殊機能コードB用</TD></TR>
+	</TABLE></P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH>ビット名</TH><TH>ドットカラーコード</TH></TR>
+	<TR><TH>SFCDx0</TH><TD>ドットカラーコードの下位4ビットが、0Hまたは1Hのとき</TD></TR>
+	<TR><TH>SFCDx1</TH><TD>ドットカラーコードの下位4ビットが、2Hまたは3Hのとき</TD></TR>
+	<TR><TH>SFCDx2</TH><TD>ドットカラーコードの下位4ビットが、4Hまたは5Hのとき</TD></TR>
+	<TR><TH>SFCDx3</TH><TD>ドットカラーコードの下位4ビットが、6Hまたは7Hのとき</TD></TR>
+	<TR><TH>SFCDx4</TH><TD>ドットカラーコードの下位4ビットが、8Hまたは9Hのとき</TD></TR>
+	<TR><TH>SFCDx5</TH><TD>ドットカラーコードの下位4ビットが、AHまたはBHのとき</TD></TR>
+	<TR><TH>SFCDx6</TH><TD>ドットカラーコードの下位4ビットが、CHまたはDHのとき</TD></TR>
+	<TR><TH>SFCDx7</TH><TD>ドットカラーコードの下位4ビットが、EHまたはFHのとき</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxには、AまたはBが入ります。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH>設定値</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>特殊機能を使用しない</TD></TR>
+	<TR><TH>1</TH><TD>特殊機能を使用する</TD>
+	</TABLE></P>
+
+	<P>	<DD>　特殊機能コードが使用されるのは、特殊プライオリティモードレジスタにおいてモード2を指定している場合、または特殊カラー演算モードレジスタにおいてモード2を指定している場合です。
+詳しくは、「<B><a href="p11_20_j.htm">11.2　特殊プライオリティ機能</A></B>」または「<B><a href="p12_20_j.htm">12.2　特殊カラー演算機能</A></B>」を参照してください。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p10_20_j.htm">戻る</A>｜
+<a href="p11_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no10">VDP2ユーザーズマニュアル</A>★
+<a href="p10_10_j.htm">第10章　ドットカラーデータ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

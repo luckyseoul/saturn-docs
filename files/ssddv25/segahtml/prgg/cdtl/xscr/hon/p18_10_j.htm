@@ -1,0 +1,98 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 5&gt;CDビルダスクリプト文法補足説明</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<B>■　　
+｜
+<a href="p19_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CDビルダスクリプト文法補足説明</B>
+<H2 ALIGN=CENTER></H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A>
+	<P><DT><H3>１．チャネルインタリーブに於ける Pack行の効果について</H3>
+	<DD>　チャネルインタリーブを利用すると、同じISOファイル内の各セクタをチャネル番号によって識別することができます。<BR>
+チャネルをどのように配置するかはBeginTimeF行、EndTimeF行、Reallocation行、UnitSize行、GapSize行およびPack行を用いて制御します。<BR>
+ここでは特にPack行の及ぼす効果について説明します。</P>
+
+	<P>　Pack行はディスクスペースの利用効率を上げるためのものです。BeginTimeF行、UnitSize行、GapSize行の指定によってISOファイルの先頭、途中、最後にダミーデータが生成される可能性があります。Pack行を指定することによってこれらのダミーデータ部分を取り除いたISOファイルを生成します。</P>
+
+<A NAME="no1_11"></A>
+	<P><DT><B>　(1)　Pack行を指定しない場合</B>
+	<DD>　まず、Pack行を指定しなかった場合、どのような配置になるかを説明します。<BR>
+Pack行を指定せずに次のような指定をすると下記の例のようなチャネルの配置となります。</P>
+
+	<P><DD><UL TYPE=DISC
+	<P><LI>チャネル１のファイルソース定義で<BR>
+　- BeginTimeF 00:00:05<BR>
+　- UnitSize  2<BR>
+　- GapSize    3</P>
+
+	<P><LI>チャネル２のファイルソース定義で<BR>
+　- BeginTimeF 00:00:07<BR>
+　- UnitSize　　2<BR>
+　- GapSize　　 3</P>
+	</UL>
+
+	<P><DD>　なお、各々のファイルサイズを８セクタとすると次のようになります。</P>
+
+	<P><UL>例　XXXXX1122X1122X1122X1122<BR>
+　X　: ダミー(ギャップ)セクタを表します。<BR>
+　数字: チャネル番号を示します。</UL></P>
+
+<A NAME="no1_12"></A>
+	<P><DT><B>　(2)　Pack行を指定した場合</B>
+	<DD>　上の例に対してPack行を指定すると次のようになります。</P>
+
+	<P><UL>例　1122112211221122</UL></P>
+
+	<P><DD>　このようにPack行を指定しなかった場合24セクタだったISOファイルがPack行を指定することによって16セクタになります。しかし、一方では次のような問題が発生しますので注意が必要です。<BR>
+	<DD><UL TYPE="DISK">
+	<P><LI>BeginTimeF行で指定した時間から開始されなくなります。</P>
+	<P><LI>EndTimeF行で指定した時間より早く終わります。</P>
+	<P><LI>ファイル定義行でMinLength行を指定した場合、ファイル領域はその指定サイズ分の大きさがとられます。</UL></P>
+
+<A NAME="no1_13"></A>
+	<P><DT><B>　(3)　すき間を埋めたい場合</B>
+	<DD>　Pack行を指定するとBeginTimeF行、EndTimeF行の指定が無効になりますが、Pack行を指定しないで、生じたすき間を利用したい場合があります。このような場合、Reallocation行を指定したチャネルを用います。上のPack行を指定しない場合の例に、次のようなReallocation行を指定したチャネル(チャネル番号 3、データ量7セクタ)を追加してみます。</P>
+
+	<DD><UL TYPE="DISK">
+	<P><LI>チャネル３のファイルソース定義で<BR>
+　- BeginTimeF  00:00:01<BR>
+　- UnitSize    1<BR>
+　- GapSize     0</UL></P>
+
+	<P><UL>例　X33331122311223112231122</UL></P>
+</DL>
+<HR NOSHADE>
+<B>■　　
+｜
+<a href="p19_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

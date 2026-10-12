@@ -1,0 +1,251 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;60/86&gt;VDP2ユーザーズマニュアル/10.1パレット形式のドットカラーデータ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no10">VDP2ユーザーズマニュアル</A>
+<HR>
+<B>▲
+<a href="p09_21_j.htm">戻る</A>｜
+<a href="p10_20_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第10章　ドットカラーデータ</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　スプライトと各スクロール画面のドットカラーデータがパレット形式の場合は、パレットナンバーとドットカラーコードから構成されたドットカラーデータにカラーRAMアドレスオフセットレジスタの値を加算したものがカラーRAMアドレスとなり、そのアドレスのカラーデータをドットのカラーデータとして出力します。RGB形式の場合は、RGBそれぞれのデータから構成されるドットカラーデータをそのまま、そのドットのカラーデータとして出力します。<BR>
+　スクロール画面のドットカラーデータがパレット形式の場合、ドットカラーデータの下位4ビットの値によって、特殊プライオリティ機能や特殊カラー演算機能を使うかどうかを指定することができます。</P>
+
+<A NAME="no10_10"></A>
+	<P>	<DT><H2>■10.1　パレット形式のドットカラーデータ</H2>
+	<DD>　パレット形式のドットカラーデータは11ビットのデータで、対応した画面のカラーRAMアドレスオフセットレジスタの値を上位3ビットに加算して、そのドットのカラーデータを格納しているカラーRAMアドレスとします。</P>
+
+<A NAME="no10_11"></A>
+	<P>	<DT><H3>　●スプライトドットカラーデータ</H3>
+		<DD>　パレット形式のスプライトドットカラーデータは、指定されたスプライトタイプによって異なります。ドットカラーデータが10ビット以下のスプライトタイプを指定した場合には、足りない上位ビットを0に固定し、上位3ビットにスプライト用のカラーRAMアドレスオフセット値を加算して、そのドットのカラーRAMアドレスとします。なお、カラーRAMモードをモード0またはモード2に設定している場合は、カラーRAMアドレスの最上位ビットは無視されます。</P>
+
+	<P>	<DD>　パレット形式のスプライトドットカラーデータを図10.1に、スプライトのカラーRAMアドレスを図10.2に示します。</P>
+
+<A NAME="z10_1"></A>
+	<P>	<DD><B>図10.1　パレット形式のスプライトドットカラーデータ</B>
+
+	<P>	<DD>◆スプライトタイプ０〜３，５の場合<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TH COLSPAN=11>ドットカラーデータ　11ビット</TH></TR></TABLE></P>
+
+	<P>	<DD>◆スプライトタイプ４，６の場合<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>0</TD>
+	<TH COLSPAN=10>ドットカラーデータ　10ビット</TH></TR></TABLE></P>
+
+	<P>	<DD>◆スプライトタイプ７の場合<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>0</TD><TD>0</TD>
+	<TH COLSPAN=9>ドットカラーデータ　9ビット</TH></TR></TABLE></P>
+
+	<P>	<DD>◆スプライトタイプＣ〜Ｆの場合<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD>
+	<TH COLSPAN=8>ドットカラーデータ　8ビット</TH></TR></TABLE></P>
+
+	<P>	<DD>◆スプライトタイプ８の場合<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD>
+	<TH COLSPAN=7>ドットカラーデータ　7ビット</TH></TR></TABLE></P>
+
+	<P>	<DD>◆スプライトタイプ９〜Ｂの場合<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD>
+	<TH COLSPAN=6>ドットカラーデータ　6ビット</TH></TR></TABLE></P>
+
+
+<A NAME="z10_2"></A>
+	<P>	<DD><B>図10.2　スプライトのカラーRAMアドレス</B>
+
+	<P>	<DD>・スプライトドットカラーデータ<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TH COLSPAN=11>ドットカラーデータ　11ビット</TH></TR></TABLE></P>
+
+	<P><TABLE BORDER=0>
+	<TR><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE><H2>＋</H2></TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR></TABLE>
+
+	<P>	<DD>・スプライト用カラーRAMアドレスオフセット<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TH COLSPAN=3>オフセット値<BR>3ビット</TH>
+	<TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD></TR></TABLE></P>
+
+	<P><TABLE BORDER=0>
+	<TR><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE><H2>↓</H2></TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR></TABLE>
+
+	<P>	<DD>・そのドットのカラーRAMアドレス<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TH COLSPAN=11>カラーRAMアドレス　11ビット</TH></TR></TABLE></P>
+
+	<P>	<DD><B>[注]</B>
+		<DD>カラーRAMモードが<B>モード０</B>または<B>モード２</B>の場合は、カラーRAMアドレスの最上位ビット(LSB)は無視されます。</P>
+
+<A NAME="no10_12"></A>
+	<P>	<DT><H3>　●スクロールドットカラーデータ</H3>
+		<DD>　パレット形式のスクロールドットカラーデータは、指定されたキャラクタ色数によって異なります。11ビットのドットカラーデータの上位3ビットに、それぞれの面に対応したカラーRAMアドレスオフセット値を加算して、そのドットのカラーRAMアドレスとします。なお、カラーRAMモードをモード0またはモード2に設定している場合は、カラーRAMアドレスの最上位ビットは無視されます。</P>
+
+	<P>	<DD>　ラインカラー画面には、対応するカラーRAMアドレスオフセット値がないので、ラインカラー画面テーブルから読み込まれた11ビットの値が、そのままカラーRAMアドレスになります。</P>
+
+	<P>	<DD>　パレット形式のスクロールドットカラーデータを図10.3に、スクロール画面のカラーRAMアドレスを図10.4に示します。</P>
+
+<A NAME="z10_3"></A>
+	<P>	<DD><B>図10.3　パレット形式のスクロールドットカラーデータ</B>
+	<P>	<DD>◆キャラクタ色数が１６色の場合<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TH COLSPAN=7>パレットナンバー<BR>7ビット</TH><TH COLSPAN=4>ドットカラーコード<BR>4ビット</TH></TR></TABLE></P>
+
+	<P>	<DD>◆キャラクタ色数が２５６色の場合<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TH COLSPAN=3>パレット<BR>ナンバー<BR>3ビット</TH><TH COLSPAN=8>ドットカラーコード<BR>8ビット</TH></TR></TABLE></P>
+
+	<P>	<DD>◆キャラクタ色数が２０４８色の場合<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TH COLSPAN=11>ドットカラーデータ<BR>11ビット</TH></TR></TABLE></P>
+
+<A NAME="z10_4"></A>
+	<P>	<DD><B>図10.4　スクロールのカラーRAMアドレス</B>
+
+	<P>	<DD>・スクロールドットカラーデータ<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TH COLSPAN=11>ドットカラーデータ　11ビット</TH></TR></TABLE></P>
+
+	<P><TABLE BORDER=0>
+	<TR><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE><H2>＋</H2></TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR></TABLE>
+
+	<P>	<DD>・各スクロール用カラーRAMアドレスオフセット<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER><TH COLSPAN=3>オフセット値<BR>3ビット</TH>
+	<TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD></TR></TABLE></P>
+
+	<P><TABLE BORDER=0>
+	<TR><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE><H2>↓</H2></TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR></TABLE>
+
+	<P>	<DD>・そのドットのカラーRAMアドレス<TABLE BORDER=1>
+	<TR><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD><TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR ALIGN=CENTER>
+	<TH COLSPAN=11>カラーRAMアドレス　11ビット</TH></TR></TABLE></P>
+
+	<P>	<DD><B>[注]</B>
+		<DD>カラーRAMモードが<B>モード０</B>または<B>モード２</B>の場合は、カラーRAMアドレスの最上位ビット(LSB)は無視されます。</P>
+
+<A NAME="no10_13"></A>
+	<P>	<DT><H3>　●カラーRAMアドレスオフセットレジスタ</H3>
+		<DD>　カラーRAMアドレスオフセットレジスタは、スプライトおよび各スクロール画面に対するカラーRAMアドレスオフセット値を指定します。書き込み専用の16ビットのレジスタで、1800E4H〜1800E6H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CRAOFA_"></A>
+<P>	<DD><B><FONT SIZE=5>CRAOFA</FONT>　<FONT SIZE=4>1800E4H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxCAOS_">N3CAOS2</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">N3CAOS1</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">N3CAOS0</A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxCAOS_">N2CAOS2</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">N2CAOS1</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">N2CAOS0</A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxCAOS_">N1CAOS2</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">N1CAOS1</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">N1CAOS0</A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxCAOS_">N0CAOS2</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">N0CAOS1</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">N0CAOS0</A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CRAOFB_"></A>
+<P>	<DD><B><FONT SIZE=5>CRAOFB</FONT>　<FONT SIZE=4>1800E6H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxCAOS_">SPCAOS2</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">SPCAOS1</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">SPCAOS0</A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxCAOS_">R0CAOS2</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">R0CAOS1</A></TH>
+<TH><PRE><A HREF="#NxCAOS_">R0CAOS0</A></TH>
+</TR></TABLE></P>
+
+<A NAME="NxCAOS_"></A>
+	<DT><B>カラーRAMアドレスオフセットビット</B>：Color RAM address offset bit
+	<DD>(N0CAOS2〜N0CAOS0, N1CAOS2〜N1CAOS0, N2CAOS2〜N2CAOS0, N3CAOS2〜N3CAOS0, R0CAOS2〜R0CAOS0, SPCAOS2〜SPCAOS0)<BR>
+　スプライトおよび各スクロール画面に対するカラーRAMアドレスオフセット値を指定します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>N0CAOS2〜N0CAOS0</TD><TD>1800E4H</TD><TD>ビット2〜0</TD><TD>NBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1CAOS2〜N1CAOS0</TD><TD>1800E4H</TD><TD>ビット6〜4</TD><TD>NBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2CAOS2〜N2CAOS0</TD><TD>1800E4H</TD><TD>ビット10〜8</TD><TD>NBG2用</TD></TR>
+	<TR><TD>N3CAOS2〜N3CAOS0</TD><TD>1800E4H</TD><TD>ビット14〜12</TD><TD>NBG3用</TD></TR>
+	<TR><TD>R0CAOS2〜R0CAOS0</TD><TD>1800E6H</TD><TD>ビット2〜0</TD><TD>RBG0用</TD></TR>
+	<TR><TD>SPCAOS2〜SPCAOS0</TD><TD>1800E6H</TD><TD>ビット6〜4</TD><TD>スプライト用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　実際のカラーRAMアドレスオフセット値は、次の式で計算されます。カラーRAMモードがモード0またはモード2の場合、カラーRAMアドレスオフセット値を加算した結果のカラーRAMアドレスの最上位ビットは無視されます。</P>
+
+	<P>	<DT><B>・カラーRAMモードがモード0またはモード1のとき</B>
+		<DD><PRE><B>
+(カラーRAMアドレスオフセット値)
+       ＝ (カラーRAMアドレスオフセットレジスタ値3ビット)×200H
+</B></PRE></P>
+
+	<P>	<DT><B>・カラーRAMモードがモード2のとき</B>
+		<DD><PRE><B>
+(カラーRAMアドレスオフセット値)
+       ＝ (カラーRAMアドレスオフセットレジスタ値3ビット)×400H
+</B></PRE></P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p09_21_j.htm">戻る</A>｜
+<a href="p10_20_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no10">VDP2ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

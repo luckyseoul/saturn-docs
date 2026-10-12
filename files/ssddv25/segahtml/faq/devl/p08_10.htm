@@ -1,0 +1,125 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/10&gt;FAQ/Development environment/VCD/Simple CD simulator related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Development environment</b><H2 ALIGN=CENTER> VCD/simple CD simulator related </H2><HR NOSHADE>
+<DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_01"><HR></a><DL>
+<H3> I would like to know more about the operating model of VCD.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me about the operating model of VCD.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> IBM-PC/AT compatible machines undergo frequent model changes, and depending on the manufacturer, even if they have the same model name, the motherboard itself may be changed in the early and later stages of production.<BR>
+ in fact<BR>
+ <B><FONT SIZE=5>"Another model"</font></b><BR>
+ In some cases, it may become .</P>
+<P> Even we do not know all the models in circulation in the world, and such a thing is simply impossible.<BR>
+ If we can obtain the relevant model, we can test it to some extent to check whether it works, but unfortunately we cannot respond to all requests.</P>
+<P> For this purpose, we conduct operation tests and designate models that can operate stably as recommended models.<BR>
+ If you wish to purchase a PC to host a VCD in the future, please purchase a VCD machine from Ado Electronics.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_02"><HR></a><DL>
+<H3> Please tell me how to operate VCD in CartDev+DevSaturn environment.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I have a question about virtual CDs.<BR>
+ Currently, it is being developed with CartDev + DevSaturn, but the only manuals I have are those that are compatible with Programming Box.<BR>
+ I tried using a sample program, but it starts up, but I can't confirm whether it's working or not.<BR>
+ We apologize for the inconvenience, but could you please tell us the following method?</P>
+<P><OL>
+<B><LI></b> How to create a virtual CD file<B><LI></b> starting method<B><LI></b> How to confirm<B><LI></b> How to debug during use</OL>
+</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The following items assume that you have already installed the VCD tool.</P>
+<DL>
+<P><DT> <B>1) How to create a virtual CD (VCD) file</b><DD> VCD has two operating modes. One is direct DOS file access mode and the other is real-time emulation mode.<BR>
+ To finally create a self-booting disk, create a disk image.<BR>
+ For detailed creation instructions, please refer to</P>
+<P><DD><UL TYPE=DISC>
+<LI> <B>" <A HREF="../../prgg/cdtl/vcds/hon/p05_10.htm">Virtual CD User's Manual Chapter 2 Operation Procedure Details</a> "</b><LI> <B>" <A HREF="../../prgg/sofg/disc/index.htm">DISC format standard specifications</a> "</b></UL>
+<P><DD> Please refer to the. The latter contains sample script files.<BR>
+ When writing scripts, special attention must be paid to the following:<BR>
+ The 1st read file is the first file that appears in the directory entry.<BR>
+ (When building a disc, files are sorted in ascending order of ASCII character code.)</P>
+<P><DT> <B>2) How to start</b><DD> CartDev is protected like the actual Saturn, and cannot be directly self-started with a write-once disc or VCD.<BR>
+ To avoid this, we offer something called SYSTEM DISC.<BR>
+ To release it, set the SYSTEM DISC before turning on the power to CartDev.<BR>
+ Set the VCD←→CD switching switch to the CD side.<BR>
+ When you turn on the power, it will start up and the Sega logo will be displayed on the screen.<BR>
+ If "COMPLETE" appears in the upper left corner of the screen after a while, protection has been cancelled.<BR>
+ Once released, the state remains valid until you reset the SMPC or turn off the power.<BR>
+ However, when using it on IRIX, due to the cartdev-server program, first kill the cartdev-server process, reset CartDev, and turn DevSaturn back on before removing protection.<BR>
+ Once released, if you want to use a VCD, set the VCD←→CD switching switch to the VCD side, press the reset button to restart, and the disk image prepared on the VCD side will be read. .<BR>
+ Please contact our <FONT SIZE=5>sales representative</font> for information on how to obtain the SYSTEM DISC.</P>
+<P><DT> <B>3) How to confirm</b><DD> The JVC-based sample attached to the VCD tool does not include a self-starting IP (Initialize Program).<BR>
+ The main focus is to confirm whether the VCD host can emulate data transfer normally.<BR>
+ When you actually create a disc image, you can create a CD-DA with tracks 2 to 5.<BR>
+ If you specify JVC.DSK when starting VCDEMU.EXE, start CartDev, and play CD-DA from the multiplayer screen, the VCD emulator will work if a 1KHz oscillation sound with a different audio level is played. doing. Perform fast forward playback, track jump/skip, A/B repeat playback, etc., and check if it works properly.<BR>
+ In many cases where files created by users with the assumption of self-starting do not work properly, it is most likely due to an improper creation of IP.BIN or a problem with the script writing.</P>
+<P><DT> <B>4) How to debug during use</b><DD> If you are creating a write-once CD one by one, you will need to perform a write operation every time there is a slight change in a file, but in the case of a VCD, you can update a portion of it by using VCDUTL.EXE even in real-time emulation mode. .<BR>
+ VCDEMU.EXE displays the commands executed to the CD drive on the screen one after another, and can also log them.<BR>
+ This allows you to check which file is currently being read, or check the contents of the disk image file that is currently being specified for emulation.<BR>
+ Also, since opening and closing of the CD tray can be emulated, you can also check whether you can reliably jump to multiplayer by checking the tray open.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_03"><HR></a><DL>
+<H3> An error occurs when running VCDBULID.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I try to use VCDBUILD to create the files necessary to run VCD, the following message appears and I am returned to the command line.</P>
+<P><DD><PRE>
+>PreProcess for VCDEMU &lt;VCDPRE&gt; Ver 3.10 Released at 30-Nov-1994
+>Copyright (c) 1994 Victor Company of Japan, Limited (JVC)
+>All right reserved.
+>
+>script file = bell.scr
+>rti    file = bell.rti
+>Parsing Scripts
+>DOS/4G error (2001): exception 0Eh (page fault) at 180:00472E25
+>TSF32: prev_tsf32 699C
+>SS       188 DS       188 ES       188 FS         0 GS        20
+>EAX        0 EBX 452E3334 ECX FFFFFFFF EDX 452E3335
+>ESI   490188 EDI   49EF20 EBP   49EF0C ESP   49EEE8
+>CS:IP  180:00472E25 ID 0E COD        0 FLG    10206
+>CS=  180, USE32, page granular, limit FFFFFFFF, base        0, acc CF9B
+>SS=  188, USE32, page granular, limit FFFFFFFF, base        0, acc CF93
+>DS=  188, USE32, page granular, limit FFFFFFFF, base        0, acc CF93
+>ES=  188, USE32, page granular, limit FFFFFFFF, base        0, acc CF93
+>FS=    0, USE16, byte granular, limit        0, base       16, acc  0
+>GS=   20, USE16, byte granular, limit     FFFF, base     ED70, acc 93
+>CR0: PG:1 ET:1 TS:0 EM:0 MP:1 PE:1   CR2: 452E3334 CR3: 12000
+>Crash address (unrelocated) = 1:00019E25
+</PRE></P>
+<P><DD>Currently, the free memory on this machine (Gateway 2000 DX4-66) is 590KB for conventional and 10MB for XMS.<BR>
+ Running VCDBUILD on another machine using the same script file produces the required information without any problems.<RB>
+ Maybe you don't have enough memory? Or maybe the DOS version is old?<BR>
+ Could you please give me information on how much memory is required for VCDBUILD to work without any problems?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This error is caused by a DOS extender error.<BR>
+ This seems to be caused by the CONFIG.SYS or AUTOEXEC.BAT environment.<BR>
+ As a countermeasure,</P>
+<P><DD> Try setting the environment variables DOS4G and DOS16M as you would with the Hitachi compiler.</P>
+<P><DD>&#65308; <B>example</b>&#65310;<BR>
+ Please make the following settings in AUTOEXEC.BAT.</P>
+<P><DD><PRE><B>
+SET DOS16M=0@2M:6M
+SET DOS4G=quite
+</b></P></DL><!-----------------------------------------------------------------------------><A NAME="no8_04"><HR></a><DL><H3> Regarding the operating environment of the simple emulator.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is the recommended environment for the VCD system the same as the recommended environment for the simple CD emulator?<P><DT> <FONT SIZE=5>A)</font><DD> The recommended environment for VCD uses an ISA bus VCD dedicated I/F card, so this problem occurs in areas that depend on the operating characteristics between PC models.<BR> A simple SCSI/CD simulator does not have such severe limitations.<BR> There is no problem if a regular SCSI card works.</P></DL><!-----------------------------------------------------------------------------><A NAME="no8_05"><HR></a><DL><H3> Is it possible to play Cinapak and CD-DA with a simple CD simulator?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I tested the file loading sample program using SIMM and confirmed that it works using a simple CD simulator, but it does not return from GFS_Init.</P><DT><OL><P><B><LI></b> I used a graphics box, but will it work without a programming box?</P><P><B><LI></b> Please tell me in detail how to use the simple CD simulator.</p></OL><P><DT> <FONT SIZE=5>A)</font><DT><OL><P><B><LI></b> Please consider that it basically doesn't work. The chips used in graphic boxes are often older versions than those used in programming boxes, and while this is not a problem when used exclusively for graphics, there are problems when used as a programming box. Please note that the simple CD function using SCSI cannot be used with CartDev + DevSaturn.</P><P><B><LI></b> how to use<OL><P><B><LI></b> Turn dip switches 2-4 ON (lower side).</P><P><B><LI></b> Connect the PC and Programming Box with a SCSI cable.</P><P><B><LI></b> Start Programming Box.</P><P><B><LI></b> Reset the Programming Box immediately after turning on the PC.</P><P><B><LI></b> Check that the Programming Box is recognized as a SCSI device on the PC startup screen.</P><P><B><LI></b> After the Programming Box screen becomes multiplayer, stop it with Ctrl-C from ICE<BR> (Do not run 'G 400' at this time. Doing 'G 400' will reset the SCSI device)</P><P><B><LI></b> Load the program from ICE.</P><P><B><LI></b> Run CDSIM.EXE on your PC.</P><P><B><LI></b> Run the program on ICE.<BR> Also, when running CDSIM.EXE on the PC side, it is necessary to create a "correspondence file between CD file names and DOS file names".</P><P> <B>(example)</b><BR> The file "PCM1.DAT" on the CD corresponds to the file "\PCMDATA\FOO.PCM" on DOS, and the file "PCM2.DAT" on the CD corresponds to the file "\PCMDATA\BAR" on DOS. PCM" file,</P><P> <B>Contents of “CD_DOS.TXT”</b><PRE>
+PCM1.DAT FOO.PCM[RET]
+PCM2.DAT BAR.PCM[RET]
+[EOF]
+CDSIM -fCD_DOS.TXT[RET]
+</PRE></P><P>Please note that the simple CD simulator is limited to use for simple file access only.<BR> (Cannot be used for file interleaving or as a substitute for MODE2 tracks.)</P></OL></OL></DL><!-----------------------------------------------------------------------------><A NAME="no8_06"><HR></a><DL><H3> How to use the simple CD simulator?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it possible to play Cinepak data and CDDA data with a simple CD simulator?</P><P><DT> <FONT SIZE=5>A)</font><DD> Unfortunately, complex emulations such as CDDA playback and MODE2 tracks are not possible with simple CD simulators (both SIMM and SCSI).<BR> As for simple movie playback, it is possible.</P></DL><!-----------------------------------------------------------------------------><A NAME="no8_07"><HR></a><DL><H3> I want to use a simple SCSI system with SGL.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to use the SIMM system of the simple CD simulator.</P><P><DT> <FONT SIZE=5>A)</font><DD> SIMM systems can be used in both Programming Box and CartDev + DevSaturn environments.</P><DL><P><DT> <B>For Programming Box:</b><DD> Up to 4 8MB SIMMs can be installed<BR> Mounting address can be selected by dip switch</P><P><TABLE BORDER=1><TR><TH WIDTH=140> SW2 SIMMCART</TH><TH WODTH=380> implementation address</TR><TR ALIGN=CENTER><TD><PRE> OFF</TD><TD><PRE> :24000000H ~ 24FFFFFFH (16MB continuous)</TD></TR><TR ALIGN=CENTER><TD><PRE> ON</TD><TD><PRE> :22000000H ~ 23FFFFFFH (32MB consecutive)</TD></TR></TABLE></P><P><DT> <B>For CartDev:</b><DD> Up to two 8MB SIMMs can be mounted on the SIMM buffer cartridge (optional) (address fixed)<BR> Implementation address is 24000000H to 24FFFFFFH (16MB continuous)</P></DL><P><DD> To access SIMM files from the GFS library, you need to set the storage address of the memory file in a global variable called 'GFMC_base'.<BR> 'GFMC_base' is defined within the library. In the user program</P><P><DD> <B>extern Sint8 *GFMC_base;</b></P><P><DD> You can use it by declaring it.<BR> Note that the storage location of the memory file does not necessarily have to be on SIMM memory.<BR> If there is enough space in the work RAM, you can also load it there and use it.<BR> To create a memory file, use a tool called MFCAT.EXE.<BR> MFCAT.EXE is located in SATURN\SEGABIN\BIN or SATURN\SEGABIN\BINCD.</P><P> For details on how to use this tool, please refer to " <A HREF="../../prgg/cdtl/cdsm/hon/p03_10.htm">Simple CD Simulator User's Manual/3. Command Description</a> " in PROGRAMMER'S GUIDE VOL.1.</P></DL><!-----------------------------------------------------------------------------><A NAME="no8_08"><HR></a><DL><H3> What are the conditions for using the simple SCSI system?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am trying to access a SCSI hard disk using the GFS library using a simple CD simulator/SCSI system in SGL, but control is not returned to the caller after executing the GFS_Init function.<BR> At this time, the PC on the SCSI system side is in a CDROM emulation state (is it in a normal state?).<BR> The same program (GFSC_base value is different) is working normally on VCD system and SIMM system.<BR> I wish I could figure out why <A HREF="../../prgg/prg1/file/hon/p08_11.htm#no1_1">the GFS_Init function</a> doesn't return.<BR> Are there settings required only for SCSI systems?</P><P><DT> <FONT SIZE=5>A)</font><DD> Simple SCSI systems cannot be used with CartDev + DevSaturn.<BR> This is possible with a simple SIMM system. (with optional buffer cartridge)<BR> With CartDev + Programming Box, both are available.</P></DL><!-----------------------------------------------------------------------------><A NAME="no8_09"><HR></a><DL><H3> Regarding the operation of virtual CD (things to check)</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What should I check if I have trouble using a virtual CD?</P><P><DT> <FONT SIZE=5>A)</font><DT><OL><P><B><LI></b> Have you confirmed that it works with a sample program using a virtual CD?</P><P><B><LI></b> Does Virtual CD hang immediately after turning on the PC?<BR> After how many hours?</P><P><B><LI></b> Regarding the physical recording status of the hard disk for virtual CDs, is it regularly refreshed?<BR> (If there are many discontinuous areas, problems will occur in access timing.)<BR> Please note that the malfunction may be due to a poor connection of the cable, etc., so please try reconnecting the connector etc.</P></OL></DL><!-----------------------------------------------------------------------------><A NAME="no8_10"><HR></a><DL><H3> I installed a virtual CD on my PC and started VCDEMU.EXE, but it does not start properly.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I installed a virtual CD on my PC and started VCDEMU.EXE, but it does not start properly.</P><P><DT> <FONT SIZE=5>A)</font><DD> Are the IRQ, DMA channel, and I/O address on the board set correctly?</P><P> Be careful of conflicts with other devices, especially DMA channels. Adaptec's SCSI card defaults to 5 channels, which conflicts with the VCD interface board's factory settings.<BR> Also, setting the IRQ level of the VCD interface to a lower number than the SCSI interface may cause a hang.<BR> If it is not recognized at all, please check the I/O address settings again.</P></DL><HR NOSHADE> <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR><A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS></BODY></HTML>

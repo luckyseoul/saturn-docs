@@ -1,0 +1,249 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;20/30&gt;SGL Programmer's Tutorial/8-10.Special scrolling function</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+ <B>▲ <A HREF="p08_90.htm">Back</a> ｜ <A HREF="p08_b0.htm">Forward</a> ▼</b><HR NOSHADE>
+<DL>
+<A NAME="no8_a0"></A><P><DT><H3> 8-10. Special scrolling function</H3><DD> In addition to the normal scrolling functions, the Sega Saturn has several special scrolling functions. Among these, the SGL library functions support the ASCII scrolling function and the transparent color bit control function.</P>
+<A NAME="no8_a1"></A><P><DT><H3> ASCII scroll</H3><DD> The ASCII scrolling function refers to using data called ASCII cells as character pattern data instead of normal scrolling character pattern data. ASCII cells are so-called ASCII data (ABCDEFG...XYZ) converted into a data format (cell data) that can be used with scrolling, and the figure below illustrates this.</P>
+<A NAME="z8_25"></A><P ALIGN=CENTER> <B>Figure 8-25 ASCII scroll image</b><BR>
+<img srcset="../grp/p08_50.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> ●ASCII scroll uses ASCII data as scroll data.<DD> ● Half-width alphanumeric characters are displayed consecutively, and the order corresponds to the ASCII code.</P>
+<P><DD> In SGL, ASCII cells are stored in VRAM at the system initialization stage.<BR>
+ By using this data when setting the normal scroll function, ASCII scrolling becomes available.</P>
+<P> In the system initialization state, the ASCII scroll is configured with 128 cells and 256 colors, and is set to use the normal scroll screen "NBG0". In addition, ASCII scroll data is stored in the following RAM areas.</P>
+<PRE>
+Character data: 2000H from address 0x25e60000
+Map data: 1000H from address 0x25e76000
+Palette data: 20H from address 0x25f00000
+</PRE><P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD><B>If for some reason other scroll data is written in the above area, the ASCII scroll will be replaced with that data, so it will be drawn in a different (incorrect) state from the default.</b></TD><TR></TABLE>
+</P>
+<P><DD> The next sample program (Listing 8-7) draws an ASCII scroll on the TV screen.</P>
+<A NAME="l8_7"></A><P ALIGN=CENTER> <B>Listing 8-7 sample_8_10_1: ASCII scroll</b></P>
+<P><DD><PRE>
+/*------------------------------------------------ ----------------------*/
+/* Ascii Scroll */
+/*------------------------------------------------ ----------------------*/
+#include "sgl.h"
+#include "ss_scroll.h"
+
+#define NBG1_CEL_ADR VDP2_VRAM_B1
+#define NBG1_MAP_ADR ( VDP2_VRAM_B1 + 0x18000 )
+#define NBG1_COL_ADR VDP2_COLRAM
+#define BACK_COL_ADR ( VDP2_VRAM_A1 + 0x1fffe )
+
+void ss_main(void)
+{
+	FIXED ascii_posx = SIPOSX , ascii_posy = SIPOSY;
+
+	slInitSystem(TV_320x224,NULL,1);
+        slTVOff();
+	slPrint("Sample program 8.10.1" , slLocate(9,2));
+
+	slColRAMMode(CRM16_1024);
+	slBack1ColSet((void *)BACK_COL_ADR , 0);
+
+	slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageNbg1((void *)NBG1_CEL_ADR , 0 , PNB_1WORD|CN_10BIT);
+	slPlaneNbg1(PL_SIZE_1x1);
+	slMapNbg1((void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR);
+	Map2VRAM(ascii_map ,(void *)NBG1_MAP_ADR , 32 , 4 , 0 , 0);
+
+	slScrAutoDisp(NBG0ON | NBG1ON);
+	slTVOn();
+
+	while(1) {
+		slScrPosNbg1(ascii_posx, ascii_posy);
+		ascii_posx += POSX_UP;
+		slSynch();
+	} 
+}
+</PRE><A NAME="f8_9"></A><H4>Flow 8-9 sample_8_10_1: ASCII scroll</H4><img srcset="../grp/p08_52.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><A NAME="no8_a2"></A><P><DT><H3> transparent color bit</H3><DD> On Sega Saturn, when palette format is selected for scroll color data, the 0th color data in one palette can be made transparent regardless of the originally registered color data.<BR>
+ Transparent color literally refers to a color specification in which the dots specified as transparent color are processed as if they were transparent, and the drawing of scrolls etc. behind the scroll specified as transparent color is given priority. . The figure below illustrates this.</P>
+<A NAME="z8_26"></A><P ALIGN=CENTER>&#65308; <B>Figure 8-26 Transparent setting image model</b>&#65310;<img srcset="../grp/p08_53_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> To use the transparent color function in SGL, please use the library function “slScrTransparent”.<BR>
+ Scrolling after using the function “slScrTransparent” will be drawn according to the function specification.</P>
+<P><DT> <B>[void slScrTransparent ( Uint16 trns_flag );]</b><DD> If palette format is selected for scroll color data, select whether or not to process the 0th color data in the palette data transparently.<BR>
+ Assign the values in the table below that correspond to the scroll surface on which transparency processing will be performed to the parameters.<BR>
+ Also, by connecting multiple parameters with the or operator "|", it is possible to specify transparent processing for multiple scroll surfaces.</P>
+<A NAME="t8_21"></A><P><DD> <B>Table 8-21 Parameter substitution value for “slScrTransparent” (trns_flag)</b><DD><TABLE BORDER=1>
+<TR><TH ROWSPAN=2></TH><TH COLSPAN=5> Scroll surface that performs transparency processing</TH></TR>
+<TR><TH> NBG0</TH><TH> NBG1</TH><TH> NBG2</TH><TH> NBG3</TH><TH> RBG0</TH></TR>
+<TR><TH> Assignment value</TH><TD> NBG0ON</TD><TD> NBG1ON</TD><TD> NBG2ON</TD><TD> NBG3ON</TD><TD> RBG0ON</TD></TR>
+</TABLE>
+ <B>Note)</b> The above values are defined in “sl_def.h” that comes with the system.</P>
+<P> The following sample program (Listing 8-8) actually uses the SGL library function "slScrTransparent" to implement transparent color processing for scrolling.</P>
+<A NAME="l8_8"></A><P ALIGN=CENTER> <B>Listing 8-8 sample_8_10_2: Transparent code control</b><P><DD><PRE>
+#include "sgl.h"
+#include "ss_scroll.h"
+
+#define NBG1_CEL_ADR VDP2_VRAM_B0
+#define NBG1_MAP_ADR ( VDP2_VRAM_B0 + 0x10000 )
+#define NBG1_COL_ADR ( VDP2_COLRAM + 0x00200 )
+#define NBG2_CEL_ADR ( VDP2_VRAM_B1 + 0x02000 )
+#define NBG2_MAP_ADR ( VDP2_VRAM_B1 + 0x12000 )
+#define NBG2_COL_ADR ( VDP2_COLRAM + 0x00400 )
+#define BACK_COL_ADR ( VDP2_VRAM_A1 + 0x1fffe )
+
+void ss_main(void)
+{
+    Uint16 trns_flg = NBG1ON ;
+    FIXED yama_posx = SIPOSX , yama_posy = SIPOSY ;
+    FIXED am2_posx = SIPOSX , am2_posy = SIPOSY ;
+    
+    slInitSystem(TV_320x224,NULL,1);
+    slTVOff();
+    slPrint("Sample program 8.10.2" , slLocate(9,2)) ;
+
+    slColRAMMode(CRM16_1024);
+    slBack1ColSet((void *)BACK_COL_ADR , 0) ;
+
+    slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
+    slPageNbg1((void *)NBG1_CEL_ADR , 0 , PNB_1WORD|CN_10BIT);
+    slPlaneNbg1(PL_SIZE_1x1);
+    slMapNbg1((void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR);
+    Cel2VRAM(am2_cel , (void *)NBG1_CEL_ADR , 16000) ;
+    Map2VRAM(am2_map, (void *)NBG1_MAP_ADR, 32, 32, 1, 0);
+    Pal2CRAM(am2_pal , (void *)NBG1_COL_ADR , 256) ;
+
+    slCharNbg2(COL_TYPE_256 , CHAR_SIZE_1x1) ;
+    slPageNbg2((void *)NBG2_CEL_ADR , 0 , PNB_1WORD|CN_12BIT);
+    slPlaneNbg2(PL_SIZE_1x1);
+    slMapNbg2((void *)NBG2_MAP_ADR , (void *)NBG2_MAP_ADR , (void *)NBG2_MAP_ADR , (void *)NBG2_MAP_ADR);
+    Cel2VRAM(yama_cel , (void *)NBG2_CEL_ADR , 31808) ;
+    Map2VRAM(yama_map, (void *)NBG2_MAP_ADR, 32, 16, 2, 256);
+    Pal2CRAM(yama_pal , (void *)NBG2_COL_ADR , 256) ;
+
+    slScrPosNbg2(yama_posx, yama_posy);
+    slScrPosNbg1(am2_posx, am2_posy);
+    slScrTransparent(trns_flg);
+
+    slScrAutoDisp(NBG0ON | NBG1ON | NBG2ON);
+    slTVOn();
+
+    while(1)
+    {
+        if(yama_posx&gt; = (SX + SIPOSX))
+        {
+            if(trns_flg == NBG1ON)
+                trns_flg = 0;
+            else
+                trns_flg = NBG1ON ;
+            yama_posx = SIPOSX;
+            slScrTransparent(trns_flg);
+        }
+
+	slScrPosNbg2(yama_posx, yama_posy);
+	yama_posx += POSX_UP;
+
+	slScrPosNbg1(am2_posx, am2_posy);
+	am2_posy += POSY_UP ;
+
+	slSynch();
+    } 
+}
+</PRE><A NAME="f8_10"></A><H4>Flow 8-10 sample_8_10_2: Transparent code control</H4><img srcset="../grp/p08_55.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><A NAME="no8_a3"></A><P><DT><H3> color calculation</H3><DD> With SGL, it is possible to calculate the color data of the top image and second image obtained by comparing the priorities of the sprite and each scroll screen at a specified ratio and display it on the screen.<BR>
+ By using this function, it is possible to draw other scroll surfaces and sprites that are hidden behind a certain scroll so that they gradually emerge.</P>
+<P> To perform color calculation processing, you need to take the following steps.</P>
+<P><DT> <B>1) Various settings for color calculation processing</b><DD> Use the function "slColorCalc" to configure various settings for color calculation processing, and use the function "slColorCalcOn" to determine the scroll surface that will be affected by the color calculation.</P>
+<P><DT> <B>[void slColorCalc ( Uint16 flag );]</b><DD> Configure various settings for color calculation processing.</P>
+<P> Assign the values shown below that correspond to the color calculation processing control to be used to the parameters.<BR>
+ For details on the parameters, refer to “HARDWARE MANUAL vol.2: VDP2 User's Manual Chapter 12 Color Calculation”.</P>
+<A NAME="z8_27"></A><P ALIGN=CENTER> <B>Figure 8-27 Parameter substitution value (flag) for “slColorCalc”</b><P><DD><PRE>
+● ColorCalc substitution value ●
+Calculation method: [CC_RATE | CC_ADD] |
+Calculation specification image: [CC_TOP | CC_2ND] |
+Extended color operation: [CC_EXT] |
+Registration surface: [NBG0ON | NBG1ON | NBG2ON | NBG3ON | RBG0ON | LNCLON | SPRON ] |
+</PRE><P><DD><B>Note)</b> The above values are defined in “sl_def.h” that comes with the system.</P>
+<P><DD> There are two main modes of color calculation.</P>
+<PRE>
+Add by ratio: Color calculation by specifying the calculation ratio of TOP image and 2ND image (CC_RATE)
+Direct addition: Color calculation using simple addition values of TOP image and 2ND image (CC_ADD)
+</PRE><P><DT><B>[void slColorCalcOn( Uint16 flag );]</b><DD> Determines the scroll surface that is affected by color calculation processing.<BR>
+ Assign the values in the table below that correspond to the scroll surface on which you want to perform color calculations to the parameters.<BR>
+ Also, by connecting multiple parameters with the or operator "|", you can specify color calculations for multiple scroll surfaces at the same time.</P>
+<A NAME="t8_22"></A><P><DD> <B>Table 8-22 Parameter substitution value (flag) for “slColorCalcOn”</b><DD><TABLE BORDER=1>
+<TR><TH ROWSPAN=2></TH><TH COLSPAN=7> Scroll surface that performs color operations</TH></TR>
+<TR><TH> NBG0</TH><TH> NBG1</TH><TH> NBG2</TH><TH> NBG3</TH><TH> RGB0</TH><TH> LNCL</TH><TH> SPRITE</TH></TR>
+<TR><TH> Assignment value</TH><TD> NBG0ON</TD><TD> NBG1ON</TD><TD> NBG2ON</TD><TD> NBG3ON</TD><TD> RBG0ON</TD><TD> LNCLON</TD><TD> SPRITEON</TD></TR>
+</TABLE>
+ <B>Note)</b> The values in the table above are defined in “sl_def.h” that comes with the system.</P>
+<P><DT> <B>2) Setting color calculation value</b><DD> For the scroll surfaces for which color calculation settings and registration have been completed, color calculation processing is actually performed by using the functions "slColRateNbg0 to 3", "slColRateRbg0", "slColRateLNCL", and "slColRateBACK" corresponding to each scroll surface. (specified as a ratio).</P>
+<P> However, if the addition method is used for color calculation, the ratio specification has no meaning.</P>
+<P><DT> <B>[void slColRateNbg0~3( Uint16 rate );]</b><DT> <B>[void slColRateRbg0( Uint16 rate );]</b><DT> <B>[void slColRateLNCL( Uint16 rate );]</b><DT> <B>[void slColRateBACK( Uint16 rate );]</b><DD> Set the color calculation ratio for each scroll surface specified by the function.<BR>
+ Assign the color calculation ratio (range 0 to 31) used in color calculation to the parameter.<BR>
+ The functions "slColRateNbg0 to 3" are used to set the color calculation ratio for each normal scroll screen, the function "slColRateRbg0" is used for the rotation scroll screen, the function "slColRateLNCL" is used for the line color screen, and the function "slColRateBACK" is used to set the color calculation ratio for the back screen.</P>
+<P><DD> A rough summary of the flow of color calculation processing is as follows.</P>
+<A NAME="f8_11"></A><H4> Flow 8-11 Flow of color calculation processing</H4><img srcset="../grp/p08_57.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><A NAME="no8_a4"></A><P><DT><H3> line color screen</H3><DD> A line color screen is a special scroll screen that is forcibly inserted as the second image of the top image of the specified scroll screen (the image actually drawn on the monitor) and prepared only for color calculations.<BR>
+ On the line color screen, you can set the color for the entire screen or for each line.<BR>
+ Additionally, a set of color RAM address data for the colors used for each line must be stored in the VRAM area as a line color table.</P>
+<P><DT> <B>reference</b><DD> For details on the line color screen, refer to “HARDWARE MANUAL vol.2: Line screen in the VDP2 user's manual”.</P>
+<P> To use a line color screen, you need to take the following steps:</P>
+<P><DT> <B>1) Line color screen settings</b><DD> When using the line color screen, you must first specify the line color table in which line color data is stored.<BR>
+ Also, do not forget to store the color data specified in the line color table in the color RAM area.</P>
+<P><DT> <B>[void slLineColTable( void *adr );]</b><DD> Specify the line color table address.<BR>
+ The parameter specifies the address in the VRAM area where the line color table is stored.</P>
+<P> If you want to use a single color line color screen, use the function “slLine1ColSet”.</P>
+<P><DT> <B>[void slLine1ColSet( void *adr , Uint16 col ) ;]</b><DD> Line color The screen will be a single color, and the color will also be determined at the same time.</P>
+<P><DT> <B>2) Registration of scroll surface</b><DD> Next, register the scroll surface that will be affected by the line color screen.<BR>
+ Please use the function “slLineColDisp” to register the scroll surface.</P>
+<P><DT> <B>[void slLineColDisp( Uint16 flag );]</b><DD> Determines which scroll plane is affected by the line color screen.<BR>
+ Assign the values in the table below that correspond to the scroll surface you want to register to the parameters.<BR>
+ Also, by connecting multiple parameters with the or operator "|", you can register multiple scroll surfaces at the same time.</P>
+<A NAME="t8_23"></A><P><DD> <B>Table 8-23 Parameter substitution value (flag) for “slLineColDisp”</b><DD><TABLE BORDER=1>
+<TR><TH ROWSPAN=2></TH><TH COLSPAN=5> Scroll surface to register</TH></TR>
+<TR><TH> NBG0</TH><TH> NBG1</TH><TH> NBG2</TH><TH> NBG3</TH><TH> RBG0</TH></TR>
+<TR><TH> Assignment value</TH><TD> NBG0ON</TD><TD> NBG1ON</TD><TD> NBG2ON</TD><TD> NBG3ON</TD><TD> RBG0ON</TD></TR>
+</TABLE>
+ <B>Note)</b> The values in the table above are defined in “sl_def.h” that comes with the system.</P>
+<P><DT> <B>3) Color calculation using line color screen</b><DD> The scroll surface that has been registered using the function "slLineColDisp" can be used in conjunction with the color calculation processing settings described above to perform color calculation processing using line color images.<BR>
+ For color calculation processing, please refer to the previous section "Color calculation".</P>
+<A NAME="f8_12"></A><H4> Flow 8-12 Line color screen processing flow</H4><img srcset="../grp/p08_59_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><A NAME="no8_a5"></A><P><DT><H3> color offset</H3><DD> In SGL, you can change the color displayed on the screen by adding or subtracting an offset value to the color RAM data of the sprite and each scroll screen (this value itself does not change).<BR>
+ If you want to use the color offset function, you need to follow the steps below.</P>
+<P><DT> <B>1) Color offset settings</b><DD> There are two types of color offset: color offset A and color offset B.<BR>
+ If you want to use the color offset function, you need to register the scroll surface to one of the two color offsets.<BR>
+ Use the functions “slColOffsetOn” and “slColOffsetBUse” to register scrolling.</P>
+<P><DT> <B>[void slColOffsetOn( Uint16 flag );]</b><DD> Register the scroll surface on which you want to use the color offset function.<BR>
+ Assign the values in the table below that correspond to the scroll surface to be registered to the parameters.</P>
+<P><DT> <B>[void slColOffsetBUse( Uint16 flag );]</b><DD> Register the scroll surface on which you want to use color offset B.<BR>
+ Scroll surfaces registered only with the function “slColOffsetOn” use offset A.<BR>
+ Assign the values in the table below that correspond to the scroll surface to be registered to the parameters.</P>
+<A NAME="t8_24"></A><P><DD> <B>Table 8-24 Parameter substitution values (flag) for “slColOffsetOn” and “slColOffsetBUse”</b><P><DD><TABLE BORDER=1>
+<TR><TH ROWSPAN=2></TH><TH COLSPAN=7> Scroll surface to register</TH></TR>
+<TR><TH> NBG0</TH><TH> NBG1</TH><TH> NBG2</TH><TH> NBG3</TH><TH> RBG0</TH><TH> BACK</TH><TH> SPRITE</TH></TR>
+<TR ALIGN=CENTER><TH> Assignment value</TH><TD> NBG0ON</TD><TD> NBG1ON</TD><TD> NBG2ON</TD><TD> NBG3ON</TD><TD> RBG0ON</TD><TD> BACKON</TD><TD> SPRON</TD></TR>
+</TABLE>
+<DD> <B>Note)</b> The values in the table above are defined in “sl_def.h” that comes with the system.</P>
+<P><DT> <B>2) Setting the offset value</b><DD> Each scroll surface that has been registered will be displayed on the screen under the influence of the offset value set in each color offset.<BR>
+ Use the function “slColOffSetA,B” to set the offset value for each color offset.</P>
+<P><DT> <B>[void slColOffsetA( Sint16 r , Sint16 g , Sint16 b ) ;]</b><DT> [void slColOffsetB( Sint16 r , Sint16 g , Sint16 b ) ;]<DD> Set the color offset value for each color offset.<BR>
+ Assign the offset value (signed 9 bits) of each RGB color element to the parameter.<BR>
+ The function "slColOffSetA" is used to set the offset value of color offset A, and the function "slColOffSetB" is used to set the offset value of color offset B.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_90.htm">Back</a> ｜ <A HREF="p08_b0.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

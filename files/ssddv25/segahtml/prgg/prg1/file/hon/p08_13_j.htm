@@ -1,0 +1,95 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/17&gt;プログラマーズガイド/ファイルシステムライブラリ/8.関数仕様-3</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#intr">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<a href="p08_12_j.htm">戻る</A>｜
+<a href="p08_14_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>8.関数仕様-3</H2>
+<HR NOSHADE>
+
+<A NAME="no8_30"></A>
+<H3>8.3　完了復帰型読み込み</H3>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_1"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><a href="p08_10_j.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ファイルの一括読み込み</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_Load</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3.1</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 GFS_Load(Sint32 fid, Sint32 off, void *buf, Sint32 bsize)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>fid</TD><TD><PRE>：ファイル識別子</TD></TR>
+<TR><TD><PRE>off</TD><TD><PRE>：オフセット(セクタ単位)</TD></TR>
+<TR><TD><PRE>bsize</TD><TD><PRE>：読み込むデータ数の上限(単位：バイト)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>buf  ：データ読み込み領域
+<DT><B>　関数値</B><DD>読み込んだデータ数(バイト単位)。エラーの場合は負のエラーコード。
+<DT><B>　機　能</B><DD>ファイル識別子を指定してファイルのデータを読込みます。オープン、クローズの処理はこの関数の内部で行われます。<BR>ファイルの大きさがbsizeに満たないときは、ファイルの末尾までのデータが読み込まれます。bsizeにGFS_BUFSIZ_INFを指定すると、指定位置からファイルの最後までのデータが読み込まれます。
+
+<DT><B>　備　考</B><DD>bufは４バイト境界に配置されていなければなりません。取り出しモード、転送モード、読み込みパラメータ、取り出しパラメータはデフォルト値が使用されます。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_2"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><a href="p08_10_j.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>データの読み込み</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_Fread</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3.2</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 GFS_Fread(GfsHn gfs, Sint32 nsct, void *buf, Sint32 bsize)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>gfs</TD><TD><PRE>：ファイルハンドル</TD></TR>
+<TR><TD><PRE>nsct</TD><TD><PRE>：読み込むセクタ数</TD></TR>
+<TR><TD><PRE>bsize</TD><TD><PRE>：読み込むデータ数の上限(単位：バイト)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>buf  ：読み込み領域
+<DT><B>　関数値</B><DD>実際に読み込んだバイト数
+<DT><B>　機　能</B><DD>オープンされたファイルハンドルを指定してファイルのデータを読み込み処理を行います。<BR>アクセスポインタからnsctセクタのデータを読込みます。読込んだデータのうち、最大bsizeバイトまでのデータがbufに書き込まれます。アクセスポインタはnsctセクタ先に進みます。
+<DT><B>　備　考</B><DD>転送モードによってbufのアドレス境界に制限があります。
+<DD><TABLE>
+<TR><TD><PRE>・GFS_TMODE_SCUの時</TD><TD><PRE>：制限なし</TD></TR>
+<TR><TD><PRE>・それ以外の時</TD><TD><PRE>：4バイト境界に配置する</TD></TR></TABLE>
+
+<!-- *** Update by CRI ：5.10 --><DD>GFS_SetReadParaで指定した値に関わらず、読み込みパラメータはデフォルト値が使用されます。
+</DL>
+
+<HR NOSHADE>
+<B>▲
+<a href="p08_12_j.htm">戻る</A>｜
+<a href="p08_14_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#intr">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no7">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

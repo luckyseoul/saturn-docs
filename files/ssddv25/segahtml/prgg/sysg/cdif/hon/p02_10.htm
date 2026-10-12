@@ -1,0 +1,98 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/19&gt;CD communication I/F (CD part)/basics</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual</b><H2 ALIGN=CENTER> Basics</H2><HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A><P><DT><H2> 2.1 Terminology and symbols</H2><A NAME="no2_11"></A><P><DT> <B>(1) Definition of terms</b><DD> Table 2.1 defines the terms used.</P>
+<A NAME="t2_1"></A><P><DD> <B>Table 2.1 Definition of terms</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> term</TH><TH><PRE> meaning</TH></TR>
+<TR><TD><PRE> sector</TD><TD><PRE> A basic unit of data handled in a CD block. (2352 bytes fixed)<BR> The sector size and structure follows the CD-ROM format.</TD></TR>
+<TR><TD><PRE> stream</TD><TD><PRE> A logically continuous flow of data distinguished by sector headers and subheaders.</TD></TR>
+<TR><TD><PRE> cd buffer</TD><TD><PRE> A buffer within a CD block that stores sector data.</TD></TR>
+<TR><TD><PRE> CD buffer size</TD><TD><PRE> CD buffer size in sectors.</TD></TR>
+<TR><TD><PRE> buffer compartment</TD><TD><PRE> A partition of the CD buffer into multiple logical partitions.<BR> It can be viewed as a logical element that stores and retrieves streams.</TD></TR>
+<TR><TD><PRE> buffer partition size</TD><TD><PRE> Size of the buffer partition in sectors.</TD></TR>
+<TR><TD><PRE> sector position</TD><TD><PRE> The position of the sector within the buffer partition. (position in sector units)<BR> Takes a value from 0 to (buffer partition size - 1).<BR> Sectors in the buffer partition are accessed using the sector position as a key.</TD></TR>
+<TR><TD><PRE> Aperture</TD><TD><PRE> A logical element that separates streams according to set conditions.</TD></TR>
+<TR><TD><PRE> selector</TD><TD><PRE> A logical element that selects streams, consisting of an aperture and a buffer compartment.<BR> A stream selection circuit can be constructed using a selector.</TD></TR>
+<TR><TD><PRE> device</TD><TD><PRE> A logical device that generates and absorbs streams such as CD-ROM and MPEG. Above circuit<BR> Stream selection processing is possible by connecting a device to.</TD></TR>
+<TR><TD><PRE> connector</TD><TD><PRE> Aperture, buffer compartment, terminals for connecting devices.</TD></TR>
+<TR><TD><PRE> Frame address (FAD)</TD><TD><PRE> The absolute time on the CD, 00:00:00, is set to 0, and each frame is numbered consecutively.<BR> Corresponds one-to-one with absolute time.<BR> CD blocks are accessed using the frame address as the key, not the absolute time.<BR> access. (both CD-ROM and CD-DA)</TD></TR>
+<TR><TD><PRE> Logical sector number (LSN)</TD><TD><PRE> The absolute time on the CD, 00:02:00, is set to 0, and the numbers are consecutively assigned to each sector (frame).<BR> What I attached. Logical sector number = frame address - 150 (2 seconds).<BR> Used for information in directory records (ISO9660).</TD></TR>
+<TR><TD><PRE> File information</TD><TD><PRE> Directory record information maintained for accessing files.<BR> FAD at the beginning of the file, file size, unit size, gap size,<BR> Contains file number and attributes.</TD></TR>
+<TR><TD><PRE> file identifier</TD><TD><PRE> Sequential number within the directory to identify the file.<BR> Takes a value between 0 and (number of directory records - 1).<BR> However, 0: indicates your directory, 1: indicates the parent directory.</TD></TR>
+</TABLE>
+</P>
+<A NAME="no2_12"></A><P><DT> <B>(2) List of symbols and abbreviations</b><DD> <B>Table 2.2 List of symbols and abbreviations</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> Symbols/abbreviations</TH><TH><PRE> meaning</TH><TH><PRE> explanation</TH></TR>
+<TR><TD><PRE> Adr</TD><TD><PRE> address</TD><TD><PRE> address</TD></TR>
+<TR><TD><PRE> B.C.D.</TD><TD><PRE> binary coded decimal</TD><TD><PRE> Binary coded decimal number</TD></TR>
+<TR><TD><PRE> bn,bufno</TD><TD><PRE> buffer no.</TD><TD><PRE> buffer partition number</TD></TR>
+<TR><TD><PRE> bufnum</TD><TD><PRE> buffer numbers</TD><TD><PRE> Total number of buffer partitions</TD></TR>
+<TR><TD><PRE> CI</TD><TD><PRE> coding information</TD><TD><PRE> Coding information</TD></TR>
+<TR><TD><PRE> CN</TD><TD><PRE> channel no.</TD><TD><PRE> channel number</TD></TR>
+<TR><TD><PRE> Ctrl</TD><TD><PRE> control</TD><TD><PRE> Control</TD></TR>
+<TR><TD><PRE> dst</TD><TD><PRE> destination</TD><TD><PRE> Copy/move destination</TD></TR>
+<TR><TD><PRE> fad</TD><TD><PRE> frame address</TD><TD><PRE> frame address</TD></TR>
+<TR><TD><PRE> fasnum</TD><TD><PRE> fad sector numbers</TD><TD><PRE> Number of frame address sectors</TD></TR>
+<TR><TD><PRE> fid</TD><TD><PRE> file identifier</TD><TD><PRE> file identifier</TD></TR>
+<TR><TD><PRE> fln,filtno</TD><TD><PRE> filter no.</TD><TD><PRE> Aperture number</TD></TR>
+<TR><TD><PRE> FN</TD><TD><PRE> file no.</TD><TD><PRE> file number</TD></TR>
+<TR><TD><PRE> LSB</TD><TD><PRE> least significant bit</TD><TD><PRE> least significant bit</TD></TR>
+<TR><TD><PRE> MSB</TD><TD><PRE> most significant bit</TD><TD><PRE> most significant bit</TD></TR>
+<TR><TD><PRE> ply</TD><TD><PRE> play parameter</TD><TD><PRE> playback parameters</TD></TR>
+<TR><TD><PRE> pos</TD><TD><PRE> position parameter</TD><TD><PRE> position parameters</TD></TR>
+<TR><TD><PRE> SM</TD><TD><PRE> submode</TD><TD><PRE> submode</TD></TR>
+<TR><TD><PRE> sct</TD><TD><PRE> sector</TD><TD><PRE> sector</TD></TR>
+<TR><TD><PRE> ses</TD><TD><PRE> session information</TD><TD><PRE> Session information</TD></TR>
+<TR><TD><PRE> sesno</TD><TD><PRE> session no.</TD><TD><PRE> session number</TD></TR>
+<TR><TD><PRE> snum</TD><TD><PRE> sector numbers</TD><TD><PRE> Number of sectors (when specifying sector range of partition)</TD></TR>
+<TR><TD><PRE> sp,spos</TD><TD><PRE> sector position</TD><TD><PRE> Sector position (when specifying sector range of partition)</TD></TR>
+<TR><TD><PRE> src</TD><TD><PRE> source</TD><TD><PRE> Copy/move destination</TD></TR>
+<TR><TD><PRE> stat</TD><TD><PRE> CD status information</TD><TD><PRE> CD status information</TD></TR>
+<TR><TD><PRE> subh</TD><TD><PRE> subheader condition</TD><TD><PRE> Subheader conditions for aperture</TD></TR>
+<TR><TD><PRE> TNO</TD><TD><PRE> track no.</TD><TD><PRE> Track number (song number)</TD></TR>
+<TR><TD><PRE> toc</TD><TD><PRE> TOC information</TD><TD><PRE> TOC information</TD></TR>
+<TR><TD><PRE> txwnum</TD><TD><PRE> transfer word numbers</TD><TD><PRE> Number of transferred words (data transfer size in words)</TD></TR>
+<TR><TD><PRE> X,idx</TD><TD><PRE> index</TD><TD><PRE> index number</TD></TR>
+<TR><TD><PRE> word</TD><TD><PRE> word</TD><TD><PRE> word. A unit of length of 2 bytes (16 bits).</TD></TR>
+</TABLE>
+</P>
+<A NAME="no2_13"></A><P><DT> <B>(3) Numerical notation</b><DD> Add "B" to the end of binary numbers. (Example: The decimal number 5 is written as 101B.)<BR>
+ Add "H" to the end of hexadecimal numbers. (Example: The decimal number 255 is written as FFH.)<BR>
+ However, hexadecimal numbers in C language programs are expressed using C language specifications (0x).</P>
+<A NAME="no2_14"></A><P><DT> <B>(4) Handling of BCD</b><DD> As a general rule, BCD is not used for parameters etc. All numerical values recorded in BCD on CDs, such as track numbers, are converted to binary values and exchanged.</P>
+<A NAME="no2_15"></A><P><DT> <B>(5) C language identifier</b><DD> The CD communication interface uses identifiers that begin with CD or Cd. Applications must be careful not to collide with these identifiers.</P>
+<A NAME="no2_20"></A><P><DT><H3> 2.2 Disk layout</H3><A NAME="no2_21"></A><P><DT> <B>(1) Track layout</b><DD> Figure 2.1 shows the relationship between the track structure and the access keys that specify locations on the disk.<BR>
+<A NAME="z2_1"></A><P ALIGN=CENTER> <B>Figure 2.1 Relationship between track structure and access keys</b><BR>
+<img srcset="../grp/i054_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no2_22"></A><P><DT> <B>(2) Multi-session layout</b><A NAME="z2_2"></A><P ALIGN=CENTER> <B>Figure 2.2 Multi-session layout</b><BR>
+<img srcset="../grp/i054_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

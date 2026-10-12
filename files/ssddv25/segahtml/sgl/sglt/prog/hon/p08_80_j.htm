@@ -1,0 +1,281 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;18/30&gt;SGL Programmer's Tutorial/8-8.ノーマルスクロール画面</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<a href="p08_70_j.htm">戻る</A>｜<a href="p08_90_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no8_80"></A>
+  <P><DT><H3>8-8. ノーマルスクロール画面</H3>
+     <DD>　ノーマルスクロール画面“NBG0〜3”は、スクロールの縦横移動と拡大縮小（ただし、NBG0,NBG1のみ）が可能です。
+	ここでは、それら２つの機能をサンプルプログラムと共に解説していきます。</P>
+
+<A NAME="no8_81"></A>
+  <P><DT><H3>　<A NAME="NO1">ノーマルスクロール画面の移動</A></H3>
+     <DD>　ノーマルスクロール画面“NBG0〜3”は、スクロール表示位置の変更という形で、スクロールの縦横移動が可能です。<BR>
+	これをイメージ化したものが下図になります。</P>
+
+<A NAME="z8_18"></A>
+  <A ALIGN=CENTER><B>＜図8-18　スクロール表示位置イメージ＞</B><BR>
+  <img srcset="../grp/p08_33_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+  <P><DD>　スクロール表示位置の移動には、ライブラリ関数“slScrPosNbg0〜3”を使用します。<BR>
+	“slScrPosNbg0〜3”は、スクロールの初期位置の設定にも使用します。</P>
+
+  <P><DT><B>【void slScrPosNbg0〜3 ( FIXED posx , FIXED posy ) ;】</B>
+     <DD>　ノーマルスクロール画面“Nbg0〜3”の表示開始位置を設定します。<BR>
+	スクロール表示位置は、スクロールマップ上のどの位置にモニターを配置するかで決定され、モニターの左上を代表点とし、パラメータとしてスクロールマップ上の一点を指定します。<BR>
+	パラメータには、スクロール座標系を表すＸＹ座標値を代入します。</P>
+
+  <P>　また、スクロール表示位置が上下左右に移動し、スクロールが表示エリアを越えた場合、スクロールは逆端から再び描画を開始します。</P>
+
+<A NAME="z8_19"></A>
+  <A ALIGN=CENTER><B>＜図8-19　スクロールが表示領域を超えた場合の処理＞</B><BR>
+  <img srcset="../grp/p08_33_2_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+  <P><DD>　以下の２つのサンプルプログラム（リスト8-2、8-3）は、それぞれＳＧＬライブラリ関数を用いて、スクロールの横移動および縦横移動を実現したものです。</P>
+
+<A NAME="l8_2">
+	<P>	<DD><B>リスト8-2　sample_8_8_1：スクロールの横移動</B></P>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Graphic Scroll [X axis]						*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+#include	"ss_scrol.h"
+
+#define		NBG1_CEL_ADR		( VDP2_VRAM_B1 + 0x02000 )
+#define		NBG1_MAP_ADR		( VDP2_VRAM_B1 + 0x12000 )
+#define		NBG1_COL_ADR		( VDP2_COLRAM + 0x00200 )
+#define		BACK_COL_ADR		( VDP2_VRAM_A1 + 0x1fffe )
+
+void ss_main(void)
+{
+	FIXED yama_posx = SIPOSX , yama_posy = SIPOSY;
+
+	slInitSystem(TV_320x224,NULL,1);
+	slTVOff();
+	slPrint("Sample program 8.8.1" , slLocate(9,2));
+
+	slColRAMMode(CRM16_1024);
+	slBack1ColSet((void *)BACK_COL_ADR , 0);
+
+	slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageNbg1((void *)NBG1_CEL_ADR , 0 , PNB_1WORD|CN_12BIT);
+	slPlaneNbg1(PL_SIZE_1x1);
+	slMapNbg1((void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR);
+	Cel2VRAM(yama_cel , (void *)NBG1_CEL_ADR , 31808);
+	Map2VRAM(yama_map , (void *)NBG1_MAP_ADR , 32 , 16 , 1 , 256);
+	Pal2CRAM(yama_pal , (void *)NBG1_COL_ADR , 256);
+
+	slScrPosNbg1(yama_posx , yama_posy);
+	slScrAutoDisp(NBG0ON | NBG1ON);
+	slTVOn();
+
+	while(1) {
+		slScrPosNbg1(yama_posx , yama_posy);
+		yama_posx += POSX_UP;
+
+		slSynch();
+	} 
+}
+
+</PRE>
+
+<A NAME="f8_3">
+  <H4>フロー8-3　sample_8_8_1：スクロールの横移動</H4>
+  <img srcset="../grp/p08_35_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];">
+
+<A NAME="l8_3">
+	<P>	<DD><H4>リスト8-3　sample_8_8_2：スクロールの縦横移動</H4>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Graphic Scroll [X & Y axis ]					*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+#include	"ss_scrol.h"
+
+#define		NBG1_CEL_ADR		( VDP2_VRAM_B1 + 0x02000 )
+#define		NBG1_MAP_ADR		( VDP2_VRAM_B1 + 0x12000 )
+#define		NBG1_COL_ADR		( VDP2_COLRAM + 0x00200 )
+#define		BACK_COL_ADR		( VDP2_VRAM_A1 + 0x1fffe )
+
+void ss_main(void)
+{
+	FIXED  yama_posx = SIPOSX , yama_posy = SIPOSY;
+	Uint16 scroll_flg = YOKO;
+	
+	slInitSystem(TV_320x224,NULL,1);
+	slTVOff();
+	slPrint("Sample program 8.8.2" , slLocate(9,2));
+
+	slColRAMMode(CRM16_1024);
+	slBack1ColSet((void *)BACK_COL_ADR , 0);
+
+	slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageNbg1((void *)NBG1_CEL_ADR , 0 , PNB_1WORD|CN_12BIT);
+	slPlaneNbg1(PL_SIZE_1x1);
+	slMapNbg1((void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR);
+	Cel2VRAM(yama_cel , (void *)NBG1_CEL_ADR , 31808);
+	Map2VRAM(yama_map , (void *)NBG1_MAP_ADR , 32 , 16 , 1 , 256);
+	Pal2CRAM(yama_pal , (void *)NBG1_COL_ADR , 256);
+
+	slScrPosNbg1(yama_posx , yama_posy);
+	slScrAutoDisp(NBG0ON | NBG1ON);
+	slTVOn();
+
+	while(1){
+		if (scroll_flg == YOKO) {
+			if(yama_posx &gt;= (SX * 2 + SIPOSX)) {
+				scroll_flg = TATE;
+				yama_posx = SIPOSX;
+			} else yama_posx += POSX_UP;
+		} else if (scroll_flg == TATE) {
+			if(yama_posy &gt;= (SY * 2 + SIPOSY)) {
+				scroll_flg = YOKO;
+				yama_posy = SIPOSY;
+			} else yama_posy += POSY_UP;
+		}
+		slScrPosNbg1(yama_posx , yama_posy);
+
+		slSynch();
+	} 
+}
+</PRE>
+
+<A NAME="f8_4">
+  <H4>フロー8-4　sample_8_8_2：スクロールの縦横移動</H4>
+  <img srcset="../grp/p08_37_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];">
+
+<A NAME="no8_82"></A>
+  <P><DT><H3>　ノーマルスクロール画面の拡大縮小</H3>
+     <DD>　ノーマルスクロール画面の内“NBG0,NBG1”は、スクロールの拡大縮小（最大：1/4〜256倍）が可能です。これをイメージ化したものが下図になります。</P>
+
+<A NAME="z8_20"></A>
+	<P ALIGN=CENTER><B>図8-20　スクロール拡大縮小イメージ</B>
+	<img srcset="../grp/p08_38_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+  <P><DD>　ノーマルスクロール画面“NBG0,NBG1”を用いたスクロールの拡大縮小は、スクロール機能設定の縮小設定により、縮小可能な範囲が異なってきます。</P>
+
+<A NAME="t8_20"></A>
+  <H4>表8-20　縮小設定による拡大縮小範囲の変化</H4>
+		<DD><TABLE BORDER=1>
+	<TR><TH ROWSPAN=2></TH><TH COLSPAN=3>縮小設定</TH></TR>
+	<TR><TH>1倍</TH><TH>1/2倍</TH><TH>1/4倍</TH></TR>
+	<TR><TH><PRE>拡 大 縮 小 範 囲</TH><TD>1〜256倍</TD><TD>1/2〜256倍</TD><TD>1/4〜256倍</TD></TR>
+	</TABLE></P>
+
+  <P><DD>　ＳＧＬでノーマルスクロール画面の拡大縮小を行うには、ノーマルスクロール画面“NBG0,NBG1”にそれぞれ対応したライブラリ関数“slZoomNbg0,1”を使用してください。</P>
+
+　　<P><DT><B>【void slZoomNbg0,1 ( FIXED scale_x , FIXED scale_y ) ;】</B>
+       <DD>　ノーマルスクロール画面“NBG0,NBG1”の拡大縮小を行います。<BR>
+	パラメータには、スクロール縦横の倍率を逆数で代入します。<BR>
+	例えば、２倍に拡大したい場合はパラメータに1/2を代入、1/2倍に縮小したい場合は２を代入します。
+	縮小範囲は、縮小設定によって選択可能な限界値が変化します（上表参照）。</P>
+
+  <P><DT><H3>　拡大縮小関数のパラメータ設定について</H3>
+     <DD>　スクロールの拡大縮小に使用するパラメータには、希望する倍数の逆数を代入してやる必要があります（例：2.0倍を希望するなら1/2）。<BR>
+	これは、パラメータの指す値がそのままスケール値を表していないことに起因します。<BR>
+	拡大縮小関数のパラメータとして代入される値は、スクロールを１ドット表示した後、次に表示するドットまでの移動量を指し示します。<BR>
+	移動量として2.0を指定すると、スクロールは１ドットずつ飛ばして次のドットを表示していき、結果的にスクロールは1/2倍に縮小されて描画されます。<BR>
+	移動量が1.0なら１倍、移動量が2.0なら1/2倍、移動量が1/2なら同じドットを２回ずつ表示するため結果的に2.0倍になって表示されます。</P>
+
+  <P>　次のサンプルプログラム（リスト8-4）は、ＳＧＬライブラリ関数を用いて、実際にノーマルスクロール画面の拡大縮小を行った例です。</P>
+
+<A NAME="l8_4"></A>
+	<P>	<DD><B>リスト8-4　sample_8_8_3：スクロールの拡大縮小</B>
+		<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Graphic Scroll & Expansion & Reduction				*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+#include	"ss_scrol.h"
+
+#define		NBG1_CEL_ADR		VDP2_VRAM_B0
+#define		NBG1_MAP_ADR		( VDP2_VRAM_B0 + 0x10000 )
+#define		NBG1_COL_ADR		( VDP2_COLRAM + 0x00200 )
+#define		BACK_COL_ADR		( VDP2_VRAM_A1 + 0x1fffe )
+
+void ss_main(void)
+{
+	FIXED  yama_posx = toFIXED(0.0) , yama_posy = toFIXED(0.0);
+	FIXED  yama_zoom = toFIXED(1.0);
+	FIXED  up_down  = toFIXED(-0.1);
+
+	slInitSystem(TV_320x224,NULL,1);
+	slTVOff();
+	slPrint("Sample program 8.8.3" , slLocate(9,2));
+
+	slColRAMMode(CRM16_1024);
+	slBack1ColSet((void *)BACK_COL_ADR , 0);
+
+	slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageNbg1((void *)NBG1_CEL_ADR , 0 , PNB_1WORD|CN_10BIT);
+	slPlaneNbg1(PL_SIZE_1x1);
+	slMapNbg1((void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR);
+	Cel2VRAM(yama_cel , (void *)NBG1_CEL_ADR , 31808);
+	Map2VRAM(yama_map , (void *)NBG1_MAP_ADR , 32 , 16 , 1 , 0);
+	Pal2CRAM(yama_pal , (void *)NBG1_COL_ADR , 256);
+
+	slZoomModeNbg1(ZOOM_HALF);
+
+	slScrPosNbg1(yama_posx , yama_posy);
+	slScrAutoDisp(NBG0ON | NBG1ON);
+	slTVOn();
+
+	while(1){
+		if(yama_posx &gt;= SX) {
+			if(yama_zoom &gt;= toFIXED(1.5))
+				up_down = toFIXED(-0.1);
+			else if(yama_zoom &lt;= toFIXED(0.7))
+				up_down = toFIXED(0.1);
+			yama_zoom += up_down;
+			yama_posx = toFIXED(0.0);
+			slZoomNbg1(yama_zoom , yama_zoom);
+		}
+		slScrPosNbg1(yama_posx , yama_posy);
+		yama_posx += POSX_UP;
+
+		slSynch();
+	} 
+}
+</PRE>
+
+<A NAME="l8_5"></A>
+  <H4>フロー8-5　sample_8_8_3：スクロールの拡大縮小</H4>
+  <img srcset="../grp/p08_40_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];">
+
+</DL>
+
+<HR NOSHADE>
+<B>▲<a href="p08_70_j.htm">戻る</A>｜<a href="p08_90_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

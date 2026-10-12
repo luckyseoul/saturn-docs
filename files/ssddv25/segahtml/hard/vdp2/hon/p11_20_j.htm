@@ -1,0 +1,132 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;64/86&gt;VDP2ユーザーズマニュアル/11.2特殊プライオリティ機能</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no11">VDP2ユーザーズマニュアル</A>★
+<a href="p11_10_j.htm">第11章　プライオリティ機能</A>
+<HR>
+<B>▲
+<a href="p11_10_j.htm">戻る</A>｜
+<a href="p11_30_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第11章　プライオリティ機能</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no11_20"></A>
+	<P>	<DT><H2>■11.2　特殊プライオリティ機能</H2>
+		<DD>　特殊プライオリティ機能は、各スクロール画面に対応した3ビットのプライオリティナンバーの最下位ビットをキャラクタごとやドットごとに変える機能です。この機能を利用してスクロール画面中のある部分だけのプライオリティを変えることで1面のスクロール画面を複数面あるように見せることができます。なお、特殊プライオリティ機能によって変わるのはプライオリティナンバーの最下位ビットのみで、上位2ビットはレジスタの値がそのまま使用されます。特殊プライオリティ機能には次の3つのモードがあります。</P>
+
+	<P><DD><OL>
+	<B><LI></B>プライオリティナンバーの最下位ビットは、画面ごとに指定する
+	<B><LI></B>プライオリティナンバーの最下位ビットは、キャラクタごとに指定する
+	<B><LI></B>プライオリティナンバーの最下位ビットは、ドットごとに指定す
+	</OL></P>
+
+	<P>	<DD>　プライオリティナンバーの最下位ビットを画面ごとに指定する場合は、各スクロール画面に対応したプライオリティナンバーレジスタの値がそのまま使用されます。</P>
+
+	<P>	<DD>　キャラクタごとに指定する場合は、パターンネームデータ中の特殊プライオリティビットの値が、プライオリティナンバーの最下位ビットとして使用されます。
+特殊プライオリティビットについては、「<B><a href="p04_60_j.htm">4.6　パターンネームテーブル(ページ)</A></B>」を参照してください。</P>
+
+	<P>	<DD>　ドットごとに指定する場合は、パターンネームデータ中の特殊プライオリティビットが1に指定されたキャラクタパターンにおいて、特殊機能コードに指定されたドットカラーコードと一致したドットのみ、プライオリティナンバーの最下位ビットを1にし、それ以外は最下位ビットを0に固定します。スクロール画面のカラー形式がRGB形式のときは、このモードを設定しないでください。ドットカラーコードについては、「<B><a href="p10_30_j.htm">10.3　特殊機能コード</A></B>」を参照してください。</P>
+
+	<P>	<DD>　特殊プライオリティ機能によって得られた3ビットのプライオリティナンバーの値が0Hのとき、その画面、キャラクタまたはドットは透明とみなされます。<BR>
+　モードによる特殊プライオリティ機能を表11.2に示します。</P>
+
+<A NAME="t11_2"></A>
+	<DD><B>表11.2　モードによる特殊プライオリティ機能</B>
+	<DD><TABLE BORDER>
+	<TR><TH><PRE>特殊プライオリティ<BR>モード</TH><TH><PRE>特殊プライオリティ<BR>指定内容</TH><TH><PRE>カラー形式</TH><TH><PRE>プライオリティナンバーの最下位ビット値</TD></TR>
+	<TR><TH>モード0</TH><TD><PRE>画面ごとに指定</TD><TD><PRE>パレット形式<BR>またはRGB形式</TD><TD><PRE>プライオリティナンバーレジスタの最下位ビット値</TD></TR>
+	<TR><TH>モード1</TH><TD><PRE>キャラクタごと<BR>に指定</TD><TD><PRE>パレット形式<BR>またはRGB形式</TD><TD><PRE>パターンネームデータ中の特殊プライオリティビット値</TD></TR>
+	<TR><TH ROWSPAN=2>モード2</TH>
+		<TD ROWSPAN=2><PRE>ドットごとに指定</TD><TD><PRE>パレット形式</TD>
+		<TD><PRE>パターンネームデータ中の特殊プライオリティビット＝1のときに、<BR>特殊機能コードに指定されたドットカラーコードと一致したドット<BR>のみ1になり、それ以外は0となる</TD></TR>
+	<TR><TD>RGB形式</TD><TD>設定禁止</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　表示形式がビットマップ形式のスクロール画面においてモード1または2を指定した場合、パターンネームデータ中の特殊プライオリティビットではなく、ビットマップパレットナンバーレジスタの特殊プライオリティビットが使用されます。</P>
+
+<A NAME="no11_21"></A>
+	<P><DT><H3>　●特殊プライオリティモードレジスタ</H3>
+	<DD>　特殊プライオリティモードレジスタは、各スクロール画面に対する特殊プライオリティ機能のモードを指定します。書き込み専用の16ビットのレジスタで、1800EA番地にあります。<BR>
+	電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SFPRMD_"></A>
+<P>	<DD><B><FONT SIZE=5>SFPRMD</FONT>　<FONT SIZE=4>1800EAH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxSPRM_">R0SPRM1</A></TH>
+<TH><PRE><A HREF="#NxSPRM_">R0SPRM0</A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#NxSPRM_">N3SPRM1</A></TH>
+<TH><PRE><A HREF="#NxSPRM_">N3SPRM0</A></TH>
+<TH><PRE><A HREF="#NxSPRM_">N2SPRM1</A></TH>
+<TH><PRE><A HREF="#NxSPRM_">N2SPRM0</A></TH>
+<TH><PRE><A HREF="#NxSPRM_">N1SPRM1</A></TH>
+<TH><PRE><A HREF="#NxSPRM_">N1SPRM0</A></TH>
+<TH><PRE><A HREF="#NxSPRM_">N0SPRM1</A></TH>
+<TH><PRE><A HREF="#NxSPRM_">N0SPRM0</A></TH>
+</TR></TABLE></P>
+
+<A NAME="NxSPRM_"></A>
+	<DT><B>特殊プライオリティモードビット</B>：Special priority mode bit<BR>
+	<DD>(N0SPRM1, N0SPRM0, N1SPRM1, N1SPRM0, N2SPRM1, N2SPRM0, N3SPRM1, N3SPRM0, R0SPRM1, R0SPRM0)<BR>
+　各スクロール画面の特殊プライオリティ機能のモードを指定します。<P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD>N0SPRM1,N0SPRM0</TD><TD>1800EAH</TD><TD>ビット1,0</TD><TD>NBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1SPRM1,N1SPRM0</TD><TD>1800EAH</TD><TD>ビット3,2</TD><TD>NBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2SPRM1,N2SPRM0</TD><TD>1800EAH</TD><TD>ビット5,4</TD><TD>NBG2用</TD></TR>
+	<TR><TD>N3SPRM1,N3SPRM0</TD><TD>1800EAH</TD><TD>ビット7,6</TD><TD>NBG3用</TD></TR>
+	<TR><TD>R0SPRM1,R0SPRM0</TD><TD>1800EAH</TD><TD>ビット9,8</TD><TD>RBG0用</TD></TR>
+	</TABLE></P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH>xxSPRM1</TH><TH>xxSPRM0</TH><TH>モード</TH><TH>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TD>モード0</TD><TD>プライオリティナンバーの最下位ビットは画面ごとに指定する</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TD>モード1</TD><TD>プライオリティナンバーの最下位ビットはキャラクタごとに指定する</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TD>モード2</TD><TD>プライオリティナンバーの最下位ビットはドットごとに指定する</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TD>−</TD><TD>設定禁止</TD></TR>
+	</TABLE>
+
+	<P><DD>[注]ビット名のxxには、N0、N1、N2、N3、またはR0が入ります。
+	<P><DD>　スクロール画面のカラー形式がRGBモードの場合、モード2は設定しないでください。<BR>
+　EXBGでは、モード0以外を設定しないでください。<BR>
+　プライオリティナンバーが0になったキャラクタまたはドットは、透明とみなされます。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p11_10_j.htm">戻る</A>｜
+<a href="p11_30_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no11">VDP2ユーザーズマニュアル</A>★
+<a href="p11_10_j.htm">第11章　プライオリティ機能</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

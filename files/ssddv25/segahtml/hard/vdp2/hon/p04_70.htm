@@ -1,0 +1,120 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;27/86&gt;VDP2 User's Manual/4.7 Plane</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no4">VDP2 User's Manual</a> ★ <A HREF="p04_10.htm">Chapter 4 Scroll screen</a><HR>
+ <B>▲ <A HREF="p04_62.htm">Back</a> ｜ <A HREF="p04_80.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 4 Scroll screen</b><HR NOSHADE>
+<DL>
+<P><DT><H2> ■4.7 Plane</H2><DD> A plane is a pattern name table (page) arranged in a 1x1, 2x1, or 2x2 size, and the size is specified in each register.</P>
+<A NAME="no4_71"></A><P><DT><H3> ●Plane size</H3><DD> If a plane consists of multiple pattern name tables (pages), store the pattern name tables used for one plane contiguously in VRAM. Figure 4.13 shows the relationship between pattern name table placement and pattern name table according to plane size (number of plane pages).</P>
+<A NAME="z4_13"></A><P><DD> <B>Figure 4.13 Arrangement of pattern name table by plane size</b><DD><PRE>
+          Character pattern table 
+Specified─→┌────────┐ 
+character  │        │ ●For 1 page horizontally 
+pattern    │        │    x 1 page vertically
+address    │ Page 0 │ ┌──────┐┬ 
+           │        │ │      ││ 
+           │        │ │Page 0││64 cells 
+           ├────────┤ │      ││ 
+           │        │ └──────┘┴ 
+           │        │ ├──────┤ 
+           │ Page 1 │ 64 cells 
+           │        │ 
+           │        │ ●For 2 pages horizontally
+           ├────────┤    x 1 page vertically 
+           │        │ ┌──────┬──────┐┬ 
+           │        │ │      │      ││ 
+           │ Page 2 │ │Page 0│Page 1││ 64 cells 
+           │        │ │      │      ││ 
+           │        │ └──────┴──────┘┴ 
+           ├────────┤ ├─────────────┤ 
+           │        │    128 cells 
+           │        │ 
+           │ Page 3 │ ●For 2 pages horizontally
+           │        │    x 2 pages vertically 
+           │        │ ┌──────┬──────┐┬ 
+           ├────────┤ │      │      ││ 
+           │        │ │Page 0│Page  ││ 
+           │        │ │      │      ││ 
+           │ Page 4 │ ├──────┼──────┤│128 cells
+           │        │ │      │      ││ 
+           │        │ │Page 2│Page 3││ 
+           ├────────┤ │      │      ││ 
+           │        │ └──────┴──────┘┴ 
+           │        │ ├─────────────┤ 
+                          128 cells 
+</PRE><A NAME="no4_72"></A><P><DT><H3>●Plane size register</H3><DD> The plane size register controls the plane size and specification of screen over handling for rotating scroll screens. This is a 16-bit write-only register located at address 18003AH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PLSZ_"></A><P><DD> <B><FONT SIZE=5>PLSZ</font> <FONT SIZE=4>18003AH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#RBOVR_">RBOVR1</a></TH><TH><PRE> <A HREF="#RBOVR_">RBOVR0</a></TH><TH><PRE> <A HREF="#RBPLSZ_">RBPLSZ1</a></TH><TH><PRE> <A HREF="#RBPLSZ_">RBPLSZ0</a></TH><TH><PRE> <A HREF="#RAOVR_">RAOVR1</a></TH><TH><PRE> <A HREF="#RAOVR_">RAOVR0</a></TH><TH><PRE> <A HREF="#RAPLSZ_">RAPLSZ1</a></TH><TH><PRE> <A HREF="#RAPLSZ_">RAPLSZ0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#N3PLSZ_">N3PLSZ1</a></TH><TH><PRE> <A HREF="#N3PLSZ_">N3PLSZ0</a></TH><TH><PRE> <A HREF="#N2PLSZ_">N2PLSZ1</a></TH><TH><PRE> <A HREF="#N2PLSZ_">N2PLSZ0</a></TH><TH><PRE> <A HREF="#N1PLSZ_">N1PLSZ1</a></TH><TH><PRE> <A HREF="#N1PLSZ_">N1PLSZ0</a></TH><TH><PRE> <A HREF="#N0PLSZ_">N0PLSZ1</a></TH><TH><PRE> <A HREF="#N0PLSZ_">N0PLSZ0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="N0PLSZ_">　</A><A NAME="N1PLSZ_">　</A><A NAME="N2PLSZ_">　</A><A NAME="N3PLSZ_">　</A><A NAME="RAPLSZ_">　</A><A NAME="RBPLSZ_">　</A><DT>Plane <B>size</b> bit<DD> (N0PLSZ1, N0PLSZ0, N1PLSZ1, N1PLSZ0, N2PLSZ1, N2PLSZ0, N3PLSZ1, N3PLSZ0, RAPLSZ1, RAPLSZ0, RBPLSZ1, RBPLSZ0)<BR>
+ Specify the plane size (number of pages) for each scroll screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0PLSZ1, N0PLSZ0</TD><TD> 18003AH</TD><TD> bit 1,0</TD><TD> For NBG0</TD></TR>
+<TR><TD> N1PLSZ1, N1PLSZ0</TD><TD> 18003AH</TD><TD> bit 3,2</TD><TD> For NBG1</TD></TR>
+<TR><TD> N2PLSZ1, N2PLSZ0</TD><TD> 18003AH</TD><TD> bit 5,4</TD><TD> For NBG2</TD></TR>
+<TR><TD> N3PLSZ1, N3PLSZ0</TD><TD> 18003AH</TD><TD> bit 7,6</TD><TD> For NBG3</TD></TR>
+<TR><TD> RAPLSZ1, RAPLSZ0</TD><TD> 18003AH</TD><TD> bit 9,8</TD><TD> For rotation parameter A</TD></TR>
+<TR><TD> RBPLSZ1, RBPLSZ0</TD><TD> 18003AH</TD><TD> bit 13,12</TD><TD> For rotation parameter B</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> xxPLSZ1</TH><TH> xxPLSZ0</TH><TH> plane size</TH></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TD> 1 page horizontal x 1 page vertical</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TD> 2 pages horizontally x 1 page vertically</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TD> Setting prohibited (Please do not set)</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TD> 2 pages horizontally x 2 pages vertically</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, RA, or RB.</P>
+<P><DD> If NBG0 and NBG1 are set to be able to be reduced to 1/4, the plane size of that screen should not be 2 pages wide x 2 pages tall.</P>
+<A NAME="RAOVR_">　</A><A NAME="RBOVR_">　</A><DT><B>Screen over processing bit</b> : Over bit (RAOVR1, RAOVR0, RBOVR1, RBOVR0)<DD> Specifies the process to be performed when the display coordinate value exceeds the display area on a rotating scroll screen (screen over process).</P>
+<P><DD><TABLE BORDER>
+<TR><TD> RAOVR1,RAOVR0</TD><TD> 18003AH</TD><TD> bit 11,10</TD><TD> For rotation parameter A</TD></TR>
+<TR><TD> RBOVR1, RBOVR0</TD><TD> 18003AH</TD><TD> bit 15,14</TD><TD> For rotation parameter B</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> RxOVR1</TH><TH> RxOVR0</TH><TH> Screen over processing</TH></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TD> Images set in the display area are repeated outside the display area.</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TD> Outside the display area, the character specified in the screen over pattern name register is displayed.<BR>
+ Repeat the pattern (only when the rotating scroll screen is in cell format)</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TD> Make everything outside the display area transparent</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TD> Force display area to 0≦ regardless of plane size or bitmap size<BR>
+ X&#65308; 512, 0≦Y&#65308; 512 to make everything outside that area transparent.</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> A or B can be substituted for x in the bit name.</P>
+<P><DD> If the rotating scroll screen is in bitmap format, do not set the process to repeat the character pattern specified in the screen over pattern name register.<BR>
+ If the rotating scroll screen is in bitmap format and the vertical size of the bitmap is 256 dots, force the display area to 0≦X&#65308; 512, 0≦Y&#65308; If you set it to 512 and make everything outside that area transparent, the same image will be displayed twice in each vertical direction with 256 dots each.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_62.htm">Back</a> ｜ <A HREF="p04_80.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no4">VDP2 User's Manual</a> ★ <A HREF="p04_10.htm">Chapter 4 Scroll screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

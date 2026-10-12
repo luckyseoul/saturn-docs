@@ -1,0 +1,153 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;p=4/5&gt;SEGA CONVERTERユーザーズマニュアル/</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#win">Graphic Tools Guide</A>
+★<A HREF="../index.htm">SEGA CONVERTERユーザーズマニュアル</A>
+<HR>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SEGA CONVERTERユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>４．プラグインの作成方法</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P><DT><H3>■リソースファイル</H3>
+	<DD>　SSSDKプラグインモジュールでは、以下のリソースが予約されています。モジュールプログラム上でリソースを使用する場合は、用途が重ならないように注意してください。
+
+	<P><DD><TABLE BORDER=1><CAPTION><B>STRINGリソース<BR>（サンプル例）</B></CAPTION>
+<TR><TD><PRE>
+STRINGTABLE DISCARDABLE 
+BEGIN
+
+1  &quot;READ WRITE&quot;
+2  &quot;dg2&quot;
+3  &quot;DGT2 Files&quot;
+4  &quot;4 8 16 24&quot;
+
+END
+</PRE></TD></TR></TABLE></P>
+
+	<DL>
+	<P><DT><B>ID 1：プラグイン機能を指定します。</B>
+	<DD>「ファイルＩ／Ｏ」 <UL TYPE=DISC>
+	<LI>入力のみの場合 &quot;READ&quot;
+	<LI>出力のみの場合 &quot;WRITE&quot;
+	<LI>入出力の場合 &quot;READ WRITE&quot;
+	</UL>
+	<DD>「エフェクト」 &quot;EFFECT&quot;
+
+	<P><DT><B>ID 2：ファイル拡張子（３文字）を指定します。</B>
+	<DD>英数・小文字が望ましい。
+	<DD>「エフェクト」の場合&quot;eff&quot;を指定します。
+
+	<P><DT><B>ID 3：表示されるプラグイン名を指定します。</B>
+	<DD>「ファイルＩ／Ｏ」の場合
+	<DD>ダイアログのポップアップメニューになります
+	<P>
+	<DD>「エフェクト」の場合
+	<DD>エフェクトメニューのサブメニューになります
+
+	<P><DT><B>ID 4：このモジュールがサポートする色深度（ビット）を指定します。</B>
+	<DD>１・４・８・１６・２４
+	<DD>のいずれかを、半角スペース（&quot; &quot;）で区切って指定。
+	</DL>
+
+<A NAME="no4_20"></A>
+	<P><DT><H3>■「ファイルＩ／Ｏ」モジュール</H3>
+	<DL>
+	<P><DT><B>【１：入力モジュール】</B>
+	<DD>　以下の手順でファイルを読み込み、ウインドウに表示します。
+	<DD><OL>
+	<B><LI></B> オープンダイアログでファイルを選択する。
+	<B><LI></B><A HREF="p05_10.htm#scvCheckFileFormat"> scvCheckFileFormat</A>
+	<B><LI></B><A HREF="p05_10.htm#scvGetFileImageSize"> scvGetFileImageSize</A>
+	<B><LI></B><A HREF="p05_10.htm#scvGetFileImageDepth"> scvGetFileImageDepth</A>
+	<B><LI></B><A HREF="p05_10.htm#scvGetFileImageBits"> scvGetFileImageBits</A>
+	<B><LI></B> ウインドウを表示する。
+	</OL>
+	<DD>　入力モジュールを作成するユーザーは、上記2)〜5)の手順に対応した関数を必ず用意する必要があります。
+
+	<P><DT><B>【２：出力モジュール】</B>
+	<DD>　以下の手順でファイルを保存します。
+	<DD><OL>
+	<B><LI></B> 保存ダイアログでファイル名を指定する。
+	<B><LI></B><A HREF="p05_10.htm#scvPutFileImageBits"> scvPutFileImageBits</A>
+	<B><LI></B> ファイルが保存される。
+	</OL>
+
+	<P><DD>　カタログ保存機能を利用した場合は、以下の手順でファイルを保存します。
+	<DD><OL>
+	<B><LI></B> 保存ダイアログで保存ディレクトリを指定する。
+	<B><LI></B><A HREF="p05_10.htm#scvBeginCatalogSave"> scvBeginCatalogSave</A>
+	<B><LI></B><A HREF="p05_10.htm#scvPutFileImageBits"> scvPutFileImageBits</A>
+	<B><LI></B> ファイルが保存される。（カタログ登録数分3)〜4)繰り返し）
+	<B><LI></B><A HREF="p05_10.htm#scvEndCatalogSave">scvEndCatalogSave</A>
+	</OL>
+	<DD>　出力モジュールを作成するユーザーは、上記2)3)5)の手順に対応した関数を必ず用意する必要があります。
+	</DL>
+
+<A NAME="no4_30"></A>
+	<P><DT><H3>■「エフェクト」モジュール</H3>
+	<DL>
+	<DD>　以下の手順でウインドウに効果をかけます。
+	<DD><OL>
+	<B><LI></B> エフェクトメニューアイテムを選択。
+	<B><LI></B><A HREF="p05_10.htm#scvBeginEffect"> scvBeginEffect</A>
+	<B><LI></B><A HREF="p05_10.htm#scvEffectImageBits"> scvEffectImageBits</A>
+	<B><LI></B><A HREF="p05_10.htm#scvEndEffect"> scvEndEffect</A>
+	<B><LI></B>ウインドウを再表示。
+	</OL>
+	<DD>　エフェクトモジュールを作成するユーザーは、上記2)〜4)の手順に対応した関数を必ず用意する必要があります。
+	</DL>
+
+<A NAME="no4_40"></A>
+	<P><DT><H3>■ビットマップメモリについて</H3>
+	<DL>
+	<P><DT><B>色深度：１</B>
+	<DD>１ビット／ピクセルでビットマップを配置する。<BR>
+	ただし、横方向は１バイトバウンダリ。<BR>
+	１が黒、０が白で表示される。</P>
+
+
+	<P><DT><B>色深度：４</B>
+	<DD>１６色のインデックス形式。<BR>
+	RGBQUAD構造体を１６色分配置する。<BR>
+	その後に、４ビット／ピクセルでビットマップを配置する。<BR>
+	ただし、横方向は１バイトバウンダリ。</P>
+
+
+	<P><DT><B>色深度：８</B>
+	<DD>２５６色のインデックス形式。<BR>
+	<DD>RGBQUAD構造体を２５６色分配置する。<BR>
+	その後に、８ビット／ピクセルでビットマップを配置する。</P>
+
+
+	<P><DT><B>色深度：１６</B>
+	<DD>ダイレクトカラー形式。<BR>
+	１６ビット／ピクセルでビットマップを配置する。<BR>
+	各色強度は 0b|R5|G5|B5 でフォーマットする。</P>
+
+	<P><DT><B>色深度：２４（３２）</B>
+	<DD>ダイレクトカラー形式。<BR>
+	３２ビット／ピクセルでビットマップを配置する。<BR>
+	各色強度は 8b|R8|G8|B8 でフォーマットする。</P>
+	</DL>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#win">Graphic Tools Guide</A>
+★<A HREF="../index.htm">SEGA CONVERTERユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,97 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/ 8&gt;FAQ/SGL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#ETC">SGL programming related</a><HR>
+ <B>▲ <A HREF="p07_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>FAQ/SGL programming related</b><H2 ALIGN=CENTER> others</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_01"><HR></a><DL>
+<H3> How to specifically use slColorCalc?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to use the slColorCalc function.<BR>
+ Also, what is the default value if this function is not called?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This function simply sets the data area to be set in the color calculation control register.</P>
+<P> VDP2 manual 12.1 Color calculation Data corresponding to <A HREF="../../hard/vdp2/hon/p12_14.htm">the color calculation control register</a> is set.<BR>
+ If this function is not called, color calculations are not performed. This is the same as the initial state of the hardware.</P>
+<P><DT></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_02"><HR></a><DL>
+<H3> Does the slLookAt function affect all matrices?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How much of a burden does the internal processing of the function slLookAt have?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The current matrix (at the time slLookAt is called; if nothing is being done, the environment matrix (the matrix that is the base of the calculation)) is simply multiplied by the value of the slLookAt function, so the processing time is is equivalent to one position conversion and one rotation conversion.</P>
+<P> You can think of the slLookAt function as performing operations such as slTranslate and slRot* once on the current matrix for the camera coordinates.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_03"><HR></a><DL>
+<H3> I want to obtain a 2D coordinate system with SGL.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> On page 4-3 of the SGL tutorial, it is stated that a 2D coordinate system is also maintained in addition to the virtual 3D space coordinates, but how can the data in the 2D coordinate system be referenced?<P><DT> <FONT SIZE=5>A)</font><DD> Think of the 2D coordinate system as the coordinates (two-dimensional) sent to the command table of VDP1.<BR>
+ To view this coordinate data from the user side, use the slConvert3Dto2D function.</P>
+<P> If local coordinate data for the current matrix is given as an argument, the value converted to the 2D coordinate system will be returned.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_04"><HR></a><DL>
+<H3> I want to play CDROM-XA with SGL.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to play CD-XA files with SGL, but I can't find any documentation regarding XA anywhere. How should I actually create CDROM-XA?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> SGL does not have a library to play CDROM-XA, so you will need to use SBL's GNU C version of the PCM/ADPCM playback library. We are currently checking this library on SGL.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_05"><HR></a><DL>
+<H3> I want to use DGT2(PP).</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How can I display 2D sprites using the DGT2(PP) file format?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> When converting DGT2 data to SGL data, use DG2TXR.EXE in the SGL package.</P>
+<P> This converter supports all DGT2 modes, so it can also convert PP formats.</P>
+<P> This tool is located in SATURN\SGL\TOOL.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_06"><HR></a><DL>
+<H3> I want to program the model data for each stage to be read each time.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> In a game that uses polygons, I would like to read and reference different model data for each stage at a specific address, but how should I write this?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This can be done by preparing a file for each model data used in each stage and using overlay techniques to load it from the CD according to each stage.</P>
+<P> I think another method would be to prepare only the different data parts for each stage in separate sections.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_07"><HR></a><DL>
+<H3> I want to cast a shadow.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I don't know a good way to display the shadows of players in sports games, etc. Please let me know if there is a better way.<P><DT> <FONT SIZE=5>A)</font><DD> <B>If the player is a 3D polygon</b><BR>
+ Create one model exclusively for shadows. This model does not have to be exactly the same as the original, it can have as few polygons as possible.<BR>
+ Next, display the original model on the program.<BR>
+ The same current matrix is used to display the shadow model, but the size of the current matrix in the y direction is set to 0. The quickest way to set the size in the y direction to 0 is to set the size in the y direction to 0 before displaying the model.</P>
+<P><DD> <B>slScale( toFIXED( 1.0 ), toFIXED( 0.0 ), toFIXED( 1.0 ) )</b></P>
+<P> is to execute.</P>
+<P> The shadow model then becomes a shadow parallel to the y-axis plane. If the ground is not parallel to the y-axis, changing the component given to slScale (specifically, it is related to the normal vector) will produce a shadow that looks like that.</P>
+<P> There is also a way to manipulate the matrix directly.<BR>
+ In this case, you can also expect the effect of extending shadows as the sun sets.</P>
+<P><DD> <B>[How to calculate shadow]</b><P><PRE>
+1                              0  0
+slMulFX( slSin( ang ), long )  0  slMulFX( slCos( ang ), long )
+0                              0  1
+</PRE></P>
+<P>Direction of shadow by changing ang<BR>
+ You can adjust the length of the shadow by changing long.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_08"><HR></a><DL>
+<H3> I don't really understand how to use slConvert3Dto2D.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When using slConvert3Dto2D, if the X and Y values are too large or the Z value is too small and the display cannot fit within the 2D plane, how can I determine this?<BR>
+ Also, what does it mean to return the Z value as a function value?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> slConvert3Dto2D is a function that uses the current matrix to find out where the 3D coordinates specified by the user are on the 2D plane, but if the 3D coordinates specified go beyond the drawing area, the judgment is made by the user according to the resolution used. Determine from the side.<BR>
+ However, as with all SGLs, the origin is at the center of the screen, so care must be taken when making a distinction. Also, please note that the 3D coordinate values given are relative coordinates from the coordinate space indicated by the current matrix.<BR>
+ Also, Zpos, which is returned as the return value of this function, is usually used to find out if something is stuck in Z sort.</P>
+<P> In SGL, the screen position is managed using the system variables MsScreenDist and SlScreenDist. Therefore, by using the near clipping position together with the system variable "MsZdpsfcnt", you can find out which coordinates will be the boundary value.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜■</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#ETC">SGL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,212 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 8&gt;CD通信I/F(MPEGパート)/3.MPEGデバイス</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+<A HREF="p04_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信I/F(MPEGパート)</B>
+<H2 ALIGN=CENTER>３．MPEGデバイス</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A>
+	<P><DT><H3>3.1　MPEGデバイスとの通信</H3>
+
+<A NAME="no3_311"></A>
+	<P><DT><B>3.1.1　MPEGデバイス通信用レジスタ</B>
+	<DD>　MPEG関係の通信用レジスタの一覧と、対応するアクセス関数を表３．１に示す。</P>
+
+<A NAME="t3_1"></A>
+	<P><DD><B>表3.1　通信用レジスタ一覧</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH>レジスタ名</TH><TH>R/W</TH><TH>説　　明</TH><TH>アクセス関数</TH></TR>
+	<TR><TD>HIRQREQ</TD><TD>R/W</TD><TD>割り込み要因レジスタ</TD>   <TD><A HREF="../../cdif/hon/p08_19.htm#no9_2">CDC_GetHirqReq</A>,<A HREF="../../cdif/hon/p08_19.htm#no9_3">CDC_ClrHirqReq</TD></TR>
+	<TR><TD>HIRQMSK</TD><TD>R/W</TD><TD>割り込みマスクレジスタ</TD> <TD><A HREF="../../cdif/hon/p08_19.htm#no9_4">CDC_GetHirqMsk</A>,<A HREF="../../cdif/hon/p08_19.htm#no9_5">CDC_SetHirqMsk</TD></TR>
+	<TR><TD>MPEGRGB</TD><TD>R</TD><TD>MPEGレジスタ（RGBデータ）</TD><TD><A HREF="../../cdif/hon/p08_19.htm#no9_6">CDC_GetMpegPtr</A></TD></TR>
+	</TABLE>
+	<DD>　アクセス幅はすべて16ビット（１ワード）</P>
+
+	<P><DD>　MPEG関係の通信用レジスタの詳細を以下に示す。</P>
+
+	<P><DD>　図中、予約ビットは「−」で表す。予約ビットには必ず０を指定する。<BR>
+　ビット構成は、最上位ビット（MSB）が15、最下位ビット（LSB）が０です。</P>
+
+
+	<P><DT><B>　（１）割り込み要因レジスタ（HIRQREQ）</B>
+	<DD>　ＣＤブロックからホストへの割り込み要因を通知するためのレジスタです。<BR>（詳細はＣＤパートを参照のこと）</P>
+
+<A NAME="t3_2"></A>
+	<P><DD><B>表3.2　割り込み要因レジスタのビット構成</B>
+	<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE>レジスタ名</TH><TD><PRE>R/W</TD><TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>9</TD><TD><PRE>8</TD></TR>
+<TR ALIGN=CENTER><TH><PRE>HIRQREQ</TH>   <TD><PRE>R/W</TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>MPST</TD><TD><PRE>MPCM</TD><TD><PRE>MPED</TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR><TR></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2> </TD><TD><PRE>7</TD><TD><PRE>6</TD><TD><PRE>5</TD><TD><PRE>4</TD><TD><PRE>3</TD><TD><PRE>2</TD><TD><PRE>1</TD><TD><PRE>0</TD></TR>
+<TR ALIGN=CENTER><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR></TABLE></P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH>ビット</TH><TH>名称</TH><TH>説　　明</TH><TH>初期値</TH></TR>
+	<TR><TD>bit11</TD><TD>MPED</TD><TD>1：MPEG関連処理の終了</TD><TD ALIGN=CENTER>１</TD></TR>
+	<TR><TD>bit12</TD><TD>MPCM</TD><TD>1：MPEG動作不定区間の終了</TD><TD ALIGN=CENTER>０</TD></TR>
+	<TR><TD>bit13</TD><TD>MPST</TD><TD>1：MPEG割り込みステータスの通知（MPEG関連の割り込み発生）</TD><TD ALIGN=CENTER>０</TD></TR>
+	</TABLE>
+	<DD>bit0〜bit10 ：ＣＤ関連の割り込み要因</P>
+
+
+	<P><DT><B>　（２）割り込みマスクレジスタ（HIRQMSK）</B>
+	<DD>　ＣＤブロックからホストへの割り込みをマスクするためのレジスタです。<BR>（詳細はＣＤパートを参照のこと）</P>
+<A NAME="t3_3"></A>
+	<P><DD><B>表3.3　割り込みマスクレジスタのビット構成</B>
+	<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE>レジスタ名</TH><TD><PRE>R/W</TD><TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>9</TD><TD><PRE>8</TD></TR>
+<TR ALIGN=CENTER><TH><PRE>HIRQMSK</TH>   <TD><PRE>R/W</TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>MPST</TD><TD><PRE>MPCM</TD><TD><PRE>MPED</TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR><TR></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2> </TD><TD><PRE>7</TD><TD><PRE>6</TD><TD><PRE>5</TD><TD><PRE>4</TD><TD><PRE>3</TD><TD><PRE>2</TD><TD><PRE>1</TD><TD><PRE>0</TD></TR>
+<TR ALIGN=CENTER><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR></TABLE></P>
+
+	<P><DD><OL TYPE=a>
+	<P><B><LI></B>ビットの意味は割り込み要因レジスタと同じです。<BR>（１：割り込み許可、０：マスク）</P>
+	</OL>
+
+	<P><DT><B>　（３）MPEGレジスタ（MPEGRGB）</B>
+	<DD>　MPEGフレームバッファのイメージデータをRGB形式でホストへ転送するためのレジスタです。</P>
+<A NAME="t3_4"></A>
+	<DP><DD><B>表3.4　MPEGレジスタのビット構成</B>
+	
+	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH><PRE>レジスタ名</TH><TD><PRE>R/W</TD><TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>9</TD><TD><PRE>8</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>MPEGRGB</TH>   <TD><PRE> R </TD><TD><PRE>TRP </TD><TD><PRE> B7 </TD><TD><PRE> B6 </TD><TD><PRE> B5 </TD><TD><PRE> B4 </TD><TD><PRE> B3 </TD><TD><PRE> G7 </TD><TD><PRE> G6 </TD></TR><TR></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2> </TD><TD><PRE>7</TD><TD><PRE>6</TD><TD><PRE>5</TD><TD><PRE>4</TD><TD><PRE>3</TD><TD><PRE>2</TD><TD><PRE>1</TD><TD><PRE>0</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE> G5 </TD><TD><PRE> G4 </TD><TD><PRE> G3 </TD><TD><PRE> R7 </TD><TD><PRE> R6 </TD><TD><PRE> R5 </TD><TD><PRE> R4 </TD><TD><PRE> R3 </TD></TR></TABLE></P>
+	
+	<P><DD><TABLE BORDER=1>
+	<TR><TH>名　称</TH><TH>説　　明</TH></TR>
+	<TR><TD>R3〜R7</TD><TD>：Ｒ（赤）データの上位５ビット</TD></TR>
+	<TR><TD>G3〜G7</TD><TD>：Ｇ（緑）データの上位５ビット</TD></TR>
+	<TR><TD>B3〜B7</TD><TD>：Ｂ（青）データの上位５ビット</TD></TR>
+	<TR><TD> TRP  </TD><TD>：透明ビット（画面特殊効果の透明ビットモードの設定で処理する）</TD></TR></TABLE>
+
+	<DD><OL TYPE=a>
+	<P><B><LI></B>ビットの初期値は不定です。</B></P>
+	</OL>
+
+	<P><DT><B>　（４）コマンド終了フラグ</B>
+	<DD>　MPEDフラグはMPEG関連のコマンド終了フラグであり、以下の各コマンドの処理終了を通知する。CDC関数は、これらのコマンドに対してコマンド発行の排他処理をする。<BR>（コマンド発行の排他処理についてはＣＤパートを参照のこと）</P>
+
+<A NAME="t3_5"></A>
+	<P><DD><B>表3.5　コマンド終了フラグに属するコマンド（MPEGパート）</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH>フラグ</TH><TH>コ　マ　ン　ド</TH></TR>
+	<TR><TD ALIGN=CENTER>MPED</TD><TD><PRE>
+・MPEGデコーダの初期化 （<A HREF="p08_10.htm#20.5">CDC_MpInit</A>）<B>※</B><BR>
+・イメージデータウィンドウからの読み込み（<A HREF="p08_10.htm#23.4">CDC_MpReadImg</A>）<BR>
+・イメージデータウィンドウへの書き出し（<A HREF="p08_10.htm#23.5">CDC_MpWriteImg</A>）<BR>
+・MPEGセクタバッファからのセクタ読み込み（<A HREF="p08_10.htm#24.1">CDC_MpReadSct</A>）<BR>
+・MPEGセクタバッファへのセクタ書き出し（<A HREF="p08_10.htm#24.2">CDC_MpWriteSct</A>）</TD></TR></TABLE>
+<DD><B>※</B><A HREF="p08_10.htm#20.5">CDC_MpInit</A>に関しては、例外的にコマンド終了フラグをチェックせず０クリアだけする。</P>
+
+<A NAME="no3_312"></A>
+	<P><DT><B>3.1.2　動作不定区間</B>
+
+	<P><DT><B>　（１）MPEGコマンドの動作周期</B>
+	<DD>　VSYNC同期の場合、MPEGコマンドはVBLANK-INを先頭として２VSYNC周期、または１VSYNC周期で動作する。この１周期を動作区間と呼ぶ。<BR>
+　ある動作区間中に設定された項目は、次回の動作区間に反映される。<BR>
+　コマンドの種類に応じた動作区間の間隔（動作周期）を表３．３に示す。</P>
+
+<A NAME="t3_6"></A>
+	<P><DD><B>表3.6　コマンドの動作周期</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH COLSPAN=2>コ　マ　ン　ド</TH><TH>動作周期</TH></TR>
+	<TR><TD COLSPAN=2>デコード系（MPEGデコーダ、MPEGストリーム）</TD><TD>２VSYNC</TD></TR>
+	<TR><TD ROWSPAN=2>表示系（MPEG表示画面）</TD><TD>ノンインタレース</TD><TD>１VSYNC</TD></TR>
+	<TR><TD>インタレース</TD><TD>２VSYNC</TD></TR></TABLE>
+
+	<P><DT><B>　（２）動作不定区間</B>
+	<DD>　ＣＤブロック内では、MPEGデコーダに対する設定はVSYNCのタイミングで行われる。一方、ホスト側のユーザプログラムがVSYNCのタイミングを得ることは難しい。このため、発行したMPEGコマンドが現区間で反映されるか、次区間で反映されるか不定となる区間が生ずる。</P>
+
+	<P><DT><B>　（３）動作不定区間の判定</B>
+	<DD>　動作不定区間を避けるには、以下の２つの方法がある。</P>
+	<DD><OL TYPE=a>
+	<P><B><LI>VBLANK-OUT</B><BR>VBLANK-OUTでは、動作不定区間が終了していることが保証される。<BR>
+VBLANK-OUTのタイミングからMPEG関連の処理を行うことを推奨する。</P>
+	<P><B><LI>割り込み要因レジスタのMPCMフラグ</B><BR>MPCMフラグは、MPEGデコーダのステータスが確定したことを示すフラグです。<BR>
+MPCM＝１になってからVBLANK-INまでの間に発行したコマンドは、次区間で反映される。<BR>
+ホスト側でMPCMフラグを０クリアし、再度１となるのを待つ。</P>
+	</OL>
+
+<A NAME="z3_1"></A>
+	<P ALIGN=CENTER><B>図3.1　動作不定区間の判定</B><BR><IMG SRC="../grp/i009_01.gif"></P>
+	<DD>　ホスト同期の場合は、VSYNCに加え、デコード同期信号（DSYNC）の送出にも起因してMPCMフラグが１になる。VSYNC, DSYNCのどちらであっても不定区間は終了する。</P>
+
+	<P><DT><B>　（４）コマンド発行時におけるMPCMフラグのチェック</B>
+	<DD>　MPEG通信関数は、コマンド発行時にMPCMフラグをチェックし、０であればコマンドを発行せずにエラーコード<A HREF="p07_10.htm#20.0">CDC_ERR_MP_COMU</A>を返す。<BR>
+　動作不定区間の終了をMPCMフラグで判定する場合、ユーザプログラムはVBLANK-INのタイミングでMPCMフラグを０クリアし、MPEG通信関数が<A HREF="../../cdif/hon/p07_11.htm#no2_01">CDC_ERR_OK</A>を返すことを確認してください。</P>
+
+	<P><DD>　ただし、以下の関数はMPCMフラグのチェックをしない。</P>
+
+<A NAME="t3_7"></A>
+	<P><DD><B>表3.7　MPCMフラグのチェックをしないMPEG通信関数</B>
+	<DD><TABLE><TR><TD>
+	<TR><TD><PRE>・直前のMPEGステータス情報の取得</TD><TD><PRE>（<A HREF="p08_10.htm#20.2">CDC_MpGetLastStat</A>）</TD></TR>
+	<TR><TD><PRE>・MPEGデコーダの初期化</TD><TD>（<A HREF="p08_10.htm#20.5">CDC_MpInit</A>）</TD></TR>
+	<TR><TD><PRE>・イメージデータウィンドウ位置の設定</TD><TD>（<A HREF="p08_10.htm#23.2">CDC_MpSetImgPos</A>）</TD></TR>
+	<TR><TD><PRE>・イメージデータウィンドウサイズの設定</TD><TD>（<A HREF="p08_10.htm#23.3">CDC_MpSetImgSiz</A>）</TD></TR>
+	<TR><TD><PRE>・イメージデータウィンドウからの読み込み</TD><TD>（<A HREF="p08_10.htm#23.4">CDC_MpReadImg</A>）</TD></TR>
+	<TR><TD><PRE>・イメージデータウィンドウへの書き出し</TD><TD>（<A HREF="p08_10.htm#23.5">CDC_MpWriteImg</A>）</TD></TR>
+	<TR><TD><PRE>・MPEGセクタバッファからのセクタ読み込み</TD><TD>（<A HREF="p08_10.htm#24.1">CDC_MpReadSct</A>）</TD></TR>
+	<TR><TD><PRE>・MPEGセクタバッファへのセクタ書き出し</TD><TD>（<A HREF="p08_10.htm#24.2">CDC_MpWriteSct</A>）</TD></TR>
+	</TABLE>
+
+<A NAME="no3_20"></A>
+	<P><DT><H3>3.2　動作モードとデータフロー</H3>
+
+	<P><DT><B>　（１）動画再生モード</B>
+
+<A NAME="z3_2"></A>
+	<P ALIGN=CENTER><B>図3.2　動画再生モードのデータフロー</B><BR><IMG SRC="../grp/i011_01.gif"></P>
+
+	<P><DT><B>　（２）静止画再生モード</B>
+	<DD>　静止画は、すべてのピクチャがＩピクチャで構成されるMPEGストリームを順次デコードすることによって再生される。<BR>　静止画再生モードでは、イメージデータを格納するフレームバンクを指定してデコードする。表示・出力するフレームバンクは独立に指定できる。<BR>（同一のフレームバンクを指定した場合、デコード途中の状態も画面に表示される）</P>
+
+<A NAME="z3_3"></A>
+	<P ALIGN=CENTER><B>図3.3　静止画再生モードのデータフロー</B><BR><IMG SRC="../grp/i011_02.gif"></P>
+
+	<P><DT><B>　（３）MPEGセクタバッファモード</B>
+<A NAME="z3_4"></A>
+	<P ALIGN=CENTER><B>図3.4MPEGセクタバッファモードのデータフロー</B><BR><IMG SRC="../grp/i011_03.gif"></P>
+
+<A NAME="no3_30"></A>
+	<P><DT><H3>3.3　MPEG機能を使用するための手順</H3>
+
+	<P><DT><B>　（１）BOOT ROM内ルーチン「MPEGチェック」</B>
+	<DD>　MPEG機能を使用するには、BOOT ROM内のMPEGチェックルーチン（SYS_CHKMPEG関数マクロ）を実行する必要がある。本ルーチンは、MPEG機能を使用するために必要な処理を行う。<BR>
+　本ルーチンを実行して正常終了しなければ、全てのMPEG通信関数はREJECTとなってしまい、一切使用できない。<BR>
+　SYS_CHKMPEG関数マクロは、SYSライブラリ（sega_sys.h）に定義されている。具体的な実行方法やサンプルプログラムについては、ライブラリ説明ファイル（mansys.txt）を参照のこと。</P>
+
+	<P><DT><B>　（２）実行手順</B>
+	<DD>　MPEG機能を使用するために必要な、MPEGチェックルーチンの実行手順を以下に示す。</P>
+	<DD><OL TYPE=a>
+	<P><B><LI></B><A HREF="../../cdif/hon/p08_11.htm#no1_7">CDC_CdInit関数</A>によりＣＤブロックのソフトリセットを実行する。</P>
+	<P><B><LI></B><A HREF="../../cdif/hon/p08_11.htm#no1_4">CDC_GetHwInfo関数</A>を実行し、MPEGカートリッジが装着されているか調べる。</P>
+	<P><B><LI></B>装着されていれば、SYS_CHKMPEG関数マクロを実行する。<BR>（失敗しても最大２回まで実行）</P>
+	<P><B><LI></B>成功すれば、<A HREF="p08_10.htm#20.5">CDC_MpInit関数</A>でスイッチONを指定して実行し、MPEGシステムを起動する。</P>
+	<P><B><LI></B>正常終了すれば、全てのMPEG通信関数が使用可能となる。</P>
+	</OL>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+<A HREF="p04_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

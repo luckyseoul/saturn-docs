@@ -1,0 +1,52 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/31&gt;SCU User's Manual/4.DSP Control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p04_03.htm">Back</a> ｜ <A HREF="p04_05.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 4 DSP Control</b><HR NOSHADE>
+<A NAME="no4_40"></A><H2> ■4.4 Executing special processing</H2><P> DSP can perform special processing as shown below.</P>
+<DL>
+<P><OL>
+<B><LI></b> How to load a program using DMA instructions<B><LI></b> Repeated execution of one instruction<B><LI></b> Execution of subroutine program</OL>
+</P>
+<A NAME="no4_41"></A><P><DT><H3> ◆How to load programs using DMA instructions</H3><DD> Previously, we explained how to load programs from the CPU (see Section 2.3), but you can also load programs into the DSP's program RAM using the DSP's DMA instructions.<BR>
+ The program is loaded in the following format.</P>
+<P><PRE>
+	MVI Imm,[RA0]      ; Set the external memory transfer start address
+	DMA D0,[PRG],SImm  ; Set the number of transfer words, start transfer
+	MVI Imm,[PC]       ; Set the program execution start address</PRE></P>
+<A NAME="no4_42"></A><P><DT><H3> ◆Repeated execution of one instruction</H3><DD> The format for repeated execution of one instruction is shown below. The 1-instruction repeat execution instruction (LPS instruction, see Section 4.5 "Instructions" LOOP BOTTOM instruction section) repeatedly executes the next instruction. The number of repetitions will be one more than the set value.</P>
+<P><PRE>
+	MVI Imm,[LOP]      ; Set the number of repetitions
+	LPS                ; Repeat execution command
+	###                ; This command is executed repeatedly.
+  </PRE></P>
+<A NAME="no4_43"></A><P><DT><H3>◆Execution of subroutine program</H3><DD> DSP programs (mnemonics) do not have instructions dedicated to subroutine execution. A subroutine is realized by combining the Load immediate instruction to [PC] and the LOOP BOTTOM instruction as shown in Figure 4.4.</P>
+<P ALIGN=CENTER> Figure 4.4 Execution of subroutine program<BR>
+<img srcset="../grp/i090_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_03.htm">Back</a> ｜ <A HREF="p04_05.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

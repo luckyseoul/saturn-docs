@@ -1,0 +1,201 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 4&gt;FAQ/SBL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sbl">FAQ</a> ★ <A HREF="index.htm">SBL programming related</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SBL programming related</b><H2 ALIGN=CENTER> VDP</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_01"><HR></a><DL>
+<H3> I want to match polygons and scrolls.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to use the SBL library to synchronize and display polygons and rotating scroll screens in 3D, but is there a way to convert the viewpoint parameters of the SPR function to SCL parameters?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> It is true that handling SCL and SPR in the same space with SBL takes more effort than with SGL.<BR>
+ If you follow the method below, I think you can roughly match it, so please give it a try.</P>
+<DL>
+<P><DT> <B>(1) Setting the viewpoint and center point</b><DD> The default distance between the SPR viewpoint and the center point is 256 dots (in units of 1), but for SCL it is 400 dots.<BR>
+ Adjust this position using the SCL function (I think it's better than SPR).</P>
+<P> As a default value,<BR>
+ Viewpoint position (X=screen horizontal size/2, Y=screen vertical size/2, Z=400)<BR>
+ Center point (X=screen horizontal size/2, Y=screen vertical size/2, Z=0)<BR>
+ It is set to</P>
+<P> I think if you set the difference in the Z direction to 256, it will fit as the center.</P>
+<P><DT> <B>(2) About angle and movement</b><DD> The difference between SPR and SCL is that the rotation direction and movement method are reversed.<BR>
+ Pass the reciprocal of the angle rotated by SPR to SCL.<BR>
+ However, it may be necessary to make minor adjustments here, so please respond by moving etc. on the app side.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_02"><HR></a><DL>
+<H3> I don't really understand how to set the distance between the viewpoint and the reference point, and the distance between the viewpoint and the projection plane.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> As a result of trying to synchronize the sprite and the scroll screen, I was able to synchronize the rotation, but I couldn't understand how to set the distance between the viewpoint and the reference point, and the distance between the viewpoint and the projection plane. When changing the distance between the viewpoint and the reference point, do you move the RBG in the Z direction or change the scale?<P> please tell me in detail. For example, in a sprite function, if the distance between the viewpoint and the reference point is 2.0, what is the setting value?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The default value is set to 256 as the number of screen pixels for each 1.0 in X and Y when performing perspective conversion to the screen (projection surface).<BR>
+ This default value can be changed using the SPR_3SetPixelCount function.<BR>
+ Set this value so that the distance between the scroll viewpoint coordinates and the center point is 256. I don't know how the value 2.0 is set, but I think it is set in proportion to this distance.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_03"><HR></a><DL>
+<H3> If you tilt RBG too much, it will be clipped.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am using RBG from the SCL library to perform 3D rotation, but if I tilt the BG too much, Z clipping will occur. Under what conditions will this be clipped? Also, is there a way to prevent Z-clip?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> You mentioned that the image will be Z-clipped, but is this what you are talking about?</P>
+<P> If you tilt it backwards by rotating it on the X axis, it will momentarily disappear from the screen until it is perpendicular to the screen, and if you tilt it further, you will be able to see the back side. Is that so?</P>
+<P> This phenomenon occurs when the viewpoint becomes parallel to the center point of the rotation plane. As a countermeasure to this problem, we recommend that you constantly check the angle between the viewpoint and the rotation plane, and if they become parallel, use the software to process it.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_04"><HR></a><DL>
+<H3> When using NBG0 side with 32k color and 2WORD, inverted cells are not displayed correctly.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When using NBG0 side with 32k color and 2WORD, cells that are not inverted are displayed correctly, but cells that are inverted are not displayed correctly.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Does reversal mean horizontal reversal? (There are vertical reversal and horizontal reversal.) For horizontal reversal, only 16 colors and 256 colors can be used according to the VDP2 specifications.<BR>
+ Please refer to SEGASATURN Developer's Information STN-37 for details.</P>
+<!--@-->
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_05"><HR></a><DL>
+<H3> The translucency that I want to apply only to SCL_SP2 also applies to SCL_SP6.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to set the priority order as below and perform color calculations on the BG only for the SCL_SP2 sprite, but SCL_SP6 also becomes semi-transparent. Specify the color calculation ratio to only one sprite. Is it not possible?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Have you selected a sprite type that has only 2 priority bits?</P>
+<P> This can occur because the third bit (0) is ignored if types 0, 3, 4, 8 to F are set in the function SCL_SetSpriteMode, or if nothing is set.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_06"><HR></a><DL>
+<H3> Sprites flicker when applying Gouro shading.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If Gouraud shading is specified when using SPR_2NormSpr() or SPR_2Polygon(), etc., that part will flicker. If you stop the emulator and look at it, you will see that one side of the frame buffer is drawn correctly, but the other side is filled with a single color using a color code that is not known from where the Gouraud specification was referenced. What are the possible causes?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD><UL TYPE=DISC>
+<LI> I have only registered once.<LI> The Gouraud shading address on one side is not set correctly.</UL>
+</P>
+<P><DD> This is possible.<BR>
+ Since the VDP1 library has a command table divided into two parts, it is necessary to call the SPR_2NormSpr function every time there is a frame change.<BR>
+ In the case of such symptoms, the cause is often that the function is registered only once and then the function is not called since there are no changes.<BR>
+ If possible, compare the contents of the command table,</P>
+<P><OL>
+<B><LI></b> Is the address to Gouraud that cannot be displayed correctly correct?<B><LI></b> Is the table set correctly at that Gouraud address?</OL>
+</P>
+ Please confirm.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_07"><HR></a><DL>
+<H3> Hangs when repeatedly defining/deleting SPR_2SetChar and SPR_2ClrChar.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> In SBL's SPR2 library, there was a hang-up phenomenon when repeatedly defining and deleting sprites using SPR_2SetChar and SPR_2ClrChar.</P>
+<P> When I added a check routine to SPR_2SetChar and looked into it, I found that even though there was still memory that could be allocated using allocBlock, a NULL pointer was being returned.<BR>
+ Also, since there is no need to change the library every time, could you please make it possible to return an error if a sprite cannot be secured with SPR_2SetChar from the next version update?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Try changing it as below.</P>
+<P><PRE>
+static Vaddr allocBlock( Uint16 size ){
+NullBlock *memblk = nullBlockTop;
+NullBlock *prev = NULL;
+NullBlock *second_best = NULL;
+NullBlock *prev_second_best = NULL;
+Vaddr p = ( Vaddr )NULL;
+while( memblk != NULL ){
+  if( memblk-&gt; size == size )
+    break;
+  if( memblk-&gt; size&gt; size ){
+     if(( second_best == NULL )
+     ||(( second_best != NULL )
+     &&( memblk-&gt; size&lt; second_best-&gt; size ))){
+       second_best = memblk;
+       prev_second_best = prev;
+     }
+  }
+  prev = memblk;
+  memblk = memblk-&gt; next;
+}
+if( memblk == NULL ){
+  memblk = second_best;
+  prev = prev_second_best;
+} 
+if( memblk != NULL ){
+  Uint32 blocksize;     
+  memblk-&gt; size -= size;
+  blocksize = ( Uint32 )memblk-&gt; size*32;
+  p = ( Vaddr )(( Uint32 )memblk + blocksize - ( Uint32 )VRAM );
+  if(( memblk-&gt; size == 0 )&&( prev != NULL ))
+    prev-&gt; next = memblk-&gt; next;
+  }
+  return p;
+}
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_08"><HR></a><DL>
+<H3> I want to display sprites in palette format.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How do I set the sprite display palette?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> When setting the palette number to Uint16 color, it is necessary to give an offset to the lower bits.<BR>
+ The amount of offset changes depending on the number of colors in the palette used (displayed sprite).</P>
+<P><UL TYPE=DISC>
+<LI> 4 bits for 16 colors<LI> 6 bits for 64 colors<LI> 7 bits for 128 colors<LI> 8 bit for 256 colors</UL>
+</P>
+<P><DD> (Please set all offset parts to 0)</P>
+<P><DD> (Example) When using the second palette with 256 color sprites<BR>
+ Set the fourth argument, Uint16 color, to the SPR_2NormSpr() function to 0x0100.</P>
+<P> In addition, Uint16 color corresponds to CMDCOLR (color control word) in the command table in actual hardware VDP1 operation.<BR>
+ CMDCOLR (color control word) is also used to specify the priority of the scroll surface.</P>
+<P> For more information,</P>
+<P><DT> <B>reference</b><DD> VDP1 User's Manual " <A HREF="../../hard/vdp1/hon/p06_40.htm">6.4 CMDCOLR (Color Control Word)</a> "<DD> VDP2 User's Manual " <A HREF="../../hard/vdp2/hon/p09_10.htm">9.1 Sprite Data</a> "<DD> VDP2 User's Manual " <A HREF="../../hard/vdp2/hon/p09_20.htm">9.2 Priority and Color Calculation</a> "<DD> Please refer to.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_09"><HR></a><DL>
+<H3> I want to set priority to sprites.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to set priority to sprites.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> You can set up to 8 sprite priority values.<BR>
+ The setting method is explained below, so please refer to the hardware manual " <A HREF="../../hard/vdp1/index.htm">VDP1</a> / <A HREF="../../hard/vdp2/index.htm">VDP2</a> User's Manual".</P>
+<DL>
+<P><DT> <B>1. Sprite type settings</b><DD> void SCL_SetSpriteMode(Uint8 type,Uint8 colMode,Uint8 winMode)</P>
+<DD> →Refer to the " <A HREF="../../prgg/prg2/vdp2/index.htm">Program Library VDP2 Library User's Manual</a> " to set the sprite type.<BR>
+ (SBL default is type 0)</P>
+<P><DD> <B>"What is a sprite type?"</b><DD> This is the data format used when VDP2 receives frame buffer data drawn by VDP1, and consists of 16 bits. (8BIT at high resolution) Depending on the type of sprite type,</P>
+<P><UL TYPE=DISC>
+<LI> Number of available colors<LI> Number that can be set as priority<LI> Shadow feature selection bit<LI> Numbers that can be used to specify percentages for color calculations</UL>
+</P>
+<P><DD> etc. will change.<BR>
+ Select the sprite type according to the function you want to use.<BR>
+ (Note: Sprite type settings are only valid for color bank format (=palette format) sprite data.For RGB format sprite data, all of the above function bits are assumed to be 0. please note.)</P>
+<P> Details → VDP2 Manual Chapter 9 " <A HREF="../../hard/vdp2/hon/p09_10.htm">Sprite Data</a> " For example, in the case of sprite type 5, as you can see from <A HREF="../../hard/vdp2/hon/p09_10.htm#z9_1">Figure 9.1</a> of the VDP2 manual, there are 3 bits for priority (PR0 to PR2 in the figure), so <B><FONT SIZE=4>there are 8 priority bits.</font></b> It is possible to specify <B><FONT SIZE=4>'register'</font></b> .</P>
+<P> <B>*</b> Please note that the priority value is not directly specified.</P>
+<P><DT> <B>2. How to set sprite priority number register</b><DD> Please set using the following function.</P>
+<P><DD> <B>void SCL_SetPriority(Uint32 surface , Uint8 priority)</b><DD> <B>Function:</b> Set the priority number for each screen.<DD> <B>surface :</b> SCL_SP0,...SCL_SP7, SCL_NBG0, SCL_NBG1, SCL_NBG2, SCL_NBG3, SCL_RBG0, SCL_RBG1, SCL_EXBG<DD> <B>priority:</b> Specify a value between 0 and 7 (faces with 0 specified will not be displayed).</P>
+<P><DD> <B>"What is the sprite priority number register?"</b><DD> This register determines the priority of sprites.<BR>
+ There are 8 registers in total, numbered 0-7. (Corresponds to SCL_SP0,...,SCL_SP7) Referenced by the priority bit on the VDP1 frame buffer.<BR>
+ Set the actual priority number in this register.</P>
+<P><DT> <B>3. How to set the priority bit</b><DD> To set the priority bit when drawing sprites, set it in the color code word data.</P>
+<P><DD> <B>For polygons:</b><DD> Uint16 color in texture table SprTexture structure<DD> →Refer to Program Library User's Guide 2 VDP2 Library</P>
+<P><DD> <B>For sprites:</b><DD> Third argument of SPR_2SetChar function Uint16 color<DD> Or<DD> Uint16 color in each sprite drawing function</P>
+<P> Processing is performed by setting the priority bit.<BR>
+ The bit position changes depending on the sprite type used.<BR>
+ Please refer to <A HREF="../../hard/vdp2/hon/p09_10.htm#z9_1">Figure 9.1</a> in the VDP2 manual to determine which bits are the priority bits.</P>
+<P><DD> Example: If using sprite type 5<UL TYPE=DISC>
+<LI> priority register 4<LI> Specify the second of the 256-color palette</UL>
+</P>
+<P><DD> In this case, the values to set are as follows:<PRE>
+0100000100000000 = 0x4100
+ ||| |||
+ ||| +++----------Specify palette number 1
+ +++--------------Specify priority register 4</PRE></P>
+<P><DD> <B>Note:</b><DD> Sprites are drawn in the order they are registered in the VDP1 command table (Z sort order).<BR>
+ (It is processed regardless of the priority bit settings.) Since the sprite frame buffer has only one side, data drawn first will be overwritten by data written later.<BR>
+ If you overwrite a sprite with a lower priority on a sprite with a higher priority, the front-back relationship with the BG will look strange.</P>
+<P><DD> Please refer to <A HREF="../../hard/vdp2/hon/p09_10.htm#z9_1">Figure 9.1</a> in the VDP2 manual to determine which bits are the priority bits.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_10"><HR></a><DL>
+<H3> It is not possible to allocate more than 256 colors using the SCL_AllocColRam function.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> SCL_AllocColRam(SCL_SPR, 512, OFF) returns 0.<BR>
+ It seems that when I try to secure color data for 256 colors or more, an error returns.What does this mean?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> In this function, the color offset address is set for each screen, and because this setting is the main focus, it is not possible to secure a data area that exceeds 256 colors and manage it properly.</P>
+<P> Initially, you can obtain more than 512 colors, but once you register, you cannot obtain more than 256 colors.</P>
+<P> As a workaround, if you want to allocate a data area that exceeds 256 colors, call a function as 256 colors at the end of allocating and manage it independently.<BR>
+ Sprites usually use color data of 256 colors or more, so be sure to reserve the colors for sprites last.</P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sbl">FAQ</a> ★ <A HREF="index.htm">SBL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

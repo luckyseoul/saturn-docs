@@ -1,0 +1,56 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 5&gt; CD builder script grammar supplementary explanation</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+ <B>▲ <A HREF="p19_10.htm">Back</a> ｜ <A HREF="p21_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD builder script grammar supplementary explanation</b><H2 ALIGN=CENTER></H2><HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A><P><DT><H3> 3. About the relationship between sector rate and bit rate</H3><DD> This chapter explains the relationship between sector rate and bit rate.<BR>
+ Any integer value can be defined for the sector rate, but there are two typical values: 75 sectors/second and 150 sectors/second, and the bit rate (CD rate) that can be written in each case is</P>
+<DD><UL TYPE="DISK">
+<LI> CD rate (75) = 75 × 2324 × 8 = 1,394,400(bps)<LI> CD rate (150) = 150 × 2324 × 8 = 2,788,800 (bps)</UL>
+<P><DD> It becomes.</P>
+<P> this is&#65308; File&#65310; ‥‥‥&#65308; EndFile&#65310; It means the maximum value of the sum of bitrates that can be written within, and if the sum of bitrates exceeds this maximum value, multiplexing of streams will not be possible.<BR>
+ When the disc format is compliant with CD-ROM XA, the data length per sector that can be used in MPEG multiplex varies depending on the data type, and is as follows.</P>
+<P><DD><UL TYPE="DISK">
+<LI> MPEG video: 2296 bytes<LI> MPEG audio: 2279<LI> Data (FORM1): 2048<LI> Data (FORM2): 2324</UL>
+</P>
+<P><DD> therefore&#65308; BitRate&#65310; The following conversion is required between the bit rate defined by the keyword and the CD rate.</P>
+<P><DD> Let's say that the bit rate of MPEG video is BR (MV), the bit rate of MPEG audio is BR (MA), the bit rate of data (FORM1) is BR (F1), and the bit rate of data (FORM 2) is BR (F2), and these four streams are Suppose we perform a multiplex of</P>
+<DT><PRE><H3>
+          BR(MV)×2324   BR(MA)×2324   BR(F1)×2324   BR(F2)×2324
+CD rate ≧ ─────────── + ─────────── + ─────────── + ───────────
+              2296          2279          2048          2324
+  
+           BR(MV)   BR(MA)   BR(F1)
+        = (────── + ────── + ──────)×2324+BR(F2)
+            2296     2279     2048
+</H3></PRE></P>
+<P><DD>This is the relationship.<BR>
+ This relationship must always hold during multiplexing, is checked at runtime, and an error occurs if it is violated.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p19_10.htm">Back</a> ｜ <A HREF="p21_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

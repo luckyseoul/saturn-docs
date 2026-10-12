@@ -1,0 +1,170 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE> SEGASATURN Developer's Information STN-5 </TITLE>
+</HEAD>
+
+<BODY>
+<HR>
+  <A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../index.htm">INDEX</A>
+▲
+ <A HREF="stn02.htm">STN-2</A>
+|<A HREF="stn03.htm">STN-3</A>
+|<A HREF="stn04.htm">STN-4</A>
+|<B>STN-5</B>
+|<A HREF="stn06.htm">STN-6</A>
+|<A HREF="stn09.htm">STN-9</A>
+|<A HREF="stn18.htm">STN-18</A>
+▼
+<HR NOSHADE>
+<H1 ALIGN=CENTER>STN-5</H1>
+<H2 ALIGN=CENTER>セガサターン用ＣＤ−ＲＯＭでのリードリトライ </H2>
+<HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発行番号：</TH><TD>STN-5</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発 行 日：</TH><TD>94/10/07</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>メディア：</TH><TD>○共　通</TD><TD>●CD-ROM</TH><TD>○カートリッジ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>関　　連：</TH><TD>●プログラム</TD><TD>○ハード</TD><TD>○マニュアル</TD><TD>○ツール</TD><TD>○ゲーム</TD><TD>○バグ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>情報区別：</TH><TD>●新　規</TD><TD>○変　更</TD><TD>○追　加</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>重 要 度：</TH><TD>●厳　守</TD><TD>○推　奨</TD><TD>○参　考</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>添付資料：</TH><TD>○無</TH><TD>●有</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>件名補足：</TH><TD COLSPAN=7>    </TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER>内　容</H3>
+
+<DL>
+
+  <P><DT><TABLE><TR>
+     <TD><IMG SRC="../../what/atto.gif"></TD>
+     <TD><B>　セガサターン用CD-ROMを作成する場合、データエラーを考慮して、必ずリードリトライを行うこと。<B></TD></TR></TABLE></P>
+
+  <P><DT><H3>■説明</H3>
+     <DD><P>　CD-ROMは、高いエラー訂正能力をもっていますが、ドライブの劣化・ディスク傷,
+            偏心・ディスクに付着したほこり等により、訂正不能なエラーが発生する場合があり
+            ます。<BR>
+            　従ってデータエラーを考慮して、<A HREF="#NO1">「ECCの回数を増やす方法」
+           (添付資料参照)</A>だけではなく、必ずリードリトライを行うようにしてください。<BR>
+           　但しデバック時等には、リードリトライを行う事により、エラー等の発生原因が解らな
+           くなる恐れがありますのでご注意ください。</P>
+</DL>
+
+<HR>
+<H3 ALIGN=CENTER><A NAME="NO1">添付資料</A></H3>
+<H2 ALIGN=CENTER>ECC/リトライ回数の設定方法</H2>
+<DL>
+  <P><DT><H3>■目的</H3>
+     <DD>　CD-ROMデータがリード時にエラーが発生した場合、デフォルトの設定値ではリトライせずリードが中止されます。<BR>
+ →[エラー状態を返す]</P>
+
+  <P><DT><H3>■設定方法</H3>
+     <DD>　リトライ回数は、CDC_CdInit関数で設定します。設定は、目的とするCD再生の手前
+ で行うと有効になります。実際には一度設定すれば再設定するかソフトリセットする
+ まで設定は有効なので、通常はプログラムの先頭(初期化等)で実行するのが適当です。</P>
+
+  <P><DT><B>　◆注意</B>
+     <DD>　CDC_CdInit関数を実行すると、CDドライブは,＜PAUSE＞状態になります。従ってCD再生中にリトライ回数を変更すると、設定は変更されますが<PAUSE>状態になってしまします。</P>
+	
+  <P><DT><B>　◆プログラム例</B>
+<PRE>
+	#include	"sega_cdc.h"
+	#define		ECC	5	/* ECC繰り返し回数：  ５回 */
+	#define		RETRY	0x0f	/* リトライ回数   ：１５回 */
+
+	/* ECC/リトライ回数の設定（初期化フラグ,スタンバイタイムはデフォルト値）*/
+	CDC_CdInit(0,0,ECC,RETRY);
+</PRE></P>
+
+  <P><DT><B>　◆参照</B>CDC_CdInit()関数については
+     <DD><LI>「PROGRAMMER'S GUIDE VOL.1」CD通信インタフェースユーザーズマニュアル
+     <DD><LI><A HREF="stn_19.htm">STN-19</A>:ＧＦＳ使用時のＣＤブロックの初期化方法</P>
+
+  <P><DT><B>　◆　その他</B>
+     <DD>　CDドライブ状態が＜ERROR＞になった場合、データが正しくリードできたFADまでシークして再度プレイしてください。
+     <DD>　現在のFADを知るには、１度ポーズコマンドを発行してから、CDステータス情報を取得してください。
+	 何度も同じ場所で<ERROR>になる場合は、修復不可能な傷などがあると考えられますので、スキップするしかありません。</P>
+
+	<P><DT><H3>■サンプルプログラム</H3>
+	<DD><PRE>
+#include	"sega_cdc.h"
+
+#define	STS_MSK	0x0f		/* CDステータスのマスクパターン */
+
+Sint32 recovPlay(Sint32 fad);
+Sint32 waitStat(Sint32 sts);
+
+/* ＣＤ再生の復帰処理（指定fadから再生を再開する）*/
+Sint32 recovPlay(Sint32 fad)
+{
+	Sint32	Ret;
+	CdcPos	pos;
+	CdcPly	ply;
+	
+	/* 目的位置へシークする */
+	CDC_POS_PTYPE(&pos) = CDC_PTYPE_FAD;
+	CDC_POS_FAD(&pos) = fad;
+	ret = CDC_CdSeek(&pos);
+	if (ret != CDC_ERR_OK) {
+		return NG;
+	}
+	
+	/* <PAUSE>状態になるまで待つ */
+	ret = waitStat(CDC_ST_PAUSE);
+	if (ret != OK) {
+		return ret;
+	}
+	
+	/* ＣＤ再生を再開する */
+	CDC_PLY_STYPE(&ply) = CDC_PTYPE_NOCHG;
+	CDC_PLY_ETYPE(&ply) = CDC_PTYPE_NOCHG;
+	CDC_PLY_PMODE(&ply) = CDC_PM_NOCHG;
+	ret = CDC_CdPlay(&ply);
+	if (ret != CDC_ERR_OK) {
+		return NG;
+	}
+	return OK;
+}
+
+/* 指定ドライブ状態になるまで待つ */
+Sint32 waitStat(Sint32 sts)
+{
+	Sint32	ret;
+	Sint32	stwk;
+	CdcStat	stat;
+	
+	while (TRUE) {	/* 実際にはループ回数の上限が必要 */
+		/* 定期レスポンスの取得 */
+		ret = CDC_GetPeriStat(&stat);
+		if (ret == CDC_ERR_PERI) {
+			continue;
+		}
+		if (ret != CDC_ERR_OK) {
+			return NG;
+		}
+		stwk = (CDC_STAT_STATUS(&stat) & STS_MSK);
+		if (stwk == sts) {
+			brake;
+		}
+	}
+	return OK;
+}
+　
+</PRE></P>
+</DL>
+以上
+<HR NOSHADE>
+  <A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../index.htm">INDEX</A>
+▲
+ <A HREF="stn02.htm">STN-2</A>
+|<A HREF="stn03.htm">STN-3</A>
+|<A HREF="stn04.htm">STN-4</A>
+|<B>STN-5</B>
+|<A HREF="stn06.htm">STN-6</A>
+|<A HREF="stn09.htm">STN-9</A>
+|<A HREF="stn18.htm">STN-18</A>
+▼
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

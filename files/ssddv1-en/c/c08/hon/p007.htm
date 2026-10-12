@@ -1,0 +1,27 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p006.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p008.htm> Go to next page </A>
+<HR><P><P>
+<H2> Chapter 2 Sound Driver Startup </H2>
+<H3> 2.1 Sound driver startup method </H3>
+<UL> To start up the sound driver, basically just transfer the sound driver to the sound memory and cancel the reset signal. However, the memory contents at power-on are not guaranteed, so initialization such as zero clear is required. <P>
+To start the sound driver, follow steps 1 to 6 below. This starts the sound driver and starts from the beginning of the program. For details on hardware such as SCSP and reset, refer to the SCSP and SMPC user's manuals. <P></UL>
+<H4> 2.1.1 Startup procedure </H4>
+<UL><table border cellpadding=5>
+<th align = "center"> <pre> Order </th> <th align = "center"> <pre> Processing content </th> <th align = "center"> <pre> Description </th> <tr>
+<td align = "left"> <pre> 1 </td> <td align = "left"> <pre> Stop 68000 <br> (reset the sound CPU) </td> <td align = " left "> <pre> Execute" Sound OFF "in the software library" SMPC interface live library ". </td><tr>
+<td align = "left"> <pre> 2 </td> <td align = "left"> <pre> Initialize SCSP registers </td> <td align = "left"> <pre> SH Write 02h in byte at address 25B00400. <br> (DAC18B = 0, MEM4MB = 1) </td> <tr>
+<td align = "left"> <pre> 3 </td> <td align = "left"> <pre> Clear system area </td> <td align = "left"> <pre> SH address Clear all <0> from address 25A00000 to address 25A0AFFF. </td><tr>
+<td align = "left"> <pre> 4 </td> <td align = "left"> <pre> Transfer a sound program to a sound memory <br> <br> <td> <td align = "left" > <pre> Transfer the sound program <br> (SDDRVS.TSK) from address 25A00000 of SH address. </td><tr>
+<td align = "left"> <pre> 5 </td> <td align = "left"> <pre> Transfer sound area map to sound memory <br> Transfer </td> <td align = "left" > <pre> Transfer sound area map from address 25A0A000 of SH address. </td><tr>
+<td align = "left"> <pre> 6 </td> <td align = "left"> <pre> Start 68000 <br> (Release sound CPU reset) </td> <td align = "left"> <pre> Execute “Sound ON” in the software library “SMPC interface live library”. </td>
+</table><p>
+<B> Remarks) </B> <BR>
+The maximum size of the sound area map is 4096 bytes. If the size is larger than this, please divide it into multiple sound area maps. However, in that case, replace the sound area map before the map change (as described in the section on how to play the sound) if necessary. </UL>
+<P><P><HR>
+<A HREF=p006.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p008.htm> Go to next page </A>
+</BODY>
+</HTML>

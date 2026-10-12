@@ -1,0 +1,143 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;18/86&gt;VDP2 User's Manual/3.4 Color RAM Mode</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">VDP2 User's Manual</a> ★ <A HREF="p03_10.htm">Chapter 3 RAM</a><HR>
+ <B>▲ <A HREF="p03_35.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 3 RAM</b><HR NOSHADE>
+<DL>
+<A NAME="no3_40"></A><P><DT><H2> ■3.4 Color RAM mode</H2><DD> The color RAM is 32K bits (2K words), and the stored color data is used for all palette-style sprites and scroll screens. Color data can be stored by selecting either 15-bit data with 5 bits each for RGB or 24-bit data containing 8 bits each. You can also use the extended color calculation function by dividing the data into 16K bits (1K words) and storing the same color data in each. There are three ways to store color data in color RAM:</P>
+<DD><OL>
+<P><B><LI></b> Mode 0: 1024 color settings with a total of 15 bits (5 bits each for RGB)</P>
+<P><B><LI></b> Mode 1: 2048 color settings with a total of 15 bits (5 bits each for RGB)</P>
+<P><B><LI></b> Mode 2: 1024 color settings with a total of 24 bits (8 bits each for RGB)</P>
+</OL>
+<P><DD> When outputting color data, it is fixed at 8 bits each for RGB, so if the color data stored in the color RAM is 5 bits each for RGB, 0 is added to the lower 3 bits.<BR>
+ When the special color calculation mode is specified as mode 3, the most significant bit of the color RAM data becomes the color calculation enable bit. For details on the special color calculation mode, see " <B><A HREF="p12_20.htm">12.2 Special color calculation function</a></b> ".</P>
+<P><DD> Figure 3.9 shows the structure of color data on color RAM.</P>
+<A NAME="z3_9"></A><P><DD> <B>Figure 3.9 Color data structure on color RAM</b> <!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="z3_9"></A><P><DT> <B>●For RGB each 5 bits</b><DD> color data<TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 09</TD><TD><PRE> 08</TD><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH><PRE> CC</TD>
+<TH COLSPAN=5><PRE>BLUE data 5 bits</TH>
+<TH COLSPAN=5><PRE>GREEN data 5 bits</TH>
+<TH COLSPAN=5><PRE>RED data 5 bits</TH></TR>
+</TABLE>
+<P ALIGN=CENTER> <B><FONT SIZE=5>↓</font></b></P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> Output BLUE data</TH><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH COLSPAN=5><PRE> BLUE data 5 bits</TH><TH><PRE> 0</TH><TH><PRE> 0</TH><TH><PRE> 0</TH></TR>
+</TABLE>
+<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> Output GREEN data</TH><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH COLSPAN=5><PRE> GREEN data 5 bits</TH><TH><PRE> 0</TH><TH><PRE> 0</TH><TH><PRE> 0</TH></TR>
+</TABLE>
+<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> Output RED data</TH><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH COLSPAN=5><PRE> RED data 5 bits</TH><TH><PRE> 0</TH><TH><PRE> 0</TH><TH><PRE> 0</TH></TR>
+</TABLE>
+<P><DD> <B>[Note] The most significant bit CC is an enable bit when the special color calculation mode is mode 3.</b><P><DT> <B>●For RGB each 5 bits</b><DD> color data<TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE> 31</TD><TD><PRE> 30</TD><TD><PRE> 29</TD><TD><PRE> 28</TD><TD><PRE> 27</TD><TD><PRE> 26</TD><TD><PRE> 25</TD><TD><PRE> 24</TD><TD><PRE> 23</TD><TD><PRE> 22</TD><TD><PRE> 21</TD><TD><PRE> 20</TD><TD><PRE> 19</TD><TD><PRE> 18</TD><TD><PRE> 17</TD><TD><PRE> 16</TD></TR>
+<TR><TH><PRE> CC</TH><TH COLSPAN=7><PRE> ignore</TH><TH COLSPAN=8><PRE> BLUE data 8 bits</TH></TR>
+</TABLE>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 09</TD><TD><PRE> 08</TD><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH COLSPAN=8><PRE> GREEN data 8 bits</TH><TH COLSPAN=8><PRE> RED data 8 bits</TH></TR>
+</TABLE>
+<P ALIGN=CENTER> <B><FONT SIZE=5>↓</font></b></P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> Output BLUE data</TH><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH COLSPAN=8><PRE> BLUE data 8 bits</TH></TR>
+</TABLE>
+<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> Output GREEN data</TH><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH COLSPAN=8><PRE> GREEN data 8 bits</TH></TR>
+</TABLE>
+<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> Output RED data</TH><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH COLSPAN=8><PRE> RED data 8 bits</TH></TR>
+</TABLE>
+<P><DD> <B>[Note] The most significant bit CC is an enable bit when the special color calculation mode is mode 3.</b><P><DD> Figure 3.10 shows the color data written to color RAM.</P>
+<A NAME="z3_10"></A><P><DD> <B>Figure 3.10 Color data of color RAM</b><PRE>
+●Mode 0
+  100000H┌──────────────┐
+         │ 16 bits x    │1K words←┐
+         │ 1024 colors  │         │Same color data
+         ├ ─ ─ ─ ─ ─ ─ ─┤         │
+         │ 16 bits x    │1K words←┘
+         │ 1024 colors  │
+  100FFFH└──────────────┘
+
+
+●Mode 1
+  100000H┌──────────────┐
+         │              │
+         │              │
+         │ 16 bits x    │2K words
+         │ 2048 colors  │
+         │              │
+  100FFFH└──────────────┘
+
+
+●Mode 2
+  100000H┌──────────────┐
+         │              │
+         │              │
+         │ 32 bits x    │2K words
+         │ 1024 colors  │
+         │              │
+  100FFFH└──────────────┘
+</PRE><A NAME="no3_41"></A><P><DT><H3>●RAM control register</H3><DD> The RAM control register specifies VRAM bank division, VRAM usage purpose for rotating scroll screen, and color RAM mode. It is a 16-bit readable and writable register located at address 18000EH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="RAMCTL_"></A><P><DD> <B><FONT SIZE=5>RAMCTL</font> <FONT SIZE=4>18000EH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#CRKTE_">CRKTE</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#CRMD_">CRMD1</a></TH><TH><PRE> <A HREF="#CRMD_">CRMD0</a></TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#VRBMD_">VRBMD</a></TH><TH><PRE> <A HREF="#VRAMD_">VRAMD</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#RDBSB1_">RDBSB11</a></TH><TH><PRE> <A HREF="#RDBSB1_">RDBSB10</a></TH><TH><PRE> <A HREF="#RDBSB0_">RDBSB01</a></TH><TH><PRE> <A HREF="#RDBSB0_">RDBSB00</a></TH><TH><PRE> <A HREF="#RDBSA1_">RDBSA11</a></TH><TH><PRE> <A HREF="#RDBSA1_">RDBSA10</a></TH><TH><PRE> <A HREF="#RDBSA0_">RDBSA01</a></TH><TH><PRE> <A HREF="#RDBSA0_">RDBSA00</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="CRKTE_">　</A><P><DT><B>Color RAM Coefficient Table Enable Bit</b><BR>
+ :Color RAM coefficient table enable bit (CRKTE), bit 15<DD> Please refer to " <B><A HREF="p06_40.htm">6.4 Coefficient table control</a></b> ".</P>
+<A NAME="CRMD_">　</A><P><DT><B>Color RAM mode bit</b><BR>
+ :Color RAM mode bit (CRMD1, CRMD0), bits 13, 12<DD> Specifies the color RAM mode.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> CRMD1</TH><TH WIDTH=50><PRE> CRMD0</TH><TH WIDTH=50><PRE> mode</TH><TH WIDTH=300><PRE> process</TH></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TH><PRE> 0</TH><TD><PRE> 1024 colors set with 5 bits each for RGB</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TH><PRE> 1</TH><TD><PRE> 2048 colors set with 5 bits each for RGB</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TH><PRE> 2</TH><TD><PRE> 1024 colors set with 8 bits each for RGB</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TH><PRE> -</TH><TD><PRE> Setting prohibited</TD></TR>
+</TABLE>
+</P>
+<P><DD> Be sure to set this bit before storing color data in color RAM.<BR>
+ If mode 0 is set, by writing data to the first half of the color RAM address, the same data as the first half will be written to the second half at the same time.<BR>
+ When the CRKTE bit is set to 1, set the color RAM mode to mode 1. At that time, the second half of the color RAM (100800H to 100FFFH) is used for coefficient table data, so color data cannot be stored.</P>
+<A NAME="VRAMD_">　</A><A NAME="VRBMD_">　</A><P><DT><B>VRAM mode bit</b> : VRAM mode bit (VRBMD, VRAMD), bits 9, 8<DD> Please refer to " <B><A HREF="p03_20.htm">3.2 VRAM Bank Division</a></b> ".</P>
+<A NAME="RDBSB1_">　</A><A NAME="RDBSB0_">　</A><A NAME="RDBSA1_">　</A><A NAME="RDBSA0_">　</A><P><DT><B>Rotation data bank selection bit</b> : RBG0 data bank select bit (RDBSA00 to RDBSB11), bits 7 to 0<DD> Please refer to " <B><A HREF="p06_20.htm">6.2 Rotational scroll screen display control</a></b> ".<BR>
+ When the CRKTE bit is set to 1, do not specify that the 4 banks of VRAM be used as RAM for coefficient table data.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_35.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no3">VDP2 User's Manual</a> ★ <A HREF="p03_10.htm">Chapter 3 RAM</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

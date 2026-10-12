@@ -1,0 +1,192 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SG3D file format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR NOSHADE>
+<CENTER>
+<H1> SG3D file format</H1><H5> 1996-07-12</H5></CENTER>
+<HR>
+<DL>
+<P><DT><H3> ■File layout</H3><DD><TABLE BORDER=0>
+<TR><TH><PRE> [header]</TH><TD> Required</TD></TR>
+<TR><TH><PRE> [Object](1)</TH><TD> Required</TD></TR>
+<TR><TH><PRE> [Vertex]</TH><TD> Required</TD></TR>
+<TR><TH><PRE> [Normal]</TH><TD> Required</TD></TR>
+<TR><TH><PRE> [polygon]</TH><TD> Required</TD></TR>
+<TR><TH><PRE> [Model name]</TH><TD> expansion</TD></TR>
+<TR><TH><PRE> ......</TH><TD></TD></TR>
+<TR><TH><PRE> [Object](2)</TH><TD></TD></TR>
+<TR><TH><PRE> [Vertex]</TH><TD></TD></TR>
+<TR><TH><PRE> [Normal]</TH><TD></TD></TR>
+<TR><TH><PRE> [polygon]</TH><TD></TD></TR>
+<TR><TH><PRE> ......</TH><TD></TD></TR>
+<TR><TH><PRE> [object]...</TH><TD></TD></TR>
+<TR><TH><PRE> .............</TH><TD></TD></TR>
+</TABLE>
+<P><DT><H3> ■IFF format</H3><DL>
+<P><DT> <B>(1) Little endian (Intel format)</b><P><DT> <B>(2) Tag</b><DD><PRE>
+typedef char CHAR;
+typedef unsigned char BYTE;
+typedef unsigned short WORD;
+typedef unsigned long DWORD;
+typedef float FLOAT;
+struct tag_IFF{
+CHAR chunk[4]; //4 character chunk name
+DWORD size; //data size
+};
+</PRE><P><DT><B>(3)Layout</b><DD><PRE>
+[tag]
+[data]
+[tag]
+[data]
+......
+......
+</PRE></DL>
+<P><DT><H3>■Format</H3><DL>
+<P><DT><H3> (1) Standard tags → All required</H3><DD> <B>[header]</b><PRE>
+Contents: File identification information
+Chunk: &quot;SG3D&quot;
+Size: 256
+Data: Type Contents
+　　　　 DWORD version (0x00011000)
+　　　　 DWORD number of objects
+　　　　 DWORD[62] Reservation
+</PRE><P><DD> <B>[object]</b><PRE>
+Contents: Hierarchy information
+Chunk: &quot;OBJT&quot;
+Size: 96
+Data: Type Contents
+　　　　 FLOAT[4][3] 3x4 transformation matrix
+　　　　 FLOAT[3] Translation (XYZ)
+　　　　 FLOAT[3] Rotation (XYZ)
+　　　　 FLOAT[3] Scaling (XYZ)
+　　　　 DWORD ID(0~n)
+　　　　 DWORD Child ID
+　　　　 DWORD Sibling ID
+
+Note: The unit of angle is (degrees)
+      ID is -1 (0xffffffff) if there are no children or siblings
+</PRE><P><DD><B>[vertex]</b><PRE>
+Contents: Vertex coordinates
+Chunk: &quot;VerF&quot;
+Size: 12x number of vertices
+Data: Type Contents
+　　　　　 FLOAT[3] Vertex coordinates (XYZ)
+
+Note: Set the above data for the number of vertices.
+</PRE><P><DD> <B>[Normal]</b><PRE>
+Contents: Vertex normal vector
+Chunk: &quot;NorF&quot;
+Size: 12x number of vertices
+Data: Type Contents
+　　　　 FLOAT[3] Vertex normal vector (XYZ)
+
+Note: Unit vector that sets the above data for the number of vertices
+</PRE><P><DD> <B>[polygon]</b><PRE>
+Contents: Polygon vertex number
+Chunk: &quot;POLY&quot;
+Size: 8x number of polygons
+Data: Type Contents
+　　　　 WORD[4] Vertex numbers that make up the 4-point polygon
+
+Note: Set the above data for the number of polygons.
+　　　　 Vertex number is clockwise
+
+</PRE><P><DT><H3> (2) Extended tag → can be omitted</H3><DD> <B>[Model name]</b><PRE>
+Contents: Object (layer) name
+Chunk: &quot;MoNm&quot;
+Size: string length
+Data: Type Contents
+　　　　 CHAR[?] Object name string
+
+Note: The string must include the exit code ('\0')
+</PRE><P><DD> <B>[Gouro table]</b><PRE>
+Contents: Gouro table for Sega Saturn
+Chunk: &quot;SSGr&quot;
+Size: 8x number of polygons
+Data: Type Contents
+　　　　 WORD[4] Gouraud data with polygon applied
+
+Note: Set the above data for the number of polygons.
+Default is {0xc210,0xc210,0xc210,0xc210}
+Details separately
+</PRE><P><DD> <B>[attribute]</b><PRE>
+
+Contents: Surface attributes for Sega Saturn
+Chunk: &quot;SSAt&quot;
+Size: 12x number of polygons
+Data: Type Contents
+      WORD Front and back flip flag
+      0 Single_Plane
+      1 Dual_Plane
+      
+      WORD Z sort flag
+      0 SORT_CEN (center point)
+      1 SORT_MIN (nearest point)
+      2 SORT_MAX (refar point)
+      3 SORT_FAR (unused)
+      4 SORT_NER (unused)
+      
+      WORD Texture number WORD Color (R:G:B=5:5:5)
+      
+      DWORD Surface attribute type BIT
+      0 texHflip
+      1 texVflip
+      2
+      3 sprTexture
+      4 sprPolygon
+      5 sprPolyLine
+      6
+      7 User Shade
+      8 MESHon
+      9 CL_Shadow
+      10 CL_Half
+      11 CL_Trans
+      12 CL_Gouraud
+      13 ECdis
+      14 SPdis
+      15 CL16Bnk
+      16 CL16Look
+      17 CL64Bnk
+      18 CL128Bnk
+      19 CL256Bnk
+      20 CL32KRGB
+      21 Window_In
+      22 Window_Out
+      23
+      24 UseLight
+      25 UseClip
+      26 UsePalette
+      27 UseNearClip
+      28 UseDepth
+      29
+      30
+      31
+
+Note: The default setting of the above data for the number of polygons is {0,0,0,0xc210,0x01100010}
+      Details separately
+</PRE></DL>
+</DL>
+<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,106 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/11&gt;追記ライトワンス/5.システムの実行</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">追記ライトワンス</A>
+<HR>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p06_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>追記ライトワンスシステムユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>５．システムの実行</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A>
+	<P><DT><H3>5.1　起動方法</H3>
+	<DD>　DOSのプロンプトから以下の形式のコマンドを入力する。オプションの前には、ハイフン「-」またはスラッシュ「/」が必要です。</P>
+
+	<P><DL><DD><B>C:&gt;addcdw [-オプション ...] </B></DL></P>
+
+	<P><DD>　オプションには、サブコマンドかサブコマンドファイルを指定できる。<BR>
+　サブコマンドとはCD-Rディスクの内容を編集するための命令です。詳しくは、「<A HREF="p06_10.htm">6.サブコマンド</A>」を参照すること。</P>
+
+	<P><DT><B>　（１）コマンドライン指定</B>
+	<DD>　コマンドラインから直接サブコマンドを指定する方法で、先頭から順に解釈される。</P>
+
+	<P><DL><DD><B>C:&gt;addcdw -サブコマンド1=引数1,引数2 -サブコマンド2=引数1,引数2 ...</B></DL></P>
+
+	<P><DT><B>　（２）サブコマンドファイル指定</B>
+	<DD>　コマンドラインの代わりに、ファイルによってサブコマンドを指定する方法です。<BR>ファイルの先頭から１行ずつ解釈される。</P>
+
+	<P><DL><DD><B>C:&gt;addcdw -sub=サブコマンドファイルのパス名</B></DL></P>
+
+	<P><DD>　サブコマンド群を記述したファイルをサブコマンドファイルと呼ぶ。<BR>
+　サブコマンドファイル内にコメントを記述するには「;」を使う。「;」から行末までの文字列が無視される。</P>
+
+<A NAME="no5_20"></A>
+	<P><DT><H3>5.2　コマンドの例</H3>
+
+	<P><DT><B>　《例１》</B>
+	<P><DL><DD><B>C:&gt;addcdw newdisc -s=2</B></DL></P>
+
+	<DD><OL TYPE=a>
+	<P><B><LI></B>カレントディレクトリにあるnewdisc.dsk, newdisc.tocをもとにマスタ用ディスクを作成する。</P>
+	<P><B><LI></B>書き込み済みのディスクを使用することはできない。</P>
+	<P><B><LI></B>２倍速で書き込みをおこなう。</P>
+	<P><B><LI></B>同じ処理をおこなうコマンドを以下に示す。（上記例のように -master は省略可能）</P></OL>
+
+	<P><DL><DD><B>C:&gt;addcdw -master=newdisc -s=2</B></DL></P>
+
+	<P><DT><B>　《例２》</B>
+	<P><DL><DD><B>C:&gt;addcdw -debug=newdisc -s=4</B></DL></P>
+	<DD><OL TYPE=a>
+	<P><B><LI></B>カレントディレクトリにあるnewdisc.dsk, newdisc.tocをもとに全面追記し、デバッグ用ディスクを作成する。</P>
+	<P><B><LI></B>ディスクの再使用が可能です。</P>
+	<P><B><LI></B>４倍速で書き込みをおこなう。（省略値）</P></OL>
+
+
+	<P><DT><B>　《例３》</B>
+	<P><DL><DD><B>C:&gt;addcdw -replace=¥dir1¥file1.dat,file1_1.dat</B></DL></P>
+	<DD><OL TYPE=a>
+	<P><B><LI></B>ディスク上の¥DIR1¥FILE1.DATを、カレントディレクトリのfile1_1.datで置き換える。<BR>ファイル名は変更しない。</P></OL>
+
+
+	<P><DT><B>　《例４》</B>
+	<P><DL><DD><B>C:&gt;addcdw -sub=discedit.cdw -t</B></DL></P>
+	<P><DD><B>discedit.cdw</B>
+	<HR WIDTH=60% ALIGN=LEFT>
+	<DD><PRE>
+;コメント
+delete = ¥file1.dat
+add = ¥file1_1.dat, subdir¥file1.dat
+s = 2
+</PRE>
+	<HR WIDTH=60% ALIGN=LEFT>
+	<DD><OL TYPE=a>
+	<P><B><LI></B>newdisc.dskのルートディレクトリにあるFILE1.DATを削除する。</P>
+	<P><B><LI></B>DOS上のsubdir¥file1.datを、ディスクのルートディレクトリにFILE1_1.DATという名前で追加する。</P>
+	<P><B><LI></B>２倍速、テストモードで書き込みをおこなう。（コマンドラインの -t も有効）</P></OL>
+
+
+	<P><DT><B>　《例５》</B>
+	<P><DL><DD><B>C:&gt;addcdw -otf=newdisc -s=2</B></DL></P>
+	<DD><OL TYPE=a>
+	<P><B><LI></B>カレントディレクトリにあるnewdisc.sct, newdisc.toc，newdisc.pvdをもとに、<BR>オンザフライ方式でディスクを作成する。<BR>オンザフライ方式で作成するディスクはデバッグ用ディスクとなる。</P>
+	<P><B><LI></B>ディスクの再使用が可能です。</P>
+	<P><B><LI></B>２倍速で書き込みをおこなう。</P></OL>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p06_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">追記ライトワンス</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

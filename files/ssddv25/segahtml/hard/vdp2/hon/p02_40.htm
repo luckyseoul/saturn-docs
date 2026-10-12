@@ -1,0 +1,133 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/86&gt;VDP2 User's Manual/2.4TV Screen Mode Register</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP2 User's Manual</a> ★ <A HREF="p02_10.htm">Chapter 2 TV Screen</a><HR>
+ <B>▲ <A HREF="p02_30.htm">Back</a> ｜ <A HREF="p02_50.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 2 TV Screen</b><HR NOSHADE>
+<DL>
+<A NAME="no2_40"></A><P><DT><H2> ■2.4 TV screen mode register</H2><DD> The TV screen mode register controls the display of the TV screen. This is a 16-bit readable and writable register located at address 180000H. The value is cleared to 0 after power-on or reset, so be sure to set it.</P>
+<A NAME="TVMD_"></A><P><DD> <B><FONT SIZE=5>TVMD</font> <FONT SIZE=4>180000H</font></b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH> <A HREF="#DISP_">DISP</a></TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> <A HREF="#BDCLMD_">BDCLMD</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH> <A HREF="#LSMD_">LSMD1</a></TH><TH> <A HREF="#LSMD_">LSMD0</a></TH><TH> <A HREF="#VRESO_">VRESO1</a></TH><TH> <A HREF="#VRESO_">VRESO0</a></TH><TH> -</TH><TH> <A HREF="#HRESO_">HRESO2</a></TH><TH> <A HREF="#HRESO_">HRESO1</a></TH><TH> <A HREF="#HRESO_">HRESO0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="DISP_"></A><P><DT> <B>TV screen display bit</b> : Display bit (DISP), bit 15<DD> Controls the display of pictures on the TV screen.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=50><PRE> DISP</TH><TH WIDTH=200><PRE> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Do not display pictures on the TV screen</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Display a picture on the TV screen</TD></TR>
+</TABLE>
+</P>
+<P><DD> When this bit is 0, it remains blank during the display period, allowing VRAM access from the CPU or DMA controller at any time.<BR>
+ The color displayed when this bit is 0 is determined by the BDCLMD bit.<BR>
+ Be sure to change this bit from 0 to 1 during the V blank period.</P>
+<A NAME="BDCLMD_"></A><P><DT> <B>Border color mode bit</b> : Border color mode bit (BDCLMD), bit 8<DD> Controls the color displayed in the border area.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> BDCLMD</TH><TH WIDTH=200><PRE> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> display black</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Display back screen</TD></TR>
+</TABLE>
+</P>
+<P><DD> When the DISP bit is 0, the color of all standard display areas is specified. However, if this bit is set to 1 without setting the DISP bit to 1 after power-on or reset, the back screen will not be displayed correctly. If the back screen is set so that you can specify each line, the color displayed in the border area will be the same color as the bottom line of the settings display area.</P>
+<A NAME="LSMD_"></A><P><DT> <B>Interlace mode bit</b> : Interlace mode bit (LSMD1, LSMD0), bits 7, 6<DD> Specify interlaced mode.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> LSMD1</TH><TH WIDTH=50><PRE> LSMD0</TH><TH WIDTH=200><PRE> process</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TD><PRE> non-interlaced</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TD><PRE> Setting prohibited</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TD><PRE> Single dense interlace</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TD><PRE> double dense interlace</TD></TR>
+</TABLE>
+</P>
+<P><DD> Single dense interlace is a mode in which the same picture is displayed in odd and even fields, and double dense interlace is a mode in which different pictures are displayed in odd and even fields. In either case, there will be no gaps between scan lines. Vertical resolution 072 during double-dense interlacing The vertical resolution is the same as when non-interlaced.<BR>
+ The picture displayed during double-dense interlacing is vertically 1/2 times the picture displayed during non-interlacing or single-dense interlacing.<BR>
+ When setting the horizontal resolution (HRESO2 to HRESO0) to dedicated monitor mode, be sure to set it to non-interlace (00B).</P>
+<A NAME="VRESO_"></A><P><DT> <B>Vertical resolution bit</b> : Vertical resolution bit (VRESO1, VRESO0), bits 5, 4<DD> Specify the vertical resolution when displaying pictures on the TV screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> VRESO1</TH><TH WIDTH=50><PRE> VRESO0</TH><TH WIDTH=164><PRE> vertical resolution</TH><TH WIDTH=164><PRE> Viewable monitor</TH></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TD><PRE> 224 lines</TD><TD><PRE> NTSC or PAL TV</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TD><PRE> 240 lines</TD><TD><PRE> NTSC or PAL TV</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TD><PRE> 256 lines</TD><TD><PRE> PAL TV</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TD><PRE> Setting prohibited</TD><TD><PRE> −</TD></TABLE>
+</P>
+<P><DD> Increments when increasing vertical resolution are added to the top and bottom of the screen; the center of the screen remains unchanged.<BR>
+ If the horizontal resolution (HRESO2 to HRESO0) is set to dedicated monitor mode, this bit setting will be ignored and fixed at 480 lines.</P>
+<A NAME="HRESO_"></A><P><DT> <B>Horizontal resolution bit</b> : Horizontal resolution bit (HRESO2 to HRESO0), bits 2 to 0<DD> Specify the horizontal resolution when displaying pictures on the TV screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TH><PRE> HRES02</TH><TH><PRE> HRESO1</TH><TH><PRE> HRESO0</TH><TH><PRE> horizontal resolution</TH><TH><PRE> graphic mode</TH><TH><PRE> It can be displayed<BR> monitor</TH></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TH><PRE> 0</TH><TD><PRE> 320 pixels</TD><TD><PRE> normal<BR> Graphic A</TD><TD ROWSPAN=4><PRE> NTSC method or<BR> PAL TV</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TH><PRE> 1</TH><TD><PRE> 352 pixels</TD><TD><PRE> normal<BR> Graphic B</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TH><PRE> 0</TH><TD><PRE> 640 pixels</TD><TD><PRE> high resolution<BR> Graphic A</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TH><PRE> 1</TH><TD><PRE> 704 pixels</TD><TD><PRE> high resolution<BR> Graphic B</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TH><PRE> 0</TH><TD><PRE> 320 pixels</TD><TD><PRE> dedicated normal<BR> Graphic A</TD><TD><PRE> 31kHz monitor</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TH><PRE> 1</TH><TD><PRE> 352 pixels</TD><TD><PRE> dedicated normal<BR> Graphic B</TD><TD><PRE> HD monitor</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TH><PRE> 0</TH><TD><PRE> 640 pixels</TD><TD><PRE> Dedicated high resolution<BR> Graphic A</TD><TD><PRE> 31kHz monitor</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TH><PRE> 1</TH><TD><PRE> 704 pixels</TD><TD><PRE> Dedicated high resolution<BR> Graphic B</TD><TD><PRE> HD monitor</TD></TABLE>
+</P>
+<P><DD> Switching from normal graphics A (320 pixels) or high resolution graphics A (640 pixels) to normal graphics B (352 pixels) or high resolution graphics B (704 pixels) must be done during the horizontal retrace period. To comply with this restriction, be sure to use the service routine in BOOT-ROM to switch the horizontal resolution.<P><DD> If you specify Dedicated High Resolution Graphic A or Dedicated High Resolution Graphic B, you must set other registers as specified. Please refer to " <A HREF="p02_10.htm#no2_11"><B>Dedicated High Resolution Graphics Mode</b></a> " in " <A HREF="p02_10.htm"><B>2.1 TV Screen Mode</b></a> ".<BR>
+ Be sure to reset VDP2 when switching the TV screen mode from dedicated monitor mode to normal mode and high resolution mode.</P>
+<!-- VDP2のリセットってどうやるの？？？？？ -->
+<P><DT><TABLE>
+<TR><TH> Note<BR>
+<img srcset="../../../what/atto.png 5x"></TH><TD> <B>Be sure to use the service routine in the BOOT ROM to switch the horizontal resolution.</b></TD></TR>
+</TABLE>
+</P>
+<P><DD> There are restrictions on the combination of TV screen mode settings for VDP1 and VDP2. Also, the screen display changes depending on the combination of interlace mode settings. <A HREF="#t2_2">Table 2.2</a> shows the limitations of TV screen mode settings, and <A HREF="#t2_3">Table 2.3</a> shows the respective screen displays depending on the interlace mode settings.<A NAME="t2_2"></A><P><DD> <B>Table 2.2 Restrictions on TV screen mode settings</b><TABLE BORDER=1>
+<TR><TH> VDP2 settings <A HREF="../../hard/vdp2/hon/p02_40.htm#HRESO_">(TVMD:HRESO2..0)</a></TH><TH> VDP1 settings <A HREF="../../hard/vdp1/hon/p04_11.htm#TVM_">(TVMR:TVM2..0)</a></TH><TH> Setting permission/denial</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=5> Normal mode<BR>
+ (000 or 001)</TH><TD> Normal 000</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> High resolution 001</TD><TD> Setting prohibited</TD></TR>
+<TR ALIGN=CENTER><TD> Rotation 16 010</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> Rotation 8 011</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> HDTV 100</TD><TD> Setting prohibited</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=5> High resolution mode<BR>
+ (010 or 011)</TH><TD> Normal 000</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> High resolution 001</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> Rotation 16 010</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> Rotation 8 011</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> HDTV 100</TD><TD> Setting prohibited</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=5> Dedicated monitor mode<BR>
+ (100,101,110,111)</TH><TD> Normal 000</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> High resolution 001</TD><TD> Setting prohibited</TD></TR>
+<TR ALIGN=CENTER><TD> Rotation 16 010</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> Rotation 8 011</TD><TD> Possible</TD></TR>
+<TR ALIGN=CENTER><TD> HDTV 100</TD><TD> Setting prohibited</TD></TR>
+</TABLE>
+<A NAME="t2_3"></A><P><DD> <B>Table 2.3 Screen display depending on interlace mode setting</b><TABLE BORDER=1>
+<TR><TH> LSMD value</TH><TH> DIE value</TH><TH> VDP2 display</TH><TH> VDP1 display</TH></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> 00</TD><TD> 0</TD><TD> non-interlaced</TD><TD> non-interlaced</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> non-interlaced</TD><TD> cannot be displayed correctly</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> 01</TD><TD> 0</TD><TD> Single dense interlace</TD><TD> Single dense interlace</TD></TR>
+<TR ALIGN=CENTER></TD><TD> 1</TD><TD> Single dense interlace</TD><TD> double dense interlace</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> 11</TD><TD> 0</TD><TD> double dense interlace</TD><TD> Single dense interlace</TD></TR>
+<TR ALIGN=CENTER></TD><TD> 1</TD><TD> double dense interlace</TD><TD> double dense interlace</TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_30.htm">Back</a> ｜ <A HREF="p02_50.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP2 User's Manual</a> ★ <A HREF="p02_10.htm">Chapter 2 TV Screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

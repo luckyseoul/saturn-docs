@@ -1,0 +1,385 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/11&gt;Cinepak for SEGA Saturn User's Manual</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">MOVIE TOOLS GUIDE</a> ★ <A HREF="../index.htm">Cinepak for SEGA Saturn</a><HR>
+<B>▲ <A HREF="p04_14.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+<B>Cinepak for SEGASaturn</b><H2 ALIGN=CENTER></H2><HR NOSHADE>
+<DL>
+<DT><H2> 4.6 Function details</H2><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Initialization</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_Init</TD><TD WIDTH=60><PRE> No<BR> 1.1</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> Bool CPK_Init(void)
+<B>Input</b> None 
+<B>Output</b> None 
+<B>Function value</b> TRUE if initialized successfully
+<B>　　　</B>FALSE if unable to initialize successfully
+<B>Function</b> Immediately after starting the program, initialization is performed to use this library.
+<B>Remarks</b> When using this library, be sure to call this function at the beginning of the program.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> End processing</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_Finish</TD><TD WIDTH=60><PRE> No<BR> 1.2</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_Finish(void)
+<B>Input</b> None 
+<B>Output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Call this function if you do not want to play the movie again.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Creating a handle (memory)</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_CreateMemMovie</TD><TD WIDTH=60><PRE> No<BR> 2.1</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> CpkHn CPK_CreateMemMovie(CpkCreatePara *para)
+<B>Input</b> para: Creation parameter 
+<B>output</b> None 
+<B>function value</b> Movie handle (NULL if creation is not possible)
+<B>Function</b> Creates a movie handle to play a movie file in memory.
+<B>remarks</b><UL><UL TYPE="DISK"><LI> Up to 32 movies can be created at the same time.
+<LI>Load the movie file into memory using an application program.
+<LI>For the movie handle generated with CPK_CreateMemMovie, be sure to notify the size of the movie file with CPK_NotifyWriteSize.</UL></UL></PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Erasing handles (memory)</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_DestroyMemMovi</TD><TD WIDTH=60><PRE> No<BR> 2.2</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_DestroyMemMovie(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Clears the movie handle.
+
+<B>　　</B>Once you clear a handle, you can no longer use the movie handle.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Creating a handle (file system)</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_CreateGfsMovie</TD><TD WIDTH=60><PRE> No<BR> 2.3</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> CpkHn CPK_CreateGfsMovie(CpkCreatePara *para, GfsHn gfs)
+<B>Input</b> para: creation parameter
+<B>　　</B>gfs: File handle 
+<B>output</b> None 
+<B>function value</b> Movie handle (NULL if it cannot be created)
+<B>Function</b> Creates a movie handle to play a movie file on the file system.
+<B>remarks</b><UL><UL TYPE="DISK"><LI> Up to 32 movies can be created at the same time.
+<LI>Obtain the file handle in advance using the application program.</UL></UL></PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Clearing a handle (file system)</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_DestroyGfsMovi</TD><TD WIDTH=60><PRE> No<BR> 2.4</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_DestroyGfsMovie(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None function 
+<B>value</b> None 
+<B>function</b><UL><UL TYPE="DISK"><LI> Erase the movie handle.
+<LI>Once you clear a handle, you can no longer use the movie handle.
+<LI>Clear the movie handle before closing the file handle.</UL></UL></PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD><PRE> Data<BR> Creating a handle (stream system)</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_CreateStmMovie</TD><TD WIDTH=60><PRE> No<BR> 2.5</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> CpkHn CPK_CreateStmMovie(CpkCreatePara *para, StmHn stm)
+<B>Input</b> para: creation parameter
+<B>　　</B>stm: File handle 
+<B>output</b> None 
+<B>function value</b> Movie handle (NULL if it cannot be created)
+<B>Function</b> Creates a movie handle to play a movie file on a stream system.
+<B>remarks</b><UL><UL TYPE="DISK"><LI> Up to 32 movies can be created at the same time.
+<LI>Obtain the stream handle in advance using the application program.</UL></UL></PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD><PRE> Data<BR> Clearing handles (stream system)</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_DestroyStmMovi</TD><TD WIDTH=60><PRE> No<BR> 2.6</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_DestroyStmMovie(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None function 
+<B>value</b> None 
+<B>function</b><UL><UL TYPE="DISK"><LI> Erase the movie handle.
+<LI>Once you clear a handle, you can no longer use the movie handle.
+<LI>Clear the movie handle before closing the stream handle.</UL></UL></PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> replay task</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_Task</TD><TD WIDTH=60><PRE> No<BR> 2.7</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_Task(CpkHn cpk)
+<B>Input</b> cpk: Movie 
+<B>handle output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Reads files from CD and expands images.
+<B>Remarks</b> : Please call this function periodically while the movie is playing. Please set the calling interval
+          to be greater than the number of playback frames. If the number of frames is less than that, smooth
+          playback will not be possible. After reading this function, be sure to check whether the display
+          timing is set using CPK_IsDispTime. If CPK_IsDispTime returns TRUE, it is time to display the image,
+          so if it has been expanded to sprite VRAM, change the frame. If it was expanded to memory, please
+          transfer it to VRAM. Be sure to call CPK_CompleteDisp afterwards. Please note that if you specify
+          the expansion destination address in VRAM, it will be expanded before the display timing.
+</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Determining display timing</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_IsDispTime</TD><TD WIDTH=60><PRE> No<BR> 2.8</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> Bool CPK_IsDispTime(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>Function value</b> TRUE when the movie frame image has been expanded and it is time to display it.
+<B>　　　</B>FALSE if it is not yet time to display
+<B>Function</b> If this function returns TRUE, it is time to display one frame of image, so if it was expanded to
+          sprite VRAM, change the frame. If it was expanded to memory, transfer the expanded contents to VRAM. Be
+          sure to call CPK_CompleteDisp afterward.
+</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Display completion notification</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_CompleteDisp</TD><TD WIDTH=60><PRE> No<BR> 2.9</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_CompleteDisp(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Notifies the library that image display has finished.
+<B>Remarks</b> Please call this function when CPK_IsDispFrame becomes TRUE.
+
+<B>　　</B>If you don't call it, the movie won't play.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> V blank IN processing function</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_VblIn</TD><TD WIDTH=60><PRE> No<BR> 2.10</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_VblIn(void)
+<B>Input</b> None 
+<B>Output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Manages the movie playback time.
+<B>Remarks</b> When using this library, be sure to call this function with a V blank IN interrupt.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Start playing</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_Start</TD><TD WIDTH=60><PRE> No<BR> 3.1</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_Start(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Starts playing the movie.
+<B>remarks</b><UL><UL TYPE="DISK"><LI> A movie can only be played once for a generated movie handle.
+If you want to play the same movie over and over again, generate a movie handle each time.</UL></UL></PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Stop playing</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_Stop</TD><TD WIDTH=60><PRE> No<BR> 3.2</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_Stop(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Stops playing the movie.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Pause</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_Pause</TD><TD WIDTH=60><PRE> No<BR> 3.3</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_Pause(CpkHn cpk, CpkPauseCmd cmd)
+<B>Input</b> cpk: movie handle
+<B>　　</B>cmd: Pause control command 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Pauses or cancels movie playback.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Registering the next movie to play</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_EntryNext</TD><TD WIDTH=60><PRE> No<BR> 3.4</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_EntryNext(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Next, register the movie handle to be played. If you register a movie with this function,
+          it will automatically switch to the next movie when the currently playing movie ends. Specifying
+          NULL will cancel the registration. Even when forced switching is performed using CPK_Change,
+          the movie registered using this function will be played next.
+</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Forced movie switching</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_Change</TD><TD WIDTH=60><PRE> No<BR> 3.5</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_Change(void)
+<B>Input</b> None 
+<B>Output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Interrupts the currently playing movie and starts playing the movie registered in CPK_EntryNext.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Obtaining movie switching status</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_CheckChange</TD><TD WIDTH=60><PRE> No<BR> 3.6</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> CpkChangeStatus CPK_CheckChange(void)
+<B>Input</b> None 
+<B>Output</b> None 
+<B>Function value</b> Forced switching possibility check value 
+<B>function</b> Returns the switching possibility when forced switching is performed with CPK_Change.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Expand specified frame</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_DecodeFrame</TD><TD WIDTH=60><PRE> No<BR> 3.7</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_DecodeFrame(CpkHn cpk, Sint32 frame_no)
+<B>Input</b> cpk: movie handle
+<B>　　</B>frame_no: Number 
+<B>output</b> of the frame to be expanded None 
+<B>Function value</b> None 
+<B>Function</b> Expands the image of the specified frame.
+<B>Remarks</b> This function can only be used for movies loaded into memory. In the application program,
+          read the movie file, create a movie handle with CPK_CreateMemMovie, and then call this function.
+          This function cannot be used with movie handles created with CPK_CreateGfsMovie and
+          CPK_CreateStmMovie. Please use a movie file with only keyframes and no sound.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Setting the destination address</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_SetDecodeAddr</TD><TD WIDTH=60><PRE> No<BR> 4.1</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_SetDecodeAddr(CpkHn cpk, void *dec_addr, Sint32 dec_line_size)
+<B>Input</b> cpk: movie handle
+<B>　　</B>dec_addr: Address of image expansion destination
+<B>　　</B>dec_line_size: The number of bytes in one line of the image expansion destination buffer
+<B>Outputs</b> None 
+<B>Function value</b> None 
+<B>Function</b> Specify the address to which the expanded image will be transferred. If the image expansion
+          destination address is NULL, image expansion will not be performed. Default is NULL. Please call
+          this function before playing the movie.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Setting the number of display colors</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_SetColor</TD><TD WIDTH=60><PRE> No<BR> 4.2</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_SetColor(CpkHn cpk, CpkColorType color)
+<B>Input</b> cpk: movie handle
+<B>　　</B>color: Number of display colors 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Specify the number of colors displayed in the image. Default is 16 million colors. Please
+          call this function before playing the movie.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Setting the maximum number of transferred sectors</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_SetLoadNum</TD><TD WIDTH=60><PRE> No<BR> 4.3</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_SetLoadNum(CpkHn cpk, Sint32 load_sct)
+<B>Input</b> cpk: movie handle
+<B>　　</B>load_sct: Maximum number of transferred sectors 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Set the maximum number of transfer sectors when transferring from the CD buffer to the
+          library's internal buffer. Default is 20 sectors. Please call this function before playing
+          the movie.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Playback PAN settings</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_SetPan</TD><TD WIDTH=60><PRE> No<BR> 4.4</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_SetPan(CpkHn cpk, Sint32 pan)
+<B>Input</b> cpk: movie handle
+<B>　　</B>pan: PAN value (0 to 31)
+<B>Output</b> None 
+<B>Function Value</b> None 
+<B>Function</b> Specifies the PAN of the sound.
+
+<B>　　</B>Default is 0.</PRE><UL>
+<TABLE BORDER CELLPADDING=5>
+<TD><pre></td><td WIDTH=30><PRE> 0</TD><TD WIDTH=30><PRE> 1</TD><TD WIDTH=30><PRE> 2</TD><TD WIDTH=30><PRE> →</TD><TD WIDTH=30><PRE> 15</TD><TD WIDTH=30><PRE> 16</TD><TD WIDTH=30><PRE> 17</TD><TD WIDTH=30><PRE> 18</TD><TD WIDTH=30><PRE> →</TD><TD WIDTH=30><PRE> 31</TD><TR><TD><PRE> Left<BR> Right</TD><TD><PRE> Max<BR> Max</TD><TD><PRE>&gt;&gt;<BR> Max</TD><TD><PRE>&gt;&gt;<BR> Max</TD><TD><PRE>&gt;&gt;<BR> Max</TD><TD><PRE> Off<BR> Max</TD><TD><PRE> Max<BR> Max</TD><TD><PRE> Max<BR>&gt;&gt;</TD><TD><PRE> Max<BR>&gt;&gt;</TD><TD><PRE> Max<BR>&gt;&gt;</TD><TD><PRE> Max<BR> Off</TD></TABLE>
+</UL>
+<p><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Setting playback volume</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_SetVolume</TD><TD WIDTH=60><PRE> No<BR> 4.5</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_SetVolume(CpkHn cpk, Sint32 volume)
+<B>Input</b> cpk: movie handle
+<B>　　</B>volume: Volume (0 to 7)
+<B>Output</b> None 
+<B>Function Value</b> None 
+<B>Function</b> Specify the volume. (0 means no output, 7 means maximum volume) Default is 7.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Setting PCM command block number</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_SetPcmCmdBlock</TD><TD WIDTH=60><PRE> No<BR> 4.6</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> voidC PK_SetPcmCmdBlockNo(CpkHn cpk, Sint32 blk_no)
+<B>Input</b> cpk: movie handle
+<B>　　</B>blk_no: PCM command block number (0 to 7)
+<B>Output</b> None 
+<B>Function Value</b> None 
+<B>Function</b> Set the PCM command block number to be set in the sound driver. Default is 0. For more
+          information on PCM command block numbers, see SEGASATURN Sound Driver System Interface.
+          Please call this function before playing the movie.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Setting the PCM stream playback number</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_SetPcmStreamNo</TD><TD WIDTH=60><PRE> No<BR> 4.7</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_SetPcmStreamNo(CpkHn cpk, Sint32 stream_no)
+<B>Input</b> cpk: movie handle
+<B>　　</B>stream_no: PCM stream playback number (0 to 7)
+<B>Output</b> None 
+<B>Function Value</b> None 
+<B>Function</b> Set the PCM stream playback number to be set in the sound driver. Default is 0. For more
+          information on PCM stream playback numbers, see SEGASATURN Sound Driver System Interface.
+<B>Note:</b> When playing multi-movies, use different stream playback numbers for each movie. Please call
+          this function before playing the movie.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Setting the key out range</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_SetKeyOutRange</TD><TD WIDTH=60><PRE> No<BR> 4.8</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_SetKeyOutRange(CpkHn cpk, Sint32 range)
+<B>Input</b> cpk: movie handle
+<B>　　</B>range: Key out (transparent color) range 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Sets the range of transparent colors in chromakey processing.
+<B>remarks</b><UL><UL TYPE="DISK"><LI>In chroma key processing, the RGB value of the expanded point and the
+RGB value specified by the chroma key are compared using the following formula, and if the value is smaller
+than the key out range, it becomes transparent.
+ABS(ckey.b - decode.b) + ABS(ckey.g - decode.g) + ABS(ckey.r - decode.r)
+ckey is the RGB value specified by the chroma key
+decode is the RGB value of the expanded point<BR>
+<LI>For 32000 colors, you can specify a range from 0 to 96.
+<LI>For 16 million colors, you can specify a range from 0 to 768.
+<LI>Default is 21.</UL></UL></PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Get timescale</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_GetTimeScale</TD><TD WIDTH=60><PRE> No<BR> 5.1</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> Sint32 CPK_GetTimeScale(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>Function value</b> Time scale 
+<B>function</b> Get the timescale value. The time scale value is invalid until the film header data
+          has been supplied to the ring buffer.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Get playback time</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_GetTime</TD><TD WIDTH=60><PRE> No<BR> 5.2</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> Sint32 CPK_GetTime(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>function value</b> Current time 
+<B>function</b> Get the current time of the movie. The current time is a count value in timescale units.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Get playback status</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_GetPlayStatus</TD><TD WIDTH=60><PRE> No<BR> 5.3</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> CpkPlayStatus CPK_GetPlayStatus(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>Output</b> None 
+<B>Function value</b> Playback status 
+<B>function</b> Returns the current playback status of the movie.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Get film header</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_GetHeader</TD><TD WIDTH=60><PRE> No<BR> 5.4</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> CpkHeader *CPK_GetHeader(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>Function value</b> Film header 
+<B>function</b> Returns the address of the film header part of the movie file. The contents of the
+          structure are invalid until the film header data has been supplied to the buffer.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Get write buffer</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_GetWriteBuf</TD><TD WIDTH=60><PRE> No<BR> 6.1</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> Uint32 *CPK_GetWriteBuf(CpkHn cpk, Sint32 *free_size, Sint32 *free_total)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> free_size: Number of bytes of continuous writable area
+<B>　　</B>free_total: 
+<B>Function value of</b> the total number of bytes in the writable area including discontinuous areas Start address of the continuous writable area (NULL if writable is not possible)
+<B>Function</b> Gets the write destination buffer address and the number of writable bytes.
+<B>Remarks</b> Use this when you want to independently supply data to the ring buffer.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Write size notification</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_NotifyWriteBuf</TD><TD WIDTH=60><PRE> No<BR> 6.2</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_NotifyWriteSize(CpkHn cpk, Sint32 write_size)
+<B>Input</b> cpk: movie handle
+<B>　　</B>write_size: Number of bytes written 
+<B>Output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Notifies the library of the number of bytes actually written to the buffer.
+<B>Remarks</b> Use this when you want to independently supply data to the ring buffer.
+
+<B>　　</B>Used when playing movie files in memory.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Load movie into buffer</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_PreloadMovie</TD><TD WIDTH=60><PRE> No<BR> 7.1</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_PreloadMovie(CpkHn cpk, Uint32 size)
+<B>Input</b> cpk: movie handle
+<B>　　</B>size: Number of bytes to read 
+<B>Output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Reads the movie file into memory.
+<B>Remarks</b> If the number of read bytes is smaller than the buffer managed by the library, read up to the buffer size.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Load film header into buffer</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_PreloadHeader</TD><TD WIDTH=60><PRE> No<BR> 7.2</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_PreloadHeader(CpkHn cpk)
+<B>Input</b> cpk: Movie handle 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Reads the film header part of the movie file into memory.
+<B>Remarks</b> Before calling this function, move the pickup position to the beginning of the movie file.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Get error information</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_GetErr</TD><TD WIDTH=60><PRE> No<BR> 8.1</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> CpkErrCode CPK_GetErr(void)
+<B>Input</b> None 
+<B>Output</b> None 
+<B>Function value</b> Error code 
+<B>function</b> Returns the most recent error code.</PRE><DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE> Title<BR> function specification</TD><TD WIDTH=220><PRE> Data<BR> Registering an error function</TD><TD WIDTH=160><PRE> Data Name<BR> CPK_SetErrFunc</TD><TD WIDTH=60><PRE> No<BR> 8.2</TD></TABLE>
+<p><DD><PRE> 
+<B>Format</b> void CPK_SetErrFunc(CpkErrFunc func, void *obj)
+<B>Input</b> func: Function to call when an error occurs
+<B>　　</B>obj: Registered object 
+<B>output</b> None 
+<B>Function value</b> None 
+<B>Function</b> Set the function to be called when an error occurs. The registration object is passed as the
+          first argument of the registration function.</PRE></DL>
+<HR NOSHADE>
+ 
+<B>▲ <A HREF="p04_14.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">MOVIE TOOLS GUIDE</a> ★ <A HREF="../index.htm">Cinepak for SEGA Saturn</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

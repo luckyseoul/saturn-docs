@@ -1,0 +1,76 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 5&gt; CD builder script grammar supplementary explanation</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+ <B>■ ｜ <A HREF="p19_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>CD builder script grammar supplementary explanation</b><H2 ALIGN=CENTER></H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H3> 1. Effect of Pack line on channel interleaving</H3><DD> Channel interleaving allows sectors within the same ISO file to be identified by channel number.<BR>
+ How channels are allocated is controlled using the BeginTimeF line, EndTimeF line, Reallocation line, UnitSize line, GapSize line, and Pack line.<BR>
+ Here we will especially explain the effects of the Pack line.</P>
+<P> Pack lines are used to increase the efficiency of disk space usage. Dummy data may be generated at the beginning, middle, or end of the ISO file depending on the BeginTimeF line, UnitSize line, and GapSize line specifications. By specifying the Pack line, an ISO file with these dummy data parts removed is generated.</P>
+<A NAME="no1_11"></A><P><DT> <B>(1) When no Pack line is specified</b><DD> First, I will explain what the arrangement will be if no Pack line is specified.<BR>
+ If you specify the following without specifying the Pack line, the channels will be arranged as shown in the example below. </P>
+<P><DD><UL TYPE=DISC
+	<P>
+<LI>In the file source definition of channel 1<BR>
+ - BeginTimeF 00:00:05<BR>
+ -UnitSize 2<BR>
+ - GapSize 3</P>
+<P><LI> In the file source definition of channel 2<BR>
+ - BeginTimeF 00:00:07<BR>
+ -UnitSize 2<BR>
+ - GapSize 3</P>
+</UL>
+<P><DD> If each file size is 8 sectors, it will be as follows.</P>
+<P><UL>
+ Example XXXXX1122X1122X1122X1122<BR>
+ X: Represents a dummy (gap) sector.<BR>
+ Number: Indicates the channel number.</UL>
+</P>
+<A NAME="no1_12"></A><P><DT> <B>(2) When specifying the Pack line</b><DD> Specifying the Pack line for the above example would look like this:</P>
+<P><UL>
+ Example 1122112211221122</UL>
+</P>
+<P><DD> In this way, if the Pack line is not specified, the ISO file would be 24 sectors, but by specifying the Pack line, the ISO file will be 16 sectors. However, the following problems may occur, so be careful.<BR>
+<DD><UL TYPE="DISK">
+<P><LI> It will no longer start from the time specified in the BeginTimeF line.</P>
+<P><LI> The process will end earlier than the time specified in the EndTimeF line.</P>
+<P><LI> If you specify the MinLength line in the file definition line, the file area will be equal to the specified size.</UL>
+</P>
+<A NAME="no1_13"></A><P><DT> <B>(3) If you want to fill the gap</b><DD> If you specify the Pack line, the BeginTimeF and EndTimeF lines will be invalidated, but you may want to use the gap without specifying the Pack line. In such cases, use a channel with a Reallocation line specified. To the example above when the Pack line is not specified, let's add a channel (channel number 3, data amount 7 sectors) with the following Reallocation line specified.</P>
+<DD><UL TYPE="DISK">
+<P><LI> In the file source definition of channel 3<BR>
+ - BeginTimeF 00:00:01<BR>
+ -UnitSize 1<BR>
+ -GapSize 0</UL>
+</P>
+<P><UL>
+ Example X33331122311223112231122</UL>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p19_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,67 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/29&gt;SCSP User's Manual/4.2.5PITCH</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p04_24.htm">Back</a> ｜ <A HREF="p04_26.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/4.2 Sound source register</b><HR NOSHADE>
+<DL>
+<A NAME="no4_25"></A><P><DT><H3> ■PITCH register</H3></P>
+<A NAME="OCT_"></A><P><DT> <B>OCT[3:0](R/W) ; OCTave</b><DD> "OCT" is a register that has the function of raising or lowering the sound frequency by an octave for the waveform data stored in memory.</P>
+<A NAME="FNS_"></A><P><DT> <B>FNS[9:0](R/W); Frequency Number Switch</b><DD> This register has a more detailed sounding frequency setting function between the upper and lower octaves of "OCT". If the "FNS" value and "OCT" value are both "0H", the pitch will match the sampling source. Figure 4.45 shows the relationship between the "FNS" and "OCT" values.</P>
+<A NAME="z4_45"></A><P ALIGN=CENTER> <B>Figure 4.45 Relationship between OCT and FNS</b><BR>
+<img srcset="../grp/i073_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The actual pitch (n) is calculated using the formula shown below.</P>
+<P><CENTER>
+<img srcset="../grp/i073_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></CENTER>
+</P>
+<P><DD> The value obtained by this formula is expressed in cents.</P>
+<A NAME="4_45_0"></A><P><DD> Let me explain about cents here.</P>
+<P><DD> 1 cent is 2 <SUP>
+1/1200</sup>
+ = 1.000577789 times. Also, one octave is 1200 cents. When it is n cents, it is 2 to the original frequency. <SUPn/1200</SUP>
+ times {=(1.000577789) <SUP>
+n</sup>
+ }. Therefore, the frequency Fn[Hz] of a sound that is n cents higher than the basic frequency Fo[Hz] can be calculated using the following formula.</P>
+<P><CENTER>
+<img srcset="../grp/i074_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></CENTER>
+</P>
+<P><DD> The actual frequency for the number of cents at this time is shown in Table 4.12.</P>
+<A NAME="t4_12"></A>
+	<P>	<DD><B>Table 4.12 Actual frequency versus number of cents</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD><PRE>　number of cents　</TD><TD><PRE>　Real frequency wave number value (×Fo)</TD></TR>
+	<TR ALIGN=CENTER><TD>0</TD><TD>1.000000000</TD></TR>
+	<TR ALIGN=CENTER><TD>100</TD><TD>1.059463094</TD></TR>
+	<TR ALIGN=CENTER><TD>200</TD><TD>1.122462048</TD></TR>
+	<TR ALIGN=CENTER><TD>300</TD><TD>1.189207115</TD></TR>
+	<TR ALIGN=CENTER><TD>400</TD><TD>1.259921050</TD></TR>
+	<TR ALIGN=CENTER><TD>500</TD><TD>1.334839854</TD></TR>
+	<TR ALIGN=CENTER><TD>600</TD><TD>1.414213562</TD></TR>
+	<TR ALIGN=CENTER><TD>700</TD><TD>1.498307077</TD></TR>
+	<TR ALIGN=CENTER><TD>800</TD><TD>1.587401052</TD></TR>
+	<TR ALIGN=CENTER><TD>900</TD><TD>1.681792830</TD></TR>
+	<TR ALIGN=CENTER><TD>1000</TD><TD>1.781797436</TD></TR>
+	<TR ALIGN=CENTER><TD>1100</TD><TD>1.887748625</TD></TR>
+	<TR ALIGN=CENTER><TD>1200</TD><TD>2.000000000</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>Next, we will explain how to set "FNS" and "OCT" using an example where the C4 (C) sound is sampled at 44.1KHz.<BR>The "FNS" value when P[Cent] can be calculated using the following formula.<P></a><CENTER><img srcset="../grp/i074_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></CENTER></P><P><DD> From this formula, it is possible to output at any frequency by setting each parameter as shown in Table 4.13.</P><A NAME="t4_13"></A><P><DD> <B>Table 4.13 FNS.OCT parameter table</b><DD><TABLE BORDER=1><TR ALIGN=CENTER><TD> pitch name</TD><TD> NOTE number</TD><TD> PITCH[Cent]</TD><TD> FNS[9:0][DEC]</TD><TD> FNS[9:0][HEX]</TD><TD> OCT[3:0][HEX]</TD></TR><TR ALIGN=CENTER><TD> B3</TD><TD> 59</TD><TD> 1100</TD><TD> 909.1</TD><TD> 38D</TD><TD> F</TD></TR><TR ALIGN=CENTER><TD> C4</TD><TD> 60</TD><TD> 0</TD><TD> 0.0</TD><TD> 0</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> C4#</TD><TD> 61</TD><TD> 100</TD><TD> 60.9</TD><TD> 03D</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> D4</TD><TD> 61</TD><TD> 200</TD><TD> 125.4</TD><TD> 07D</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> D4#</TD><TD> 63</TD><TD> 300</TD><TD> 193.7</TD><TD> 0C2</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> E4</TD><TD> 64</TD><TD> 400</TD><TD> 266.2</TD><TD> 10A</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> F4</TD><TD> 65</TD><TD> 500</TD><TD> 342.9</TD><TD> 157</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> F4#</TD><TD> 66</TD><TD> 600</TD><TD> 424.2</TD><TD> 1A8</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> G4</TD><TD> 67</TD><TD> 700</TD><TD> 510.3</TD><TD> 1FE</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> G4#</TD><TD> 68</TD><TD> 800</TD><TD> 601.5</TD><TD> 25A</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> A4</TD><TD> 69</TD><TD> 900</TD><TD> 698.2</TD><TD> 2BA</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> A4#</TD><TD> 70</TD><TD> 1000</TD><TD> 800.6</TD><TD> 321</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> B4</TD><TD> 71</TD><TD> 1100</TD><TD> 909.1</TD><TD> 38D</TD><TD> 0</TD></TR><TR ALIGN=CENTER><TD> C5</TD><TD> 72</TD><TD> 0</TD><TD> 0.0</TD><TD> 0</TD><TD> 1</TD></TR></TABLE></P></DL><HR NOSHADE> <B>▲ <A HREF="p04_24.htm">Back</a> ｜ <A HREF="p04_26.htm">Forward</a> ▼</b><HR><A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

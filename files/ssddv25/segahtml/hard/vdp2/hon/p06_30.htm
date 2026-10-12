@@ -1,0 +1,193 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;41/86&gt;VDP2 User's Manual/6.3 Rotation Parameter Control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no6">VDP2 User's Manual</a> ★ <A HREF="p06_10.htm">Chapter 6 Rotating scroll screen</a><HR>
+ <B>▲ <A HREF="p06_20.htm">Back</a> ｜ <A HREF="p06_31.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 6 Rotating scroll screen</b><HR NOSHADE>
+<DL>
+<P><DT><H2> ■6.3 Rotation parameter control</H2><DD> When displaying a rotation scroll screen, be sure to store the rotation parameters that control it in VRAM as a table. The rotary scroll screen reads the rotation parameter table stored in VRAM line by line and displays the screen according to the values. Rotation parameters<A NAME="t6_2"></A><A NAME="t6_2"></A><P><DD> <B>Table 6.2 Rotation parameters</b><DD><TABLE BORDER CELLPADDING=5>
+<TR><TH COLSPAN=2> Rotation parameters</TH><TH> Definition</TH></TR>
+<TR><TD ROWSPAN=3> <A HREF="#t6_2_01">Screen screen start coordinates</a></TD><TH> Xst</TH><TD> X coordinate of the upper left corner (or left edge*) of the screen</TD></TR>
+<TR><TH> Yst</TH><TD> Y coordinate of the upper left corner (or left edge*) of the screen</TD></TR>
+<TR><TH> Zst</TH><TD> Z coordinate of screen screen</TD></TR>
+<TR><TD ROWSPAN=2> <A HREF="#t6_2_02">Screen screen vertical coordinate increment</a></TD><TH> △Xst</TH><TD> X coordinate increment per line of screen screen coordinates</TD></TR>
+<TR><TH> △Yst</TH><TD> Y-coordinate increment per line of screen screen coordinates</TD></TR>
+<TR><TD ROWSPAN=2> <A HREF="#t6_2_03">Screen horizontal coordinate increment</a></TD><TH> △X</TH><TD> X coordinate increment per dot in screen screen coordinates</TD></TR>
+<TR><TH> △Y</TH><TD> Y-coordinate increment per dot in screen screen coordinates</TD></TR>
+<TR><TD ROWSPAN=6> <A HREF="#t6_2_04">rotation matrix parameters</a></TD><TH> A</TH><TD ROWSPAN=6> 3x3 rotation matrix<BR>
+ ABC<BR>
+ DEF<BR>
+ GHI<BR>
+ Six matrix parameters A to F of</TD></TR>
+<TR><TH> B</TH></TR>
+<TR><TH> C</TH></TR>
+<TR><TH> D</TH></TR>
+<TR><TH> E</TH></TR>
+<TR><TH> F</TH></TR>
+<TR><TD ROWSPAN=3> <A HREF="#t6_2_05">viewpoint coordinates</a></TD><TH> Px</TH><TD> Viewpoint X coordinate</TD></TR>
+<TR><TH> Py</TH><TD> View Y coordinate</TD></TR>
+<TR><TH> Pz</TH><TD> Z coordinate of viewpoint</TD></TR>
+<TR><TD ROWSPAN=3> <A HREF="#t6_2_06">center coordinates</a></TD><TH> Cx</TH><TD> X coordinate of center point</TD></TR>
+<TR><TH> Cy</TH><TD> Y coordinate of center point</TD></TR>
+<TR><TH> Cz</TH><TD> Z coordinate of center point</TD></TR>
+<TR><TD ROWSPAN=2> <A HREF="#t6_2_07">Parallel movement amount</a></TD><TH> Mx</TH><TD> Amount of parallel movement in the X direction of the screen screen, viewpoint, and center point</TD></TR>
+<TR><TH> My</TH><TD> Amount of parallel movement in the Y direction of the screen screen, viewpoint, and center point</TD></TR>
+<TR><TD ROWSPAN=2> <A HREF="#t6_2_08">scaling factor</a></TD><TH> kx</TH><TD> Scaling factor of the display screen in the X direction</TD></TR>
+<TR><TH> ky</TH><TD> Scaling factor in the Y direction of the display screen</TD></TR>
+<TR><TD> <A HREF="#t6_2_09">Coefficient table start address</a></TD><TH> KAst</TH><TD> Starting the table when using coefficient tables<BR>
+ address</TD></TR>
+<TR><TD> <A HREF="#t6_2_10">Coefficient table vertical direction</a><BR>
+ <A HREF="#t6_2_10">address increment</a></TD><TH> △KAst</TH><TD> Address per line when using coefficient table<BR>
+ incremental</TD></TR>
+<TR><TD> <A HREF="#t6_2_11">Coefficient table horizontal direction</a><BR>
+ <A HREF="#t6_2_11">address increment</a></TD><TH> △KAx</TH><TD> Per-dot address when using coefficient table<BR>
+ incremental</TD></TABLE>
+<DD> <B>[Note]</b> * indicates when reading line by line.<P><P><DD> Of the rotation parameters, only Xst, Yst, and KAst are usually read only on the first line of the display screen. When DXst, DYst, DX, DY, DKAst, and DKAx do not change within one screen, the values of Xst, Yst, and KAst are expressed by the following formulas.</P>
+<P><DD><PRE><B>
+(Screen screen X coordinate)
+          = Xst + △Xst × (V counter value) + △X × (H counter value)
+
+(Screen screen Y coordinate)
+          = Yst + △Yst × (V counter value) + △Y × (H counter value)
+
+(coefficient table address)
+          = KAst + △KAst × (V counter value) + △KAx × (H counter value)
+</b></PRE></P>
+<P><DD>Also, by setting the rotation parameter read control register, Xst, Yst, and KAst can be read at lines other than the first line. When DXst, DYst, DX, DY, DKAst, and DKAx do not change within one screen, the values of Xst, Yst, and KAst from the second line onward are expressed by the following formula.</P>
+<P><DD><PRE><B>
+(Screen screen X coordinate)
+          = Xst 
+          + △Xst × {(V counter value) - (V counter value when reading Xst)}
+          + △X × (H counter value)
+
+(Screen screen Y coordinate)
+       = Yst
+          + △Yst × {(V counter value) - (V counter value when Yst is read)}
+          + △Y × (H counter value)
+
+(coefficient table address)
+          = KAst
+          + △KAst × {(V counter value) - (V counter value when KAst is read)}
+          + △KAx × (H counter value)
+</b></PRE></P>
+<P><DD>The rotation scroll screen has two sets of parameter tables called "Rotation Parameter A" and "Rotation Parameter B". RBG1 screen display is performed by rotation parameter B. RBG0 allows you to specify which of the two parameter tables to use, and to switch between them on the display screen. This allows RBG0 to simultaneously display two different rotating scroll screens on one screen.<BR>
+ Also, the rotation parameter table works by simply storing only the rotation parameter table used by RBG0 and RBG1, rather than having to store two sets of rotation parameter tables at all times.</P>
+<A NAME="no6_31"></A><P><DT><H3> ●Data structure of rotation parameter table</H3><DD> The bit configuration of each rotation parameter is shown below. Specify negative numbers as two's complement numbers. <B>Bits in blank spaces</b> are ignored. </P>
+</DL>
+<!-- -------------------------------------------------------------------------- -->
+<A NAME="z6_2"></A><P><DD> <B>Figure 6.2 Data structure of rotation parameters</b><A NAME="t6_2_01"><HR></a><DD> ●Screen screen start coordinates (Xst, Yst, Zst)<DD><TABLE BORDER>
+<TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=3><TH> sign<TH COLSPAN=12> Integer part 12 bits</TR>
+</TABLE></P><P><TABLE BORDER><TR><TH ROWSPAN=2> +2<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=10> Fractional part 10 bits <TH COLSPAN=6></TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_02"><HR></a><DD> ●Screen screen vertical direction coordinate increment (ΔXst, ΔYst)<DD><TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=13><TH> sign<TH COLSPAN=2> integer part</TR>
+</TABLE></P><TABLE BORDER><TR><TH ROWSPAN=2> +2<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=10> Fractional part 10 bits <TH COLSPAN=6></TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_03"><HR></a><DD> ●Screen horizontal coordinate increment (ΔX, ΔY)<DD><TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=13><TH> sign<TH COLSPAN=2> integer part</TR>
+</TABLE></P><TABLE BORDER><TR><TH ROWSPAN=2> +2<TR><TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=10> Fractional part 10 bits <TH COLSPAN=6></TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_04"><HR></a><DD> ●Rotation matrix parameters (A, B, C, D, E, F)<DD><TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=12><TH> sign<TH COLSPAN=3> integer part</TR>
+</TABLE></P><TABLE BORDER><TR><TH ROWSPAN=2> +2<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=10> Fractional part 10 bits <TH COLSPAN=6></TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_05"><HR></a><DD> ●Viewpoint coordinates (Px, Py, Pz)<TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=2><TH> sign<TH COLSPAN=13> Integer part 13 bits</TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_06"><HR></a><DD> ●Center coordinates (Cx, Cy, Cz)<DD><TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=2><TH> sign<TH COLSPAN=13> Integer part 13 bits</TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_07"><HR></a><DD> ●Parallel movement amount (Mx, My)<DD><TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=2><TH> sign<TH COLSPAN=13> Integer part 13 bits</TR>
+</TABLE></P><TABLE BORDER><TR><TH ROWSPAN=2> +2<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=10> Fractional part 10 bits <TH COLSPAN=6></TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_08"><HR></a><DD> ●Scaling coefficient (kx,ky)<TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=8><TH> sign<TH COLSPAN=7> Integer part 7 bits</TR>
+</TABLE></P><TABLE BORDER><TR><TH ROWSPAN=2> +2<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=16> Fractional part 16 bits</TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_09"><HR></a><DD> ●Coefficient table start address (kAst)<DD><TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=16> Integer part 16 bits</TR>
+</TABLE></P><TABLE BORDER><TR><TH ROWSPAN=2> +2<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=10> Fractional part 10 bits <TH COLSPAN=6></TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_10"><HR></a><DD> ●Coefficient table vertical address increment (ΔKAst)<DD><TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=6><TH> sign<TH COLSPAN=9> Integer part 9 bits</TR>
+</TABLE></P><TABLE BORDER><TR><TH ROWSPAN=2> +2<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=10> Fractional part 10 bits <TH COLSPAN=6></TR>
+</TABLE><!-- -------------------------------------------------------------------------- --><A NAME="t6_2_11"><HR></a><DD> ●Coefficient table horizontal address increment (ΔKAx)<TABLE BORDER><TR><TH ROWSPAN=2> +0<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=6><TH> sign<TH COLSPAN=9> Integer part 9 bits</TR>
+</TABLE><TABLE BORDER><TR><TH ROWSPAN=2> +2<TD><PRE> 15<TD><PRE> 14<TD><PRE> 13<TD><PRE> 12<TD><PRE> 11<TD><PRE> 10<TD><PRE> 9<TD><PRE> 8<TD><PRE> 7<TD><PRE> 6<TD><PRE> 5<TD><PRE> 4<TD><PRE> 3<TD><PRE> 2<TD><PRE> 1<TD><PRE> 0</TR>
+<TR><TH COLSPAN=10> Fractional part 10 bits <TH COLSPAN=6></TR>
+</TABLE><HR><!-- ----------------------------------------------------------------------------><DL><A NAME="no6_32"></A><P><DT><H3> ●Rotation parameter table</H3><DD> The rotation parameter table is stored in VRAM as one set of 60H tables. Figure 6.3 shows the structure of a set of tables.</P><A NAME="z6_3"></A><P><DD> <B>Figure 6.3 Rotation parameter table</b><DD><TABLE BORDER=1>
+<TR><TD> +00H<BR> +02H</TD><TD><PRE> Screen screen start coordinate Xst (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +04H<BR> +06H</TD><TD><PRE> Screen screen start coordinate Yst (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +08H<BR> +0AH</TD><TD><PRE> Screen screen start coordinate Zst (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +0CH<BR> +0EH</TD><TD><PRE> Screen vertical increment     ΔXst (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +10H<BR> +12H</TD><TD><PRE> Screen vertical increment     ΔYst (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +14H<BR> +16H</TD><TD><PRE> Screen horizontal increment   ΔX   (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +18H<BR> +1AH</TD><TD><PRE> Screen horizontal increment   ΔY   (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +1CH<BR> +1EH</TD><TD><PRE> Rotation matrix parameter  A       (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +20H<BR> +22H</TD><TD><PRE> Rotation matrix parameter  B       (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +24H<BR> +26H</TD><TD><PRE> Rotation matrix parameter  C       (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +28H<BR> +2AH</TD><TD><PRE> Rotation matrix parameter  D       (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +2CH<BR> +2EH</TD><TD><PRE> Rotation matrix parameter  E       (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +30H<BR> +22H</TD><TD><PRE> Rotation matrix parameter  F       (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +34H</TD><TD><PRE> Viewpoint coordinates  Px          (integer part)</TD></TR>
+<TR><TD> +36H</TD><TD><PRE> Viewpoint coordinates  Py          (integer part)</TD></TR>
+<TR><TD> +38H</TD><TD><PRE> Viewpoint coordinates  Pz          (integer part)</TD></TR>
+<TR><TD> +3AH</TD><TH><PRE> This data will be ignored</TH></TR>
+<TR><TD> +3CH</TD><TD><PRE> Center coordinate  Cx              (integer part)</TD></TR>
+<TR><TD> +3EH</TD><TD><PRE> Center coordinate  Cy              (integer part)</TD></TR>
+<TR><TD> +40H</TD><TD><PRE> Center coordinate  Cz              (integer part)</TD></TR>
+<TR><TD> +42H</TD><TH><PRE> This data will be ignored</TH></TR>
+<TR><TD> +44H<BR> +46H</TD><TD><PRE> Parallel movement amount  Mx       (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +48H<BR> +4AH</TD><TD><PRE> Parallel movement amount  My       (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +4CH<BR> +4EH</TD><TD><PRE> Scaling factor       kx            (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +50H<BR> +52H</TD><TD><PRE> Scaling coefficient  ky            (integer part)<BR>                                    (Decimal part)</TD></TR>
+<TR><TD> +54H<BR> +56H</TD><TD><PRE> Coefficient table start address KAst (integer part)<BR>                                      (Decimal part)</TD></TR>
+<TR><TD> +58H<BR> +5AH</TD><TD><PRE> Coefficient table vertical address increment    ΔKAst (integer part)<BR>                                                       (Decimal part)</TD></TR>
+<TR><TD> +5CH<BR> +5EH</TD><TD><PRE> Coefficient table horizontal address increment  ΔKAx  (integer part)<BR>                                                       (Decimal part)</TD></TR>
+</TABLE></P><P><DD> When storing two tables of rotation parameter A and rotation parameter B, store the table of rotation parameter A from the first address of the rotation parameter table, then insert 20H worth of invalid data and store the table of rotation parameter B. Store the table. Instead of always having to store two sets of rotation parameter tables, you can just store the tables you need. Figure 6.4 shows how to store two sets of tables: rotation parameter A and rotation parameter B.</P><A NAME="z6_4"></A><CENTER> <B>Figure 6.4 How to store rotation parameter table in VRAM</b><PRE>
+Start address of                     
+rotation parameter table             
+     │                               
+     └──→ +00H┏━━━━━━━━━━━━━━━━━━━━━┓
+              ┃                     ┃
+              ┃                     ┃
+              ┃ Rotation            ┃
+              ┃ parameter           ┃
+              ┃ A table             ┃
+              ┃                     ┃
+          +5EH┃                     ┃
+          +60H┣━━━━━━━━━━━━━━━━━━━━━┫
+              │ Data in this area   │
+              │ is not used as      │
+          +7EH│ rotation parameters │
+          +80H┣━━━━━━━━━━━━━━━━━━━━━┫
+              ┃                     ┃
+              ┃                     ┃
+              ┃ Rotation            ┃
+              ┃ parameter           ┃
+              ┃ B table             ┃
+              ┃                     ┃
+          +DEH┃                     ┃
+          +E0H┣━━━━━━━━━━━━━━━━━━━━━┫
+              ┃                     ┃
+</PRE></CENTER></DL><HR NOSHADE><B>▲ <A HREF="p06_20.htm">Back</a> ｜ <A HREF="p06_31.htm">Forward</a> ▼</b><HR><A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no6">VDP2 User's Manual</a> ★ <A HREF="p06_10.htm">Chapter 6 Rotating scroll screen</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

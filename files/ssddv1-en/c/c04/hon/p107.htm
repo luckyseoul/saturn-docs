@@ -1,0 +1,47 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p106.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p108.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT><table border cellpadding=5>
+<td width = 150> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220> <pre> <B> Function </B> <br> Open tray </td> <td width = 160> <pre> <B> Function Name </B> [SR] <br> CDC_CdOpen </td> <td width = 60> <pre> <B> No </B> <br>1.8</td>
+</table><P>
+<DD><PRE>
+<B> Format </B> Sint32 CDC_CdOpen (void)
+<B> Input </B> None
+<B> Output </B> None
+<B> Function value </B> Returns an error code.
+<B> Function </B> Stops the CD drive and opens the tray.
+<B>. </B>-Automatic type (front loading): The CD block automatically opens the tray.
+<B>. </B>-Manual type (top loading): 〈BUSY〉 state until manually opened.
+<B> Remarks </B> When the tray is opened, the TOC / session information and file information are initialized and an interrupt is required.
+<B> </B> The cause register's DCHG and EFLS flags are set to 1. (Same when manually opened)
+<B> </B> Refer to “5.5 Block Initialization” for details. </PRE><P>
+<DT><table border cellpadding=5>
+<td width = 150> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220> <pre> <B> Function </B> <br> Preparing for data transfer Wait </td> <td width = 160> <pre> <B> Function Name </B> [-] <br> CDC_DataReady </td> <td width = 60> <pre> <B> No </B><br>1.9</td>
+</table><P>
+<DD><PRE>
+<B> Format </B> Sint32 CDC_DataReady (Sint32 dtype)
+<B> Input </B> dtype: Waiting for transfer preparation type
+<B> Output </B> None
+<B> Function value </B> Returns an error code.
+<B> Function </B> Wait until data transfer is ready. Data can be transferred after preparation is complete.
+<B> </B> After transferring the data, it is necessary to execute the end of data transfer (CDC_DataEnd). <P>
+<UL> <B> (1) Transfer ready type </B> </PRE> <P>
+<table border cellpadding=5>
+<th width = 100 align = "center"> <pre> constant name </th> <th width = 420 align = "center"> <pre> description </th> <tr>
+<td align = "left"> <pre> CDC_DRDY_GET </td> <td align = "left"> <pre> Specify when retrieving data. (CD block to host) </td> <tr>
+<td align = "left"> <pre> CDC_DRDY_PUT </td> <td align = "left"> <pre> Specify when writing data. (Host → CD block) </td>
+</table><P>
+<PRE> <B> (2) Processing contents waiting for transfer preparation </B> <P>
+待 ち Wait until the DRDY flag in the interrupt factor register becomes 1, and when it becomes 1, clear it to 0.
+When writing, if the empty sector cannot be secured, the EHST flag in the interrupt factor register will be set to 1.
+The In that case, a CDC_ERR_PUT error is returned. </UL><P>
+<B> Remarks </B> If there is an error waiting for preparation, there is no need to execute data transfer termination. Inside this function
+<B> </B> Automatically executed. </PRE><BR>
+</DL><P><P><HR>
+<A HREF=p106.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p108.htm> Go to next page </A>
+</BODY>
+</HTML>

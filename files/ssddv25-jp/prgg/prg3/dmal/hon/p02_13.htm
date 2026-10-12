@@ -1,0 +1,393 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/5&gt;ＤＭＡライブラリ/2.4　関数仕様</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no2">ＤＭＡライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p02_12.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>ＤＭＡライブラリ/2.リファレンス</B>
+<HR NOSHADE>
+<A NAME="no2_40"></A>
+<H3>2.4　関数仕様</H3>
+
+<H2>[高水準 SCU]</H2>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no1"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>SCU DMA初期化</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_ScuInit</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_ScuMemCopy(void *dst, void *src, Uint32 cnt)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>SCU DMAの初期化をします。<BR>DMA_ScuCopyMem(),DMA_ScuResult()を実行する前に必ず行ってください。</P>
+
+<DT><TABLE><TR>
+<TH><PRE>注　意<BR><IMG SRC="../../../../what/atto.gif"></TH>
+<TD><B>SCU DMAでは、DMAモード0の転送終了割り込み処理を使用しています。よって、DMAモード0の転送終了割り込みの割り込みマスクレジスタは、変更しないでください。</B></TD></TABLE>
+
+</DL>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no2"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMAデータ転送</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_ScuMemCopy</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_ScuMemCopy(void *dst, void *src, Uint32 cnt)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>*dst</TD><TD><PRE>：ディスティネーションアドレス</TD></TR>
+	<TR><TD><PRE>*src</TD><TD><PRE>：ソースアドレス</TD></TR>
+	<TR><TD><PRE>cnt </TD><TD><PRE>：転送バイト数</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>SCUのDMAモード0の直接モードによるDMA転送をします。詳しくはSCUユーザーズマニュアルを参照してください。ディスティネーションアドレスがワークRAMのときとワークRAM以外のときとで動作が違います。以下にそれぞれの動作を示します。
+<DT><UL TYPE="DISK">
+<P><LI><B>ワークRAM</B><BR>キャッシュとの不整合をなくすため、転送後にディスティネーションエリアのパージを行います。また、CPU_Busを使用するためDMA実行が終了するまでCPUに制御は戻りません。</P>
+<P><LI><B>ワークRAM以外</B><BR>CPU_Busを使用していないため転送開始後、すぐにCPUに制御が戻ります。この場合はDMA_ScuResult()にて終了チェックを行ってください。</P>
+</UL>
+<DD>転送単位は基本的にはロングワード単位ですが、ソース、ディスティネーションアドレスはバイト単位で指定できます。ただし、デバイスがワードバウンダリなどを要求しているときはそれに従ってください。詳しくはSCUユーザーズマニュアルをご覧ください。
+
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no3"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>データ転送終了チェック</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_ScuResult</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Uint32 DMA_ScuResult(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>DMA_ScuMemCopy()の結果
+<DT><B>　機　能</B><DD>DMA_ScuMemCopy()の終了チェックを行います。返す値として以下のものがあります。
+<DD>実行結果定数名
+<TABLE BORDER CELLPADDING=5>
+<TH WIDTH=160 ALIGN="CENTER"><PRE>定数名</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH><TR>
+<TD><PRE>DMA_SCU_END</TD><TD><PRE>正常終了</TD><TR>
+<TD><PRE>DMA_SCU_FAIL</TD><TD><PRE>異常終了</TD><TR>
+<TD><PRE>DMA_SCU_BUSY</TD><TD><PRE>実行中</TD><TR>
+</TABLE><P>
+<DT><B>　備　考</B><DD>DMA_ScuMemCopy()でソースまたは、ディスティネーションにCPU_Busが指定された場合、DMAの実行中はCPUは動作できません。したがって、このときの実行結果が実行中(DMA_SCU_BUSY)になることはありません。
+</DL>
+<HR>
+<H2>[高水準 CPU]</H2>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no4"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>データ転送（バイト単位）</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuMemCopy1</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void DMA_CpuMemCopy1(void *dst, void *src, Uint32 cnt)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>*dst</TD><TD><PRE>;ディスティネーションアドレス</TD></TR>
+	<TR><TD><PRE>*src</TD><TD><PRE>;ソースアドレス</TD></TR>
+	<TR><TD><PRE>cnt </TD><TD><PRE>;転送回数(0-16777215)<BR>　0x00000001　　1回<BR>　0x00ffffff　　16777215回<BR>　0x00000000　　16777216回</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>srcアドレスからdstアドレスへバイトデータをcnt回数分転送します。転送量はcntバイトです。チャネル０、サイクルスチールモード、終了割り込みなしで転送しています。ディスティネーションアドレスがワークRAMのときは、キャッシュとの不整合をなくすため、転送後にディスティネーションエリアのパージを行います。アドレスに対する制限はありません。
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no5"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>データ転送（ワード単位）</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuMemCopy2</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>5</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_CpuMemCopy2(void *dst, void *src, Uint32 cnt)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>*dst</TD><TD><PRE>;ディスティネーションアドレス</TD></TR>
+	<TR><TD><PRE>*src</TD><TD><PRE>;ソースアドレス</TD></TR>
+	<TR><TD><PRE>cnt </TD><TD><PRE>;転送回数(0-16777215)<BR>　0x00000001　1回<BR>　0x00ffffff　16777215回<BR>　0x00000000　16777216回</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>srcアドレスからdstアドレスへワードデータをcnt回数分転送します。転送量はcnt*2バイトです。チャネル０、サイクルスチールモード、終了割り込みなしで転送しています。ディスティネーションアドレスがワークRAMのときは、キャッシュとの不整合をなくすため、転送後にディスティネーションエリアのパージを行います。アドレスはワードバウンダリでなければなりません。
+
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no6"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>データ転送（ロングワード単位）</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuMemCopy4</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_CpuMemCopy4(void *dst, void *src, Uint32 cnt)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>*dst</TD><TD><PRE>;ディスティネーションアドレス</TD></TR>
+	<TR><TD><PRE>*src</TD><TD><PRE>;ソースアドレス</TD></TR>
+	<TR><TD><PRE>cnt </TD><TD><PRE>;転送回数(0-16777215)<BR>　0x00000001　1回<BR>　0x00ffffff　16777215回<BR>　0x00000000　16777216回</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>srcアドレスからdstアドレスへロングワードデータをcnt回数分転送します。転送量はcnt*4バイトです。チャネル０、サイクルスチールモード、終了割り込みなしで転送しています。ディスティネーションアドレスがワークRAMのときは、キャッシュとの不整合をなくすため、転送後にディスティネーションエリアのパージを行います。アドレスはロングワードバウンダリでなければなりません。
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no7"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>データ転送（16バイト単位）</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuMemCopy16</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_CpuMemCopy16(void *dst, void *src, Uint32 cnt)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>*dst</TD><TD><PRE>; ディスティネーションアドレス</TD></TR>
+	<TR><TD><PRE>*src</TD><TD><PRE>; ソースアドレス</TD></TR>
+	<TR><TD><PRE>cnt</TD><TD><PRE>;  転送回数(0-16777215)（ロングワード単位)<BR>　0x00000001　1回<BR>　0x00ffffff　16777215回<BR>　0x00000000　16777216回</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>srcアドレスからdstアドレスへロングワードデータをcnt回数分転送します。転送量はcnt×４バイトです。チャネル０、サイクルスチールモード、終了割り込みなしで転送しています。ディスティネーションアドレスがワークRAMのときは、キャッシュとの不整合をなくすため、転送後にディスティネーションエリアのパージを行います。アドレスはロングワードバウンダリでなければなりません。
+
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no8"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>データ転送終了チェック</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuResult</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>8</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>Uint32 DMA_CpuResult(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>DMA_CpuMemCopy1,2,4,16()の結果
+<DT><B>　機　能</B><DD>DMA_CpuMemCopy1,2,4,16()の終了チェックを行います。返す値として以下のものがあります。
+<DD>実行結果定数名
+<TABLE BORDER CELLPADDING=5>
+<TH WIDTH=160 ALIGN="CENTER"><PRE>定数名</TH><TH WIDTH=280 ALIGN="CENTER"><PRE>説明</TH><TR>
+<TD><PRE>DMA_CPU_END</TD><TD><PRE>正常終了</TD><TR>
+<TD><PRE>DMA_CPU_BUSY</TD><TD><PRE>実行中</TD><TR>
+</TABLE><P>
+</DL>
+<HR>
+<H2>[低水準 SCU]</H2><P>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no9"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMA転送パラメータ設定</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_ScuSetPrm</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>9</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_ScuSetPrm(DmaScuPrm *prm, Uint32 ch)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>prm</TD><TD><PRE>：転送パラメータ</TD></TR>
+	<TR><TD><PRE>ch </TD><TD><PRE>：DMAチャネル</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定されたDMAチャネルへ転送パラメータの値を設定します。
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no10"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMA転送開始</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_ScuStart</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>10</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_ScuStart(Uint32 ch)
+<DT><B>　入　力</B><DD>ch：DMAチャネル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定されたDMAチャネルのDMA転送を開始します。
+</DL>
+
+
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no11"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMAステータス取得</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_ScuGetStatus</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>11</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_ScuGetStatus(DmaScuStatus *status,Uint32 ch)
+<DT><B>　入　力</B><DD>ch  ：入力チャネル
+<DT><B>　出　力</B><DD>status ：ステータスポインタ
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定されたDMAチャネルのステータスを取得します。
+<DT><B>!!注意!!</B><DD>DmaScuStatus構造体のメンバ、dxbk（DMA中断中フラグ）・dxwt（DMA待機中フラグ）を削除しました。
+</DL>
+
+<HR>
+<H2>[低水準 CPU]</H2>
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no12"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMA共通転送パラメータ設定</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuSetComPrm</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>12</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_CpuSetComPrm(DmaCpuComPrm *com_prm)
+<DT><B>　入　力</B><DD>com_prm：共通転送パラメータ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定された共通転送パラメータを設定します。ただしDmaCpuComPrm.mskによってマスクされたパラメータは設定しません。
+<DT><B>　備　考</B><DD>DmaCpuComPrm.mskでDMA_CPU_M_AEをマスクしなかった場合、アドレスエラーフラグをクリアします。DMA_CPU_M_NMIFをマスクしなかった場合、NMIフラグをクリアします。
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no13"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMA転送パラメータ設定</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuSetPrm</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>13</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_CpuSetPrm(DmaCpuPrm *prm Uint32 ch)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>prm</TD><TD><PRE>：転送パラメータ</TD></TR>
+	<TR><TD><PRE>ch </TD><TD><PRE>：DMAチャネル</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定されたDMAチャネルへ転送パラメータを設定します。ただしDmaCpuPrm.mskによってマスクされたパラメータは設定しません。
+<DT><B>　備　考</B><DD>DmaCpuPrm.mskでDMA_CPU_TEをマスクしないかった場合は、トランスファエンドフラグビットをクリアします。
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no14"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMA転送開始</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuStart</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>14</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>Uint32 DMA_CpuStart(Uint32 ch)
+<DT><B>　入　力</B><DD>ch：DMAチャネル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定されたDMAチャネルのDMA転送を開始します。
+
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no15"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMA転送中止</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuStop</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>15</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_CpuStop(Uint32 ch)
+<DT><B>　入　力</B><DD>ch：DMAチャネル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定されたDMAチャネルのDMA転送を終了します。
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no16"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMA全チャネル転送中止</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuAllStop</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>16</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_CpuAllStop(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>すべてのDMAチャネルのDMA転送を中止します。
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no17"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMA共通ステータス取得</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuGetComStatus</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>17</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_CpuGetComStatus(DmaCpuComStatus *status)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>status：ステータスポインタ
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定された共通ステータスを取得します。
+</DL>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<A NAME="no18"><HR><DL>
+<DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p02_12.htm#no2_30">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>DMAステータス取得</H4></TD>
+<TD WIDTH=200><PRE>Function name<BR><H3>DMA_CpuGetStatus</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>18</H4></TD>
+</TR></TABLE>
+
+<DT><B>　書　式</B><DD>void DMA_CpuGetStatus(DmaCpuStatus *status, Uint32 ch)
+<DT><B>　入　力</B><DD>ch    ：DMAチャネル
+<DT><B>　出　力</B><DD>status：ステータスポインタ
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定されたDMAチャネルのステータスを取得します。
+</DL>
+
+<HR NOSHADE>
+<B>▲
+<A HREF="p02_12.htm">戻る</A>｜
+　　■</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no2">ＤＭＡライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

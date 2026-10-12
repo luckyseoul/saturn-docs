@@ -1,0 +1,121 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE> SEGASATURN Developer's Information STN-21 </TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../index.htm">INDEX</A>
+▲
+|<A HREF="stn06.htm">STN-6</A>
+|<A HREF="stn09.htm">STN-9</A>
+|<A HREF="stn19.htm">STN-19</A>
+|<B>STN-21</B>
+|<A HREF="stn22.htm">STN-22</A>
+|<A HREF="stn23.htm">STN-23</A>
+|<A HREF="stn24.htm">STN-24</A>
+▼
+<HR NOSHADE>
+<H1 ALIGN=CENTER>STN-21</H1>
+<H2 ALIGN=CENTER>GFS_Init,GFS_LoadDir関数のリカバリ</H2>
+<HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発行番号：</TH><TD>STN-21</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発 行 日：</TH><TD>95/01/20</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>メディア：</TH><TD>○共　通</TD><TD>●CD-ROM</TH><TD>○カートリッジ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>関　　連：</TH><TD>●プログラム</TD><TD>○ハード</TD><TD>○マニュアル</TD><TD>○ツール</TD><TD>○ゲーム</TD><TD>○バグ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>情報区別：</TH><TD>●新　規</TD><TD>○変　更</TD><TD>○追　加</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>重 要 度：</TH><TD>●厳　守</TD><TD>○推　奨</TD><TD>○参　考</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>添付資料：</TH><TD>●無</TH><TD>○有</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>件名補足：</TH><TD COLSPAN=7>対象ライブラリ：GFS Ver1.15</TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER>内　容</H3>
+<DL>
+  <P><DT><H3>■対策方法</H3>
+     <DD>　GFS_Init,GFS_LoadDir関数でエラーが発生した場合、次のような対処をしてください。</P>
+
+  <P><DT><B>　●GFS_ERR_CDRD,GFS_ERR_FATALエラーの場合</B>
+     <DD>　GFS_InitはECC/リードリトライ回数を最大に設定しており、できるだけ&ltERROR&gt
+      状態にならないようにしています。また、<FATAL>状態になった場合は、リカバ
+      リのためストップコマンド(ホーム位置へのシーク)を発行します。<BR>
+      □これらのエラーが発生した場合は、添付資料のプラグラム例のようにポーズ
+      コマンド発行後"PAUSE"状態になるのを待ってから、再実行してください。再実
+      行の繰り返し回数は３回以上にします。<BR>
+      □繰り返し実行してもエラーになる場合は、修復不可能なディスクの傷などが考
+      えられます。メッセージを表示するかマルチプレイヤに移行してください。</P>
+
+  <P><DT><B>　●GFS_ERR_CDNODISC,GFS_ERR_CDOPENエラーの場合</B>
+     <DD>　マルチプレイヤに移行してください。</P>
+
+  <P><DT><B>　●その他のエラーの場合</B>
+     <DD>　本来発生してはいけないエラーです。プログラムを見直してください。<BR>
+	GFSライブラリやハードウェアの障害の可能性がありますので、原因が解らなければ弊社
+     まで連絡してください。<BR>製品版ではマルチプレイヤに移行するしかありません。</P>
+
+  <A NAME="no1"></A>
+  <P><DT><H3>■サンプルプログラム</H3>
+     <DD><PRE>
+
+#include "sega_cdc.h"
+Sint32	 recocGfsInit(void);
+Sint32	 waitStat(Sint32sts);
+
+/*GFS_Init,GFS_LoadDirの復帰処理*/
+Sint32 revovGfsInit(void)
+{
+	Sint32 ret;
+	CdcPos pos;
+	/*ポーズコマンドを発行する*/
+	CDC_POS_PTYPE(&pos) = CDC_PTYPE_NOCHG;
+	ret = CDC_CdSeek(&pos);
+	if(ret != CDC_ERR_OK){
+		return NG;
+	}
+	/*"PAUSE"状態になるまで待つ*/
+	ret = waitStat(CDC_ST_PAUSE);
+	return ret;
+}
+/*指定ドライブ状態になるまで待つ*/
+Sint32 waitStat(Sint32 sts)
+{
+	Sint32	ret;
+	Sint32	stwk;
+	CdcStat	stat;
+
+	while (TRUE) { /*実際にはループ回数の上限が必要*/
+		/*定期レスポンスの取得*/
+		ret = CDC_GetPeriStat(&stat);
+		if(ret == CDC_ERR_PERI){
+			continue;
+		}
+		if(ret != CDC_ERR_OK){
+			return NG;
+		}
+		stwk = CDC_GET_STC(&stat);
+		if(stwk == sts){
+			brake;
+		}
+	}
+	return OK;
+}
+</PRE>
+</DL>
+以上
+
+<HR NOSHADE>
+  <A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../index.htm">INDEX</A>
+▲
+|<A HREF="stn06.htm">STN-6</A>
+|<A HREF="stn09.htm">STN-9</A>
+|<A HREF="stn19.htm">STN-19</A>
+|<B>STN-21</B>
+|<A HREF="stn22.htm">STN-22</A>
+|<A HREF="stn23.htm">STN-23</A>
+|<A HREF="stn24.htm">STN-24</A>
+▼
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

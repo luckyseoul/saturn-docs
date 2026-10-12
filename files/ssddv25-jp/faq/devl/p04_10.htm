@@ -1,0 +1,109 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/10&gt;FAQ/開発環境/Hitach Compiler関連</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#devl">FAQ</A>
+★<A HREF="index.htm">開発環境</A>
+<HR>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/開発環境</B>
+<H2 ALIGN=CENTER>Hitach Compiler関連</H2>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_01"><HR NOSHADE></A><DL>
+<H3>SHCLIB.LIB, SHCPIC.LIB,SHCNPIC.LIBのどれをリンクすればいいの?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SH Cの標準ライブラリには、SHCLIB.LIB、SHCPIC.LIB、SHCNPIC.LIBの3種類のライブラリがありますがどれをリンクすれば良いのでしょうか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SH Cの標準ライブラリには、SHCLIB.LIB、SHCPIC.LIB、SHCNPIC.LIBの3種類のライブラリがありますが、セガサターンの開発では SHCNPIC.LIBを使用します。<BR>
+このライブラリは、SH7600シリーズ(SH2)に対応した、ポジション・インディペンデント・コードを生成しないライブラリです。<BR>
+ポジション・インディペンデント・コードとはリンク時のプログラムセクションを任意のアドレスに配置して実行できるもので、セガサターンでは対応していません。<BR>
+また、リンク時には複数の標準ライブラリをリンクしないでください。</P>
+
+<P><UL TYPE=DISC>
+	<LI>SHCLIB.LIBは、SH7000シリーズ(SH1)用のライブラリ
+	<LI>SHCPIC.LIBは、SH7600シリーズのポジション・インディペンデント・コード対応のライブラリです。
+</UL></P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_02"><HR></A><DL>
+<H3>セガサターン開発時のSH Cコンパイラオプションで注意する点はありますか?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>セガサターン開発時のSH Cコンパイラオプションで注意する点はありますか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>
+SH Cコンパイラのデフォルトは、 SH7000シリーズ(SH1)のコードを出力するようになっています。<BR>
+セガサターンのCPUは、SH7600シリーズ(SH2)相当なので、必ず CPUオプションでSH7600シリーズのオブジェクトを出力するよう指定してください。</P>
+
+<P><DD><B>＜例＞</B><BR>
+<PRE><B>
+shc -CPU=7600 -def=_SH /i=segalib¥include /optimize=1 /speed sample.c
+</B></PRE></P>
+<P><DD>※WS(sun SPARC Station,HP9000/700シリーズ,日立3050RX)においてはパス指定は"/"を使用してください。各処理系で使用を許されているパス名記述ルールと同じです。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_03"><HR></A><DL>
+<H3>GUISHでソースファイルがファイルリストに出てこない。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>GUISHを使ってソースコードを表示しようとしてもファイルリストにファイルが出てきません。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>ソースコードデバッグする際には、コンパイル時とリンク時にそれぞれ、DEBUGオプションを指定する必要があります。<BR>
+DEBUGオプション指定をしていなかったり、片方だけ(コンパイル時またはリンク時のみ)の場合はソースファイルが表示されませんので注意してください。</P>
+</DL>
+
+<!----------------------------------------------------------------------------->
+<A NAME="no4_04"><HR></A><DL>
+<H3>GUISHでソースコードの漢字など2バイトコード文字を表示したい。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>GUISHでソースコードの漢字を表示したい。
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SPARC版とIBM-PC版では漢字コードを表示することができます。<BR>
+<B>「View - Source Display... - Setting...」</B>のフォント設定で漢字フォントを指定することによって表示することができます。</P>
+</DL>
+
+<!----------------------------------------------------------------------------->
+<A NAME="no4_05_"><HR></A><DL>
+<H3>GUISHを起動させると"NO INTERFACE BOARD"というメッセージが表示されてしまう</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>E7000PC用またはEVAボード用 GUISHを起動させると<B>「NO INTERFACE BOARD」</B>というメッセージが表示されてしまう。
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>Windows側の設定が正しく行われていないと思われます。SYSTEM.INIの［386Enh］セクション内に、EMMExcludeを設定してあるかどうか調べてください。<BR>
+EMMExcludeのアドレスは、共有アドレスとしてI/Fボード上にて指定されているアドレスを記述します。<BR>
+詳しくは、E7000 SH7604 エミュレータマニュアル内 7000PC編 3.4.2「インストール方法」を参照してください。</P>
+</DL>
+
+<!----------------------------------------------------------------------------->
+<A NAME="no4_06"><HR></A><DL>
+<H3>GUISHをマスタ、スレーブ両方のデバッグに使いたい。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>デュアルCPUでの開発を行うのですが、GUISHは2つのE7000PC ICE/EVAボードを用いて同時に使えますか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>出来ません。DOS窓でIPI.EXEとの併用は可能です。このような場合、マスター、スレーブCPUをそれぞれGUISHとIPI、またはその逆として使用します。<BR>
+Windows95ではDOS窓が複数並列動作出来ますが、IPIがDOS窓で同時に動作するかは未確認です。</P>
+</DL>
+
+<HR NOSHADE>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#devl">FAQ</A>
+★<A HREF="index.htm">開発環境</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

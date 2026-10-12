@@ -1,0 +1,293 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 3&gt;Backup Library User's Manual/Detailed Specifications</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Backup Library User's Manual</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>Backup Library User's Manual/Reference</b><H2 ALIGN=CENTER> Detailed specifications</H2><HR NOSHADE>
+<A NAME="no2_12"></A><H2> ■Data specifications </H2><!-- ------------------------------------------------------------------------------------- -->
+<DL>
+<P><A NAME="no1_1"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=220><PRE> Data<BR><H4> Storage device connection information</H4></TD><TD WIDTH=180><PRE> Data Name<BR><H3> BupConfig</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1</H4></TD></TR>
+</TABLE>
+<P><DD><PRE>
+typedef struct BupConfig {
+  Uint16 unit_id; /* Unit ID */
+  Uint16 partition; /* number of partitions */
+} BupConfig;
+</PRE></P>
+<P><DD>*If unit_id is 0, it means not connected.</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH WIDTH=150><PRE> Equipment type</TH><TH WIDTH=100><PRE> unit_id</TH><TH WIDTH=100><PRE> partition</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> Built-in memory</TD><TD><PRE> 1</TD><TD><PRE> 1</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> external cartridge</TD><TD><PRE> 2</TD><TD><PRE> 1 </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no1_2"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=220><PRE> Data<BR><H4> Status information</H4></TD><TD WIDTH=180><PRE> Data Name<BR><H3> BupStat</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2</H4></TD></TR>
+</TABLE>
+<DD><PRE>
+typedef struct BupStat {
+  Uint32 totalsize; /* Total capacity() */
+  Uint32 totalblock; /* Number of blocks */
+  Uint32 blocksize; /* 1 block size() */
+  Uint32 freesize; /* Free space */
+  Uint32 freeblock; /* Number of free blocks */
+  Uint32 datanum; /* Number of writable items */
+} BupStat;
+</PRE><P><DD>datanum stores the value for the size specified by datasize in BUP_Stat(). </P>
+</DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no1_3"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=220><PRE> Data<BR><H4> date time</H4></TD><TD WIDTH=180><PRE> Data Name<BR><H3> BupDate</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3</H4></TD></TR>
+</TABLE>
+<DD><PRE>
+typedef struct BupDate {
+  Uint8 year; /* Year (1980 subtracted from the Western calendar) */
+  Uint8 month; /* Month (1-12) */
+  Uint8 day; /* day (1-31) */
+  Uint8 time; /* Hour (0~23) */
+  Uint8 min; /* minutes (0-59) */
+  Uint8 week; /* Day of the week (Sun 0 - Sat 6) */
+} BupDate;
+</PRE></DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no1_4"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_10">one</a><BR> <A HREF="p02_10.htm#no2_10">View</a><BR> <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=220><PRE> Data<BR><H4> directory information</H4></TD><TD WIDTH=180><PRE> Data Name<BR><H3> BupDir</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4</H4></TD></TR>
+</TABLE>
+<DD><PRE>
+typedef struct BupDir {
+  Uint8 filename[12]; /* filename */
+                        /* (11 ASCII characters + NUL, total 12 bytes) */
+  Uint8 comment[11]; /* Comment */
+                        /* (10 ASCII characters + NUL, total 11 bytes) */
+  Uint8 language; /* Language type of comment */
+                        /* Japanese: BUP_JAPANESE */
+                        /* English: BUP_ENGLISH */
+                        /* French: BUP_FRANCAIS */
+                        /* German: BUP_DEUTSCH */
+                        /* Spanish: BUP_ESPANOL */
+                        /* Italian: BUP_ITALIANO */
+  Uint32 date; /* date time data */
+  Uint32 datasize; /* Data size (unit: bytes) */
+  Uint16 blocksize; /* Data size (unit: block) */
+} BupDir;
+</PRE></DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR NOSHADE>
+<A NAME="no2_13"></A><H2> ■Function specifications </H2><!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_1"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Initializing the backup library</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_Init</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void BUP_Init(Uint32 *libaddr,Uint32 *workbuff,BupConfig conf[3])<DT> <B>input</b><DD> <B>libaddr:</b> Specify the address to load the library The size of the library is 16K bytes.<DD> <B>workbuff:</b> Pointer to the library work area The work area requires 8192 bytes. Since longword access may be required, be sure to secure it as Uint32.<DT> <B>output</b><DD> conf: Get information about the connected storage device.<DT> <B>function</b><DD> Loads the backup library into the specified memory area and performs preprocessing for use. Information about attached storage devices can be obtained. Each of the three tables corresponds to the following device numbers.<P><DD><TABLE BORDER=1>
+<TR><TH><PRE> device number</TH><TH><PRE> Equipment type</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> Built-in memory cartridge</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> Memory cartridge or parallel interface</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 2</TD><TD><PRE> serial interface</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> Be sure to prepare three storage device connection information tables.<DT> <B>example</b><DD><PRE>
+#define BUP_START_ADDR 0x6??????
+#include "sega_bup.h"
+Uint32 workmemory[2048+30];
+
+  void sample()
+  {
+    BupConfig conf[3];
+
+    BUP_Init(BUP_START_ADDR, workmemory, conf);
+    ......
+  }
+</PRE></DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_2"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Partition selection</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_SelPart</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 BUP_SelPart(Uint32 device,Uint16 num)<DT> <B>input</b><DD> device: device number<DD><TABLE BORDER=1>
+<TR><TH><PRE> device number</TH><TH> Storage device</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> Built-in memory</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> Memory cartridge or parallel interface</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 2</TD><TD><PRE> serial interface</TD></TR>
+</TABLE>
+<DD> num: Partition number<DD> 0~(number of partitions - 1)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> 0: Success<DD> Others: failure<DT> <B>function</b><DD> Make partition selection. In the initial state, partition 0 is selected. </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_3"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Execute format</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_Format</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 BUP_Format(Uint32 device)<DT> <B>input</b><DD> device: device number<DD><TABLE BORDER=1>
+<TR><TH><PRE> device number</TH><TH> Storage device</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> Built-in memory</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> Memory cartridge or parallel interface</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 2</TD><TD><PRE> serial interface</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> 0: Success<DD> BUP_WRITE_PROTECT: With write protection<DD> Others: failure<DT> <B>function</b><DD> Initialize the backup storage device.<DD> For partitioned backup storage devices, format only the current partition. </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_4"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Get status</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_Stat</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 BUP_Stat(Uint32 device,Uint32 datasize,BupStat *stat)<DT> <B>input</b><DD> device: device number<DD><TABLE BORDER=1>
+<TR><TH><PRE> device number</TH><TH> Storage device</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> Built-in memory</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> Memory cartridge or parallel interface</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 2</TD><TD><PRE> serial interface</TD></TR>
+</TABLE>
+<DD> datasize: Specify the size of the data you want to write in units.<DT> <B>output</b><DD> stat: status information<DT> <B>function value</b><DD> Return device status<DD> 0: Success<DD> BUP_NON: Not connected<DD> BUP_UNFORMAT: unformatted<DT> <B>function</b><DD> Get status information. </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_5"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> writing data</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_Write</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 5</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 BUP_Write(Uint32 device,BupDir *dir,Uint8 *data,Uint8 owsw)<DT> <B>input</b><DD> device: device number<DD><TABLE BORDER=1>
+<TR><TH><PRE> device number</TH><TH> Storage device</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> Built-in memory</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> Memory cartridge or parallel interface</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 2</TD><TD><PRE> serial interface</TD></TR>
+</TABLE>
+<DD><PRE>
+dir: File management information (input other than dir.blocksize)
+data: Pointer to write data owsw: Overwrite check mode ON: Do not write if a file with the same name exists.
+OFF: If a file with the same name exists, it will be overwritten.
+</PRE><DT><B>output</b><DD> none<DT> <B>function value</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> function value</TH><TH><PRE> meaning</TH></TR>
+<TR><TD><PRE> 0</TD><TD><PRE> success</TD></TR>
+<TR><TD><PRE> BUP_NON</TD><TD><PRE> disconnected</TD></TR>
+<TR><TD><PRE> BUP_UNFORMAT</TD><TD><PRE> unformatted</TD></TR>
+<TR><TD><PRE> BUP_WRITE_PROTECT</TD><TD><PRE> With write protection</TD></TR>
+<TR><TD><PRE> BUP_FOUND</TD><TD><PRE> A file with the same name exists.</TD></TR>
+<TR><TD><PRE> other</TD><TD><PRE> failure</TD></TR>
+</TABLE>
+<DT> <B>function</b><DD> Write data to backup storage device </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_6"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Loading data</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_Read</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 BUP_Read(Uint32 device, Uint8 *fname,Uint8 *data)<DT> <B>input</b><DD> device: device number<DD><TABLE BORDER=1>
+<TR><TH><PRE> device number</TH><TH> Storage device</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> Built-in memory</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> Memory cartridge or parallel interface</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 2</TD><TD><PRE> serial interface</TD></TR>
+</TABLE>
+<DD> fname: Specify the file name (must be 11 characters in ASCII)<DT> <B>output</b><DD> data: pointer to the buffer to read from<DT> <B>function value</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> function value</TH><TH><PRE> meaning</TH></TR>
+<TR><TD><PRE> 0</TD><TD><PRE> success</TD></TR>
+<TR><TD><PRE> BUP_NON</TD><TD><PRE> disconnected</TD></TR>
+<TR><TD><PRE> BUP_UNFORMAT</TD><TD><PRE> unformatted</TD></TR>
+<TR><TD><PRE> BUP_NOT_FOUND</TD><TD><PRE> file not found</TD></TR>
+<TR><TD><PRE> BUP_BROKEN</TD><TD><PRE> file is corrupted</TD></TR>
+<TR><TD><PRE> other</TD><TD><PRE> failure</TD></TR>
+</TABLE>
+<DT> <B>function</b><DD> Load data from backup storage. </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_7"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Delete data</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_Delete</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 BUP_Delete(Uint32 device, Uint8 *fname)<DT> <B>input</b><DD> device: device number<DD><TABLE BORDER=1>
+<TR><TH><PRE> device number</TH><TH> Storage device</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> Built-in memory</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> Memory cartridge or parallel interface</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 2</TD><TD><PRE> serial interface</TD></TR>
+</TABLE>
+<DD> fname: File name (must be 11 characters in ASCII)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> function value</TH><TH><PRE> meaning</TH></TR>
+<TR><TD><PRE> 0</TD><TD><PRE> success</TD></TR>
+<TR><TD><PRE> BUP_NON</TD><TD><PRE> disconnected</TD></TR>
+<TR><TD><PRE> BUP_UNFORMAT</TD><TD><PRE> unformatted</TD></TR>
+<TR><TD><PRE> BUP_NOT_FOUND</TD><TD><PRE> file not found</TD></TR>
+<TR><TD><PRE> BUP_WRITE_PROTECT</TD><TD><PRE> With write protection</TD></TR>
+<TR><TD><PRE> other</TD><TD><PRE> failure</TD></TR>
+</TABLE>
+<DT> <B>function</b><DD> Delete data on backup storage devices. </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_8"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Get directory information</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_Dir</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 BUP_Dir(Uint32 device, Uint8 *fname,Uint16 dirsize,BupDir *dir)<DT> <B>input</b><DD> device :Device number<DD><TABLE BORDER=1>
+<TR><TH><PRE> device number</TH><TH> Storage device</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> Built-in memory</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> Memory cartridge or parallel interface</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 2</TD><TD><PRE> serial interface</TD></TR>
+</TABLE>
+<DD> fname: Specify the file name (up to 11 characters in ASCII)<DD> dirsize: Specify the number of secured directory information<DT> output<DD> dir: directory information is stored<DT> <B>function value</b><DD> Number of hits for directory information.<DT> <B>function</b><DD> Search for a file name using a prefix match and store directory information in a table.<DD> The number of directory information items found by the search is returned as the function value.<DD> If it is negative, it means that the table size is insufficient, and you can check the number of items by reversing the sign.<DD> (If tbsize is set to 10 and there are 11 results, -11 is returned) </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_9"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Data matching</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_Verify</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 9</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Sint32 BUP_Verify(Uint32 device,Uint8 *filename,Uint8 *data)<DT> <B>input</b><DD> device :Device number<DD><TABLE BORDER=1>
+<TR><TH><PRE> device number</TH><TH> Storage device</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> Built-in memory</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> Memory cartridge or parallel interface</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 2</TD><TD><PRE> serial interface</TD></TR>
+</TABLE>
+<DD> filename: File name (must be 11 characters in ASCII)<DD> data: pointer to collation data<DT> <B>output</b><DD> none<DT> <B>function value</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> function value</TH><TH><PRE> meaning</TH></TR>
+<TR><TD><PRE> 0</TD><TD><PRE> success</TD></TR>
+<TR><TD><PRE> BUP_NON</TD><TD><PRE> disconnected</TD></TR>
+<TR><TD><PRE> BUP_UNFORMAT</TD><TD><PRE> unformatted</TD></TR>
+<TR><TD><PRE> BUP_NO_MATCH</TD><TD><PRE> data doesn't match</TD></TR>
+<TR><TD><PRE> BUP_NOT_FOUND</TD><TD><PRE> file not found</TD></TR>
+<TR><TD><PRE> BUP_BROKEN</TD><TD><PRE> file is corrupted</TD></TR>
+</TABLE>
+<DT> <B>function</b><DD> Verify the data written to the backup file. </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_10"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Expanding date-time data</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_GetDate</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 10</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void BUP_GetDate(Uint32 pdate,BupDate *date)<DT> <B>input</b><DD> update: Date and time data for directory information<DD> date : date time table<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Expand date and time data in the directory information table. </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2_11"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p02_10.htm#no2_11">one</a><BR> <A HREF="p02_10.htm#no2_11">View</a><BR> <A HREF="p02_10.htm#no2_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Func<BR><H4> Compressing date-time data</H4></TD><TD WIDTH=180><PRE> Function<BR><H3> BUP_SetDate</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 11</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> Uint32 BUP_SetDate(BupDate *date)<DT> <B>input</b><DD> date: date time<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Date/time data format data in directory information table<DT> <B>function</b><DD> Compress date and time data in the directory information table.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Backup Library User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

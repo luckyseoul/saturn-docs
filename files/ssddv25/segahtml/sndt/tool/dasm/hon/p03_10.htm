@@ -1,0 +1,135 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 7&gt;SCSP/DSP Assembler User's Manual/3. Source code structure</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">SCSP/DSP Assembler User's Manual</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP/DSP Assembler User's Manual</b><H2 ALIGN=CENTER> 3. Source code structure</H2><HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A><P><DT><H2> ■Source code format</H2><P><DT><H3> ●Configuration and format</H3><DD> The structure and format of the dAsms source code is shown below.</P>
+<HR WIDTH=80% ALIGN=LEFT>
+<DD><PRE>
+#COEF　　　　　　　　　　　　　　←Label indicating start of coefficient symbol definition
+--------------------------
+
+　(coefficient symbol definition formula)
+
+--------------------------
+
+#ADRS　　　　　　　　　　　　　　←Label indicating the start of address symbol definition
+--------------------------
+
+(Address symbol definition formula)
+
+--------------------------
+
+#PROG　　　　　　　　　　　　　　←Label indicating the start of program description
+--------------------------
+
+(Address symbol definition formula)
+
+--------------------------
+#END 　　　　　　　　　　　　　　←Label indicating the end of the program description
+</PRE><HR WIDTH=80% ALIGN=LEFT>
+<P><DT><H3> ●Comment (annotation text)</H3><DT><UL TYPE="DISK">
+<P><LI> In the source code, a comment can begin with the symbol '' and end at the end of the line (line feed). dAsms ignores this.</P>
+<P><LI> Comments can be placed anywhere on the source code.</P>
+</UL>
+<A NAME="no3_20"></A><P><DT><H2> ■Coefficient/address symbol definition</H2><A NAME="no3_21"></A><DT><H3> ●Definition format</H3><DD><PRE>
+……………………………………………
+(symbol name)=(initial value)
+……………………………………………
+</PRE></P>
+<P><DD>however,<DL>
+<P><DT> <B>(Symbol name):</b><DD> "Variable name" used as coefficient/address data while writing a DSP program. A string of up to 15 half-width alphanumeric characters.</P>
+<P><DT> <B>(initial value):</b><DD> The default value given to the "variable" represented by the symbol name above. Describe in one of the various notations specified separately.</P>
+</DL>
+<P><DD><TABLE>
+<TR><TH> Note<BR>
+<img srcset="../../../../what/atto.png 5x"></TH><TD> <B>One symbol can be defined per line of the definition formula, and an initial value must be given to each symbol.</b></TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_22"></A><P><DT><H3> ●Number of symbols that can be defined by the user</H3><DD><TABLE>
+<TR><TD> coefficient symbol</TD><TD> :63 pieces</TD></TR>
+<TR><TD> address symbol</TD><TD> :32 pieces</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_23"></A><P><DT><H3> ●About reserved symbols</H3><DD> Since the coefficient symbol "ZERO" has already been defined, the user must not define a new symbol name with the same name. The initial value given to this symbol is "0", and its data is placed at the beginning of the coefficient data part of the executable program. Therefore, user-defined coefficient symbols are placed in the order of their definition in the coefficient data part.</P>
+<P><DD><TABLE>
+<TR><TH> Note<BR>
+<img srcset="../../../../what/atto.png 5x"></TH><TD> This reserved symbol "ZERO" can be used in the program part of the source code created by the user without defining it in the coefficient definition part, but its value (on the executable program or on the DSP hardware loaded with it) (above, etc.) must not be modified in any way.</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_24"></A><P><DT><H3> ●Notation mode in the coefficient/address definition part of the source code</H3><DD> The following notation modes can be used in the coefficient/address definition part.</P>
+<P><DD><TABLE BORDER>
+<TR><TH><PRE> definition part</TH><TH><PRE> Notation mode</TH><TH><PRE> identifier</TH><TH><PRE> example</TH><TH><PRE> Conversion method</TH><TH><PRE> Example conversion result</TH></TR>
+<TR ALIGN=CENTER><TD rowspan=4><PRE> #COFF</TD><TD><PRE> Hexadecimal notation</TD><TD><PRE> [&H]</TD><TD><PRE> &HOFFF</TD><TD><PRE> No conversion</TD><TD><PRE> &HFFF</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Decimal notation</TD><TD><PRE> none</TD><TD><PRE> one two three</TD><TD><PRE> Decimal → Hexadecimal</TD><TD><PRE> &H007B</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> %Notation</TD><TD><PRE> [%]</TD><TD><PRE> %50</TD><TH><PRE> (1)</TH><TD><PRE> &H0800</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Decimal notation</TD><TD><PRE> [.]</TD><TD><PRE> 0.25</TD><TH><PRE> (2)</TH><TD><PRE> &H0400</TD></TR>
+<TR ALIGN=CENTER><TD rowspan=3><PRE> #ADRS</TD><TD><PRE> Hexadecimal notation</TD><TD><PRE> [&H]</TD><TD><PRE> &H8000</TD><TD><PRE> No conversion</TD><TD><PRE> &H8000</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Decimal notation</TD><TD><PRE> none</TD><TD><PRE> one two three</TD><TD><PRE> Decimal → Hexadecimal</TD><TD><PRE> &H007B</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> millisecond notation</TD><TD><PRE> [ms]</TD><TD><PRE> ms300.0</TD><TH><PRE> (3)</TH><TD><PRE> &H33AE</TD></TR>
+</TABLE>
+</P>
+<P><DD> The " <B>Conversion Method</b> " item shows how to convert " <B>values in each notation mode → actual data</b> ".<BR>
+ Conversion methods <B>(1)</b> , <B>(2)</b> , and <B>(3)</b> are as follows.</P>
+<P><DD> <B>(1)</b> (Coefficient value) = 4095 × (written value) / 100<DD> <B>(2)</b> (Coefficient value) = 4096 × (written value)<DD> <B>(3)</b> (Address constant value) = 44100 × (written value) / 100</P>
+<P><DD> <B>*</b> Please note the difference between constants ( <B>4095</b> and <B>4096</b> ) in (1) and (2).<P><DD> <B>*</b> For all (1), (2), and (3), calculations are performed using floating point numbers, and the results are ultimately rounded toward zero.</P>
+<P><DD> <B>*</b> The format of the actual data after conversion (on EXC file) is as follows.</P>
+<P><DD><TABLE BORDER>
+<TR><TH><PRE> definition part</TH><TH><PRE> Actual data format</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> #COEF</TD><TD><PRE> Hexadecimal number in 13bit 2's complement format</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> #ADRS</TD><TD><PRE> Hexadecimal number in 16bit linear format</TD></TR>
+</TABLE>
+</P>
+<P><DT><H3> ●Value range and format that can be used as coefficient/address symbol initial value</H3><DD><TABLE BORDER>
+<TR><TH><PRE> definition part</TH><TH><PRE> Notation mode</TH><TH><PRE> range</TH><TH><PRE> Format</TH></TR>
+<TR><TD rowspan=4><PRE> #COEF</TD><TD><PRE> Hexadecimal notation</TD><TD><PRE> 1000～0FFF[hex]</TD><TD><PRE> Hexadecimal signed integer (13 bits wide)</TD></TR>
+<TR><TD><PRE> Decimal notation</TD><TD><PRE> −4096 to +4095 [dec]</TD><TD><PRE> decimal signed integer</TD></TR>
+<TR><TD><PRE> %Notation</TD><TD><PRE> -100 to +100 [%]</TD><TD><PRE> decimal signed integer</TD></TR>
+<TR><TD><PRE> Decimal notation</TD><TD><PRE> −1.0 to +0.99975 [dec]</TD><TD><PRE> Decimal signed decimal number (integer part 1 digit, decimal part up to 5 digits)</TD></TR>
+<TR><TD rowspan=3><PRE> #ADRS</TD><TD><PRE> Hexadecimal notation</TD><TD><PRE> 0~FFFF[hex]</TD><TD><PRE> Hexadecimal unsigned integer (16 bit width)</TD></TR>
+<TR><TD><PRE> Decimal notation</TD><TD><PRE> 0 to 65535 [deci]</TD><TD><PRE> decimal unsigned integer</TD></TR>
+<TR><TD><PRE> millisecond notation</TD><TD><PRE> 0.0 to 1486.0 [ms]</TD><TD><PRE> Decimal unsigned decimal number (up to 4 digits for integer part and 1 digit for decimal part)</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>Example:</b> The following expression can be used in the coefficient/address definition part of the source code.<P><DL>
+<DD><PRE>
+#COEF
+CoefA = &H0FFF
+CoefB = 123
+CoefC = %50
+CoefD = 0.25
+
+#ADRS
+AdrsA = &H8000
+AdrsB = 123
+AdrsC = ms300.0
+</PRE></DL>
+</P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">SCSP/DSP Assembler User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,195 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/22&gt;CDビルダスクリプト文法/2.スクリプト概要</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CDビルダスクリプト文法</A>
+<HR>
+<B>▲
+<A HREF="p01_10.htm">戻る</A>｜
+<A HREF="p02_11.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CDビルダスクリプト文法マニュアル</B>
+<H2 ALIGN=CENTER>２．スクリプト概要</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A>
+	<P><DT><H3>2.1　ディスク構造とスクリプト</H3>
+	<DD>　CD-ROMはディスク、セッション、トラックからなる物理構造をしています。さらにトラックはセクタ構造の違いから２種類（MODE1/MODE2）のデータトラックとCDDAトラックに分けられます。<BR>
+　セガサターンディスク規格では、互換性のため、第１トラックはMODE1トラックと規定しています。ボリューム記述子、ディレクトリレコードなどの論理構造は、この第１トラックに記録されます（ボリューム記述子トラック）。<BR>
+　インタリーブファイルは第２トラック以降のMODE2トラックに記録されます。</P>
+
+	<P><DD>　ディスク構造とスクリプトの対応を図2.1に示します。</P>
+
+	<P ALIGN=CENTER><B>図2.1　ディスク構造とスクリプトの対応</B></P>
+<PRE><H5>
+　　物理構造　　　　　　　論理構造　　　　　　　　　　スクリプト
+
+─┬─┬─────┐──　　　　　　　　　　　　　　Disc
+　│　│　　　　　│　┌──────────┐　　　  Session
+　│　│　　　　　│　│ボリューム記述子　　│　　　   Track MODE1
+　│　│　　　　　│　└──────────┘　　　     Volume
+　│　│　　　　　│　┌──────────┐　　　     Directory
+　│　│ＭＯＤＥ１│　│ディレクトリレコード│　　　       Directory
+　│　│トラック　│　└──────────┘　　　          ・
+　│　│　　　　　│　　　　　　　　　　　　　　　　          ・
+　│　│　　　　　│　┌──────────┐　　　         File
+　│セ│　　　　　│　│ファイル　　　　　　├┐　　         File
+　│　│　　　　　│　└┬─────────┘│　　          ・
+　│ッ│　　　　　│　　└──────────┘　　          ・
+　│　├─────┤──　　　　　　　　　　　　　　  Track  MODE2
+　│シ│ＭＯＤＥ２│　┌──────────┐　　　    Extent
+デ│　│トラック　│　│インタリーブファイル├┐　　      FileInterleave
+　│ョ│　　　　　│　└┬─────────┘│　　          ・
+ィ│　├─────┤┐　└──────────┘　　          ・
+　│ン│　　・　　││┌──────────┐　　　    MpegMultiplex
+ス│　│　　・　　│││ＭＰＥＧストリーム　├┐　　      MpegStream
+　│　│　　・　　││└┬─────────┘│　　          ・
+ク│　│　　・　　│└　└──────────┘　　          ・
+　│　│　　・　　│
+　│　├─────┤　　　　　　　　　　　　　　　　  Track　CDDA
+　│　│ＣＤＤＡ　│
+　│　│トラック　│
+　│　├─────┤　　　　　　　　　　　　　　　　  Track　CDDA
+　│　│ＣＤＤＡ　│　　　　　　　　　　　　　　　　    ・
+　│　│トラック　│　　　　　　　　　　　　　　　　    ・
+　├─┼─────┤　　　　　　　　　　　　　　　　    ・
+　　セ　　　・　　　　　　　　　　　　　　　　　　　    ・
+　│ッ│　　・　　│
+　　シ　　　・　　　
+　│ョ│　　・　　│
+　　ン　　　・　　　
+─┴　┴　─　─　┘
+</PRE>
+	<P><DD><B>※</B>現在マルチセッションには対応していません。</P>
+
+<A NAME="no2_20"></A>
+	<P><DT><H3>2.2　スクリプト記述例</H3>
+	<DD>　以下にスクリプトの記述例を示します。</P>
+
+	<P><DT><B>　（１）MODE1トラック＋CDDAトラック</B>
+	<DD><HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+  Disc SAMPLE1.DSK
+  Session CDROM   
+  LeadIn MODE1
+  EndLeadIn   
+  ;               
+  SystemArea IP.BIN                           
+  ;                                               
+      Track MODE1                                 ; 第１トラック
+          Volume ISO9660 SAMPLE1.PVD              ; ボリュームの定義（注）
+              PrimaryVolume    0:2:16             
+                  SystemIdentifier    "SAMPLE1"   
+              EndPrimaryVolume                    
+          EndVolume                               ; ファイルの定義
+          File FILE1.DAT;1                        
+              FileSource FILE1.DAT                ; ファイルソースの定義
+              EndFileSource
+          EndFile
+  ;         :
+  ;         :
+  ;         :
+          PostGap 75
+      EndTrack
+  ;
+      Track CDDA                                  ; 第２トラック
+          Pause 150                               ; ポーズ２秒
+          FileSource SOUND.DAT                    
+          EndFileSource                           
+      EndTrack                                    
+  ;                                               
+  LeadOut CDDA                                
+      Empty 300                               
+  EndLeadOut                                  
+  EndSession                                      
+  EndDisc                                         
+</PRE>
+	<DD><HR WIDTH=60% ALIGN=LEFT>
+
+	<P><DT><B>　注）</B>
+	<DD>　セガサターンディスクのボリューム記述子については、「
+<A HREF="../../../sofg/disc/index.htm">DISCフォーマット規格仕様書</A>」の
+<A HREF="../../../sofg/disc/hon/p05_20.htm">付録Ｂ</A>を参照してください。</P>
+
+	<P><DT><B>　（２）MODE1トラック＋MODE2トラック＋CDDAトラック</B>
+	<DD><HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+  Disc SAMPLE2.DSK
+  Session SEMIXA
+  LeadIn MODE1
+  EndLeadIn
+  ;
+  SystemArea IP.BIN
+  ;
+      Track MODE1                             ; 第１トラック
+          Volume ISO9660 SAMPLE2.PVD            
+              PrimaryVolume    0:2:16           
+                  SystemIdentifier    "SAMPLE2" 
+              EndPrimaryVolume                  
+          EndVolume                             
+          File FILE1.DAT;1                      
+              FileSource FILE1.DAT              
+              EndFileSource                     
+          EndFile                               
+  ;         :                                   
+  ;         :                                   
+          PostGap 75                            
+      EndTrack                                  
+  ;                                             
+      Track MODE2                             ; 第２トラック
+          PreGap 150
+          Extent                              ; ３ファイルをインタリーブ
+              FileInterleave 1 2              ; セクタ１個を配置して２個ギャップ
+                  File INTFILE1.DAT;1             
+                      FileSource INTFILE1.DAT     
+                      EndFileSource               
+                  EndFile                         
+              EndFileInterleave                   
+              FileInterleave 1 2              ; セクタ１個を配置して２個ギャップ
+                  File INTFILE2.DAT;1             
+                      FileSource INTFILE2.DAT     
+                      EndFileSource               
+                  EndFile                         
+              EndFileInterleave                   
+              FileInterleave 1 2              ; セクタ１個を配置して２個ギャップ
+                  File INTFILE3.DAT;1             
+                      FileSource INTFILE3.DAT     
+                      EndFileSource               
+                  EndFile                         
+              EndFileInterleave                   
+          EndExtent                               
+          PostGap 75
+      EndTrack                                    
+  ;                                               
+      Track CDDA                              ; 第３トラック
+          Pause 150                               
+          FileSource SOUND.DAT                    
+          EndFileSource                           
+      EndTrack                                    
+  ;                                               
+  LeadOut CDDA                                    
+      Empty 300                                   
+  EndLeadOut                                      
+  EndSession                                      
+  EndDisc
+</PRE>
+	<DD><HR WIDTH=60% ALIGN=LEFT>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p01_10.htm">戻る</A>｜
+<A HREF="p02_11.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CDビルダスクリプト文法</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

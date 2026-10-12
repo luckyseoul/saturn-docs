@@ -1,0 +1,203 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/ 8&gt;CD通信I/F(MPEGパート)/6.その他のMPEG機能</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<B>▲
+<A HREF="p05_10.htm">戻る</A>｜
+<A HREF="p07_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信I/F(MPEGパート)</B>
+<H2 ALIGN=CENTER>６．その他のMPEG機能</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no6_10"></A>
+	<P><DT><H3>6.1　MPEG表示画面<BR>（フレームバッファウィンドウとディスプレイウィンドウ）</H3>
+	<DD>　MPEGシステムでの画面表示は、フレームバッファウィンドウ内のデータをディスプレイウィンドウに出力することによって行う。各ウィンドウの関係を図6.1に示す。</P>
+
+<A NAME="z6_1"></A>
+	<P ALIGN=CENTER><B>図6.1　フレームバッファウィンドウとディスプレイウィンドウ</B><BR><IMG SRC="../grp/i026_01.gif"></P>
+
+	<P><DT><B>　（１）フレームバッファウィンドウ</B>
+	<DD>　フレームバッファ内の表示データ矩形領域をフレームバッファウィンドウと呼ぶ。<BR>
+　フレームバッファウィンドウに対しては、以下の値を設定することができる。</P>
+	<DD><OL TYPE=a>
+	<P><B><LI>位　置（fpx, fpy）：</B><BR>フレームバッファウィンドウの左上座標（<A HREF="p08_10.htm#22.2">CDC_MpSetWinFpos</A>）</P>
+	<P><B><LI>拡大率（frx, fry）：</B><BR>フレームバッファウィンドウの拡大率　（<A HREF="p08_10.htm#22.3">CDC_MpSetWinFrat</A>）</P>
+	</OL>
+
+	<P><DD>　ただし、実際のフレームバッファウィンドウサイズの計算式は、ディスプレイウィンドウサイズと拡大率の単純な掛け算ではない。</P>
+
+	<P><DT><B>　（２）ディスプレイウィンドウ</B>
+	<DD>　ＴＶモニタ上に実際に表示される矩形領域をディスプレイウィンドウと呼ぶ。<BR>
+　ディスプレイウィンドウに対しては、以下の値を設定することができる。</P>
+	<DD><OL TYPE=a>
+	<P><B><LI>位　置　　（dpx, dpy）：</B><BR>ディスプレイウィンドウの左上座標（<A HREF="p08_10.htm#22.4">CDC_MpSetWinDpos</A>）</P>
+	<P><B><LI>サイズ　　（dsx, dsy）：</B><BR>ディスプレイウィンドウのサイズ　（<A HREF="p08_10.htm#22.5">CDC_MpSetWinDsiz</A>）</P>
+	<P><B><LI>オフセット（dox, doy）：</B><BR>ＴＶモニタ上の表示領域の位置　　（<A HREF="p08_10.htm#22.6">CDC_MpSetWinDofs</A>）</P>
+	</OL>
+
+	<P><DD><B>《備考》</B>
+	<DD>　ここで設定したウィンドウサイズや座標の値は、VDP2に対する設定値とは無関係です。</P>
+
+<A NAME="no6_20"></A>
+	<P><DT><H3>6.2　MPEGフレームバッファ</H3>
+
+<A NAME="no6_621"></A>
+	<P><DT><B>6.2.1　イメージデータの取り出し</B>
+	<DD>　MPEGフレームバッファ内に生成されたイメージデータは、MPEGレジスタを通してホストに取り出すことができる。<BR>
+　取り出されるイメージデータは、フレームバッファウィンドウのデータそのものではなく、ディスプレイウィンドウ画像と同じデータです。</P>
+
+<A NAME="z6_2"></A>
+	<P ALIGN=CENTER><B>図6.2　イメージデータの取り出し</B><BR><IMG SRC="../grp/i027_01.gif"></P>
+
+	<P><DT><B>　（１）イメージデータの形式</B>
+	<DD>　イメージデータは、15ビットRGB555形式の32K色データに減色される。</P>
+
+	<P><DT><B>　（２）イメージデータの取り出し（CDC_MpGetImg）</B>
+	<DD>　画像の出力準備が完了したらコマンドを発行する。コマンド発行後、ホストはMPEGレジスタからデータを転送して取り出す。<BR>
+　画像データの出力先はホスト出力に設定しておく必要がある。（VDP2出力では無効）<BR>
+　本機能は動画再生モード・静止画再生モードのどちらでも有効です。</P>
+
+<A NAME="no6_622"></A>
+	<P><DT><B>6.2.2　イメージデータの読み込み・書き出し<BR>（イメージデータウィンドウ）</B>
+	<DD>　MPEGフレームバッファは通常解像度で４面、高精細解像度で１面のフレームバンクから構成される。<BR>
+　静止画再生モードでは、フレームバンクに定義されたイメージデータウィンドウとバッファ区画の間で、イメージデータの読み込み・書き出しが可能です。</P>
+
+<A NAME="z6_3"></A>
+	<P ALIGN=CENTER><B>図6.3　イメージデータの読み込み・書き出し</B><BR><IMG SRC="../grp/i028_01.gif"></P>
+
+	<P><DT><B>　（１）イメージデータウィンドウ</B>
+	<DD>　イメージデータウィンドウは、フレームバンク０〜３のうち任意のフレームバンクに対して設定できる。（高精細解像度の時はフレームバンク０固定）<BR>
+　イメージデータウィンドウに対しては、以下の値を設定することができる。</P>
+
+	<DD><OL TYPE=a>
+	<P><B><LI>位　置（ipx, ipy）：</B><BR>イメージデータウィンドウの左上座標（CDC_MpSetImgPos）</P>
+	<P><B><LI>サイズ（isx, isy）：</B><BR>イメージデータウィンドウのサイズ　（CDC_MpSetImgSiz）</P>
+	</OL>
+
+<A NAME="z6_4"></A>
+	<P ALIGN=CENTER><B>図6.4　イメージデータウィンドウ</B><BR><IMG SRC="../grp/i028_02.gif"></P>
+
+	<P><DT><B>　（２）イメージデータの形式</B>
+	<DD>　イメージデータは、YCC4:2:0形式の輝度・色差データ（以下の３要素）に分解される。</P>
+	<DD><UL TYPE=DISC>
+	<LI>輝度データ（Y）：データ数は (isx×isy) バイト
+	<LI>色差データ（Cr）：データ数は (isx×isy)/4 バイト
+	<LI>色差データ（Cb）：データ数は (isx×isy)/4 バイト</UL></P>
+
+	<P><DD>　読み込み・書き出しをするには、それぞれの要素に対してセレクタ（絞りとバッファ区画）を割り当てる必要がある。</P>
+
+	<P><DT><B>　（３）イメージデータの読み込み（CDC_MpReadImg）</B>
+	<DD>　読み込み先の絞り番号を指定して、イメージデータウィンドウからバッファ区画にイメージデータを読み込む。<BR>
+　イメージデータは、バッファ区画ではモード２フォーム１形式のセクタとして扱われ、ユーザデータ領域（2048バイト）に格納される。先頭の24バイトは０で埋められ、ユーザデータ以後の領域は不定です。</P>
+
+<A NAME="z6_5"></A>
+	<P ALIGN=CENTER><B>図6.5　イメージデータウィンドウからの読み込み</B><BR><IMG SRC="../grp/i029_01.gif"></P>
+
+
+	<P><DT><B>　（４）イメージデータの書き出し（CDC_MpWriteImg）</B>
+	<DD>　書き出し元のバッファ区画番号を指定して、バッファ区画からイメージデータウィンドウにイメージデータを書き出す。</P>
+
+<A NAME="z6_6"></A>
+	<P ALIGN=CENTER><B>図6.6　イメージデータウィンドウへの書き出し</B><BR><IMG SRC="../grp/i030_01.gif"></P>
+
+	<P><DT><B>　（５）セレクタの設定</B>
+	<DD>　イメージデータの読み込み・書き出し時に必要なセレクタの設定は、ホスト側でＣＤ通信インタフェースを使って行うこと。（バッファ区画のクリアや、絞りとバッファ区画の接続など）ＣＤブロック側ではセレクタの設定は行わない。</P>
+
+<A NAME="no6_30"></A>
+	<P><DT><H3>6.3　MPEGセクタバッファ</H3>
+　MPEGセクタバッファモードでは、MPEGバッファはMPEGセクタバッファとして使用される。この機能により、MPEGデコーダを使用しない時は、MPEGカートリッジ内のメモリをデータの保管領域として自由に使用することができる。<BR>
+　MPEGセクタバッファに対するアクセスは、ＣＤバッファとの間でセクタデータ（2048バイト）を読み書きすることで行う。<BR>
+　MPEGセクタの数は全部で256セクタです。（NTSC/PALによらない。）</P>
+
+	<P><DT><B>　（１）セクタデータの読み込み（CDC_MpReadSct）</B>
+	<DD>　読み込み先の絞り番号を指定して、MPEGセクタバッファの任意のMPEGセクタ位置からバッファ区画にセクタデータを読み込む。<BR>
+　MPEGセクタデータは、バッファ区画ではモード２フォーム１形式のセクタとして扱われ、ユーザデータ領域（2048バイト）に格納される。先頭の24バイトは０で埋められ、ユーザデータ以後の領域は不定です。</P>
+
+<A NAME="z6_7"></A>
+	<P ALIGN=CENTER><B>図6.7　MPEGセクタバッファからの読み込み</B><BR><IMG SRC="../grp/i031_01.gif"></P>
+
+	<P><DT><B>　（２）セクタデータの書き出し（CDC_MpWriteSct）</B>
+	<DD>　書き出し元のバッファ区画番号を指定して、バッファ区画からMPEGセクタバッファの任意のMPEGセクタ位置にセクタデータを書き出す。</P>
+
+<A NAME="z6_8"></A>
+	<P ALIGN=CENTER><B>図6.8　MPEGセクタバッファへの書き出し</B><BR><IMG SRC="../grp/i031_02.gif"></P>
+
+<A NAME="no6_40"></A>
+	<P><DT><H3>6.4　MPEGコマンドに対するREJECTとWAIT</H3>
+
+	<P><DT><B>　（１）動作モードによるREJECT</B>
+	<DD>　MPEG動作モード、画像データの出力先によってMPEGコマンドがREJECTになる条件を表6.1に示す。</P>
+
+	<DD><B>表6.1　MPEGコマンドがREJECTになる条件</B>
+	<DD><TABLE BORDER=1>
+<TR><TH>関数名</TH><TH>MPEG動作モード</TH><TH>画像データの出力先</TH></TR>
+<TR><TD><A HREF="p08_10.htm#23.1">CDC_MpGetImg</A></TD><TD>-</TD><TD>VDP2出力</TD></TR>
+<TR><TD><A HREF="p08_10.htm#23.4">CDC_MpReadImg</A>,<A HREF="p08_10.htm#23.5">CDC_MpWriteImg</TD><TD>静止画再生モード以外</TD><TD>-</TD></TR>
+<TR><TD><A HREF="p08_10.htm#24.1">CDC_MpReadSct</A>,<A HREF="p08_10.htm#24.2">CDC_MpWriteSct</A></TD><TD>MPEGセクタバッファモード以外</TD><TD>-</TD></TR>
+</TABLE>
+
+	<P><DT><B>　（２）LONG WAITとSHORT WAIT</B>
+	<DD>　MPEGコマンドに対するWAITには、LONG WAITとSHORT WAITがある。<BR>
+　LONG WAITは、現在のMPEG動作モードやMPEGステータスでは実行できないコマンドを発行したときに発生する。ホストは、これらの状態が変化してからリトライ（再実行）してください。<BR>
+　SHORT WAITは、ＣＤブロックの内部状態が変化しているときに特定のコマンドを発行すると発生する。ホストは、50μsec以上の間隔をあけて数回リトライしてください。</P>
+
+<A NAME="t6_2"></A>
+	<P><DD><B>表6.2　LONG WAITが発生する要因</B>
+	<DL>
+	<P><DT><B><A HREF="p08_10.htm#20.8">CDC_MpSetDec</A></B>
+	<DD>ビデオの動作状態が復活処理の時にポーズ、フリーズを設定した。</P>
+
+	<P><DT><B><A HREF="p08_10.htm#20.9">CDC_MpOutDsync</A></B>
+	<DD>デコードタイミングがVSYNC同期になっている。</P>
+
+	<P><DT><B><A HREF="p08_10.htm#21.1">CDC_MpSetCon</A></B>
+	<DD>既に接続先バッファ区画を設定しているのに重ねて設定した。<BR>
+ビデオ又はオーディオの動作状態が再生、切り替え、復活処理の時に、現在の接続先を取り消した。<BR>
+ビデオ又はオーディオの動作状態が切り替えの時に、次の接続先を取り消した。</P>
+
+	<P><DT><B><A HREF="p08_10.htm#21.3">CDC_MpChgCon</A></B>
+	<DD>次の接続先バッファ区画が登録されていない時に切り替えを実行した。動作状態が再生でない。</P>
+
+	<P><DT><B><A HREF="p08_10.htm#21.4">CDC_MpSetStm</A></B>
+	<DD>ビデオ又はオーディオの動作状態が切り替え状態です。</P>
+
+	<P><DT><B><A HREF="p08_10.htm#23.1">CDC_MpGetImg</A></B>
+	<DD>MPEG/Videoステータスの出力準備完了フラグが０です。</P>
+	</DL>
+
+	<P><DD><B>表6.3　SHORT WAITが発生しうる関数</B>
+	<DD><UL TYPE=DISC>
+	<LI><A HREF="p08_10.htm#20.6">CDC_MpSetMode</A>
+	<LI><A HREF="p08_10.htm#20.7">CDC_MpPlay</A>
+	<LI><A HREF="p08_10.htm#20.8">CDC_MpSetDec</A>
+	<LI><A HREF="p08_10.htm#20.9">CDC_MpOutDsync</A>
+	<LI><A HREF="p08_10.htm#20.10">CDC_MpGetTc</A>
+	<LI><A HREF="p08_10.htm#21.1">CDC_MpSetCon</A>
+	<LI><A HREF="p08_10.htm#21.3">CDC_MpChgCon</A>
+	<LI><A HREF="p08_10.htm#21.4">CDC_MpSetStm</A>
+	<LI><A HREF="p08_10.htm#21.6">CDC_MpGetPictSiz</A>
+	<LI><A HREF="p08_10.htm#22.1">CDC_MpDisp</A>
+	<LI><A HREF="p08_10.htm#22.8">CDC_MpSetFade</A>
+	<LI><A HREF="p08_10.htm#22.9">CDC_MpSetVeff</A></UL></P>
+
+	<P><DD>　WAITが発生した場合、まずLONG WAITの要因を取り除き、それでもWAITが解消しない場合はSHORT WAITに対するリトライを行うこと。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p05_10.htm">戻る</A>｜
+<A HREF="p07_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

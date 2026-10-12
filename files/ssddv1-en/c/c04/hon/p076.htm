@@ -1,0 +1,30 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p075.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p077.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H3> 5.3.4 Notes on selectors </H3>
+<DT> <H4> (1) Error in stream processing </H4>
+<DD> Generally, errors occur in stream processing when the following operations are performed. (However, an error does not occur for CD-ROM devices.) <BR>
+<UL TYPE = "DISK"> <LI> If the connection is disconnected by another device while the device is operating <BR>
+<LI> When the CD buffer becomes full when reading / writing to the buffer partition </UL> <P>
+<DT> <H4> (2) Selector setting valid timing </H4>
+<DD> The selector setting becomes valid when the selector setting command is issued and the ESEL flag in the interrupt factor register is set to 1. <BR>
+∙ When the selector setting command is issued during CD playback, the FAD that becomes valid is within +1 frame (FAD to FAD + 1) relative to the FAD returned in the CD report. The host should consider the margin and issue the setting command at least 10 sectors before the target FAD. <P>
+<DT> <H4> (3) Sector data at connection switching </H4>
+<DD> Data is not lost even if the connection is switched to another selector when sector data is flowing, such as during CD reading. In other words, the data flow is guaranteed when the connection is temporarily disconnected. <BR>
+If the data is completely disconnected, the leaked data will be deleted. <P>
+<DT> <H4> (4) General access to buffer section (general command to specify sector position and sector range) </H4>
+<DD> If an invalid specification is made, such as a position or range that exceeds the number of data in the partition, the command returns WAIT. <BR>
+WAIT will always be returned in the following cases. <BR>
+<UL TYPE = "DISK"> <LI> If the number of sectors in the partition is 0 <BR>
+<LI> If the number of specified sectors is 0 </UL>
+* Before accessing the partition, be sure to execute the acquisition of the number of sectors in the buffer partition (CDC_GetSctNum) and confirm that the number of sectors is not 0. <P>
+<DT> <H4> (5) Erasing release from buffer section </H4>
+<DD> In the process of erasing a sector from a partition and releasing it, all data in the sector range specified first will be erased even if the process is canceled due to an error or the like. (Sector data retrieval, deletion, movement, etc.) <P>
+</DL><P><P><HR>
+<A HREF=p075.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p077.htm> Go to next page </A>
+</BODY>
+</HTML>

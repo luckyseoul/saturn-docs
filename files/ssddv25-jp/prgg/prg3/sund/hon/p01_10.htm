@@ -1,0 +1,134 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 5&gt;サウンドI/Fライブラリ</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#">サウンドI/Fライブラリ</A>
+<HR>
+<B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>サウンドI/Fライブラリ</B>
+<H2 ALIGN=CENTER>1．ガイド</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A>
+	<P><DT><H3>1.1　目的</H3>
+	<DD>　サウンドシステムとメイン(CDシステムを含む)システムとのインタフェースを実現し、サウンドをコントロールすることです。</P>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>1.2　概要</H3>
+	<DD>　サウンドシステムでは、シーケンス、PCM、CDのサウンドをコントロールできます。<BR>　サウンドをコントロールするには、まずサウンドシステムを起動する必要があります。次にシーケンスとPCMについては演奏の準備としてサウンドデータをサウンドメモリに転送する必要があります。またサウンドのコントロールの結果はステータスの取得で取得します。詳細を以下の順で説明していきます。<BR>　サウンド開発マニュアルのサウンドドライバシステムインタフェースもご覧ください。</P>
+
+	<DD><UL TYPE="DISK">
+	<LI>サウンドシステムの起動
+	<LI>演奏の準備
+	<LI>サウンドのコントロール
+	<LI>ステータスの取得
+	</UL>
+
+<A NAME="no1_30"></A>
+	<P><DT><H3>1.3　サウンドシステムの起動</H3>
+	<DD>　サウンドシステムの起動は電源投入時に行う必要があります。以下にコーリングシーケンスを示します。</P>
+	<DD><PRE>
+void sndStart()
+{
+     SndIniDt sys_ini;        /* システム起動用データ格納領域    　　　　　　*/
+
+     SND_INI_PRG_ADR(sys_ini) = (Uint16 *)0x22002400;
+                              /* 68Kプログラム格納先頭アドレス設定 　　　　　*/
+     SND_INI_PRG_SZ(sys_ini) = (Uint16 *)0x4fc8;
+                              /* 68Kプログラムサイズ設定 　　　　　　　　　　*/
+     SND_INI_ARA_ADR(sys_ini) = (Uint16 *)0x22004400;     
+                              /* サウンドエリアマップ格納先頭アドレス設定　　*/
+     SND_INI_ARA_SZ(sys_ini) = 0x0550;
+                              /* サウンドエリアマップサイズ(ワード指定)設定　*/
+     SND_Init(&amp;sys_ini); 　　　/* サウンドシステム起動    　　　　　　　　　　*/
+     ...
+}
+</PRE><P>
+
+<A NAME="no1_40"></A>
+	<P><DT><H3>1.4　演奏の準備</H3>
+
+	<P><DT><B>　[シーケンス]</B>
+	<DD>　サウンドコントロール関数で実行対象となるシーケンスデータ(曲データ、効果音データ)をサウンドメモリへ転送する必要があります。転送は現在のサウンドエリアマップにあわせて転送してください。サウンドエリアマップについては、サウンド開発マニュアルをご覧ください。コーリングシーケンスは、「<A HREF="#no1_50">サウンドのコントロール</A>」に示してあります。</P>
+
+	<P><DT><B>　[PCM]</B>
+	<DD>　PCMの演奏の準備についてはサウンド開発マニュアルのサウンドドライバシステムインタフェースをご覧ください。</P>
+
+<A NAME="no1_50"></A>
+	<P><DT><H3>1.5　サウンドのコントロール</H3>
+
+	<P><DT><B>　[機能概要]</B>
+	<DD>　サウンドのコントロール関数はサウンドメモリへコマンドを書き込みます。コマンドバッファは8個あります。サウンドのコントロール関数ではコマンドバッファを意識しなくても使えるようにしています。</P>
+	<DD><UL TYPE=DISC>
+	<P><LI><B>シーケンス</B><BR>　シーケンスデータの再生開始、終了、音量設定などを行うことができます。</P>
+
+	<P><LI><B>PCM</B><BR>　PCMデータの再生開始、終了を行うことができます。</P>
+
+	<P><LI><B>CD</B><BR>　CDデータの音量設定、PAN設定、音量解析、エフェクト変更などを行うことができます。</P>
+	</UL>
+
+	<P><DT><B>　[コーリングシーケンス]</B>
+	<DD>　以下のコーリングシーケンスは、シーケンス開始までの処理です。</P>
+
+	<P><DD><PRE>
+void sndCnt()
+{
+     sndStart();                        /* サウンドシステム起動(上記項目参照)　　*/
+     SND_ChgMap(2);                     /* サウンドエリアマップ変更　　　　　　　*/
+     SND_MoveData((Uint16 *)0x22005000, 0xffff, SND_KD_SEQ, 2);
+                                        /* サウンドデータ転送(シーケンス)　　　　*/
+     SND_MoveData((Uint16 *)0x22005500, 0xffff, SND_KD_TONE, 2);
+                                        /* サウンドデータ転送(音色)　　　　　　　*/
+     SND_SetTlVl(15);                   /* 全体音量の設定　　　　　　　　　　　　*/
+     SND_StartSeq(0, 2, 5, 0);          /* シーケンス開始　　　　　　　　　　　　*/
+     ...
+}
+</PRE></P>
+
+<A NAME="no1_60"></A>
+	<P><DT><H3>1.6　ステータスの取得</H3>
+	<P><DT><B>　[機能概要]</B>
+	<DD>　以下にサウンドデータ別に機能概要を示します。</P>
+	<DD><UL TYPE="DISK">
+	<P><LI><B>シーケンス</B><BR>　現在の実行状態(再生中、中断中等)を取得できます。</P>
+
+	<P><LI><B>PCM</B><BR>　現在の実行中のPCMデータアドレスを取得できます。</P>
+
+	<P><LI><B>CD</B><BR>　音量解析結果を取得できます。</P>
+</UL>
+
+	<P><DT><B>　[コーリングシーケンス]</B>
+	<DD>　以下のコーリングシーケンスは、発音管理番号0のシーケンスがSTOPしていたら、発音管理番号0に別のシーケンスを開始する処理です。</P>
+	<DD>
+<PRE>
+void sndHantei()
+{
+     SndSeqStat status;                 /* シーケンスステータス格納領域定義         */
+     ...
+     SND_GetSeqStat(&amp;status, 0);　　　　/* シーケンスステータス取得                 */
+     if(SND_SEQ_STAT_MODE(stauts) == SND_MD_STOP){
+                                        /* 発音管理番号0のシーケンスがstopかどうか？*/
+          SND_StartSeq(0, 2, 6, 0);     /* シーケンス開始                          */
+     }
+}
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#">サウンドI/Fライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

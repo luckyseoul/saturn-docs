@@ -1,0 +1,952 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 1&gt;SGL Reference/補足マニュアル</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN=MIDDLE></A>
+★<a href="../../index_j.htm">SGL User's Manual</A>
+★<a href="index_j.htm">補足マニュアル</A>
+<HR NOSHADE>
+<B>SGL REFERENCE/SGL補足マニュアル</B>
+<HR NOSHADE>
+<A NAME="no1_10"></A>
+<DL>
+	<P><DT><H2>■イベントの登録と実行について</H2>
+	<DD><a href="../func/event_j.htm#slInitEvent"><I>slInitEvent</I></A>() を実行した時には実行リストはクリアされますので、実行したい
+イベントをリストに登録しなければなりません。<BR>
+  イベントの登録には <a href="../func/event_j.htm#slSetEvent"><I>slSetEvent</I></A>() あるいは <a href="../func/event_j.htm#slSetEventNext"><I>slSetEventNext</I></A>() を使用します。</P>
+
+	<DD><PRE>
+    void *eventtbl[] = {
+        init_camera ,
+        init_player1 ,
+        init_player2 ,
+        init_enemyctrl
+    } ;
+
+    void InitGame(){
+        void  **evrdptr ;
+        <a href="../struct/types_j.htm#EVENT"><I>EVENT</I></A>  *evptr ;
+        int        cnt ;
+
+        <a href="../func/event_j.htm#slInitEvent"><I>slInitEvent</I></A>() ;                /* イベント管理用変数の初期化 */
+        evrptr = eventtbl ;
+        for(cnt = sizeof(eventtbl) / sizeof(void *) ; cnt-- &gt; 0 ;){
+            evptr = <a href="../func/event_j.htm#slSetEvent"><I>slSetEvent</I></A>(*evrptr++) ;
+        }
+        <a href="../func/init_j.htm#slSetSprTVMode"><I>slSetSprTVMode</I></A>(<a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A>) ;
+    }
+
+    void Game(){
+        <a href="../func/event_j.htm#slExecuteEvent"><I>slExecuteEvent</I></A>() ;        /* イベントの実行 */
+        <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>() ;                /* ポリゴンデータの出力とビデオ表示同期 */
+    }
+</PRE></P>
+
+	<P><DD>  イベントは <a href="../func/event_j.htm#slExecuteEvent"><I>slExecuteEvent</I></A>() 関数を呼び出すごとに実行されます。<BR>
+  各イベントは基本的に、登録された順に実行されます。<BR>
+  はじめに登録されたイベントは システムの <a href="../mem/system01_j.htm#EventTop"><I>EventTop</I></A> 変数に定義され、これを起点として、イベントのポインタを順次 <a href="../mem/system01_j.htm#EventNow"><I>EventNow</I></A> 変数に定義しながら、各イベントの処理関数を呼び出します。処理関数は以下の形式で定義しておきます。</P>
+
+	<P><DD><PRE>
+  void function(<a href="../struct/types_j.htm#EVENT"><I>EVENT</I></A> *evptr){
+        ...                /* イベント処理 */
+  }
+
+  アセンブリ言語で書く場合には
+
+  _function:
+        ...                ; イベント処理
+                        ; イベントのポインタは r４レジスタにセットされている
+        rts
+        nop
+</PRE></P>
+
+	<P><DD>  ひとつのイベントが終わると、そのイベントの構造体にある next ポインタを
+  EventNow 変数に入れ、同様に処理関数に実行を移します。これらは next ポインタ
+  がNULLとなるまで繰り返されます。</P>
+
+	<P><DD><PRE>
+  <a href="../mem/system01_j.htm#EventTop"><I>EventTop</I></A>: ----+
+                 |
+                 |   +------------------+
+                 +-->| *work = <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>     |
+                     | *before = <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>   |
+                +--  | *next            |
+                |    | *exad()          |
+                |    |  user[]          |
+                |    +------------------+
+                |
+                |    +------------------+       +------------------+
+                +--> | *work            |  ---> | *next            | -+
+                     | *before          |       |                  |  |
+                +--  | *next            |       |                  |  |
+                |    | *exad()          |       +------------------+  |
+                |    |  user[]          |   +-------------------------+
+                |    +------------------+   |
+                |                           |   +------------------+
+                |    +------------------+   +-> | *next = <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>     | 
+  <a href="../mem/system01_j.htm#EventLast"><I>EventLast</I></A>: ---+--> | *work            |       |                  |
+                     | *before          |       |                  |
+                     | *next = <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>     |       +------------------+
+                     | *exad()          |
+                     |  user[]          |
+                     +------------------+
+</PRE></P>
+
+	<P>
+	<DD>  <a href="../mem/system01_j.htm#EventLast"><I>EventLast</I></A> 変数には最後に実行されるイベントのポインタが定義されており、イベントを追加する際に使用されます。<BR>
+  ユーザーがRAMを使用するには、ユーザー用に構造体を定義し、イベントRAMの user[] を その構造体に cast します。</P>
+
+	<P>
+	<DT><B>例)</B>
+	<DD><PRE>
+    typedef struct rob{
+        <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>  posX , posY , posZ ;
+        <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A>  angX , angY , angZ ;
+        <a href="../struct/types_j.htm#PDATA"><I>PDATA</I></A> *pat ;
+    } ROBOT ;                /* この構造体は112バイトを越えない様にすること */
+
+    void rob_control(<a href="../struct/types_j.htm#EVENT"><I>EVENT</I></A> *evptr){
+        ROBOT *rbptr ;
+
+        rbptr = (ROBOT *)evptr-&gt;user ;
+        rbptr-&gt;posX = to_fixed(0) ;
+        rbptr-&gt;posY = to_fixed(0) ;
+        rbptr-&gt;posZ = to_fixed(0) ;
+        rbptr-&gt;pat = &PD_Robot ;
+    }
+</PRE>
+
+	<P><DD>  ワークはポインタのリストによりつなげて持つことができます。<BR>
+  ひとつのイベントで複数のキャラクタを動かす場合にはワークを使用して、RAMを確保します。
+
+	<P><DD><PRE>
+    typedef struct road{
+        struct road *next ;
+        <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>  posX , posY , posZ ;
+        <a href="../struct/types_j.htm#PDATA"><I>PDATA</I></A> *pat ;
+    } ROAD ;
+
+    typedef struct rdat{
+        <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> px , py , pz ;
+        <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> pn ;
+    } ROAD_DAT ;
+
+    ROAD_DAT roadtbl[] = {
+        {   0 ,   0 ,   0 , PN_ROAD} ,
+        {   0 ,   0 , 100 , PN_ROAD} ,
+        {   0 ,   0 , 200 , PN_ROAD}
+    } ;
+
+    void InitRoadControl(<a href="../struct/types_j.htm#EVENT"><I>EVENT</I></A> *evptr){
+        <a href="../struct/types_j.htm#WORK"><I>WORK</I></A>  *wkptr ;
+        ROAD  *rdptr ;
+        ROAD_DAT *rdtptr ;
+        int    cnt ;
+
+        rdptr = (ROAD *)evptr ;
+        rdtptr = roadtbl ;
+        for(cnt = sizeof(roadtbl) / sizeof(ROAD_DAT) ; cnt-- &gt; 0 ;){
+            if((wkptr = <a href="../func/event_j.htm#slGetWork"><I>slGetWork</I></A>()) == <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>){
+                break ;
+            }
+            rdptr-&gt;next = (ROAD *)wkptr ;        /* ひとつめのポインタは */
+                                                /* イベントの work に入る */
+            rdptr = (ROAD *)wkptr ;
+            rdptr-&gt;posX = rdtptr-&gt;px &lt;&lt; 16 ;        /* ポジション */
+            rdptr-&gt;posY = rdtptr-&gt;py &gt;&gt; 16 ;
+            rdptr-&gt;posZ = rdtptr-&gt;pz &gt;&gt; 16 ;
+            rdptr-&gt;pat = pattbl[rdptr-&gt;pn] ;        /* パターンデータ */
+            rdtptr++ ;
+        }
+        rdptr-&gt;next = <a href="../struct/const_j.htm#NULL"><I>NULL</I></A> ;                        /* End mark */
+        evptr-&gt;exad = (void *)RoadControl ;
+    }
+</PRE>
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_20"><HR></A>
+<DL>
+	<P><DT><H2>■クロックチェンジ時の注意について</H2>
+	<P><DD><B>◆クロックチェンジ時に保証されるRAM</B>
+	<UL TYPE=DISC>
+	<LI>WORKRAM-HIGH
+	<LI>VRAM
+	</UL>
+
+	<P><DD><B>◆クロックチェンジ時に保証されないRAM</B>
+	<UL TYPE=DISC>
+	<LI>WORKRAM-LOW
+	<LI>VDPの各レジスタ
+	<LI>SOUND RAM
+	</UL>
+
+	<P><DD>そのため、クロックチェンジ後は保証されないメモリを再初期化する必要があります。<BR>
+特に、クロックチェンジ前に、LOW-RAMやSOUND RAMにデータがあった場合、そのデータの正当性は保証されませんので必ず、データをリロードするなどの処理を行なうようにしてください。<BR>
+SGL 3.10より、<a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>でクロックチェンジが発生した場合、MC68000を起動させ続けるために、ダミーの空ループを登録しますので、クロックチェンジ後サウンドドライバのリロードを必ず行なってください。<BR>
+また、<a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>によって、各ステータスやレジスタは初期状態になりますので、ユーザプログラムでそれぞれのパラメータに関して再初期化をしてください。
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_30"><HR></A>
+<DL>
+	<P><DT><H2>■BSS領域と、システム変数領域の初期化について</H2>
+	<DD>C言語でプログラムを組む場合必ずBSSという領域が確保されます。未初期化の変数をプログラム上で使用する場合、このBSSと呼ばれるメモリ空間の一部をその変数用に割り当てます。<BR>
+普通プログラムで、未初期化の変数を定義する場合、あとで何らかの値を代入するというのが前提の条件になるのですが、極稀に、そのまま使用する場合があります。(通常こういった操作はプログラムミスですが)その場合、
+大体において0を仮定して操作を行なうことが多くなります。もし、この領域に不定な値が書かれていた場合、未初期化変数をそのまま使用した場合の動作が不定になりバグの温床となります。そのため、SGLのサンプルプログラムではsaturn/sample/common/cinit.cというプログラムリンクしその中でBSS領域の0クリアを行なっています。<BR>
+  SGLのサンプルが、ss_mainで始まるのはこの為でmain関数では、こういった
+  初期化を行なっています。<BR>
+  また、SGL内部で使われる「システム変数領域」も同じで、この場合BOOT ROM
+  によっては、この領域と重なる所にスタックが設定されている場合もあり
+  中身が不定になります。SGLの関数<a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>で全て初期化されると
+  お思いの方もおられるとは思いますが、実際にはこの関数で全ての領域を
+  初期化するという訳ではなく、場合によっては、SGLの関数が不定な値を
+  参照する可能性もあります。<BR>
+  この「システム変数領域」の0クリアも上の"cinit.c"で行なっているため、
+  以上の2つの問題においてはこのファイルをリンクする事で解消されます。
+  もし、自分のプログラムにおいて、このファイルをリンクしない場合、
+  これらの初期化を必ず行なうようにしてください。<BR>
+  尚、このcinit.cは、最近までバグを持っており、「システム変数領域」
+  を初期化できていませんでしたので、お使いのcinit.cが
+
+	<P><DD><PRE>
+        /* 3.SGL System Variable Clear */
+        for( dst = (Uint8 *)SystemWork, i = 0;i < SystemSize; i++) {
+                *dst = 0;
+        }
+</PRE>
+
+	<P><DD>となっている場合、以下のように変更して使用ください。
+	<P><DD><PRE>
+        /* 3.SGL System Variable Clear */
+        for( dst = (Uint8 *)SystemWork, i = 0;i < SystemSize; i++) {
+                *dst++ = 0;
+                /*  ^^   */
+        }
+</PRE>
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_40"><HR></A>
+<DL>
+	<P><DT><H2>■ ブランキング割り込みの処理について</H2>
+	<DD>ブランキング開始割り込みではスクロールのデータ転送、<a href="../func/int_j.htm#slTransferEntry"><I>slTransferEntry</I></A>
+   によって作成されたDMA転送テーブルの実行、slIntFunction[a]により
+   登録されたユーザー関数の実行が行われます。この内、スクロールの
+   データ転送は PauseFlag 変数により、禁止することができます。
+
+	<P><DD><a href="../mem/system01_j.htm#PauseFlag"><I>PauseFlag</I></A> は <a href="../struct/types_j.htm#Uint8"><I>Uint8</I></A>型のフラグ変数で、0以外では上記の転送を
+   禁止するように働きます。
+
+	<P><DD>ブランキング終了割り込みでは、スプライトのフレームバッファの
+   イレースライト、フレームチェンジ等のモード切り替え、スプライトデータの
+   DMA転送、ペリフェラルデータの取り込み、割り込み待ちカウンタの減算を
+   行います。このうち、スプライトに関する部分は上記の <a href="../mem/system01_j.htm#PauseFlag"><I>PauseFlag</I></A>により、
+   禁止することができます。
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_50"><HR></A>
+<DL>
+	<P><DT><H2>■ SGLで使用のFRTについて</H2>
+   SGLでは、SMPCへのコマンド発行のために、FRT(フリーランニングタイマ)を
+   使用しています。この時のFRTの分周比は128となっており、これをユーザ側
+   で変更するとことは禁止します。<BR>
+   V-Blank In以降300μsのSMPCへのアクセス禁止時間帯にSMPCリクエストをしない
+   ように、その時間分のウエイトをFRTをみてかけているためです。
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_60"><HR></A>
+<DL>
+	<P><DT><H2>■ 演算ライブラリ及び、システムライブラリについて</H2>
+	<DD>ライブラリで使用する数値は以下の使用に基づいています。
+
+	<P><DD><B>ポジション、三角関数等の固定小数点データ :</B>
+	<DD>上位16ビットが整数部、下位16ビットが小数部のトータル32ビット(符号付き)
+    型名称  <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>
+
+	<P><DT><B>例)</B>
+	<DD>16.5 を 表す場合 
+<PRE>
+０ｘ００１０＿８０００
+　　━━━━　━━━━
+　　　↑　　　　　↑　　
+      │          └──小数部
+      └────────整数部
+</PRE>
+
+	<P><DD>座標は 左右方向がX軸(プラスは右)、上下方向がY軸(プラスは下)、奥行方向がZ軸(プラスは奥)になります。
+
+	<P><DD>角度 :360度を16ビットで表す場合
+	<DD>型名称  <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A>
+
+	<P><DT><B>例)</B>
+	<DD>
+<PRE>
+90.0゜ :  0x4000
+45.0゜ :  0x2000
+22.5゜ :  0x1000
+11.25゜:  0x0800
+</PRE>
+
+	<P><DD>回転行列を作成した場合、角度のプラス方向は軸に対して右回転になります。
+
+	<P><DD>行列 :
+	<DD>数値は <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> を使用。３×４の行列で、メモリ上の配置は以下の通り。
+<PRE>
+    <a href="../struct/constenm_j.htm#M00"><I>M00</I></A>, <a href="../struct/constenm_j.htm#M01"><I>M01</I></A>, <a href="../struct/constenm_j.htm#M02"><I>M02</I></A>,
+    <a href="../struct/constenm_j.htm#M10"><I>M10</I></A>, <a href="../struct/constenm_j.htm#M11"><I>M11</I></A>, <a href="../struct/constenm_j.htm#M12"><I>M12</I></A>,
+    <a href="../struct/constenm_j.htm#M20"><I>M20</I></A>, <a href="../struct/constenm_j.htm#M21"><I>M21</I></A>, <a href="../struct/constenm_j.htm#M22"><I>M22</I></A>,
+    <a href="../struct/constenm_j.htm#M30"><I>M30</I></A>, <a href="../struct/constenm_j.htm#M31"><I>M31</I></A>, <a href="../struct/constenm_j.htm#M32"><I>M32</I></A>
+</PRE>
+
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_70"><HR></A>
+<DL>
+	<P><DT><H2>■ペリフェラルライブラリの概要</H2>
+	<DD><UL TYPE=DISC>
+	<P><LI>排他制御を行なっているので、マルチプロセス環境での使用が可能。
+	<P><LI>アプリケーションからあらゆるタイミングで呼び出す事ができる。<BR>SMPCコマンドをリクエストしたフレームで既にインタラプトバックが発行されていた場合、コマンドキャッシュにキューイングされ、次のVブランクで適切にSMPCへのコマンド発行が行なわれる。
+	<P><LI>インタラプトバック発行・データ収集は全自動。<BR>ユーザーがデータ収集の設定を変更すると、次のフレームからは自動的にインタラプトバックを発行してデータ収集が行なわれる。SMPCがデータ収集中でも以前のデータを参照でき、フレームが変わるVブランク中に最新の情報に切り替わる。
+	<P><LI>ペリフェラル未接続ポートのスキップ機能。<BR>マルチタップを一切意識する必要が無い。
+	</UL>
+
+	<P><DD><B>◆これで全てがわかる!ペリフェラル制御サンプルプログラム</B>
+	<DD><PRE>
+  void main()
+  {
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+    {
+      <a href="../func/per_j.htm#slSetLanguage"><I>slSetLanguage</I></A>( <a href="../struct/constenm_j.htm#SMPC_JAPAN"><I>SMPC_JAPAN</I></A> );
+      <a href="../func/per_j.htm#slSetSoundOutput"><I>slSetSoundOutput</I></A>( <a href="../struct/constenm_j.htm#SMPC_SOUND_STEREO"><I>SMPC_SOUND_STEREO</I></A> );
+      ( void )<a href="../func/smpc_com_j.htm#slSetSmpcMemory"><I>slSetSmpcMemory</I></A>();
+    }
+
+    {
+      <a href="../struct/types_j.htm#SmpcDateTime"><I>SmpcDateTime</I></A> *dt = &( <a href="../struct/constper_j.htm#Smpc_Status"><I>Smpc_Status</I></A>-&gt;rtc );
+
+      dt-&gt;year = 0x1999;
+      dt-&gt;month = <a href="../struct/constper_j.htm#SMPC_FRI"><I>SMPC_FRI</I></A> | <a href="../struct/constenm_j.htm#SMPC_DEC"><I>SMPC_DEC</I></A>;
+      dt-&gt;date = 0x31;
+      dt-&gt;hour = 0x23;
+      dt-&gt;minute = 0x59;
+      dt-&gt;second = 0x59;
+      ( void )<a href="../func/smpc_com_j.htm#slSetDateTime"><I>slSetDateTime</I></A>();
+    }
+
+    ( void )<a href="../func/smpc_com_j.htm#slResetDisable"><I>slResetDisable</I></A>();
+
+    while( <a href="../struct/constenm_j.htm#TRUE"><I>TRUE</I></A> ) {
+      if( <a href="../func/per_j.htm#slCheckReset"><I>slCheckReset</I></A>() == <a href="../struct/constenm_j.htm#SMPC_RES_ON"><I>SMPC_RES_ON</I></A>) {
+      ( void )<a href="../func/per_j.htm#slClearReset"><I>slClearReset</I></A>();
+      break;
+    }
+
+    if(<a href="../struct/constper_j.htm#Per_Connect1"><I>Per_Connect1</I></A>) {
+      <a href="../struct/types_j.htm#PerDigital"><I>PerDigital</I></A> *pad;
+
+      pad = <a href="../struct/constper_j.htm#Smpc_Peripheral"><I>Smpc_Peripheral</I></A> + 0;
+      if( !( pad-&gt;data & <a href="../struct/constper_j.htm#PER_DGT_ST"><I>PER_DGT_ST</I></A> ) ) break;
+    }
+    <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>();
+  }
+
+  ( void )<a href="../func/smpc_com_j.htm#slResetEnable"><I>slResetEnable</I></A>();
+  ( void )<a href="../func/per_j.htm#slIntBackCancel"><I>slIntBackCancel</I></A>();
+
+  while( <a href="../struct/constenm_j.htm#TRUE"><I>TRUE</I></A> ) <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>();
+}
+</PRE>
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_80"><HR></A>
+<DL>
+	<P><DT><H2>■ライブラリ使用時の禁じ手および、<BR>ファンクションコール手順による実行失敗の例</H2>
+
+	<P><DD>☆スレーブSH2からの呼び出しは禁止。<BR>
+      内部ワークエリアをキャッシュスルー領域に取っていないので、動作が不定と
+      なります。<BR>
+      特に排他制御が正常に行なわれない為、SMPCがデッドロックするなどの
+      不具合が生じます。
+
+	<P><DD>☆ "<a href="../func/per_j.htm#slGetPeripheral"><I>slGetPeripheral</I></A>" および "<a href="../func/per_j.htm#slGetStatus"><I>slGetStatus</I></A>" 実行後、
+      以下の関数が呼び出された時にイントバックコマンドを実行中だった場合、
+      実行に失敗します。<BR>
+      これはウエイトモードでのSMPCコマンドリクエストがコマンドキャッシュを
+      使用しない事を前提としているために起こります。
+
+	<DD><PRE>
+      <a href="../func/smpc_com_j.htm#slNMIRequestWait"><I>slNMIRequestWait</I></A>
+      <a href="../func/smpc_com_j.htm#slResetDisableWait"><I>slResetDisableWait</I></A>
+      <a href="../func/smpc_com_j.htm#slResetEnableWait"><I>slResetEnableWait</I></A>
+      <a href="../func/smpc_com_j.htm#slSetDateTimeWait"><I>slSetDateTimeWait</I></A>
+      <a href="../func/smpc_com_j.htm#slSetSmpcMemoryWait"><I>slSetSmpcMemoryWait</I></A>
+</PRE>
+
+	<P><DD>上記の実行失敗を回避するには、"<a href="../func/per_j.htm#slIntBackCancel"><I>slIntBackCancel</I></A>" を呼び出し、次のフレームでコマンド発行すればよい。
+
+	<P><DD>以下の関数はイントバックコマンド実行中でなくても実行に失敗します。<BR>
+      これはSMPCが初期設定状態以外でのイントバックコマンドの発行を
+      禁止しているためです。
+
+	<P><DD><PRE>
+      <a href="../func/per_j.htm#slSetPortDir1"><I>slSetPortDir1</I></A>,2
+      <a href="../func/per_j.htm#slSetPortExt1"><I>slSetPortExt1</I></A>,2
+      <a href="../func/per_j.htm#slSetPortSelect1"><I>slSetPortSelect1</I></A>,2
+</PRE>
+
+	<P><DD>上記の実行失敗を回避するには、"<a href="../func/per_j.htm#slIntBackCancel"><I>slIntBackCancel</I></A>" を呼び出せばよい。
+
+	<P><DD><PRE>
+  ◆ "<a href="../func/per_j.htm#slIntBackCancel"><I>slIntBackCancel</I></A>" 実行後、以下の条件を設定した場合、
+     "<a href="../func/per_j.htm#slGetPeripheral"><I>slGetPeripheral</I></A>" の呼出しで失敗となる。
+
+     "<a href="../func/per_j.htm#slSetPortSelect1"><I>slSetPortSelect1</I></A>,2" でSMPCコントロールモードにしたポートについて
+     "<a href="../func/per_j.htm#slSetPortDir1"><I>slSetPortDir1</I></A>,2" で出力設定にした。
+     "<a href="../func/per_j.htm#slSetPortExt1"><I>slSetPortExt1</I></A>,2" で外部ラッチ入力を許可した。
+</PRE>
+
+	<P><DD>上記いずれかの場合および、両方設定した場合。
+
+	<P><DD>これはSMPCが初期設定状態以外でのイントバックコマンドの発行を禁止しているためです。<BR>
+     "<a href="../func/per_j.htm#slSetPortSelect1"><I>slSetPortSelect1</I></A>,2" でポート1・2を共にSH2ダイレクトモードにした。
+
+	<P><DD>これはSMPCがポート入出力設定に関わらず、ポートセレクトが共にSH2
+     ダイレクトモードの時は、ペリフェラルデータのみを返すイントバックコマンドの
+     発行を禁止しているためです。
+
+	<P><DD><PRE>
+  ◆ "<a href="../func/per_j.htm#slIntBackCancel"><I>slIntBackCancel</I></A>" 実行後、以下の条件を設定した場合、
+     "<a href="../func/per_j.htm#slGetStatus"><I>slGetStatus</I></A>" の呼出しで失敗となる。
+
+     "<a href="../func/per_j.htm#slSetPortSelect1"><I>slSetPortSelect1</I></A>,2" でSMPCコントロールモードにしたポートについて
+     "<a href="../func/per_j.htm#slSetPortDir1"><I>slSetPortDir1</I></A>,2" で出力設定にした。
+     "<a href="../func/per_j.htm#slSetPortExt1"><I>slSetPortExt1</I></A>,2" で外部ラッチ入力を許可した。
+</PRE>
+
+	<P><DD>上記いずれかの場合および、両方設定した場合。<BR>
+     これはSMPCが初期設定状態以外でのイントバックコマンドの発行を禁止しているためです。
+
+	<P><DD><B>◆ 限界性能</B>
+<PRE>
+☆ 最大キャッシングコマンド数   ... 31個
+☆ 最大ペリフェラルデータサイズ ... 15バイト * 30ポート
+</PRE>
+
+	<P><DD>95年4月1日現在で発売されているペリフェラルデバイスおよび、
+      今後発売されるペリフェラルデバイスからの15バイトモードでの
+      データ取得に対応。<BR>
+
+	<P><DD>システム変数 "<a href="../struct/constper_j.htm#Smpc_Status"><I>Smpc_Status</I></A>" および "<a href="../struct/constper_j.htm#Smpc_Peripheral"><I>Smpc_Peripheral</I></A>" への
+      ユーザー定義バッファアドレスの登録により、
+      255バイトモードによるデータ取得が可能。<BR>
+      ただし、デバイス固有のデータ変換処理を行なうには
+      ライブラリサポートが必要です。
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_90"><HR></A>
+<DL>
+	<P><DT><H2>■サウンド関数のコマンド発行と成功不成功について。</H2>
+	<DD>サウンドドライバには、8つのコマンドバッファを持っています。<BR>
+  SGLのサウンド関数ではコマンドの発行を要求がある度に、ドライバのバッファ
+  に送るのではなく、まず最初にライブラリ内部のバッファに転送します。<BR>
+  それを、<a href="../func/sound_j.htm#slSndFlush"><I>slSndFlush</I></A>関数が呼ばれたか、<a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>関数が呼ばれると、
+  CPU-DMAを用いて、コマンドバッファに転送しています。<BR>
+  また、サウンドドライバとの通信にはタイミングフラグハンドシェイクを用いて
+  おり、バッファのデータをDMA転送する前に、サウンドドライバのタイミング
+  フラグが0になるまで待ってからデータ転送を行なっています。<BR>
+  一般にサウンド関数が成功しない場合、発音管理番号やPCMチャネルが足りない
+  場合に起こります。
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_a0"><HR></A>
+<DL>
+	<P><DT><H2>■ ポリゴンのデータについて</H2>
+	<DD><a href="../func/polygon_j.htm#slPutPolygon"><I>slPutPolygon</I></A>() で使用するポリゴンデータは以下のフォーマットになっています。
+	<P><DD><PRE>
+    .data.l        point_tbl     ; 頂点座標のテーブル
+    .data.l        NbPoint       ; 計算させる頂点の数
+    .data.l        polygon_tbl   ; 各ポリゴンの法線ベクトルと頂点番号のテーブル
+    .data.l        NbPolygon     ; 計算させるポリゴンの数
+    .data.l        attribute_tbl ; 各ポリゴンのアトリビュートのテーブル
+
+ point_tbl:
+    .data.l        X,Y,Z                ; 頂点番号0の座標データ
+    .data.l        X,Y,Z                ; 頂点番号1の座標データ
+        ...
+    .data.l        X,Y,Z                ; 頂点番号 NbPoint - 1 の座標データ
+</PRE>
+
+	<P><DD>C言語でテーブルを作成する場合、<a href="../struct/types_j.htm#POINT"><I>POINT</I></A>型が宣言されており、<a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>
+    マクロを使用することで、上記のデータテーブルを作成することができます。
+
+	<P><DT><B>例)</B>
+	<DD><PRE>
+        static <a href="../struct/types_j.htm#POINT"><I>POINT</I></A> point_CUBE[] = {
+            <a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>(-80,-80,-80),
+            <a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>( 80,-80,-80),
+            <a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>( 80, 80,-80),
+            <a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>(-80, 80,-80),
+
+            <a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>( 80,-80, 80),
+            <a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>(-80,-80, 80),
+            <a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>(-80, 80, 80),
+            <a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>( 80, 80, 80)
+        } ;
+
+ polygon_tbl:
+    .data.l        Nx,Ny,Nz     ; ポリゴン番号0の法線ベクトル
+    .data.w        P0,P1,P2,P3  ; ポリゴン番号0で使用する頂点の番号
+        (三角形のポリゴンの場合、P2 と P3 が同じ番号になる)
+        ...
+    .data.l        Nx,Ny,Nz     ; ポリゴン番号 NbPolygon - 1 の法線ベクトル
+    .data.w        P0,P1,P2,P3  ; ポリゴン番号 NbPolygon - 1 で使用する頂点の
+                                ; 番号
+</PRE>
+
+	<P><DD>C言語でテーブルを作成する場合、<a href="../struct/types_j.htm#POLYGON"><I>POLYGON</I></A>型が宣言されており、<a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>
+    マクロを使用することで、上記のデータテーブルを作成することができます。
+
+	<P><DT><B>例)</B>
+	<DD><PRE>
+        static <a href="../struct/types_j.htm#POLYGON"><I>POLYGON</I></A> polygon_CUBE[] = {
+            {<a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>( 0 , 0 ,-1) , { 0 , 1 , 2 , 3}} ,
+                |__ |__
+            {<a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>( 1 , 0 , 0) , { 1 , 4 , 7 , 2}} ,
+            {<a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>(-1 , 0 , 0) , { 5 , 0 , 3 , 6}} ,
+            {<a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>( 0 ,-1 , 0) , { 4 , 1 , 0 , 5}} ,
+            {<a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>( 0 , 1 , 0) , { 2 , 7 , 6 , 3}} ,
+            {<a href="../struct/macro_j.htm#POStoFIXED"><I>POStoFIXED</I></A>( 0 , 0 , 1) , { 4 , 5 , 6 , 7}} ,
+        } ;
+
+ attribute_tbl:
+    .data.b        RevCheck     ; 表裏判定により裏側になった面を表示するかどう
+                                  かのフラグ
+                        <a href="../struct/constenm_j.htm#Single_Plane"><I>Single_Plane</I></A>と<a href="../struct/constenm_j.htm#Dual_Plane"><I>Dual_Plane</I></A>のいずれかを指定します。
+    .data.b        SortMode     ; ソーティングの基準にする位置の算出方法とオプ
+                                  ション機能の使用を宣言します。
+                        <a href="../struct/constenm_j.htm#SORT_CEN"><I>SORT_CEN</I></A>, <a href="../struct/constenm_j.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constenm_j.htm#SORT_MAX"><I>SORT_MAX</I></A>, <a href="../struct/constenm_j.htm#SORT_BFR"><I>SORT_BFR</I></A> の いずれか
+        <a href="../struct/constenm_j.htm#SORT_CEN"><I>SORT_CEN</I></A> : 指定された4点のZ位置の平均をソーティングの基準に使用します
+        <a href="../struct/constenm_j.htm#SORT_MIN"><I>SORT_MIN</I></A> : 4点の内、最も小さいZ位置を使用します
+        <a href="../struct/constenm_j.htm#SORT_MAX"><I>SORT_MAX</I></A> : 4点の内、最も大きいZ位置を使用します
+        <a href="../struct/constenm_j.htm#SORT_BFR"><I>SORT_BFR</I></A> : 直前に表示されたポリゴンのZ位置を使用します
+                  直前のポリゴンの常に手前に表示されます
+                        オプションはこれらに加えて指定します
+                        <a href="../struct/constspr_j.htm#UseTexture"><I>UseTexture</I></A>, <a href="../struct/constspr_j.htm#UseLight"><I>UseLight</I></A>, <a href="../struct/constspr_j.htm#UseClip"><I>UseClip</I></A> オプションは複数指定す
+                        ることができます。
+        <a href="../struct/constspr_j.htm#UseTexture"><I>UseTexture</I></A> : テクスチャ(変形スプライト)を使用する場合に指定します。
+        <a href="../struct/constspr_j.htm#UseLight"><I>UseLight</I></A> : 光源ベクトルと法線ベクトルとの内積によりポリゴンのカラーに
+                   オフセットを掛け明暗を表現します。
+                   <a href="../struct/constspr_j.htm#UseTexture"><I>UseTexture</I></A> と 同時には使用できません。
+        <a href="../struct/constspr_j.htm#UseClip"><I>UseClip</I></A> : 大きなポリゴンを使用する場合、表示位置がオーバーフローして
+                  正しく表示できないような時に使用します。
+
+    .data.w        TextNum      ; テクスチャを使用する場合、キャラクタの登録番
+                                  号として使用します。
+    .data.w        DispMode  ; ポリゴンの表示モードを指定します。
+                               指定できる表示モードには以下のものがあります
+        <a href="../struct/constspr_j.htm#MSBon"><I>MSBon</I></A> : フレームバッファへの書き込みにおいて最上位ビットのみを1に
+                します。(スプライトへのシャドウは通常これを使用します)
+        <a href="../struct/constspr_j.htm#HSSon"><I>HSSon</I></A> : ハイスピードシュリンク有効
+        <a href="../struct/constspr_j.htm#HSSoff"><I>HSSoff</I></A>: ハイスピードシュリンク無効(default)
+        <a href="../struct/constspr_j.htm#Window_In"><I>Window_In</I></A> : 指定したウィンドウの内側に表示します。
+        <a href="../struct/constspr_j.htm#Window_Out"><I>Window_Out</I></A> : ウィンドウの外側に表示します。
+        <a href="../struct/constspr_j.htm#No_Window"><I>No_Window</I></A> : (default)ウィンドウに影響されずに表示します。
+        <a href="../struct/constspr_j.htm#MESHon"><I>MESHon</I></A> : メッシュで表示します。
+        <a href="../struct/constspr_j.htm#MESHoff"><I>MESHoff</I></A> : (default)通常表示をします。
+        <a href="../struct/constspr_j.htm#ECdis"><I>ECdis</I></A> : テクスチャを使用する時、エンドコードを無効にします。
+        <a href="../struct/constspr_j.htm#ECenb"><I>ECenb</I></A> : (default)テクスチャを使用する時、エンドコードを有効にします。
+        <a href="../struct/constspr_j.htm#SPdis"><I>SPdis</I></A> : テクスチャを使用する時、スペースを無効(パレット0のカラーで
+                表示)にします。
+                ただし、フレームバッファへの書き込みデータが 0000になる
+                場合には、表示されませんので、プライオリティ等の値を調整して
+                0000にならないようにしてください。
+        <a href="../struct/constspr_j.htm#SPenb"><I>SPenb</I></A> : (default)テクスチャを使用するとき、スペースを有効にします。
+
+        <a href="../struct/constspr_j.htm#CL16Bnk"><I>CL16Bnk</I></A>  : (default)テクスチャのカラーモードを16色のカラーバンク方式
+                  にします。
+        <a href="../struct/constspr_j.htm#CL16Look"><I>CL16Look</I></A> : テクスチャのカラーモードを16色のルックアップテーブル方式
+                   にします。
+        <a href="../struct/constspr_j.htm#CL64Bnk"><I>CL64Bnk</I></A>  : テクスチャのカラーモードを64色のカラーバンク方式にします。
+        <a href="../struct/constspr_j.htm#CL128Bnk"><I>CL128Bnk</I></A> : テクスチャのカラーモードを128色のカラーバンク方式にします。
+        <a href="../struct/constspr_j.htm#CL256Bnk"><I>CL256Bnk</I></A> : テクスチャのカラーモードを256色のカラーバンク方式にします。
+        <a href="../struct/constspr_j.htm#CL32KRGB"><I>CL32KRGB</I></A> : テクスチャのカラーモードを32000色のRGB方式にします。
+
+        <a href="../struct/constspr_j.htm#CL_Replace"><I>CL_Replace</I></A> : (default)書き換えモードにします。
+        <a href="../struct/constspr_j.htm#CL_Trans"><I>CL_Trans</I></A>   : 半透明で表示します。
+        <a href="../struct/constspr_j.htm#CL_Half"><I>CL_Half</I></A>    : 半輝度で表示します。
+        <a href="../struct/constspr_j.htm#CL_Shadow"><I>CL_Shadow</I></A>  : シャドウ表示にします。
+        <a href="../struct/constspr_j.htm#CL_Gouraud"><I>CL_Gouraud</I></A> : グーローシェーディングを指定します。
+
+        表示モードは各グループのいずれかひとつずつを指定します。
+
+    .data.w        Color         ; 表示カラーを指定します。
+        光源の影響を受ける場合、また、表示モードで <a href="../struct/constspr_j.htm#CL_Replace"><I>CL_Replace</I></A> 以外を指定する場合に
+        はRGBモードでなければなりません。
+        また、テクスチャを使用する場合で、<a href="../struct/constspr_j.htm#CL32KRGB"><I>CL32KRGB</I></A>モードの場合には、ここでの指
+        定は無視されます。
+
+    .data.w        GouraudTable  ; グーローシェーディングテーブルを指定します。
+        <a href="../struct/constspr_j.htm#CL_Gouraud"><I>CL_Gouraud</I></A> を指定した場合、グーローシェーディングテーブルのオフセット位
+        置を指示します。オフセット位置は<a href="../struct/constspr_j.htm#SpriteVRAM"><I>SpriteVRAM</I></A>(0x25c00000)を0とし、8バイト
+        ごとに1進む値で指定します。
+        例えば、0x25c12000にデータがある場合
+        ( 0x25c12000 - 0x25c00000 ) / 0x08 = 0x2400
+
+    .data.w        Function      ; スプライト表示ファンクションを指定します。
+        ポリゴン、テクスチャ、ポリラインのいずれとして表示するかを指定します。
+        指定には以下の6つからひとつを選びます。
+        <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A>  : テクスチャを表示します。
+        <a href="../struct/constspr_j.htm#sprHflip"><I>sprHflip</I></A>   : テクスチャを横方向に反転して表示します。
+        <a href="../struct/constspr_j.htm#sprVflip"><I>sprVflip</I></A>   : テクスチャを縦方向に反転して表示します。
+        <a href="../struct/constspr_j.htm#sprHVflip"><I>sprHVflip</I></A>  : テクスチャを縦、横双方に反転して表示します。
+        <a href="../struct/constspr_j.htm#sprPolygon"><I>sprPolygon</I></A> : ポリゴンとして表示します。
+        <a href="../struct/constspr_j.htm#sprPolyLine"><I>sprPolyLine</I></A>: ポリライン(ポリゴンの輪郭のみ)を表示します。
+
+    C言語でテーブルを作成する場合、<a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A>型が宣言されており、<a href="../struct/macro_j.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>
+    マクロを使用することで、上記のデータテーブルを作成することができます。
+  例)
+        static <a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A> attr_CUBE[] = {
+            <a href="../struct/macro_j.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm_j.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm_j.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr_j.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const_j.htm#CD_MediumGreen"><I>CD_MediumGreen</I></A>,
+                      <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr_j.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr_j.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro_j.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm_j.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm_j.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr_j.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const_j.htm#CD_MediumBlue"><I>CD_MediumBlue</I></A>,
+                      <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr_j.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr_j.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro_j.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm_j.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm_j.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr_j.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const_j.htm#CD_MediumMagenta"><I>CD_MediumMagenta</I></A>,
+                      <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr_j.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr_j.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro_j.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm_j.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm_j.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr_j.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const_j.htm#CD_MediumWhite"><I>CD_MediumWhite</I></A>,
+                      <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr_j.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr_j.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro_j.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm_j.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm_j.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr_j.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const_j.htm#CD_MediumYellow"><I>CD_MediumYellow</I></A>,
+                      <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr_j.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr_j.htm#UseLight"><I>UseLight</I></A> ),
+            <a href="../struct/macro_j.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm_j.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm_j.htm#SORT_MIN"><I>SORT_MIN</I></A>, <a href="../struct/constspr_j.htm#No_Texture"><I>No_Texture</I></A>, <a href="../struct/const_j.htm#CD_MediumRed"><I>CD_MediumRed</I></A>,
+                      <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#Window_In"><I>Window_In</I></A>, <a href="../struct/constspr_j.htm#sprPolygon"><I>sprPolygon</I></A>, <a href="../struct/constspr_j.htm#UseLight"><I>UseLight</I></A> )
+        };
+</PRE>
+
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_b0"><HR></A>
+<DL>
+	<P><DT><H2>■ スプライト表示関数用のアトリビュートについて</H2>
+	<DD><a href="../func/sprite_j.htm#slPutSprite"><I>slPutSprite</I></A>() 、<a href="../func/sprite_j.htm#slDispSprite"><I>slDispSprite</I></A>() で使用するアトリビュートテーブルは、上記のポ
+  リゴン用のものとほぼ同じですが、先頭の2つのデータがなくなっています。<BR>
+    C言語でこのテーブルを作成する場合、<a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A>型が宣言されており、
+  <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>マクロを使用することができます。<BR>
+
+	<P><DD><B>例)</B>
+	<PRE>
+        <a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A> attr_AM2Logo = {
+            <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>(PN_AM2_Logo,CL_AM2_Logo,<a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>,<a href="../struct/constspr_j.htm#Window_In"><I>Window_In</I></A>|<a href="../struct/constspr_j.htm#ECdis"><I>ECdis</I></A>,
+                <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A>|<a href="../struct/constspr_j.htm#_ZmCB"><I>_ZmCB</I></A>)
+        } ;
+</PRE>
+
+	<P><DD><a href="../struct/constspr_j.htm#_ZmCB"><I>_ZmCB</I></A> はポジションがスプライトのどの位置を指すかを指定するもので、以下の9つが定義されています。
+<PRE>
+     <a href="../struct/constspr_j.htm#_ZmLT"><I>_ZmLT</I></A>      <a href="../struct/constspr_j.htm#_ZmCT"><I>_ZmCT</I></A>        <a href="../struct/constspr_j.htm#_ZmRT"><I>_ZmRT</I></A>
+           +-------+-------+
+           |       |       |
+     <a href="../struct/constspr_j.htm#_ZmLC"><I>_ZmLC</I></A> +----<a href="../struct/constspr_j.htm#_ZmCC"><I>_ZmCC</I></A>------+ <a href="../struct/constspr_j.htm#_ZmRC"><I>_ZmRC</I></A>
+           |       |       |
+           +-------+-------+
+     <a href="../struct/constspr_j.htm#_ZmLB"><I>_ZmLB</I></A>      <a href="../struct/constspr_j.htm#_ZmCB"><I>_ZmCB</I></A>        <a href="../struct/constspr_j.htm#_ZmRB"><I>_ZmRB</I></A>
+</PRE>
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_c0"><HR></A>
+<DL>
+	<P><DT><H2>■ スプライト表示サンプル</H2>
+	<DD><PRE>
+ #define        CGtop                 0x10000
+ #define        <a href="../struct/macro_j.htm#TEXTBL"><I>TEXTBL</I></A>(hs,vs,cga)     {hs , vs , (cga)&gt;&gt;3 , ((hs)&0x1f8)&gt;&gt;5|(vs)}
+ #define        <a href="../struct/macro_j.htm#AdjCG"><I>AdjCG</I></A>(cga,hs,vs,col)  ((cga + (((hs)*(vs)*4)&gt;&gt;(col)) + 0x1f) & 0x7ffe0)
+ #define        <a href="../struct/macro_j.htm#PICTBL"><I>PICTBL</I></A>(txno,cmod,cga) {txno , cmod , cga}
+ #define        CL_Triangle           0x00
+
+ static const Uint16 triangle[] = {
+   0x0000,0x0001,0x1000,0x0000,        /* スプライトのキャラクタデータ */
+   0x0000,0x0012,0x2100,0x0000,
+   0x0000,0x0123,0x3210,0x0000,
+   0x0000,0x1234,0x4321,0x0000,
+   0x0001,0x2344,0x4432,0x1000,
+   0x0012,0x3333,0x3333,0x2100,
+   0x0122,0x2222,0x2222,0x2210,
+   0x1111,0x1111,0x1111,0x1111
+ };
+
+ enum patn {
+   PN_Triangle,                        /* スプライトパターンナンバー */
+   Max_Texture,                        /* 総パターン数               */
+   Max_Picture = Max_Texture           /* 総キャラクタ数             */
+ };
+
+ enum cga {                                /* キャラクタアドレス */
+   CG_Triangle = CGtop,
+   CG_Next = AdjCG( CG_Triangle, 16, 8, <a href="../struct/constspr_j.htm#COL_16"><I>COL_16</I></A> )
+ };
+
+ <a href="../struct/types_j.htm#TEXTURE"><I>TEXTURE</I></A> form_tbl[] = {         /* パターンサイズデータ */
+   <a href="../struct/macro_j.htm#TEXTBL"><I>TEXTBL</I></A>( 16, 8, CG_Triangle )
+ };
+
+ <a href="../struct/types_j.htm#PICTURE"><I>PICTURE</I></A> pic_tbl[] = {                          /* キャラクタ定義テーブル */
+   PICTBL( PN_Triangle, <a href="../struct/constspr_j.htm#COL_16"><I>COL_16</I></A>, triangle )
+ };
+
+ static const <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> Triangle_Color[] = {                   /* カラーデータ */
+                    <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0,31), <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 29 ), <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 27 ),
+   <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 25 ), <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0,23), <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 21 ), <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 19 ),
+   <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 17 ), <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0,15), <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 13 ), <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 11 ),
+   <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 9  ), <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0,7),  <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 5 ),  <a href="../struct/macro_j.htm#RGB"><I>RGB</I></A>( 0, 0, 3 )
+ };
+
+ typedef struct{                        /* カラー定義用構造体 */
+   <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> *src;
+   void   *dst;
+   <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A>  size;
+ } COLMAP;
+
+ static const COLMAP ctrns_list[] = {  /* カラー定義テーブル */
+   { Triangle_Color,
+     ( void* )( <a href="../struct/constscl_j.htm#VDP2_COLRAM"><I>VDP2_COLRAM</I></A> + ( CL_Triangle + 1 ) * 2 ),
+     sizeof( Triangle_Color )
+   }
+ };
+
+ extern <a href="../struct/types_j.htm#TEXTURE"><I>TEXTURE</I></A> * <a href="../mem/system01_j.htm#FormTbl"><I>FormTbl</I></A> ;
+
+ /*                                                */
+ /*  キャラクタデータ転送                          */
+ /*                                                */
+
+ void SetTexture( <a href="../struct/types_j.htm#PICTURE"><I>PICTURE</I></A> *pcptr, <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> NbPicture ) {
+   <a href="../struct/types_j.htm#TEXTURE"><I>TEXTURE</I></A> *txptr;
+
+   for( ; NbPicture-- &gt; 0 ; pcptr++ ) {
+     txptr = <a href="../mem/system01_j.htm#FormTbl"><I>FormTbl</I></A> + pcptr-&gt;texno ;
+     <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>( pcptr-&gt;pcsrc,
+                ( void * )( <a href="../struct/constspr_j.htm#SpriteVRAM"><I>SpriteVRAM</I></A> + ( ( txptr-&gt;CGadr ) &gt;&gt; 3 ) ),
+                ( txptr-&gt;Hsize * txptr-&gt;Vsize * 4 ) &gt;&gt; ( pcptr-&gt;cmode ) );
+   }
+ }
+
+ /*                                                */
+ /*  カラーデータ転送                              */
+ /*                                                */
+
+ void SetColor(){
+   COLMAP      *cmptr ;
+   <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A>       cnt ;
+
+   <a href="../func/scroll_j.htm#slTVOff"><I>slTVOff</I></A>() ;
+   cmptr= ctrns_list ;
+   for ( cnt = sizeof( ctrns_list ) / sizeof( COLMAP ) ; cnt-- &gt; 0 ; cmptr++ ){
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>( cmptr-&gt;src, cmptr-&gt;dst, cmptr-&gt;size );
+   }
+   <a href="../func/scroll_j.htm#slTVOn"><I>slTVOn</I></A>();
+ }
+
+ /*  サンプルキャラクタ表示位置 */
+   <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> tpos[] = { <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>(1.0), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>(2.0), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>(2.0), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>(4.0)};
+ /*                 |             |             |             |_ 表示スケール*/
+ /*                 X位置         Y位置         Y位置 (等倍なら<a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>(<a href="../struct/constspr_j.htm#ORIGINAL"><I>ORIGINAL</I></A>)
+                                                        を指定のこと) */
+
+ /*  サンプルキャラクタデータ */
+   <a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A> tattr = <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>(PN_Triangle,CL_Triangle,<a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>,<a href="../struct/constspr_j.htm#CL16Bnk"><I>CL16Bnk</I></A>,<a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A>|<a href="../struct/constspr_j.htm#_ZmCC"><I>_ZmCC</I></A>);
+ /*                               |           |           |          |       |         |__ 回転中心位置 */
+ /*                               |           |           |          |       |__ キャラクタ反転はなし */
+ /*                               |           |           |          |__ 16色カラーバンクモード  */
+ /*                               |           |           |___ グーローシェーディングは使用しない */
+ /*                        パターンナンバー  カラーバンクナンバー */
+
+ main() {
+   <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A>        ang = DEGtoANG (0.0);
+
+   *( <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> * )( 0x06002500 ) = ( <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> )( 0x060007f0 );
+   /* クロックチェンジ中はサウンド用の68Kがスイッチデータを読み、
+      ここにセットされたアドレスにデータを用意するらしいのだが、
+      うまく動いていないようなので、とりあえず押されていないデータ0xFFFFのある
+      アドレスを入れておく */
+
+   <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A>, form_tbl, 1 ); /* システム初期化 */
+   SetTexture( pic_tbl, Max_Picture );      /* キャラクタデータのセット */
+   SetColor();                              /* カラーデータのセット */
+   while( -1 ) {
+     <a href="../func/sprite_j.htm#slDispSprite"><I>slDispSprite</I></A>( tpos, &tattr, ang );     /* スプライトの登録 */
+     ang += <a href="../struct/macro_j.htm#DEGtoANG"><I>DEGtoANG</I></A> ( 3.0 );
+     <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>();                             /* 画面表示への同期との
+                                              スプライト出力 */
+   }
+ }
+</PRE>
+
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_d0"><HR></A>
+<DL>
+	<P><DT><H2>■リアルタイムグーロー使用手順</H2>
+	<DD>リアルタイムグーローを実現するには以下の4つの処理が必要です。
+
+	<P><DT><B>　(1)アトリビュートテーブルに以下の3つを加えます</B>
+	<DD><OL TYPE=a>
+		<B><LI></B>MODEに「<a href="../struct/constspr_j.htm#CL_Gouraud"><I>CL_Gouraud</I></A>」を指定。
+		<B><LI></B>GOURAUDにグローテーブルの格納位置の指定。
+		<B><LI></B>OPTIONに「<a href="../struct/constspr_j.htm#UseGouraud"><I>UseGouraud</I></A>」を指定。
+		</OL>
+	<DD><B>＜例＞</B>
+	<PRE>
+     ATTRIBUTE(<a href="../struct/constenm_j.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm_j.htm#SORT_CEN"><I>SORT_CEN</I></A>, 0, 0xffa0, 0xe000,
+            <a href="../struct/constspr_j.htm#CL16Look"><I>CL16Look</I></A>|<a href="../struct/constspr_j.htm#MESHoff"><I>MESHoff</I></A>|<a href="../struct/constspr_j.htm#CL_Gouraud"><I>CL_Gouraud</I></A>, <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A>, <a href="../struct/constspr_j.htm#UseGouraud"><I>UseGouraud</I></A> )
+</PRE>
+
+	<P><DT><B>　(2)法線ベクトルの指定</B>
+	<DD>各頂点の法線ベクトルと「<a href="../struct/types_j.htm#XPDATA"><I>XPDATA</I></A>」というポリゴンモデルデータテーブルを指定
+	<DD><B>＜例>＞</B>
+	<PRE>
+         <a href="../struct/types_j.htm#VECTOR"><I>VECTOR</I></A>        gr_point[] = {              /* 頂点法線ベクトルデータ */
+           <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>(-0.873),<a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.436),<a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.217),
+           <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>(-0.873),<a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>(-0.436),<a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.217),
+                                :
+                                :
+         };
+         <a href="../struct/types_j.htm#XPDATA"><I>XPDATA</I></A> PD_BOX = {                          /* モデルテーブル指定    */
+           point_BOX,                               /* 頂点の位置データ
+                                                                  テーブル   */
+           sizeof( point_BOX ) / sizeof( <a href="../struct/types_j.htm#POINT"><I>POINT</I></A> ),   /* 頂点の数              */
+           polygon_BOX,                             /* ポリゴン定義テーブル  */
+           sizeof( polygon_BOX ) /sizeof( <a href="../struct/types_j.htm#POLYGON"><I>POLYGON</I></A> ),/* ポリゴンの数          */
+           attribute_BOX2,                          /* ポリゴンの
+                                                     アトリビュートテーブル  */
+           gr_point                                 /*頂点法線ベクトルデータ */
+         };
+</PRE>
+
+	<P><DT><B>　(3)リアルタイムグーロープログラムの初期化</B>
+	<DD>(a)使用するグーローテーブルの位置大きさを指定
+	<DD><B>＜例＞</B>
+	<PRE>
+       <a href="../func/polygon_j.htm#slInitGouraud"><I>slInitGouraud</I></A>( ( <a href="../struct/types_j.htm#GOURAUDTBL"><I>GOURAUDTBL</I></A> * )gr_tab, ( <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> )300, 0xe000, addr );
+</PRE>
+
+	<P><DD>(b) グーロープログラムをVブランクに登録
+	<DD><B>＜例＞</B>
+	<PRE>
+       <a href="../func/int_j.htm#slIntFunction"><I>slIntFunction</I></A>( <a href="../func/polygon_j.htm#slGouraudTblCopy"><I>slGouraudTblCopy</I></A> );
+</PRE>
+
+	<P><DT><B>　(4)光源ベクトルの指定</B>
+	<DD><B>＜例＞</B>
+	<PRE>
+         <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>      light[<a href="../struct/constenm_j.htm#XYZ"><I>XYZ</I></A>];
+         light[<a href="../struct/constenm_j.htm#X"><I>X</I></A>] = <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 1.0 );
+         light[<a href="../struct/constenm_j.htm#Y"><I>Y</I></A>] = <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 );
+         light[<a href="../struct/constenm_j.htm#Z"><I>Z</I></A>] = <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 );
+         <a href="../func/polygon_j.htm#slPutPolygonX"><I>slPutPolygonX</I></A>( &PD_BOXx, ( <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> * )light );
+</PRE>
+
+	<P><DT><B>　(5)実際のプログラム使用例</B>
+	<DD><B>＜例＞</B>
+	<PRE>
+ static <a href="../struct/types_j.htm#GOURAUDTBL"><I>GOURAUDTBL</I></A> gr_tab[300];
+
+ void ss_main( void )
+ {
+   FIXED light[<a href="../struct/constenm_j.htm#XYZ"><I>XYZ</I></A>];
+          :
+   /* リアルタイムグロープログラムの初期化 */
+   <a href="../func/polygon_j.htm#slInitGouraud"><I>slInitGouraud</I></A>( ( <a href="../struct/types_j.htm#GOURAUDTBL"><I>GOURAUDTBL</I></A> * )gr_tab, ( <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> )300, 0xe000, addr );
+   <a href="../func/polygon_j.htm#slGouraudTblCopy"><I>slGouraudTblCopy</I></A>();
+   <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>();
+               :
+   light[<a href="../struct/constenm_j.htm#X"><I>X</I></A>] = <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 1.0 );
+   light[<a href="../struct/constenm_j.htm#Y"><I>Y</I></A>] = <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 );
+   light[<a href="../struct/constenm_j.htm#Z"><I>Z</I></A>] = <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 );
+   while( 1 )
+   {
+           :
+     <a href="../func/matrix_j.htm#slPushMatrix"><I>slPushMatrix</I></A>();
+     {
+        :
+       /**/
+       <a href="../func/polygon_j.htm#slPutPolygonX"><I>slPutPolygonX</I></A>( &PD_BOX, ( <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> * )light );
+     }
+     <a href="../func/matrix_j.htm#slPopMatrix"><I>slPopMatrix</I></A>();
+     <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>();
+   }
+ }
+</PRE>
+
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_e0"><HR></A>
+<DL>
+	<P><DT><H2>■ニアクリッピング</H2>
+	<DD>アトリビュートテーブルのOPTIONに「<a href="../struct/constspr_j.htm#UseNearClip"><I>UseNearClip</I></A>」を指定するとニアクリッピング
+   処理をします。「<a href="../struct/constspr_j.htm#UseClip"><I>UseClip</I></A>」はVer3.0から同機能追加により「<a href="../struct/constspr_j.htm#UseNearClip"><I>UseNearClip</I></A>」に
+   置き換わりました。
+
+	<P><DD><B>＜例＞</B>
+	<PRE>
+  <a href="../struct/macro_j.htm#ATTRIBUTE"><I>ATTRIBUTE</I></A>( <a href="../struct/constenm_j.htm#Single_Plane"><I>Single_Plane</I></A>, <a href="../struct/constenm_j.htm#SORT_CEN"><I>SORT_CEN</I></A>, 1, <a href="../struct/constspr_j.htm#No_Palet"><I>No_Palet</I></A>, <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, 
+              <a href="../struct/constspr_j.htm#CL32KRGB"><I>CL32KRGB</I></A>|<a href="../struct/constspr_j.htm#MESHoff"><I>MESHoff</I></A>,<a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A>, <a href="../struct/constspr_j.htm#UseNearClip"><I>UseNearClip</I></A> );
+</PRE>
+
+</DL>
+<!----------------------------------------------------------------------->
+<A NAME="no1_f0"><HR></A>
+<DL>
+ 	<P><DT><H2>■SGL Ver2.1xとSGL Ver3.00の相違点</H2>
+
+	<P><DT><B>　(1)フラットシェーディングの光源計算方法の変更</B>
+	<DD>フラットシェーディングの光源計算方法が以下のように変更になっています。
+
+	<DD>
+<PRE>
+<B>＜Ver2.1xまでの光源計算方法＞</B>
+光源と面の角度　→0------45------90-----135-----180
+グーローテーブル→31-----16-------0-------0-------0
+</PRE>
+
+	<DD>
+<PRE>
+<B>＜Ver3.0 からの光源計算方法＞</B>
+光源と面の角度　→0------45------90-----135-----180
+グーローテーブル→31-----24------16-------8-------0
+</PRE>
+
+	<P><DT><B>　(2)光源の影響による発色データテーブルのサイズ変更</B>
+	<DD>光源処理に機能追加したことにより、発色データテーブル(CLOfsfBuf)領域を確保するサイズが、
+
+	<P><DL><DD>32×32 (0x400)から32×32×3 (0xC00)</DL>
+
+	<P><DD>に変更になりました。
+
+	<P><DD>よって、初期値が設定されていたsaturn/sgl/libディレクトリのsglarea.oの変更と、ユーザカスタム用の
+
+	<P><DL><DD>saturn¥sgl¥sample¥workarea</DL>
+
+	<P><DD>ディレクトリにあるworkarea.cなどのファイルも計算部分に変更が加えられています。SGL Ver2.1xからの移行時には必ず変更するようにしてください。
+ 
+
+	<P><DT><B>　(3)UseClipオプションの削除</B>
+	<DD>アトリビュートオプション<a href="../struct/constspr_j.htm#UseClip"><I>UseClip</I></A>が、SGL Ver3.0の機能追加により<a href="../struct/constspr_j.htm#UseNearClip"><I>UseNearClip</I></A>に置き換わりました。
+<HR NOSHADE>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN=MIDDLE></A>
+★<a href="../../index_j.htm">SGL User's Manual</A>
+★<a href="index_j.htm">補足マニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

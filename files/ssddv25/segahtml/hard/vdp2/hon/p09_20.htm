@@ -1,0 +1,70 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;58/86&gt;VDP2 User's Manual/9.2 Priority and color calculation</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no9">VDP2 User's Manual</a> ★ <A HREF="p09_10.htm">Chapter 9 Sprite Data</a><HR>
+ <B>▲ <A HREF="p09_10.htm">Back</a> ｜ <A HREF="p09_21.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 9 Sprite Data</b><HR NOSHADE>
+<DL>
+<P><DT><H2> ■9.2 Priority and color calculation</H2><DD> The priority of sprites and scroll screens is determined by the size of a 3-bit value called the priority number. Up to 8 priority numbers can be specified for a sprite, and one of them can be selected for each character depending on the priority bit in the sprite data.</P>
+<P><DD> When using the color calculation function between sprites and scroll screens, you can decide whether to perform color calculations depending on the priority number value selected by the sprite character. Additionally, up to eight color calculation ratios can be specified, and one of them can be selected for each character using the color calculation ratio bit in the sprite data.</P>
+<A NAME="no9_21"></A><P><DT><H3> ●Priority number selection</H3><DD> The sprite priority number selects one of the eight priority numbers for each sprite character, depending on the priority bit of the specified sprite type. If the specified sprite type has 2 or fewer priority bits, the missing bits will be treated as 0, and if there are no priority bits, all 3 bits will be treated as 0. Also, if the sprite data is in RGB format, sprite register 0 will be selected.</P>
+<P><DD> Table 9.2 shows the priority number register selection based on the priority bit value.</P>
+<A NAME="t9_2"></A><P><DD> <B>Table 9.2 Sprite Priority Number Register Selection</b><DD><TABLE BORDER CELLPADDING=5>
+<TR><TH COLSPAN=3> Priority bit</TH><TH ROWSPAN=2> Priority number register selected</TH></TR>
+<TR><TH> PR2</TH><TH> PR1</TH><TH> PR0</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD> Sprite register 0 (1800F0H bits 2 to 0)</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD> Sprite register 1 (1800F0H bits 10 to 8)</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD> Sprite register 2 (1800F2H bits 2 to 0)</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD> Sprite register 3 (1800F2H bits 10 to 8)</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD> Sprite register 4 (1800F4H bits 2 to 0)</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD> Sprite register 5 (1800F4H bits 10 to 8)</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD> Sprite register 6 (1800F6H bits 2 to 0)</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD> Sprite register 7 (1800F6H bits 10 to 8)</TD></TR>
+</TABLE>
+</P>
+<A NAME="no9_22"></A><P><DT><H3> ●Color calculation enable condition</H3><DD> For sprites, you can specify whether or not to perform color calculations not only for the entire sprite, but also by the value of the priority number selected for each character or the value of the most significant bit of color data selected for each dot. You can select from the following four conditions.</P>
+<P><DD><OL>
+<LI> Only when (priority number)≦(color calculation condition number)<LI> Only when (priority number) = (color calculation condition number)<LI> Only when (priority number) ≧ (color calculation condition number)<LI> Only when the most significant bit of color data is 1</P>
+</OL>
+<P><DD> The color calculation condition number is a 3-bit value that is used to compare the size with the priority number value selected for each sprite character, and is specified in the sprite control register. These conditions are valid only when <B>the SPCCEN bit</b> in <B>the color calculation control register</b> is 1; when it is 0, no color calculation is performed.</P>
+<A NAME="no9_23">　</A><P><DT><H3>●Color calculation ratio selection</H3><DD> The sprite color calculation ratio selects one of the 8 color calculation ratios for each sprite character, depending on the color calculation ratio bit of the specified sprite type data. If the specified sprite type has 2 bits or less for color calculation ratio, the missing bits are considered to be 0, and if there are no color calculation ratio bits, all 3 bits are considered to be 0. Also, if the sprite data is in RGB format, sprite register 0 will be selected.</P>
+<P><DD> Table 9.3 shows the color calculation ratio register selection based on the value of the color calculation ratio bit.</P>
+<DD> <B>Table 9.3 Sprite color calculation ratio register selection</b><DD><TABLE BORDER CELLPADDING=5>
+<TR><TH COLSPAN=3> Color calculation ratio bit</TH><TH ROWSPAN=2> Selected color calculation ratio register</TH></TR>
+<TR><TH> CC2</TH><TH> CC1</TH><TH> CC0</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD> Sprite register 0 (180100H bits 4 to 0)</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD> Sprite register 1 (180100H bits 12 to 8)</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD> Sprite register 2 (180102H bits 4 to 0)</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD> Sprite register 3 (180102H bits 12 to 8)</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD> Sprite register 4 (180104H bits 4 to 0)</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD> Sprite register 5 (180104H bits 12 to 8)</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD> Sprite register 6 (180106H bits 4 to 0)</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD> Sprite register 7 (180106H bits 12 to 8)</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p09_10.htm">Back</a> ｜ <A HREF="p09_21.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no9">VDP2 User's Manual</a> ★ <A HREF="p09_10.htm">Chapter 9 Sprite Data</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

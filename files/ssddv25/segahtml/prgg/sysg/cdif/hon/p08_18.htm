@@ -1,0 +1,107 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;18/19&gt;CD communication I/F (CD part)/Function details-8</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>▲ <A HREF="p08_17.htm">Back</a> ｜ <A HREF="p08_19.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual (CD part)</b><H2 ALIGN=CENTER> Function details-8</H2><HR NOSHADE>
+<H3> 8.2.8 CD Block File System</H3><!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no8_1"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_8">one</a><BR> <A HREF="p08_10.htm#t8_1_8">View</a><BR> <A HREF="p08_10.htm#t8_1_8">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Move directory</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_ChgDir</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_ChgDir(Sint32 filtno, Sint32 fid)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> filtno</TD><TD><PRE> : Aperture number</TD></TR>
+<TR><TD><PRE> fid</TD><TD><PRE> :File identifier of directory file (CDC_NUL_FID: root directory)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> EFLS flag<DT> <B>function</b><DD> Moves the current directory to the directory indicated by the specified file identifier. Specifying CDC_NUL_FID as the file identifier moves you to the root directory. When moving, it reads directory records and retains up to 254 file information from the beginning. (Up to 256 including self and parent) Returns REJECT if the file identifier does not point to a directory.<DT> <B>remarks</b><DD> The CD block file system uses selectors for its work. The working selector is specified by the aperture number.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no8_2"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_8">one</a><BR> <A HREF="p08_10.htm#t8_1_8">View</a><BR> <A HREF="p08_10.htm#t8_1_8">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Retaining file information</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_ReadDir</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_ReadDir(Sint32 filtno, Sint32 fid)<DT> <B>input</b><DD> filtno: Aperture number<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> EFLS flag<DT> <B>function</b><DD> Reads the directory record of the current directory and retains information on up to 254 files starting from the specified file identifier. (Always retained by myself and parents)<DT> <B>remarks</b><DD> The CD block file system uses selectors for its work. The working selector is specified by the aperture number.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no8_3"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_8">one</a><BR> <A HREF="p08_10.htm#t8_1_8">View</a><BR> <A HREF="p08_10.htm#t8_1_8">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Obtaining the retained file information range</H4></TD><TD WIDTH=160><PRE> Function Name［S-］<BR><H3> CDC_GetFileScope</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_GetFileScope(Sint32 *fid, Sint32 *infnum, Bool *drend)<DT> <B>input</b><DD> none<DT> <B>output</b><DD><TABLE>
+<TR><TD><PRE> fid</TD><TD><PRE> : First file identifier held</TD></TR>
+<TR><TD><PRE> infnum</TD><TD><PRE> : Number of retained file information</TD></TR>
+<TR><TD><PRE> drend</TD><TD><PRE> :Last directory record retention flag</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Returns the range of file information currently held by the CD block.<P><DT> <B>(1) Last directory record retention flag</b><DD> Notifies whether the current retained file information range includes the last directory record in the directory block. This allows you to determine if there are any subsequent directory records.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> constant name</TH><TH WIDTH=420><PRE> explanation</TH></TR>
+<TR><TD><PRE> TRUE</TD><TD><PRE> Holds the final directory record.</TD></TR>
+<TR><TD><PRE> FALSE</TD><TD><PRE> Not keeping the final directory record.</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> Since the self and parent directories are always retained, they are not included in the number of file information.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no8_4"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_8">one</a><BR> <A HREF="p08_10.htm#t8_1_8">View</a><BR> <A HREF="p08_10.htm#t8_1_8">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Get retained file information</H4></TD><TD WIDTH=160><PRE> Function Name［S-］<BR><H3> CDC_TgetFileInfo</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_TgetFileInfo(Sint32 fid, CdcFile *file)<DT> <B>input</b><DD> fid: File identifier (CDC_NUL_FID: Shows all file information)<DT> <B>output</b><DD> file: File information<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Obtain file information (12 bytes) by specifying a file identifier from the retained file information range.<BR>
+ If you specify CDC_NUL_FID as the file identifier, all file information held by the CD block (up to 254 files excluding self and parent) will be retrieved.<DT> <B>Note</b><DD> Immediately after issuing the file read (CDC_ReadFile) command, be sure to wait at least <B>16.7ms</b> to prevent the command from being overwritten.<DT> <B>example</b><DD><PRE>
+CdcFile file; /* Secure 1 file information storage area */
+ret = CDC_TgetFileInfo(fid, &file);
+
+CdcFile allfile[254]; /* Secure all file information storage area */
+ret = CDC_TgetFileInfo(CDC_NUL_FID, allfile);
+</PRE></DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no8_5"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_8">one</a><BR> <A HREF="p08_10.htm#t8_1_8">View</a><BR> <A HREF="p08_10.htm#t8_1_8">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Load file</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_ReadFile</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8.5</H4></TD></TR>
+</TABLE>
+</p>
+<DT> <B>Format</b><DD> Sint32 CDC_ReadFile(Sint32 filtno, Sint32 fid, Sint32 offset)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> filtno</TD><TD><PRE> : Aperture number</TD></TR>
+<TR><TD><PRE> fid</TD><TD><PRE> :File identifier</TD></TR>
+<TR><TD><PRE> offset</TD><TD><PRE> : Logical offset from the beginning of the file (in sectors)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> EFLS flag<DT> <B>function</b><DD> Reads the specified file into the CD buffer. The load destination selector is specified by the aperture number.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no8_6"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_8">one</a><BR> <A HREF="p08_10.htm#t8_1_8">View</a><BR> <A HREF="p08_10.htm#t8_1_8">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Aborting file access</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_AbortFile</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_AbortFile(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> EFLS flag (only cleared to 0)...Can be executed regardless of the EFLS value<DT> <B>function</b><DD> Stops accessing files using the CD block file system (features described below).<BR>
+<P><DD><UL TYPE=DISC>
+<LI> Move directory ( <B>CDC_ChgDir</b> )<LI> Maintaining file information ( <B>CDC_ReadDir</b> )<LI> Read file ( <B>CDC_ReadFile</b> )</UL>
+</P>
+<DD> When file access is aborted, the CD drive is paused and the EFLS flag in the interrupt factor register becomes 1.<BR>
+ If the file is not being accessed, just set the EFLS flag to 1.<DT> <B>remarks</b><DD> Aborting file access does not clear the buffer partition or initialize the selector.<BR>
+ If you stop executing <B>the CDC_ChgDir</b> or <B>CDC_ReadDir</b> functions, all retained file information will be cleared.<BR>
+ File access is also aborted if the tray is opened.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_17.htm">Back</a> ｜ <A HREF="p08_19.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

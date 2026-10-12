@@ -1,0 +1,378 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/10&gt;FAQ/Development environment/GNU development environment</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a> ★ <A HREF="index.htm#no6">GNU development environment</a><HR>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Development environment</b><H2 ALIGN=CENTER> GNU development environment</H2><!----------------------------------------------------------------------------->
+<A NAME="no6_01"><HR NOSHADE></a><DL>
+<H3> I want to use kanji with gcc.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it possible to use kanji strings in comments etc. with gcc?<P><DT> <FONT SIZE=5>A)</font><DD> Basically, kanji codes cannot be used. (Of course, it may pass in some cases.) However, in gcc SOA96/3/28 and later versions, you can use // comments as in C++ by default. If you use this, you won't have any problems using kanji.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_02"><HR></a><DL>
+<H3> About the assembly development environment in GNU.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I don't really understand how to create assembler routines and how to assemble them in the GNU environment.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There are two main ways to develop using an assembler in the GNU environment, depending on the coding rules. Explaining each method,</P>
+<DL>
+<P><DT> <B>1) Hitachi Assembler coding rules</b><DD> Hitachi Assembler allows you to express data as strings, and allows you to specify ALIGN and SECTION in detail.<BR>
+ This coding rule allows you to use SHCASM codes as they are, so past assets can be used effectively.<BR>
+ To assemble sources written in this format, you need an IP creation tool, an AWK script included in the SBL6 package, an AWK program such as GAWK.EXE (awk on UNIX versions), and a batch file to start them. GASM.BAT (gasm.scr for UNIX) is required. These scripts convert Hitachi Assembler expressions into GNU AS assembly code, which can then be assembled using GNU AS.</P>
+<P><DT> <B>2) GNU assembler coding rules</b><DD> In GNU as, basic code is all lowercase. If you have experience developing with GNU as, I think this is better.<BR>
+ The invocation options are similar to gcc,</P>
+<P><DD> <B>as -o object source -Iinclude -Ooptimizeflag</b></P>
+<P><DD> At SGI,</P>
+<P><DD> <B>sh-as -o object source -Iinclude -Ooptimizeflag</b></P>
+<P><DD> Assemble it like this. You can also specify optimization etc. using the same method as gcc. Also, code written using this coding rule can be assembled directly from gcc.<BR>
+ For GNU as coding rules, please refer to the info file included with the gcc package, although it is in English.<BR>
+ How to read the info file:</P>
+<P><DD> <B>info as</b></P>
+<P><DD> If you press the RET key at the item you want to read, a detailed explanation about that item will appear.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_03"><HR></a><DL>
+<H3> When compiling with gcc, an error occurs in go32.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I try to compile the SGL sample program, it stops at the following location.Why?<BR>
+ Both GCC and SGL were downloaded from the internet, and the versions of SGL are 2.0A and GCC are from 10/26/95.</P>
+<P><DD><PRE>
+&gt;C:\SGL\SAMPLE\S_2_2&gt; make
+&gt;ld -Tsl.lnk -oformat srec -Map sl.map -e ___Start main.o polygon.o 
+&gt;../../lib/libsgl.a ../../lib/libgcc.a -o sl.s
+&gt;go32 version 1.12.maint1 Copyright (C) 1994 DJ Delorie
+&gt;Error:This program requires a version of go32(1.12.maint2) newer than 
+&gt;this one.
+&gt;make.exe: *** [sl.s] Error 1
+</PRE></P>
+<P><DT><FONT SIZE=5>A)</font><DD> The following are the main causes:</P>
+<DD><OL>
+<P><B><LI></b> The version of go32.exe you are using is old.</P>
+<P><B><LI></b> If you are using a Windows95 DOS window, this problem may occur depending on the property settings.</P>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_04"><HR></a><DL>
+<H3> SBL cannot be compiled with gcc 3/28 version.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I installed gcc from SGL TOOL KIT (April 30, 1996), the following error occurs when I run make. If you restore gccsh/ and below to the old version, this error will not occur.<BR>
+ I am using SBL instead of SGL for the library, is that related?</P>
+<P><DD><PRE>
+c:/gccsh/bin/../lib/libgcc.a(__main.o): In function `__do_global_dtors':
+libgcc2.c(.text+0x2c): undefined reference to `__dtors'
+libgcc2.c(.text+0x30): undefined reference to `__dtors_end'
+c:/gccsh/bin/../lib/libgcc.a(__main.o): In function `__do_global_ctors':
+libgcc2.c(.text+0x68): undefined reference to `__ctors_end'
+libgcc2.c(.text+0x6c): undefined reference to `__ctors'
+make.exe: *** [mltest.cof] Error 1
+</PRE><P><DD>The version of gcc is</P>
+<P><DD><PRE>
+gcc driver version cygnus-2.7-96q1 SOA-960328 executing gcc version 
+cygnus-2.7-96q1
+</PRE></P>
+<P><DD>is.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Add the following segment to the link file (probably named saturn.lnk) linked with SBL.</P>
+<P><DD><PRE><B>
+.tors ALIGN(0x10) :
+{
+	___ctors = .;
+	*(.ctors)
+	___ctors_end = .;
+	___dtors = . ;
+	*(.dtors)
+	___dtors_end = . ;
+}
+</b></PRE></P>
+<P><DD>This is because C++ coding has been internally supported and symbol information has been added as GCC has been updated.</P>
+<P><DD> <B>*</b> .ctor is the C++ global constructor section, and .dtor is the C++ global destructor section.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_05"><HR></a><DL>
+<H3> Even if I increase the optimization of gcc, the speed does not increase.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I run a program (approximately 40,000h) with the GCC compiler, whether the optimization level is set to 0 or 3, there seems to be no change in processing speed.<BR>
+ What could be the reason?<BR>
+ Other compile options except -O are the same as in the sample.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> For library-dependent code (that is, if the library has a large number of functions), optimizing it will probably not make much of a difference in speed or size.<BR>
+ Also, even if you use a lot of code other than the code to be optimized, you will not see much of an optimization effect.</P>
+<P><DD> A brief explanation of the optimization options that can be used with gcc is as follows:</P>
+<DL>
+<P><DT> <B>-fthread-jumps:</b><DD> Check whether the jump instruction jumps to another comparison instruction or branch whose result is already known, and set the address of the branch instruction instead of the comparison instruction address as the jump destination.</P>
+<P><DT> <B>-fdefer-pop:</b><DD> If there are multiple calls to functions that require PUSH on the stack, POP the stack by waiting for several function calls and performing them all at once.<P><DT> <B>-fcse-follow-jumps:</b><DD> If the destination of the jump instruction is not passed by another path, follow the jump instruction and find it.</P>
+<P><DT> <B>-fcse-skip-blocks:</b><DD> Chases jump instructions that conditionally skip blocks.</P>
+<P><DT> <B>-fexpensive-optimizations:</b><DD> Optimizes with execution speed in mind.<BR>
+ This option primarily affects optimization options that are grouped together into multiple simple instructions.</P>
+<P><DT> <B>-fstrength-reduce:</b><DD> Generates code that uses as few loops as possible.</P>
+<P><DT> <B>-finline:</b><DD> Inline function calls whenever possible.</P>
+<P><DT> <B>-fcaller-saves:</b><DD> Eliminate redundant instructions to save register usage.</P>
+<P><DT> <B>-freturn-cse-after-loop:</b><DD> After loop optimization, we again remove similar code from the loop.</P>
+<P><DT> <B>-fschedule-insns2:</b><DD> After register allocation, instruction optimization is performed.</P>
+<P><DT> <B>-fomit-frame-pointer:</b><DD> Allows r14 to be used as a regular register when the frame pointer is not needed.</P>
+<P><DT> <B>-funroll-loops:</b><DD> Allows you to open and code for loops, etc.<BR>
+ More information, albeit in English, can be found in GCC's INFO file. Location,</P>
+<P><DD> <FONT SIZE=5>gcc-</font>&gt; <FONT SIZE=5>Invoking GCC-</font>&gt; <FONT SIZE=5>Optimize Options</font></P>
+<P><DD> is. Please refer there.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_06"><HR></a><DL>
+<H3> Is there any good way to dump the error list emitted by gcc into a file?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When a compile error occurs, I would like to redirect the error information and use it for tag jumps on the editor, but it seems that the error is output to stderr instead of stdout, so I can't write it to a file.<BR>
+ If possible, I would appreciate it if you could change the information such as the file and line number where the error occurred to be output to stdout.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> It is true that tools created in UNIX environments such as gcc often output errors to STDERR, so the output cannot be redirected in environments such as DOS.<BR>
+ However, if you set the parameter 2r1 to the GO32 environment variable, both STDERR and STDOUT output will be output to STDOUT, so you can redirect error output.<BR>
+ Specifically, SATURN\GCCSH\SETENV.BAT</P>
+<P><DD> <B>GO32=...</b><P><DD> part of<P><DD> <B>GO32=2r1</b><P><DD> Please. (The EMM part is only required if the CPU is 386 or less.) Another solution is to use the gcc option,</P>
+<P><DD> <B>-Wno-*</b><P><DD> You can limit the output of error messages using the following.<BR>
+ For more information on this option, please see the article about Gcc's Invoking using the info command.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_07"><HR></a><DL>
+<H3> I want to set sections for variables and functions.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to arbitrarily assign SECTION to functions and variables in the gcc environment, but how should I do this?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> In the gcc environment, SECTION can be specified for each function or variable. (It is not possible to put part of the code within a function in a separate section.)<BR>
+ To explain how to do it, declare the functions and variables as follows.</P>
+<P><DD> <B>Type declarator symbol __attribute__ ((section ("section name")));</b></P>
+<P><DD> for example,</P>
+<P><DD><PRE>
+char stack[10000] __attribute__ ((section ("STACK")));
+int flag __attribute__ ((section ("COMMON"))) = 10;
+void ExpandData( void ) __attribute__ ((section ("Overlay")));
+</PRE></P>
+<P><DD>Also, this section name must be defined when linking.<BR>
+ Regarding section declaration at link time, generally:</P>
+<P><DD> <B>'sl.lnk'</b> for SGL<DD> <B>'saturn.lnk'</b> for SBL</P>
+<P><DD> It is contained in the file.<BR>
+ If you need to specify a new section, you should add the new section using this file as a reference.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_08"><HR></a><DL>
+<H3> I want to enter long commands from the command line.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to enter long commands from the command line.<P><DT> <FONT SIZE=5>A)</font><DD> GCC supports so-called "subcommand files".</P>
+<P><DD> <B>gcc ilename...</b></P>
+<P><DD> This allows GCC to read command line options from a file.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_09"><HR></a><DL>
+<H3> I want to use an inline assembler in a C function.</H3><P><DT> <FONT SIZE=5>Q)</font><DD><P><DT> <FONT SIZE=5>A)</font><DD> Instead of defining inline assemblers using <B>"__asm__"</b> , define them using <B>"_asm_volatile"</b> .<BR>
+ This prevents you from optimizing or removing inline assemblers.</P>
+<P> GCC is known to return incorrect results when optimizing non-volatile inline assemblers.<BR>
+ Also, if you forget the two colons separating register constraints at the end of an inline assembler fragment, GCC will usually crash. Even if your inline assembler does not have register constraints, be sure to include two colons.</P>
+<P> GCC allows inline assembler sections to be placed outside functions, so it is possible to create routines written entirely in assembler in the C source.<BR>
+ When using assembly outside of C functions, ignore the "volatile" keyword as it only confuses the compiler.</P>
+<P> <B>*</b> Inline assembler written outside functions in C source cannot be debugged at the source level. - If you want to write large-sized assembly code, we recommend creating a separate assembly file.<BR>
+ This will probably allow you to properly debug at the source level.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_10"><HR></a><DL>
+<H3> GCC returns the message "garbage at end of number".</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When compiling with gcc, I get the error message "garbage at end of number".<BR>
+ When does this happen?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Have you written something like this?</P>
+<P><DD> <B>"0x1800E+OFFSET"</b></P>
+<P><DD> GCC interprets this as a floating point number because the "0E+OFFSET" part looks like a floating point number.<BR>
+ To prevent this, put a space between "E" and "+".</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_11"><HR></a><DL>
+<H3> I want to use a divider using gcc.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I heard that gcc does not normally generate code that uses a divider, but how can I generate code that uses a divider?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> SH2 has a parallel divider that operates with 39 clocks. GCC does not use this divider.<BR>
+ Below are two examples of macros to easily use the divider.</P>
+<P><DD> For C:</P>
+<P><DD><PRE>
+/*
+** void Set_Hardware_Divide(int, int);
+**
+** Set the dividend and divisor of the hardware divide unit.
+** The divider requires 37 clocks to calculate a result,
+** so you want to execute some other code before retrieving the result.
+*/
+#define Set_Hardware_Divide(x,y) \
+  ({ \ 
+     int *div_unit = (int *)0xffffff00; \ 
+     int dividend = x, divisor = y; \ 
+     __asm__ volatile ("mov.l %0,@(4,%2); mov.l %1,@%2" \ 
+       : /* no output */ \ 
+       : "r" (dividend), "r" (divisor), "r" (div_unit)); \ 
+  });
+/*
+** int Get_Hardware_Divide(void)
+**
+** Retrieves division result from the hardware divide unit.
+** If less than 37 clocks have elapsed the CPU will be halted
+** until the result is ready.
+*/
+#define Get_Hardware_Divide() \
+  ({ \ 
+    int *div_unit = (int *)0xffffff00; \
+    int __result; \
+    __asm__ volatile ("mov.l @(0x1c,%1),%0" \
+      : "=r" (__result) \ 
+      : "r" (div_unit)); \ 
+    __result; \ 
+  });
+</PRE></P>
+<P><DD>To perform a division operation, you must call Set_Hardware_Divide.<BR>
+ While the divider is calculating, we execute some C code and then call Get_Hardware_Divide to get the result.<BR>
+ Make sure that both the mainline and interrupt programs do not use the divider.<BR>
+ If both the mainline program and the interrupt routine use a divider, the result of the mainline division will be rewritten, causing a very nasty bug that cannot be identified.<BR>
+ If the divider must be used both in the main line and in the interrupt code, the RAR and RSR that use the divider must be saved and restored in the interrupt process.</P>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../what/atto.png 5x"></TD><TD> <B>Using a divider is very risky because it uses the MAC register.</b></TD></TR>
+</TABLE>
+</P>
+<DT> (Since dividers and multipliers are used inside SGL functions, there is a possibility that the MAC register will become inconsistent.) Please be careful about the state of the MAC register when using it. Technical Support cannot be held responsible for any instability or runaway behavior caused by using this feature.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_12"><HR></a><DL>
+<H3> I want to write code in C++.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to code in C++.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> In conclusion, please do not include C++ code in SATURN programs.</P>
+<P><DD> for example,</P>
+<P><DD><PRE><B>
+int main(void)
+{
+  cout</b>&lt;&lt; <B>"hello, world";
+}
+</b></PRE></P>
+<P><DD>The above program costs 448k in C++. Usually, C++ programs become extremely large due to the following two reasons.</P>
+<P><DD><OL>
+<B><LI></b> The code that is written is not effective.<B><LI></b> Importing a large library.</OL>
+</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_13"><HR></a><DL>
+<H3> What are some efficient coding techniques?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me effective techniques when writing SATURN programs using gcc.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD><DL>
+<P><DT> <B>1) Avoid code like this:</b><DD><PRE><B>
+temp[index++] = a;
+temp[index++] = b;
+temp[index++] = c;
+</b></PRE></P>
+<P><DD>ANSI C tells us to update all variables at the end of the statement.<BR>
+ So the code created is</P>
+<P><DD> We are updating "index" with each statement.</P>
+<P><DD><PRE><B>
+temp[index] = a;
+temp[index+1] = b;
+temp[index+2] = c;
+     index += 3;  
+</b></PRE></P>
+<P><DD>Another solution is to identify "index" as "register int".<BR>
+ There is no need to register index, but it is not executed directly from index. (Even if you write through the pointer, the value of index will not be rewritten.)</P>
+<P><DT> <B>2) Using local variables</b><DD> Using global variables is time consuming. - SH2 must run the following code to get the value.</P>
+<P><DD><PRE><B>
+mov.l L2,r1
+mov.l @r1,r1
+</b></PRE></P>
+<P><DD>Local variables are less time consuming to use than global variables.<BR>
+ It is stack relative and the parameters are passed through the first four registers r4-r7 so it is faster.</P>
+<P><DT> <B>3) If you want to shift to the right, use unsigned int.</b><DD> SH2 does not have an arithmetic shift instruction to the right. Therefore, gcc creates large code to arithmetic shift a signed value to the right.<BR>
+ Please use a variable that can be arithmetic shifted to the right without a sign.</P>
+<P><DT> <B>4) Write small functions.</b><DD> Try not to use too many registers in a single function, as gcc will create disastrous code if it uses too many registers.<BR>
+ If you have a large function that takes more than 100 lines, please break it up into several smaller functions.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_14"><HR></a><DL>
+<H3> I would like to display a correspondence table between sources and assemblies.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to be able to see the correspondence between C source and assembly when compiling with gcc. Is there any way to do this?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Try compiling gcc with the -Wa,-ahl options.<BR>
+ A list of possible correspondences will be printed to standard output.<BR>
+ However, the source code will not be output unless -g is added as a compile option.</P>
+<P><DD> <B><< Example output >
+></b><PRE>
+      gcc -g -O -Wa,-ahl main.c
+                         :
+        19:main.c        ****       j = 0xf000;
+        77 004c D10E                  mov.l   L10,r1
+        78 004e 9215                  mov.w   L14,r2
+        79 0050 2121                  mov.w   r2,@r1
+        21:main.c        ****     } else {
+        81 0052 A003                  bra     L4
+        82 0054 0009                  nop
+        83                    L6:
+                         :
+</PRE></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_15"><HR></a><DL>
+<H3> Which make should I use?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> An unexplained error occurs during Make.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Basically, the Makefiles provided here are written for GNU Make.<BR>
+ If you try to run this using Microsoft Make or Boland Make, an incomprehensible error may occur.<BR>
+ Each Make has its own <FONT SIZE=4>dialect</font> and may differ slightly.</p>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_16"><HR></a><DL>
+<H3> I want to create an original library.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is there no librarian for gcc?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The method to create a library in the GNU environment is as follows.</P>
+<P><DD> Create an object file.<BR>
+ Use the AR command included in the GNU package (sh-ar in the SGI environment) and write it as follows.</P>
+<P><DD> <B>AR r userlib.a userobjs.o ...</b></P>
+<P><DD> userlib.a is the destination library file<BR>
+ userobjs.o is the object file you want to turn into a library.<BR>
+ This can be listed multiple times.<BR>
+ created with this command</P>
+<P><DD> <B>ranlib userlib.a</b></P>
+<P><DD> Activate symbol information as (For the SGI version, use sh-ranlib instead of the ranlib command.)<BR>
+ The library created in this way can be used like any other library.<BR>
+ Also, if you want to add a new object to a library that has been compiled, you will need to unarchive <B>it once</b> . To unravel the archive,</P>
+<P><DD> <B>ar x userlib.a</b></P>
+<P><DD> Add a new object to the output object file and repeat the above operations to complete a new library.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_17"><HR></a><DL>
+<H3> What is gasm?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> We don't have gasm (GNU assembler?), which is used in the program makefle, but could you provide it?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> As you can see from the extension, gasm is a batch file, so by including this location in your path, gasm itself can be executed.<BR>
+ However, this batch file uses a script file for a pattern processing language called "awk" in the same directory to compile (assemble) the source file while processing it.<BR>
+ Regarding the PC version of awk, it is included in the SGL (4/30/96) version CD-ROM or the SBL posted on the technical information forum.<BR>
+ UNIX is a standard tool for the system, so there is no need to prepare anything else.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_18"><HR></a><DL>
+<H3> I get the error message "can't open blah: interrupted system call".</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I run LD on my PC</P>
+<P><DD> <B>"can't open blah: interrupted system call"</b></P>
+<P> An error message appears.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There are not enough file descriptors. Add FILE=30 to CONFIG.SYS.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_19"><HR></a><DL>
+<H3> When I try to run LD on my PC, I get the error message "Not enough memory".</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I try to run LD on my PC, I get the error message "1Not enough memory".<P><DT> <FONT SIZE=5>A)</font><DD> To see how much free memory is available for the DOS extender,</P>
+<P><DD> <B>go32</b></P>
+<P><DD> Please type.<BR>
+ Reports how much RAM and SWAP space is available.<BR>
+ If you are using EMM386,</P>
+<P><DD> <B>EMM386 AUTO</b></P>
+<P><DD> By doing so, you can convert XMS to EMS when necessary and increase the usable RAM capacity.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_20"><HR></a><DL>
+<H3> Linker is slow.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Linker is slow.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Try using RAMdisk for temporary files.<BR>
+ Many people report that this dramatically reduces link times.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_21"><HR></a><DL>
+<H3> I want to disassemble object files and COFF files.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to disassemble the contents of object files and COFF files without using a debugger.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Use the command objdump (sh-objdump for IRIX).<BR>
+ For example, if you want to disassemble a COFF file,</P>
+<P><DD> <B>objdump -d sl.cof</b></P>
+<P><DD> A disassemble list of sl.cof will be displayed.<BR>
+ However, in the case of binary data, information such as the start address is missing, so it cannot be disassembled.<BR>
+ For details on the objdump command, please see the attached information file.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_22"><HR></a><DL>
+<H3> I want to view symbol information of library files and COFF files.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to display the symbol map list of library files, COFF files, etc.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Use nm (sh-nm for IRIX).</P>
+<P><DD> <B>nm libsgl.a</b><P><DD> If you do something like this, the symbol list for libsgl.a will be displayed.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a> ★ <A HREF="index.htm#no6">GNU development environment</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

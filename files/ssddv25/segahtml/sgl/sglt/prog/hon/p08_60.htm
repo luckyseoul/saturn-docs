@@ -1,0 +1,221 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/30&gt;SGL Programmer's Tutorial/8-6.Scroll function settings</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+ <B>▲ <A HREF="p08_50.htm">Back</a> ｜ <A HREF="p08_70.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>8.Scroll</b><HR NOSHADE>
+<DL>
+<A NAME="no8_60"></A><P><DT><H2> 8-6.Scroll function settings</H2><DD> In this article, we will explain how to set up scrolling, starting with each character and finally setting up the map. In SGL, scroll functions (number of character colors, character size, etc.) are set at each stage of scroll settings.<BR>
+ The table below is a list of scroll functions.</P>
+<A NAME="t8_6"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 8-6 Scroll function list</b></CAPTION>
+<TR><TH ROWSPAN=2> function</TH><TH COLSPAN=4> normal scroll</TH><TH> rotating scroll</TH></TR>
+<TR><TH> NBG0</TH><TH> NBG1</TH><TH> NBG2</TH><TH> NBG3</TH><TH> RBG0</TH></TR>
+<TR><TD> Number of character colors</TD><TD> 16 colors<BR>
+ 256 colors<BR>
+ 2048 colors*<BR>
+ 32768 colors<BR>
+ 16.77 million colors<BR>
+ more selection</TD><TD> 16 colors<BR>
+ 256 colors<BR>
+ 2048 colors*<BR>
+ 32768 colors<BR>
+ more selection</TD><TD> 16 colors<BR>
+ 256 colors<BR>
+ more selection</TD><TD> 16 colors<BR>
+ 256 colors<BR>
+ more selection</TD><TD> 16 colors<BR>
+ 256 colors<BR>
+ 2048 colors*<BR>
+ 32768 colors<BR>
+ 16.77 million colors<BR>
+ more selection</TD></TR>
+<TR><TD> character size</TD><TD COLSPAN=5> Select from 1 cell horizontally x 1 cell vertically or 2 cells horizontally x 2 cells vertically.</TD></TR>
+<TR><TD> Pattern name data size</TD><TD COLSPAN=5> Select from 1 word or 2 words</TD></TR>
+<TR><TD> plane size</TD><TD COLSPAN=5> Select from 1 page wide x 1 page tall, 2 pages wide x 1 page tall, or 2 pages wide x 2 pages tall.</TD></TR>
+<TR><TD> Number of planes</TD><TD> 4</TD><TD> 4</TD><TD> 4</TD><TD> 4</TD><TD> 16</TD></TR>
+<TR><TD> Scaling function</TD><TD COLSPAN=2> 1/4x ~ 256x</TD><TD COLSPAN=2> none</TD><TD> Any magnification</TD></TR>
+<TR><TD> Rotation function</TD><TD COLSPAN=4> none</TD><TD> can be</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>note)</b><DD> *2048 colors are available when the color RAM mode is mode 1.<BR>
+ For mode 0 or mode 2 it will be 1024 colors<A NAME="no8_61"></A><P><DT><H3> About VRAM access restrictions</H3><DD> The list of functions listed in Table 8-6 is only a display of functions for each scroll surface. When actually using these scroll surfaces in a program, it is not always possible to use the maximum performance of each scroll surface, nor can all scroll surfaces be drawn at the same time.<BR>
+ This is caused by restrictions on access to VRAM, and the number of scroll screens and function settings that can be used at the same time are limited by these access restrictions.<BR>
+ For details on access restrictions, refer to “HARDWARE MANUAL vol.2: VDP2 User's Manual”.</P>
+<P> In addition to VRAM access specification restrictions, there are also scroll drawing restrictions that come from the character color settings for the normal scroll screen "NBG0-3".<BR>
+ (See character pattern section)</P>
+<P> These two limitations limit and determine the number of scroll planes that can be drawn at the same time and their functions.</P>
+<A NAME="no8_62"></A><P><DT><H3> character pattern</H3><DD> A character pattern is a square pattern made up of 1x1 cells or 2x2 cells, and stores information in units of dots (information such as the drawing color of the dots). In SGL, a block of character pattern information (data table) is stored in VRAM as character pattern data, and accessed and used.<BR>
+ At this stage in SGL, specify the number of character colors for each scroll surface.<BR>
+ Also, when one character is composed of four cells, the cell data used for the same character pattern must be stored consecutively in the character pattern table.</P>
+<A NAME="z8_9"></A><P ALIGN=CENTER> <B>Figure 8-9 Character pattern image</b> <BR>
+<img srcset="../grp/p08_14_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="t8_7"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 8-7 Number of character colors</b></CAPTION>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> color format</TH><TH ROWSPAN=2><PRE> Number of character colors</TH><TH ROWSPAN=2><PRE> Number of bits per dot</TH><TH COLSPAN=5><PRE> Number of colors available depending on scroll surface</TH></TR>
+<TR ALIGN=CENTER><TH> NBG0</TH><TH> NBG1</TH><TH> NBG2</TH><TH> NBG3</TH><TH> RBG0</TH></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=3> pallet format</TD><TD> 16 colors</TD><TD> 4 bits</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD> 256 colors</TD><TD> 8 bit</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD> 2048 colors</TD><TD> 16 bit<BR>
+ (Uses only lower 11 bits)</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> RGB format</TD><TD> 32768 colors</TD><TD> 16 bit</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD> 16.77 million colors</TD><TD> 32 bit<BR>
+ (Use MSB and lower 24 bits></TD><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ×</TD><TD> ○</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>note)</b><DD> In color RAM modes 0 and 2, 2048 colors become 1024 colors.</P>
+<P><DD> To determine the number of character colors and character size in SGL, use the library functions "slCharNbg0~3" and "slCharRbg0".</P>
+<P><DT> <B>[void slCharNbg0~3 ( Uint16 color_type , Uint16 char_size ) ;]</b> [void slCharRbg0 ( Uint16 color_type , Uint16 char_size ) ;]<DD> Specify the number of character colors and character size for each scroll screen (for the scroll screen name at the end of slChar). Assign the #define value according to the table below that corresponds to the number of colors and character size to the parameter.<BR>
+ However, the number of colors that can be used is limited depending on the scroll screen (see “Table 8-6 Scroll function list”).<A NAME="t8_8"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 8-8 Parameter substitution values for “slCharNbg0 to 3” and “slCharRbg0”</b></CAPTION>
+<TR><TH ROWSPAN=3></TH><TH COLSPAN=5> Number of character colors</TH><TH ROWSPAN=2 COLSPAN=2> character size</TH></TR>
+<TR><TH COLSPAN=3> pallet format</TH><TH COLSPAN=2> RGB format</TH></TR>
+<TR><TH> 16 colors</TH><TH> 256 colors</TH><TH> 2048 colors</TH><TH> 32768 colors</TH><TH> 16.77 million colors</TH><TH> 1x1</TH><TH> 2x2</TH></TR>
+<TR><TH><PRE> Substitution value</TH><TD> COL_TYPE_16</TD><TD> COL_TYPE_256</TD><TD> COL_TYPE_2048</TD><TD> COL_TYPE_32768</TD><TD> COL_TYPE_1M</TD><TD> CHAR_SIZE_1x1</TD><TD> CHAR_SIZE_2x2</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>Note 1)</b><DD> When the color RAM mode is 0 or 2, 2048 colors become 1024 colors.<BR>
+<P><DD> <B>Note 2)</b><DD> The values in the table above are defined in “sl_def.h” that comes with the system.</P>
+<A NAME="no8_63"></A><P><DT><H3> Scroll restrictions based on number of character colors</H3><DD> Depending on the color number settings for normal scroll screens NBG0 and NBG1, there may be restrictions on the number of scroll screens that can be output.<BR>
+ The table below summarizes this.</P>
+<A NAME="t8_9"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 8-9 Restrictions on scroll surface depending on number of character colors</b></CAPTION>
+<TR ALIGN=CENTER><TH COLSPAN=2> Number of colors of NBG0, NBG1</TH><TH COLSPAN=4> valid scroll surface</TH></TR>
+<TR ALIGN=CENTER><TH> NBG0</TH><TH> NBG1</TH><TH> NBG0</TH><TH> NBG1</TH><TH> NBG2</TH><TH> NBG3</TH></TR>
+<TR ALIGN=CENTER><TD> 16.77 million colors</TD><TD> *</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> 2048 colors or 32678 colors<TD> *</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> *</TD><TD> 2048 colors or 32678 colors<TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> 2048 colors or 32678 colors</TD><TD> 2048 colors or 32678 colors<TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>Note)</b> * indicates selection of 256 colors or less.</P>
+<P><DD><LI> If NBG0 is set to 16.77 million colors, NBG1 to 3 cannot be displayed.<LI> If NBG0 is set to 2048 colors or 32768 colors, NBG2 cannot be displayed.<LI> If NBG1 is set to 2048 colors or 32768 colors, NBG3 cannot be displayed.</P>
+<A NAME="no8_64"></A><P><DT><H3> Scroll restrictions due to VRAM access</H3><P><DD> Due to hardware performance, Sega Saturn also has scrolling restrictions due to VRAM access.<BR>
+ This applies in addition to the limitations imposed by the number of character colors on the normal scroll screen.<BR>
+ In particular, be careful when scaling down the normal scroll surface or using a rotating scroll surface, as the number of character colors and the scroll surface that can be drawn are severely limited.<BR>
+ For details on access restrictions, refer to “HARDWARE MANUAL vol.2: VDP2 User's Manual”.</P>
+<A NAME="no8_65"></A><P><DT><H3> pattern name data</H3><DD> Pattern name data is created by extracting the following two pieces of information from the dot-by-dot data created as a character pattern.</P>
+<PRE>
+Character number: Start address of character pattern (VRAM)
+                              Character patterns are stored in units of 20H.Palette number: Palette number of the color palette to be used (color RAM)
+</PRE><P>The pattern name data is finally composed of the above two pieces of information plus the following two function control bits related to character patterns.</P>
+<P> Special function bits (2 bits): Controls special color calculations and special priorities<BR>
+ Reversal function bit (2 bits): Controls the vertical and horizontal reversal of the character pattern.</P>
+<P> Pattern name data is classified into three types shown in a), b), and c) in the figure below based on the difference in the amount of information they contain.<BR>
+ (See next section for details)<BR>
+ The figure is an image model of pattern name data. From this figure, you can see that depending on the type of pattern name data, special function bits and inversion function bits may or may not be included.</P>
+<A NAME="z"></A> <A ALIGN=CENTER><B>Figure 8-10 Pattern name data image</b></a><BR>
+<A ALIGN=CENTER><img srcset="../grp/p08_16.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></a> The pattern name data is used when setting the page, and a pattern name data table is created using 64 x 64 consecutive pattern name data as a group, and placement information is passed to the plane and map.</P>
+<A NAME="no8_66"></A><P><DT><H3> Data type of pattern name data</H3><DD> There are two types of pattern name data: 1 word type and 2 word type.<BR>
+ The 1-word type is further divided into two types depending on the number of information bits used for character identification (10 or 12 pattern identification bits).<BR>
+ Each data type has its advantages and disadvantages, but in SGL you must select and use one of these three.</P>
+<A NAME="t8_10"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 8-10 Pattern name data size</b></CAPTION>
+<TR ALIGN=CENTER><TH> word size</TH><TH> Character number bit number</TH><TH> remarks</TH></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> ☆<BR>
+ 1 word<TD> lower 10 bits</TD><TD> Reverse function can be specified for each character</TD></TR>
+<TR ALIGN=CENTER><TD> lower 12 bits</TD><TD> No reversal function</TD></TR>
+<TR ALIGN=CENTER><TD> 2 words</TD><TD> lower 15 bits</TD><TD> Reverse function can be specified for each character</TD></TR>
+</TABLE>
+</P>
+<P><DT><TABLE>
+<TR><TH><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>SGL recommends 1 word size.</b></TD></TR>
+</TABLE>
+</P>
+<P><DD> One-word pattern name data is divided into two types depending on whether or not to introduce inversion function bits (2 bits) into the pattern name data.</P>
+<P><DD> As the name suggests, the character pattern reversal function is for controlling and executing the vertical and horizontal reversal of the corresponding character pattern. In order to control this, it is necessary to reserve two inversion function bits in the pattern name data.<BR>
+ In the case of 2-word type pattern name data, the inversion function bit is always reserved, but in the case of 1-word type, there is not enough bits to use, so if the inversion function bit is secured, the number of character patterns that can be identified is limited. 2 bits can be removed.<BR>
+ Therefore, 1-word pattern name data can be divided into two types depending on whether the inversion function is used or not, that is, the number of distinguishable character patterns.</P>
+<P><DD> The difference between the 1-word type and the 2-word type is simply the number of character patterns that can be processed. However, the memory area used by the 2-word type is simply double that of the 1-word type, and while the 1-word type can specify offsets, the 2-word type requires absolute addresses to be specified. Therefore, considering the ease of use, SGL recommends one-word pattern name data.</P>
+<A NAME="no8_67"></A><P><DT><H3> About auxiliary data</H3><DD> If the pattern name data type is one word, it will not be possible to specify all the necessary pattern name data. Therefore, the system supplements the pattern name data with the lower 10 bits of the pattern name control register. This is called auxiliary data.<BR>
+ For details, refer to “HARDWARE MANUAL vol.2: VDP2 Manual”.</P>
+<A NAME="no8_68"></A><P><DT><H3> page</H3><DD> The page is a square of character patterns with a size of 64 cells horizontally and 64 cells vertically. The actual data format is one table of pattern name data for each character pattern, 64 cells wide x 64 cells high, stored consecutively in memory, and this is called a pattern name data table.<BR>
+ The pattern name table created in page setup is passed to a higher level plane or map and rearranged.</P>
+<A NAME="z8_11"></A><P ALIGN=CENTER> <B>Figure 8-11 Page image</b><BR>
+<img srcset="../grp/p08_18_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> To set pages in SGL, use the library functions "slPageNbg0~3" and "slPageRbg0" depending on each scroll screen.</P>
+<P><DT> <B>[void slPageNbg0~3 (void *cell_adr, void *col_adr, Uint16 data_type);]</b> [void slPageRbg0 (void *cell_adr, void *col_adr, Uint16 data_type);]<DD> Configure the page (pattern name data table).<BR>
+ Assign the parameters in order: the start address of the character pattern to be used, the start address of the palette to be used (offset can be specified if it is a 1-word type), and the type specification of the pattern name data (see the table below for parameter substitution values). .<A NAME="t8_11"></A><P><DD> <B>Table 8-11 Parameter substitution values for “slPageNbg0 to 3” and “slPageRbg0” (data_type)</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> word count</TH><TH> character number bit</TH><TH> Substitution value</TH></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> 1 word<TD> lower 10 bits</TD><TD><PRE> PNB_1WORD</TD></TR>
+<TR ALIGN=CENTER><TD> lower 12 bits</TD><TD><PRE> PNB_1WORD|CN_12BIT</TD></TR>
+<TR ALIGN=CENTER><TD> 2 words</TD><TD> lower 16 bits</TD><TD> PNB_2WORD</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>Note)</b> The values in the table above are defined in “sl_def.h” that comes with the system.</P>
+<P><DD> The following figure shows an example of actual page settings and a list of #defines used for page setting parameters.</P>
+<A NAME="z8_12"></A><P><DD> <B>Figure 8-12 Parameter setting example for “slPageNbg0 to 3” and “slPageRbg0”</b><P><DD><PRE><H3>
+slPageNbg0(NBG0_CELL_ADR,0,PNB_1WORD|CN_10BIT);
+↑ ↑↑ ↑
+: : : Character number bit specification : : Word count specification : Palette start address (offset specification)
+Character pattern start address</H3></PRE></P>
+<A NAME="l8_1"></A><P ALIGN=CENTER> <B>Listing 8-1 #define related to page setting parameters</b></P>
+<P><DD><PRE>
+<B>● #define used for page setting parameters ●</b>
+/* VRAM_BANK ADDRESS */
+#define VDP2_VRAM_A0 0x25e00000
+#define VDP2_VRAM_A1 0x25e20000
+#define VDP2_VRAM_B0 0x25e40000
+#define VDP2_VRAM_B1 0x25e60000
+/* slPage */
+#define PNB_2WORD 0
+#define PNB_1WORD 0x8000
+#define CN_10BIT 0
+#define CN_12BIT 0x4000
+/* others */
+#define NBG_CELL_ADR VDP2_VRAM_B0
+</PRE><P><DT><B>note)</b><DD> These #defines are defined in “sl_def.h”.</P>
+<A NAME="no8_69"></A><P><DT><H3> plane</H3><P><DD> A plane page is one in which pages are arranged in one of the following sizes: 1 width x 1 height, 2 width x 1 height, or 2 width x 2 height. When a plane is composed of multiple pages, the page data (pattern name data table) that composes the plane must be stored consecutively in VRAM.<BR>
+ Plane data is passed to higher-level maps and rearranged.</P>
+<A NAME="z8_13"></A><P ALIGN=CENTER> <B>Figure 8-13 Plane image</b><BR>
+<img srcset="../grp/p08_20_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>Note)</b> All are displayed vertically and horizontally.</P>
+<P><DD> To set the plane size in SGL, use the library functions “slPlaneNbg0~3” and “slPlaneRA, B”.</P>
+<P><DT> <B>[void slPlaneNbg0~3 (Uint16 plane_size );]</b><DT> <B>[void slPlaneRA,RB( Uint16 plane_size );]</b><DD　>
+ Sets the plane size of each scroll surface. Assign the values in the table below that correspond to the plane size to the parameters.</P>
+<A NAME="t8_12"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 8-12 Parameter substitution values for “slPlaneNbg0 to 3” and “slPlaneRA,RB” (plane_size)</b></CAPTION>
+<TR><TH ROWSPAN=2></TH><TH COLSPAN=3> plane size</TH></TR>
+<TR><TH> 1 horizontal x 1 vertical</TH><TH> 2 horizontal x 1 vertical</TH><TH> 2 horizontal x 2 vertical</TH></TR>
+<TR><TH> Assignment value</TH><TD> PL_SIZE_1x1</TD><TD> PL_SIZE_2x1</TD><TD> PL_SIZE_2x2</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>note)</b><DD> The values in the table above are defined in “sl_def.h” that comes with the system.</P>
+<P><DT><H3> Regarding plane size specification limitations due to reduction settings</H3><P><DD> If you set the reducible range to 1/4 times on normal scroll screens NBG0 and NBG1, do not set the plane size of that scroll screen to 2 x 2 pages. This is because the map size when the reducible range is increased to 1/4 is different from normal.<BR>
+ 1×1 and 2×1 pages can be used without any problems.<BR>
+ For details on plane size specification restrictions, refer to “HARDWARE MANUAL vol.2: VDP2 User's Manual”.</P>
+<A NAME="no8_6a"></A><P><DT><H3> map</H3><P><DD> The map is the largest unit of scrolling that SGL actually uses to draw scrolls. The map is represented by 2 horizontal x 2 vertical planes on a normal scroll screen, and 4 horizontal x 4 vertical planes on a rotating scroll screen.<BR>
+ The planes that make up the map can be arbitrarily stored (without having to be stored consecutively in VRAM) by specifying the start address of each plane (actually, the start address where the pattern name data table that makes up the plane is stored). You can decide. For this reason, it is also possible to make all the planes that make up the map the same.<BR>
+ The scroll movement, scaling, and rotation described below are also performed on a map-by-map basis.</P>
+<A NAME="z8_14"></A><P ALIGN=CENTER> <B>Figure 8-14 Map image</b><BR>
+<img srcset="../grp/p08_21_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The map size is determined by the type of scroll screen.<LI> Normal scroll screen: 4 planes (2 horizontally x 2 vertically)<LI> Rotating scroll screen: 16 planes in total (4 horizontally x 4 vertically)<P><DD> To register each plane that makes up the map in SGL, use the library functions “slMapNbg0~3” and “sl1MapRA,RB”.</P>
+<P><DL>
+ <B>[void slMapNbg0~3 ( void *map_a , void *map_b , void *map_c , void *map_d );]</b><DD> Register plane data to the map of each normal scroll screen.<BR>
+ Assign the start address of each of the four planes to be registered to each parameter. The target scroll screen corresponds to the normal scroll screen name at the end of the function name.</P>
+<P><DT> <B>[void sl1MapRA ( void *map_a );]</b><DT> <B>[void sl1MapRB ( void *map_a );]</b><DD> Register plane data to the map on the rotating scroll screen.<BR>
+ Assign the start address of the plane to be registered to each parameter. The function starts from the specified address.<BR>
+ Register one page of plane data to the map.<BR>
+ Also, the function "sl1MapRA" is used for map registration when rotation parameter A is used, and the function "sl1MapRB" is used for map registration when rotation parameter B is used.</P>
+<P><DT><TABLE>
+<TR><TH><PRE> Note<BR><img srcset="../../../../what/atto.png 5x"></TH><TD><PRE> <B>For rotation parameters, see below.</b><BR><B>
+<FONT SIZE=5><A HREF="#no8_6c">“Function settings specific to the rotating scroll screen”</a></font></b><BR> <B>Please refer to.</b></TR></TABLE></P><A NAME="no8_6b"></A><P><DT><H3> Reduce settings</H3><DD> Of the five types of scroll screens on the Sega Saturn, three of them, the rotating scroll screen "RBG0" and the normal scroll screens "NBG0, NBG1", can be enlarged or reduced for scrolling. Among the three scroll screens that can be enlarged or reduced, the rotating scroll screen “RBG0” can always be enlarged or reduced at any magnification, but the normal scroll screens “NBG0, NBG1” can be enlarged or reduced in the range of 1/4 to 256 times. You can only scale within.<BR> Furthermore, the normal scroll screen has three modes for scaling depending on the setting of the reducible range. This is called a reduction setting, and therefore, when using the normal scroll screen “NBG0, NBG1”, it is necessary to perform a reduction setting. For details, refer to “HARDWARE MANUAL vol.2: VD P2 User Manual P129-P130”.</P><A NAME="t8_13"></A><P><DD> <B>Table 8-13 Scroll screen and scaling range</b><TABLE BORDER=1><TR ALIGN=CENTER><TH> scroll type</TH><TH> name</TH><TH> Scaling</TH><TH> Scaling range</TH></TR><TR ALIGN=CENTER><TD ROWSPAN=4> Normal scroll screen</TD><TD> NBG0</TD><TD> ○</TD><TD> 1/4 to 256 times</TD></TR><TR ALIGN=CENTER></TD><TD> NBG1</TD><TD> ○</TD><TD> 1/4 to 256 times</TD></TR><TR ALIGN=CENTER></TD><TD> NBG2</TD><TD> ×</TD><TD></TD></TR><TR ALIGN=CENTER></TD><TD> NBG3</TD><TD> ×</TD><TD></TD></TR><TR ALIGN=CENTER><TD> rotating scroll</TD></TD><TD> RBG0</TD><TD> ○</TD><TD> Any magnification</TD></TR></TABLE></P><P><DT> <B>note)</b><DD> The reducible range of NBG0,1 changes depending on the reduction setting.</P><P> To set reduction in SGL, use the library function “slZoomModeNbg0,1” that corresponds to the normal scroll screen for which you want to set reduction.</P></DL><DL><DT> <B>[void slZoomModeNbg0,1 ( Uint16 zoom_mode );]</b><DD> Determine the reduction setting for the normal scroll screen “NBG0, NBG1” that can be enlarged or reduced.<BR> The target scroll screen corresponds to the normal scroll screen name at the end of the function name.<BR> Assign the values in the table below that correspond to the reduction setting mode to the parameters.</DL><A NAME="t8_14"></A><P><DD> <B>Table 8-14 Parameter substitution value for “slZoomModeNbg0,1” (zoom_mode)</b><TABLE BORDER=1><TR><TH ROWSPAN=2></TH><TH COLSPAN=3> plane size</TH></TR><TR><TH><PRE> 1x</TH><TH><PRE> 1/2 times</TH><TH><PRE> 1/4 times</TH></TR><TR ALIGN=CENTER><TH> Assignment value</TH><TD> ZOOM_1</TD><TD> ZOOM_HALF</TD><TD> ZOOM_QUATER</TD></TR></TABLE></P><P><DT> <B>Note)</b> The values in the table above are defined in “sl_def.h” that comes with the system.</P><P><DT><H3> About scaling the rotating scroll screen</H3><DD> The rotary scroll screen “RBG0” can always be enlarged or reduced at any magnification, so there is no need to make any reduction settings.</P><P><DT><H3> Regarding the limit on the number of scroll pages due to reduction settings</H3><DD> Depending on the reduction setting of the normal scroll screen "NBG0, NBG1" (if it is possible to reduce it to a smaller value), the number of scroll screens and functions that can be displayed may be limited. This is because the number of VRAM accesses changes depending on the reduction settings. For details on access restrictions, refer to “HARDWARE MANUAL vol.2: VDP2 User's Manual”.</P><A NAME="no8_6c"></A><P><DT><H3> Function settings specific to rotating scroll screen 1</H3><DD> In the case of a rotating scroll screen, several function settings are required in addition to the scroll function settings mentioned above.<BR> These function settings are necessary to use the functions specific to rotary scrolling.</P><P><DT> <B>●Rotation parameter settings</b><BR><DD> When using a rotating scroll screen, an area is required to store and recall some information related to rotation, and this collection of information is called rotation parameters.<BR> So, if you want to use a rotating scroll screen, you need to store the rotation parameters in VRAM as part of the scroll function settings (size of rotation parameters: 100H).<BR> Please use the library function “slRparaInitSet” to specify rotation parameters.</P><P><DD> <B>[void slRparaInitSet ( ROTSCROLL *Rpara_adr );]</b><DD> Store rotation parameters in VRAM area and set default values at the same time.<BR> Assign the start address of the area that stores rotation parameters to the parameter.</P><P><DT> <B>●Rotation parameter usage mode</b><DD> There are two types of rotation parameters: rotation parameter A and rotation parameter B. These two types of rotation parameters are stored together in the area secured by the function "slRparaInitSet". Since there are two types of rotation parameters, the rotation scroll will simultaneously hold two types of state data, and when drawing, it is possible to select one of these two and execute drawing on the monitor. Become.<BR> The user can select how to use the rotation parameters from among the following four rotation parameter usage modes.</P><P><DD> Mode 0: Use rotation parameter A<DD> Mode 1: Use rotation parameter B<DD> Mode 2: Switch images according to the coefficient data read from the coefficient table of rotation parameter A<DD> Mode 3: Switch by rotation parameter window</P><P><DD> <B>[void slRparaMode( Uint16 mode );]</b><DD> Switches the usage mode of rotation parameters.<BR> Assign the flag in the table below that indicates the rotation parameter usage mode to the parameter.</P><A NAME="t"></A><P><DD> <B>Table 8-15 Parameter substitution values for “slRparaMode”</b><TABLE BORDER=1><TR><TH></TH><TH> mode 0</TH><TH> mode 1</TH><TH> mode 2</TH><TH> mode 3</TH></TR><TR ALIGN=CENTER><TH> Assignment value</TH><TD> R.A.</TD><TD> R.B.</TD><TD> K_CHANGE</TD><TD> W_CHANGE</TD></TR></TABLE></P><P><DT> <B>Note)</b> The values in the table above are defined in “sl_def.h” that comes with the system.</P><P><DT> <B>●Current rotation parameter switching</b><DD> Among the functions used for rotational scrolling, those whose function names end with “R” set the function that each function handles for the current rotation parameter. By switching with ``, you can set separate functions for rotation parameters A and B.</P><P><DD> Also, for function names ending in "RA" or "RB", settings are made for the rotation parameters pointed to by the respective function names.</P><P><DD> <B>[void slCurRpara( Uint16 flag );]</b><DD> Switches the current rotation parameter.<BR> Assign the flag in the table below that indicates the rotation parameter to be switched to the parameter.</P><A NAME="t8_16"></A><P><DD> <B>Table 8-16 Parameter substitution values for “slCurRpara”</b><TABLE BORDER=1><TR ALIGN=CENTER><TH></TH><TH> Rotation parameter A</TH><TH> Rotation parameter B</TH></TR><TR ALIGN=CENTER><TH> Assignment value</TH><TD> R.A.</TD><TD> R.B.</TD></TR></TABLE><DD> <B>Note)</b> The values in the table above are defined in “sl_def.h” that comes with the system.</P><BLOCK  QUPTE><P> <B>Note</b><BR> For details on rotation parameters, please refer to “HARDWARE MANUAL vol.2”<BR> (VDP2 User's Manual)</P></BLOCKQUOTE><A NAME="no8_6d"></A><P><DT><H3> Function settings specific to rotating scroll screen 2</H3><P><DT> <B>●Selection of screen over processing mode</b><DD> Select the process to be performed when the drawing on the rotating scroll screen exceeds the display area. This is called screen overflow processing, and there are four modes for screen overflow processing:</P><P><DD> Mode 0: Outside the area, the image set in the display area is repeated.<DD> Mode 1: Outside the area, the character pattern specified by the screen over PN register is repeated.<DD> Mode 2: Make everything outside the area transparent.<DD> Mode 3: Forcibly clip the area to “0≦X≦512, 0≦Y≦512” and make everything outside the area transparent.</P><P><DD> Use the library function “slOverRA,RB” to select screen over processing.</P><P><DD> <B>[void slOverRA ( Uint16 over_mode ) ;]</b><DD> <B>[void slOverRB ( Uint16 over_mode );]</b><DD> Select the screen overflow process when the rotating scroll screen exceeds the display area.<BR> Assign the values in the table below that correspond to the screen over processing mode to the parameters.<BR> The function "slOverRA" executes the overprocessing settings when using rotation parameter A, and the function "slOverRB" executes the overprocessing settings when using rotation parameter B.</P><A NAME="t"></A><P><DD> <B>Table 8-17 Screen over processing parameter substitution value (over_mode)</b><DD><TABLE BORDER=1><TR><TH ROWSPAN=2></TH><TH COLSPAN=4> Over processing mode</TH><TR><TH> mode 0</TH><TH> mode 1</TH><TH> mode 2</TH><TH> mode 3</TH></TR><TR><TH> Parameter substitution value</TH><TH> 0</TH><TH> 1</TH><TH> 2</TH><TH> 3</TH></TR></TABLE></P><A NAME="no8_6e"></A><P><DT><H3> Scroll setting flow</H3><DD> Here, we will use a simple flowchart to explain the scroll setting steps from character pattern settings to page → plane → map settings, reduction settings, and scroll registration, and summarize the scroll function settings.</P><A NAME="f8_1"></A><P ALIGN=CENTER> <B>Flow 8-1 Flow of scroll function settings</b><BR><img srcset="../grp/p08_26.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P></DL><HR NOSHADE> <B>▲ <A HREF="p08_50.htm">Back</a> ｜ <A HREF="p08_70.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

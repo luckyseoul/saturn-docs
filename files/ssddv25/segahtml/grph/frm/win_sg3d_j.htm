@@ -1,0 +1,239 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SG3Dファイルフォーマット</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm">Graphic Tools Guide</A>
+★<a href="../index_j.htm#frm">フォーマット一覧</A>
+<HR NOSHADE>
+<CENTER>
+<H1>SG3Dファイルフォーマット</H1>
+<H5>1996-07-12</H5>
+</CENTER>
+<HR>
+<DL>
+<P><DT><H3>■ファイルレイアウト</H3>
+<DD><TABLE BORDER=0>
+<TR><TH><PRE>[ヘッダ]</TH><TD> 必須</TD></TR>
+<TR><TH><PRE>[オブジェクト](1)</TH><TD> 必須</TD></TR>
+<TR><TH><PRE>[頂　点]</TH><TD> 必須</TD></TR>
+<TR><TH><PRE>[法　線]</TH><TD> 必須</TD></TR>
+<TR><TH><PRE>[ポリゴン]</TH><TD> 必須</TD></TR>
+<TR><TH><PRE>[モデル名]</TH><TD> 拡張</TD></TR>
+<TR><TH><PRE>........</TH><TD></TD></TR>
+<TR><TH><PRE>[オブジェクト](2)</TH><TD></TD></TR>
+<TR><TH><PRE>[頂　点]</TH><TD></TD></TR>
+<TR><TH><PRE>[法　線]</TH><TD></TD></TR>
+<TR><TH><PRE>[ポリゴン]</TH><TD></TD></TR>
+<TR><TH><PRE>........</TH><TD></TD></TR>
+<TR><TH><PRE>[オブジェクト]...</TH><TD></TD></TR>
+<TR><TH><PRE>.............</TH><TD></TD></TR>
+</TABLE>
+
+<P><DT><H3>■IFF形式</H3>
+<DL>
+	<P><DT><B>(1)リトルエンディアン(Intel形式)</B>
+
+	<P><DT><B>(2)タグ</B>
+	<DD>
+<PRE>
+typedef char CHAR;
+typedef unsigned char BYTE;
+typedef unsigned short WORD;
+typedef unsigned long DWORD;
+typedef float FLOAT;
+struct tag_IFF{
+CHAR chunk[4]; //4文字のチャンク名
+DWORD size; //データサイズ
+};
+</PRE>
+
+	<P><DT><B>(3)レイアウト</B>
+	<DD>
+<PRE>
+[タグ]
+[データ]
+[タグ]
+[データ]
+......
+......
+</PRE>
+	</DL>
+
+<P><DT><H3>■フォーマット</H3>
+<DL>
+	<P><DT><H3>(1)標準タグ→全て必須</H3>
+	<DD><B>[ヘッダ]</B>
+<PRE>
+　内　容 : ファイル識別情報
+チャンク : &quot;SG3D&quot;
+　サイズ : 256
+　データ : タイプ 内容
+　　　　   DWORD バージョン(0x00011000)
+　　　　   DWORD オブジェクト数
+　　　　   DWORD[62] 予約
+</PRE>
+
+	<P><DD><B>[オブジェクト]</B>
+<PRE>
+　内　容 : 階層情報
+チャンク : &quot;OBJT&quot;
+　サイズ : 96
+　データ : タイプ 内容
+　　　　   FLOAT[4][3] 3x4の変換マトリクス
+　　　　   FLOAT[3] トランスレーション(XYZ)
+　　　　   FLOAT[3] ローテーション(XYZ)
+　　　　   FLOAT[3] スケーリング(XYZ)
+　　　　   DWORD ID(0〜n)
+　　　　   DWORD 子供のID
+　　　　   DWORD 兄弟のID
+
+　備　考 : 角度の単位は(度)
+　　　　   IDは子供・兄弟がない場合は-1(0xffffffff)
+</PRE>
+
+	<P><DD><B>[頂点]</B>
+<PRE>
+　内　容 : 頂点座標
+チャンク : &quot;VerF&quot;
+　サイズ : 12x頂点数
+　データ : タイプ 内容
+　　　　   FLOAT[3] 頂点の座標(XYZ)
+
+　備　考 : 上記データを頂点数分セットする
+</PRE>
+
+	<P><DD><B>[法線]</B>
+<PRE>
+　内　容 : 頂点の法線ベクトル
+チャンク : &quot;NorF&quot;
+　サイズ : 12x頂点数
+　データ : タイプ 内容
+　　　　   FLOAT[3] 頂点の法線ベクトル(XYZ)
+
+　備　考 : 上記データを頂点数分セットする
+　　　　   単位ベクトル
+</PRE>
+
+	<P><DD><B>[ポリゴン]</B>
+<PRE>
+　内　容 : ポリゴンの頂点番号
+チャンク : &quot;POLY&quot;
+　サイズ : 8xポリゴン数
+　データ : タイプ 内容
+　　　　   WORD[4] 4点ポリゴンを構成する頂点番号
+
+　備　考 : 上記データをポリゴン数分セットする
+　　　　   頂点番号は右回り
+</PRE>
+
+<P><DT><H3>(2)拡張タグ→なくてもよい</H3>
+	<DD><B>[モデル名]</B>
+<PRE>
+　内　容 : オブジェクト(階層)名
+チャンク : &quot;MoNm&quot;
+　サイズ : 文字列長
+　データ : タイプ 内容
+　　　　   CHAR[?] オブジェクト名の文字列
+
+　備　考 : 文字列は終了コード('¥0')を含めなければならない
+</PRE>
+
+	<P><DD><B>[グーローテーブル]</B>
+<PRE>
+　内　容 : セガサターン用グーローテーブル
+チャンク : &quot;SSGr&quot;
+　サイズ : 8xポリゴン数
+　データ : タイプ 内容
+　　　　   WORD[4] ポリゴン適用されたグーローデータ
+
+　備　考 : 上記データをポリゴン数分セットする
+　　　　   デフォルトは{0xc210,0xc210,0xc210,0xc210}
+詳細別途
+</PRE>
+
+	<P><DD><B>[アトリビュート]</B>
+<PRE>
+　内　容 : セガサターン用面属性
+チャンク : &quot;SSAt&quot;
+　サイズ : 12xポリゴン数
+　データ : タイプ 内容
+　　　　   WORD 表裏反転フラグ
+　　　　   0 Single_Plane
+　　　　   1 Dual_Plane
+
+　　　　   WORD Zソートフラグ
+　　　　   0 SORT_CEN (中心点)
+　　　　   1 SORT_MIN (最近点)
+　　　　   2 SORT_MAX (再遠点)
+　　　　   3 SORT_FAR (未使用)
+　　　　   4 SORT_NER (未使用)
+
+　　　　   WORD テクスチャ番号
+
+　　　　   WORD カラー(R:G:B=5:5:5)
+
+　　　　   DWORD 面属性の種類
+　　　　   BIT
+　　　　   0 texHflip
+　　　　   1 texVflip
+　　　　   2
+　　　　   3 sprTexture
+　　　　   4 sprPolygon
+　　　　   5 sprPolyLine
+　　　　   6
+　　　　   7 UserShade
+　　　　   8 MESHon
+　　　　   9 CL_Shadow
+　　　　   10 CL_Half
+　　　　   11 CL_Trans
+　　　　   12 CL_Gouraud
+　　　　   13 ECdis
+　　　　   14 SPdis
+　　　　   15 CL16Bnk
+　　　　   16 CL16Look
+　　　　   17 CL64Bnk
+　　　　   18 CL128Bnk
+　　　　   19 CL256Bnk
+　　　　   20 CL32KRGB
+　　　　   21 Window_In
+　　　　   22 Window_Out
+　　　　   23
+　　　　   24 UseLight
+　　　　   25 UseClip
+　　　　   26 UsePalette
+　　　　   27 UseNearClip
+　　　　   28 UseDepth
+　　　　   29
+　　　　   30
+　　　　   31
+
+　備　考 : 上記データをポリゴン数分セットする
+　　　　   デフォルトは{0,0,0,0xc210,0x01100010}
+　　　　   詳細別途
+</PRE>
+	</DL>
+</DL>
+<HR NOSHADE>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm">Graphic Tools Guide</A>
+★<a href="../index_j.htm#frm">フォーマット一覧</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

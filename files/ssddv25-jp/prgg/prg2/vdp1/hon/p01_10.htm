@@ -1,0 +1,182 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/11&gt;VDP1ライブラリ/1.VDP1基本処理ガイド</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">VDP1ライブラリ</A>
+<HR>
+<B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ライブラリ</B>
+<H2 ALIGN=CENTER>1.VDP1基本処理ガイド</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A>
+	<P><DT><H3>1.1　目的</H3>
+	<DT><UL TYPE="DISK">
+	<P><LI>VDP1の初期化やレジスタ操作などハードウェアに関する処理を隠ぺいし、アプリケーション作成者の負担を軽減します。</P>
+	<P><LI>VRAMへのコマンド書き込みは、アプリケーションにより高速化のための処理方式が異なると思われるので、基本処理ライブラリでは行いません。アプリケーションにはVRAMのアドレスを通知しますので、アプリケーション側で自由に管理および書き込みができます(VRAMへの書き込みやVRAMの管理は、拡張処理ライブラリでサポートします)。</P>
+	</UL>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>1.2　解説</H3>
+	<DT><B>　［初期処理］</B>
+	<DT><UL TYPE="DISK">
+	<P><LI>TVモードおよび、フレームチェンジごとのフレームバッファのイレースエリアとイレースデータを設定します。</P>
+	</UL>
+
+	<P><DT><B>　［V-BLANK割り込み内処理関数］</B>
+	<DT><UL TYPE="DISK">
+	<P><LI>SPR_WaitDrawEnd()は、V_BLANKVDP割り込み処理ルーチン内で使用され、VDP1描画終了をチェックします。</P>
+	</UL>
+
+<A NAME="no1_30"></A>
+	<P><DT><H3>1.3　スプライト実行環境の変更方法</H3>
+	<DD>　3Dおよび2Dの高速処理を行うために、スレーブSH、DSPを用いますが、
+   アプリケーションによってはそれらをライブラリ側で使用しないようにしたい場合
+   があります。このような場合、<B>sega_spr.h</B> の先頭に定義されている以下の 
+   #define を定義またはコメントアウトしてスプライト、スクロールライブラリを
+   再構築することで、スプライトの実行環境を変更することができます。</P>
+
+	<P><DD><PRE>
+/*------------------------------------------
+ * Select 3D & Sprite Execute Environment
+ *----------------------------------------*/
+ #define  <A HREF="#SPR_SYNC_VB_OUT">SPR_SYNC_VB_OUT</A>
+ #define  <A HREF="#USE_SLAVE">USE_SLAVE</A>
+ #define  <A HREF="#USE_DSP">USE_DSP</A>
+ #define  <A HREF="#USE_INBETWEEN_OBJECT">USE_INBETWEEN_OBJECT</A>
+ #define  <A HREF="#USE_DEBUG_INFO">USE_DEBUG_INFO</A>
+</PRE></P>
+
+	<P><DD>各 #define の説明を以下に示します。
+	<DL>
+<A NAME="SPR_SYNC_VB_OUT"></A>
+	<P><DT><B>(1) SPR_SYNC_VB_OUT</B>
+	<DD>　これを定義すると SCL_DisplayFrame() のスプライトのフレームバッファ切り替え
+    待ちがVブランクアウトになり、1フィールドの処理時間が延びます。<BR>
+    スクロールのレジスタ書き込みは、SCL_DisplayFrame() を待たずVブランクイン
+    で行われます。<BR>
+    コメントアウトすると、従来通りVブランクインでスクロール、スプライトの同期
+    が取られます。</P>
+
+<A NAME="USE_SLAVE"></A>
+	<P><DT><B>(2) USE_SLAVE</B>
+	<DD>　これを定義するとスレーブCPUを使用し、メインCPUとの並列処理を行います。<BR>
+    コメントアウトするとスレーブCPUは使用しません。</P>
+
+<A NAME="USE_DSP"></A>
+	<P><DT><B>(3) USE_DSP</B>
+	<DD>　これを定義すると座標変換のマトリックス合成をDSPで行い、CPU側と並列処理を行います。<BR>
+    コメントアウトするとDSPは使用しません。</P>
+
+<A NAME="USE_INBETWEEN_OBJECT"></A>
+	<P><DT><B>(4) USE_INBETWEEN_OBJECT</B>
+	<DD>　これを定義するとオブジェクト間接続ポリゴンの処理ができます。オブジェクト間
+    接続ポリゴンが無い場合、この定義をコメントアウトすることで3Dライブラリの
+    若干のシェイプアップが図れます。</P>
+
+<A NAME="USE_DEBUG_INFO"></A>
+	<P><DT><B>(5) USE_DEBUG_INFO</B>
+	<DD>　これを定義すると SPR_3DrawModel() による計算ポリゴン数と描画ポリゴン数を
+    以下の変数に設定します。<BR>この値は累積値なので、アプリケーション側で必要に
+    応じクリアしてください。</P>
+
+<P><PRE>
+extern int  dbgComputePol;   /* 計算ポリゴン数 */
+extern int  dbgDrawPol;      /* 描画ポリゴン数 */
+</PRE></P>
+
+	<P>この変数は <B>sega_spr.h</B> に定義済みです。</P>
+	</DL>
+
+
+<A NAME="no1_40"></A>
+	<P><DT><H3>1.4　プログラム記述例</H3>
+	<DD><PRE>
+#include &lt;machine.h&gt;
+#include &quot;saga_spr.h&quot;
+#include &quot;sega_scl.h&quot;
+#include &quot;sega_int.h&quot;
+
+extern void vbStart(void);          /*     V-BLANK IN  割り込みルーチン　　         */
+extern void vbEnd(void);            /*     V-BLANK OUT  割り込みルーチン　　        */
+main()
+
+{
+     Uint8          *vram;          /*     VRAMアドレス格納エリア　　               */
+
+     set_imask(0);                  /*     割り込み可にする 　　　                  */
+
+     SCL_Vdp2Init();            　  /*     スクロールとプライオリティの初期化      　*/
+     SCL_SetPriority(SCL_SP0|SCL_SP1|SCL_SP2|SCL_SP3|SCL_SP4|
+                     SCL_SP5|SCL_SP6|SCL_SP7,7);
+     SCL_SetSpriteMode(SCL_TYPE1,SCL_MIX,SCL_SP_WINDOW);
+     SPR_Initial(&amp;vram);            /*     スプライトを初期化　　                   */
+
+     INT_ChgMsk(INT_MSK_NULL, INT_MSK_VBL_IN | INT_MSK_VBL_OUT);
+                                    /*     V-BLANK割り込みをディセーブル            */
+     INT_SetFunc(INT_SCU_VBLK_IN, &amp;vbStart);     
+                                    /*     V-BLANK IN     割り込みルーチンの登録    */
+     INT_SetFunc(INT_SCU_VBLK_OUT, &amp;vbEnd);     
+                                    /*     V-BLANK OUT    割り込みルーチンの登録    */
+     INT_ChgMsk(INT_MSK_VBL_IN | INT_MSK_VBL_OUT, INT_MSK_NULL);
+                                    /*     V-BLANK割り込みをイネーブル              */
+
+     SCL_SetFrameInterval(2);       /*     フレームチェンジインターバルを　　        */
+                                    /*     2/60 秒にセット　　  　　　              */
+
+     for(;;){
+           memcpy(vram,command,sizeof(command));
+                                    /*     VRAMにスプライトコマンドをセット  　　　　*/
+
+              --------              /*     スクロールデータセット                   */
+           SCL_DisplayFrame();      /*     V-BLANK割り込み待ち　　　　　            */
+                                    /*     スプライト表示とスクロール動作を行う      */
+     }
+ }
+</PRE></P>
+
+−Vブランク処理ルーチン(上記メインとは別ソースファイル)−<P>
+
+	<P><DD><PRE>
+#include &lt;machine.h&gt;
+#include &quot;sega_spr.h&quot;
+#include &quot;sega_scl.h&quot;
+
+#pragma  interrupt(VbStart)
+#pragma  interrupt(VbEnd)
+
+void VbStart(void)
+{
+     SCL_VblankStart();          　/*     Vブランク開始VDP割り込み処理              */
+
+             --------              /*     その他Vブランク開始処理        　         */
+}
+
+void VbEnd(void)
+{
+     SCL_VblankEnd();              /*     Vブランク終了VDP割り込み処理              */
+     --------                      /*     その他Vブランク終了処理 　                */
+}
+</PRE></P>
+
+
+
+</DL>
+<HR NOSHADE><B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">VDP1ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

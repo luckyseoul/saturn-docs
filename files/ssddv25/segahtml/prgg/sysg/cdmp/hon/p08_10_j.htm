@@ -1,0 +1,1150 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/ 8&gt;CD通信I/F(MPEGパート)/8.MPEG関数仕様</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>CD通信I/F(MPEGパート)</B>
+<H2 ALIGN=CENTER>８．MPEG関数仕様</H2>
+<HR NOSHADE>
+<DL>
+<P>　MPEG通信インタフェースの関数仕様を記述する。</P>
+
+	<P><DT><B>　（１）書式</B>
+	<DD>　図中、未使用領域は「−」で表す。未使用領域の値は０です。</P>
+
+	<P><DT><B>　（２）MPEGステータス情報（ステータスとMPEGレポート）の保持</B>
+	<DD>　MPEG通信インタフェースは、MPEGコマンド発行時のステータスとMPEGレポートを保持している。保持内容の初期値は全て０です。<BR>
+　保持ステータス／MPEGレポートを更新する関数を以下の記号で示す。</P>
+	<P><DD><PRE>
+　　　　[SR] ：ステータスとＭＰＥＧレポートを更新する┐
+　　　　[S-] ：ステータスだけを更新する　　　　　　　├─────┐
+　　　　[--] ：更新しない（コマンドを発行しない）　　┘　　　　　│
+　　　　     　　　　　　　　　　　　　　　　　　　　　　　　　　│
+《関数タイトルの例》     　　　　　　　　　　　　　　　　　　　　↓
+┌───────┬──────────┬────────────────┬────┐
+│Ｔｉｔｌｅ　　│Ｆｕｎｃｔｉｏｎ　　│ＦｕｎｃｔｏｎＮａｍｅ　［ＳＲ］│Ｎｏ　　│
+│関数仕様　　　│ＭＰＥＧの再生　　　│ＣＤＣ＿ＭｐＰｌａｙ　　　　　　│２０．７│
+└───────┴──────────┴────────────────┴────┘
+</PRE></P>
+<P><DD>ただし、エラー時（エラーコードがCDC_ERR_OK以外の時）には何も更新しない。</P>
+
+	<P><DT><B>　（３）WAITの発生する関数</B>
+	<DD>　WAITの発生する関数を、関数ー覧に以下の記号で示す。<BR>
+　WAITについては、「<a href="p06_10_j.htm#no6_40">6.4　MPEGコマンドに対するREJECTとWAIT</A>」を参照のこと。</P>
+
+<P><DD><PRE>
+　　　　[L]  ：ＬＯＮＧ　ＷＡＩＴが発生しうる　　　　　　┐
+　　　　[S]  ：ＳＨＯＲＴ　ＷＡＩＴが発生しうる　　　　　├──┐
+　　　　[LS] ：ＬＯＮＧ，ＳＨＯＲＴ　ＷＡＩＴが発生しうる┘　　│
+     　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│
+《関数一覧の例》     　　　　　　　　　　　　　　　　　　　　　↓
+┌──────────────┬──────────────────┬────┐
+│デコード方法の設定　　　　　│ＣＤＣ＿ＭｐＳｅｔＤｅｃ　　［ＬＳ］│２０．８│
+└──────────────┴──────────────────┴────┘
+</PRE></P>
+
+	<P><DT><B>　（５）コマンド終了フラグ（割り込み要因レジスタ内）</B>
+	<DD>関連するコマンド終了フラグがある場合、<DT><B>　終了フラグ</B><DD>という項目欄に記述する。</P>
+
+	<P><DD><B>《例》</B><DT><B>　終了フラグ</B><DD>　MPEDフラグ</P>
+	
+	<P><DD>コマンド発行の排他処理について詳細は、「表3.5　コマンド終了フラグに属するコマンド（MPEGパート）」と、ＣＤパートのマニュアルを参照のこと。</P>
+
+	<P><DT><B>　（６）MPCMフラグ（割り込み要因レジスタ内）</B>
+	<DD>MPEG通信関数は、一部の関数を除き、コマンド発行時にMPCMフラグをチェックしている。コマンドを発行できなければエラーコードCDC_ERR_MP_COMUを返す。<BR>
+MPCMフラグについて詳細は、「<a href="p03_10_j.htm#no3_212">3.1.2　動作不定区間</A>」を参照のこと。</P>
+
+<A NAME="no8_10"></A>
+	<P><DT><H3>8.1　MPEG関数一覧</H3>
+	<DD>MPEG通信インタフェースの関数一覧を表８．１に示す。</P>
+<A NAME="t8_1"></A>
+	<P><DD><B>表8.1　MPEG通信インタフェースの関数一覧</B>
+<TABLE BORDER=1>
+<TR><TH COLSPAN=2 WIDTH=240>機　能</TH><TH WIDTH=180>関数名</TH><TH WIDTH=040>番号</TH></TR>
+<TR><TD COLSPAN=3>MPEGデコーダ</TD><TD>20.0</TD></TR>
+<TR><TD ROWSPAN=11 WIDTH=10></TD>
+	<TD>現在のMPEGステータス情報の取得</TD><TD><A HREF="#20.1">CDC_MpGetCurStat</A></TD><TD>20.1</TD></TR>
+<TR><TD>直前のMPEGステータス情報の取得</TD><TD><A HREF="#20.2 ">CDC_MpGetLastStat   </A></TD><TD>20.2 </TD></TR>
+<TR><TD>MPEG割り込み要因の取得        </TD><TD><A HREF="#20.3 ">CDC_MpGetInt        </A></TD><TD>20.3 </TD></TR>
+<TR><TD>MPEG割り込みマスクの設定      </TD><TD><A HREF="#20.4 ">CDC_MpSetIntMsk     </A></TD><TD>20.4 </TD></TR>
+<TR><TD>MPEGデコーダの初期化          </TD><TD><A HREF="#20.5 ">CDC_MpInit          </A></TD><TD>20.5 </TD></TR>
+<TR><TD>MPEG動作モードの設定          </TD><TD><A HREF="#20.6 ">CDC_MpSetMode    [S]</A></TD><TD>20.6 </TD></TR>
+<TR><TD>MPEGの再生                    </TD><TD><A HREF="#20.7 ">CDC_MpPlay       [S]</A></TD><TD>20.7 </TD></TR>
+<TR><TD>デコード方法の設定            </TD><TD><A HREF="#20.8 ">CDC_MpSetDec    [LS]</A></TD><TD>20.8 </TD></TR>
+<TR><TD>デコード同期信号の送出        </TD><TD><A HREF="#20.9 ">CDC_MpOutDsync  [LS]</A></TD><TD>20.9 </TD></TR>
+<TR><TD>ビデオのタイムコードの取得    </TD><TD><A HREF="#20.10">CDC_MpGetTc      [S]</A></TD><TD>20.10</TD></TR>
+<TR><TD>ーディオのタイムスタンプの取得</TD><TD><A HREF="#20.11">CDC_MpGetPts        </A></TD><TD>20.11</TD></TR>
+
+<TR><TD COLSPAN=3>MPEGストリーム</TD><TD>21.0</TD></TR>
+<TR><TD ROWSPAN=6 WIDTH=10></TD>
+	<TD>MPEGデコーダの接続先の設定    </TD><TD><A HREF="#21.1">CDC_MpSetCon    [LS]</A></TD><TD>21.1</TD></TR>
+<TR><TD>MPEGデコーダの接続先の取得    </TD><TD><A HREF="#21.2 ">CDC_MpGetCon         </A></TD><TD>21.2 </TD></TR>
+<TR><TD>MPEGデコーダの接続先の切り替え</TD><TD><A HREF="#21.3 ">CDC_MpChgCon     [LS]</A></TD><TD>21.3 </TD></TR>
+<TR><TD>MPEGストリームの設定          </TD><TD><A HREF="#21.4 ">CDC_MpSetStm     [LS]</A></TD><TD>21.4 </TD></TR>
+<TR><TD>MPEGストリームの取得          </TD><TD><A HREF="#21.5 ">CDC_MpGetStm         </A></TD><TD>21.5 </TD></TR>
+<TR><TD>ストリーム画像サイズの取得    </TD><TD><A HREF="#21.6 ">CDC_MpGetPictSiz  [S]</A></TD><TD>21.6 </TD></TR>
+
+<TR><TD COLSPAN=3>MPEG表示画面</TD><TD>22.0</TD></TR>
+<TR><TD ROWSPAN=9 WIDTH=10></TD>
+	<TD>画像の表示                          </TD><TD><A HREF="#22.1">CDC_MpDisp       [S]</A></TD><TD>22.1</TD></TR>
+<TR><TD>フレームバッファウィンド位置の設定  </TD><TD><A HREF="#22.2 ">CDC_MpSetWinFpos    </A></TD><TD>22.2 </TD></TR>
+<TR><TD>フレームバッファウィンド拡大率の設定</TD><TD><A HREF="#22.3 ">CDC_MpSetWinFrat    </A></TD><TD>22.3 </TD></TR>
+<TR><TD>ディスプレイウィンド位置の設定      </TD><TD><A HREF="#22.4 ">CDC_MpSetWinDpos    </A></TD><TD>22.4 </TD></TR>
+<TR><TD>ディスプレイウィンドサイズの設定    </TD><TD><A HREF="#22.5 ">CDC_MpSetWinDsiz    </A></TD><TD>22.5 </TD></TR>
+<TR><TD>ディスプレイウィンドオフセットの設定</TD><TD><A HREF="#22.6 ">CDC_MpSetWinDofs    </A></TD><TD>22.6 </TD></TR>
+<TR><TD>ボーダカラーの設定                  </TD><TD><A HREF="#22.7 ">CDC_MpSetBcolor     </A></TD><TD>22.7 </TD></TR>
+<TR><TD>フェードの設定                      </TD><TD><A HREF="#22.8 ">CDC_MpSetFade    [S]</A></TD><TD>22.8 </TD></TR>
+<TR><TD>画面特殊効果の設定                  </TD><TD><A HREF="#22.9 ">CDC_MpSetVeff    [S]</A></TD><TD>22.9 </TD></TR>
+
+<TR><TD COLSPAN=3>MPEGフレームバッファ</TD><TD>23.0</TD></TR>
+<TR><TD ROWSPAN=5 WIDTH=10></TD>
+	<TD>イメージデータの取り出し              </TD><TD><A HREF="#23.1">CDC_MpGetImg     [L]</A></TD><TD>23.1</TD></TR>
+<TR><TD>イメージデータウィンドウ位置の設定    </TD><TD><A HREF="#23.2 ">CDC_MpSetImgPos </A></TD><TD>23.2 </TD></TR>
+<TR><TD>イメージデータウィンドウサイズの設定  </TD><TD><A HREF="#23.3 ">CDC_MpSetImgSiz </A></TD><TD>23.3 </TD></TR>
+<TR><TD>イメージデータウィンドウからの読み込み</TD><TD><A HREF="#23.4 ">CDC_MpReadImg   </A></TD><TD>23.4 </TD></TR>
+<TR><TD>イメージデータウィンドウへの書き出し  </TD><TD><A HREF="#23.5 ">CDC_MpWriteImg  </A></TD><TD>23.5 </TD></TR>
+
+<TR><TD COLSPAN=3>MPEGセクタバッファ</TD><TD>24.0</TD></TR>
+<TR><TD ROWSPAN=2 WIDTH=10></TD>
+	<TD>MPEGセクタバッファからのセクタ読み込み</TD><TD><A HREF="#24.1">CDC_MpReadSct</A></TD><TD>24.1</TD></TR>
+<TR><TD>MPEGセクタバッファへのセクタ書き出し  </TD><TD><A HREF="#24.2 ">CDC_MpWriteSct   </A></TD><TD>24.2 </TD></TR>
+</TABLE>
+
+<A NAME="no8_20"></A>
+	<P><DT><H3>8.2　MPEG関数詳細</H3>
+
+<A NAME="no8_821"></A>
+	<P><DT><B>8.2.1　MPEGデコーダ</B>
+</DL>
+
+
+<!------------------------------------------------------------------------>
+<A NAME="20.1"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>現在のMPEGステータス情報の取得</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpGetCurStat</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.1</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpGetCurStat(CdcMpStat *mpstat)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>mpstat  ：MPEGステータス情報
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>現在のMPEGステータス情報を取得する。
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.2"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>直前のMPEGステータス情報の取得</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[--]<BR><H3>CDC_MpGetLastStat</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.2</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpGetLastStat(CdcMpStat *mpstat)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>mpstat：MPEGステータス情報
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>直前のMPEGコマンドに対するMPEGステータス情報を取得する。
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.3"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEG割り込み要因の取得</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[S-]<BR><H3>CDC_MpGetInt</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.3</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpGetInt(Sint32 *intreq)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>intreq  ：割り込み要因（下位24ビットが有効）……データ仕様（Intreq）を参照
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>MPEG割り込みの割り込み要因を取得する。
+<DT><B>　備　考</B><DD>本関数の実行によってMPEG割り込み要因は０クリアされる。
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.4"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEG割り込みマスクの設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetIntMsk</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.4</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetIntMsk(Sint32 intmsk)
+<DT><B>　入　力</B><DD>intmsk  ：割り込みマスク（下位24ビットが有効）
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>MPEG割り込みの割り込みマスクを設定する。<BR> 割り込みマスクの各ビットの意味はMPEG割り込み要因と同じ。
+<DT><B>　備　考</B><DD>マスクしたいビットを０、その他を１にする。<BR>本関数でマスク解除された割り込み要因が発生すると、MPSTフラグがONになる。
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.5"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEGデコーダの初期化</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpInit</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.5</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpInit(Bool sw)
+<DT><B>　入　力</B><DD>sw：MPEGシステムスイッチ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　終了フラグ</B><DD>MPEDフラグ（０クリアだけしている）……MPEDの値によらず実行可能
+<DT><B>　機　能</B><DD>MPEGシステムを初期化し、MPEGシステムの起動・停止を制御する。
+
+<P><DT><B>　（１）MPEGシステムスイッチ</B>
+<DD>MPEGシステムをOFFにすると、以降ONにするまで、他のMPEG通信関数は全てREJECTとなる。<BR>MPEGシステム起動中はＣＤパートの性能に影響を与える。ＣＤパートの機能だけを使用する場合は、本スイッチによりMPEGシステムを停止しておくこと。</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=220>説　　明</TH></TR>
+<TR><TD>OFF</TD><TD>停止……初期値</TD></TR>
+<TR><TD>ON</TD><TD>起動</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　備　考</B><DD>
+<DT><OL TYPE=a>
+<P><B><LI></B>本関数は内部で３ms程度待ってから、MPED, MPCMフラグを無視してコマンドを発行している。</P>
+<P><B><LI></B>初期化の完了を判定するには、本関数の実行後２VSYNC以上経過し、かつMPEDフラグが１になるのを待つこと。</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.6"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEG動作モードの設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetMode</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.6</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetMode(Sint32 actmod, Sint32 dectim, Sint32 out,Sint32 scnmod)
+<DT><B>　入　力</B><DD>
+actmod：MPEG動作モード
+dectim：デコードタイミング
+out   ：画像データの出力先
+          scnmod  ：走査モード（下位８ビットが有効）
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>　MPEGデコーダの動作モードを設定する。
+
+<P><DT><B>　（１）MPEG動作モード</B>
+<DD>MPEGセクタバッファモードに切り替えるには、その前に必ずCDC_MpInit関数を実行しておくこと。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPACT_NMOV </TD><TD>動画再生モード……初期値</TD></TR>
+<TR><TD>CDC_MPACT_NSTL </TD><TD>静止画再生モード</TD></TR>
+<TR><TD>CDC_MPACT_HMOV </TD><TD>高精細の動画再生モード（未対応）</TD></TR>
+<TR><TD>CDC_MPACT_HSTL </TD><TD>高精細の静止画再生モード</TD></TR>
+<TR><TD>CDC_MPACT_SBUF </TD><TD>MPEGセクタバッファモード</TD></TR>
+<TR><TD>CDC_PARA_NOCHG </TD><TD>設定を変更しない</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（２）デコードタイミング</B>
+<DD>デコード同期信号（DSYNC）のタイミングを指定する。動画再生モード時に有効です。<BR>
+ホスト同期は、CDC_MpPlay関数のMPEG再生モードが独立再生モードの時に有効です。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPDEC_VSYNC</TD><TD>VSYNC同期によるデコード……初期値</TD></TR>
+<TR><TD>CDC_MPDEC_HOST </TD><TD>ホスト同期によるデコード<BR>（ホストの指示でDSYNCを送出）</TD></TR>
+<TR><TD>CDC_PARA_NOCHG </TD><TD>設定を変更しない</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（３）画像データの出力先</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPOUT_VDP2 </TD><TD>VDP2へ出力……初期値</TD></TR>
+<TR><TD>CDC_MPOUT_HOST </TD><TD>ホストへ出力（MPEGレジスタからの取り出し）</TD></TR>
+<TR><TD>CDC_PARA_NOCHG </TD><TD>設定を変更しない</TD></TR>
+</TABLE></p>
+
+<P><DT><B>　（４）走査モード</B>
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│−│−│−│−│−│　│　│　初期値：00H   未変更：CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴─┴┬┴┬┘
+   　│　　　　　　　　　　　│　└─1：ノンインタレース    0：インタレース
+   　│　　　　　　　　　　　└───1：PAL                 0：NTSC
+   　└───────────────1：設定を変更しない    0：変更する
+</PRE></P>
+
+<P><DT><B>　備　考</B>
+<DT><OL TYPE=a>
+<P><B><LI></B>フレームレートは自動設定される。</P>
+<P><B><LI></B>本関数は、MPEG/Videoの動作状態が停止状態の時に実行してください。</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.7"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEGの再生</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpPlay</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.7</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>　Sint32 CDC_MpPlay(Sint32 plymod, Sint32 tmod_a, Sint32 tmod_v,Sint32 dec_v)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>plymod　</TD><TD>：MPEG再生モード</TD></TR>
+<TR><TD>tmod_a　</TD><TD>：MPEG/Audioの転送モード</TD></TR>
+<TR><TD>tmod_v　</TD><TD>：MPEG/Videoの転送モード</TD></TR>
+<TR><TD>dec_v   </TD><TD>：MPEG/Videoのデコードスイッチ</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>オーディオとビデオの同期再生、各転送モード、ビデオのデコードスイッチを設定する。
+<P><DT><B>　（１）MPEG再生モード</B>
+<DD>同期再生モードは、CDC_MpSetMode関数のデコードタイミングがVSYNC同期の時に有効です。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPPLY_SYNC </TD><TD>同期再生モード……初期値</TD></TR>
+<TR><TD>CDC_MPPLY_INDP </TD><TD>独立再生モード</TD></TR>
+<TR><TD>CDC_PARA_NOCHG </TD><TD>設定を変更しない</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（２）MPEGデコーダの転送モード</B>
+<DD>自動転送モードでは、必要なデータ量がＣＤバッファに格納されると、自動的にデコーダへ転送を開始する。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPTRN_AUTO </TD><TD>自動転送モード……初期値</TD></TR>
+<TR><TD>CDC_MPTRN_FORCE</TD><TD>強制転送モード</TD></TR>
+<TR><TD>CDC_PARA_NOCHG </TD><TD>設定を変更しない</TD></TR>
+</TABLE></P>
+
+<P><DD><B>(a) ビデオ</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>転送モード</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>自動転送</TD><TD>STDバッファサイズ＋16KBのデータがＣＤバッファに格納されると、<BR>VBVバッファへの転送とデコードを開始する。</TD></TR>
+<TR><TD>強制転送</TD><TD>ＣＤバッファの状態によらず、転送・デコードを開始する。</TD></TR>
+</TABLE></P>
+
+<P><DD><B>(b) オーディオ</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>転送モード</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>自動転送</TD><TD>２セクタ分のデータがＣＤバッファに格納されると、転送・デコードを開始する。<BR>同期再生するときは、ビデオの最初のピクチャが表示されたときにデコードを開始する。</TD></TR>
+<TR><TD>強制転送</TD><TD>ＣＤバッファの状態やビデオの状態によらず、<BR>転送・デコードを開始する。</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（３）MPEG/Videoのデコードスイッチ</B>
+<DD>MPEG/Video LSIのデコードスイッチを直接制御する。<BR>通常は必ずCDC_PARA_NOCHGを指定してください。（設定を変更しないこと。）
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>OFF</TD><TD>デコード停止</TD></TR>
+<TR><TD>ON </TD><TD>デコード開始……初期値</TD></TR>
+<TR><TD>CDC_PARA_NOCHG</TD><TD>設定を変更しない……通常指定値</TD></TR>
+</TABLE></P>
+
+<P><DT><TABLE><TR>
+<TH>注　意<BR><img srcset="../../../../what/atto_j.png 5x"></TH>
+<TD>MPEGデコーダは、バッファ区画との接続によってデコードを始める。本関数の実行によってデコードの開始・終了を制御してはならない。<BR>
+CDC_MpSetCon関数による接続や、CDC_MpChgCon関数による強制切り替えを実行すると、本スイッチに依存せずデコードを開始する。（たとえデコード停止されていても。）<BR>
+デコードを強制終了させるには、CDC_MpChgCon関数を使用してください。</TD></TR></TABLE></P>
+
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.8"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>デコード方法の設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetDec</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.8</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>　Sint32 CDC_MpSetDec(Sint32 mute, Sint32 pautim, Sint32 frztim)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>mute    </TD><TD>：MPEG/Audioのミュート　　　　　（下位 8ビットが有効）</TD></TR>
+<TR><TD>pautim  </TD><TD>：MPEG/Videoのポーズタイミング　（下位16ビットが有効）</TD></TR>
+<TR><TD>frztim  </TD><TD>：MPEG/Videoのフリーズタイミング（下位16ビットが有効）</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>MPEGデコーダのデコード方法を設定する。
+<P><DT><B>　（１）MPEG/Audioのミュート</B>
+<DD>ミュートする・しないにかかわらず、必ずbit2＝１にして値を設定してください。<BR>
+本パラメータの初期値は０であるため、未変更指定（CDC_PARA_NOCHG）ではbit2＝０になってしまう。従って、必ず最初は明示的に固定値（CDC_MPMUT_DFL）を指定してください。
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│−│−│−│−│　│　│　│　初期値：00H   未変更：CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴┬┴┬┴┬┘
+   　│　　　　　　　　　│　│　└─CDC_MPMUT_R   1：右チャンネルのミュートをする
+   　│　　　　　　　　　│　└───CDC_MPMUT_L   1：左チャンネルのミュートをする
+   　│　　　　　　　　　└─────CDC_MPMUT_DFL 1：固定値（必ず指定）
+   　└───────────────1：設定を変更しない        　0：変更する
+</PRE></P>
+
+<P><DT><B>　（２）MPEG/Videoのポーズタイミング</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>0000H       </TD><TD>ポーズ（ポーズ中は再ポーズ：コマ送り）……初期値</TD></TR>
+<TR><TD>0001H       </TD><TD>ポーズ解除</TD></TR>
+<TR><TD>0002H〜FFFEH</TD><TD>再ポーズまでのフレーム間隔（スロー再生間隔）</TD></TR>
+<TR><TD>FFFFH       </TD><TD>設定を変更しない（CDC_PARA_NOCHG）</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（３）MPEG/Videoのフリーズタイミング</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>0000H       </TD><TD>フリーズ（フリーズ中は再フリーズ）……初期値</TD></TR>
+<TR><TD>0001H       </TD><TD>フリーズ解除</TD></TR>
+<TR><TD>0002H〜FFFEH</TD><TD>再フリーズまでのフレーム間隔（ストロボ再生間隔）</TD></TR>
+<TR><TD>FFFFH       </TD><TD>設定を変更しない（CDC_PARA_NOCHG）</TD></TR>
+</TABLE></P>
+
+<DT><B>　備　考</B><DT><OL TYPE=a>
+<P><B><LI></B>ポーズ／フリーズは、静止画再生モードでは無効です。（動画再生モードで有効）</P>
+<P><B><LI></B>ビデオの動作状態が復活処理の時にポーズ／フリーズを設定すると、WAITになる。</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.9"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>デコード同期信号の送出</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpOutDsync</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.9</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>　Sint32 CDC_MpOutDsync(Sint32 fbn)
+<DT><B>　入　力</B><DD>　fbn     ：フレームバンク番号（０〜３）……静止画再生モードで有効
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>デコード同期信号（DSYNC）を送出する。ホストにより、各フレームのデコードタイミングを制御することができる。
+<P><DT><B>　（１）フレームバンク番号</B>
+<DD>静止画再生モードの場合、デコードするフレームバンク番号（０〜３）を指定できる。<BR>動画再生モードではフレームバンク番号は無効です。</P>
+
+<P><DT><B>　（２）デコード同期信号の送出タイミング</B>
+<DD>DSYNC送出タイミングは、必ず１フレーム分のデコード時間（2VSYNC）以上の間隔を空けること。通常は、VSYNCやオーディオ再生量などを利用して同期タイミングを取る必要がある。</P>
+
+<P><DT><TABLE BORDER=0><TR>
+<TH>注　意<BR><img srcset="../../../../what/atto_j.png 5x"></TH>
+<TD><B>ピクチャスタートコード（PSC）検出に関する仕様制限</B><BR>
+ピクチャ周期Ｍ≦３のビデオストリームでは、ストリーム最後の３フレームを除き、PSC検出とDSYNC送出の同期が可能です。つまり、PSC検出をDSYNC送出タイミングとして使用できる。<BR>（PSC検出は、MPEG割り込み要因フラグのビデオ割り込みbit8によって通知される。）<BR>
+しかしストリーム最後の３フレームとＭ≧４の場合、PSC検出とDSYNC送出は１対１に対応しない。この場合、PSC検出は使えず、上記（２）の方法で同期タイミングを取る必要がある。</TD></TR></TABLE></P>
+
+<DT><B>　備　考</B><DT><UL TYPE=a>
+<P><B><LI></B>動画再生モードの場合、CDC_MpSetMode関数のデコードタイミングをホスト同期に設定する必要がある。VSYNC同期に設定されているとWAITになる。</P>
+<P><B><LI></B>ホスト同期の動画再生モード、または静止画再生モードで本関数を実行すると、MPCMフラグが１になる。<BR>
+詳細は「<a href="p03_10_j.htm#z3_1">図3.1　動作不定区間の判定</A>」を参照のこと。</P>
+</OL>
+</DL>
+
+<!------------------------------------------------------------------------>
+<A NAME="20.10"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>ビデオのタイムコードの取得</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[S-]<BR><H3>CDC_MpGetTc</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.10</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>　Sint32　CDC_MpGetTc(Sint32 *bnk, Sint32 *pictyp, Sint32 *tr, CdcMpTc *mptc)
+<DT><B>　入　力</B><DD>　なし
+<DT><B>　出　力</B><DD><TABLE>
+<TR><TD>bnk     </TD><TD>：現在表示中のフレームバンク番号（０〜３）</TD></TR>
+<TR><TD>pictyp  </TD><TD>：ピクチャタイプ</TD></TR>
+<TR><TD>tr  　　</TD><TD>：テンポラルリファレンス (下位８ビットが有効）</TD></TR>
+<TR><TD>mptc    </TD><TD>：タイムコード</TD></TR></TABLE>
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>表示中のフレームのタイムコードとテンポラルリファレンスを取得する。<BR>静止画再生状態では、デコード待機中またはデコード中のフレームを指す。
+
+<P><DT><B>　（１）ピクチャタイプ</B>
+<DD>MPEGステータス情報のピクチャ情報と同じです。（初期値：０）
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPPICT_I   </TD><TD>Ｉピクチャ</TD></TR>
+<TR><TD>CDC_MPPICT_P   </TD><TD>Ｐピクチャ</TD></TR>
+<TR><TD>CDC_MPPICT_B   </TD><TD>Ｂピクチャ</TD></TR>
+<TR><TD>CDC_MPPICT_D   </TD><TD>Ｄピクチャ</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（２）テンポラルリファレンス</B>
+<DD>現在表示されているピクチャのテンポラルリファレンス（下位８ビット）を返す。</P>
+
+<P><DT><B>　（３）タイムコード</B>
+<DD>現在表示されているピクチャのタイムコードを返す。（ストリーム中のGOP層先頭のタイムコードではない。）</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="20.11"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>オーディオのタイムスタンプの取得</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[S-]<BR><H3>CDC_MpGetPts</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.11</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpGetPts(Sint32 *pts_a)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>pts     ：MPEG/Audioのタイムスタンプ
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>オーディオのタイムスタンプ（PTS：Presentation Time Stamp）を取得する。
+<P><DT><B>　（１）MPEG/Audioのタイムスタンプ</B>
+<DD>タイムスタンプの値は、33ビットのPTS（90KHz）の下位32ビットを取り出した値です。<BR>
+この値は、デコードに入る直前の最新の値です。MPEG/Audioが動作していない時は、前値保持となる。</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="no8_822"><HR NOSHADE SIZE=3></A>
+<H3>8.2.2　MPEGストリーム</H3>
+<!------------------------------------------------------------------------>
+<A NAME="21.1"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEGデコーダの接続先の設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetCon</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.1</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32　CDC_MpSetCon(Sint32 next, CdcMpCon *mpcon_a, CdcMpCon *mpcon_v)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>next    </TD><TD>：次ストリームフラグ</TD></TR>
+<TR><TD>mpcon_a </TD><TD>：MPEG/Audioの接続先パラメータ</TD></TR>
+<TR><TD>mpcon_v </TD><TD>：MPEG/Videoの接続先パラメータ</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>MPEGデコーダの接続先（バッファ区画とその他のパラメータ）を設定・登録する。<BR>バッファ区画番号にCDC_NUL_SELを指定すると、接続先の設定を取り消す。
+
+<P><DT><B>　（１）次ストリームフラグ</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPSTF_CUR  </TD><TD>現在の接続先の設定（先発ストリーム）</TD></TR>
+<TR><TD>CDC_MPSTF_NEXT </TD><TD>次の接続先の登録（次発ストリーム）</TD></TR>
+</TABLE></P>
+
+<DT><B>　備　考</B><DD>接続先の取り消し（切断）は、MPEG動作状態に依存する。特に、再生中に現在の接続先を切断（強制終了）させるには、CDC_MpChgCon関数を使用する必要がある。<BR>
+詳細はデータ仕様（CdcMpCon）を参照のこと。</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.2"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEGデコーダの接続先の取得</H4></TD>
+<TD WIDTH=200><PRE>Function Name   [S-]<BR><H3>CDC_MpGetCon</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.2</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpGetCon(Sint32 next, CdcMpCon *mpcon_a, CdcMpCon *mpcon_v)
+<DT><B>　入　力</B><DD>next    ：次ストリームフラグ
+<DT><B>　出　力</B><DD><TABLE>
+<TR><TD>mpcon_a </TD><TD>：MPEG/Audioの接続先パラメータ</TD></TR>
+<TR><TD>mpcon_v </TD><TD>：MPEG/Videoの接続先パラメータ</TD></TR></TABLE>
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>MPEGデコーダの接続先（バッファ区画とその他のパラメータ）を取得する。<BR>未接続（未登録）の場合はバッファ区画番号にCDC_NUL_SELを返す。
+
+<P><DT><B>　（１）次ストリームフラグ</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPSTF_CUR  </TD><TD>現在の接続先の取得（先発ストリーム）</TD></TR>
+<TR><TD>CDC_MPSTF_NEXT </TD><TD>次の接続先の取得（次発ストリーム）</TD></TR>
+</TABLE></P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.3"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEGデコーダの接続先の切り替え</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpChgCon</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.3</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpChgCon(Sint32 chg_a, Sint32 chg_v, Sint32 clr_a, Sint32 clr_v)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>chg_a   </TD><TD>：MPEG/Audioの接続切り替えフラグ</TD></TR>
+<TR><TD>chg_v   </TD><TD>：MPEG/Videoの接続切り替えフラグ</TD></TR>
+<TR><TD>clr_a   </TD><TD>：MPEG/Audioのクリア方式</TD></TR>
+<TR><TD>clr_v   </TD><TD>：MPEG/Videoのクリア方式</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>MPEGデコーダの接続先を強制的に切り替える。または、接続先を強制的に切り離す。<BR>
+MPEG再生を強制終了させるには、本関数で切り離しを指定してください。
+
+<P><DT><B>　（１）MPEGデコーダの接続切り替えフラグ</B>
+<DD>切り替えを指定するには、あらかじめCDC_MpSetCon関数により、次に再生するストリームを登録しておかなければならない。<BR>
+切り替え指定時は、クリア方式が有効となる。クリア処理終了後、接続先が切り替わる。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPCOF_ABT  </TD><TD>切り離し（強制終了）</TD></TR>
+<TR><TD>CDC_MPCOF_CHG  </TD><TD>強制切り替え</TD></TR>
+<TR><TD>CDC_PARA_NOCHG </TD><TD>設定を変更しない</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（２）MPEG/Audioのクリア方式</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPCLA_OFF  </TD><TD>クリアしない（１セクタ分のデータは転送される）</TD></TR>
+<TR><TD>CDC_MPCLA_ON   </TD><TD>即座に１セクタのバッファをクリアする</TD></TR>
+</TABLE></p>
+
+<P><DT><B>　（３）MPEG/Videoのクリア方式</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPCLV_FRM</TD><TD>即座にVBVとWBC（表示待ちMPEGフレームバッファ）をクリアする</TD></TR>
+<TR><TD>CDC_MPCLV_VBV</TD><TD>次のＩまたはＰピクチャスタートでVBVをクリアする</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　備　考</B><DD>本関数は、MPEG動作状態が再生中の場合だけ実行できる。<BR>他の状態で接続先を切り離すには、CDC_MpSetCon関数を使用する必要がある。</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.4"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEGストリームの設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetStm</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.4</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetStm(Sint32 next, CdcMpStm *mpstm_a, CdcMpStm *mpstm_v)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>next  　</TD><TD>：次ストリームフラグ</TD></TR>
+<TR><TD>mpstm_a </TD><TD>：MPEG/Audioのストリームパラメータ</TD></TR>
+<TR><TD>mpstm_v </TD><TD>：MPEG/Videoのストリームパラメータ</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>　デコードすべきストリーム番号（ストリームＩＤ）とチャネル番号を設定する。
+
+<P><DT><B>　（１）次ストリームフラグ</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPSTF_CUR  </TD><TD>現在のストリームの設定（先発ストリーム）</TD></TR>
+<TR><TD>CDC_MPSTF_NEXT </TD><TD>次のストリームの登録（次発ストリーム）</TD></TR>
+</TABLE></P>
+<P><DT><B>　備　考</B><DD>MPEG動作状態が切り替え中の場合、WAITとなる。
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.5"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEGストリームの取得</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[S-]<BR><H3>CDC_MpGetStm</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.5</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpGetStm(Sint32 next, CdcMpStm *mpstm_a, CdcMpStm *mpstm_v)
+<DT><B>　入　力</B><DD>next  　：次ストリームフラグ
+<DT><B>　出　力</B><DD><TABLE>
+<TR><TD>mpstm_a </TD><TD>：MPEG/Audioのストリームパラメータ</TD></TR>
+<TR><TD>mpstm_v </TD><TD>：MPEG/Videoのストリームパラメータ</TD></TR></TABLE>
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>デコードするストリーム番号（ストリームＩＤ）とチャネル番号を取得する。
+
+<P><DT><B>　（１）次ストリームフラグ</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>CDC_MPSTF_CUR  </TD><TD>現在のストリームの取得（先発ストリーム）</TD></TR>
+<TR><TD>CDC_MPSTF_NEXT </TD><TD>次のストリームの取得（次発ストリーム）</TD></TR>
+</TABLE></P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="21.6"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>ストリーム画像サイズの取得</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[S-]<BR><H3>CDC_MpGetPictSiz</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.6</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpGetPictSiz(Sint32 *siz_h, Sint32 *siz_v)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD><TABLE>
+<TR><TD>siz_h   </TD><TD>：水平方向画像サイズ（画素単位）</TD></TR>
+<TR><TD>siz_v   </TD><TD>：垂直方向画像サイズ（画素単位）</TD></TR></TABLE>
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>ビデオストリーム中の画像サイズを取得する。初期値はいずれも０です。
+</DL>
+
+<!------------------------------------------------------------------------>
+<A NAME="no8_823"><HR NOSHADE SIZE=3></A>
+<H3>8.2.3　MPEG表示画面</H3>
+<!------------------------------------------------------------------------>
+<A NAME="22.1"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>画像の表示</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpDisp</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.1</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpDisp(Bool dspsw, Sint32 fbn)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>dspsw   </TD><TD>：表示スイッチ（VDP2への表示ON/OFF）</TD></TR>
+<TR><TD>fbn     </TD><TD>：フレームバンク番号（０〜３）……静止画再生モードで有効</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>表示スイッチに従って、画像を表示する。
+
+<P><DT><B>　（１）表示スイッチ</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>OFF</TD><TD>VDP2に表示しない……初期値</TD></TR>
+<TR><TD>ON </TD><TD>VDP2に表示する</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（２）フレームバンク番号</B>
+<DD>静止画再生モードの場合、デコードするフレームバンク番号（０〜３）を指定できる。<BR>
+動画再生モードではフレームバンク番号は無効です。</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.2"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>フレームバッファウィンド位置の設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetWinFpos</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.2</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetWinFpos(Bool chgflg, Sint32 fpx, Sint32 fpy)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>chgflg  </TD><TD>：設定変更フラグ（OFF：設定値を登録、ON：登録済みの値に設定変更）</TD></TR>
+<TR><TD>fpx     </TD><TD>：フレームバッファウィンドウの左上Ｘ座標</TD></TR>
+<TR><TD>fpy     </TD><TD>：フレームバッファウィンドウの左上Ｙ座標</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>フレームバッファウィンドウの位置を画素単位で設定する。
+<P><DT><B>　（１）フレームバッファウィンドウの左上座標</B>
+<DD>初期値はfpx, fpyとも０です。
+<DD>fpx, fpyにCDC_PARA_NOCHGを設定するとそれぞれ前値保持となる。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2>座標</TH><TH WIDTH=180>通常出力モード</TH><TH WIDTH=180>高精細出力モード</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>NTSC</TH><TD>fpx</TD><TD>0〜351（CDC_MPNT_NPX）</TD><TD>0〜703（CDC_MPNT_HPX）</TD></TR>
+<TR ALIGN=CENTER><TD>fpy</TD><TD>0〜239（CDC_MPNT_NPY）</TD><TD>0〜479（CDC_MPNT_HPY）</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>PAL</TH><TD>fpx</TD><TD>0〜351（CDC_MPPL_NPX）</TD><TD>0〜703（CDC_MPPL_HPX）</TD></TR>
+<TR ALIGN=CENTER><TD>fpy</TD><TD>0〜287（CDC_MPPL_NPY）</TD><TD>0〜575（CDC_MPPL_HPY）</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.3"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>フレームバッファウィンド拡大率の設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetWinFrat</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.3</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetWinFrat(Bool chgflg, Sint32 frx, Sint32 fry)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>chgflg  </TD><TD>：設定変更フラグ（OFF：設定値を登録、ON：登録済みの値に設定変更）</TD></TR>
+<TR><TD>frx     </TD><TD>：フレームバッファウィンドウのＸ方向拡大率（下位16ビットが有効）</TD></TR>
+<TR><TD>fry     </TD><TD>：フレームバッファウィンドウのＹ方向拡大率（下位16ビットが有効）</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>フレームバッファウィンドウの拡大率を設定する。
+<P><DT><B>　（１）フレームバッファウィンドウの各方向の拡大率</B>
+<DD>初期値はfrx, fryとも01H（拡大率＝１）です。
+<DD>frx, fryにCDC_PARA_NOCHGを指定すると、それぞれ前値保持となる。
+<DD><PRE>
+bit　15　14　13　12　11　10　９　８  ７　６　５　４　３　２　１　０  
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │Ｃ│　│←───────Ａ─────────→│Ｄ│←─Ｂ─→│
+   └┬┴┬┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴┬┴─┴─┴─┘
+   　│　│　　　　　　　　　↑　　　　　　　　　　　│　　　↑　　　
+   　│　│　　　　　　　　　拡大比率　　　　　　　　│　　　補正係数
+   　│　│　　　　　　　　　　　　　　　　　　　　　│
+   　│　│　　　　　　　　　　　　　　　　　　　　　└─補正係数極性
+   　│　│
+   　│　└────────────前値保持1：設定を変更しない0：変更する
+   　└──────────────縮小フラグ1：縮小0：拡大
+</PRE>
+<P><DD>以下の関係を満たすようにＡ、Ｂ、Ｃ、Ｄの各ビットを設定する。<BR>
+ただし、Ａ＜1024、Ｂ＞０とする。</P>
+<P><DD><TABLE BORDER=1>
+<TR><TD>　</TD><TH WIDTH=30>Ｃ</TH><TH WIDTH=30>Ｄ</TH><TH WIDTH=200>拡　大　率</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>拡<BR>大</TH>
+	<TD>０</TD><TD>０</TD><TD>Ａ＋２−１／Ｂ</TD></TR>
+<TR ALIGN=CENTER><TD>０</TD><TD>１</TD><TD>Ａ＋１＋１／Ｂ</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>縮<BR>小</TH>
+	<TD>１</TD><TD>０</TD><TD>１／（Ａ＋１−１／Ｂ）</TD></TR>
+<TR ALIGN=CENTER><TD>１</TD><TD>１</TD><TD>１／（Ａ＋１／Ｂ）</TD></TR>
+</TABLE>
+
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.4"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>ディスプレイウィンド位置の設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetWinDpos</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.4</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetWinDpos(Bool chgflg, Sint32 dpx, Sint32 dpy)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>chgflg  </TD><TD>：設定変更フラグ（OFF：設定値を登録、ON：登録済みの値に設定変更）</TD></TR>
+<TR><TD>dpx     </TD><TD>：ディスプレイウィンドウの左上Ｘ座標</TD></TR>
+<TR><TD>dpy     </TD><TD>：ディスプレイウィンドウの左上Ｙ座標</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>ディスプレイウィンドウの位置を画素単位で設定する。
+
+<P><DT><B>　（１）ディスプレイウィンドウの左上座標</B>
+<DD>初期値はdpx, dpyとも０です。
+<DD>dpx, dpyにCDC_PARA_NOCHGを設定するとそれぞれ前値保持となる。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2>座標</TH><TH WIDTH=180>通常出力モード</TH><TH WIDTH=180>高精細出力モード</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>NTSC</TH><TD>dpx</TD><TD>0〜351（CDC_MPNT_NPX）</TD><TD>0〜703（CDC_MPNT_HPX）</TD></TR>
+<TR ALIGN=CENTER><TD>dpy</TD><TD>0〜239（CDC_MPNT_NPY）</TD><TD>0〜479（CDC_MPNT_HPY）</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>PAL</TH><TD>dpx</TD><TD>0〜351（CDC_MPPL_NPX）</TD><TD>0〜703（CDC_MPPL_HPX）</TD></TR>
+<TR ALIGN=CENTER><TD>dpy</TD><TD>0〜287（CDC_MPPL_NPY）</TD><TD>0〜575（CDC_MPPL_HPY）</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.5"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>ディスプレイウィンドサイズの設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetWinDsiz</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.5</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetWinDsiz(Bool chgflg, Sint32 dsx, Sint32 dsy)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>chgflg  </TD><TD>：設定変更フラグ（OFF：設定値を登録、ON：登録済みの値に設定変更）</TD></TR>
+<TR><TD>dsx     </TD><TD>：ディスプレイウィンドウのＸ方向サイズ</TD></TR>
+<TR><TD>dsy     </TD><TD>：ディスプレイウィンドウのＹ方向サイズ</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>ディスプレイウィンドウのサイズを画素単位で設定する。
+
+<P><DT><B>　（１）ディスプレイウィンドウのサイズ</B>
+<DD>初期値は、NTSC/PAL, 通常／高精細によらず、dsx＝352, dsy＝240です。
+<DD>dsx, dsyにCDC_PARA_NOCHGを設定するとそれぞれ前値保持となる。
+
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2>座標</TH><TH WIDTH=180>通常出力モード</TH><TH WIDTH=180>高精細出力モード</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>NTSC</TH><TD>dsx</TD><TD>0〜352（CDC_MPNT_NSX）</TD><TD>0〜704（CDC_MPNT_HSX）</TD></TR>
+<TR ALIGN=CENTER><TD>dsy</TD><TD>0〜240（CDC_MPNT_NSY）</TD><TD>0〜480（CDC_MPNT_HSY）</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>PAL</TH><TD>dsx</TD><TD>0〜352（CDC_MPPL_NSX）</TD><TD>0〜704（CDC_MPPL_HSX）</TD></TR>
+<TR ALIGN=CENTER><TD>dsy</TD><TD>0〜288（CDC_MPPL_NSY）</TD><TD>0〜576（CDC_MPPL_HSY）</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.6"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>ディスプレイウィンドオフセットの設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetWinDofs</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.6</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetWinDofs(Bool chgflg, Sint32 dox, Sint32 doy)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>chgflg  </TD><TD>：設定変更フラグ（OFF：設定値を登録、ON：登録済みの値に設定変更）</TD></TR>
+<TR><TD>dox     </TD><TD>：ディスプレイウィンドウのＸ方向オフセット</TD></TR>
+<TR><TD>doy     </TD><TD>：ディスプレイウィンドウのＹ方向オフセット</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>ディスプレイウィンドウのオフセットを輝点単位で設定する。（画素単位ではない。）
+
+<P><DT><B>　（１）ディスプレイウィンドウのオフセット</B>
+<DD>初期値・設定範囲とも、NTSC/PAL, 通常／高精細によらない。
+<DD>dox, doyにCDC_PARA_NOCHGを設定するとそれぞれ前値保持となる。
+<DD><TABLE BORDER=1>
+<TR><TH>オフセット</TH><TH>初期値</TH><TH>設定範囲</TH><TH>備　　考</TH></TR>
+<TR><TD>dox</TD><TD>150</TD><TD>18〜704</TD><TD>dox≦17では全面にボーダカラー表示</TD></TR>
+<TR><TD>doy</TD><TD>38</TD><TD>8〜480</TD><TD>doy≦7では全面にボーダカラー表示</TD></TR>
+</TABLE>
+
+<P><DT><B>　備　考</B><DD>PALでは画面中央に設定するための標準値としてdox＝150, doy＝45を推奨する。</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.7"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>ボーダカラーの設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetBcolor</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.7</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetBcolor(Sint32 bcolor)
+<DT><B>　入　力</B><DD>bcolor  ：ボーダカラー（下位16ビットが有効）
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>ボーダカラーのカラーデータ（RGB555形式）を設定する。
+
+<P><DT><B>　（１）ボーダカラー</B>
+<DD><PRE>
+初期値：8000H（ボーダカラー出力）
+bit　15　14　13　12　11　10　９　８  ７　６　５　４　３　２　１　０  
+   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│←─Ｂ　データ─→│←─Ｇ　データ─→│←─Ｒ　データ─→│
+   └┬┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+   　│
+   　└──透明ビット 1：ボーダカラーを出力する　0：出力しない（透明状態）
+</PRE></P>
+<P><DT><B>　備　考</B><DD>VDP2へ画像を出力している時だけ動作する。<BR>
+出力先がホスト（MPEGレジスタ）の場合、ボーダカラーは出力されない。</P>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.8"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>フェードの設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetFade</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.8</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetFade(Sint32 gain_y, Sint32 gain_c)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>gain_y  </TD><TD>：輝度信号ゲイン（−８〜７、初期値：０）</TD></TR>
+<TR><TD>gain_c  </TD><TD>：色差信号ゲイン（−８〜７、初期値：０）</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>輝度
+・色差信号のレベルを１／８ステップで変更する。<BR>
+フェードイン、フェードアウトのために使用する。
+
+<P><DT><B>　（１）輝度・色差信号ゲイン</B>
+<DD>設定値の範囲は−８〜７で初期値は０です。この範囲外の値を指定するとREJECTとなる。<BR>
+ゲイン設定値と実際の倍率を以下に示す。
+<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE>ゲイン設定値</TH>
+<TD><PRE>−８</TD><TD><PRE>−７</TD><TD><PRE>−６</TD><TD><PRE>−５</TD>
+<TD><PRE>−４</TD><TD><PRE>−３</TD><TD><PRE>−２</TD><TD><PRE>−１</TD><TH><PRE>０</TH>
+<TD><PRE>＋１</TD><TD><PRE>＋２</TD><TD><PRE>＋３</TD><TD><PRE>＋４</TD>
+<TD><PRE>＋５</TD><TD><PRE>＋６</TD><TD><PRE>＋７</TD></TR>
+<TR ALIGN=CENTER><TH><PRE>倍　率</TH>
+<TD>0</TD><TD>1/8</TD><TD>2/8</TD><TD>3/8</TD><TD>4/8</TD><TD>5/8</TD><TD>6/8</TD><TD>7/8</TD><TH>1</TH><TD>9/8</TD><TD>10/8</TD><TD>10/8</TD><TD>12/8</TD><TD>12/8</TD><TD>2</TD><TD>2</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="22.9"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>画面特殊効果の設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetVeff</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.9</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetVeff(CdcMpVeff *mpvef)
+<DT><B>　入　力</B><DD>mpvef   ：画面特殊効果パラメータ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>画面特殊効果の設定をする。
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="no8_824"><HR NOSHADE SIZE=3></A>
+<H3>8.2.4　MPEGフレームバッファ</H3>
+<!------------------------------------------------------------------------>
+<A NAME="23.1"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>イメージデータの取り出し</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[S-]<BR><H3>CDC_MpGetImg</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.1</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpGetImg(Sint32 *dwnum)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>dwnum   ：イメージデータ転送ワード数
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>ディスプレイウィンドウ内のイメージデータをホストに取り出す。<BR>
+画像データの出力先がVDP2の場合は動作しない。必ず出力先をホストにしておくこと。
+<DT><B>　備　考</B><DT><OL TYPE=a>
+<P><B><LI></B>関数実行後、MPEGレジスタからデータを転送して取り出す必要がある。</P>
+<P><B><LI></B>横方向サイズdsxは、通常で５以上（高精細で10以上）を設定する必要がある。</P>
+<P><B><LI></B>高精細静止画モードでは、サイズdsx, dsyを２の整数倍に設定する必要がある。</P>
+<P><B><LI></B>実行する前に、CDC_MpDisp関数の表示スイッチをONにしておくこと。</P>
+<P><B><LI></B>MPEGレポートの出力準備完了フラグが１になってから実行してください。</P>
+<P><B><LI></B>イメージデータ転送中は、フリーズ等でディスプレイウィンドウを固定しておくことが望ましい。</P>
+</OL>
+
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="23.2"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>イメージデータウィンドウ位置の設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetImgPos</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.2</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetImgPos(Sint32 fbn, Sint32 ipx, Sint32 ipy)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>fbn </TD><TD>：フレームバンク番号（０〜３）</TD></TR>
+<TR><TD>ipx </TD><TD>：イメージデータウィンドウの左上Ｘ座標</TD></TR>
+<TR><TD>ipy </TD><TD>：イメージデータウィンドウの左上Ｙ座標</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>指定フレームバンクに対して、イメージデータウィンドウの位置を画素単位で設定する。
+
+<P><DT><B>　（１）イメージデータウィンドウの左上座標</B>
+<DD>初期値はipx, ipyとも０です。<BR>指定値は２画素単位に切り捨てられる。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2>座標</TH><TH WIDTH=180>通常出力モード</TH><TH WIDTH=180>高精細出力モード</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>NTSC</TH><TD>ipx</TD><TD>0〜351（CDC_MPNT_NPX）</TD><TD>0〜703（CDC_MPNT_HPX）</TD></TR>
+<TR ALIGN=CENTER><TD>ipy</TD><TD>0〜239（CDC_MPNT_NPY）</TD><TD>0〜479（CDC_MPNT_HPY）</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>PAL</TH><TD>ipx</TD><TD>0〜351（CDC_MPPL_NPX）</TD><TD>0〜703（CDC_MPPL_HPX）</TD></TR>
+<TR ALIGN=CENTER><TD>ipy</TD><TD>0〜287（CDC_MPPL_NPY）</TD><TD>0〜575（CDC_MPPL_HPY）</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="23.3"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>イメージデータウィンドウサイズの設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpSetImgSiz</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.3</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpSetImgSiz(Sint32 fbn, Sint32 isx, Sint32 isy)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>fbn　</TD><TD>：フレームバンク番号（０〜３）</TD></TR>
+<TR><TD>isx　</TD><TD>：イメージデータウィンドウのＸ方向サイズ</TD></TR>
+<TR><TD>isy　</TD><TD>：イメージデータウィンドウのＹ方向サイズ</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　機　能</B><DD>指定フレームバンクに対して、イメージデータウィンドウのサイズを画素単位で設定する。
+
+<P><DT><B>　（１）イメージデータウィンドウのサイズ</B>
+<DD>初期値はisx, isyとも０です。<BR>指定値は２画素単位に切り捨てられる。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100 COLSPAN=2>座標</TH><TH WIDTH=180>通常出力モード</TH><TH WIDTH=180>高精細出力モード</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>NTSC</TH><TD>isx</TD><TD>0〜352（CDC_MPNT_NSX）</TD><TD>0〜704（CDC_MPNT_HSX）</TD></TR>
+<TR ALIGN=CENTER><TD>isy</TD><TD>0〜240（CDC_MPNT_NSY）</TD><TD>0〜480（CDC_MPNT_HSY）</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2>PAL</TH><TD>isx</TD><TD>0〜352（CDC_MPPL_NSX）</TD><TD>0〜704（CDC_MPPL_HSX）</TD></TR>
+<TR ALIGN=CENTER><TD>isy</TD><TD>0〜288（CDC_MPPL_NSY）</TD><TD>0〜576（CDC_MPPL_HSY）</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="23.4"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>イメージデータウィンドウからの読み込み</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpReadImg</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.4</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpReadImg(Sint32 srcfbn,Sint32 fln_y, Sint32 fln_cr, Sint32 fln_cb)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>srcfbn  </TD><TD>：読み込み元フレームバンク番号（０〜３）</TD></TR>
+<TR><TD>fln_y   </TD><TD>：輝度データ(Y)用絞り番号</TD></TR>
+<TR><TD>fln_cr  </TD><TD>：色差データ(Cr)用絞り番号</TD></TR>
+<TR><TD>fln_cb  </TD><TD>：色差データ(Cb)用絞り番号</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　終了フラグ</B><DD>MPEDフラグ
+<DT><B>　機　能</B><DD>フレームバンク内のイメージデータウィンドウから、絞りを通してバッファ区画にイメージデータ（YCC）を読み込む。
+<DT><B>　備　考</B><DT><OL TYPE=a>
+<P><B><LI></B>本関数は、静止画再生モードだけで有効です。</P>
+<P><B><LI></B>画面サイズによってはデータ量がＣＤバッファ容量を越える場合がある。<BR>そういった場合は、データをホスト側に取り出しながら処理してください。</P>
+<P><B><LI></B>ＣＤバッファが満杯になっても本関数は終了しない。（MPED＝１にならない。）<BR>途中で処理を中止するには、CDC_MpInit関数（またはCDC_CdInit関数によるソフトリセット）を実行してください。</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="23.5"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>イメージデータウィンドウへの書き出し</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpWriteImg</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.5</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpWriteImg(Sint32 bn_y, Sint32 bn_cr, Sint32 bn_cb,Sint32 dstfbn, Bool clrmod)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>bn_y    </TD><TD>：輝度データ(Y)用バッファ区画番号</TD></TR>
+<TR><TD>bn_cr   </TD><TD>：色差データ(Cr)用バッファ区画番号</TD></TR>
+<TR><TD>bn_cb   </TD><TD>：色差データ(Cb)用バッファ区画番号</TD></TR>
+<TR><TD>dstfbn  </TD><TD>：書き出し先フレームバンク番号（０〜３）</TD></TR>
+<TR><TD>clrmod　</TD><TD>：バッファ区画内セクタの消去モード</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　終了フラグ</B><DD>　MPEDフラグ
+<DT><B>　機　能</B><DD>バッファ区画から、フレームバンク内のイメージデータウィンドウにイメージデータ（YCC）を書き込む。
+
+<P><DT><B>　（１）消去モード</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=140>定数名</TH><TH WIDTH=340>説　　明</TH></TR>
+<TR><TD>OFF</TD><TD>バッファ区画内のセクタを保持する（消去しない）</TD></TR>
+<TR><TD>ON </TD><TD>バッファ区画内のセクタを消去する</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　備　考</B><DT><OL TYPE=a>
+<P><B><LI></B>本関数は、静止画再生モードだけで有効です。</P>
+<P><B><LI></B>バッファ区画のデータが空になっても本関数は終了しない。（MPED＝１にならない。）途中で処理を中止するには、CDC_MpInit関数（またはCDC_CdInit関数によるソフトリセット）を実行してください。</P>
+</OL>
+</DL>
+
+<!------------------------------------------------------------------------>
+<A NAME="no8_825"><HR NOSHADE SIZE=3></A>
+<H3>8.2.5　MPEGセクタバッファ</H3>
+　本機能を使用するには、必ずCDC_MpInit関数を実行してから、CDC_MpSetMode関数でMPEGセクタバッファモードに切り替えること。MPEGセクタバッファ内の初期値は不定です。
+<!------------------------------------------------------------------------>
+<A NAME="24.1"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEGセクタバッファからのセクタ読み込み</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpReadSct</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>24.1</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpReadSct(Sint32 srcmsp, Sint32 snum, Sint32 dstfln)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>srcmsp　</TD><TD>：読み込み元MPEGセクタ位置</TD></TR>
+<TR><TD>snum　  </TD><TD>：セクタ数</TD></TR>
+<TR><TD>dstfln  </TD><TD>：絞り番号</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　終了フラグ</B><DD>　MPEDフラグ
+<DT><B>　機　能</B><DD>MPEGセクタバッファから、絞りを通してバッファ区画にセクタデータを読み込む。<BR>
+読み込むセクタ範囲は、MPEGセクタ位置とセクタ数で指定する。</P>
+<DT><B>　備　考</B><DT><OL TYPE=a>
+<P><B><LI></B>指定セクタ数によってはデータ量がＣＤバッファ容量を越える場合がある。<BR>そういった場合は、データをホスト側に取り出しながら処理してください。</P>
+<P><B><LI></B>ＣＤバッファが満杯になっても本関数は終了しない。（MPED＝１にならない。）<BR>途中で処理を中止するには、CDC_MpInit関数（またはCDC_CdInit関数によるソフトリセット）を実行してください。</P>
+</OL>
+</DL>
+<!------------------------------------------------------------------------>
+<A NAME="24.2"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=060><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=280><PRE>Function<BR><H4>MPEGセクタバッファへのセクタ書き出し</H4></TD>
+<TD WIDTH=200><PRE>Function Name　[SR]<BR><H3>CDC_MpWriteSct</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>24.2</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>Sint32 CDC_MpWriteSct(Sint32 srcbn, Sint32 sp, Sint32 snum, Sint32 dstmsp)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD>srcbn 　</TD><TD>：バッファ区画番号</TD></TR>
+<TR><TD>sp      </TD><TD>：セクタ位置（CDC_SPOS_END：区画最後のセクタを示す）</TD></TR>
+<TR><TD>snum    </TD><TD>：セクタ数  （CDC_SNUM_END：spから区画最後までのセクタ数を示す）</TD></TR>
+<TR><TD>dstmsp  </TD><TD>：書き出し先MPEGセクタ位置</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>　なし
+<DT><B>　関数値</B><DD>エラーコードを返す。
+<DT><B>　終了フラグ</B><DD>　MPEDフラグ
+<DT><B>　機　能</B><DD>バッファ区画から、MPEGセクタバッファにセクタデータを書き出す。<BR>書き出すセクタ範囲は、セクタ位置とセクタ数で指定する。
+<DT><B>　備　考</B><DT><OL TYPE=a>
+<P><B><LI></B>書き出し時にバッファ区画のセクタは消去される。</P>
+<P><B><LI></B>バッファ区画のデータが空になっても本関数は終了しない。（MPED＝１にならない。）<BR>途中で処理を中止するには、CDC_MpInit関数（またはCDC_CdInit関数によるソフトリセット）を実行してください。</P>
+</OL>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+　　■</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

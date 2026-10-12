@@ -1,0 +1,114 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/31&gt;SCUユーザーズマニュアル/2.動作説明</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p01_03.htm">戻る</A>｜
+     <A HREF="p02_11.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCUユーザーズマニュアル</B>
+<H1 ALIGN=CENTER>第２章　動作説明</H1>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_30"></A>
+  <P><DT><H2>■2.1　ＤＭＡ転送</H2>
+
+<A NAME="no1_31"></A>
+	<P><DT><H3>　◆ＤＭＡの基本動作</H3>
+	<DD>　図2.1に、DMAの基本動作を示します。本DMAは、DMAコントローラのバッファを介して、
+	基本的にロングワードアクセスになっていますが、開始アドレスや終了アドレスがロングワード境界になかった場合、
+	バイト単位で読み書きし、DMA転送を実行することができます。<BR>
+	　図2.1は、転送元アドレス1H〜50Hから転送先アドレス6H〜55HへのDMA転送を実行している例ですが、
+	転送元では、ロングワード境界が4Hですので、1H〜3Hをバイト単位で読み込みます。
+	一方、転送先では、ロングワード境界が8Hですので、読み込んだデータの最初の2Byteをバイト単位で6H〜7Hへ書き出します。
+	さらに、転送元終了アドレスは50Hですが、ロングワード境界は4FHまでですので、50Hのデータはバイト単位で読み込みます。
+	一方、転送先終了アドレスは、55Hですが、ロングワード境界は53Hまでですので、読み込んだ最後の2Byteを54H〜55Hへバイト単位で書き出します。</P>
+
+<A NAME="z2_1"></A>
+	<P ALIGN="CENTER"><B>図2.1　DMA転送基本動作</B><BR><IMG SRC="../grp/i016_01.gif"></P>
+
+
+	<P><DD>　SCUのDMA転送制御には、2通りの起動方法があります。</P>
+
+	<P><DD><OL>
+	<B><LI></B>メインCPUからのDMA起動
+	<B><LI></B>DSPからのDMA起動</OL></P>
+
+	<P><DD>　図2.2に、メインCPUから起動をかけたときのDMA転送可能エリアを、図2.3に、DSPから起動をかけたときのDMA転送可能エリアを示します。</P>
+
+<A NAME="z2_2"></A>      
+	<P ALIGN="CENTER"><B>図2.2　メインCPUから起動された時のDMA転送可能エリア</B><BR><IMG SRC="../grp/i017_01.gif"></P>
+
+<A NAME="z2_3"></A>
+	<P ALIGN="CENTER"><B>図2.3　DSPから起動された時のDMA転送可能エリア</B><BR><IMG SRC="../grp/i017_02.gif"></P>
+
+<A NAME="no1_32"></A>
+	<P><DT><TABLE><TR>
+	<TH><IMG SRC="../../../what/atto.gif"></TH>
+	<TD><H3>ＤＭＡに関する注意事項</H3></TD></TR></TABLE></P>
+
+<A NAME="no1_32_01"></A>
+	<P><DT><B>　●A-BusへのSCU-DMAによる書き込み禁止</B>
+     <DD>　A-BusへのSCU-DMAによる書き込みは使用できません。</P>
+
+<A NAME="no1_32_02"></A>
+	<P><DT><B>　●VDP2領域からのSCU-DMAによる書き込み禁止</B>
+	<DD>　VDP2領域からのSCU-DMAによる書き込みは使用できません。</P>
+
+<A NAME="no1_32_03"></A>
+	<P><DT><B>　●WORKRAM-LへのSCU-DMA使用不可</B>
+	<DD>　WORKRRAMでSCU-DMAが使用できるのはWORKRAM-HI(SDRAM:1Mbyte)のみです。</P>
+
+<A NAME="no1_32_04"></A>
+	<P><DT><B>　●A-Bus←→B-BusのDMA動作中のCPUからA-Bub、B-Busへのアクセス禁止</B>
+	<DD>　A-BusからB-Bus、B-BusからA-BusのDMA動作中には、CPUからのA-Bus、B-Busに対するアクセスは禁止します。
+	ウエイト中に、SDRAMに対してリフレッシュが発生しなくなりハングアップする場合があるからです。</P>
+
+<A NAME="no1_32_05"></A>
+	<P><DT><B>　●A-Bus、B-BusへCPUによるライト時のA-Bus←→B-BusのSCU-DMAの起動の待機</B>
+	<DD>　A-Bus、B-BusへのCPUによるライト処理は、A-BusとB-BusのSCU-DMAの起動よりも優先されます。<BR>
+	例えば、VDP1(B-Bus)に対してCPUで連続ライトを実行しているときに、A-BusからVDP2(B-Bus)に対して
+	SCU-DMAの起動をかけても、連続ライトが終了するまでSCU-DMAは起動されません。<BR>
+	　ただし、SCU-DMA起動中には、A-Bus、B-Busに対するCPUアクセスは待機されます。</P>
+
+<A NAME="no1_32_06"></A>
+	<P><DT><B>　●DMAの同時使用可能チャンネルは、２チャンネル</B>
+	<DD>　DMAの優先順位を保証した同時使用可能チャンネル数は、２チャンネルまでです。<BR>
+	３チャンネル同時に使用すると優先順位が無視されます。（DSPのDMA命令も１チャンネルと数えられます）</P>
+
+<A NAME="no1_32_07"></A>
+	<P><DT><B>　●DMAレベル1の実行中にDMAレベル2の起動は禁止</B>
+	<DD>　DMAをレベル1で起動中にDMAのレベル2を起動すると誤動作を起こす場合があります。<BR>
+	対応として、DMAレベル1で起動中にDMAレベル2の起動をしないでください。</P>
+
+<A NAME="no1_32_08"></A>
+	<P><DT><B>　●DMA起動中にその対応するレベルの書き込み禁止</B>
+	<DD>　DMAモード、アドレス更新、起動要因選択レジスタおよび加算値レジスタは、そのレベルのDMA起動中は内容の書き換えをしてはいけません。<BR>
+	書き換えをするとハングアップします。</P>
+
+<!--追加1997/04/24あ-->
+<A NAME="no1_32_09"></A>
+	<P><DT><B>　●SCU-DMA間接モードの禁止事項</B>
+	<DD>　CDバッファからの読み出しに、SCU-DMAの間接モードの使用を禁止します。<BR>
+      SCU-DMAの直接モードか、CPU-DMA又はソフトウェアによる転送を行ってください。<BR>
+	　CDバッファだけでなく、A-BUS空間をソースとする転送には、ソースの読み込み<A HREF="p03_02.htm#no3_214">アドレス加算値</A>に、
+	「4バイト加算」のみが指定可能で「加算しない」の設定は禁止です。<BR>
+	SCU-DMAの直接モードについてはこの制限はありません。</P>
+</DL>
+
+<HR NOSHADE>
+<B>▲<A HREF="p01_03.htm">戻る</A>｜
+     <A HREF="p02_11.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

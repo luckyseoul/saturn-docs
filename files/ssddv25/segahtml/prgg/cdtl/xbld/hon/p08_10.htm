@@ -1,0 +1,74 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/10&gt;XBLD User's Manual/8.Differences from VCDBUILD</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no">XBLD User's Manual</a><HR>
+ <B>▲ <A HREF="p07_11.htm">Back</a> ｜ <A HREF="p0a_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>XBLD User's Manual</b><H2 ALIGN=CENTER> 8. Differences with VCDBUILD</H2><HR NOSHADE>
+<DL>
+<A NAME="no8_10"></A><P><DT><H3> 8.1 Enhancements</H3><DD> In addition to the functions of VCDBUILD, XBLD has the following unique functions.</P>
+<A NAME="no8_11"></A><P><DT> <B>(1) Support for on-the-fly writing</b><DD> You can perform on-the-fly writing in conjunction with the write-once system ADDCDW.</P>
+<A NAME="no8_12"></A><P><DT> <B>(2) Output of TOC file</b><DD> Since XBLD automatically outputs a TOC file, there is no need to create a TOC file with the TOC information generation program VCDMKTOC.</P>
+<A NAME="no8_13"></A><P><DT> <B>(3) The following script commands can now be used with channel interleaving.</b><DD><UL TYPE=DISC>
+<LI> BitRate<LI> Pack<LI> Reallocation<LI> SectorRate</UL>
+</P>
+<A NAME="no8_14"></A><P><DT> <B>(4) Extension of SO file file name characters</b><DD> XBLD does not specify a character set for file names.<BR>
+ When using file names that do not meet the ISO9660 standard, please use caution on the application side.<BR>
+ (According to the ISO9660 standard, only characters '0' to '9', 'A' to 'Z', and '_' can be used as file names)</P>
+<A NAME="no8_15"></A><P><DT> <B>(5) Conditional import</b><DD> If the argument of the keyword #if is "1" or "TRUE", the block from #if to #else is taken in, and the block from #else to #endif is ignored. If the argument of the keyword #if is "0" or "FALSE", the import target will be the opposite. It is also possible to use it without defining the #else block.</P>
+<A NAME="no8_20"></A><P><DT><H3> 8.2 Notes</H3><A NAME="no8_21"></A><P><DT> <B>(1) XBLD output file</b><DD><OL TYPE=a>
+<P><B><LI></b> XBLD outputs TOC files in all operating modes.</P>
+<P><B><LI></b> XBLD outputs RTI files in real-time emulation mode and direct DOS file access mode. (RTI file is not output by default)</P>
+</OL>
+<A NAME="no8_21"></A><P><DT> <B>(2) Handling of files with subheaders in direct DOS file access</b><DD> When performing CD emulation using direct DOS file access, interleaving and MPEG functions are not supported. Although it is possible to access files with subheaders, correct operation is not guaranteed. (according to VCDEMU specifications)<BR>
+ XBLD has fixed the problem with VCDBUILD, so files with subheaders cannot be accessed when directly accessing DOS files.<BR>
+ By specifying this with the vcd subcommand and starting XBLD in VCDBUILD compatibility mode, you can access files with subheaders during direct DOS file access. (However, there remains the problem that the file size with subheaders is incorrect)</P>
+<A NAME="no8_30"></A><P><DT><H3> 8.3 Limitations</H3><DD> XBLD maintains compatibility with VCDBUILD, but in order to increase processing speed, memory usage efficiency, and overall system performance, we have placed functional limitations on some script commands.</P>
+<DD><OL TYPE=a>
+<P><B><LI></b> SubEmpty and SubSource commands are not supported.</P>
+<P><B><LI></b> MPEG files cannot be used in file interleaving blocks or channel interleaving blocks (interleaving is performed once output as an MPEG file).</P>
+<P><B><LI></b> Multiplexing with multiple MPEG videos and multiple MPEG audios is not possible.<BR>
+ (Only one channel each of MPEG video and MPEG audio is valid)</P>
+<P><B><LI></b> You cannot specify MPEG file output using the MpegMultiplex command and file output using the File command at the same time.</P>
+<P><B><LI></b> The number of definitions for each of PVD (primary volume descriptor), SVD (secondary volume descriptor), and BTR (boot record) is one.<BR>
+ Also, PVD must be defined before SVD.</P>
+<P><B><LI></b> Disk image files do not calculate ECC data for mode1 or form1 sectors.<BR>
+ Always calculate for EDC.</P>
+<P><B><LI></b> On-the-fly writing cannot be performed if the following commands are included.<UL TYPE=DISC>
+<LI> SupplementaryVolume<LI> SameName<LI> Escape Sequences<LI> BootIdentifier<LI> BootRecord<LI> Boot System Identifier<LI> Trigger<LI> Eors</UL>
+</P>
+<P><B><LI></b> Only one source file can be defined in the file block (File to EndFile).<BR>
+ However, a file block within a CDDA track allows the definition of multiple source files.</P>
+<P><B><LI></b> You cannot create directories on CDDA tracks.</P>
+<P><B><LI></b> The BeginTime command does not support specifying the "+" symbol.<BR>
+ EndTime command does not support specifying the "-" symbol.</P>
+</OL>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>Among these restrictions, items (a.), (g.) to (j.) are scheduled to be addressed in the future.</b></TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_11.htm">Back</a> ｜ <A HREF="p0a_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no">XBLD User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

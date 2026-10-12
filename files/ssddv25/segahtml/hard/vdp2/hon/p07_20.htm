@@ -1,0 +1,114 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;52/86&gt;VDP2 User's Manual/7.2 Back screen</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no7">VDP2 User's Manual</a> ★ <A HREF="p07_10.htm">Chapter 7 Line Screen</a><HR>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 7 Line Screen</b><HR NOSHADE>
+<DL>
+<A NAME="no7_20"></A><P><DT><H2> ■7.2 Back screen</H2><DD> The back screen (BACK) is a screen that is displayed only when no other screens are displayed, and you can choose to make the entire screen a single color or specify a color for each line. Specify the color data to be used for that line in 5 bits each of RGB.<BR>
+ In non-interlaced and double-dense interlaced modes, you can specify a color for each line, but in single-dense interlaced mode, you can only specify every two lines.<BR>
+ Figure 7.4 shows the configuration of the back screen table for each interlace mode, and Figure 7.5 shows the data configuration on the back screen table.</P>
+<A NAME="z7_4"></A><P><DD> <B>Figure 7.4 Back screen table configuration</b><P><DD> ●Non-interlaced and double-dense interlaced modes<DD><TABLE BORDER=1>
+<TR><TD><PRE></TD><TH><PRE> Bit 15 ← Back screen table (VRAM) → 0</TH></TR>
+<TR><TH> +00H</TH><TD ALIGN=CENTER> 1st line RGB data</TD></TR>
+<TR><TH> +02H</TH><TD ALIGN=CENTER> 2nd line RGB data</TD></TR>
+<TR><TH> +04H</TH><TD ALIGN=CENTER> 3rd line RGB data</TD></TR>
+<TR><TH> +06H</TH><TD ALIGN=CENTER> 4th line RGB data</TD></TR>
+<TR><TH> +08H</TH><TD ALIGN=CENTER> 5th line RGB data</TD></TR>
+<TR><TH> +0AH</TH><TD ALIGN=CENTER> 6th line RGB data</TD></TR>
+<TR><TH> :<BR>
+ :</TH><TD ALIGN=CENTER> :<BR>
+ :</TD></TR>
+</TABLE>
+<DD> <B>[note]</b><DD> In the case of a single color, the RGB data of the first line is used for the entire line color.<BR>
+ For double-dense interlacing, store line color data for even and odd fields together</P>
+<P><DD> ●Single dense interlace mode<DD><TABLE BORDER=1>
+<TR><TD><PRE></TD><TH><PRE> Bit 15 ← Back screen table (VRAM) → 0</TH></TR>
+<TR><TH> +00H</TH><TD ALIGN=CENTER> RGB data of 1st and 2nd lines</TD></TR>
+<TR><TH> +02H</TH><TD ALIGN=CENTER> RGB data for 3rd and 4th lines</TD></TR>
+<TR><TH> +04H</TH><TD ALIGN=CENTER> RGB data for 5th and 6th lines</TD></TR>
+<TR><TH> +06H</TH><TD ALIGN=CENTER> RGB data for 7th and 8th lines</TD></TR>
+<TR><TH> +08H</TH><TD ALIGN=CENTER> RGB data for 9th and 10th lines</TD></TR>
+<TR><TH> +0AH</TH><TD ALIGN=CENTER> RGB data for 11th and 12th lines</TD></TR>
+<TR><TH> :<BR>
+ :</TH><TD ALIGN=CENTER> :<BR>
+ :</TD></TR>
+</TABLE>
+<DD> <B>[note]</b><DD> In the case of a single color, the RGB data of the 1st and 2nd lines will be used for the entire line color.</P>
+<A NAME="z7_5"></A><P><DD> <B>Figure 7.5 Bit configuration of back screen table data</b><P><TABLE BORDER>
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR><TH></TH><TH COLSPAN=5> BLUE data 5 bits</TH><TH COLSPAN=5> GREEN data 5 bits</TH><TH COLSPAN=5> RED data 5 bits </TH></TR>
+</TABLE>
+<P><DD><TABLE>
+<TR><TD><TABLE BORDER CELLSPACING=5>
+<TR><TD></TD></TR>
+</TABLE>
+</TD><TD> part is ignored.</TD></TR>
+</TABLE>
+<DD> Also, add 0 to the lower 3 bits of each RGB to make it 8 bits.</P>
+<A NAME="no7_21"></A><P><DT><H3> ●Back screen table address register</H3><DD> The back screen table address register specifies the back screen color mode and the start address of the table. This is a 32-bit write-only register located at addresses 1800ACH to 1800AEH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="BKTAU_"></A><P><DD> <B><FONT SIZE=5>BKTAU</font> <FONT SIZE=4>1800AC</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#BKCLMD_">BKCLMD</a></TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#BKTA_">BKTA18</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA17</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA16</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="BKTAL_"></A><P><DD> <B><FONT SIZE=5>BKTAL</font> <FONT SIZE=4>1800AE</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#BKTA_">BKTA15</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA14</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA13</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA12</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA11</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA10</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA9</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#BKTA_">BKTA7</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA6</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA5</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA4</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA3</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA2</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA1</a></TH><TH><PRE> <A HREF="#BKTA_">BKTA0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="BKCLMD_"></A><DT> <B>Back screen color mode bit</b> : BACK color mode bit (BKCLMD), bit 15<DD> Specify the color mode of the back screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> BKCLMD</TD><TD> back screen color</TD></TR>
+<TR><TH><PRE> 0</TH><TD> Make it monochrome</TD></TR>
+<TR><TH><PRE> 1</TH><TD> Specify for each line</TD></TR>
+</TABLE>
+</P>
+<A NAME="BKTA_"></A><DT> <B>Back screen table address bit</b> : BACK color table address bit (BKTA18 to BKTA0)<DD> Specify the start address of the back screen table on VRAM.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> BKTA18～BKTA16</TD><TD> 1800ACH</TD><TD> bits 2-0</TD><TD></TD></TR>
+<TR><TD> BKTA15～BKTA0</TD><TD> 1800AEH</TD><TD> bits 15-0</TD><TD></TD></TR>
+</TABLE>
+</P>
+<P><DD> The actual first VRAM address is calculated using the following formula. If the VRAM capacity is 4Mbits, the most significant bit of the address is ignored.</P>
+<P><DD><PRE><B>
+(Back screen table start address)
+             = (back screen table address register value 19 bits) x 2H
+</b></PRE></P>
+<P><DD>If the back screen color mode bit is set to "single color", the color data specified by the back screen table address bit will be used for the entire screen.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no7">VDP2 User's Manual</a> ★ <A HREF="p07_10.htm">Chapter 7 Line Screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

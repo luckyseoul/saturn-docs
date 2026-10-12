@@ -1,0 +1,100 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;27/29&gt;SCSPユーザーズマニュアル/4.2.13DMA転送</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p04_2c_j.htm">戻る</A>
+｜<a href="p04_30_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCSPユーザーズマニュアル/4.2　音源部レジスタ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_2d"></A>
+	<P>	<DT><H3>■DMA転送レジスタ</H3>
+		<DD>　SCSP内蔵のDMAは、SCSPの内蔵のコントロールレジスタとサウンドメモリ間の転送のみ行えます。このことから、連続最長転送バイト数は3812バイト(EE4H分)となります（内部レジスタには、100000H〜100EE3Hのメモリ空間が割り当てられています）。
+		また、以下に説明するDMA関係のレジスタはDMA転送にて変更することを禁止します。DMA転送時、アドレスは常に増加方向に変化します。
+		　DMA転送を実行する上での注意事項を、以下に示します。</P>
+
+	<P>	<DT><B>　注意事項</B>
+	<P>	<DD><UL TYPE=DISC>
+		<LI>DMA実行中は、メインCPU、サウンドCPUの動作速度が落ちる可能性があります。</P>
+
+	<P>	<LI>DMAコントローラのコントロールレジスタに対して、DMA転送によるアクセスは絶対禁止です。この転送を行った場合の動作は、全く保証できません。</P>
+
+	<P>	<LI>DMA転送は、ワード(16bit)転送です。</UL></P>
+
+<A NAME="DGATE_"></A>
+	<P>	<DT><B>　DGATE(R/W) ; Dma GATE (and "0")</B>
+		<DD>　DMAコントローラのブロック図を、図4.59に示します。SCSP内蔵のコントロールレジスタまたはサウンドメモリ上の任意の領域を"0"に初期化します。このビットが"1B"の時、"0"クリアを実行します
+		(実際にスタートさせるには、"DEXE"を実行しなければなりません)。<BR>
+		　DGATEによる転送の消去("0"ライト)作業では、転送元のデータには影響を与えません。またデータが無くなるということもありません。<P>
+
+<A NAME="z4_59"></A>
+	<P ALIGN=CENTER><B>図4.59　DMAコントローラブロック図</B><BR><img srcset="../grp/i101_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="DDIR_"></A>
+	<P>	<DT><B>　DDIR(R/W) ; Dma (transferring) DIRection</B>
+		<DD>　DMA転送の方向を指定します。このビットが"0B"の時サウンドメモリからLSI内部レジスタへの転送、"1B"の時その逆の指定になります。</P>
+
+<A NAME="t4_32"></A>
+	<P>	<DD><B>表4.32　DMA転送方向</B>
+		<DD><TABLE BORDER=1>
+		<TR><TD ALIGN=CENTER>DDIR</TD><TD ALIGN=CENTER>転送方向</TD></TR>
+		<TR><TD ALIGN=CENTER>0</TD><TD>サウンドメモリからLSI内部レジスタへ転送</TD></TR>
+		<TR><TD ALIGN=CENTER>1</TD><TD>LSI内部レジスタからサウンドメモリへ転送</TD></TR>
+		</TABLE></P>
+
+<A NAME="DEXE_"></A>
+	<P>	<DT><B>　DEXE(R/W) ; Dma EXEcution</B>
+		<DD>　DMA転送の開始を指示します。このビットが"1B"でDMA転送が開始されます。"0B"書き込みは無効となります。また、DMA転送が終了すると自動的に"0B"となります。</P>
+
+<A NAME="t4_33"></A>
+	<P>	<DD><B>表4.33　DMA転送</B>
+		<DD><TABLE BORDER=1>
+		<TR><TD ALIGN=CENTER>DEXE</TD><TD ALIGN=CENTER>転送状態</TD></TR>
+		<TR><TD ALIGN=CENTER>0</TD><TD>無効または転送終了</TD></TR>
+		<TR><TD ALIGN=CENTER>1</TD><TD>DMA転送開始</TD></TR>
+		</TABLE></P>
+
+<A NAME="DMEA_"></A>
+	<P>	<DT><B>　DMEA[19:1](W) ; Dma MEmory start Address </B>
+		<DD>　DMA転送を開始するサウンドメモリのアドレス(ワード単位)を指定します。</P>
+
+<A NAME="DRGA_"></A>
+	<P>	<DT><B>　DRGA[11:1](W) ; Dma ReGister start Address</B>
+		<DD>　DMA転送を開始するLSI内部レジスタのアドレス(ワード単位)を指定します。</P>
+
+<A NAME="DTLG_"></A>
+	<P>	<DT><B>　DTLG[11:1](W) ; Dma (Transferring) LenGth</B>
+		<DD>　DMA転送の転送ワード数を指定します。その際、転送元および転送先の各領域が、サウンドメモリ領域やLSI内部レジスタ領域を越えないように注意する必要があります。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p04_2c_j.htm">戻る</A>
+｜<a href="p04_30_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,155 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/17&gt;プログラマーズガイド/ファイルシステムライブラリ/1．概要</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>1．概要</H2>
+<HR NOSHADE>
+<DL>
+	<P><DD>　ここでは、CD上のファイルをアクセスするためのライブラリについて説明します。</P>
+
+<!-- +++ Update by CRI ：7.2 --><A NAME="no1_10"></A>
+	<P><DT><H3>1.1　特徴</H3>
+		<DD>　本ライブラリは以下の特徴を持っています。
+
+	<P><DT><B>　(1)対象CD-ROM</B>
+		<DD><OL TYPE=a>
+		<LI>ISO9660レベルのファイルアクセスが可能です。
+		<LI>CD-ROM XAのサブヘッダ情報を利用したアクセスについては本ライブラリではカバーしません。</OL></P>
+
+	<P>	<DT><B>　(2)データのバッファリング</B>
+		<DD><OL TYPE=a>
+		<LI>CDブロックのバッファ管理機構を前提としたアクセスを行います。
+		<LI>単純なファイル読み込みの他にバッファを利用した先読みが可能です。</OL></P>
+
+	<P>	<DT><B>　(3) ファイル識別子</B>
+		<DD><OL TYPE=a>
+		<LI>ファイル識別子(ディレクトリ内の順序番号)によるアクセスを基本とします。
+		<LI>ディレクトリの検索による速度の低下をなくします。>
+		<LI>ファイル名によるアクセスは、ファイル名からファイル識別子への変換機能を使うことによって可能です。</OL></P>
+
+	<P>	<DT><B>　(4)開発サポート機能</B>
+		<DD><OL TYPE=a>
+		<LI>開発サポート機能としてメモリファイルとDOSファイルのアクセスができます。
+		<LI>少量データであればメモリファイルでCD上のファイルを代替できます。
+		<LI>SCSI経由で、IBM-PC上のDOSファイルをメモリファイルと同様にアクセスすることができます。<BR>SIMMに入らない大きさのデータでもCD上のファイルを代替できます。
+		<LI>製品組み込み用と開発サポート機能を含んだものの２種類のライブラリを提供します。</OL></P>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>1.2　機能概要</H3>
+		<DD>　ここでは、ファイルシステムライブラリの機能について概要を述べます。本ライブラリの機能は次の６種に分類されます。</P>
+
+	<P>	<DT><B>　(1)ディレクトリ操作</B>
+		<DD>　ライブラリ初期化、ディレクトリ情報の読み込み、カレントディレクトリ設定など以下の機能を提供します。</P>
+
+	<P>	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>関数</TH><TH><PRE>機　能</TH></TR>
+	<TR><TD><PRE>GFS_Init</TD><TD><PRE>ライブラリの初期化とCDのマウント処理</TD></TR>
+	<TR><TD><PRE>GFS_LoadDir</TD><TD><PRE>ディレクトリ情報の読み込み</TD></TR>
+	<TR><TD><PRE>GFS_SetDir</TD><TD><PRE>カレントディレクトリの設定</TD></TR>
+	<TR><TD><PRE>GFS_NameToId</TD><TD><PRE>ファイル名→ファイル識別子の変換</TD></TR>
+	<TR><TD><PRE>GFS_IdToName</TD><TD><PRE>ファイル識別子→ファイル名の変換</TD></TR>
+	<TR><TD><PRE>GFS_GetDirInfo</TD><TD><PRE>ディレクトリ情報の取得</TD></TR>
+	<TR><TD><PRE>GFS_Reset</TD><TD><PRE>ファイルシステムのリセット</TD></TR>
+	</TABLE></P>
+
+	<P>	<DT><B>　(2)ファイル操作</B>
+		<DD>　ファイルのオープン、クローズ、シークなど、次に示したファイルの一般的な操作を行います。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH><PRE>関数</TH><TH><PRE>機能</TH></TR>
+	<TR><TD><PRE>GFS_Open</TD><TD><PRE>ファイルのオープン</TD></TR>
+	<TR><TD><PRE>GFS_Close</TD><TD><PRE>ファイルのクローズ</TD></TR>
+	<TR><TD><PRE>GFS_Seek</TD><TD><PRE>アクセスポインタの移動</TD></TR>
+	<TR><TD><PRE>GFS_Tell</TD><TD><PRE>アクセスポインタの取得</TD></TR>
+	<TR><TD><PRE>GFS_IsEof</TD><TD><PRE>アクセスポインタがファイル末にあるかチェック</TD></TR>
+	<TR><TD><PRE>GFS_ByteToSct</TD><TD><PRE>バイト単位→セクタ単位の変換</TD></TR>
+	<TR><TD><PRE>GFS_GetFileSize</TD><TD><PRE>ファイルサイズの取得</TD></TR>
+	<TR><TD><PRE>GFS_GetFileInfo</TD><TD><PRE>ファイル情報の取得</TD></TR>
+	<TR><TD><PRE>GFS_GetNumCdbuf</TD><TD><PRE>CDバッファ区画のセクタ数の取得</TD></TR></TABLE></P>
+
+	<P><DT><B>　(3)完了復帰型読み込み</B>
+		<DD>　ファイルからデータを読み込みます。このとき、データ読み込みが完了するまで関数から制御が戻りません。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH><PRE>関数</TH><TH><PRE>機能</TH></TR>
+	<TR><TD><PRE>GFS_Fread</TD><TD><PRE>オープンしたファイルからデータを読込みます。</TD></TR>
+	<TR><TD><PRE>GFS_Load</TD><TD><PRE>ファイル識別子を指定してデータを読込みます。</TD></TR></TABLE></P>
+
+	<P>	<DT><B>　(4)即時復帰型読み込み</B>
+		<DD>　リクエスト関数とサーバ関数によって、ファイルからデータを読み込みます。リクエスト関数から発行された要求を、サーバ関数が処理単位ごとに処理します。<BR>
+　サーバ関数は繰返し呼び出す必要があります。サーバ関数呼び出しループの中にアプリケーション処理を挿入することにより、データ読み込みが完了するまでの間にアプリケーションの処理を実行できます。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH><PRE>関数</TH><TH><PRE>機能</TH></TR>
+	<TR><TD><PRE>GFS_NwFread</TD><TD><PRE>データ読み込みリクエストの発行</TD></TR>
+	<TR><TD><PRE>GFS_NwCdRead</TD><TD><PRE>CDバッファへの読み込みリクエストの発行</TD></TR>
+	<TR><TD><PRE>GFS_NwIsComplete</TD><TD><PRE>読み込み処理の完了チェック</TD></TR>
+	<TR><TD><PRE>GFS_NwStop</TD><TD><PRE>読み込み処理の中止</TD></TR>
+	<TR><TD><PRE>GFS_NwGetStat</TD><TD><PRE>アクセス状態の取得</TD></TR>
+	<TR><TD><PRE>GFS_NwExecOne</TD><TD><PRE>一つのファイルに対するサーバ関数</TD></TR>
+	<TR><TD><PRE>GFS_NwExecServer</TD><TD><PRE>複数ファイルに対するサーバ関数</TD></TR></TABLE></P>
+
+	<P><DT><B>　(5)読み込みパラメータ設定</B>
+		<DD>　完了復帰および即時復帰の読み込み関数に対して、各種パラメータを設定します。CDバッファの使い方、転送方式(DMA,CPUなど)、転送単位を変更できます。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH><PRE>関数</TH><TH><PRE>機能</TH></TR>
+	<TR><TD><PRE>GFS_SetGmode</TD><TD><PRE>CDバッファからの取り出し方式設定</TD></TR>
+	<TR><TD><PRE>GFS_SetTmode</TD><TD><PRE>転送方式の設定</TD></TR>
+	<TR><TD><PRE>GFS_SetReadPara</TD><TD><PRE>CDバッファへの読み込み単位設定</TD></TR>
+	<TR><TD><PRE>GFS_SetTransPara</TD><TD><PRE>CDバッファからの転送単位設定</TD></TR>
+	<TR><TD><PRE>GFS_SetTrFunc</TD><TD><PRE>転送関数の登録</TD></TR>
+	<TR><TD><PRE>GFS_StartTrans</TD><TD><PRE>転送関数における転送開始</TD></TR></TABLE></P>
+
+	<P><DT><B>　(6)その他</B>
+		<DD>　CDピックアップの制御、エラー処理関数の登録とエラー状態取得機能を提供します。エラー処理関数はエラー発生時に呼び出されます。</P>
+<!------1997/08/27テクサポ：平野／追加----------->
+また、DSSシステム使用時には CD-DAトラック番号の変換機能を提供します。
+<!------ここまで--------------------------------->
+	<P><DD><TABLE BORDER=1>
+	<TR><TH><PRE>関数</TH><TH><PRE>機能</TH></TR>
+	<TR><TD><PRE>GFS_CdMovePickup</TD><TD><PRE>CDピックアップの移動</TD></TR>
+	<TR><TD><PRE>GFS_SetErrFunc</TD><TD><PRE>エラー処理関数の登録</TD></TR>
+	<TR><TD><PRE>GFS_GetErrStat</TD><TD><PRE>エラー状態の取得</TD></TR>
+	<TR><TD><PRE>GFS_ConvTno</TD><TD><PRE>トラック番号の変換</TD></TR><!---1997/08/27平野：追加--->
+<!-- *** Update by CRI ：7.3 --></TABLE></P>
+
+<A NAME="no1_30"></A>
+	<P><DT><H3>1.3　モジュール構成</H3>
+		<DD>　ハードウェア、他ソフトウェアに対する本ライブラリの位置づけを図1.1に示します。点線部分はデバッグ用ライブラリに含まれるモジュールです。</P>
+
+<A NAME="z1_1"></A>
+	<P ALIGN=CENTER><B>図1.1　モジュール構成図</B><BR><IMG SRC="../grp/i004_01.gif"></P>
+
+	<P><DD>　本ライブラリを使うには以下のライブラリを同時にリンクする必要があります。</P>
+	
+	<DD><UL TYPE=DISC>
+	<P><LI><B>SHCNPIC.LIB</B><BR>　　SH7600用ポジションインディペンデントコード非対応ライブラリ</P>
+	<P><LI><B>SEGA_CDC.LIB</B><BR>　　CD通信インタフェースライブラリ</P>
+	<P><LI><B>SEGA_DMA.LIB</B><BR>　　DMAライブラリ</P>
+	<P><LI><B>SEGA_CSH.LIB</B><BR>　　キャッシュライブラリ</P>
+	</UL>
+</DL>
+<HR NOSHADE>
+<B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

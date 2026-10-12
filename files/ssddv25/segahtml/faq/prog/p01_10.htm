@@ -1,0 +1,121 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 7&gt;FAQ/General program</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Program General</b><H2 ALIGN=CENTER> DMA</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_01"><HR></a><DL>
+<H3> Transfer from A-BUS to C-BUS using CPU-DMA does not work.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am using CPU DMA to transfer from ABUS to CBUS (work RAM-L), but it seems that the second and subsequent transfers are failing.<BR>
+ The number of transfers obtained by CDC_DATAEnd returns a normal value for the first transfer, but for the second and subsequent transfers, a value of 5 words is always returned, and not a single byte has been transferred to the transfer destination.<BR>
+ The routine is described below, but is any processing required before the transfer?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Add DMA_CPU_M_TE to DmaC.msk, a parameter passed to the DMA_CpuSetPrm function.<BR>
+ Detail is,</P>
+<DD><PRE>
+SH7095 Hardware Manual Chapter 9 Direct Memory Access Controller 9.2.4 DMA Channel Control Registers 0, 1
+</PRE></P>
+<P><DD>Please refer to.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_02"><HR></a><DL>
+<H3> Transfer between the same buses is not possible using SCU-DMA.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> DMA_ScuMemCopy() does not work properly when copying between WORK_RAM_Hs.<BR>
+ What reasons can you think of?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> SCU-DMA is a DMA that performs transfers between different buses.<BR>
+ This cannot be done in the same space.<BR>
+ Please use CPU-DMA or software transfer for data transfer in the same space.</P>
+<P><DD>&#65308; <B>Transfer examples that can use SCU-DMA</b>&#65310;<DD><PRE>
+WorkRAM-H <B>←→</b> VDP1
+WorkRAM-H <B>─→</b> VDP2
+WorkRAM-H <B>←→</b> SCSP(SoundRAM)
+CD Buffer <B>─→</b> WorkRAM-H
+CD Buffer <B>─→</b> VDP1
+CD Buffer <B>─→</b> VDP2
+CD Buffer <B>─→</b> SCSP(SoundRAM)
+</PRE></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_03"><HR></a><DL>
+<H3> Transfer from HighRAM to B-Bus does not work with SCU-DMA.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am trying to transfer data from work RAM-H to B-BUS using SCU DMA 2ch in indirect mode, but no data is transferred at all.<BR>
+ Please let me know what could be the cause.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> What are the SCU indirect mode table settings?<BR>
+ Please set "Number of bytes transferred", "Write address", and "Read address" in this order.</P>
+<P><DD><PRE>
+├──────────────────────┤
+│ Number of bytes      │m ←Set in the write address register
+│ transferred 1st time │
+├──────────────────────┤ Address
+│ First write address  │m+4
+├──────────────────────┤ 
+│ First read address   │m+8
+├──────────────────────┤
+│           :          │
+│           :          │
+│           :          │
+│           :          │
+├──────────────────────┤
+│ Number of bytes      │
+│ transferred nth time │
+├──────────────────────┤
+│ nth write address    │
+├─┬────────────────────┤
+│1│nth read address    │
+└─┴────────────────────┘
+ ↑
+ Be sure to set "1" to the 31st bit of the nth read address. </PRE></P>
+<!--      マニュアル(HardwareManual Vol1)ではなく、SCUの仕様変更の資料
+      (Developer's Information STN-10のNo.25)どおりに作成していますか?
+      ご確認ください。-->
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_04"><HR></a><DL>
+<H3> Regarding SCU-DMA indirect mode table specifications.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The SCU-DMA indirect mode table specifications state that if the table size is up to 1020 bytes, the start address is placed on the 1024-byte boundary, but what happens if the data exceeds 1020 bytes?<BR>
+ Currently it seems to be working on a 1024-byte boundary (the table is currently about 2688 bytes), but does this mean that it will not be guaranteed in the future?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> According to the SCU additional manual (No. 25), a data table of 2 ^ m bytes is required when the data size is up to (n x 12) bytes. In other words, the data size currently used there is ( 2 ^ 11 ) = 2048 < 2688 = ( 224 × 12 ) <= 2688 < 4096 = ( 2 ^ 12 ), so a table size of 4096 bytes is required. It becomes.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_05"><HR></a><DL>
+<H3> About the limitations during level 1 boot in DMA.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> In SCU-DMA, there is a statement that DMA level 2 is prohibited from starting while DMA level 1 is being executed, but does this just prohibit starting DMA level 2 when DMA level 1 is operating (DMA transfer in progress)?</P>
+<P> If DMA level 1 is automatically started by SCU interrupt, does that mean that level 1 is always active?</P>
+<P> It says it's a malfunction, but what are the specific symptoms?<BR>
+ Is it okay to use it if it does not affect the game?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is prohibited.<BR>
+ If you start level 2 while running level 1, unexpected things will happen and normal operation cannot be guaranteed.<BR>
+ If you are using it, please change the program.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_06"><HR></a><DL>
+<H3> Regarding SCU-DMA simultaneous use channels.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The number of channels that can be used simultaneously with SCU-DMA is 2 channels, and if 3 channels are used simultaneously, the priority will be ignored. Does this mean that all 3 will always end just because the priority is ignored?</P>
+<P> If priorities are ignored, what is the exact order?</P>
+<P> Also, this overlaps with the previous question, but if the priority is ignored, if level 1 starts up while level 2 starts up, will malfunctions occur in that case?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Please do not use this as it is prohibited by hardware.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_07"><HR></a><DL>
+<H3> Which is the fastest way to transfer from LowRAM to VDP1?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to use the WORK_RAM_L area as a buffer for sprite data, but what is the fastest method to transfer from the WORK_RAM_L area to the SPR_VRAM area?<BR>
+ It seems that SCU_DMA cannot be used, so I would like to use CPU_DMA.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The fastest way to transfer from the WORK_RAM_L area is to use CPU-DMA transfer, depending on the amount of transfer.<BR>
+ If the amount of transfer is small (several bytes), DMA transfer requires a wait of several clocks before and after startup, so memory transfer may be better.</P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

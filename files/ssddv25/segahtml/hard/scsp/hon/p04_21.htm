@@ -1,0 +1,104 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/29&gt;SCSP User's Manual/4.2.1 Loop control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p04_20.htm">Back</a> ｜ <A HREF="p04_22.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/4.2 Sound source register</b><HR NOSHADE>
+<DL>
+<A NAME="no4_21"></A><P><DT><H3> ■Loop control register</H3><A NAME="KYONEX_"></A><P><DT> <B>KYONEX(W)</b> : KeY ON EXecution<DD> Every time "1B" is written, KEY_ON and OFF of all slots are executed.</P>
+<A NAME="KYONB_"></A><P><DT> <B>KYONB(R/W)</b> : KeY ON Bit<DD> Register KEY_ON,OFF. If you want to turn KEY_ON at the same time, set "KYONB" of the slot you want to turn on to "1B".</P>
+<A NAME="KYONB__"></A><P><DD> <B>KYONB Bit Features</b><DD> 0=Register KEY_OFF<DD> 1=Register KEY_ON</P>
+<P><DB>
+ <B>About KYONEX bit and KYONB bit</b><DD> "KYONEX" and "KYONB" exist in each slot. The KEY_ON and KEY_OFF sequence is shown in Figure 4.2.<BR>
+ "KYONEX" does not need to write "0B" after writing "1B". No matter which slot is set to "1B", it will affect all slots, so there is no need to set it to "1B" in a specific slot.</P>
+<A NAME="z4_2"></A><P ALIGN=CENTER> <B>Figure 4.2 KEY_ON and KEY_OFF functions</b><BR>
+<img srcset="../grp/i035_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="SBCTL_"></A><P><DT> <B>SBCTL[1:0](R/W); Source Bit ConTroL</b><DD> Specifies a bit-reversal operation <B>that removes the sign bit</b> of the sound input data.<BR>
+ The inversion function of the bit to which "1B" is written is enabled.</P>
+<A NAME="SBCTL__"></A><P><DD> <B>SBCTL function</b><DD> SBCTL0: Specify to invert all but the sign bit of the source waveform data<DD> SBCTL1: Specifies inversion of sign bit of source waveform data</P>
+<A NAME="SSCTL_"></A><P><DT> <B>SSCTL[1:0](R/W) ; Sound Source ConTroL</b><DD> Specifies the data to be used as sound input data. If you want to generate sound using the waveform data on the sound memory, write "0B". When this register is set to "1B", noise will be output from the slot for which this setting is made (LFO attached to each slot).<BR>
+ The relationship between the block diagram and LFO related to noise generation when "SSCTL"="1B" is shown in Figure 4.3 with ALFO attached.</P>
+<A NAME="z4_3"></A><P><DT> <B>Figure 4.3 Block diagram related to noise generation and relationship between LFO</b><BR>
+<img srcset="../grp/i036_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><DT> <B>*</b> <B>ALFO</b> is included here.</P>
+<P><DD> Each slot uses the output of the LFO's noise oscillator to output noise. At this time, the LFO parameters ("LFORE", "LFOF", "ALFOWS", "ALFOS", "PLFOWS", "PLFOS" in Figure 4.3) have no effect on the noise as audio data.<BR>
+ Also, as shown in Figure 4.3, when using the LFO for low frequency modulation and setting the LFO waveform selection to noise (ALFOWS="3H" or PLFOWS="3H"), the reset by "LFORE" is not applied. yeah. Also, the frequency cannot be changed. This means that when selecting noise, the LFO can select the waveform, but cannot change other parameters.</P>
+<A NAME="SSCTL__"></A><P><DD> <B>Features of SSCTL</b><DD> 00B=External DRAM data<DD> 01B=Internally generated data (noise)<DD> 10B=Internally generated data (ALL"0")<DD> 11B=Not available</P>
+<A NAME="SA_"></A><P><DT> <B>SA[19:0](R/W) ; Start Address</b><DD> When using waveform data in memory to produce a sound, specify the start address of the waveform data using a byte address. However, if the waveform data is in "16-bit PCM format" ("PCM8B" = "0B"), be sure to set the value of the least significant bit (SA0) of the register to "0B".</P>
+<A NAME="LSA_"></A><P><DT> <B>LSA[15:0](R/W); Loop Start Address</b><DD> The loop start address of the sound data is expressed as the number of samples from "SA".</P>
+<A NAME="LEA_"></A><P><DT> <B>LEA[15:0](R/W) ; Loop End Address</b><DD> The loop end address of the sound data is expressed as the number of samples from "SA".</P>
+<A NAME="PCM8B_"></A><P><DT> <B>PCM8B(R/W); PCM 8Bit</b><DD> Specify the word length (format) of the waveform data.</P>
+<A NAME="PCM8B_0"></A><P><DD> <B>Types of sound data (PCM8B functions)</b><DD> 0B=16 bit PCM data 2'S complement<DD> 1B=8-bit PCM data 2'S complement</P>
+<A NAME="LPCTL_"></A><P><DT> <B>LPCTL[1:0](R/W) LooP ConTroL</b><DD> Set the loop format.</P>
+<P><DD> <B>Loop type (LPCTL function)</b><DD> 00B=Loop OFF<DD> 01B=Normal loop<DD> 10B=Reverse loop<DD> 11B=Alternative loop</P>
+<P><DD> Loop processing or sound memory access ends under one of the following two conditions.</P>
+<OL>
+<LI> When the amount of attenuation reaches its maximum after release.<LI> When the read point reaches the loop end point when the loop is OFF.</OL>
+<P><DD> When using normal loop and reverse loop, set the data corresponding to "SA+LSA" (loop start address) in the waveform data and the data corresponding to "SA+LEA" (loop end address) to the same value. Please set it to . By using the same method for the alternate loop, you can match the pitch of the normal and reverse loops.<BR>
+ Figure 4.10 shows specific examples of loop types.</P>
+<A NAME="z4_4"></A><P ALIGN=CENTER> <B>Figure 4.4 Types of loops</b><PRE>
+┌────┬────┬────┬────┬────┐ 
+│haaa│hiii│huuu│heee│hooo│ 
+└────┴────┴────┴────┴────┘ 
+↑ Attack  ↑      Loop    ↑ 
+↑  data   ↑      data    ↑ 
+SA       LSA            LEA
+</PRE></P>
+<P><DD>When you use the sound of <FONT SIZE=5>“hah hee hee hee ho”</font> as the waveform data and set the start address (SA), loop start address (LSA), and loop end address (LEA) as shown in the diagram above,</P>
+<P><DD><PRE>
+<B>●For normal loop</b>
+┌────┬────┬────┬────┬────┬────┬────┬────┬──── 
+│haaa│hiii│huuu│heee│hooo│huuu│heee│hooo│huu 
+└────┴────┴────┴────┴────┴────┴────┴────┴──── 
+↑         ↑              ↑              ↑      
+SA       LSA            LEA(LSA)       LEA(LSA)
+ 
+<B>●For reverse loop</b> 
+┌────┬────┬────┬────┬────┬────┬────┬────┬──── 
+│haaa│hiii│oooh│eeeh│uuuh│oooh│eeeh│uuuh│ooo 
+└────┴────┴────┴────┴────┴────┴────┴────┴──── 
+↑         ↑              ↑              ↑      
+SA       LEA            LSA(LEA)       LSA(LEA)
+ 
+<B>●In the case of alternative loop</b> 
+┌────┬────┬────┬────┬────┬────┬────┬────┬──── 
+│haaa│hiii│huuu│heee│hooo│oooh│eeeh│uuuh│huu 
+└────┴────┴────┴────┴────┴────┴────┴────┴─── 
+↑         ↑              ↑              ↑      
+SA       LSA            LEA            LEA     
+</PRE></P>
+<P><DD>is pronounced.</P>
+<P><DD> Furthermore, the waveforms of the normal loop, reverse loop, and alternative loop can be expressed as shown in Figure 4.5. Note that the waveforms for uuuh, eeeh, and oooh are inverted from those for huuu, heee, and hooo.</P>
+<A NAME="z4_5"></A><P><DD> <B>Figure 4.5 Loop waveform</b><DD> Define each waveform of <FONT SIZE=5>“fuu”, “heh”, and “ho”</font> as shown in the figure below.<BR>
+<img srcset="../grp/i039_01a.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>●For normal loop</b><BR>
+<img srcset="../grp/i039_01b.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>●For reverse loop</b><BR>
+<img srcset="../grp/i039_01c.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>●In the case of alternative loop</b><BR>
+<img srcset="../grp/i039_01d.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_20.htm">Back</a> ｜ <A HREF="p04_22.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

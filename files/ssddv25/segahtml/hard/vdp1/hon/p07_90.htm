@@ -1,0 +1,87 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;51/54&gt;VDP1 User's Manual/7.9 Line drawing commands</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a> ★ <A HREF="p07_00.htm">Chapter 7 Command</a><HR>
+ <B>▲ <A HREF="p07_80.htm">Back</a> ｜ <A HREF="p07_a0.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 7 Commands</b><HR NOSHADE>
+<DL>
+<A NAME="7_90"></A><P><DT><H2> ■7.9 Line drawing commands</H2><DD> Line drawing commands draw rectangles into the frame buffer. The inside of the rectangle is not filled.<BR>
+ When the end bit is 0B and the command selection bit is 0110B, it is a line drawing command.<BR>
+ The contents of the command table are as follows: <P><!-- -------------------------------------------------------------------------------- -->
+<P><DT><TABLE BORDER=0<TR>
+<TD><TABLE BORDER=1>
+<TR><TH><PRE> bit</TH><TH><PRE> 15</TH><TH><PRE> 14</TH><TH><PRE> 13</TH><TH><PRE> 12</TH><TH><PRE> 11</TH><TH><PRE> 10</TH><TH><PRE> 9</TH><TH><PRE> 8</TH><TH><PRE> 7</TH><TH><PRE> 6</TH><TH><PRE> 5</TH><TH><PRE> 4</TH><TH><PRE> 3</TH><TH><PRE> 2</TH><TH><PRE> 1</TH><TH><PRE> 0</TH></TR>
+<TR ALIGN=CENTER><TD> CMDCTRL<BR>
+ +00</TD><TH> 0</TH><TD COLSPAN=3> JP</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH></TR>
+<TR ALIGN=CENTER><TD> CMDLINK<BR>
+ +02</TD><TD COLSPAN=14> LINK specification/8H</TD><TD> 0</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TD> CMDPMOD<BR>
+ +04</TD><TD> M.O.</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> PC</TD><TD> Cl</TD><TD> Cm</TD><TD> Me</TD><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD COLSPAN=3> color calculation</TD></TR>
+<TR ALIGN=CENTER><TD> CMDCOLR<BR>
+ +06</TD><TH COLSPAN=16> non-textured color</TH></TR>
+<TR ALIGN=CENTER><TD> +08</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +0A</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> CMDXA<BR>
+ +0C</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (A), X coordinate (XA)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYA<BR>
+ +0E</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (A), Y coordinate (YA)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXB<BR>
+ +10</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (B), X coordinate (XB)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYB<BR>
+ +12</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (B), Y coordinate (YB)</TD></TR>
+<TR ALIGN=CENTER><TD> +14</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +16</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +18</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +1A</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> CMDGRDA<BR>
+ +1C</TD><TD COLSPAN=16> Gouraud shading table/8H</TD></TR>
+</TABLE>
+</TD><TD><img srcset="../grp/i130.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD></TR>
+</TABLE>
+<TABLE>
+<TR><TD> 【note】</TD><TD><TABLE BORDER cellspacing=10>
+<TR><TD></TD></TR>
+</TABLE>
+</TD><TD> is ignored (don't care) </TD></TR>
+</TABLE>
+</P>
+<!-- -------------------------------------------------------------------------------- -->
+<P><DD>Line drawing commands are defined as follows.</P>
+<P><DT><UL TYPE="DISC">
+<LI> Setting the end bit to 0B and the command selection bit to 0110B makes it a polyline drawing command.</P>
+<P><LI> Specify the jump format. When the jump format is Assign or Call, divide the address of the next command table to be processed by 8H and set it to CMDLINK.</P>
+<P><LI> Set pre-clipping. Specify whether to enable or disable it, considering the clipping area and the drawing position of the part.</P>
+<P><LI> Specify the user clipping enable bit and clipping mode. Specifies whether user clipping is outside or inside in clipping mode.</P>
+<P><LI> Set mesh enable. When mesh is enabled, the entire line may not be drawn depending on the position and shape of the line.</P>
+<P><LI> Set MSB on for shade or window processing in VDP2.</P>
+<P><LI> Set the color mode to 000B. Set the color code to <B>non-textured color (CMDCOLR)</b> .</P>
+<P><LI> Specify color operation. Color calculation is valid when non-texture color is in RGB mode. If you do not want to perform color calculations, specify Replace. When performing Gouraud shading processing, divide the address of the Gouraud shading table by 8H and specify it. Gouraud shading processing is effective when the non-texture color is in RGB mode. Only the vertices (A) and vertices (B) of the Gouraud shading table are valid, and the vertices (C) and vertices (D) are ignored.</P>
+<P><LI> Define the vertices (A) of the line to be drawn to CMDXA, CMDYA, and the vertices (B) to CMDXB, CMDYB.</P>
+<P><LI> <B>Note:</b> If two vertices are set to the same coordinates, the line will be drawn with 1 pixel.</ul>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_80.htm">Back</a> ｜ <A HREF="p07_a0.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a> ★ <A HREF="p07_00.htm">Chapter 7 Command</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

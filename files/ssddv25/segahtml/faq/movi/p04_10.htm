@@ -1,0 +1,153 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 5&gt;FAQ/Movie related/TrueMotion</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#movi">FAQ</a> ★ <A HREF="index.htm#true">Movie related</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Movie related</b><H2 ALIGN=CENTER> TrueMotion</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_01"><HR></a><DL>
+<H3> No sound with SGL2.0a in TrueMotion.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The TRUEMOTION library supplied on the CD-ROM seems to be compatible with SGL1.3, but is it not compatible with SGL2.0a?<BR>
+ When I compile, no sound is played. (It worked normally in the condition it was supplied.)</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The reason why there is no sound is probably because a program to deal with a bug in SGL Ver1.3 is installed.<BR>
+ The function that actually caused the problem was the slSoundRequest function. To resolve the bug, the _sound_request_sub function was used in the inline assembler to execute the function. For SGL Ver2.0a or later, please delete the _sound_request_sub function and change it to use the slSoundRequest function directly.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_02"><HR></a><DL>
+<H3> The movie size becomes smaller when "Compression Level" = "High".</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When "Compress Mode" is "IntERframe" and "Compression Level" is "High", the generated compressed image will be reduced (?) by 1-2% horizontally, and a black vertical line will appear on the right edge (230x224 4 dots wide in the image).</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> "High" compression achieves a high compression rate by reducing the movie size by two-thirds. In other words, if it is 320 x 224, it is encoded by reducing it to 208 x 224 and displayed at 312 x 224 while supplementing the data during playback. In conclusion, the above problem does not occur if the movie size is a multiple of 12.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_03"><HR></a><DL>
+<H3> What should I be careful about when securing memory for TrueMotion in Low-RAM?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Since High-RAM alone does not have enough memory, it is necessary to reserve part of the memory used by the TrueMotion library in Low-RAM. I would like to know the priority of the memory to be secured.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The memory allocated by the HFB library function does not affect performance much even if it is allocated in Low-RAM. In particular, we recommend placing the CD buffer in Low-RAM. Since the memory allocated by the DXL library functions is read/written, it is recommended to place it in High-RAM.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_04"><HR></a><DL>
+<H3> The created TrueMotion movie contains a logo mark that is not included in the source material.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I play a TrueMotion compressed movie on my Saturn, the TrueMotion logo is attached to the movie. Could it be that there was a failure in creating the movie?<P><DT> <FONT SIZE=5>A)</font><DD> When merging multiple compressed movies on a movie editing tool, if you do not turn off the recompression option, recompression will be applied. When this recompression occurs, a logo mark will be included.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_05"><HR></a><DL>
+<H3> Is there a way to eliminate blocky noise that appears in highly saturated areas?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is there a way to eliminate blocky noise that appears in highly saturated areas?<P><DT> <FONT SIZE=5>A)</font><DD> The most effective method is to increase the color resolution to "High_XY" with the Color Resp parameter during compression. This improves the 4×4 pixel block to 2×2. However, in Release 3.0 distributed on CD, this color resolution can only be selected in IntRAframe mode of 16bitColor. Other modes only go up to "High_Y".</P>
+<P> The latest version, Release 3.5, allows you to select "High_XY" in all modes, but please note that increasing the color resolution will also increase the transfer data rate.</P>
+<P> Another method is to cut out only the scenes where the block noise in the material is noticeable and apply filter processing such as lowering the saturation in pre-processing before compression.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_06"><HR></a><DL>
+<H3> I cannot test play a commercially available TrueMotion movie.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I extracted TrueMotion movie data from a commercially available Sega Saturn title and tried to play it for a test, the sound played on Windows, but the video did not play well, with only vertical red stripes appearing on the screen. . Is it possible to play VCDs on the Sega Saturn without any problems?<P><DT> <FONT SIZE=5>A)</font><DD> This is due to the difference in the key codes issued at the same time when the TrueMotion Development Kit is distributed to each licensee. By giving the movie data different key code information for each development environment during TrueMotion compression, it is possible to prevent editing work from being performed on other development environments and prevent copyright infringement due to modification of the movie data. It's the purpose. It is possible to play a movie similar to the retail version using a VCD on a Sega Saturn.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_07"><HR></a><DL>
+<H3> Is it possible to use only TrueMotion audio compression?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it possible to use only TrueMotion's DK4BIT and DK3BIT audio compression?<P><DT> <FONT SIZE=5>A)</font><DD> You can do this by creating an audio-only AVI movie file and using the audio decompression functions in the TrueMotion library. Since a dedicated sample program is not provided, you will need to create an audio compression data decompression routine using the audio part of the provided sample player as a reference.</P>
+<P> Currently, we can only handle AVI format data, but we will consider supporting other audio formats if there is a strong demand.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_08"><HR></a><DL>
+<H3> What is DCK_DEFAULT_READSIZE in the HFB_FillBuffer() function?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The HFB_FillBuffer() function says DCK_DEFAULT_READSIZE, but what is the actual size that is read into the buffer when updating the frame?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> For example, when playing a 20fps movie, the library should set the read size for each frame to 300/20 = 15(KB) based on the upper limit of 2x CD transfer rate of 300KB/s.<BR>
+ Here, according to the sector in 2K units</P>
+<P> <B>14(KB), 16(KB), ...</b><P> The data is read from the CD alternately. In other words, if the average data rate of the movie to be played is only about 200KB, buffer management can be more efficient if you directly use 10 x 1024 (byte) as an argument instead of the DEFAULT value above.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_09"><HR></a><DL>
+<H3> When compression is applied with TrueMotion, dithering is applied to the entire image.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When compression is applied with TrueMotion, dithering is applied to the entire image.<BR>
+ Even if I change the parameter to "smooth" etc., the situation does not change.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> When compressed with 24 bits, everything becomes "grainy". This is a mode that generates noise throughout to increase the compression rate.</P>
+<P> For 16bit, you can select ``smooth'' and ``grainy.'' If you do not want to apply dither, set ``Amount'' of ``dither'' to 0 for ``smooth'' and you will get a Mach band, but no dithering will be applied.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_10"><HR></a><DL>
+<H3> True Motion samples may not compile.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I tried to rebuild the TRUE MOTION sample by deleting all .o .cof files and using the make command, the compilation was successful, but linking using ld was not successful. .<BR>
+ And the following error will be output.</P>
+<P> <B>c:/gccsh/bin/ld.exe: cannot open dukaudio.o: Interrupted system call</b></P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The problem can be solved by increasing files = in config.sys of the development environment.<BR>
+ The above error seems to be output when the file cannot be opened due to a lack of file handles.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_11"><HR></a><DL>
+<H3> What buffer size is required for long movie playback?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I tried to play a 45-minute movie in English education software that uses foreign movies, I had to increase the buffer size to 550Kbytes to be able to play it properly.<BR>
+ Other movies can be played with no problem with the 480Kbyte sample, but why does this happen?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> TrueMotion requires 8 bytes of data space for each frame as index information.<BR>
+ Therefore, for a short movie, if the frame rate is 15fps and the demo is about 3 minutes long, the memory size required is about 21K, but if it is 45 minutes, 15 times that amount, about 315K, is required for this index information. . Therefore, the required buffer size will also increase.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_12"><HR></a><DL>
+<H3> An error occurred when playing the specified frame and playback is not possible.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to start from a specified frame, but HFB_GetStreamingData() returns an error value of -4 and I can't play it at all. Why is an error returned?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> If an error value is returned, there is a problem with the way the function is called. If you change it as shown below, you should be able to play it properly.</P>
+<P><DD> <B>(Change before)</b><BR>
+ bg.index = HFB_GetStreamingData(xVideoStream,(void **)&bg.data, ¥ &bg.length, DUK_FORWARD, 1);<P><DD> <B>(After change)</b><BR>
+ bg.index = HFB_GetStreamingData(xVideoStream,(void **)&bg.data, ¥ &bg.length, DUK_ABSOLUTE, 0);</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_13"><HR></a><DL>
+<H3> What does "0x25a004a1 = 0x00" in the sample do?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> There is the following description in the "duckAudioInitHW()" function.</P>
+<P><DD> <B>*(volatile char *)0x25a004a1 = 0x00;</b><P> what is this doing?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Handshake is off. If you don't do this, there will be no sound.<BR>
+ For more information</P>
+<P><DT> <B>reference</b><DD> "Sound Driver Programmer's Guide / <A HREF="../../sndt/prog/drve/sndcmd0.htm">3. Sound Control Commands</a> "<!--あ1997-04-14-->
+<P> See etc.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_14"><HR></a><DL>
+<H3> What is the relationship between buffer size and data rate?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How does the data rate that can be achieved change depending on the buffer reservation status?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Basically, the only thing you can do is adjust the buffer while checking the peak condition using movie analysis such as Premier, using the 300K transfer limit of 2x CD as a guideline.<BR>
+ However, it is impossible to play back material with long peaks of over 300K, no matter how much buffer you secure.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_15"><HR></a><DL>
+<H3> What is the data transfer method?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What data transfer method are you using?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> If you use IntERFrame compression to store the frame buffer in HighRAM, you can also use SCU-DMA, but if you store it in LowRAM, it is always transferred using the CPU.<BR>
+ Since the data transfer method is not fixed on the library side, it can be set freely on the application side.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_16"><HR></a><DL>
+<H3> White noise appears on the edges of sprite display</H3><P><DT> <FONT SIZE=5>Q)</font><DD> There is no noise on Windows Premier, but when playing on Sega Saturn, white noise appears on the edges of the black background.<BR>
+ The movie is displayed in 16-bit color on a sprite surface, but the plane where the noise is displayed has not yet been identified.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The reason is that the RGB=0 part of the sprite surface becomes transparent and the BG color appears, and when 8000H is written in the sprite character data, the color becomes transparent. This is due to the specifications of the Sega Saturn hardware. .</P>
+<P> Currently, the TrueMotion encoder does not support this, so as a workaround, try increasing the "Brightness" parameter by about 3% when compressing the movie, and change the 8000H data to 8001H.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_17"><HR></a><DL>
+<H3> There is noise in the audio in loop playback mode</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I performed loop playback using HFBMODE_FORWARDLOOP with the HFB_SetBufferMode function, noise started appearing in the audio playback after 10 minutes.<BR>
+ The movie is stored on SIMM, and I have confirmed that it plays normally in a loop for the first 10 times.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This mode is not recommended due to differences in audio and video rates and buffering issues.<BR>
+ However, if you want to play the audio using the built-in sound source and only loop the video, you should be able to use it without any problems.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_18"><HR></a><DL>
+<H3> About the capture environment</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The DUCK capture system sold by Nippon Columbia specifies MACH64/4M and SB16 for the VGA card and sound card, respectively, but I think these cards are already in short supply. If this is the only option, I have no choice, but please let me know which cards are available.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> <FONT SIZE=5>Unfortunately</font> , the VGA card has only been confirmed with ATI's MACH64 on DUCK's capture board. VRAM can be 2M.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_19"><HR></a><DL>
+<H3> What are the specifications of the SGL sample of Ver 3.5.1?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The samples included with TrueMotion do not comply with the code creation conventions (using cinit.c) after SGL3.0, so what is the solution?<BR>
+ Regarding playback processing, the playback method was different between Ver3.2 and Ver3.51. What is the reason for this?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> To explain the changes in the contents of sample programs, first, SGL samples up to "Ver3.2" were created based on "SGL1.31".<BR>
+ The newly provided "Ver. 3.5.1" is a sample compatible with "SGL 2.10", and changes have been made such as a modification so that slave processing is directly controlled by SGL. Therefore, the "Ver3.5.1" sample will work without problems with "SGL3.0", but "cinit.c" is not yet supported.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_20"><HR></a><DL>
+<H3> Win95 TrueMotion driver does not recognize DK4Bit and DK3Bit.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I installed the TrueMotion driver in a Win95 environment, but DK4BIT and DK3BIT are not recognized as audio compression drivers.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> TrueMotion audio compression drivers from Ver. 3.0 to Ver. 3.5.1 are not 32-bit compatible. The editing tool used for audio compression should be a 16-bit application, Premier Ver. 4.0.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#movi">FAQ</a> ★ <A HREF="index.htm#true">Movie related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

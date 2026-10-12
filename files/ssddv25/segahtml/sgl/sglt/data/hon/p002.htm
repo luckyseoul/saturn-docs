@@ -1,0 +1,75 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 4&gt;SGL Tutorial DATA/2.Sound Data</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">Data exchange</a><HR>
+ <B>▲ <A HREF="p001.htm">Back</a> ｜ <A HREF="p003.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Passing data</b><H2 ALIGN=CENTER> 2.Sound data</H2><HR NOSHADE>
+<DL>
+<P><DD> This chapter explains the minimum data format and operations that must be known when passing sound data created by a sound designer to a programmer in order to incorporate it into software using SGL.</P>
+<A NAME="no2_10"></A><P><DT><H2> 2-1. Types of data</H2><DD> All sound data created on Macintosh is a binary file and is divided into the following files.</P>
+<DD><UL TYPE=DISC>
+<LI> BGM, sequence data file<LI> Data file for PCM stream playback</UL>
+<A NAME="no2_11"></A><P><DT><H3> BGM, sequence data</H3><P><DD> <B>1) Tone bank data</b><DD> Tone data used for songs and sound effects.<BR>
+ Created using Sega Sound Tools Tone Editor.</P>
+<A NAME="z2_1"></A><P ALIGN=CENTER><H4> Figure 2-1 Example of tone bank data file</H4><BR>
+<img srcset="../grp/p02_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> You need as many files as you want to use for the map.<BR>
+ Tell the programmer the order in the map.</P>
+<P><DD> <B>2) Sequence data</b><DD> Song and sound effect data.<BR>
+ Created using the Sega Sound Tools sound simulator.</P>
+<A NAME="z2_2"></A><P ALIGN=CENTER><H4> Figure 2-2 Example of sequence data file</H4><BR>
+<img srcset="../grp/p02_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> You need as many files as you want to use for the map.<BR>
+ Tell the programmer the order in the map.</P>
+<P><DD> <B>3) DSP program</b><DD> This is a program for effect modules.<BR>
+ Created using Sega Sound Tool's DSP Linker.</P>
+<A NAME="z2_3"></A><P ALIGN=CENTER><H4> Figure 2-3 DSP program file example</H4><BR>
+<img srcset="../grp/p02_3.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> It is not necessary if you do not use effects.<BR>
+ Tell the programmer the order in the map.</P>
+<P><DD> <B>4) Map binary file</b><DD> Instruct the memory of the 68000 sound CPU to the load address of the files <B>1)</b> to <B>3)</b> above and the work area used for the DSP program.<BR>
+ This file will be loaded into A000h of the 68000 memory.</P>
+<P><DD> The maximum size of a map is 4096 bytes, and you can have up to 128 area maps, and one area map can have up to 32 bytes of map information.</P>
+<A NAME=z2_4"></A><P ALIGN=CENTER><H4> Figure 2-4 Map binary file structure</H4><BR><img srcset="../grp/p03_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P><P><DD> The bit images of each map (Map1 to 4) are shown below.</P><A NAME=z2_5"></A><P ALIGN=CENTER><H4> Figure 2-5 MAP bit image</H4><BR>
+<img srcset="../grp/p03_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME=z2_6"></A><P ALIGN=CENTER><H4> Figure 2-6 Map binary file example</H4><BR><img srcset="../grp/p03_3.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P><P><DD> <B>5) Sound driver</b><DD> It is better to give the programmer the one that comes with the Macintosh sound tool to ensure that the versions are consistent.</P><A NAME=z2_7"></A><P ALIGN=CENTER><H4> Figure 2-7 Sound driver</H4><BR>
+<img srcset="../grp/p04_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>6) Dump data file</b><DD> This is a dump of the memory from B000h to the last map data with the files <B>1)</b> to <B>3)</b> above loaded into the 68000's memory.<BR>
+ (However, if the last data was in the DSP work RAM, the previous data will be dumped.) There is no need to partially load and use only the necessary banks, and all map data can be dumped at once. If you use this dump data file, you can avoid loading the files 1) to 3) above one by one. This eliminates the possibility of loading data in the wrong order and saves time on the programmer's part. Dump data files are created using the SEGA Sound Tools sound simulator.</P>
+<A NAME=z2_8"></A><P ALIGN=CENTER><H4> Figure 2-8 Dump data file example</H4><BR><img srcset="../grp/p04_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P><P><DD> The figure below shows the BGM and sequence files that need to be passed to the programmer.<BR> Give the programmer one of the following files:</P><P><DD><OL><LI> Sound driver, map binary, dump data (includes tone bank data, sequence data, DSP program)<LI> Sound driver, map binary, tone bank data, sequence data, DSP program</OL></P><A NAME=z2_9"></A><P ALIGN=CENTER><H4> Figure 2-9 BGM and sequence files passed to the programmer</H4><BR>
+<img srcset="../grp/p05_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT><H4> ●Notification of sound control number</H4><DD> Programmers use "sound control numbers" to play songs and sound effects on SGL.<BR>
+ The combination of the sequence data number on the sound simulator and the song number becomes the "sound control number," so when the sound designer hands over the file, the sound designer tells the programmer which number to use and what kind of sound will be produced. Please tell.</P>
+<A NAME=z2_"></A><P ALIGN=CENTER><H4> Figure 2-10 Sound control number passed to the programmer</H4><BR><img srcset="../grp/p05_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P><A NAME="no2_12"></A><P><DT><H3> PCM stream playback data</H3><DD> This is PCM data for use with SGL.</P><A NAME="z2_11"></A><P ALIGN=CENTER> <B>Figure 2-11 PCM data file example</b><BR>
+<img srcset="../grp/p06_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Created using the Sega Sound Tools sound simulator.</P>
+<P><DD> Sound designers should convey the following information to programmers when passing files:</P>
+<A NAME="t2_1"></A><P><DD> <B>Table 2-1 PCM data file information to be passed to the programmer</b><P><DD><TABLE BORDER=1><TR><TH> file name</TH><TH> sound</TH><TH> stereo</TH><TH> bit</TH><TH> pitch</TH><TH> comment</TH></TR><TR><TD> stereo.8</TD><TD> “It’s 10 years early.”</TD><TD> stereo</TD><TD> 8</TD><TD> 7800</TD><TD> It is shifted left and right</TD></TR><TR><TD> mono.16</TD><TD> "Yes."</TD><TD> monaural</TD><TD> 16</TD><TD> 7180</TD><TD></TD></TR><TR><TD> stereo.16</TD><TD> "Aww"</TD><TD> stereo</TD><TD> 16</TD><TD> 7F00</TD><TD> Voices flow from right to left</TD></TR></TABLE></P><A NAME="no2_20"></A><P><DT><H2> 2-2. Incorporating data</H2><DD> In order to incorporate the sound data files explained in the previous section into software using SGL, it is necessary to convert each binary data file to array data so that it can be read by C language.</P><P><DD> Below is an example script that performs this task on UNIX.<BR> Here I am using GNU's sed.</P><PRE>
+<H3>
+Script file name [binary file name] [array name]&#65310; [Output file name]
+</H3><B>
+
+#!/bin/csh -f
+echo "char$2[]={"
+od -hv$1|cut -s -d ""-f2-|gsed's/\(..\)\(..\)*/0x\1,0x\2,/g'
+echo"};"
+</b></PRE><P><DD>This can be easily done in C language using ANSI functions, so if your development environment is a PC, please create it in C language.</P><P><DD> Now you have sound data that can be incorporated into your software. All you have to do is treat it like any other data.</P></DL><HR NOSHADE> <B>▲ <A HREF="p001.htm">Back</a> ｜ <A HREF="p003.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">Data exchange</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

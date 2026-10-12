@@ -1,0 +1,323 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/10&gt;FAQ/開発環境/VCD/簡易CDシミュレータ関連</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#devl">FAQ</A>
+★<a href="index_j.htm">開発環境</A>
+<HR>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+<a href="p09_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/開発環境</B>
+<H2 ALIGN=CENTER>VCD/簡易CDシミュレータ関連</H2>
+<HR NOSHADE>
+<DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_01"><HR></A><DL>
+<H3>VCDの動作機種についてもう少し詳しい事を教えて欲しい。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>VCDの動作機種について教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>IBM-PC/AT互換機はモデルチェンジが激しく、メーカーによっては同一型名
+のものであっても製造初期と後期ではマザーボード自体が変更されてしまい、<BR>
+事実上<BR>
+　<B><FONT SIZE=5>「別の機種」</FONT></B><BR>
+となってしまう場合もあります。</P>
+
+<P>当方でも世の中に流通している全ての機種を把握している訳ではありませんし、そのような事は到底不可能です。<BR>
+該当機種を当方で入手出来ればテストを行って動作の可否をチェックすることはある程度は出来ますが、全てのご要望に応えることは残念ながら出来ません。</P>
+
+<P>そのために動作テストを行い、安定した動作が可能な機種を推奨機種として指定しています。<BR>
+もし、今後VCDのホスト用としてPCをご購入される場合は、亜土電子工業よりVCD用のマシンを購入してください。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_02"><HR></A><DL>
+<H3>CartDev+DevSaturn環境でのVCDの動作手順を教えて。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>バーチャルCDについて質問があります。<BR>
+現在、CartDev + DevSaturnにて開発中ですが手元にあるマニュアルはProgramming Boxに対応したものしかありません。<BR>
+サンプルプログラムで試みましたが、起動はしますが正常かどうか確認できない状況です。<BR>
+ご迷惑をおかけいたしますが下記の方法を教えて頂けませんでしょうか?</P>
+
+<P><OL>
+<B><LI></B>バーチャルCDのファイルの作り方
+<B><LI></B>起動方法
+<B><LI></B>確認の方法
+<B><LI></B>使用時のデバック方法</OL></P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>以下の各事項は、既にVCDツールがインストールされているのを前提とします。</P>
+<DL>
+<P><DT><B>1)　バーチャルCD(VCD)ファイルの作り方</B>
+<DD>VCDには、2種類の動作モードがあります。一つはダイレクトDOSファイルアクセスモード、もうひとつはリアルタイムエミュレーションモードです。<br>
+最終的に自己起動するディスクを作るにはディスクイメージを作成します。<BR>
+詳細な作成方法については、</P>
+
+<P><DD><UL TYPE=DISC>
+	<LI><B>「<a href="../../prgg/cdtl/vcds/hon/p05_10_j.htm">バーチャルCDユーザーズマニュアル　第2章　操作手順詳細</A>」</B>
+    <LI><B>「<a href="../../prgg/sofg/disc/index_j.htm">DISCフォーマット規格仕様書</A>」</B>
+	</UL>
+
+<P><DD>をご覧ください。後者はスクリプトファイルのサンプルが含まれています。<BR>
+スクリプト記述時において特に注意しなければならないのは、<BR>
+1stリードファイルはディレクトリエントリにおいて最初に出現したファイルとなります。<BR>
+(ディスクビルド時には、asciiコードで最も若いキャラクタコードから順にファイルが並びます)</P>
+
+<P><DT><B>2)　起動方法</B>
+<DD>CartDevにおいては実機サターンと同様プロテクトが掛かっており、ライトワンスディスクやVCDでは直接自己起動が出来ません。<BR>
+これを回避するために、SYSTEM DISCというものをご用意しています。<BR>
+解除方法は、CartDevへ電源を投入する前にSYSTEM DISCをセットしておきます。<BR>
+VCD←→CD切換えSWはCD側に設定しておきます。<BR>
+電源を投入すると起動し、画面にセガのロゴが表示されます。<BR>
+しばらく後に画面左上に"COMPLETE"の表示が出れば、プロテクトは解除されています。<BR>
+一度解除するとSMPCリセットを行うか、電源を切断するまで解除の状態は有効です。<BR>
+ただし、IRIX上で利用している場合は、cartdev-serverプログラムの都合上、まずcartdev-serverプロセスをkillした後、CartDevをリセット、DevSaturn は電源再投入してからプロテクトを外します。<BR>
+解除が出来ましたら、VCDを使用する場合はVCD←→CD切換えSWをVCD側へ設定し、リセットボタンを押下して再起動を行えば、VCD側に用意されているディスクイメージから読み込まれます。<BR>
+SYSTEM DISCの入手方法は弊社の<FONT SIZE=5>営業担当者</FONT>へお申しつけください。</P>
+
+<P><DT><B>3)　確認の方法</B>
+<DD>VCDツールへ添付されているJVCから始まるサンプルは、自己起動する形のIP(Inithalize Program)を含んでいません。<BR>
+VCDホストが正常にデータ転送をエミュレーションできるかの確認を主眼におかれています。<BR>
+実際にディスクイメージを作成するとトラック2から5までのCD-DAが出来ます。<BR>
+VCDEMU.EXEを起動時にJVC.DSKを指定しておき、CartDev側を起動してマルチプレーヤ画面からCD-DA再生操作により、音声レベルの違う1KHzの発振音が再生されていればVCDエミュレーターは動作しています。早送り再生トラックジャンプ/スキップ、A/Bリピート再生等を行い、正常に動作するかを確認します。<BR>
+ユーザー各自で自己起動を想定して作成されたファイルが正常な動作をしない多くの場合、IP.BINの作成が適切でなかったり、スクリプトの記述に問題があることほとんどです。</P>
+
+<P><DT><B>4)　使用時のデバック方法</B>
+<DD>ライトワンスCDをいちいち作成している場合、僅かなファイルの変更の
+たびに書き込み動作を行う必要がありますが、VCDの場合はリアルタイム
+エミュレーションモード時でもVCDUTL.EXEを用いることによって
+一部分の更新も可能です。<BR>
+VCDEMU.EXEでは、CDドライブに対して行われたコマンドを逐次画面へ表示していますし、そのlogを取ることも出来ます。<BR>
+これにより、現在どのファイルを読みだしているかを確認したり、現在指定してエミュレーションを行っているディスクイメージファイル内容を確認したりも出来ます。<BR>
+また、CDトレイの開閉もエミュレートできますから、トレイオープンチェックによって確実にマルチプレーヤへジャンプするように出来るかといったチェックも出来ます。</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_03"><HR></A><DL>
+<H3>VCDBULIDを実行するとエラーが出る。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>VCDBUILDを使って VCD を動作させる為に必要なファイルを作成しようとする
+と、以下のような表示がされて、コマンドラインに戻ってしまいます。</P>
+<P><DD><PRE>
+>PreProcess for VCDEMU &lt;VCDPRE&gt; Ver 3.10 Released at 30-Nov-1994
+>Copyright (c) 1994 Victor Company of Japan, Limited (JVC)
+>All right reserved.
+>
+>script file = bell.scr
+>rti    file = bell.rti
+>Parsing Scripts
+>DOS/4G error (2001): exception 0Eh (page fault) at 180:00472E25
+>TSF32: prev_tsf32 699C
+>SS       188 DS       188 ES       188 FS         0 GS        20
+>EAX        0 EBX 452E3334 ECX FFFFFFFF EDX 452E3335
+>ESI   490188 EDI   49EF20 EBP   49EF0C ESP   49EEE8
+>CS:IP  180:00472E25 ID 0E COD        0 FLG    10206
+>CS=  180, USE32, page granular, limit FFFFFFFF, base        0, acc CF9B
+>SS=  188, USE32, page granular, limit FFFFFFFF, base        0, acc CF93
+>DS=  188, USE32, page granular, limit FFFFFFFF, base        0, acc CF93
+>ES=  188, USE32, page granular, limit FFFFFFFF, base        0, acc CF93
+>FS=    0, USE16, byte granular, limit        0, base       16, acc  0
+>GS=   20, USE16, byte granular, limit     FFFF, base     ED70, acc 93
+>CR0: PG:1 ET:1 TS:0 EM:0 MP:1 PE:1   CR2: 452E3334 CR3: 12000
+>Crash address (unrelocated) = 1:00019E25
+</PRE></P>
+
+<P><DD>現在、このマシン(Gateway 2000 DX4-66)の空きメモリは、コンベンショナルが590KB、XMS が 10MB 空いております。<BR>
+同じスクリプトファイルを使用して別のマシンで VCDBUILD を実行すると、全く問題なく必要な情報が生成されます。<RB>
+必要なメモリが不足しているのでしょうか。それとも、DOS のバージョンが古いのでしょうか？<BR>
+VCDBUILD を全く問題なく動作させる為にはどれくらいメモリを必要とするのかといった情報を教えて頂けないでしょうか。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>このエラーはDOSエクステンダーのエラーが発生しています。<BR>
+原因としてCONFIG.SYSやAUTOEXEC.BATの環境によって起こるようです。<BR>
+対策としては、</P>
+
+<P><DD>日立コンパイラと同様に環境変数DOS4GとDOS16Mを設定して行ってみてください。</P>
+
+<P><DD><B>＜例＞</B><BR>AUTOEXEC.BATに以下のような設定をしてください。</P>
+
+<P><DD><PRE><B>
+　SET DOS16M=0@2M:6M
+　SET DOS4G=quite
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_04"><HR></A><DL>
+<H3>簡易エミュレータの動作環境について。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>VCDシステムでの推奨の環境がそのまま簡易CDエミュレーターの推奨環境となるのでしょうか?
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>VCDでの推奨環境は、ISAバスVCD専用I/Fカードを用いているため、PCの機種間での動作特性に依存する部分で発生しているものです。<BR>
+簡易SCSI/CDシミュレータそれほど厳しい制限はありません。<BR>
+通常のSCSIカードが動作すれば問題ありません。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_05"><HR></A><DL>
+<H3>簡易CDシミュレータでCinapakやCD-DAを再生させる事は出来る?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>ファイルロードのサンプルプログラムを、SIMMを使用し、動作することを確認したものを、簡易CDシミュレーターを使用し、動作確認した所GFS_Initから戻ってきません。 </P>
+<DT><OL>
+<P><B><LI></B>グラフィックスボックスを使用したのですが、プログラミングボックスでないと、動作しないのでしょうか? </P>
+<P><B><LI></B>簡易CDシミュレーターの使用方法を、詳しく教えてください。</p>
+	</OL>
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DT><OL>
+<P><B><LI></B>基本的には動作しないと考えてください。グラフィックボックスに使われている
+         チップは、Programming Boxに用いられているものに比べバージョンが
+         古いことが多く、グラフィック専用として使う分には問題ありませんが、
+         Programming Boxとして使う場合には問題があります。
+         なお、CartDev + DevSaturnではSCSIによる簡易CD機能は使用出来ません．</P>
+
+<P><B><LI></B>使用方法<OL>
+	<P><B><LI></B>ディップスイッチ2-4をON(下側)にする。</P>
+	<P><B><LI></B>PCとProgramming BoxをSCSIケーブルで接続する。</P>
+	<P><B><LI></B>Programming Boxを起動する。</P>
+	<P><B><LI></B>PCの電源をONにした後、すぐにProgramming Boxをリセットする。</P>
+	<P><B><LI></B>PCの起動画面にて、SCSI機器としてProgramming Boxが認識されるのを確認する。</P>
+	<P><B><LI></B>Programming Boxの画面がマルチプレイヤーになった後に、ICEからCtrl-Cで停止させる<BR>(この時'G 400'を行わないでください.'G 400'を行うとSCSIデバイスがリセットされます)</P>
+	<P><B><LI></B>プログラムをICEからロードする。</P>
+	<P><B><LI></B>PCにてCDSIM.EXEを実行する。</P>
+	<P><B><LI></B>ICEでプログラムを実行させる。<BR>
+また、PC側にてCDSIM.EXEを実行させる際には、「CDファイル名とDOSファイル名の対応ファイル」を作成する必要があります。</P>
+<P><B>(例)</B><BR>
+CD上の"PCM1.DAT"というファイルを、DOS上の"¥PCMDATA¥FOO.PCM"というファイルで対応させ、CD上の"PCM2.DAT"というファイルを、DOS上の
+"¥PCMDATA¥BAR.PCM"というファイルで対応させる場合、</P>
+
+<P><B>　「CD_DOS.TXT」の内容</B>
+<PRE>
+　PCM1.DAT FOO.PCM[RET]
+　PCM2.DAT BAR.PCM[RET]
+　[EOF]
+　CDSIM -fCD_DOS.TXT[RET]
+</PRE></P>
+
+<P>簡易CDシミュレータは、単純なファイルアクセスのみの使用に限られますので、ご注意ください。<BR>
+(ファイルインタリーブや、MODE2トラックの代替には使用できません。)</P>
+ </OL>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_06"><HR></A><DL>
+<H3>簡易CDシミュレータの使い方は?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>簡易CDシミュレータでCinepakデータ及びCDDAデータの再生は可能でしょうか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>残念ながら、CDDA再生やMODE2トラックといった複雑なエミュレーションは、簡易CDシミュレータ(SIMM・SCSI共)では不可能です。<BR>
+単純なムービー再生に関しては、可能です。</P>
+</DL>
+
+<!----------------------------------------------------------------------------->
+<A NAME="no8_07"><HR></A><DL>
+<H3>SGLで簡易SCSIシステムを使いたい。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>簡易CDシミュレータのSIMMシステムの使用方法を教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SIMMシステムは、Programming Boxおよび CartDev + DevSaturn のどちらの環境でも使用可能です。</P>
+	<DL>
+<P><DT><B>Programming Boxの場合：</B>
+<DD>8MバイトSIMM を4枚まで実装可能<BR>
+実装アドレスは、ディップスイッチにより選択可</P>
+<P><TABLE BORDER=1>
+<TR><TH WIDTH=140>SW2 SIMMCART</TH><TH WODTH=380>実装アドレス</TR>
+<TR ALIGN=CENTER><TD><PRE>OFF</TD><TD><PRE>:24000000H 〜 24FFFFFFH(16Mバイト連続)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE>O N</TD><TD><PRE>:22000000H 〜 23FFFFFFH(32Mバイト連続)</TD></TR></TABLE></P>
+
+<P><DT><B>CartDevの場合：</B>
+<DD>SIMMバッファカートリッジ(オプション)の上に 8MバイトSIMMを2枚まで実装可能(アドレス固定)<BR>
+実装アドレスは、24000000H 〜 24FFFFFFH(16Mバイト連続)</P>
+	</DL>
+
+<P><DD>GFSライブラリからSIMMファイルにアクセスするには、'GFMC_base'というグローバル変数に、メモリファイルの格納アドレスを設定する必要があります。<BR>
+'GFMC_base'はライブラリ内で定義されています．ユーザプログラム内では</P>
+
+<P><DD><B>　extern   Sint8  *GFMC_base;</B></P>
+
+<P><DD>と宣言すれば使用可能となります。<BR>
+なお、メモリファイルの格納場所は、必ずしもSIMMメモリ上である必要はありません。<BR>
+ワークRAM内に余裕がある場合には、そこにロードして使用する事も可能です。<BR>
+メモリファイルの作成は、MFCAT.EXEというツールを使用します。<BR>
+MFCAT.EXE は SATURN¥SEGABIN¥BIN もしくは、SATURN¥SEGABIN¥BINCD に収められています。</P>
+
+<P>このツールの使用方法については、PROGRAMMER'S GUIDE VOL.1 の、
+「<a href="../../prgg/cdtl/cdsm/hon/p03_10_j.htm">簡易CDシミュレータユーザーズマニュアル/3.コマンドの説明</A>」の項を御参照ください。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_08"><HR></A><DL>
+<H3>簡易SCSIシステムの使用条件を教えて?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SGLで簡易CDシミュレータ/SCSIシステムを使ってGFSライブラリを用いてSCSI
+ハードディスクにアクセスを試みていますが、GFS_Init関数を実行後呼出元に制御が戻ってきません。<BR>
+このときSCSIシステム側のPCはCDROMエミュレート状態(正常状態でしょうか。)になっています。<BR>
+同じプログラム(GFSC_baseの値は異なります。)がVCDシステム、SIMMシステムでは正常動作しています。<BR>
+<a href="../../prgg/prg1/file/hon/p08_11_j.htm#no1_1">GFS_Init関数</A>が帰ってこない原因が解れば、と思うのですが。<BR>
+SCSIシステムについてのみ必要な設定があるのでしょうか。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>CartDev + DevSaturnでは、簡易SCSIシステムは使用できません。<BR>
+簡易SIMMシステムであれば可能です。(オプションのバッファカートリッジを使用)<BR>
+CartDev + Programing Boxでは、どちらも使用可能です。</P>
+</DL>
+
+<!----------------------------------------------------------------------------->
+<A NAME="no8_09"><HR></A><DL>
+<H3>バーチャルCDの動作について(確認して欲しい事)</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>バーチャルCDの使用状況についてトラブルが起こった際にはどんなことを見れば良いのでしょうか。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DT><OL>
+<P><B><LI></B>バーチャルCDを用いたサンプルプログラムでの動作は確認済みでしょうか?</P>
+<P><B><LI></B>バーチャルCDがハングするのは、PCの電源を入れてからすぐでしょうか?<BR>何時間かたってからでしょうか?</P>
+<P><B><LI></B>バーチャルCD用のハードディスクの物理的な記録状況ですが、定期的なリフレッシュ作業は行われているでしょうか?<BR>
+(不連続領域が多いとアクセスタイミングに障害が生します。)<BR>
+なお、ケーブルなどの接続不良による動作不具合も考えられますので、コネクタ等をもう一度接続し直してみてください。</P>
+</OL>
+</DL>
+
+<!----------------------------------------------------------------------------->
+<A NAME="no8_10"><HR></A><DL>
+<H3>バーチャルCDをPCにインストールしVCDEMU.EXEを起動したが、うまく起動しない。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>バーチャルCDをPCにインストールし、VCDEMU.EXEを起動しましたが、うまく起動しません。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>ボード上のIRQ,DMAチャネル,I/Oアドレスは正しく設定されているでしょうか?</P>
+<P>他のデバイスとの衝突、 特にDMAチャネルには注意してください。AdaptecのSCSIカードではデフォルトが5チャネルとなっていますので、VCDインターフェースボードの工場出荷時設定と衝突します。<BR>
+また、VCDインターフェースのIRQレベルをSCSIインターフェースより低い番号を設定すると、ハングアップすることがあります。<BR>
+全く認識されない場合は、I/Oアドレスの設定をもう一度確認してください。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+<a href="p09_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#devl">FAQ</A>
+★<a href="index_j.htm">開発環境</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

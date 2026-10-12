@@ -1,0 +1,53 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p053.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p055.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 1.5 Calling sequence </H2>
+<H3> [Interrupt register access management] </H3>
+<DD><PRE>void sysInit()
+{
+     INT_SetMsk((INT_MSK_HBLK_IN | INT_MSK_VBLK_OUT),
+                                         (INT_MSK_SPR | INT_MSK_DMA1));
+               / * Enable "H-blank-IN" and "V-blank-OUT" * /
+               / * Disable "Sprite Drawing End" and "Level 0-DMA" * /
+     ...
+}
+void anyPrg()
+{
+     Uint32 status_bit;
+     status_bit = INT_GET_STAT (); / * Get status * /
+     if(INT_JudgeStat(status_bit,INT_ST_VBLK_OUT,INT_ST_VBLK_IN) == TRUE){
+                                   / * V-blank-OUT interrupt occurs, * /
+                                   / * When V-blank-IN interrupt has not occurred * /
+     ...
+     }
+}</PRE><P>
+<DT> <H3> [Register and refer to interrupt handling routine] </H3>
+<DD> <PRE> <B> File A </B>
+#pragma interrupt (vblkIn) / * Use the vblkIn function as an interrupt function * / <P>
+void vblkIn(void)
+{
+     ...
+}<P>
+<B> File B </B>
+void systemInit(void)
+{
+     INT_SetFunc(INT_SCU_VBLK_IN, vblkIn);
+                              / * Change vblkIn interrupt function to V-blank-IN interrupt vector * /
+                              / * Register in the data table. ** /
+     INT_SetScuFunc(INT_SCU_VBLK_OUT, vblkOut);
+                              / * VblkOut function with V-blank-OUT interrupt vector * /
+                              / * Register with the SCU interrupt function. */
+     ...
+}<P>
+void vblkOut(void)
+{
+     ...
+}</PRE><BR>
+</DL><P><P><HR>
+<A HREF=p053.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p055.htm> Go to next page </A>
+</BODY>
+</HTML>

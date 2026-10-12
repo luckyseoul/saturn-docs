@@ -1,0 +1,51 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p123.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p125.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT><table border cellpadding=5>
+<td width = 150> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220> <pre> <B> Function </B> <br> Sector data writing </td> <td width = 160> <pre> <B> Function Name </B> [SR] <br> CDC_PutSctData </​​td> <td width = 60> <pre> <B> No </B> <br>7.5</td>
+</table><P>
+<DD><PRE>
+<B> format </B> Sint32 CDC_PutSctData (Sint32 filtno, Sint32 snum)
+<B> Input </B> filtno: Aperture number
+<B> </B> snum: Number of sectors
+<B> Output </B> None
+<B> Function value </B> Returns an error code.
+<B> End flag </B> EHST flag (Set to 1 after execution of the CDC_DataEnd function)
+<B> Function </B> Writes sector data to the specified aperture.
+<B> </B> The length of one sector can be changed by setting the sector length (CDC_SetSctLen).
+<B> Remarks </B> After executing the function, it is necessary to transfer and write the data.
+<B> </B> Even if data transfer is interrupted, data of the specified number of sectors will be written. Transferred data
+Values ​​other than <B> </B> are undefined. <P>
+<B> </B> << Incorporation of sector data >>
+<B> Sector data </​​B> Sector data is incorporated into the section from the aperture after executing the end of data transfer (CDC_DataEnd).
+<B> </B> When all sectors have been incorporated, the EHST flag is set to 1. <P>
+<B> </B> << Securing free space >>
+<B> </B> If there is not enough free space when issuing the command, WAIT is returned. (Free space <snum) Command reception
+<B> If an empty area cannot be secured after </B>, the DRDY flag in the interrupt factor register remains 0 and EHST
+The <B> flag </B> is 1. (When free space is used in other device processing) </PRE> <P>
+<DT><table border cellpadding=5>
+<td width = 150> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220> <pre> <B> Function </B> <br> Copying sector data </td> <td width = 160> <pre> <B> Function Name </B> [SR] <br> CDC_CopySctData </​​td> <td width = 60> <pre> <B> No </B> <br>7.6</td>
+</table><P>
+<DD><PRE>
+<B> format </B> Sint32 CDC_CopySctData (Sint32 srcbn, Sint32 spos, Sint32 snum, Sint32 dstfln)
+<B> Input </B> srcbn: Copy source buffer section number
+<B>: </B> spos: Sector position (CDC_SPOS_END: ​​Indicates the last sector of the section)
+<B> </B> snum: Number of sectors (CDC_SNUM_END: ​​Indicates the number of sectors from spos to the end of the partition)
+<B>: </B> dstfln: Copy destination aperture number
+<B> Output </B> None
+<B> Function value </B> Returns an error code.
+<B> End flag </B> ECPY flag
+<B> Function </B> Copies sector data from the specified sector range of the buffer partition to the aperture. (Copy between selectors)
+<B>. </B> The length of one sector is fixed at 2352 bytes.
+<B> Remarks </B> If there is not enough free space when issuing the command, WAIT is returned. (Free space <snum) command processing
+<B>: </B> If there is no more free space during the process, the copy process will be canceled and an error will occur. (other
+(<B>: </B> When free space is used in device processing)
+To obtain <B> error </B> error information, execute sector data copy / move error acquisition (CDC_GetCopyErr). </PRE><BR>
+</DL><P><P><HR>
+<A HREF=p123.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p125.htm> Go to next page </A>
+</BODY>
+</HTML>

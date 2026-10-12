@@ -1,0 +1,233 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/29&gt;SCSPユーザーズマニュアル/FM音源方式を使用するにあたって/2</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p04_fm1_j.htm">戻る</A>
+｜   <a href="p04_fm3_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCSPユーザーズマニュアル/4.3　音源部レジスタ</B>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　ＦＭ音声合成では、スロット同士の接続(実際は、サウンドスタック →スロットとの接続)が重要となります。図4.28のＦＭ音声構成図でのスロットの演算は、図4.24のように表すことができます。<P>
+
+<A NAME="z4_24"></A>
+	<P ALIGN=CENTER><B>図4.24　スロットの演算及びサウンドスタックの状態</B><BR><img srcset="../grp/i056_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　スロットの演算は、PG演算処理およびPLFO演算処理(OP1)から始まり、ADP(アドレスポインタ)演算処理およびMD（モジュレーション）データ読み出し(OP2)、波形データ読み出し(OP3)、
+		補間演算処理およびEG演算処理およびALFO演算処理(OP4)、レベル演算処理(OP5) (OP6)、波形出力値サウンドスタックライト(OP7)のサイクルで実行されます。レベル演算処理は演算処理が長いため、２つのサイクルを必要としています。<BR>
+		　演算処理を一時的に見てみると、例えば「スロット3がPG演算処理およびPLFO演算処理を行なっている時、ADP演算処理およびMD読み出しはスロット2、波形<BR>
+
+	<P>	<DD>　データ読み出しはスロット1、補間演算処理およびEG演算処理およびALFO演算処理はスロット0、レベル演算処理はスロット31およびスロット30、サウンドスタックはスロット30がライトされる」という処理を行なっています。<BR>
+		　スロットの演算は、スロット0から始まりスロット31に向かって演算されていくので、スロット0から若い順番サウンドスタックに書かれていきます。ただしスロットの演算が始まってからそのスロットがサウンドスタックに書かれるまでには、
+		演算実行分の時間差があります。例えばスロット0がサウンドスタックにライトされるまでには、図4.25のように６サイクル分の時間が必要になります。<BR>
+		　図4.24のように、スロットに対して他のスロットを接続する時は、接続される側のスロットがOP2の状態の時にサウンドスタックにすでにデータが書き込まれているスロットでなければ実際に接続できません。<BR>
+		　例えばスロット0に接続可能な他のスロットは、OP2がスロット0の時、サウンドスタックには"27"までのスロットが書かれているので、"27"までの色付きのサウンドデータが当てはまります。このことを公式で表すと次のようになります。</P>
+
+<A NAME="s4_0"></A>
+	<P><DD><PRE><B>
+●スロットの接続式
+
+｛ 現スロット番号＋３２−接続したいスロット番号 (サウンドスタック) ＋ A ｝≧５
+</B></PRE></P>
+
+	<P>	<DD>　現スロット番号とは、レジスタのスロット番号を表わします。ただしAは、接続したいスロットのサウンドスタックが現在のサイクルの時"32"、過去のサイクルの時"0"を代入してください。<BR>
+　ここでいう過去とは、1サンプル前のサイクルのデータのことです。<P>
+
+<A NAME="z4_25"></A>
+	<P ALIGN=CENTER><B>図4.25　スロットがサウンドスタックにライトされるまでの時間差</B><BR><img srcset="../grp/i057_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="MDXSL_MSYSL"></A>
+	<P><DD><B>"MDXSL"・"MDYSL"の算出式</B>
+	<P>	<DD>　ＦＭ音声合成を構成させるために２つ以上のスロットを接続させますが、この時の"MDXSL"および"MDYSL"(各６ビット)の算出法を説明します。<BR>
+		　２つのスロットを接続させる時、変調をかける側(モジュレータ)のスロットをM、変調をかけられる側（キャリア）のスロットをCとし、M−Cの答えをJとすると、</P>
+
+	<P>	<DD><PRE>
+<B>Ｍ − Ｃ ＝ Ｊ　</B>．．．．．　4.1式
+</PRE></P>
+
+	<P>	<DD>　となります。求めたＪの値によって、"MDXSL"および"MDYSL"の最上位ビット(MSB…6ビット目)のとる値が変わってきます。その条件を以下に示します。</P>
+
+	<P>	<DD><B>●条件１　Ｊ≧２８の場合</B>
+		<DD><UL TYPE=DISC>
+		<LI>Ｊの値を１６進数の５ビット値に変換します。
+		<LI>最新サンプルの時はMSB(６ビット目)を"0B"にします。<BR>過去サンプルの時は"1B"にします。</UL></P>
+
+	<P>	<DD><B>●条件２　Ｊ＜０(Ｊが負)の場合</B>
+		<DD><UL TYPE=DISC>
+		<LI>３２＋Ｊの計算を行ないます(１０進で計算)。
+		<LI>次に上記の値を１６進数の５ビット値に変換します。
+		<LI>最新サンプルの時はMSB(６ビット目)を"0B"にします。<BR>過去サンプルの時は"1B"にします。</UL></P>
+
+	<P>	<DD><B>●条件３　Ｊの値が条件１、条件２のどちらにも当てはまらない場合</B>
+		<DD><UL TYPE=DISC>
+		<LI>Ｊの値を１６進数の５ビット値に変換します。
+		<LI>最新サンプルの時はMSB(６ビット目)を"1B"にします。<BR>過去サンプルの時は"0B"にします。</UL></P>
+
+	<P>	<DD>　実際にＦＭ音声合成を実現するにあたって、注意事項を記述しておきます。</P>
+
+<A NAME="z4_26"></A>
+	<P ALIGN=CENTER><PRE><B>図4.26　スロットの平均化演算</B><BR>
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃スロットの入出力　　　　　　　　　　　　　変調入力　　　　　　　　　　　　　　　　  ┃
+┃　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　  ┃
+┃　　　Ｘ　　　Ｙ・・・変調入力　　　　　　　　Ｘ　　　　Ｙ　　　　　　　　　　　　  ┃
+┃　　　↓　　　↓　　　　　　　　　　　　　　　↓　　　　↓　　　　　　　　　　　　  ┃
+┃　┌─┴───┴─┐　　　　　　　　　　　┌─┴────┴─┐　　　　Ｘ　＋　Ｙ　  ┃
+┃　│　スロット　　│　　　　　　　　　　　│　平均化演算部　│　＝　───────  ┃
+┃　└───┬───┘　　　　　　　　　　　└────┬───┘　　　　　　２　　　  ┃
+┃　　　　　↓　　　　　　　　　　　　　　　　　　　　↓　　　　　　　　　　　　　　  ┃
+┃　　波形データ出力　　　　　　　　　　　　　ＡＤＤＲＥＳＳ　　　　　　　　　　　　　┃
+┃　　　　　　　　　　　　　　　　　　　　　　　ＰＯＩＮＴＥＲへ　　　　　　　　　　　┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+</PRE></P>
+
+	<P><DD>　スロットに入力するソースは、サウンドスタック("SOUS")中のデータです。従って、あるスロットで変調するということは、変調スロットに対応するサウンドスタックを、被変調スロットにアサインおよび接続を行うことを表します。
+		実際の機能としては、変調入力YおよびXに対して入力するサウンドスタックを選択する"MDXSL"および"MDYXL"があるので、このレジスタに先に説明した演算法で求めたパラメータを、設定する必要があります。<BR>
+		　また、スロットへの変調入力はXおよびYの２本があります。この２本の入力は、平均化演算によって1／2倍にされてしまうことに注意してください。従ってスロットの入力が１本で接続されている場合は、XおよびYの入力に同じパラメータを設定して、
+		同じスロットのサウンドスタックデータを入力するようにしてください。片側入力のみの設定にしますと、考えてもいないデータが混入したり、ＦＭの変調度が小さく感じられたりすることがあります。<BR>
+		　次に"MDXSL"および"MDYSL"の算出法を用いて、実際にＦＭ音声合成で使われる4スロット構成のＦＭ音源を例として、各パラメータを求めていきます。<BR>初めに、図4.27に示したＦＭ音声合成のアルゴリズムの読み取り方について説明します。<P>
+
+<A NAME="z4_27"></A>
+	<P ALIGN=CENTER><B>図4.27　4スロット構成のアルゴリズム</B><BR><img srcset="../grp/i059_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD><B>●スロット0</B>
+		<DD>　スロット0は、出力をスロット2の入力に用いていますが、一方でスロット0の出力をスロット0の入力に用いています。これをセルフフィードバックといいます。</P>
+
+	<P>	<DD><B>●スロット1</B>
+		<DD>　スロット1は、出力をスロット2の入力として用いています。</P>
+
+	<P>	<DD><B>●スロット2</B>
+		<DD>　スロット2は、スロット0およびスロット1の出力を入力として用いています。その出力をスロット3の入力に用いています。</P>
+
+	<P>	<DD><B>●スロット3</B>
+		<DD>　スロット3は、スロット2の出力を入力としています。スロット3の出力は何も接続されていませんが、これを音声出力として使用します。</P>
+
+	<P>	<DD><B>(1)スロット0に設定するパラメータ</B>
+
+<A NAME="z4_28"></A>
+	<P ALIGN=CENTER><B>図4.28  スロット0のアルゴリズム</B><BR><img srcset="../grp/i060_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　スロット0のようなセルフフィードバック型の構成は、スロット0の出力データが格納されたサウンドスタックを変調入力のXおよびYに接続することが必要です。<BR>
+		サウンドスタックには現在演算中のサンプルに対して、最新サンプルおよび過去サンプルがあるので、変調入力XおよびYには、両方に最新サンプルまたは過去サンプル、あるいは片方に最新サンプルもう片方に過去サンプルを入力するというように、
+		３通りの入力方法が考えられます。</P>
+
+	<P>	<DD><B>※注意</B>
+		<DD>　ただし、セルフフィードバックの場合には、同じサンプルを入力すると発振する可能性があるので、片方に最新サンプル、もう片方に過去サンプルを入力するという方法をとるようにしてください。<BR>
+		　MDXSLおよびMDYSLの値は、変調をかけるスロット、変調をかけられるスロットは共に０なので、4.1式に代入すると以下のようになります。</P>
+
+	<P>	<DD><PRE><B>
+０ − ０ ＝ ０
+</B></PRE></P>
+
+	<P>	<DD>　これは4.1式の条件３を満たすので、MDXSLおよびMDYSLのMSBは、</P>
+
+	<P>	<DD><PRE>
+最新サンプルの時　MSB=１(<B>1</B>00000)Ｂ　＝２０Ｈ
+過去サンプルの時　MSB=０(<B>0</B>00000)Ｂ　＝００Ｈ
+</PRE></P>
+
+	<P>	<DD>　となります。</P>
+
+	<P>	<DD><B>(2)スロット２に設定するパラメータ</B></P>
+
+<A NAME="z4_29"></A>
+	<P ALIGN=CENTER><B>図4.29　スロット2アルゴリズム</B><BR><img srcset="../grp/i061_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　スロット２は複数スロットの入力であるため、最新サンプル、過去サンプル入力にこだわる必要はありません。<BR>
+	　スロット１を入力(スロット1側)とした"MDXSL"および"MDYSL"の値は、変調をかけるスロットが１、変調をかけられるスロットは２なので、4.1式に代入すると以下のようになります。</P>
+
+	<P>	<DD><PRE><B>
+１ − ２ ＝ −１
+</B></PRE></P>
+
+	<P>	<DD>　これは4.1式の条件２を満たすので、"MDXSL"および"MDYSL"のMSBは、</P>
+
+	<P>	<DD><PRE><B>
+３２ ＋ (−１) ＝ ３１ ＝ １ＦＨ ＝ (011111)Ｂ
+</B>
+最新サンプルの時  MSB=0   (<B>0</B>11111)Ｂ ＝ １ＦＨ
+過去サンプルの時  MSB=1   (<B>1</B>11111)Ｂ ＝ ３ＦＨ
+</PRE></P>
+
+	<P>	<DD>　となります。</P>
+
+<A NAME="z4_30"></A>
+	<P ALIGN=CENTER><B>図4.30　スロット2アルゴリズム(入力スロット別)</B><BR><img srcset="../grp/i061_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　次に、スロット０を入力(スロット0側)とした"MDXSL"および"MDYSL"の値は、変調をかけるスロットが０、変調をかけられるスロットは２なので、4.1式に代入すると以下のようになります。</P>
+
+	<P>	<DD><PRE><B>
+０ − ２ ＝ −２
+</B></PRE></P>
+
+	<P>	<DD>　これは4.1式の条件２を満たすので、"MDXSL"および"MDYSL"のMSBは、</P>
+
+	<P>	<DD><PRE><B>
+３２ ＋ (−２) ＝ ３０ ＝ １ＥＨ ＝  (011111)Ｂ
+</B>
+最新サンプルの時  MSB=0   (<B>0</B>11110)Ｂ＝  １ＥＨ
+過去サンプルの時  MSB=1   (<B>1</B>11110)Ｂ＝  ３ＥＨ
+</PRE></P>
+
+	<P>	<DD>となります。</P>
+
+	<P>	<DD><B>※注意</B>
+		<DD>　基本的に、番号の異なるスロットを入力する時は、同じ世代のサンプルを入力してください。従来のＦＭ音源はこの方式をとっていますので、ＦＭ音源の音色ライブラリーを移植する場合には、この方法をとってください。</P>
+
+	<P>	<DD><B>(3)スロット３に設定するパラメータ</B>
+
+<A NAME="z4_31"></A>
+	<P ALIGN=CENTER><B>図4.31　スロット3アルゴリズム</B><BR><img srcset="../grp/i062_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　スロット３は入力が１つしかないため、スロット2の出力を変調入力XおよびYの両方に入力する必要があります。<BR>
+		　接続されているスロットが異なっていれば発振の可能性はないので、変調入力XおよびY両方に最新サンプルのみ、または過去サンプルのみ、あるいは片方に最新サンプル、もう片方に過去サンプルを入力しても構いません。
+		従来のＦＭ音源の音色ライブラリーを移植する場合には、どちらか一方のサンプルだけを使用してください。</P>
+
+	<P>	<DD>　スロット２を入力としたMDXSLおよびMDYSLの値は、変調をかけるスロットが２、変調をかけられるスロットは３なので、4.1式に代入すると以下のようになります。</P>
+
+	<P>	<DD><PRE><B>
+２ − ３ ＝ −１
+</B></PRE></P>
+
+	<P>	<DD>　これは4.1式の条件２を満たすので、"MDXSL"および"MDYSL"のMSBは、</P>
+
+	<P>	<DD><PRE><B>
+３２ ＋ (−１) ＝ ３１ ＝ １ＦＨ>＝  (011111)Ｂ
+</B>
+最新サンプルの時  MSB=0   (<B>0</B>11111)Ｂ＝  １ＦＨ
+過去サンプルの時  MSB=1   (<B>1</B>11111)Ｂ＝  ３ＦＨ
+</PRE></P>
+
+	<P>	<DD>　となります。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p04_fm1_j.htm">戻る</A>
+｜   <a href="p04_fm3_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

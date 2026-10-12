@@ -1,0 +1,29 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="FFFFFF">
+<A HREF=p087.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p089.htm> Go to next page </A>
+<HR><P><P><dl><dt>
+<H4> Data transfer from DSP to D0 bus </H4> <P>
+<dd> Set the DSP data RAM transfer start address and external memory transfer start address in the registers ([CT0-3] and [WA0]), and transfer is started by the DMA instruction. The instruction format up to the DMA instruction is as follows. For details, refer to Section 4.5 “Instruction”. <P>
+<dl><dd><PRE>
+MOV SImm, [CT0]; DSP data RAM0 transfer start address set
+MVI Imm, [WA0]; External memory transfer start address set
+DMA [MD0], D0, SImm; Start DMA transfer using D0 bus </PRE> <P>
+</dl>
+<dd> Table 4.7 summarizes the features of this DMA transfer. Since DMA transfer is performed in units of 1 longword, the transfer word count setting (SImm for DMA instruction above) must be set in units of longwords. <P>
+<B> Table 4.7 Features of data transfer from DSP to D0 bus </B> <BR>
+<TABLE BORDER CELLPADDING=5>
+<TD ALIGN = "CENTER"> <PRE> Item </TD> <TD ALIGN = "CENTER"> <PRE> Special </TD> <TR>
+<TD ALIGN = "CENTER"> Set <PRE> flag </TD> <TD ALIGN = "LEFT"> <PRE> The TO flag of the program control port is set. </TD><TR>
+<TD ALIGN = "CENTER"> <PRE> Start and Exit </TD> <TD ALIGN = "LEFT"> <PRE> Follow the data ready signal from the outside. By this signal, data is transferred <BR> in units of one long word. The DMA transfer is terminated by an external end signal, and the TO flag of the program control port is reset at this timing. </TD><TR>
+<TD ALIGN = "CENTER"> <PRE> Address Update </TD> <TD ALIGN = "LEFT"> <PRE> Every 1 longword transfer, DSP data RAM transfer address ([CTO-3]) is 1 is added and the external memory transfer address ([WAO]) is added according to the address addition number. </TD><TR>
+<TD ALIGN = "CENTER"> <PRE> Hold state </TD> <TD ALIGN = "LEFT"> <PRE> Setting the Hold bit of the DMA instruction (see section 4.5 “Instruction” DMA instruction) to 1 <BR> The number of transfer words ([TN0]) and the external memory transfer address ([WA0]) are maintained at the value at the start of transfer. </TD>
+</TABLE><P>
+<dt> <H3> ■ END instruction execution </H3>
+<dd> When the END instruction is recognized, the program control port program RAM address addition process is stopped and the program execution control bit (EX flag) is reset. This stops DSP program execution. However, the data transfer by the DMA instruction continues until the transfer is completed regardless of this END instruction. When the program stops, the program address value stops at the address next to the address where the END instruction is stored. <BR>
+</dl><P><P><HR>
+<A HREF=p087.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p089.htm> Go to next page </A>
+</BODY>
+</HTML>

@@ -1,0 +1,74 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/30&gt;SGL Programmer's Tutorial/8-3.Screen mode</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+ <B>▲ <A HREF="p08_20.htm">Back</a> ｜ <A HREF="p08_40.htm">Forward</a> ▼</b><HR NOSHADE>
+<DL>
+<A NAME="no8_30"></A><P><DT><H2> 8-3. Screen mode</H2><DD> Screen mode is for determining screen resolution, screen size, display device, etc. Sega Saturn supports a wide variety of screen modes, and SGL specifically supports the following 16 screen modes.</P>
+<A NAME="t8_1"></A><H4> Table 8-1 Screen mode</H4><P><DT><TABLE BORDER=1>
+<TR><TH><PRE> display device</TH><TH><PRE> TV screen mode</TH><TH><PRE> graphic mode</TH><TH><PRE> interlaced mode</TH><TH><PRE> Resolution: vertical x horizontal<BR> (pixel)</TH></TR>
+<TR><TD ROWSPAN=16> NTSC method</TD><TD ROWSPAN=8> normal</TD><TD ROWSPAN=4> Graphic A</TD><TD ROWSPAN=2> non-interlaced</TD><TD> 320×224</TD></TR>
+<TR><TD> 320×240</TD></TR>
+<TR><TD ROWSPAN=2> interlace</TD><TD> 320×448</TD></TR>
+<TR><TD> 320×480</TD></TR>
+<TR><TD ROWSPAN=4> Graphic B</TD><TD ROWSPAN=2> non-interlaced</TD><TD> 352×224</TD></TR>
+<TR><TD> 352×240</TD></TR>
+<TR><TD ROWSPAN=2> interlace</TD><TD> 352×448</TD></TR>
+<TR><TD> 352×480</TD></TR>
+<TD ROWSPAN=8> high resolution</TD><TD ROWSPAN=4> Graphic A</TD><TD ROWSPAN=2> non-interlaced</TD><TD> 640×224</TD></TR>
+<TR><TD> 640×240</TD></TR>
+<TR><TD ROWSPAN=2> interlace</TD><TD> 640×448</TD></TR>
+<TR><TD> 640×480</TD></TR>
+<TR><TD ROWSPAN=4> Graphic B</TD><TD ROWSPAN=2> non-interlaced</TD><TD> 704×224</TD></TR>
+<TR><TD> 704×240</TD></TR>
+<TR><TD ROWSPAN=2> interlace</TD><TD> 704×448</TD></TR>
+<TR><TD> 704×480</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>note)</b><DD> The default value of the screen mode is 320 horizontal x 224 vertical.</P>
+<P> For details on screen modes, refer to “HARDWARE MANUAL vol.2: VDP2 User's Manual”.</P>
+<P> In SGL, use the library function "slInitSystem" to initialize scrolling and set the screen mode.<BR>
+ This function "slInitSystem" also performs initialization and initial settings other than scrolling, but for details, please refer to the default list at the end of the reference manual "Function Reference".</P>
+<P><DT> <B>[void slInitSystem ( Uint16 type , TEXTURE *texptr , Uint16 cnt ) ;]</b><DD> Initialize various settings including scrolling, set screen mode, and set drawing processing unit.<BR>
+ Assign the #define value representing the screen mode, the start address of the memory where the texture is stored (NULL if the texture is not used), and an integer value (1 to 127) representing the screen processing unit to the parameters.<BR>
+ The default value is a resolution of 320 pixels wide x 224 pixels high.<BR>
+ In addition, the mode with a resolution of 352 pixels wide x 240 pixels high cannot be displayed on a regular TV monitor because the resolution is insufficient. The mode with a resolution of 352 pixels wide x 240 pixels high can only be fully displayed when using a monitor that can input RGB.</P>
+<A NAME="t8_2"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 8-2 “slInitSystem” parameter substitution value example (TV_MODE)</b></CAPTION>
+<TR><TH ROWSPAN=2></TH><TH COLSPAN=2> Resolution (pixels)</TH></TR>
+<TR><TH> Width 320 x Height 224</TH><TH> Width 352 x Height 240</TH></TR>
+<TR><TH> Substitution value</TH><TD> TV_320x224</TD><TD> TV_352x240</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>note)</b><DD> The values in the table above are defined in “sl_def.h”.</P>
+<P> If the resolution is 320 x 224 pixels (non-interlaced), no texture, and drawing processing unit: 1 (1/60 second), the function “slInitSystem” will be as shown below.</P>
+<A NAME="z8_4"></A>&#65308; <A ALIGN=CENTER><B>Figure 8-4 Example of using the function “slInitSystem”</b></a>&#65310;<BR>
+<DD><PRE>
+●System initialization●
+<H3>
+slInitSystem(TV_320x224,NULL,1);
+             |          |    |
+             |          |    Drawing processing unit: 1 (1/60 seconds)
+             |          No texture
+             Resolution: 320 x 224 pixels
+</H3>
+</PRE><P><DT><H3><A NAME="BINT">About drawing processing units</a></H3><DD> Setting the drawing processing unit in the parameters means specifying the time interval at which the image is rewritten.<BR> For SGL, one drawing processing unit is 1/60 seconds for non-interlaced and 1/30 seconds for double-dense interlace, and can be set in the range of 1 to 127.<BR> The longer the rewriting interval, the more calculation processing can be performed, but because the drawing interval is long, it will look awkward if consecutive images are drawn.<BR> Conversely, if the rewriting interval is short, smooth images can be achieved, but the amount of calculations that can be processed at one time will be reduced.</P></DL><HR NOSHADE> <B>▲ <A HREF="p08_20.htm">Back</a> ｜ <A HREF="p08_40.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

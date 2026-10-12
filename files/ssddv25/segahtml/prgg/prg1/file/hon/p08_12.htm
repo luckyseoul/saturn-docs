@@ -1,0 +1,123 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/17&gt;Programmer's Guide/File System Library/8.Function Specifications-2</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+ <B>▲ <A HREF="p08_11.htm">Back</a> ｜ <A HREF="p08_13.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><H2 ALIGN=CENTER> 8.Function specification-2</H2><HR NOSHADE>
+<A NAME="no8_20"></A><H3> 8.2 File operations</H3><!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_1"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Open file</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_Open</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> GfsHn GFS_Open(Sint32 fid)<DT> <B>input</b><DD> fid: file identifier<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> file handle. Returns NULL in case of error.<DT> <B>function</b><DD> Opens the specified file and returns a file handle.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_2"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Close file</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_Close</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> void GFS_Close(GfsHn gfs)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Closes the specified file handle.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_3"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Moving the access point</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_Seek</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_Seek(GfsHn gfs, Sint32 off, Sint32 org)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> off</TD><TD><PRE> :Amount of access pointer movement (in sector units)</TD></TR>
+<TR><TD><PRE> org</TD><TD><PRE> : Movement criteria (seek mode: GFS_SEEK_~)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> The position of the access pointer after the move. A negative error code if there was an error.<DT> <B>function</b><DD> Move the access pointer off sector away from org.<!-- *** Update by CRI ：5.8 --><BR>
+ Access pointers cannot be specified outside the scope of the file.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_4"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Get access pointer</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_Tell</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_Tell(GfsHn gfs)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Location of access pointer. Negative error code in case of error.<DT> <B>function</b><DD> Get the location of the access pointer.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_5"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Check for end of file</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_IsEof</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Bool GFS_IsEof(GfsHn gfs)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> End of file flag.<DT> <B>function</b><DD> Checks whether the access pointer has reached the end of the file. Function values have the following meanings:<DD><TABLE>
+<TR><TD><PRE> TRUE</TD><TD><PRE> : The end of the file has been reached.</TD></TR>
+<TR><TD><PRE> FALSE</TD><TD><PRE> : The end of the file has not been reached.</TD></TR>
+</TABLE>
+<DD> If an invalid file handle is input, it is assumed that the end of the file has been reached.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_6"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Conversion from byte size to sector length</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_ByteToSct</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_ByteToSct(GfsHn gfs, Sint32 nbyte)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> nbyte</TD><TD><PRE> : Number of bytes</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Number of sectors. Negative error code in case of error.<DT> <B>function</b><DD> Converts units from bytes to sectors (nsct). The length in sectors, nsct, is calculated using the following formula.<P> nsct = (nbyte + file sector length - 1) / file sector length;</P>
+<DD> If the sector length is undefined (Form1 and Form2 are mixed), 0 is the function value.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_7"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Get file size</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_GetFileSize</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.7</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> void GFS_GetFileSize(GfsHn gfs, Sint32 *sctsize, Sint32 *nsct,Sint32 *lastsize)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD><TABLE>
+<TR><TD><PRE> sctsize</TD><TD><PRE> :Sector length</TD></TR>
+<!-- *** Update by CRI ：5.9 -->
+<TR><TD><PRE> nsct</TD><TD><PRE> : Number of sectors (including the last sector)</TD></TR>
+<TR><TD><PRE> last size</TD><TD><PRE> :Number of bytes occupied by file data in the last sector</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Gets information for determining the file size. By specifying NULL for sctsize, nsct, and lastsize, you can suppress the output of that information. The file size (fsize) can be calculated using the following formula.<BR>
+ fsize=sctsize*(nsct−1)+lastsize;<!-- *** Update by CRI ：5.9 -->
+<DT> <B>remarks</b><DD> In a file containing both Form1 and Form2, both sctsize and lastsize will be 0.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_8"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Get file information</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_GetFileInfo</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.8</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> void GFS_GetFileInfo(GfsHn gfs, Sint32 *fid, Sint32 *fn, Sint32 *fsize,Sint32 *atr)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD><TABLE>
+<TR><TD><PRE> fid</TD><TD><PRE> :File identifier</TD></TR>
+<TR><TD><PRE> fn</TD><TD><PRE> :File number</TD></TR>
+<TR><TD><PRE> fsize</TD><TD><PRE> : File size (unit: bytes)</TD></TR>
+<TR><TD><PRE> atr</TD><TD><PRE> :File attributes</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Get file information. By specifying NULL for fid, fn, fsize, and atr, you can suppress the output of that information. The file size is the value recorded in the directory information, so the size of 1 sector is calculated as 2048 bytes.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_9"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Obtaining the number of sectors in the CD buffer partition</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_GetNumCdbuf</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.9</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_GetNumCdbuf(GfsHn gfs)<DT> <B>input</b><DD> gfs: file handle<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Number of sectors in CD buffer partition<DT> <B>function</b><DD> Gets the number of sectors present in the CD buffer partition.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_11.htm">Back</a> ｜ <A HREF="p08_13.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no7">File system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

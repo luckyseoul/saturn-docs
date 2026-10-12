@@ -1,0 +1,128 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/29&gt;SCSP User's Manual/2.SCSP Overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p01_30.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual</b><H1 ALIGN=CENTER> Chapter 2 SCSP Overview</H1><HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A><P><DT><H3> ■2.1 LSI overview</H3><DD> SCSP was developed with multimedia support in mind, so its audio features are even more sophisticated and sound quality than ever before. The calculation section also has performance comparable to that of commercially available synthesizers, and can produce a large number of notes. In addition, various interfaces are provided in consideration of future extensibility. The DSP section can also create multiple sound fields, making it effective for various sound field reproductions and special effects such as 3D sound localization.<BR>
+ The characteristics of LSI are described below.</P>
+<P><DT> <B>●Sampling frequency</b><DD><UL TYPE=DISC>
+<LI> Sound source resampling frequency (constant playback rate) 44.1KHz<LI> Waveform data sampling frequency 0 (CD) ~ 44.1KHz</UL>
+</P>
+<P><DT> <B>●Features</b><DD><UL TYPE=DISC>
+<LI> Equipped with 32 slots for both FM and PCM.<LI> Equipped with a total of 32 LFOs, one for each slot (completely independent).<LI> Equipped with 32 4-segment EGs.<LI> It has two built-in CPU interfaces: a sound CPU and a main CPU.<LI> It has a built-in MIDI interface.<LI> Equipped with 128 step DSP.<LI> It has a built-in input mixer to select DSP input.<LI> It has a built-in output mixer that mixes the sound source output and DSP output.<LI> Equipped with a new FM calculation method.</UL>
+</P>
+<A NAME="no2_20"></A><P><DT><H3> ■2.2 LSI specifications</H3><DD> Detailed specifications of the sound CPU (MC68EC000) and SCSP are described below.</P>
+<A NAME="t2_1"></A><P><DT> <B>●Sound CPU specifications</b><DD><UL TYPE=DISC>
+<LI> <B>SOUND CPU MC 68EC000-12 12.5MHz version</b><LI> <B>Operating frequency</b><BR>
+ 11.2896MHz<LI> <B>CPU instructions</b><BR>
+ Fully compatible instruction system with MC68000CPU <B>Note 1</b><LI> <B>interrupt signal</b><BR>
+ Level 1-7 interrupts with auto-vectoring<LI> <B>Hardware configuration</b><BR>
+ Configuration in which the MC6800 (8-bit) interface is removed from the MC68000CPU</UL>
+</P>
+<P><DT> <B>Note 1:</b><DD> Some commands are <A HREF="../../../info/hon/stn51.htm">prohibited for use</a> on Sega Saturn.<DT><UL TYPE=DISC>
+<LI> RESET instruction<LI> TAS instruction</UL>
+</P>
+<A NAME="t2_2"></A><P><DT> <B>●SCSP LSI specifications</b><DD><UL TYPE=DISC>
+<LI> <B>SOUND LSI SCSP (SATURN CUSTOM SOUND PROCESSOR)</b><LI> <B>Operating frequency</b><BR>
+ 22.5792MHz</UL>
+<P><DT> <B>◆Sound source section</b><DD><UL TYPE=DISC>
+<LI> <B>Speech synthesis method</b><BR>
+ PCM voice synthesis and FM voice synthesis method noise sound source (can be used together)<BR>
+ FM voice synthesis can use not only the conventional 4 operator (slot) type but also 2 to 32 operators to perform any FM connection. You can also configure feedback settings as you like.<LI> <B>Sound source resampling frequency</b><BR>
+ 44.1KHz fixed, linear interpolation</P>
+<LI> <B>Waveform data format</b><BR>
+ 16-bit linear and 8-bit linear 2'S complement method<LI> <B>Number of audio processing slots</b> (Number installed: 32)<BR>
+ Equivalent to 1 operator (1 slot) for PCM sound source and FM sound source<LI> <B>Maximum (maximum) number of simultaneous polyphony</b> (number installed: 1 to 32)<BR>
+ All 4 operator (slot) type FM sounds will have 8 sounds, and all PCM sounds will have 32 sounds. The number of slots used for one FM sound can be set arbitrarily. Mixed use of FM sound and PCM sound is also possible. Any combination is fine as long as the total number of slots used does not exceed 32.<LI> <B>Waveform loop function</b><BR>
+ Select from normal, reverse, or alternative loop for each slot<LI> <B>EG</b> (Number installed: 32)<BR>
+ 4-segment AMPLITUDE-EG (one unit installed in each slot)<LI> <B>LFO</b> (Number of installed: 32)<BR>
+ One unit installed in each slot (for amplitude/frequency modulation)<LI> <B>Types of LFO output waveforms</b> (number of installed: 4)<BR>
+ 4 waveforms: sawtooth, square, triangle, and white noise<LI> <B>Sound source oscillation frequency</b><BR>
+ -8 to +7 octaves 1024 steps (non-linear) can be set between octaves</UL>
+<P><DT> <B>◆DSP section for effects</b><DD><UL TYPE=DISC>
+<LI> <B>DSP processing speed</b><BR>
+ 128 steps/Fs (multi-parallel processing type DSP Fs=44.1KHz)<LI> <B>Program RAM</b> (capacity: 128W)<BR>
+ 128 words x 60 bits<LI> <B>Coefficient data RAM</b> (capacity: 64W)<BR>
+ 64 words x 13 bits<LI> <B>Temporary (general purpose) RAM</b> (capacity: 128W)<BR>
+ 128 words x 24 bits<LI> <B>multiplier accuracy</b><BR>
+ 24 bits x 13 bits = 26 bits output<LI> <B>adder accuracy</b><BR>
+ 26 bits + 26 bits = 26 bits output<LI> <B>DSP internal bus width</b><BR>
+ 24 bit data bus</UL>
+<P><DT> <B>◆Digital mixer section</b><DD><UL TYPE=DISC>
+<LI> <B>Number of output level adjustment stages</b><BR>
+ 8 levels (for each slot sound and DSP output sound)<LI> <B>Number of panpot adjustment stages</b><BR>
+ 31 stages (1 stage in the center, 15 stages each on the left and right)<LI> <B>DSP effect number of send channels</b> (equipped number: 16)<BR>
+ The outputs of multiple slots can be mixed and stored in each channel.<LI> <B>DSP effect number of return channels</b> (equipped number: 16)<BR>
+ Level and panpot settings for each channel.<LI> <B>Master volume setting function</b><BR>
+ Stereo compatible</UL>
+<P><DT> <B>◆CPU interface</b><DD><UL TYPE=DISC>
+<LI> <B>Main CPU interface</b> (Number installed: 1)<BR>
+ SCU B-BUS interface<LI> <B>Sound CPU interface</b> (Number of installed: 1)<BR>
+ MC68EC000 interface</UL>
+<P><DT> <B>◆Other functions and interfaces</b><DD><UL TYPE=DISC>
+<LI> <B>Timer</b> (Number of installed: 3)<BR>
+ 8-bit timer with prescaler<LI> <B>DMAC</b> (Number installed: 1)<BR>
+ DMA controller for transfer between SCSP and DRAM<LI> <B>Interrupt controller</b> (Number of installed: 1)<BR>
+ Interrupt controller for main sound CPU<LI> <B>MIDI interface</b><BR>
+ IN:1 OUT:1<LI> <B>Digital audio interface</b> (Number installed: 1)<BR>
+ Stereo interface for input: 1<LI> <B>Sound memory interface</b> (Number installed: 1)<BR>
+ DRAM interface<LI> <B>DAC output interface</b> (Number of installed: 1)<BR>
+ 16-bit/18-bit stereo DAC interface<LI> <B>External interrupt signal interface</b> (Number of installed: 3)<BR>
+ Unconnected/unused on Sega Saturn</UL>
+<P><DT> <B>◆DSP program library</b><DD> Various effect programs<DD><UL TYPE=DISC>
+<LI> REVERB (HALL, ROOM, VOCAL, PLATE, etc.)<LI> EARLY REFLECTION<LI> ECHO/DELAY (STEREO, MONORAL)<LI> PITCH SHIFTER (SINGLE, DOUBLE, TRIPLE)<LI> CHORUS<LI> FLANGER<LI> SYMPHONIC<LI> SURROUND<LI> VOICE CANCEL<LI> AUTO PAN<LI> PHASER<LI> DISTORTION<LI> FILTER<LI> PARAMETRIC EQUALIZER</UL>
+</P>
+<A NAME="no2_30"></A><P><DT><H3> ■2.3 SCSP chip block</H3><DD> Figure 2.1 shows the SCSP chip block.</P>
+<A NAME="z2_1"></A><P><DT><TABLE BORDER=0>
+<CAPTION> <B>Figure 2.1 SCSP chip block diagram</b></CAPTION>
+<TR><TD><PRE> <FONT SIZE=2><A HREF="#no2_31">sound cpu</a></font><BR> <FONT SIZE=2><A HREF="#no2_31">interface</a></font></TD><TD ROWSPAN=7><img srcset="../grp/i013_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD><TD><PRE> <FONT SIZE=2><A HREF="#no2_36">LFO</a></font></TD></TR>
+<TR><TD><PRE> <FONT SIZE=2><A HREF="#no2_32">Main CPU</a></font><BR> <FONT SIZE=2><A HREF="#no2_32">interface</a></font></TD><TD><PRE> <FONT SIZE=2><A HREF="#no2_37">phase</a></font><BR> <FONT SIZE=2><A HREF="#no2_37">generator</a></font></TD></TR>
+<TR><TD><PRE> <FONT SIZE=2><A HREF="#no2_33">For DMA transfer</a></font><BR> <FONT SIZE=2><A HREF="#no2_33">interface</a></font></TD><TD><PRE> <FONT SIZE=2><A HREF="#no2_38">address pointer</a></font></TD></TR>
+<TR><TD><PRE> <FONT SIZE=2><A HREF="#no2_34">MIDI</a></font><BR> <FONT SIZE=2><A HREF="#no2_34">interface</a></font></TD><TD><PRE> <FONT SIZE=2><A HREF="#no2_39">memory controller</a></font></TD></TR>
+<TR><TD><PRE> <FONT SIZE=2><A HREF="#no2_35">External input</a></font></TD><TD><PRE> <FONT SIZE=2><A HREF="#no2_3a">interpolator</a></font></TD></TR>
+<TR><TD><PRE> <FONT SIZE=2><A HREF="#no2_3b">envelope</a></font><BR> <FONT SIZE=2><A HREF="#no2_3b">generator</a></font></TD><TD><PRE> <FONT SIZE=2><A HREF="#no2_3c">Level calculation section</a></font></TD></TR>
+<TR><TD><PRE> <FONT SIZE=2><A HREF="#no2_3d">DSP</a></font></TD><TD><PRE> <FONT SIZE=2><A HREF="#no2_3e">output mixer</a></font></TD></TR>
+</TABLE>
+</P>
+<A NAME="no2_31"></A><P><DT> <B>●Sound CPU interface</b><DD> This is an interface to connect MC68EC000.</P>
+<A NAME="no2_32"></A><P><DT> <B>●Main CPU interface</b><DD> This is an interface to connect the system controller (SCU).</P>
+<A NAME="no2_33"></A><P><DT> <B>●DMA transfer interface</b><DD> A DMA controller with built-in SCSP enables data transfer between SCSP and sound memory.</P>
+<A NAME="no2_34"></A><P><DT> <B>●MIDI interface</b><DD> A serial interface compatible with MIDI standards. However, some external circuitry is required to make it compatible with MIDI connectors.</P>
+<A NAME="no2_35"></A><P><DT> <B>●External input (external digital audio input interface)</b><DD> This is an interface that inputs digital audio signals from external equipment (external devices).</P>
+<A NAME="no2_36"></A><P><DT> <B>●LFO (Low Frequency Oscillator)</b><DD> A function generator that generates waveforms with frequencies lower than the range that the human ear can hear, and is used as waveforms for various modulations.</P>
+<A NAME="no2_37"></A><P><DT> <B>●Phase generator</b><DD> This block calculates and calculates frequency information according to the sound frequency setting of PCM data.</P>
+<A NAME="no2_38"></A><P><DT> <B>●Address pointer</b><DD> Generates waveform address values based on phase information etc. from the phase generator.</P>
+<A NAME="no2_39"></A><P><DT> <B>●Memory controller</b><DD> This block controls the sound memory by outputting the address generated by the address pointer to the memory and reading data.</P>
+<A NAME="no2_3a"></A><P><DT> <B>●Interpolator</b><DD> This block performs interpolation calculations on waveform data.</P>
+<A NAME="no2_3b"></A><P><DT> <B>●Envelope Generator (EG: Envelope Generator)</b><DD> This is a functional calculation block that temporally controls the audio output level.</P>
+<A NAME="no2_3c"></A><P><DT> <B>●Level calculation section</b><DD> This block calculates the waveform output level based on the level coefficients generated by EG, TL (Total Level), and ALFO.</P>
+<A NAME="no2_3d"></A><P><DT> <B>●DSP</b><DD> This is an audio DSP that handles SCSP's acoustic special effects.</P>
+<A NAME="no2_3e"></A><P><DT> <B>●Output mixer</b><DD> This is the final block that has various localization calculation functions and level adjustment functions to combine each audio output into a stereo output.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_30.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

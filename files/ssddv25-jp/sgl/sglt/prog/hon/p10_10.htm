@@ -1,0 +1,600 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;25/30&gt;SGL Programmer's Tutorial/10.イベントコントロール</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<A HREF="p09_10.htm">戻る</A>｜<A HREF="p11_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PROGRAMMER'S TUTORIAL</B>
+<H2 ALIGN=CENTER>10.イベントコントロール</H2>
+<HR NOSHADE>
+
+<DL>
+	<P>　本章では、イベント構造及びイベント管理関数の具体的な用法について解説します。<BR>
+	イベントの観念を使用するにより、プログラムをプログラムイベント（プログラム中の要素１つ１つ）の組み合わせとして記述することが可能となり、これによりプログラム全体の流れを非常に把握しやすくなります。
+	さらに各プログラムイベントの共通使用が可能なため、プログラムの簡素化も計れます。</P>
+
+<A NAME="no10_10"></A>
+	<P>	<DT><H2>10-1. イベントの構造</H2>
+
+<A NAME="no10_11"></A>
+	<P>	<DT><H3>イベント処理</H3>
+		<DD>　イベント処理とは、プログラムリスト中に登場する関数群をイベントと呼ばれるラベルに代表させ、連続したイベントのリストを先頭から順に実行していくような処理のことをいいます。<BR>
+		イベント処理を使用することにより、連続して実行される煩雑な関数群を簡単なラベルのリストとして処理することが可能となります。また実行順序も、イベントとして登録されたラベルの操作として、簡便に入れ替えることが可能です。<BR>
+		このため、プログラム全体の流れを把握でき、また、イベントの共通使用やプログラムの簡素化が図れます。</P>
+
+<A NAME="z10_1"></A>
+	<P ALIGN=CENTER><B>図10-1　イベントイメージ</B></P>
+
+	<P>	<DD><TABLE BORDER=0>
+	<TR><TD>
+<PRE>
+/*　前　略　*/
+
+slInitEvent();			/*　イベントの初期化　*/
+
+slSetEvent((void*)<B>game_demo</B>);	/*　イベントの登録　*/
+slSetEvent((void*)<B>game_play</B>);
+slSetEvent((void*)<B>game_over</B>);
+
+slExecuteEvent();		/*　イベントの実行　*/
+
+void game_demo(EVENT *evptr){	/*　イベントの実行１(game_demo)　*/
+		:
+}
+
+void game_play(EVENT *evptr){	/*　イベントの実行２(game_play)　*/
+		:
+}
+
+void game_over(EVENT *evptr){	/*　イベントの実行３(game_over)　*/
+		:
+}
+
+/*　後　略　*/
+</PRE></TD>
+<TD><IMG SRC="../grp/p10_02.gif"></TD></TR></TABLE></P>
+
+
+	<P>	<DD>　イベントとして登録される関数群及びイベントの実行順序は、イベント用RAM領域に確保されたEVENT構造体と呼ばれるイベント管理領域で処理されます。<BR>
+		また、ＳＧＬでは、イベントの実行順序をイベントリストと呼びます。</P>
+
+<A NAME="no10_12"></A>
+	<P>	<DT><H3>EVENT構造体</H3>
+		<DD>　イベントはイベント用RAM領域（8kbyte）中にEVENT構造体として定義されます。1個のEVENT構造体は128byteから構成され、最大64個のEVENT構造体をこのRAM領域に定義することが可能です。
+		EVENT構造体は図10-2のように構成されます。</P>
+
+<A NAME="z10_2"></A>
+	<P ALIGN=CENTER><B>図10-2　EVENT構造体</B><BR>
+	<IMG SRC="../grp/p10_03.gif"></P>
+
+
+	<P>	<DD>　各EVENT構造体は、それぞれ次のようなメンバで構成されます。</P>
+		<DD>
+<PRE>
+*work  ：user領域拡張のためのWORK構造体の先頭アドレス。
+*next  ：次に実行されるイベントの先頭アドレス。
+*before：直前に実行されるイベントの先頭アドレス。
+*exad()：イベントとして実行する関数の格納される領域の先頭アドレス。
+user[] ：イベント登録された関数が使用する変数を格納するためのuser領域。
+       　ワークなどを用いてuser領域を拡張することも可能。
+</PRE>
+
+	<P>	<DD>　また、“*work”、“*next”、“*before”の各メンバが該当するアドレスを持たない場合は、NULLが代入されます。</P>
+
+	<P>	<DD>　ユーザーがEVENT構造体中のuser領域を使用する場合、user領域をユーザー用に定義した構造体などでcastしてやると非常に便利です。</P>
+
+	<P>	<DD>　１つのEVENT構造体のuser領域は112byteで構成されますが、これを超えてuser領域を使用したい場合は、ワークなどを用いてuser領域を拡張してやることも可能です。
+		user領域の拡張については、“10-4項：user領域の拡張”を参照してください。</P>
+
+<A NAME="no10_13"></A>
+	<P>	<DT><H3>イベントリスト</H3>
+		<DD>　イベント用RAM領域中にEVENT構造体として定義された各イベントは、実行するイベントの順に従ってリストを構成します。<BR>
+リストは、イベント構造体中に予約された“*next”及び“*before”によって連結され、実行される一連のイベントをイベントリストと呼びます。<BR>
+また、イベントリスト中で連続して実行されるイベントは、必ずしも連続してイベント用RAM領域中に格納される必要はなく、“*next”及び“*before”でポインタが連結されていれば、連続して実行されます。</P>
+
+<A NAME="z10_3"></A>
+	<P ALIGN=CENTER><B>図10-3　イベントリストの構造</B><BR><IMG SRC="../grp/p10_04.gif"></P>
+
+  <P><DD><B>注）</B>該当するイベント・ワークが存在しない場合はNULL(0)</P>
+
+	<P>	<DD>　システムは、イベントリストの先頭に登録されたEVENT構造体の先頭アドレスを、EventTop変数としてもっており、イベントを実行する際は“EventTop”で指定されたイベントから順に実行していきます。<BR>
+		実行されたイベントは、EVENT構造体中のポインタ“*next”の値をEventNow変数に渡し、システムは“EventNow”の指すアドレスから始まるEVENT構造体を次に実行します。システムは“EventNow”に従って順にイベントを実行し、“*next”の指す値がNULL
+	（後に続くイベントがない）になった時点でイベント実行処理を終了します。<BR>
+	EventLast変数はリストの最後に登録されているEVENT構造体の先頭アドレスを指し、イベントの追加・登録時に使用されます。また、EventLast変数はライブラリ関数の内、“slSetEvent”、“slSetEventNext”、
+	“slCloseEvent”実行時にのみ変更が加えられます。<BR>
+	“*before”はイベントの挿入・登録・削除時に使用されます。</P>
+
+<A NAME="no10_20"></A>
+	<P>	<DT><H2>10-2. ＳＧＬ関数を用いたイベント処理</H2>
+		<DD>　ここでは、ＳＧＬライブラリ関数を用いた実際のイベント処理を解説していきます。</P>
+
+<A NAME="no10_21"></A>
+	<P><DT><H3>イベントの初期化</H3>
+	<DD>　ＳＧＬでイベント処理を使用するためには、最初にイベントに関わるバッファやイベントリストを初期化してやる必要があります。</P>
+
+	<P><DD>　ＳＧＬでイベントの初期化を実行するには、ライブラリ関数“slInitEvent”を使用してください。</P>
+
+	<P><DD><B>【void slInitEvent ( void ) ;】</B>
+	<DD>　イベント処理に関わる全ての初期化（イベントリストやバッファの初期化など）を行います。</P>
+
+	<P><DT><TABLE><TR>
+	<TH><PRE>注　意<BR><IMG SRC="../../../../what/atto.gif"></TH>
+	<TD><B>イベントの初期化を実行しないでイベント処理を使用した場合、初期化されないバッファやイベントリスト等との整合がとれなくなり、最悪の場合、CPUが停止することもありえます。<BR>
+（詳細は<AHREF="no10_50">“10-5項：イベント処理における注意事項”</A>参照）。</B><TD></TR></TABLE></P>
+
+<A NAME="no10_22"></A>
+	<P>	<DT><H3>イベントリストの作成</H3>
+		<DD>　イベント処理を行うには、イベントを実行順にイベントリストとして登録する必要があります。<BR>
+		イベントはイベント登録用ライブラリ関数“slSetEvent”によって、図10-4のようにイベントリストに追加されていきます。<BR>
+		登録されたイベントは、イベントリストの末尾に順次登録され、イベント実行用ライブラリ関数“slExecuteEvent”により、イベントリスト先頭から順に実行されます。</P>
+
+<A NAME="z10_4"></A>
+	<P ALIGN=CENTER><B>図10-4　イベントリストの作成</B><BR><IMG SRC="../grp/p10_06.gif"></P>
+
+	<P>	<DD>　イベントの登録には、ライブラリ関数“slSetEvent”を使用してください。</P>
+
+	<P>	<DD><B>【EVENT *slSetEvent ( void (*func)() ) ;】</B>
+		<DD>　イベント用RAM領域にEVENT構造体（128byte）を確保し、イベントリストの最後に新しいイベントを追加・登録します。パラメータには、登録するイベントの実行アドレス値を代入します。<BR>
+			関数“slSetEvent”は戻り値として、登録されたEVENT構造体の先頭アドレスを返します。
+			イベントの登録に失敗した場合は、NULLを返します。
+	<P>	<DD>　イベントの書式と構造は次項を参照してください。</P>
+
+<A NAME="no10_23"></A>
+	<P>	<DT><H3>イベントの書式</H3>
+		<DD>　イベントとして登録する関数群は、図10-5のような書式をとる必要があります。</P>
+
+<A NAME="z10_5"></A>
+	<P>	<DD><B>図10-5　イベントの書式</B>
+		<DD>
+<PRE>
+●　イベント書式　●
+<H3>
+void function_name(EVENT *evptr){execute_contents}
+　　　↑　　　　　　↑　　　　　　↑
+　　　｜　　　　　　｜　　　　　　イベント実行内容
+　　　｜　　　　　　EVENT構造体の先頭アドレス
+　　　イベント名
+</H3>
+</PRE>
+
+	<P>	<DD>　また、登録・実行されるイベントは、EVENT構造体により管理されます。<BR>
+		EVENT構造体には登録するイベントの実行アドレス及びイベント内で使用される変数用の構造体が格納され、この２つでイベントを管理します。</P>
+
+<A NAME="z10_6"></A>
+	<P>	<DD><B>図10-6　イベントの構造</B>
+		<DD><TABLE BORDER=0>
+	<TR><TD>
+<PRE>
+/*　前　略　*/
+slSetEvent((void *)init_cube);
+
+slExecuteEvent();
+
+typedef struct cube{ FIXEDpos[xyz];
+				ANGLE	ang[xyz]
+;
+		:
+			Sint16 unset_count;
+			Sint16 unset_i;
+		}	CUBE;
+
+void init_cube(EVENT *evptr)
+{
+	CUBE *cubeptr;
+
+	cubeptr=(CUBE *)evptr -&gt; user;
+
+	cubeptr-&gt;pos[x]=pos_x;
+
+		:
+
+	cubeptr-&gt;unset_count=0;
+
+	disp_cube(evptr);
+}
+
+/*　後　略　*/
+</PRE></TD>
+	<TD><IMG SRC="../grp/p10_07_2.gif"></TD></TR></TABLE></P>
+
+
+	<P>	<DD>
+		<LI>イベントとして登録された関数はEVENT構造体により制御されます。
+		<LI>メンバ“*exad( )”には、登録されるイベントの実行アドレス、メンバ“user[ ]”には、イベントで使用される構造体が格納されます。
+		<LI>構造体はイベント内の変数用に使用されますが、構造体がuser領域（size：112byte）を越えないように注意してください。
+		<LI>より多くの変数を使用したい場合は、WORK構造体などを利用してuser領域を拡張し,構造体自身も分割して格納されるようにしてください。</P>
+
+	<P>	<DT><H3>イベント内変数用構造体について</H3>
+		<DD>　イベント内で各種変数を使用する場合、それら変数群を構造体として定義しておく必要があります。<BR>
+		<定義されたイベント内変数用構造体は、イベント登録時にEVENT構造体中のuser領域（112byte）に格納され（格納作業はユーザー自身で行います）、以後、イベント実行時に随時使用されます。<BR>
+		このためイベント内変数用構造体は、構造体の格納されるuser領域のサイズ（112byte）を超えて設定することができません。<BR>
+		<ただし、より多くの変数を使用したい場合は、user領域をWORK構造体などを用いて拡張し、イベント内変数用構造体もuser領域のサイズに合うように分割して格納・使用するようにしてください
+		（user領域の拡張法は“10-4項：user領域の拡張”を参照してください）。</P>
+
+<A NAME="no10_24"></A>
+	<P>	<DT><H3>イベントの実行</H3>
+		<DD>　イベントリストに登録されたイベントは、イベント管理関数により、順に実行されます。<BR>
+		イベントの実行には、ライブラリ関数“slExecuteEvent”を使用します。</P>
+
+	<P>	<DD>　例えば、イベントＡ、イベントＢ、イベントＣをライブラリ関数“slSetEvent”を用いて順にイベントリストに登録した場合、各イベントはイベントリストに従って下図のような順番で実行されます。</P>
+
+<A NAME="z10_7"></A>
+	<P ALIGN=CENTER><B>図10-7　イベントの実行</B><BR><IMG SRC="../grp/p10_08.gif"></P>
+
+	<P>	<DD><B>【void slExecuteEvent ( void ) ;】</B>
+		<DD>　イベントリストに登録されたイベントを、リストの順に実行していきます。</P>
+
+<A NAME="no10_30"></A>
+	<P>	<DT><H2>10-3. イベントリストの変更</H2>
+
+<A NAME="no10_31"></A>
+	<P><DT><H3>イベントの追加</H3>
+	<DD>　イベントリストに登録されたイベントに、イベントを追加できます。<BR>
+		イベントは、イベントリストの最後に追加されます。<BR>
+		イベントの追加には、イベント登録で使用したのと同じライブラリ関数“slSetEvent”を使用します。</P>
+
+<A NAME="z10_"></A>
+	<P ALIGN=CENTER><B>図10-8　イベントの追加</B><BR>
+	<IMG SRC="../grp/p10_09_1.gif"></P>
+
+
+	<P>	<DD><B>【EVENT *slSetEvent ( void (*func)() ) ;】</B>
+		<DD>　イベント用RAM領域にEVENT構造体（128byte）を確保し、イベントリストの最後に新しいイベントを追加・登録します。パラメータには、登録するイベントの実行アドレス値を代入します。<BR>
+		関数“slSetEvent”は戻り値として、登録されたEVENT構造体の先頭アドレスを返します。<BR>
+		イベントの登録に失敗した場合は、NULLを返します。</P>
+
+<A NAME="no10_32"></A>
+	<P>	<DT><H3>イベントの挿入</H3>
+		<DD>　イベントリストに登録されたイベントに、イベントを挿入できます。<BR>
+			イベントは、指定されたイベントの次に挿入されます。<BR>
+			イベントの挿入には、ライブラリ関数“slSetEventNext”を使用します。</P>
+
+<A NAME="z10_"></A>
+	<P ALIGN=CENTER><B>図10-9　イベントの挿入</B><BR>
+	<IMG SRC="../grp/p10_09_2.gif"></P>
+
+
+	<P>	<DD><B>【EVENT *slSetEventNext ( EVENT *evptr , void (*func)() ) ;】</B>
+		<DD>　イベント用RAM領域にEVENT構造体（128byte）を確保し、イベントリストの途中に新たなイベントを挿入・登録します。パラメータには、イベントを挿入する直前のEVENT構造体の先頭アドレス、
+		挿入・登録するイベントの実行アドレスをそれぞれ代入します。<BR>
+		関数“slSetEventNext”は戻り値として、登録されたEVENT構造体の先頭アドレスを返します。<BR>
+		イベントの登録に失敗した場合は、NULLを返します。</P>
+
+<A NAME="no10_33"></A>
+	<P>	<DT><H3>イベントの削除</H3>
+		<DD>　イベントリストに登録されたイベントは、イベントリストから削除できます。<BR>
+		イベントの削除には、ライブラリ関数“slCloseEvent”を使用します。</P>
+
+<A NAME="z10_"></A>
+	<P ALIGN=CENTER><B>図10-10　イベントの削除</B><BR>
+	<IMG SRC="../grp/p10_10_1.gif"></P>
+
+
+	<P>	<DD><B>【void slCloseEvent ( EVENT *evptr ) ;】</B>
+		<DD>　パラメータで指定されたイベントを、イベントリストから削除します。<BR>
+		また同時に、指定されたイベントのメンバ“work”がNULLでない場合、ワークリストがあるものとして、付属するワークを全てシステムに返却します。<BR>
+		パラメータには、削除するEVENT構造体の先頭アドレスを代入します。<BR>
+		また、関数“slCloseEvent”は返還する領域が登録されたEVENT構造体であるのかどうかをチェックしません。このため間違って拡張user領域をシステムに返還してもわかりません。<BR>
+		この場合、様々な不具合が生じ、最悪の場合CPUが停止することも考えられます（詳細は“10-5項：イベント処理における注意事項”参照）。
+
+<A NAME="no10_34"></A>
+	<P><DT><H3>イベント実行中のイベントリストの変更</H3>
+	<DD>　イベント登録済のイベントリストを実行中に何らかの形でイベントリストを変更しようとした場合（イベント内でのイベントリストの変更など）、変更されるイベントは次図のような影響を受けます。</P>
+
+<A NAME="z10_11"></A>
+	<P ALIGN=CENTER><B>図10-11　イベント実行中のイベントリストの変更</B><BR><IMG SRC="../grp/p10_10_2.gif"></P>
+
+	<P><DD>　現在実行中のイベントより前の（実行済）のイベントリストに対する変更は、次回以降のイベントリスト実行時に適用されます。
+		現在実行中にイベントより後の（未実行）のイベントリストに対する変更は、今回のイベント実行時に変更されたイベントリストの順序に従って実行されます。
+		イベントの追加・挿入・削除のいかなる変更もこの適用の下に実行されます。</P>
+
+<A NAME="no10_40"></A>
+	<P><DT><H2>10-4. user領域の拡張</H2>
+		<DD>　イベント処理を使用してプログラムを記述する際に、場合によってはイベントとして実行する関数の使用する変数群（構造体）がイベントのuser領域（112byte）に納まりきらないことがあります。<BR>
+		このような場合、ＳＧＬではuser領域を拡張して使用することができます。<BR>
+		user領域の拡張には、ワークと呼ばれる拡張専用領域を使用する方法と、イベント用RAM領域からEVENT構造体と同サイズの拡張領域を獲得する方法の、２つの方法があります。</P>
+
+<A NAME="no10_41"></A>
+	<P><DT><H3>ワーク領域を利用したuser領域の拡張</H3>
+	<DD>　ＳＧＬでは、ワークと呼ばれるuser領域拡張専用領域を使用し、EVENT構造体のuser領域を拡張使用することができます。<BR>
+ワークは、ワーク用RAM領域中にWORK構造体（64byte）として定義され、最大256個までのワークが使用できます。<BR>
+ワーク１つあたりで拡張できるuser領域のサイズは、60byteです。<BR>
+WORK構造体の残り4byteは、連結するWORK構造体のアドレス指定に使用されます。</P>
+
+<A NAME="z10_12"></A>
+	<P ALIGN=CENTER><B>図10-12　WORK構造体</B><BR><IMG SRC="../grp/p10_11.gif"></P>
+
+	<P><DD>　WORK構造体のメンバは、それぞれ次のようになります。</P>
+	<P><PRE>
+*next ：チェーン構造として連結させたいWORK構造体の先頭アドレス。
+      　チェーン構造として後に続くワークが存在しない場合は、NULLが代入されます。
+
+user[]：拡張されたuser領域（60byte）。
+</PRE>
+
+	<P>	<DD>　WORK構造体として獲得されたワークは、EVENT構造体中の“*work”にWORK構造体の先頭アドレスを代入することで連結され、チェーン構造となります。<BR>
+		またワークは、WORK構造体中で再びワークを獲得することで、更にuser領域を拡張することが可能です。
+		このとき、WORK構造体中の“*next”に連結するWORK構造体の先頭アドレスを代入することで、連結するワークをチェーン構造にすることができます。<BR>
+		チェーン構造として後に続くWORK構造体が無くなった時、“*next”にはNULLが代入されます。</P>
+
+<A NAME="z10_13"></A>
+	<P ALIGN=CENTER><B>図10-13　ワークの連結</B><BR><IMG SRC="../grp/p10_12.gif"></P>
+
+	<P>	<DD>　ＳＧＬでワークを使用するには、ライブラリ関数“slGetWork”及び“slReturnWork”を使用します。“slGetWork”はワークの獲得に、“slReturnWork”はワークの解放に使用します。</P>
+
+	<P>	<DD><B>【WORK *slGetWork ( void ) ;】</B>
+		<DD>　ワーク用RAM領域にWORK構造体（64byte）を確保します。<BR>
+		関数“slGetWork”は、戻り値として、確保したワーク領域のWORK構造体アドレス値を返します。
+		領域確保に失敗した場合は、関数はNULLを返します。
+
+	<P>	<DD><B>【void slReturnWork ( WORK *wkptr ) ;】</B>
+		<DD>パラメータで指定されたワーク領域を返還・解放します。パラメータには、返還するワーク領域のWORK構造体アドレス値を代入します。また、チェーン構造で連結されたワークの一部をシステムに返還・解放する場合は、残ったワークのチェーン構造が正しくなるよ		うに調整してください。調整を行わないと、チェーン構造とワーク処理の整合が取れなくなり、最悪CPUが停止する事も考えられます（詳細は“10-5項: イベント処理における注意事項”参照）。
+
+	<P>	<DT><H3>EVENT構造体の解放による、連結されたWORK構造体の動作について</H3>
+		<DD>　ワークは必ずしも“*work”、“*next”を使用してチェーン構造を構成する必要はなく、user領域中に連結するWORK構造体の先頭アドレスを格納することもできます。<BR>
+		ただし、“*work”、“*next”で連結されたワークは、イベントを解放することで同時にワークもシステムに返還・解放されますが、user領域から連結されたワークは、イベントを解放してもWORK構造体の解放は実行されません。<BR>
+		このため、user領域から連結されたWORK構造体は、イベント解放時にライブラリ関数“slReturnWork”でシステムに返還・解放してやる必要があります。</P>
+
+<A NAME="no10_42"></A>
+	<P>	<DT><H3>イベント領域を利用したuser領域の拡張</H3>
+		<DD>　拡張する１つのuser領域のサイズがWORK構造体（60byte）では不十分だった場合は、イベント用RAM領域からEVENT構造体と同サイズ（128byte）のuser領域を確保することができます。<BR>
+		ただし、元々は１つのイベント用に割り当てられた領域をuser領域として使用するため、登録できる最大イベント数がその分だけ減じることになります。</P>
+
+<A NAME="z10_14"></A>
+	<P ALIGN=CENTER><B>図10-14　イベント用RAM領域を使用したuser領域の拡張</B><BR><IMG SRC="../grp/p10_13.gif"></P>
+
+	<P>	<DD>　ＳＧＬでイベント用RAM領域を利用したEVENT構造体のuser領域拡張を行う場合は、ライブラリ関数“slGetEvent”及び“slReturnEvent”を使用してください。
+		“slGetEvent”はuser領域の確保に、“slReturnEvent”はuser領域の解放に使用します。</P>
+
+	<P>	<DD><B>【EVENT *slGetEvent ( void ) ;】</B>
+		<DD>　イベント用RAM領域から、イベントと同サイズ（128byte）のRAM領域を取り出し、user領域とします。また、EVENT構造体用に割り当てられた領域をuser領域として使用するため、その分だけ登録できるイベント数が減ります。<BR>
+		関数“slGetEvent”は、戻り値として、確保したRAM領域の先頭アドレスを返します。<BR>
+		領域確保に失敗した場合は、関数はNULLを返します。</P>
+
+	<P>	<DD><B>【void slReturnEvent ( EVENT *evptr ) ;】</B>
+		<DD>　パラメータで指定されたイベント用RAM領域をシステムに返還・解放します。<BR>
+		パラメータには、返還するRAM領域の先頭アドレスを代入します。<BR>
+		また、関数“slReturnEvent”は返還する領域が拡張されたuser領域であるのかどうかをチェックしません。そのため間違ってイベントとして登録してあるEVENT構造体をシステムに返還してもわかりません。
+		この場合、様々な不具合が生じるため、最悪の場合CPUが停止することも考えられます（詳細は“10-5項: イベント処理における注意事項”参照）。</P>
+
+<A NAME="no10_50"></A>
+	<P>	<DT><H2>10-5. イベント処理における注意事項</H2>
+		<DD>　イベント処理を行う場合、種々の領域のシステムへの返還・解放には特に注意してください。これは、返還・解放操作時に、操作を行う関数が指定されたパラメータの指す領域が、関数の扱うべき種類の領域であるかどうかのチェック
+		を行わないために引き起こされるものです。</P>
+
+	<P>	<DD>　例えば、ライブラリ関数“slReturnEvent”を用いて拡張user領域の返還・解放操作を実行しようした時、間違って通常のイベントとして登録されている領域を返還・解放してしまった場合は次のような弊害が生じ、最悪、
+		CPUが停止してしまうことも考えられます。</P>
+
+	<DD><OL>
+	<P><B><LI>領域の返還</B><BR>関数“slReturnEvent”によって指定されたEVENT構造体はシステムに返還される。</P>
+	<P><B><LI>イベントリスト</B><BR>EVENT構造体はイベントとして解放されないためイベントリスト中に存在し続ける。</P>
+	<P><B><LI>新たなイベント登録</B><BR>領域はシステム的にはフリーな状態にあるため、関数“slSetEvent”等を用いて自由に使用できる。</P>
+	<P><B><LI>チェーン構造の矛盾</B><BR>イベントリストに登録されているが、領域はフリーな状態にあるためEVENT構造体の内容が書き換えられ、これによりチェーン構造に不具合が生じる。</P>
+	<P><B><LI>CPU停止</B><BR>チェーン構造の整合が取れなくなり、最悪の場合、CPUが停止する。</P>
+	</OL>
+
+<A NAME="z10_15"></A>
+	<P ALIGN=CENTER><B>図10-15　誤ったイベント操作</B><BR><IMG SRC="../grp/p10_14.gif"></P>
+
+<A NAME="no10_60"></A>
+	<P>	<DT><H2>10-6. イベント処理の流れ</H2>
+		<DD>　イベント処理を大まかな流れで示したものが、次のフローチャートです。
+		イベント処理では、さらに、実行されるイベント内部で必要に応じてuser領域を拡張したり、構造体を利用して変数を使用したりしています。</P>
+
+<A NAME="f10_1"></A>
+	<P ALIGN=CENTER><B>フロー10-1　イベント処理の流れ</B><BR><IMG SRC="../grp/p10_15.gif"></P>
+
+<A NAME="no10_70"></A>
+	<P><DT><H2>10-7. イベントの使用例</H2>
+		<DD>　サンプルプログラム“ sample_10 ”（リスト10-1、10-2）は、実際にイベント処理を使用してプラミングを行った例です。
+		プログラムでは、イベントを利用して、立方体の表示非表示を制御・実行しています。</P>
+
+	<P>	<DD>　プログラムは大きく２つに分けられ、リスト10-1“main.c”ではシステムの初期化とイベントの実行を、リスト10-2“sample.c”ではイベントの初期化・イベント内容の定義・登録を行っています。</P>
+
+<A NAME="l10_1"></A>
+	<P>	<DD><B>リスト10-1　sample_10：イベント処理（main.c）</B>
+		<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Event Demo							*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+void ss_main(void)
+{
+	slInitSystem(TV_320x224,NULL,1) ;
+	slPrint("Sample program 10" , slLocate(9,2)) ;
+
+	set_event();
+	while(-1) {
+		slExecuteEvent() ;
+		slSynch() ;
+	}
+}
+</PRE></P>
+
+<A NAME="f10_2"></A>
+	<P ALIGN=CENTER><B>フロー10-2　sample_10：メインループ</B><BR><IMG SRC="../grp/p10_16_2.gif"></P>
+
+	<P>	<DD>　リスト10-2は、“sample10”中、イベントの登録とイベント実行内容の定義を行っている部分です。
+		また、ユーザー定義関数“disp_cube”中で、イベントリストの内容変更（追加・削除）も行っています。</P>
+
+<A NAME="l10_2"></A>
+	<P>	<DD><B>リスト10-2　sample_10：イベント処理（sample.c）</B>
+		<DD>
+<PRE>
+#include	"sgl.h"
+
+extern PDATA PD_CUBE;
+
+#define		POS_X     toFIXED(0.0)
+#define		POS_X_UP  200.0 
+#define		POS_Y     toFIXED(20.0)
+#define		POS_Z     toFIXED(270.0)
+#define		POS_Z_UP  50.0
+#define		SET_COUNT 500
+
+static void init_cube2(EVENT*);
+
+typedef struct cube {
+	FIXED	pos[XYZ];
+	ANGLE	ang[XYZ];
+	ANGLE	angx, angz;
+	ANGLE	angx_up , angz_up;
+	PDATA	*poly;
+	Sint16	set_count , set_i;
+	Sint16	unset_count , unset_i;
+} CUBE;
+
+static void disp_cube(EVENT *evptr)
+{
+	CUBE	 *cubeptr;
+
+	cubeptr = (CUBE *)evptr-&gt;user;
+	slPushMatrix();
+	{
+		slTranslate(cubeptr-&gt;pos[X] , cubeptr-&gt;pos[Y] , cubeptr-&gt;pos[Z]);
+		cubeptr-&gt;pos[X] = POS_X + POS_X_UP * slSin(cubeptr-&gt;angx);
+		cubeptr-&gt;pos[Y] = cubeptr-&gt;pos[Y];
+		cubeptr-&gt;pos[Z] = POS_Z + POS_Z_UP * slCos(cubeptr-&gt;angz);
+		cubeptr-&gt;angx += cubeptr-&gt;angx_up;
+		cubeptr-&gt;angz += cubeptr-&gt;angz_up;
+		slRotY(cubeptr-&gt;ang[Y]); 
+		slRotX(cubeptr-&gt;ang[X]); 
+		slRotZ(cubeptr-&gt;ang[Z]); 
+		cubeptr-&gt;ang[X] += DEGtoANG(5.0);
+		cubeptr-&gt;ang[Y] += DEGtoANG(5.0);
+		cubeptr-&gt;ang[Z] += DEGtoANG(5.0);
+		slPutPolygon(cubeptr-&gt;poly);
+	}
+	slPopMatrix();
+	cubeptr-&gt;set_count -= cubeptr-&gt;set_i;
+	if(cubeptr-&gt;set_count &lt; 0 ) {
+		slSetEvent( (void *)init_cube2 );
+		cubeptr-&gt;set_count = SET_COUNT;
+	}
+	cubeptr-&gt;unset_count -= cubeptr-&gt;unset_i;
+	if(cubeptr-&gt;unset_count &lt; 0 ) slCloseEvent(evptr);
+}
+
+static void init_cube1(EVENT *evptr)
+{
+	CUBE	 *cubeptr;
+
+	cubeptr = (CUBE *)evptr-&gt;user;
+	cubeptr-&gt;pos[X] = POS_X;
+	cubeptr-&gt;pos[Y] = POS_Y;
+	cubeptr-&gt;pos[Z] = POS_Z;
+	cubeptr-&gt;ang[X] = cubeptr-&gt;ang[Y] = cubeptr-&gt;ang[Z] = DEGtoANG(0.0);
+	cubeptr-&gt;angx = cubeptr-&gt;angz = DEGtoANG( 0.0);
+	cubeptr-&gt;angx_up = cubeptr-&gt;angz_up = DEGtoANG( 0.0);
+	cubeptr-&gt;set_count = SET_COUNT;
+	cubeptr-&gt;set_i = 1;
+	cubeptr-&gt;unset_count = 0;
+	cubeptr-&gt;unset_i = 0;
+	cubeptr-&gt;poly = &PD_CUBE;
+	evptr-&gt;exad = (void *)disp_cube;
+	disp_cube(evptr);
+}
+
+static void init_cube2(EVENT *evptr)
+{
+	CUBE	 *cubeptr;
+
+	cubeptr = (CUBE *)evptr-&gt;user;
+	cubeptr-&gt;pos[X] = POS_X;
+	cubeptr-&gt;pos[Y] = POS_Y - toFIXED(50);
+	cubeptr-&gt;pos[Z] = POS_Z + POS_Z_UP;
+	cubeptr-&gt;ang[X] = cubeptr-&gt;ang[Y] = cubeptr-&gt;ang[Z] = DEGtoANG(0.0);
+	cubeptr-&gt;angx = cubeptr-&gt;angz = DEGtoANG( 0.0);
+	cubeptr-&gt;angx_up = cubeptr-&gt;angz_up = DEGtoANG( 3.0) * (-1);
+	cubeptr-&gt;set_count = 0;
+	cubeptr-&gt;set_i = 0;
+	cubeptr-&gt;unset_count = SET_COUNT / 2 ;
+	cubeptr-&gt;unset_i = 1;
+	cubeptr-&gt;poly = &PD_CUBE;
+	evptr-&gt;exad = (void *)disp_cube;
+	disp_cube(evptr);
+}
+ 
+static void init_cube3(EVENT *evptr)
+{
+	CUBE	 *cubeptr;
+
+	cubeptr = (CUBE *)evptr-&gt;user;
+	cubeptr-&gt;pos[X] = POS_X;
+	cubeptr-&gt;pos[Y] = POS_Y + toFIXED(50);
+	cubeptr-&gt;pos[Z] = POS_Z + POS_Z_UP;
+	cubeptr-&gt;ang[X] = cubeptr-&gt;ang[Y] = cubeptr-&gt;ang[Z] = DEGtoANG(0.0);
+	cubeptr-&gt;angx = cubeptr-&gt;angz = DEGtoANG( 0.0);
+	cubeptr-&gt;angx_up = cubeptr-&gt;angz_up = DEGtoANG( 3.0);
+	cubeptr-&gt;set_count = 0;
+	cubeptr-&gt;set_i = 0;
+	cubeptr-&gt;unset_count = 0;
+	cubeptr-&gt;unset_i = 0;
+	cubeptr-&gt;poly = &PD_CUBE;
+	evptr-&gt;exad = (void *)disp_cube;
+	disp_cube(evptr);
+}
+ 
+void *event_tbl[] = {
+	init_cube1 ,
+	init_cube2 ,
+	init_cube3
+};
+
+void set_event()
+{
+	EVENT *evptr;
+	void	**exptr;
+	Uint16 cnt;
+
+	slInitEvent();
+	for(exptr = event_tbl , cnt = sizeof(event_tbl) / sizeof(void *); cnt--&gt; 0;) {
+		evptr = slSetEvent(*exptr++);
+	}
+}
+</PRE></P>
+
+	<P>	<DD>　次の流れ図は、イベントの実行内容を簡単にまとめたものです。<BR>
+		イベントは、最初のループと２回目以降のループで、イベントの実行内容が異なります。<BR>
+		図中、左が一回目のイベント実行内容、右が２回目以降の実行内容になります。</P>
+
+<A NAME="f10_3"></A>
+	<P ALIGN=CENTER><B>フロー10-3　samp_10：イベント実行内容</B><BR><IMG SRC="../grp/p10_19.gif"></P>
+
+<A NAME="no10_f"></A>
+	<P><DT><H3>付記　本章に登場したＳＧＬライブラリ関数</H3>
+		<DD>　本章では、次表の関数を解説しました。</P>
+
+<A  NAME="t10_1"></A>
+	<P>	<DD><B>表10-1　本章に登場したＳＧＬライブラリ関数</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH><PRE>関数型</TH><TH><PRE>　　　関 数 名　　　</TH><TH><PRE>　　　　　パ　ラ　メ　ー　タ　　　　</TH><TH><PRE>　　　　　　　　　機　　　能　　　　　　　　　</TH></TR>
+	<TR><TD>void</TD><TD>slInitEvent</TD><TD>void</TD><TD>イベントの初期化を行います</TD></TR>
+	<TR><TD>EVENT</TD><TD>*slSetEvent</TD><TD>void(*func)()</TD><TD>イベントリストイベントを登録・追加します</TD></TR>
+	<TR><TD>void</TD><TD>slExecuteEvent</TD><TD>void</TD><TD>リストに登録されたイベントを順に実行します</TD></TR>
+	<TR><TD>EVENT</TD><TD>*slSetEventNext</TD><TD>EVENT *evptr,void(*func)()</TD><TD>指定されたイベントの直後に、新たなイベントを挿入・登録します</TD></TR>
+	<TR><TD>void</TD><TD>slCloseEvent</TD><TD>EVENT *evptr</TD><TD>イベントリストからイベントを削除し、同時に付属するワークもシステムに返還・開放します</TD></TR>
+	<TR><TD>WORK</TD><TD>*slGetWork</TD><TD>void</TD><TD>ワーク領域を確保します</TD></TR>
+	<TR><TD>void</TD><TD>slReturnWork</TD><TD>WORK *wkptr</TD><TD>ワーク領域を返還・解放します</TD></TR>
+	<TR><TD>EVENT</TD><TD>*slGetEvent</TD><TD>void</TD><TD>イベントと同サイズのRAM領域をイベント用RAMに確保します</TD></TR>
+	<TR><TD>void</TD><TD>slReturnEvent</TD><TD>EVENT *evptr</TD><TD>関数"slGetEvent"で確保された領域をシステムに返還・解放します</TD></TR>
+	</TABLE></P>
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p09_10.htm">戻る</A>｜<A HREF="p11_10.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

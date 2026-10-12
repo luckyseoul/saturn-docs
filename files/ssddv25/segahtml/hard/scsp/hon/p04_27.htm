@@ -1,0 +1,174 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;21/29&gt;SCSP User's Manual/4.2.7MIXER</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p04_26.htm">Back</a> ｜ <A HREF="p04_28.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/4.2 Sound source register</b><HR NOSHADE>
+<DL>
+<A NAME="no4_27"></A><P><DT><H3> ■MIXER register</H3><DD> The digital mixer is a block that adjusts the level and balance of each audio signal in SCSP. A digital mixer consists of four parts: a direct audio adjustment section, a DSP input stage adjustment section, a DSP output stage adjustment section, and a final stage output adjustment section. Figure 4.47 shows the digital mixer block diagram and explains each block.</P>
+<A NAME="z4_47"></A><P ALIGN=CENTER> <B>Figure 4.47 Digital mixer block diagram</b><BR>
+<img srcset="../grp/i080_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="4_27_00"></A><P><DT> <B>Direct audio adjustment section</b><DD> This is a mixer block that manages the path where each slot's output connects directly to the DAC output. You can control the output level ("DISDL") and output balance ("DIPAN") for each slot.</P>
+<A NAME="4_27_01"></A><P><DT> <B>DSP input stage adjustment section</b><DD> Mixing is performed to input the output of each slot to the DSP ("MIXS"). Actually, select "MIXS" to input the audio signal with "ISEL" of each slot, and adjust the input level with "IMXL". When mixing multiple sounds with "ISEL", it is necessary to balance each sound. "MIXS" allows you to mix and input multiple slot outputs, so you can apply the same effect processing to multiple sounds, such as BGM reverb. Also, if you want to apply effects with DSP, please transfer the audio data to "MIXS".<P><A NAME="4_27_02"></A><P><DT> <B>DSP output stage adjustment section</b><DD> Audio that has been applied effects with DSP and audio that has been captured via external digital input is finally combined into stereo through mixing processing. You can adjust the output level ("EFSDL") and output balance ("EFPAN") for the audio signals output from "EFREG", which corresponds to DSP, and "EXTS", which receives external digital audio input. can. The data compiled here is also mixed with the direct audio component.</P>
+<A NAME="4_27_03"></A><P><DT> <B>Final stage output adjustment section</b><DD> Combines the direct and effect components of the audio and adjusts the output level to the DAC. Adjust the final output level with "MVOL".</P>
+<A NAME="4_27_04"></A><P><DD> <B>*About direct ingredients and effect ingredients</b><DD> When effects are applied to audio, the sound without effects (dry) and the sound with effects applied (wet) are mixed with the appropriate balance for each scene. The built-in effect program is divided into dry and wet parts inside the DSP and mixed at the end, so if you are creating dry and wet components inside the DSP, there is no need to output the direct component. This can be disabled by setting DISDL to "0". Figure 4.48 shows the paths of the direct component and effect component.</P>
+<A NAME="z4_48"></A><P ALIGN=CENTER> <B>Figure 4.48 Path of direct component and effect component</b><BR>
+<img srcset="../grp/i081_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> When rewriting the DSP program, the DSP operation will become unstable and audio will not be output correctly from "EFREG", so please set "EFSDL" to "0H" to prevent audio from being output.</P>
+<P><DD> <B>*About localization</b><DD> SCSP's digital mixer supports a 31-step panning function, but if you want to make even more detailed settings, use the SCSP's built-in DSP to perform panning processing, as shown in Figure 4.49.</P>
+<A NAME="z4_49"></A><P ALIGN=CENTER> <B>Figure 4.49 Localization calculation using DSP</b><BR>
+<img srcset="../grp/i082_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Figure 5.56 shows a block diagram of a digital mixer.</P>
+<A NAME="z4_50"></A><P ALIGN=CENTER> <B>Figure 4.50 Digital mixer block diagram</b><BR>
+<img srcset="../grp/i083_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P><DD> Next, we will explain how to set each parameter based on the detailed diagram in Figure 4.50.<BR>
+ The "IMXL", "ISEL", "DISDL", and "EPSDL" settings are used to prevent overflow when a considerable number of notes are output, and to prevent the overall volume from becoming low when not many notes are output. Therefore, the setting method described below is required.</P>
+<P><DD> <B>(a) Mixer on the DSP input side</b><DD> The "IMXL" and "ISEL" parameters correspond to the mixer on the DSP input side.<BR>
+ "MIXS" (mix stack will be explained later) can input multiple slot outputs. This register has the ability to mix multiple pieces of data. At this time, set "IMXL" to an appropriate value depending on the number of slots to be input, and be careful not to cause "MIXS" to overflow.<BR>
+ Table 4.18 shows the number of notes that can be input when changing the "IMXL" value. For example, if you set "IMXL" to "7H" for the input source and set the level input to "MIXS" to "0[dB]", the number of slots that can be input to "MIXS" is 1. It will be a sound minute.</P>
+<A NAME="t4_18"></A><P><DD> <B>Table 4.18 Relationship between the number of sources that can be input to IMXL and MIXS</b><DD><TABLE BORDER>
+<TR ALIGN=CENTER><TD ROWSPAN=2> "IMXL" value[2:0]</TD><TD COLSPAN=2> level</TD><TD ROWSPAN=2> Number of notes that can be input (number of sources)</TD></TR>
+<TR ALIGN=CENTER><TD> [dB]</TD><TD> magnification</TD></TR>
+<TR ALIGN=CENTER><TD> 0H</TD><TD> -MAX</TD><TD> ×0.000000</TD><TD> --sound</TD></TR>
+<TR ALIGN=CENTER><TD> 1H</TD><TD> -36</TD><TD> ×0.015625</TD><TD> 64 sounds</TD></TR>
+<TR ALIGN=CENTER><TD> 2H</TD><TD> -30</TD><TD> ×0.031250</TD><TD> 32 sounds</TD></TR>
+<TR ALIGN=CENTER><TD> 3H</TD><TD> -24</TD><TD> ×0.062500</TD><TD> 16 sounds</TD></TR>
+<TR ALIGN=CENTER><TD> 4H</TD><TD> -18</TD><TD> ×0.125000</TD><TD> 8 sounds</TD></TR>
+<TR ALIGN=CENTER><TD> 5H</TD><TD> -12</TD><TD> ×0.250000</TD><TD> 4 sounds</TD></TR>
+<TR ALIGN=CENTER><TD> 6H</TD><TD> -6</TD><TD> ×0.500000</TD><TD> 2 sounds</TD></TR>
+<TR ALIGN=CENTER><TD> 7H</TD><TD> -0</TD><TD> ×1.000000</TD><TD> 1 note</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>(b) "DISDL" and "EFSDL"</b><DD> "DISDL" and "EFSDL" have the same concept as "IMXL", but these two are determined by taking into account the total number of sound outputs.<BR>
+ The total number of sound outputs refers to the sum of direct components, effect components, and external input components that are in the state of outputting sound. This refers to the number of sources that output sound to the L/R cumulative adder in Figure 4.50 (considering the L/R pair as one). In other words, this means that it is not equal to the sum of the slots that are outputting sound.</P>
+<P><DD> <B>(c) "DIPAN" and "EFPAN"</b><DD> These registers are centered when the set value is "00H" or "10H".<BR>
+ If you increase the value of the lower 4 bits while leaving the most significant bit at "0B", the stereo position will move to the right.<BR>
+ If you increase the value of the lower 4 bits while leaving the most significant bit at "1B", the stereo position will move to the left.</P>
+<A NAME="IMXL_"></A><P><DT> <B>IMXL[2:0](R/W) ; Input MiXing Level</b><DD> Specify the mix stack input level for each slot when sound slot output data is input to the DSP mix stack (MIXS).</P>
+<A NAME="t4_19"></A><P><DD> <B>Table 4.19 Mix stack register input level</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD> IMXL</TD><TD WIDTH=150> Level (dB)</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> -MAX (do not mix)</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> -36</TD></TR>
+<TR ALIGN=CENTER><TD> 2</TD><TD> -30</TD></TR>
+<TR ALIGN=CENTER><TD> 3</TD><TD> -24</TD></TR>
+<TR ALIGN=CENTER><TD> 4</TD><TD> -18</TD></TR>
+<TR ALIGN=CENTER><TD> 5</TD><TD> -12</TD></TR>
+<TR ALIGN=CENTER><TD> 6</TD><TD> -6</TD></TR>
+<TR ALIGN=CENTER><TD> 7</TD><TD> -0</TD></TR>
+</TABLE>
+</P>
+<A NAME="ISEL_"></A><P><DT> <B>ISEL[3:0](R/W) ; Input SELect</b><DD> Specify the mix stack number for each slot when inputting sound slot output data to the DSP mix stack register ("MIXS").</P>
+<P><DD> Mix Stack ("MIXS") calculates the sum of inputs for all slots and uses it as the DSP input. The mix stack does not have an overflow protection function, so please set it so that the sum of all slots does not exceed "0[dB]".</P>
+<A NAME="DISDL_"></A><P><DT> <B>DISDL[2:0](R/W) ; DIrect SenD Level</b><DD> Specify the output level for each slot when outputting direct data to the D/A converter.</P>
+<A NAME="t4_20"></A><P><DD> <B>Table 4.20 D/A converter output level</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD> DISDL</TD><TD> Level (dB)</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> -∞(Do not send)</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> -36</TD></TR>
+<TR ALIGN=CENTER><TD> 2</TD><TD> -30</TD></TR>
+<TR ALIGN=CENTER><TD> 3</TD><TD> -24</TD></TR>
+<TR ALIGN=CENTER><TD> 4</TD><TD> -18</TD></TR>
+<TR ALIGN=CENTER><TD> 5</TD><TD> -12</TD></TR>
+<TR ALIGN=CENTER><TD> 6</TD><TD> -6</TD></TR>
+<TR ALIGN=CENTER><TD> 7</TD><TD> -0</TD></TR>
+</TABLE>
+</P>
+<A NAME="DIPAN_"></A><P><DT> <B>DIPAN[4:0](R/W); DIrect PANpot</b><DD> Specify the stereo position for each slot when sending direct data.</P>
+<A NAME="t4_21"></A><P><DD> <B>Table 4.21 Localization data by DIPAN</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD> DIPAN</TD><TD> Left localization (dB)</TD><TD> Right localization (dB)</TD><TD><PRE></TD><TD> DIPAN</TD><TD> Left localization (dB)</TD><TD> Right localization (dB)</TD></TR>
+<TR ALIGN=CENTER><TD> 00H</TD><TD> -00.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 10H</TD><TD> -00.0</TD><TD> -00.0</TD></TR>
+<TR ALIGN=CENTER><TD> 01H</TD><TD> -03.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 11H</TD><TD> -00.0</TD><TD> -03.0</TD></TR>
+<TR ALIGN=CENTER><TD> 02H</TD><TD> -06.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 12H</TD><TD> -00.0</TD><TD> -06.0</TD></TR>
+<TR ALIGN=CENTER><TD> 03H</TD><TD> -09.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 13H</TD><TD> -00.0</TD><TD> -09.0</TD></TR>
+<TR ALIGN=CENTER><TD> 04H</TD><TD> -12.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 14H</TD><TD> -00.0</TD><TD> -12.0</TD></TR>
+<TR ALIGN=CENTER><TD> 05H</TD><TD> -15.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 15H</TD><TD> -00.0</TD><TD> -15.0</TD></TR>
+<TR ALIGN=CENTER><TD> 06H</TD><TD> -18.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 16H</TD><TD> -00.0</TD><TD> -18.0</TD></TR>
+<TR ALIGN=CENTER><TD> 07H</TD><TD> -21.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 17H</TD><TD> -00.0</TD><TD> -21.0</TD></TR>
+<TR ALIGN=CENTER><TD> 08H</TD><TD> -24.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 18H</TD><TD> -00.0</TD><TD> -24.0</TD></TR>
+<TR ALIGN=CENTER><TD> 09H</TD><TD> -27.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 19H</TD><TD> -00.0</TD><TD> -27.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0AH</TD><TD> -30.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1AH</TD><TD> -00.0</TD><TD> -30.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0BH</TD><TD> -33.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1BH</TD><TD> -00.0</TD><TD> -33.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0CH</TD><TD> -36.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1CH</TD><TD> -00.0</TD><TD> -36.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0DH</TD><TD> -39.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1DH</TD><TD> -00.0</TD><TD> -39.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0EH</TD><TD> -42.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1EH</TD><TD> -00.0</TD><TD> -42.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0FH</TD><TD> -∞</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1FH</TD><TD> -00.0</TD><TD> -∞</TD></TR>
+</TABLE>
+</P>
+<A NAME="EFSDL_"></A><P><DT> <B>EFSDL[2:0](R/W); EFfect SenD Level</b><DD> Specify the output level of waveform data (effect data) processed through DSP and external input waveform data to the D/A converter.</P>
+<A NAME="t4_22"></A><P><DD> <B>Table 4.22 Send level to D/A converter</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD> EFSDL</TD><TD WIDTH=150> Level (dB)</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> -∞(Do not send)</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> -36</TD></TR>
+<TR ALIGN=CENTER><TD> 2</TD><TD> -30</TD></TR>
+<TR ALIGN=CENTER><TD> 3</TD><TD> -24</TD></TR>
+<TR ALIGN=CENTER><TD> 4</TD><TD> -18</TD></TR>
+<TR ALIGN=CENTER><TD> 5</TD><TD> -12</TD></TR>
+<TR ALIGN=CENTER><TD> 6</TD><TD> -6</TD></TR>
+<TR ALIGN=CENTER><TD> 7</TD><TD> -0</TD></TR>
+</TABLE>
+</P>
+<A NAME="EFPAN_"></A><P><DT> <B>EFPAN[4:0](R/W); EFfect PANpot</b><DD> Specify the stereo location of waveform data (effect data) that has undergone effect processing through DSP and external input waveform data.</P>
+<A NAME="t4_23"></A><P><DD> <B>Table 4.23 Localization data by EFPAN</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD> EFPAN</TD><TD> Left output (dB)</TD><TD> Right output (dB)</TD><TD><PRE></TD><TD> EFPAN</TD><TD> Left output (dB)</TD><TD> Right output (dB)</TD></TR>
+<TR ALIGN=CENTER><TD> 00H</TD><TD> -00.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 10H</TD><TD> -00.0</TD><TD> -00.0</TD></TR>
+<TR ALIGN=CENTER><TD> 01H</TD><TD> -03.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 11H</TD><TD> -00.0</TD><TD> -03.0</TD></TR>
+<TR ALIGN=CENTER><TD> 02H</TD><TD> -06.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 12H</TD><TD> -00.0</TD><TD> -06.0</TD></TR>
+<TR ALIGN=CENTER><TD> 03H</TD><TD> -09.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 13H</TD><TD> -00.0</TD><TD> -09.0</TD></TR>
+<TR ALIGN=CENTER><TD> 04H</TD><TD> -12.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 14H</TD><TD> -00.0</TD><TD> -12.0</TD></TR>
+<TR ALIGN=CENTER><TD> 05H</TD><TD> -15.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 15H</TD><TD> -00.0</TD><TD> -15.0</TD></TR>
+<TR ALIGN=CENTER><TD> 06H</TD><TD> -18.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 16H</TD><TD> -00.0</TD><TD> -18.0</TD></TR>
+<TR ALIGN=CENTER><TD> 07H</TD><TD> -21.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 17H</TD><TD> -00.0</TD><TD> -21.0</TD></TR>
+<TR ALIGN=CENTER><TD> 08H</TD><TD> -24.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 18H</TD><TD> -00.0</TD><TD> -24.0</TD></TR>
+<TR ALIGN=CENTER><TD> 09H</TD><TD> -27.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 19H</TD><TD> -00.0</TD><TD> -27.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0AH</TD><TD> -30.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1AH</TD><TD> -00.0</TD><TD> -30.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0BH</TD><TD> -33.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1BH</TD><TD> -00.0</TD><TD> -33.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0CH</TD><TD> -36.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1CH</TD><TD> -00.0</TD><TD> -36.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0DH</TD><TD> -39.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1DH</TD><TD> -00.0</TD><TD> -39.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0EH</TD><TD> -42.0</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1EH</TD><TD> -00.0</TD><TD> -42.0</TD></TR>
+<TR ALIGN=CENTER><TD> 0FH</TD><TD> -∞</TD><TD> -00.0</TD><TD><PRE></TD><TD> 1FH</TD><TD> -00.0</TD><TD> -∞</TD></TR>
+</TABLE>
+</P>
+<P><DD> "EFSDL" and "EFPAN" can be set individually for each "EFREG" and "EXTS". The addresses of the "EFSDL" and "EFPAN" registers corresponding to each "EFREG" and "EXTS" are shown in Table 4.24.</P>
+<A NAME="t4_24"></A><P><DD> <B>Table 4.24 Register addresses of EFSDL and EFPAN corresponding to each EFREG and EXTS</b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD ROWSPAN=2> sauce</TD><TD ROWSPAN=2> address</TD><TD COLSPAN=8> data</TD><TD ROWSPAN=2> sauce</TD><TD ROWSPAN=2> address</TD><TD COLSPAN=8> data</TD></TR>
+<TR ALIGN=CENTER><TD> 7</TD><TD> 6</TD><TD> 5</TD><TD> 4</TD><TD> 3</TD><TD> 2</TD><TD> 1</TD><TD> 0</TD><TD> 7</TD><TD> 6</TD><TD> 5</TD><TD> 4</TD><TD> 3</TD><TD> 2</TD><TD> 1</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TD> EFREG0</TD><TD> 100017H</TD><TD COLSPAN=3> EFSDL0</TD><TD COLSPAN=5> EFPAN0</TD><TD> EFREG9</TD><TD> 100137H</TD><TD COLSPAN=3> EFSDL9</TD><TD COLSPAN=5> EFPAN9</TD></TR>
+<TR ALIGN=CENTER><TD> EFREG1</TD><TD> 100037H</TD><TD COLSPAN=3> EFSDL1</TD><TD COLSPAN=5> EFPAN1</TD><TD> EFREG10</TD><TD> 100157H</TD><TD COLSPAN=3> EFSDL10</TD><TD COLSPAN=5> EFPAN10</TD></TR>
+<TR ALIGN=CENTER><TD> EFREG2</TD><TD> 100057H</TD><TD COLSPAN=3> EFSDL2</TD><TD COLSPAN=5> EFPAN2</TD><TD> EFREG11</TD><TD> 100177H</TD><TD COLSPAN=3> EFSDL11</TD><TD COLSPAN=5> EFPAN11</TD></TR>
+<TR ALIGN=CENTER><TD> EFREG3</TD><TD> 100077H</TD><TD COLSPAN=3> EFSDL3</TD><TD COLSPAN=5> EFPAN3</TD><TD> EFREG12</TD><TD> 100197H</TD><TD COLSPAN=3> EFSDL12</TD><TD COLSPAN=5> EFPAN12</TD></TR>
+<TR ALIGN=CENTER><TD> EFREG4</TD><TD> 100097H</TD><TD COLSPAN=3> EFSDL4</TD><TD COLSPAN=5> EFPAN4</TD><TD> EFREG13</TD><TD> 1001B7H</TD><TD COLSPAN=3> EFSDL13</TD><TD COLSPAN=5> EFPAN13</TD></TR>
+<TR ALIGN=CENTER><TD> EFREG5</TD><TD> 1000B7H</TD><TD COLSPAN=3> EFSDL5</TD><TD COLSPAN=5> EFPAN5</TD><TD> EFREG14</TD><TD> 1001D7H</TD><TD COLSPAN=3> EFSDL14</TD><TD COLSPAN=5> EFPAN14</TD></TR>
+<TR ALIGN=CENTER><TD> EFREG6</TD><TD> 1000D7H</TD><TD COLSPAN=3> EFSDL6</TD><TD COLSPAN=5> EFPAN6</TD><TD> EFREG15</TD><TD> 1001F7H</TD><TD COLSPAN=3> EFSDL15</TD><TD COLSPAN=5> EFPAN15</TD></TR>
+<TR ALIGN=CENTER><TD> EFREG7</TD><TD> 1000F7H</TD><TD COLSPAN=3> EFSDL7</TD><TD COLSPAN=5> EFPAN7</TD><TD> EXTS0</TD><TD> 100217H</TD><TD COLSPAN=3> EFSDL16</TD><TD COLSPAN=5> EFPAN16</TD></TR>
+<TR ALIGN=CENTER><TD> EFREG8</TD><TD> 100117H</TD><TD COLSPAN=3> EFSDL8</TD><TD COLSPAN=5> EFPAN8</TD><TD> EXTS1</TD><TD> 100237H</TD><TD COLSPAN=3> EFSDL17</TD><TD COLSPAN=5> EFPAN17</TD></TR>
+</TABLE>
+</P>
+<A NAME="MVOL_"></A><P><DT> <B>MVOL[3:0](W) ; Master VOLume</b><DD> Represents the output master volume to the D/A converter.<BR>
+ This is to control the overall output level, and even if you lower the gain by lowering the "MVOL" setting for output overflow, clipping noise will not disappear (to eliminate clipping noise, , please reconfigure "DISDL" and "EFSDL" to resolve the overflow).</P>
+<A NAME="DAC18B_"></A><P><DT> <B>DAC18B(W); DAC out 18Bit</b><DD> Set this bit to "1B" when using the digital output as an interface for an 18-bit D/A converter. For 16 bits, set "0B". (Basically, a 16-bit type D/A converter is connected, so set "0B" in the register.)</P>
+<A NAME="z4_51"></A><P ALIGN=CENTER> <B>Figure 4.51 SCSP and DAC connection</b><BR>
+<img srcset="../grp/i088_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_26.htm">Back</a> ｜ <A HREF="p04_28.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

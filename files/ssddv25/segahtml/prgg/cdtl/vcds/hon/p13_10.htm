@@ -1,0 +1,117 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/14&gt;Virtual CD System/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">Virtual CD System</a><HR>
+ <B>▲ <A HREF="p12_10.htm">Back</a> ｜ <A HREF="p14_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Virtual CD System User's Manual/Chapter 5 CD Emulation Related Tools</b><HR NOSHADE>
+<DL>
+<A NAME="no5_30"></A><P><DT><H3> 5.3 TOC information diagnostic tool TOCCHK</H3><P><DT><H3> 5.3.1 Overview</H3><DD> TOCCHK checks the TOC file (VCDMKTOC output file "~.TOC") and outputs a diagnostic message to the standard output to check for abnormal TOC information.</P>
+<P><DT> <B>Check item</b><DD><TABLE BORDER=0>
+<TR><TD> (1)</TD><TD> Track size check</TD><TD> (Must be 4 seconds or more)</TD><TD></TD></TR>
+<TR><TD> (2)</TD><TD> Pre-gap size check</TD><TD> (Must be 2 seconds or more)</TD><TD></TD></TR>
+<TR><TD> (3)</TD><TD> Post gap size check</TD><TD> (Must be 1 second or more)</TD><TH> ※Note</TH></TR>
+<TR><TD> (4)</TD><TD> Audio track start pause</TD><TD> (Must be 2 seconds or more)</TD><TD></TD></TR>
+</TABLE>
+<P><DT> <B>※Note</b><DD> The post-gap mentioned here is shown in the CD-ROM XA standard.<BR>
+ According to the CD-ROM standard (YELLOW BOOK), a post gap of 2 seconds or more is required at the end of the data track that precedes the audio track, but this post gap is not checked because the information is not reflected in the TOC file. not.</P>
+<P> Please make sure that the following statement is included at the end of the data track in the virtual CD script.</P>
+<P><DD><PRE>
+Data track just before CDDA
+ ｜         :
+ ｜       <B>PostGap 150</B>    ; <----- Confirm post gap of 2 seconds or more
+ ↓   EndTrack
+━━━  Track CDDA
+ ｜       Pause 150
+ ｜       FileSource 〜.DAT
+ ｜       EndFileSource
+ ↓         :
+CDDA track
+</PRE>
+</P>
+<P><DT><H3> 5.3.2 Command specifications</H3> TOCCHK TOC file name (extension ".TOC" can be omitted)<P><DT> <B>command:</b><DD> TOCCHK</P>
+<P><DT> <B>Command name:</b><DD> TOC file diagnosis</P>
+<P><DT> <B>Format:</b><DD> SWAP△file name</P>
+<P><DT> <B>argument:</b><DD> File name: TOC file name created by VCDMKTOC.EXE</P>
+<P><DT> <B>option:</b><DD> none</P>
+<P><DT> <B>function:</b><DD> Diagnose the specified TOC file.</P>
+<P><DT> <B>Example of use:</b><DD> To check the TOC file "SAMPLE.TOC" created by VCDMKTOC.EXE and output the results to the check file "SAMPLE.TCK", do as follows.</P>
+<P><DD><PRE><B>
+C:\</b>&gt; <B>TOCCHK SAMPLE.TOC</b>&gt; <B>SAMPLE.TCK
+</b></PRE>(Assume you are working in the root directory of drive C.)</P>
+<P><DT><H3> 5.3.3 Output format (sample)</H3><DD><PRE>
+TOCCHK.EXE Ver.1.02 1995-04-25
+Copyright(c) SEGA ENTERPRISES, LTD. 1995
+Copyright(c) CSK Research Institute Corp. 1995
+
+OFFSET : CONTROL   TNO/X   FORM     TIME      DUMP(HEX)
+ 0000H : DATA  --- LeadIn  MODE1    00:00:00  41 00 00 02 00 00 00 00
+ 0008H : DATA  --- 01/00   MODE1    00:00:00  41 01 00 02 00 00 00 00
+ 0010H : DATA  --- 01/01   MODE1    00:02:00  41 01 01 02 00 00 02 00
+ 0018H : AUDIO -2- LeadOut MODE1    00:22:52  01 AA 01 02 00 00 22 52
+               |||                            |  |  |  |  |  |  |  |
+               |||                            |  |  |  |  |  MM:SS:FF
+               ||+-- e: Emphasis flag         |  |  |  |  +--ZERO
+               |+-- 2: 2ch / 4: 4ch           |  |  |  +--FORM
+               +-- c: digital Copy permitted  |  |  +--X
+                                              |  +--TNO
+                                              +--CONTROL/ADR
+DIAGNOSIS
+V01.TOC(0018H) : FORM is not consistent with CONTROL
+    |      |         |
+    |      |         +---message body
+    |      +--- OFFSET
+    +---------- file name
+</PRE></P>
+<P><DT> <B>Message list</b><P><DT> <B>(1) TNO=?? size XXX < 300 (4 sec)</b>
+<DD> The track size is 4 seconds or less.</P>
+<P><DT> <B>(2) POST-GAP missing</b><DD> There is no post gap.<BR>
+ The post-gap referred to here is shown in the CD-ROM XA standard.<BR>
+ The time when the FORM byte does not change even when changing from TNO to TNO+1 and X to 0 is determined to be the start of the pre-gap, and the time when the FORM byte changes is determined to be the end of the post-gap.</P>
+<P><DT> <B>(3) POST-GAP smaller than 1 sec</b><DD> Post gap is less than 1 second. (CD-ROM XA standard)</P>
+<P><DT> <B>(4) PRE-GAP missing</b><DD> Form bite changed even though there was no pre-gap.</P>
+<P><DT> <B>(5) PRE-GAP smaller than 2 sec</b><DD> Pre-gap is 2 seconds or less. (CD-ROM XA standard)</P>
+<P><DT> <B>(6) PAUSE Missing</b><DD> There is no pause in the audio track.</P>
+<P><DT> <B>(7) PAUSE smaller than 2 seconds</b><DD> Pre-gap is 2 seconds or less. (CD-ROM XA standard)</P>
+<P><DT> <B>(8) LeadIn Control(??H) is not DATA</b><DD> Control in the LeadIn area is not in DATA format. (Saturn format)<BR>
+ (For music CDs, it will be in AUDIO format)</P>
+<P><DT> <B>(9) LeadIn FORM(??H) is not CD-ROM</b><DD> The FORM in the LeadIn area is not in CD-ROM format. (Saturn format)</P>
+<P><DT> <B>(10) LeadIn ATIME is not 00:00:00</b><DD> The ATIME of the LeadIn area is not 00:00:00.</P>
+<P><DT> <B>(11) Illegal Disc Type (??H)</b><DD> Disc Type in the LeadIn area is not CD-ROM / CD-ROM XA / CD-I format.</P>
+<P><DT> <B>(12) Illegal TNO/X=(??/??) at PAUSE</b><DD> TNO/X of the first pose is not 01/00. (Saturn format)</P>
+<P><DT> <B>(13) Illegal Control(??H) at PAUSE</b><DD> Control of the first pose is not in DATA format. (Saturn format)</P>
+<P><DT> <B>(14) Illegal ATIME ??:??:?? at PAUSE</b><DD> The ATIME of the first pose is not 00:00:00. (Saturn format)</P>
+<P><DT> <B>(15) Illegal TNO/X=(??/??) at 1st TRACK</b><DD> TNO/X of the first track is not 01/01. (Saturn format)</P>
+<P><DT> <B>(16) Illegal CONTROL(??H) at 1st TRACK</b><DD> CONTROL of the first track is not in DATA format. (Saturn format)</P>
+<P><DT> <B>(17) Illegal ATIME ??:??:?? at 1st TRACK</b><DD> The ATIME of the first track is not 00:02:00. (Saturn format)</P>
+<P><DT> <B>(18) Illegal CONTROL(??H)</b><DD> CONTROL is an unacceptable value. (Saturn format)</P>
+<P><DT> <B>(19) TNO/X=(??/??) Sequence error</b><DD> Track numbers/indexes are not in ascending order.</P>
+<P><DT> <B>(20) ATIME=(??:??:??) Sequence error</b><DD> ATIME is not in ascending order.</P>
+<P><DT> <B>(21) FORM is not consistent with CONTROL</b><DD> There is an inconsistency between the FORM byte and CONTROL.<BR>
+ (AUDIO for CDDA, DATA for others)</P>
+<P><DT> <B>(22) Illegal FORM (??H)</b><DD> :The value of Form byte is invalid.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p12_10.htm">Back</a> ｜ <A HREF="p14_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">Virtual CD System</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,88 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;p=7/7&gt;General purpose 3D modeling tool user's manual/4.Data format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#win">Graphic Tools Guide</a> ★ <A HREF="../index.htm">3DME User's Manual</a><HR>
+ <B>▲ <A HREF="p06_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>General purpose 3D modeling tool user's manual</b><H2 ALIGN=CENTER> 4. data format</H2><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H3> ■MDB format</H3><DD> This is a binary format of the MDL format information output by 3DME.</P>
+<P><DT> <B>●Structure</b><DD> PDATA* (MAP_SIZE_X*MAP_SIZE_Y information)<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD> Address of map number 0</TD></TR>
+<TR ALIGN=CENTER><TD> Map number 1 address</TD></TR>
+<TR ALIGN=CENTER><TD> Map number 2 address</TD></TR>
+<TR ALIGN=CENTER><TD> Map number 3 address</TD></TR>
+<TR ALIGN=CENTER><TD> :</TD></TR>
+<TR ALIGN=CENTER><TD> :</TD></TR>
+<TR ALIGN=CENTER><TD> :</TD></TR>
+<TR ALIGN=CENTER><TD> Address of map number n-1</TD></TR>
+<TR ALIGN=CENTER><TD> Null map object data</TD></TR>
+<TR ALIGN=CENTER><TD> Object data of map number 0</TD></TR>
+<TR ALIGN=CENTER><TD> Map number 1 object data</TD></TR>
+<TR ALIGN=CENTER><TD> Map number 2 object data</TD></TR>
+<TR ALIGN=CENTER><TD> Map number 3 object data</TD></TR>
+<TR ALIGN=CENTER><TD> :</TD></TR>
+<TR ALIGN=CENTER><TD> :</TD></TR>
+<TR ALIGN=CENTER><TD> :</TD></TR>
+<TR ALIGN=CENTER><TD> Object data of map n-1</TD></TR>
+</TABLE>
+<DD> Let n = MAP_SIZE_X * MAP_SIZE_Y.</P>
+<P><DT> <B>●Caution</b><DD><UL TYPE=DISC>
+<LI> The map number address indicates the storage address of the object data for that map.<LI> Each object is represented by an SGL PDATA structure.<LI> A Null map is an object with 0 polygons.</UL>
+</P>
+<P><DD> Basically, refer to the PDATA* part, see which address contains PDATA (polygon information), and output that address with slPutPolygon.</P>
+<A NAME="no4_20"></A><P><DT><H3> ■Collision format</H3><DD> Automatically divides by grit unit and allows information to be recognized.</P>
+<P><DT> <B>●Information that can be obtained</b><OL>
+<P> <B><LI>Centroid coordinates of polygon</li>
+</b><BR>
+ Used to calculate which polygon you are standing on.</P>
+<P> <B><LI>Normal vector of polygon</li>
+</b><BR>
+ Used to calculate your own slope and the slope's gravity.</P>
+<P> <B><LI>Polygon attribute number</li>
+</b><BR>
+ Acquisition of attribute flags for each polygon such as "road" or "grassland"</P>
+<P> <B><LI>polygon group number</li>
+</b><BR>
+ Obtain group number for each polygon</P>
+</OL>
+<P><DT> <B>●Header information for acquiring collision information</b><DD><PRE>
+typedef struct {
+     VECTOR norm ; /* Normal vector */
+     Uint16 att; /* Attribute */
+     Uint16 gru; /* group */
+     FIXED cen_x; /* center */
+     FIXED cen_y; /* center */
+     FIXED cen_z; /* center */
+} COLLISON;
+
+typedef struct {
+     COLLISON *cotbl; /* Polygon definition table */
+     Uint32 nbCo; /* Number of polygons */
+}CDATA;
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p06_10.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#win">Graphic Tools Guide</a> ★ <A HREF="../index.htm">3DME User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

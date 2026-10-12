@@ -1,0 +1,137 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SpriteEditorTextFormat</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm">Graphic Tools Guide</A>
+★<A HREF="../index.htm#frm">フォーマット一覧</A>
+<HR NOSHADE>
+<CENTER>
+<H1>SpriteEditor
+</H1>
+<H5>Ver1.32</H5>
+<H2>テキストフォーマット</H2>
+</CENTER>
+<Hr>
+<DL>
+<A NAME="no1"></A>
+<P><DT><H3>■１．Ｃ形式（回転なし）</H3>
+<DL>
+<P><DT><B>ＸＸＸ.clファイル例</B>
+<DD>
+<PRE>
+/******************************
+        Color Table
+******************************/
+
+/*0:16*/                        ←パレットエントリ番号＆カラーモード
+SPR_PAL pal_testFile_000[] = {
+        0x8000, /*0*/           ←実カラーデータ
+        0xE318, /*1*/           （モードにより16色または256色分続く）
+        0xD318, /*2*/
+          ：
+          ：
+          ：
+
+SPR_PAL_DAT paldata_testFile[] = {
+        SPR_PAL_DEF(0x0040,  16, pal_AtestFile_000),
+        SPR_PAL_DEF(0x0020,  16, pal_AtestFile_001),
+          ：            ↑
+          ：    編集時のパレットアドレス、カラーモード、ラベル  
+          ：    （未使用領域は基本的に出力しません）
+</PRE>
+
+<P><DT><B>ＸＸＸ.cgファイル例</B>
+<DD><PRE>
+/******************************
+        CG
+******************************/
+
+/*0: 88x136*/                   ←スプライト番号＆スプライトサイズ
+SPR_CG  cg_testFile_000[] = {
+        0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,
+        0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,
+        0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,
+        0x0011,0x0011,0x0011,0x0011,0x0021,0x0099,0x0066,0x00AA,
+          ：    ↑
+          ：    実ピクセルデータ        
+          ：    （パレットモード時はパレットコード
+                　32K色モード時は実カラーデータになります）
+
+SPR_CG_DAT      cgdata_testFile[] = {
+        SPR_CG_DEF( 88,136,0x00000000),
+        SPR_CG_DEF( 24, 16,0x00001760),
+        SPR_CG_DEF( 32, 23,0x00001820),
+        SPR_CG_DEF( 40, 23,0x00001990),
+        SPR_CG_DEF( 56, 48,0x00001B5C),
+          ：            ↑
+          ：　  Hサイズ、Vサイズ、各スプライト毎の相対アドレス
+          ：
+</PRE>
+
+<P><DT><B>ＸＸＸ.mapファイル例</B>
+<DD><PRE>
+/******************************
+        MAP
+******************************/
+/*  0:*/                ←パターン番号
+SPR_MAP map_testFile_000[] = {
+        SPR_MAP_DEF(  1,COL_16 ,cg_testFile_005,  24,  16,   7, -62,0x0010),
+        SPR_MAP_DEF(  2,COL_16 ,cg_testFile_002,  32,  23,   2, -46,0x0030),
+                ：      ↑
+                ：      スプライト番号、カラーモード(COL_16,COL_256,COL_DC)
+                ：     
+スプライトラベル、Hサイズ、Vサイズ、Hオフセット、Vオフセット
+                ：      反転情報（0x0010=H反転、0x0020=V反転）
+</PRE>
+
+<P><DT><B>ＸＸＸ.anmファイル例</B>
+<DD><PRE>
+/******************************
+        ANIME
+******************************/
+/*  0:*/
+ANM_BNK bank_testFile_000[] = {
+        ANM_DEF(map_testFile_000,   5),
+        ANM_DEF(map_testFile_010,  20),
+        ANM_DEF(map_testFile_001,   5),
+                ：　↑
+                ：　表示対象パターンラベル、表示時間
+                ：
+</PRE>
+</DL>
+
+<A NAME="no2"></A>
+<P><DT><H3>■２．Ｃ形式（+回転）</H3>
+<DD> *ＸＸＸ.pat以外は(1)と全く同じ
+<DL>
+<P><DT><B>ＸＸＸ.patファイル例</B>
+<DD><PRE>
+/******************************
+        PATTERN(+rot)
+******************************/
+/*  0:*/
+PAT_MAP pat_testFile_000[] = {
+        PAT_MAP_DEF(  0,COL_256,cg_testFile_000,   0,   3, -16, -16,  16, 
+16,0x20B6,0x0000)
+};
+
+/*  1:*/
+PAT_MAP pat_testFile_001[] = {
+        PAT_MAP_DEF(  1,COL_256,cg_testFile_001,   0,   3, -16, -16,  16, 
+16,0xF60A,0x0000),
+        PAT_MAP_DEF(  1,COL_256,cg_testFile_001, -19,   5, -16, -16,  16, 
+16,0xEAAA,0x0000),
+        PAT_MAP_DEF(  2,COL_256,cg_testFile_002,  27, -17, -16, -16,  16, 
+16,0x18E2,0x0000)
+                ：      ↑
+                ：      スプライト番号、カラーモード(COL_16,COL_256,COL_DC)
+                ：      スプライトラベル、回転中心H座標、回転中心V座標、
+                ：　　　オフセットA、オフセットB、オフセットC、オフセットD、
+                ：      回転角度、反転情報（0x0010=H反転、0x0020=V反転）
+　
+　*回転中心座標＝パターン原点からの相対座標値
+　*オフセットA〜D＝回転中心点とスプライト（角度０°時）の各頂点との相対座標値
+　（A=TopLeft-H座標　B=TopLeft-V座標　C=BottomRight-H座標　D=BottomRight-V座標

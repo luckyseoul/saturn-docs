@@ -1,0 +1,188 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;72/86&gt;VDP2 User's Manual/13.1 Color offset specification</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no13">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p12_20.htm">Back</a> ｜ <A HREF="p14_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual</b><H2 ALIGN=CENTER> Chapter 13 Color offset function</H2><HR NOSHADE>
+<DL>
+<P><DD> The color offset function is a function that changes the screen color without changing the color RAM data by adding an offset value when outputting the color data of sprites and each scroll screen, and can be used for fade in, fade out, etc. Masu.</P>
+<P><DT><H2> ■13.1 Color offset specification</H2><DD> Two color offset values, Color Offset A and Color Offset B, can be set for each RGB, and you can specify which of these two to use for each screen. The color offset value is 9-bit data corresponding to each RGB, and if the color data resulting from adding each RGB is smaller than 00H, that color data is set to 00H and becomes larger than FFH. In all such cases, FFH is used.</P>
+<P><DD> Since the processing of the color offset function is performed after the processing of the color calculation function, the color offset value is added to the color data resulting from the color calculation. Also, since the color operation result screen is considered to be the top image screen, the color offset enable register is specified using the top image screen bits.</P>
+<P><DD> Color offset data is shown in Figure 13.1.</P>
+<A NAME="z13_1"></A><P><DD> <B>Figure 13.1 Color offset data</b><DD><PRE>
+   7  6  5  4  3  2  1  0
+  ┌──┬──┬──┬──┬──┬──┬──┬──┐
+  │   Color data 8 bits   │
+  └──┴──┴──┴──┴──┴──┴──┴──┘
+              　
+              +　
+              　
+   8  7  6  5  4  3  2  1  0　
+  ┌──┬──┬──┬──┬──┬──┬──┬──┬──┐
+  │  │   Color data 8 bits   │
+  └──┴──┴──┴──┴──┴──┴──┴──┴──┘
+ Sign　
+              ↓　
+  　
+   7  6  5  4  3  2   1  0　
+  ┌──┬──┬──┬──┬──┬──┬──┬──┐
+  │Output color data 8 bit│
+  └──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><A NAME="no13_11"></A><P><DT><H3>●Color offset enable register</H3><DD> The color offset enable register specifies whether to use the color offset function for each screen. This is a 16-bit write-only register located at address 180110H. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CLOFEN_"></A><P><DD> <B><FONT SIZE=5>CLOFEN</font> <FONT SIZE=4>180110H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCOEN_">SPCOEN</a></TH><TH><PRE> <A HREF="#NxCOEN_">BKCOEN</a></TH><TH><PRE> <A HREF="#NxCOEN_">R0COEN</a></TH><TH><PRE> <A HREF="#NxCOEN_">N3COEN</a></TH><TH><PRE> <A HREF="#NxCOEN_">N2COEN</a></TH><TH><PRE> <A HREF="#NxCOEN_">N1COEN</a></TH><TH><PRE> <A HREF="#NxCOEN_">N0COEN</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="NxCOEN_"></A><DT> <B>Color offset enable bit</b> : Color offset enable bit<DD> (N0COEN, N1COEN, N2COEN, N3COEN, R0COEN, BKCOEN, SPCOEN)<BR>
+ Specify whether to use the color offset function.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0COEN</TD><TD> 180110H</TD><TD> bit 0</TD><TD> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD> N1COEN</TD><TD> 180110H</TD><TD> bit 1</TD><TD> For NBG1 (or for EXBG)</TD></TR>
+<TR><TD> N2COEN</TD><TD> 180110H</TD><TD> bit 2</TD><TD> For NBG2</TD></TR>
+<TR><TD> N3COEN</TD><TD> 180110H</TD><TD> bit 3</TD><TD> For NBG3</TD></TR>
+<TR><TD> R0COEN</TD><TD> 180110H</TD><TD> bit 4</TD><TD> For RBG0</TD></TR>
+<TR><TD> BKCOEN</TD><TD> 180110H</TD><TD> bit 5</TD><TD> For BACK</TD></TR>
+<TR><TD> SPCOEN</TD><TD> 180110H</TD><TD> bit 6</TD><TD> for sprites</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> xxCOEN</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Do not use color offset function</TD></TR>
+<TR><TH> 1</TH><TD> Use the color offset function</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, BK, or SP.</P>
+<P><DD> If you are using the color calculation function, specify it using the color offset enable bit on the screen on the top image side.</P>
+<A NAME="no13_12"></A><P><DT><H3> ●Color offset select register</H3><DD> The color offset select register specifies the color offset register to use for each screen. This is a 16-bit write-only register located at address 180112H. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CLOFSL_"></A><P><DD> <B><FONT SIZE=5>CLOFSL</font> <FONT SIZE=4>180112H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCOSL_">SPCOSL</a></TH><TH><PRE> <A HREF="#NxCOSL_">BKCOSL</a></TH><TH><PRE> <A HREF="#NxCOSL_">R0COSL</a></TH><TH><PRE> <A HREF="#NxCOSL_">N3COSL</a></TH><TH><PRE> <A HREF="#NxCOSL_">N2COSL</a></TH><TH><PRE> <A HREF="#NxCOSL_">N1COSL</a></TH><TH><PRE> <A HREF="#NxCOSL_">N0COSL</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="NxCOSL_"></A><P><DT> <B>Color offset select bit</b> : Color offset select bit<DD> (N0COSL, N1COSL, N2COSL, N3COSL, R0COSL, BKCOSL, SPCOSL)<BR>
+ Specify the color offset register to use when using the color offset function.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0COSL</TD><TD> 180112H</TD><TD> bit 0</TD><TD> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD> N1COSL</TD><TD> 180112H</TD><TD> bit 1</TD><TD> For NBG1 (or for EXBG)</TD></TR>
+<TR><TD> N2COSL</TD><TD> 180112H</TD><TD> bit 2</TD><TD> For NBG2</TD></TR>
+<TR><TD> N3COSL</TD><TD> 180112H</TD><TD> bit 3</TD><TD> For NBG3</TD></TR>
+<TR><TD> R0COSL</TD><TD> 180112H</TD><TD> bit 4</TD><TD> For RBG0</TD></TR>
+<TR><TD> BKCOSL</TD><TD> 180112H</TD><TD> bit 5</TD><TD> For BACK</TD></TR>
+<TR><TD> SPCOSL</TD><TD> 180112H</TD><TD> bit 6</TD><TD> for sprites</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> xxCOSL</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Use color offset A value</TD></TR>
+<TR><TH> 1</TH><TD> Use color offset B value</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, BK, or SP.</P>
+<P><DD> If you are using the color calculation function, specify it using the color offset select bit on the top image side screen.</P>
+<A NAME="no13_13"></A><P><DT><H3> ●Color offset register</H3><DD> The color offset register specifies the RGB values of the color offset value. This is a 16-bit write-only register located at addresses 180114H to 18011EH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COAR_"></A><P><DD> <B><FONT SIZE=5>COAR</font> <FONT SIZE=4>180114H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#COFAB_">COARD8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#COFAB_">COARD7</a></TH><TH><PRE> <A HREF="#COFAB_">COARD6</a></TH><TH><PRE> <A HREF="#COFAB_">COARD5</a></TH><TH><PRE> <A HREF="#COFAB_">COARD4</a></TH><TH><PRE> <A HREF="#COFAB_">COARD3</a></TH><TH><PRE> <A HREF="#COFAB_">COARD2</a></TH><TH><PRE> <A HREF="#COFAB_">COARD1</a></TH><TH><PRE> <A HREF="#COFAB_">COARD0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COAG_"></A><P><DD> <B><FONT SIZE=5>COAG</font> <FONT SIZE=4>180116H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#COFAB_">COAGR8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#COFAB_">COAGR7</a></TH><TH><PRE> <A HREF="#COFAB_">COAGR6</a></TH><TH><PRE> <A HREF="#COFAB_">COAGR5</a></TH><TH><PRE> <A HREF="#COFAB_">COAGR4</a></TH><TH><PRE> <A HREF="#COFAB_">COAGR3</a></TH><TH><PRE> <A HREF="#COFAB_">COAGR2</a></TH><TH><PRE> <A HREF="#COFAB_">COAGR1</a></TH><TH><PRE> <A HREF="#COFAB_">COAGR0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COAB_"></A><P><DD> <B><FONT SIZE=5>COAB</font> <FONT SIZE=4>180118H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#COFAB_">COABL8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#COFAB_">COABL7</a></TH><TH><PRE> <A HREF="#COFAB_">COABL6</a></TH><TH><PRE> <A HREF="#COFAB_">COABL5</a></TH><TH><PRE> <A HREF="#COFAB_">COABL4</a></TH><TH><PRE> <A HREF="#COFAB_">COABL3</a></TH><TH><PRE> <A HREF="#COFAB_">COABL2</a></TH><TH><PRE> <A HREF="#COFAB_">COABL1</a></TH><TH><PRE> <A HREF="#COFAB_">COABL0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COBR_"></A><P><DD> <B><FONT SIZE=5>COBR</font> <FONT SIZE=4>18011AH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#COFAB_">COBRD8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#COFAB_">COBRD7</a></TH><TH><PRE> <A HREF="#COFAB_">COBRD6</a></TH><TH><PRE> <A HREF="#COFAB_">COBRD5</a></TH><TH><PRE> <A HREF="#COFAB_">COBRD4</a></TH><TH><PRE> <A HREF="#COFAB_">COBRD3</a></TH><TH><PRE> <A HREF="#COFAB_">COBRD2</a></TH><TH><PRE> <A HREF="#COFAB_">COBRD1</a></TH><TH><PRE> <A HREF="#COFAB_">COBRD0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COBG_"></A><P><DD> <B><FONT SIZE=5>COBG</font> <FONT SIZE=4>18011CH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#COFAB_">COBGR8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#COFAB_">COBGR7</a></TH><TH><PRE> <A HREF="#COFAB_">COBGR6</a></TH><TH><PRE> <A HREF="#COFAB_">COBGR5</a></TH><TH><PRE> <A HREF="#COFAB_">COBGR4</a></TH><TH><PRE> <A HREF="#COFAB_">COBGR3</a></TH><TH><PRE> <A HREF="#COFAB_">COBGR2</a></TH><TH><PRE> <A HREF="#COFAB_">COBGR1</a></TH><TH><PRE> <A HREF="#COFAB_">COBGR0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="COBB_"></A><P><DD> <B><FONT SIZE=5>COBB</font> <FONT SIZE=4>18011EH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#COFAB_">COBBL8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#COFAB_">COBBL7</a></TH><TH><PRE> <A HREF="#COFAB_">COBBL6</a></TH><TH><PRE> <A HREF="#COFAB_">COBBL5</a></TH><TH><PRE> <A HREF="#COFAB_">COBBL4</a></TH><TH><PRE> <A HREF="#COFAB_">COBBL3</a></TH><TH><PRE> <A HREF="#COFAB_">COBBL2</a></TH><TH><PRE> <A HREF="#COFAB_">COBBL1</a></TH><TH><PRE> <A HREF="#COFAB_">COBBL0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="COFAB_"></A><P><DT> <B>Color offset</b> data bit<DD> (COARD8〜COARD0, COAGR8〜COAGR0, COABL8〜COABL0, COBRD8〜COBRD0, COBGR8〜COBGR0, COBBL8〜COBBL0)<BR>
+ Set the RGB values for color offset A and color offset B. Set negative numbers using two's complement.<P/>
+<P><DD><TABLE BORDER>
+<TR><TD> COARD8〜COARD0</TD><TD> 180114H</TD><TD> bits 8-0</TD><TD> For RED data with color offset A</TD></TR>
+<TR><TD> COAGR8～COAGR0</TD><TD> 180116H</TD><TD> bits 8-0</TD><TD> For GREEN data of color offset A</TD></TR>
+<TR><TD> COABL8〜COABL0</TD><TD> 180118H</TD><TD> bits 8-0</TD><TD> For BLUE data of color offset A</TD></TR>
+<TR><TD> COBRD8～COBRD0</TD><TD> 18011AH</TD><TD> bits 8-0</TD><TD> For RED data with color offset B</TD></TR>
+<TR><TD> COBGR8～COBGR0</TD><TD> 18011CH</TD><TD> bits 8-0</TD><TD> For GREEN data of color offset B</TD></TR>
+<TR><TD> COBBL8〜COBBL0</TD><TD> 18011EH</TD><TD> bits 8-0</TD><TD> For BLUE data of color offset B</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p12_20.htm">Back</a> ｜ <A HREF="p14_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no13">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

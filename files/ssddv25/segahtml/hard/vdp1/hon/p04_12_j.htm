@@ -1,0 +1,240 @@
+﻿<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/54&gt;VDP1ユーザーズマニュアル/4.2フレームバッファ切り替えモードレジスタ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p04_11_j.htm">戻る</A>｜
+     <a href="p04_13_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第４章　システムレジスタ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_20"></A>
+	<P><DT><H2>■4.2　フレームバッファ切り替えモードレジスタ</H2>
+	<DD>　フレームバッファ切り替えモードレジスタ(FBCR、Frame buffer change　register)は、フレームバッファの描画と表示の切り替えと倍密インタレースの描画を制御します。書き込み専用の16ビットのレジスタで、100002H番地にあります。
+		電源投入後またはリセット後は、値は不定になりますので、必ず切り替えモードを設定してください。未使用ビットは0に設定してください。</P>
+
+	<P><DT><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH ROWSPAN=2><PRE>FBCR<BR>100002H<BR>(W)</TH>
+	<TH><PRE>bit15</TH><TH><PRE>bit14</TH><TH><PRE>bit13</TH><TH><PRE>bit12</TH><TH><PRE>bit11</TH><TH><PRE>bit10</TH><TH><PRE>bit９</TH><TH><PRE>bit８</TH>
+	<TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+	<TR ALIGN=CENTER>
+	<TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD>
+<TD>EOS</TD><TD>DIE</TD><TD>DIL</TD><TD>FCM</TD><TD>FCT</TD></TR></P>
+	</TABLE></P>
+
+<A NAME="fcb"></A>
+	<P><DT><B>フレームバッファ切り替えモードビット:</B>frame buffer change mode(FCM)、bit1
+<A NAME="fct"></A>
+		<DT><B>フレームバッファ切り替えトリガビット:</B>frame buffer change trigger(FCT)、bit0
+
+	<P><DT><UL TYPE=DISC>
+		<LI>通常、2つのフレームバッファは、1つを表面、他を裏面として使います。表面を表示させておき、裏面に描画します。そして1フレーム切り替え時間経過後、表面と裏面をトグルさせます。
+		表示させていた表面が描画される裏面になり、描画されていた裏面が表示される表面になります。</P>
+
+	<P><LI>フレームバッファのアクセスは、描画側にだけできます。表示側にはできません。</P>
+
+	<P><LI>1フレームに描画できるキャラクタの数には限りがあるので、多くのキャラクタを描画したいときは、マニュアルモードに設定し、イレースとチェンジをCPUから制御します。</P>
+
+	<P><LI>CPUからFBCRに任意のデータが書き込まれると、FCM、FCTの値はVDP1の内部でフィールドチェンジ時に更新されます。</P>
+
+	<P><LI>マニュアルモードのとき、FCTビットの設定は次のフレームに対してのみ有効です。フレームチェンジのときFCTの内容は内部で更新されます。</P>
+
+	<P><LI>FCM、FCTの設定は、VブランクOUTインタラプトの直後に行ってください。VブランクOUTインタラプト後の最初のHブランクINインタラプトから、次のHブランクINインタラプトまでは、アクセスが禁止されます。</UL></P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH><PRE>VBE</TH><TH><PRE>FCM</TH><TH><PRE>FCT</TH><TH><PRE>切り替えモード</TH><TH><PRE>切り替わり時間</TH></TR>
+	<TR ALIGN=CENTER><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD><PRE>1サイクルモード</TD><TD><PRE>1／60秒毎にチェンジ</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD><PRE>設定禁止</TD><TD><PRE>−</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD><PRE>マニュアルモード（イレース）</TD><TD><PRE>次フィールドでイレース</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD><PRE>マニュアルモード（チェンジ）</TD><TD><PRE>次フィールドでチェンジ</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD><PRE>設定禁止</TD><TD><PRE>−</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD><PRE>設定禁止</TD><TD><PRE>−</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD><PRE>設定禁止</TD><TD><PRE>−</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD><PRE>マニュアルモード<BR>（イレース＆チェンジ）</TD><TD><PRE>Vブランクでイレース、<BR>次フィールドでチェンジ</TD></TR>
+	</TABLE></P>
+
+<A NAME="no4_20_0"></A>
+	<P><DT><B>1サイクルモード</B>
+	<P><DT><UL TYPE=DISC>
+		<LI>通常のモードです。</P>
+	<P><LI>1フレームは1/60秒ごとに自動的に切り替わります。</P>
+	<P><LI>VBE、FCTビットの値は0に設定してください。</UL></P>
+
+<A NAME="no4_20_1"></A>
+	<P><DT><B>イレース(マニュアルモード)</B>
+	<P><DT><UL TYPE=DISC>
+		<LI>1フレームのイレースライトを、CPUから制御します。</P>
+	<P><LI>VBE=0、FCM=1、FCT=0のレジスタへの書き込み動作を行うことでフレームバッファのマニュアルイレースライトを指定します。指定した次のフィールドで表示フレームバッファにイレースライトが行われ、表示フレームバッファがクリアされます。</P>
+	<P><LI>描画と表示のフレームバッファの切り替えは行われません。イレースを行うと表示フレームバッファがクリアされてしまうので、表示を行う場合は、イレースを指定した次のフィールドでチェンジを指定して描画と表示の切り替えを行う必要があります。</P>
+	<P><LI>倍密インタレース等、2フィールド以上で1フレームになる場合に、このモードを使います。また、マニュアルモードから1サイクルモードに切り替える場合、切り替えの前のフィールドでこのイレースを使います。</P>
+	<P><LI>イレースは、2つ先のフィールドでフレームチェンジを行うことが分かっている場合に使います。直前のフィールドまでフレームチェンジが不明の場合は、イレース＆チェンジを使ってください。</UL></P>
+
+<A NAME="no4_20_2"></A>
+	<P><DT><B>チェンジ(マニュアルモード)</B>
+	<P><DT><UL TYPE=DISC>
+		<LI>1フレームの切り替えを、CPUから制御します。</P>
+	<P><LI>VBE=0、FCM=1、FCT=1のレジスタへの書き込み動作を行うことで切り替えを指定します。指定した次のフィールドで描画と表示の切り替えが行われます。</P>
+	<P><LI>イレースライトは行われないので、チェンジを指定する直前のフィールドでイレースを指定して、フレームバッファをイレースライトする必要があります。</P>
+	<P><LI>切り替えを指示するまでは、裏面にキャラクタを描画することができます。</P>
+	<P><LI>通常、1サイクルモードからマニュアルモードに切り替える場合にこのチェンジを使います。また、マニュアルモードでフレームバッファを切り替える場合に、このチェンジを使います。</UL></P>
+
+<A NAME="no4_20_3"></A>
+	<P><DT><B>イレース＆チェンジ(マニュアルモード)</B>
+	<P><DT><UL TYPE=DISC>
+		<LI>VBE＝1をレジスタに設定することで、Vブランクイレースを指定し、あわせてFCM＝1、FCT＝1を設定することで、Vブランク後のフレームバッファの切り替えを指定します。</P>
+	<P><LI>CPUの処理が終了するまで、フレームバッファを切り替えない場合など、直前のVブランクまでフレームチェンジが不明の場合に使います。</P>
+	<P><LI>一度VBE＝1を設定すると、次のVブランクでも自動的にイレースライトが行われてしまうので、フレームチェンジ後は次のVブランクの前までに、VBE＝0に設定してください。</P>
+	<P><LI>イレース＆チェンジの設定は、VブランクINインタラプトの直後に行ってください。それ以外に設定した場合、イレースできずにチェンジすることがあります。</P>
+	<P><LI>ノーマル、ハイレゾで、かつ、インタレースのようにフレームチェンジのタイミングが前もって分かっている場合は、イレースとチェンジを指定して、表示期間中のイレースライトを行ってください。
+			この場合、表示画面全体のイレースライトが可能になります。</UL></P>
+
+<A NAME="no4_21"></A>
+	<P><DT><B>●イレース＆チェンジを使用する場合のシーケンス</B></P>
+	
+	<P><DT><OL>
+		<LI>VBE＝0、FCM＝1、FCT＝1を設定します。</P>
+
+	<P><LI>TVモード選択、FB切り替えモードを設定せず、CPU等の処理の終了を待ちます。</P>
+
+	<P><LI>Vブランク直前のHブランクINインタラプト（224ライン表示時の224ライン目、240ライン表示時の240ライン目）までに、CPU の処理が終った場合、VBE＝1、FCM＝1、FCT＝1（イレース＆チェンジ）を設定します。
+		イレース＆チェンジの設定は、VブランクINインタラプトの直後に行ってください。</P>
+
+	<P><LI>VブランクINインタラプト終了後、Vブランクイレースが開始されます。</P>
+
+	<P><LI>Vブランク終了時点で、イレースライトが中断してフレームチェンジをします。</P>
+
+	<P><LI>イレースライトが完了していない場合、未消去部をポリゴンでイレースライトしてください。</P>
+
+	<P><LI>VブランクOUTインタラプト直後、VBEを0に戻し、Vブランクイレースを停止させておきます。</P>
+
+	<P><LI>(2)へ戻ります。</OL></P>
+
+<A NAME="no4_22"></A>
+	<P><DT><B>●使用例</B>
+		<DD>　フレームバッファ切り替えモードを使った例を次に示します。</P>
+
+<A NAME="t4_3a"></A>
+	<P><DD><B>表4.3(a)　フレームバッファ切り替えモード使用例(VBE＝0に固定)</B>
+		<DD><TABLE BORDER=1>
+	<TR><TD COLSPAN=2><PRE>設定値　*1</TD><TD ROWSPAN=2><PRE>　*2<BR>フレームバッファ0</TD><TD ROWSPAN=2><PRE>　*2<BR>フレームバッファ1</TD><TD ROWSPAN=2><PRE>フレームバッファ<BR>切り替えモード</TD><TD ROWSPAN=2><PRE>切り替わり<BR>時間</TD></TR>
+	<TR><TD><PRE>FCM</TD><TD><PRE>FCT</TD></TR>
+	<TR><TD><PRE>０</TD><TD><PRE>０</TD><TD><PRE>描画</TD>                <TD><PRE>表示＋イレースライト</TD><TD ROWSPAN=4><PRE>1サイクルモード</TD><TD ROWSPAN=5><PRE>60フレーム/秒</TD></TR>
+	<TR><TD><PRE>　</TD><TD><PRE>　</TD><TD><PRE>表示＋イレースライト</TD><TD><PRE>描画</TD>                </TR>
+	<TR><TD><PRE>　</TD><TD><PRE>　</TD><TD><PRE>描画</TD>                <TD><PRE>表示＋イレースライト</TD></TR>
+	<TR><TD><PRE>　</TD><TD><PRE>　</TD><TD><PRE>表示＋イレースライト</TD><TD><PRE>描画</TD>                </TR>
+	<TR><TD><PRE>１</TD><TD><PRE>１</TD><TD><PRE>描画</TD>                <TD><PRE>表示＋イレースライト</TD><TD><PRE>マニュアルモード（チェンジ）*3</TD></TR>
+	<TR><TD><PRE>　</TD><TD><PRE>　</TD><TD><PRE>表示</TD>                <TD><PRE>描画</TD>                <TD><PRE>　</TD><TD ROWSPAN=6><PRE>20フレーム/秒</TD></TR>
+	<TR><TD><PRE>１</TD><TD><PRE>０</TD><TD><PRE>表示</TD>                <TD><PRE>描画</TD>                <TD><PRE>マニュアルモード（イレース）*4</TD></TR>
+	<TR><TD><PRE>１</TD><TD><PRE>１</TD><TD><PRE>表示＋イレースライト</TD><TD><PRE>描画</TD>                <TD><PRE>マニュアルモード（チェンジ）*4</TD></TR>
+	<TR><TD><PRE>　</TD><TD><PRE>　</TD><TD><PRE>描画</TD>                <TD><PRE>表示</TD>                <TD><PRE>　</TD></TR>
+	<TR><TD><PRE>１</TD><TD><PRE>０</TD><TD><PRE>描画</TD>                <TD><PRE>表示</TD>                <TD><PRE>マニュアルモード（イレース）*5</TD></TR>
+	<TR><TD><PRE>０</TD><TD><PRE>０</TD><TD><PRE>描画</TD>                <TD><PRE>表示＋イレースライト</TD><TD ROWSPAN=3><PRE>1サイクルモード</TD></TR>
+	<TR><TD><PRE>　</TD><TD><PRE>　</TD><TD><PRE>表示＋イレースライト</TD><TD><PRE>描画</TD>                <TD ROWSPAN=2><PRE>60フレーム/秒</TD></TR>
+	<TR><TD><PRE>　</TD><TD><PRE>　</TD><TD><PRE>描画</TD>                <TD><PRE>表示＋イレースライト</TD></TR>
+	</TABLE></P>
+
+	<P><DT><B>[注]</B>
+		<DD><B>*1</B>　VブランクOUTインタラプト直後にレジスタに書き込む値です
+		<DD><B>*2</B>　フィールドの最初から切り替わります
+		<DD><B>*3</B>　チェンジで、1サイクルモードからマニュアルモードに切り替わります
+		<DD><B>*4</B>　イレース、チェンジは必ず続けて指定してください
+		<DD><B>*5</B>　1サイクルモードに切り替える直前のフィールドでは、イレースを指定してください</P>
+
+<A NAME="t4_3b"></A>
+	<P><DD><b>表4.3(b)　フレームバッファ切り替えモードの使用例(VBE使用)</B>
+	<DD><img srcset="../grp/i042_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="die"></A>
+<A NAME="dil"></A>
+	<P><DT><B>倍密インタレース有効ビット:</B>double interlace enable(DIE)、bit3
+		<DT><B>倍密インタレース描画ライン:</B>double interlace plot line(DIL)、bit2</P>
+
+<A NAME="dil_0"></A>
+	<P><DT><UL TYPE=DISC>
+		<LI>単密インタレース</A>では、偶数フィールドと奇数フィールドで同じ絵を表示します。
+		一方、倍密インタレースでは、偶数フィールド/奇数フィールドで、異なった絵(それぞれ偶数、奇数ラインのみ描画)を表示することによって、縦の解像度を2倍に増やしています。</P>
+
+	<P><LI>DIE=1で、倍密インタレースが有効になります。</P>
+	<P><LI>DIEを変更した後の最初の表示画面の内容は保証されません。</P>
+	<P><LI>倍密インタレースでは、フィールドの切り替えを1/60秒ごとにするために、FCM=FCT=0(1サイクルモード)にします。</UL></P>
+
+<A NAME="t_dil_0"></A>
+	<P><DD><TABLE BORDER=1>
+	<TR><TD><PRE>DIE</TD><TD><PRE>DIL</TD><TD><PRE>インタレースモード</TD><TD><PRE>次のフレームチェンジ後の描画</TD></TR>
+	<TR><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>ノンインタレース／<BR>単密インタレース</TD><TD><PRE>全ライン描画</TD></TR>
+	<TR><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>設定禁止</TD><TD><PRE>−</TD></TR>
+	<TR><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>倍密インタレース</TD><TD><PRE>偶数（EVEN）ラインのみ描画</TD></TR>
+	<TR><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>倍密インタレース</TD><TD><PRE>奇数（ODD）ラインのみ描画</TD></TR>
+	</TABLE></P>
+
+<A NAME="z4_1"></A>
+	<P><DD><B>図4.1　単密インタレースと倍密インタレースの表示</B>
+<PRE>
+　　　●単密インタレースの表示　　　　　　　　　　　●倍密インタレースの表示　　　　
+┌────────┐　　　　　　　　　　　　　┌────────┐　　　　　　　　　
+│　　０ライン　　├────────┐　　　　│　　０ライン　　├────────┐
+├────────┤　　０ライン　　│　　　　├────────┤　　１ライン　　│
+│　　１ライン　　├────────┤　　　　│　　２ライン　　├────────┤
+├────────┤　　１ライン　　│　　　　├────────┤　　３ライン　　│
+│　　２ライン　　├────────┤　　　　│　　４ライン　　├────────┤
+├────────┤　　２ライン　　│　　　　├────────┤　　５ライン　　│
+│　　３ライン　　├────────┤　　　　│　　６ライン　　├────────┤
+└────────┤　　３ライン　　│　　　　└────────┤　　７ライン　　│
+　　　　　　　　　└────────┘　　　　　　　　　　　　　└────────┘
+　・見た目は縦２５６ライン　　　　　　　　　　　・見た目は縦５１２ライン　　　　　　
+　・１／６０秒毎にフレームチェンジして　　　　　・各フレームバッファには、偶数　　　
+　　２回同じ描画をするか、　　　　　　　　　　　　（または奇数）ラインのみ描画　　　
+　　１／３０秒毎にフレームチェンジ　　　　　　　　　　　　　　　　　　　　　　　　　
+　（１／６０秒の信号を使用しＣＰＵから指示）　　　　　　　　　　　　　　　　　　　　
+</PRE></P>
+
+
+<A NAME="_z4_1_0"></A>
+	<P><DT><B>偶数／奇数座標選択ビット:</B>even/odd coordinate select bit(EOS)、bit4
+	
+	<P><DT><UL TYPE=DISC>
+		<LI>矩形スプライト、または変形スプライトで、ハイスピードシュリンク(HSS)を１に指定したとき、このビットは有効になります。HSS=1を指定すると、描画が　倍率＜１　になるラインは、
+		元絵データの偶数または奇数座標のいずれかのピクセルのみを、サンプリングして描画します。偶数／奇数座標のどちらの座標をサンプリングするかをこのビットで指定します。</P>
+
+	<P><LI>EOS=0のとき、偶数座標のピクセルのみをサンプリングします。EOS=1のとき、奇数座標のピクセルのみをサンプリングします。</P>
+
+	<P><LI>HSS=0を指定した場合は、このビットは参照されません。</P>
+
+	<P><LI>詳しくは、「<B><a href="p06_30_j.htm">6.3　描画モードワード</A></B>」の「<B><a href="p06_31_j.htm">ハイスピードシュリンク</A></B>」を参照してください。</UL></P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TD><PRE>EOS</TD><TD><PRE>偶数／奇数座標選択ビット</TD></TR>
+	<TR><TD><PRE>0</TD><TD><PRE>偶数座標のピクセルのみをサンプリング</TD></TR>
+	<TR><TD><PRE>1</TD><TD><PRE>奇数座標のピクセルのみをサンプリング</TD></TR>
+	</TABLE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p04_11_j.htm">戻る</A>｜
+     <a href="p04_13_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

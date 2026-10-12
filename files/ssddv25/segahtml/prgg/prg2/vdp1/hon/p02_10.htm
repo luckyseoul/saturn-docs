@@ -1,0 +1,171 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/11&gt;VDP1 Library/2.VDP1 Expansion Processing Guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">VDP1 library</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 library</b><H2 ALIGN=CENTER> 2.VDP1 extended processing guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A><P><DT><H3> 2.1 Purpose</H3><DT><UL TYPE="DISK">
+<P><LI> Supports VRAM management and writing sprite commands to VRAM, which are not included in the basic processing library.</P>
+<P><LI> You can display primitive sprites that correspond to sprite commands.</P>
+</UL>
+<A NAME="no2_20"></A><P><DT><H3> 2.2 How to manage VRAM area</H3><DD> The VRAM area (512K bytes) is allocated and used as shown below.</P>
+<P ALIGN=CENTER><img srcset="../grp/i004_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>[Description of each area]</b><DT><UL TYPE "DISK">
+<P><LI> <B>VRAM area reference switch command area</b><BR>
+ This is a sprite jump command to switch VRAM areas 0 and 1 according to frame changes.</P>
+<P><LI> <B>System command area</b><BR>
+ This is the area where this access routine expands the command for erasing the frame buffer by drawing polygons when frame changes are performed manually at irregular intervals. The same size exists in areas 0 and 1.</P>
+<P><LI> <B>User command area</b><BR>
+ This is an area where sprite commands are set sequentially from the top by various command setting routines called between SPR_2OpenCommand() and SPR_2CloseCommand() routines. The same size exists in areas 0 and 1.</P>
+<P><LI> <B>gouraud shading table area</b><BR>
+ This area stores Gouraud shading tables of 8 bytes per entry, and is managed using numbers starting from 0. The same size exists in areas 0 and 1.</P>
+<P><LI> <B>color lookup table area</b><BR>
+ This area stores a color lookup table of 32 bytes per entry, and is managed using numbers starting from 0. Commonly referenced from areas 0 and 1.</P>
+<P><LI> <B>block pool area</b><BR>
+ This area is commonly referenced from command areas 0 and 1 and stores character data, subroutine commands (subroutine commands are currently not supported), etc. Character data is managed using numbers starting from 0. Character data etc. are allocated to this area and dynamically acquired/released in block units (32 bytes).</P>
+</UL>
+<P><DT> <B>[Allocation size of each area]</b><DD> Allocate the size of each area as follows. One block is 32 bytes.</P>
+<P><DD><TABLE BORDER>
+<TR><TH><PRE> Area name</TH><TH><PRE> Number of blocks</TH></TR>
+<TR><TD><PRE> VRAM area reference switch command</TD><TD><PRE> 1</TD></TR>
+<TR><TD><PRE> System command area</TD><TD><PRE> 4×2</TD></TR>
+<TR><TD><PRE> User command area</TD><TD><PRE> COMMAND_MAX×2</TD></TR>
+<TR><TD><PRE> gouraud shading table area</TD><TD><PRE> (GOUR_TBL_MAX+3)/4×2</TD></TR>
+<TR><TD><PRE> color lookup table area</TD><TD><PRE> LOOKUP_TBL_MAX</TD></TR>
+<TR><TD><PRE> block pool area</TD><TD><PRE> All remaining blocks</TD></TR>
+</TABLE>
+</P>
+<DD> COMMANND_MAX: Maximum number of commands<DD> GOUR_TBL_MAX: Maximum number of Gouraud shading tables<DD> LOOKUP_TBL_MAX: Maximum number of lookup tables</P>
+<P><DD> These values are defined using the VDP1 extended processing work area definition macro described later.</P>
+<P><DT> <B>[Block allocation algorithm in block pool area]</b></P>
+<P><DD> <B>●In case of acquisition</b><BR>
+ Searches for a free contiguous block area that satisfies the requested block size and allocates the smallest area.</P>
+<P><DD> <B>●In case of release</b><BR>
+ If the specified block area is released and there is an adjacent free block, the free blocks are made continuous and combined into a large free block.</P>
+<A NAME="no2_30"></A><P><DT><H3> 2.3 Draw order of sprite commands to the frame buffer</H3><DD> The drawing priority number when calling the sprite command setting routine below.<BR>
+ By specifying the number, you can set the drawing order for each command.</P>
+<DD><TABLE BORDER=0>
+<TR><TD><PRE> SPR_2LocalCoord()</TD><TD><PRE> SPR_2SysClip()</TD><TD><PRE> SPR_2UserClip()</TD><TD><PRE> SPR_2line()</TD></TR>
+<TR><TD><PRE> SPR_2polyLine()</TD><TD><PRE> SPR_2Polygon()</TD><TD><PRE> SPR_2NormSpr()</TD><TD><PRE> SPR_2ScaleSpr()</TD></TR>
+<TR><TD><PRE> SPR_2DistSpr()</TD><TD><PRE> SPR_2Cmd()</TD><TD></TD><TD></TD></TR>
+</TABLE>
+</P>
+<P><DD> The drawing priority number indicates the drawing block number, and block number 0 is drawn first. Also, within the same block, commands are drawn in the order they are registered.</P>
+<P ALIGN=CENTER><img srcset="../grp/i006_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+ The drawing order setting operation is performed when calling the SPR_2CloseCommand() and SPR_2FlushDrawPrty() routines.<BR>
+ The control word jump specification and link specification word in the command are changed.<P> The number of blocks for this drawing order management is specified in advance in the 2D work area definition. Prioritize drawing<BR>
+ If you do not want to do this, you can specify it in the 2D work area definition and SPR_2OpenCommand().<BR>
+<A NAME="no2_40"></A><P><DT><H3> 2.4 Example of program description</H3><DD> An example of an actual program in C language is shown below.</P>
+<DD><PRE>
+#include&lt; machine.h&gt;
+#define _SPR2_ /* Use sprite display extension library */
+#include "sega_spr.h"
+#include "sega_scl.h"
+#include "sega_int.h"<P>
+#define COMMAND_MAX 512 /* Maximum number of commands */
+#define GOUR_TBL_MAX 512 /* Maximum number of GOUR_TBL_MAX */
+#define LOOKUP_TBL_MAX 512 /* Maximum number of lookup tables */
+#define CHAR_MAX 100 /* Maximum number of characters */
+#define DRAW_PRTY_MAX 256 /* Maximum number of drawing priority blocks */
+SPR_2DefineWork(work2d, COMMAND_MAX, GOUR_TBL_MAX,
+                      LOOKUP_TBL_MAX, CHAR_MAX, DRAW_PRTY_MAX)
+                                          /* 2D work area definition */
+extern void vbStart(void); /* V-BLANK IN interrupt routine */
+extern void vbEnd(void); /* V-BLANK OUT interrupt routine */
+
+main()
+{
+      set_imask(0); /* Enable interrupts */
+
+     SCL_Vdp2Init(); /* Scroll and priority initialization */
+
+     SCL_SetPriority(SCL_SP0|SCL_SP1|SCL_SP2|SCL_SP3|SCL_SP4|
+                              SCL_SP5|SCL_SP6|SCL_SP7,7);
+     SCL_SetSpriteMode(SCL_TYPE1,SCL_MIX,SCL_SP_WINDOW);
+     SPR_2Initial(&work2d); /* 2D sprite display initialization */
+
+     INT_ChgMsk(INT_MSK_NULL, INT_MSK_VBL_IN | INT_MSK_VBL_OUT);
+                                          /* Disable V-BLANK interrupt */
+     INT_SetFunc(INT_SCU_VBLK_IN, &vbStart);
+                                          /* Register V-BLANK IN interrupt routine */
+     INT_SetFunc(INT_SCU_VBLK_OUT, &vbEnd);     
+                                          /* Register V-BLANK OUT interrupt routine*/
+     INT_ChgMsk( INT_MSK_VBL_IN | INT_MSK_VBL_OUT, INT_MSK_NULL);
+                                          /* Enable V-BLANK interrupt */
+
+     for(;;){
+         SPR_2SetChar(...); /* Set character data to VRAM */
+     }
+
+     SPR_2FrameChgIntr(0xffff); /* Frame change interval */
+                                          /* Set to indeterminate mode */
+
+     for(;;){
+
+                   ------------- /* Scroll data set */
+
+          SPR_2OpenCommand(SPR_2DRAW_PRTY_OFF);
+                                          /* Open for command writing */
+          SPR_2SysClip(0,&xy); /* System clip area command */
+          SPR_2LocalCoord(0,&xy); /* Local coordinate command */
+
+          SPR_2Polygon(...); /* Various sprite commands */
+          SPR_2NormSpr(...); /* .
+                          .
+                          .
+
+          SPR_2CloseCommand(); /* Close command write */
+
+          SCL_DisplayFrame(); /* Wait for V-BLANK interrupt */
+                                          /* Display sprite and perform scrolling */
+     }
+}
+
+−V blank processing routine (source file separate from the main above) −
+
+#include&lt; machine.h&gt;
+#include "sega_spr.h"
+#include "sega_scl.h"
+
+#pragma interrupt(VbStart)
+#pragma interrupt(VbEnd)
+
+void VbStart(void)
+{
+     SCL_VblankStart(); /* V blank start VDP interrupt processing */
+             -------- /* Other V blank start processing */
+}
+
+void VbEnd(void)
+{
+     SCL_VblankEnd(); /* V blank end VDP interrupt processing */
+             -------- 
+}
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">VDP1 library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

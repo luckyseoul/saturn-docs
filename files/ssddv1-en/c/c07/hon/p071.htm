@@ -1,0 +1,46 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p070.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p073.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD><TABLE BORDER CELLPADDING=5>
+<TH WIDTH = 170 ALIGN = "CENTER"> <PRE> Function </TH> <TH WIDTH = 170 ALIGN = "CENTER"> <PRE> Functional Macro </TH> <TH WIDTH = 100 ALIGN = "CENTER" > <PRE> number </TH> <TR>
+<TD ALIGN = "LEFT"> <PRE> Counter value-> Microsecond conversion </TD> <TD ALIGN = "LEFT"> <PRE> TIM_FRT_CNT_TO_MCR </TD> <TD ALIGN = "LEFT"> <PRE> 15 </TD><TR>
+<TD ALIGN = "LEFT"> <PRE> microseconds-> counter value conversion </TD> <TD ALIGN = "LEFT"> <PRE> TIM_FRT_MCR_TO_CNT </TD> <TD ALIGN = "LEFT"> <PRE> 16 </TD>
+</TABLE><P>
+<DT> <H3> Usage </H3>
+<UL> <B> Initialization </B> <BR>
+Execute the following function format macro before acquiring the elapsed time and using the wait (WAIT) function. <P>
+<TABLE BORDER CELLPADDING=5>
+<TH WIDTH = 170 ALIGN = "CENTER"> <PRE> Function </TH> <TH WIDTH = 170 ALIGN = "CENTER"> <PRE> Functional Macro </TH> <TH WIDTH = 100 ALIGN = "CENTER" > <PRE> number </TH> <TR>
+<TD ALIGN = "LEFT"> <PRE> FRT initialization </TD> <TD ALIGN = "LEFT"> <PRE> TIM_FRT_INIT </TD> <TD ALIGN = "LEFT"> <PRE> 8 </TD>
+</TABLE><P>
+<B> How to get elapsed time </B> <BR>
+The following functions are provided for obtaining elapsed time. <P>
+<TABLE BORDER CELLPADDING=5>
+<TH WIDTH = 170 ALIGN = "CENTER"> <PRE> Function </TH> <TH WIDTH = 170 ALIGN = "CENTER"> <PRE> Functional Macro </TH> <TH WIDTH = 100 ALIGN = "CENTER" > <PRE> number </TH> <TR>
+<TD ALIGN = "LEFT"> <PRE> Counter value setting (16 bits) </TD> <TD ALIGN = "LEFT"> <PRE> TIM_FRT_SET_16 </TD> <TD ALIGN = "LEFT"> <PRE> 9 </TD><TR>
+<TD ALIGN = "LEFT"> <PRE> Counter value acquisition (16 bits) </TD> <TD ALIGN = "LEFT"> <PRE> TIM_FRT_GET_16 </TD> <TD ALIGN = "LEFT"> <PRE> 10 </TD>
+</TABLE><P>
+<PRE>void sysInit()
+{
+     TIM_FRT_INIT (8); / * Set frequency division to 8 * /
+     ...
+}</PRE><P>
+<PRE>void writeFrameBuff()
+{
+     Uint16 count; / * Acquisition count value storage area * /
+     float micro_sec; / * Microsecond storage area * /
+     TIM_FRT_SET_16 (0); / * Set the count value to 0 * /
+     WriteAllVram (); / * Process execution you want to measure * /
+     count = TIM_Frt_Get_16 (); / * Get the count value * /
+                                           / * count indicates the execution time of WriteAllVram () * /
+     micro_sec = TIM_FRT_CNT_TO_MCR (count); / * Convert counter value to microsecond * /
+     printDisplay (micro_sec); / * Display elapsed time on the screen * /
+}</PRE></UL><P>
+</DL><P><P><HR>
+<A HREF=p070.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p073.htm> Go to next page </A>
+</BODY>
+</HTML>

@@ -1,0 +1,70 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/54&gt;VDP1 User's Manual/4.1TV Mode Selection Register</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p04_12.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 4 System Registers</b><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H2> ■4.1 TV mode selection register</H2><DD> The TV mode selection register (TVMR, TV mode register) specifies V blank erase permission and TV display mode. This is a 16-bit write-only register located at address 100000H. The value will be undefined after the power is turned on or reset, so be sure to set the TV display mode. Fix unused bits to 0.</P>
+<P><DT><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> TVMR<BR> 100000H<BR> (W)</TH><TH><PRE> bit15</TH><TH><PRE> bit14</TH><TH><PRE> bit13</TH><TH><PRE> bit12</TH><TH><PRE> bit11</TH><TH><PRE> bit10</TH><TH><PRE> bit9</TH><TH><PRE> bit8</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> 0</TH><TD> <A HREF="#VBE_">VBE</a></TH><TD COLSPAN=3> <A HREF="#TVM_">TVM</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="VBE_"></A><P><DT> <B>V blank erase write enable bit:</b> V blank erase/write enable (VBE), bit3</P>
+<P><DT><UL TYPE=DISC>
+<LI> When VBE=1, erase write is performed during V blank. VBE=1 can be set only when FCM=1 and FCT=1 are written. For more information, see <B><A HREF="p04_12.htm">4.2 Frame Buffer Switching Mode Register</a></b> .</P>
+<P><LI> When setting the VBE value to 0 or 1, be sure to set the TVM with the same value as before setting at the same time.</P>
+<P><LI> Set VBE immediately after the V blank IN interrupt. Access is prohibited from the first H blank IN interrupt after the V blank IN interrupt until the next H blank IN interrupt.</UL>
+</P>
+<A NAME="TVM_"></A><P><DT> <B>TV mode selection bit:</b> TV mode select (TVM), bit2~0</P>
+<P><DT><UL TYPE=DISC>
+<LI> Specify the TV display mode.</P>
+<P><LI> Please refer to " <B><A HREF="p01_20.htm">Screen mode and display range</a></b> " for the coordinate values of the displayed area.</P>
+<P><LI> When TVM=010B(2), the frame buffer is only 512 pixels wide x 256 pixels high, so if you tilt the screen too much, a transparent area will appear on the display screen.</P>
+<P><LI> When specifying HDTV (TVM=100B(4)), only non-interlace can be set, and when specifying rotated display (TVM=010B(2), 011B(3)), only non-interlace and single density interlace can be set. Disable double-dense interlacing (DIE bit = 0) using the frame buffer switching mode register. For details, see " <B><A HREF="p04_12.htm">4.2 Frame Buffer Switching Mode Register</a></b> ".</P>
+<P><LI> Set TVM between the second H blank IN interrupt after the V blank IN interrupt and the H blank IN interrupt immediately after the V blank OUT interrupt.</P>
+<P><LI> The functions of each bit are as follows, but there are restrictions on the combinations of bits, so please strictly adhere to the setting values in Table 4.2.</P>
+<A NAME="TVM_2"></A><P><DT> <B>Bit 2: HDTV enable bit</b><DD> 0=NTSC, PAL<DD> 1=HDTV, 31kHz</P>
+<A NAME="TVM_1"></A><P><DT> <B>Bit 1: Frame buffer rotation enable bit</b><DD> 0=no rotation<DD> 1=rotation</P>
+<A NAME="TVM_0"></A><P><DT> <B>Bit 0: Bit width selection bit</b><DD> 0=16bit/pixel<DD> 1=8bit/pixel</P>
+</DU>
+<A NAME="t4_2"></A><P><DD> <B>Table 4.2 Screen mode</b><DT><TABLE BORDER=1>
+<TR><TD COLSPAN=3><PRE> TVM</TD><TD COLSPAN=2><PRE> screen mode</TD><TD ROWSPAN=2><PRE> bit width</TD><TD ROWSPAN=2><PRE> frame buffer<BR> Screen size</TD><TD ROWSPAN=2><PRE> Inter<BR> race</TD><TD COLSPAN=2><PRE> VDP CLK (MHz)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> bit2</TD><TD><PRE> bit1</TD><TD><PRE> bit0</TD><TD><PRE> name</TD><TD><PRE> resolution</TD><TD><PRE> NTSC time</TD><TD><PRE> When PAL</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> normal<BR> (NTSC, PAL)</TD><TD><PRE> 320×224<BR> 320×240<BR> 352×224<BR> 352×240</TD><TD><PRE> 16bit/pixel</TD><TD><PRE> Horizontal 512<BR> ×<BR> Vertical 256</TD><TD><PRE> Possible</TD><TD><PRE> 26.8426<BR> 26.8426<BR> 28.6364<BR> 28.6364</TD><TD><PRE> 26.6564<BR> 26.6564<BR> 28.4375<BR> 28.4375</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> 1</TD><TD><PRE> high resolution<BR> (NTSC, PAL<BR> high resolution)</TD><TD><PRE> 640×224<BR> 640×240<BR> 704×224<BR> 704×240</TD><TD><PRE> 8bit/pixel</TD><TD><PRE> Horizontal 1024<BR> ×<BR> Vertical 256</TD><TD><PRE> Possible</TD><TD><PRE> 26.8426<BR> 26.8426<BR> 28.6364<BR> 28.6364</TD><TD><PRE> 26.6564<BR> 26.6564<BR> 28.4375<BR> 28.4375</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 0</TD><TD><PRE> 1</TD><TD><PRE> 0</TD><TD><PRE> rotation 16<BR> (NTSC, PAL<BR> rotate)</TD><TD><PRE> 320×224<BR> 320×240<BR> 352×224<BR> 352×240</TD><TD><PRE> 16bit/pixel</TD><TD><PRE> Horizontal 512<BR> ×<BR> Vertical 256</TD><TD><PRE> Single density only<BR> Possible</TD><TD><PRE> 26.8426<BR> 26.8426<BR> 28.6364<BR> 28.6364</TD><TD><PRE> 26.6564<BR> 26.6564<BR> 28.4375<BR> 28.4375</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 0</TD><TD><PRE> 1</TD><TD><PRE> 1</TD><TD><PRE> rotation 8<BR> (NTSC, PAL<BR> rotate)</TD><TD><PRE> 320×224<BR> 320×240<BR> 352×224<BR> 352×240</TD><TD><PRE> 8bit/pixel</TD><TD><PRE> Horizontal 512<BR> ×<BR> Vertical 512</TD><TD><PRE> Single density only<BR> Possible</TD><TD><PRE> 26.8426<BR> 26.8426<BR> 28.6364<BR> 28.6364</TD><TD><PRE> 26.6564<BR> 26.6564<BR> 28.4375<BR> 28.4375</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> HDTV<BR> (31kHz, HDTV)</TD><TD><PRE> 320×240<BR> 352×240</TD><TD><PRE> 16bit/pixel</TD><TD><PRE> Width 512×<BR> Vertical 256</TD><TD><PRE> Ban</TD><TD><PRE> 26.8426<BR> 28.6364</TD><TD><PRE> 26.6564<BR> 28.4375</TD></TR>
+</TABLE>
+</P>
+<P><DT><TABLE BORDER=0>
+<TR><TD><img srcset="../../../what/atto.png 5x"></TD><TD> <B>Strictly observed★Settings other than those listed above are prohibited (please do not set them)</b></TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p04_12.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

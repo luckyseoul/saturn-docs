@@ -1,0 +1,70 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/11&gt; P.S. Write Once Appendix A. Related Tool “ADDGEN”</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">P.S. Write Once</a><HR>
+ <B>▲ <A HREF="p08_10.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>P.S. Write Once System User's Manual</b><H2 ALIGN=CENTER> Appendix A. Related tool “ADDGEN”</H2><HR NOSHADE>
+<DL>
+<A NAME="noa_1"></A><P><DT><H3> A.1 Overview</H3><DD> ADDGEN is a tool that automatically generates subcommand files for ADDCDW.<BR>
+ Modifying both the VCDBUILD script file (hereinafter referred to as script file) and the ADDCDW subcommand file in order to update the files on the CD-R disc is time consuming and likely to cause inconsistencies.<BR>
+ To solve this problem, simply modify the script file and the corresponding ADDCDW subcommand file will be automatically generated.</P>
+<A NAME="noa_2"></A><P><DT><H3> A.2 Function</H3><DD> Compares the script file with the CD-R disc and outputs a subcommand file for ADDCDW to add/delete/replace changed files. In other words, use ADDCDW to find out what kind of update processing should be performed on the CD to make it the same as the file structure described in the script file.<BR>
+ Compares the date and time of the file on DOS and the file on the CD-R disk, and determines that the file has been changed if the file on DOS is newer.</P>
+<A NAME="za_1"></A><P ALIGN=CENTER> <B>Figure A.1 ADDGEN data flow</b><BR>
+<img srcset="../grp/i023_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="noa_3"></A><P><DT><H3> A.3 How to start</H3><DD> Enter the command in the following format from the DOS prompt.</P>
+<P><DL>
+<DD> <B>C:</b>&gt; <B>addgen script file name [subcommand file name] [options]</b></DL>
+</P>
+<P><DT> <B>(1) Script file name</b><DD> Name of the script file that describes the contents of the updated CD-ROM.<BR>
+ If the extension is omitted, ".scr" is assumed to be omitted.</P>
+<P><DT> <B>(2) Subcommand file name</b><DD> Name of the ADDCDW subcommand file to be output.<BR>
+ If omitted, a subcommand file with the script file name extension ".cdw" will be output.</P>
+<P><DT> <B>(3) Options</b><DL>
+<P><DT> <B>-c</b> :<DD> Compares the contents of the file on DOS and the file on the CD-R disk, and replaces the file if there is a change. Required if you want to update a file with an older date/time.<BR>
+ However, interleaved files, MPEG streams, and CDDA files are compared by date and time.</P>
+<P><DT> <B>-e</b> :<DD> Display messages in English. If omitted, the language mode of DOS is determined and the message is displayed in either Japanese or English.</P>
+</DL>
+<A NAME="noa_4"></A><P><DT><H3> A.4 Operation details</H3><DD> Compares the script file with the last session on the CD-R disc and outputs the subcommand file. Outputs each subcommand in the following cases.</P>
+<P><DT> <B>(1) Full-page append subcommand</b><DD><OL TYPE=a>
+<B><LI></b> If the CD-R disc set in the CD-R drive is new.<B><LI></b> If you want to update the directory structure.<B><LI></b> When updating files that are interleaved.</OL>
+<P><DT> <B>(2) File addition subcommand</b><DD><OL TYPE=a>
+<B><LI></b> When the script file contains a file that is not on the CD-R disc.</OL>
+<P><DT> <B>(3) File deletion subcommand</b><DD><OL TYPE=a>
+<B><LI></b> If the file on the CD-R disc is not in the script file.</OL>
+<P><DT> <B>(4) File replacement subcommand</b><DD><OL TYPE=a>
+<B><LI></b> Compares files in the way specified in the options and if the files have changed.</OL>
+<A NAME="noa_5"></A><P><DT><H3> A.5 Error level</H3><DD> The following error levels are returned to DOS according to the execution results.</P>
+<P><DT> <B>(1) Error level: 0</b><DD> Successfully completed. A subcommand file will be output and you can run ADDCDW.</P>
+<P><DT> <B>(2) Error level: 1</b><DD> It is necessary to add the entire file, but no disk image file or TOC file has been created.<BR>
+ A subcommand file will be output, and you can run ADDCDW by executing VCDBUILD and VCDMKTOC.</P>
+<P><DT> <B>(3) Error level: 2</b><DD> Processing cannot continue. See <A HREF="p07_10.htm#t7_1">error message</a> for details.</P>
+<A NAME="noa_6"></A><P><DT><H3> A.6 Limitations</H3><DT><OL TYPE=a>
+<P><B><LI></b> The number of files that can be written in the script file must be less than or equal to the number displayed in "MAX FILE" at startup.</P>
+</OL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_10.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">P.S. Write Once</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

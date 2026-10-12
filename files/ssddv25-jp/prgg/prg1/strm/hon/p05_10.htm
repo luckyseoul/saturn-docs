@@ -1,0 +1,171 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/18&gt;ストリームシステムライブラリ/5.ストリームアクセスの例</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p06_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ストリームシステムライブラリ</B>
+<H2 ALIGN=CENTER>5.ストリームアクセスの例</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A>
+	<P><DT><H3>5.1　基本的なプログラム</H3>
+	<P><DT><B>　(1)ストリームの読み込み</B>
+		<DD>　ストリームA，B，Cをa_buf, b_buf, c_bufに読み込みます。<BR>　(A_BUFSIZE, B_BUFSIZE, C_BUFSIZEはセクタ単位のバッファサイズ)</P>
+
+	<P><DD><PRE>
+Uint8    work[STM_WORK_SIZE(STMGRP_OPEN_MAX, STM_OPEN_MAX)]; /* 作業領域　　　　　　　　　　　*/
+Sint32     a_id, b_id, c_id;                                 /* ファイル識別子　　　　　　　　*/
+StmGrpHn   abc_grp;                                          /* ストリームグループハンドル　　*/
+StmHn      a_stm, b_stm, c_stm;                              /* ストリームハンドル　　　　　　*/
+StmKey     key;                                              /* ストリームキー　　　　　　　　*/
+Uint8      a_buf[A_BUFSIZE * STM_UNIT_FORM1];                /* 転送領域Ａ　　　　　　　　　　*/
+Uint8      b_buf[B_BUFSIZE * STM_UNIT_FORM2];                /* 転送領域Ｂ　　　　　　　　　　*/
+Uint8      c_buf[C_BUFSIZE * STM_UNIT_FORM1];                /* 転送領域Ｃ　　　　　　　　　　*/<P>
+GFS_Init(･･･);                                               /* ファイルシステムの初期化　　　*/
+STM_Init(STMGRP_OPEN_MAX, STM_OPEN_MAX, work);               /* ストリームシステムの初期化　　*/
+a_id = GFS_NameToId(･･･);                                    /* ファイル識別子の取得　　　　　*/
+　　 ・
+　　 ・
+　　 ・
+abc_grp = STM_OpenGrp();                                     /* ストリームグループのオープン　*/
+                                                             /* ストリームキーの設定　　　　　*/
+STM_KEY_CN(&amp;key) = STM_KEY_NONE;                             /* チャネル番号　　　　　　　　　*/
+STM_KEY_CIMSK(&amp;key) = STM_KEY_CIVAL(&amp;key) = STM_KEY_NONE;    /* コーディング情報　　　　　　　*/
+/* ファイル識別子によるストリームのオープン */
+STM_KEY_SMMSK(&amp;key) = STM_KEY_SMVAL(&amp;key) = STM_SM_VIDEO;    /* ビデオストリーム　　　*/
+a_stm = STM_OpenFid(abc_grp, a_id, &amp;key, STM_LOOP_NOREAD);   /* ストリームＡ　　　　　*/
+STM_KEY_SMMSK(&amp;key) = STM_KEY_SMVAL(&amp;key) = STM_SM_AUDIO;    /* オーディオストリーム　*/
+b_stm = STM_OpenFid(abc_grp, b_id, &amp;key, STM_LOOP_NOREAD);   /* ストリームＢ　　　　　*/
+STM_KEY_SMMSK(&amp;key) = STM_KEY_SMVAL(&amp;key) = STM_SM_DATA;     /* データストリーム　　　*/
+c_stm = STM_OpenFid(abc_grp, c_id, &amp;key, STM_LOOP_NOREAD);   /* ストリームＣ　　　　　*/<P>
+/* 転送領域の設定　　 */
+STM_SetTrBuf(a_stm, a_buf, A_BUFSIZE, STM_UNIT_FORM1);
+STM_SetTrBuf(b_stm, b_buf, B_BUFSIZE, STM_UNIT_FORM2);
+STM_SetTrBuf(c_stm, c_buf, C_BUFSIZE, STM_UNIT_FORM1);<P>
+/* ストリームアクセス */
+STM_SetExecGrp(abc_grp);              /* 実行グループの設定　　　　　　*/
+while (1) {
+    if (STM_ExecServer() == STM_EXEC_COMPLETED) {
+        break;                        /* ストリームアクセス終了　　　　*/
+    }
+    user();                           /* ユーザ処理　　　　　　　　　　*/
+}
+STM_CloseGrp(abc_grp);                /* ストリームグループのクローズ　*/</PRE><BR>
+</PRE></P>
+
+	<P><DT><B>(2)転送領域の設定</B>
+		<DD>　転送領域の設定において、以下の2つは処理方法が異なります。</P>
+	<P><DD>　(a) STM_SetTrBuf(stm, buffer, A_BUFSIZE, STM_UNIT_FORM1)</P>
+	<P><DD>　(b) STM_SetTrBuf(stm, buffer, A_BUFSIZE * STM_UNIT_FORM1, STM_UNIT_WORD)</P>
+
+	<P><DD><B>(a) 転送領域の大きさがセクタ単位の場合</B>
+		<DD>　CDブロック内の区画から取り出せるセクタ数があらかじめ明らかなので、以下のように処理することができます。</P>
+
+<A NAME="z5_1"></A>
+	<P ALIGN=CENTER><B>図5.1　セクタ単位の場合の転送処理</B><BR><IMG SRC="../grp/i064_01.gif"></P>
+
+	<P><DD><B>(b) 転送領域の大きさがセクタ単位でない場合</B>
+		<DD>　CDブロック内の区画から取り出せるセクタ数が不明なので、以下のように処理します。</P>
+
+<A NAME="z5_2"></A>
+	<P ALIGN=CENTER><B>図5.2　セクタ単位でない場合の転送処理</B><BR><IMG SRC="../grp/i064_02.gif"></P>
+
+	<P><DD>　点線のループを繰り返す間、次のストリームの転送はできません。したがって、2つ以上のストリームを同時にアクセスする場合は、特殊な場合を除き、(a)の方法で転送するべきです。<BR>　1つのストリームにForm1セクタとForm2セクタが混在しているような場合は、(b)の方法で転送するしかありません。</P>
+
+	<P><DT><B>　(3)転送関数の設定</B>
+		<DD>　プログラム(1)においてストリームBのデータを関数「decodeFunc」を使って展開しながらread_bufへ転送する場合、以下のように変更します。</P>
+
+	<P><DD>(ａ)点線部のSTM_SetTrBufをSTM_SetTrFuncに変更します。<P>
+
+	<P><DD>STM_SetTrFunc(b_stm, decodeFunc, read_buf);</P>
+
+	<P><DD>　これによりdecodeFuncは、サーバ関数STM_ExecServerがストリームＢのデータ転送を試みるごとに起動します。</P>
+
+	<P><DD>(ｂ)「decodeFunc」は以下のようになります。</P>
+
+	<P><DD><PRE>
+Uint8　read_buf[READBUF_SIZE];
+
+Sint32　　 decodeFunc(void *obj, StmHn stm, Sint32 nsct)
+{
+	Sint32	i;
+	Sint32	read_len;	/* subFuncが転送したロングワード数         */
+	Sint32	nlongword;	/* 転送ロングワード数                      */
+	Uint32	*src;		/* 転送元アドレス                          */
+	Sint32	dadr;		/* １ロングワード転送ごとのアドレス/変化分 */
+	Uint32	*buffer;	/* 転送領域                                */
+
+	/* セクタ数からワード数への変換(転送開始前に呼び出す) */
+	nlongword = STM_SctToWord(stm, nsct) / 2;
+
+	src = STM_StartTrans(stm, &dadr);     /* 転送開始                            */
+	buffer = (Uint8 *)obj;                /* objにはSTM_SetTrFuncの第3引数が渡る */
+
+	for (i = 0; i &lt; nlongword; i += read_len) {
+
+		/* 展開したバイト数を返す関数 */
+		buffer += subFunc(src, dadr, buffer, &read_len);
+		src += read_len * dadr;
+	}
+	return (nsct);                         /* 転送したセクタ数を返す */
+}
+</PRE></P>
+
+	<P><DD>(ｃ)セクタ単位で転送しなければなりません。</P>
+
+	<P><DD>(ｄ)decodeFuncが終了した時点で、データを転送し終えていない場合、(-1)を返さなければなりません。<BR>　この場合、データを転送し終えるまで他のストリームは転送できません。データを転送し終えたら、転送したセクタ数を返します。この間、STM_StartTransを呼び出してはいけません。</P>
+
+<A NAME="z5_3"></A>
+	<P ALIGN=CENTER><B>図5.3　転送関数を使用した時の動作</B><BR><IMG SRC="../grp/i066_01.gif"></P>
+
+<!-- +++ Add CRI ：5.(1) -->
+	<P><DT><H4>　(4)転送関数を登録しているストリームのクローズ</H4>
+	<DD>　転送関数が(-1)を返した直後にストリームをクローズすると、転送関数が0以上の値を返すまでストリームシステムは転送関数を呼び続けます。転送を終えた時点で、0以上の値を返してください。</P>
+<!-- --- Add CRI ：5.(1) -->
+
+<A NAME="no5_20"></A>
+	<P><DT><H3>5.2 ファイルシステムとの併用</H3>
+		<DD>　ストリームシステムを使用中に、ファイルシステムによってCDから読み込みをおこなう場合は、一旦ドライブをポーズ状態にする必要があります。その方法には、次の2種類があります。</P>
+
+	<P><DD>(ａ)STM_SetExecGrp(NULL)を実行する。(完了復帰)</P>
+
+	<P><DD>(ｂ)STM_NwSetExecGrp(NULL)を実行し、STM_ExecServerの関数値が<BR>
+　STM_EXEC_TSKENDになるまでサーバ関数を呼び出す。(即時復帰)その後、ファイルシステムによる読み込みが終わったら、STM_SetExecGrp(grp)によりストリームの読み込みを再開します。</P>
+
+	<P><DD>＜例＞ファイルシステムで読み込み中に、先読みしたストリームデータを転送する
+		<DD><PRE>
+         ・
+         ・						/* ストリームを先読みする   */
+STM_SetExecGrp(NULL);					/* ドライブをポーズ状態にする */
+GFS_NwFread(………);
+while (1) {
+	if (GFS_NwExecOne(gfs) == GFS_SVR_COMPLETED)	/* ファイル読み込み      */
+		break;
+	STM_ExecTrans(stm);				/* ストリームデータを転送する */
+}
+STM_SetExecGrp(grp);					/* ストリームの読み込みを再開 */</PRE><BR>
+</PRE></P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p06_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

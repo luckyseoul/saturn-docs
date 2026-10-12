@@ -1,0 +1,134 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 8&gt;CD通信I/F(MPEGパート)/1.概要</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<B>■　　
+｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信I/F(MPEGパート)</B>
+<H2 ALIGN=CENTER>１．概要</H2>
+<HR NOSHADE>
+<DL>
+	<P>　本書は、ＣＤブロックのMPEGパートに関する機能と、ＣＤ通信インタフェースのMPEGパートに関する外部仕様についてまとめたものです。<BR>
+　MPEGパートのＣＤ通信インタフェースを略してMPEG通信インタフェースと呼びます。</P>
+
+<A NAME="no1_10"></A>
+	<P><DT><H3>1.1　システム構成</H3>
+	<DD>　MPEG関係のシステム構成を図1.1に示す。</P>
+
+<A NAME="z1_1"></A>
+	<P ALIGN=CENTER><DD><B>図1.1　MPEG関係のシステム構成</B></P>
+<DT><PRE>
+　┌──────────────────────────────────────────┬─┐
+　│┌────────────────────────────────────────┐│　│
+　││ホスト側プログラム（ＭＰＥＧライブラリ、アプリケーションなど）　　　　　　　　　││　│
+　│└────────────────────────────────────────┘│ホ│
+　│　　　　　│　　　　　　　　　　│　　　　　　　　　　　　↑　　　　　　　　　　　　│　│
+　│　　　　　│ＣＤ通信関数　　　　│ＭＰＥＧ通信関数　　　　│　　　　　　　　　　　　│ス│
+　│　　　　　↓　　　　　　　　　　↓　　　　　　　　　　　　│　　　　　　　　　　　　│　│
+　│┌─────────────────────┐┌　─　─　┴　─　─　─　─　─　┐│ト│
+　││　　　　　ＣＤ通信インタフェース　　　　　││（ＤＭＡ等のデータ転送モジュール）││　│
+　│└─────────────────────┘└　─　─　┬　─　─　─　─　─　┘│　│
+　└─────────────────────────────┼────────────┴─┘
+　　　　　　　│　　　　　　　　　　│　　　　　　　　　　　　│
+ＣＤブロック　│　　　　　　　　　　│　　　　　　　　　　　　│　　　　　　　　
+　との通信　　│ＣＤコマンド　　　　│ＭＰＥＧコマンド　　　　│　取り出しデータ
+　　　　　　　↓　　　　　　　　　　↓　　　　　　　　　　　　│　　　　　　　　　　
+　┌─────────────────────────────┼────────────┬─┐
+　│　　　　　　　　　　　　　　　　　　　　　　　　┌────┴───┐　　　　　　　　│　│
+　│　　　　　　　　　　　　　　　　　　　　　　　　│ＭＰＥＧレジスタ│　　　　　　　　│Ｃ│
+　│　　　　　　　　　　　　　　　　　　　　　　　　└────┬───┘　　　　　　　　│Ｄ│
+　│ＣＤパートの機能　　　　　　ＭＰＥＧパートの機能　　　　　│　　　　　　　　　　　　│ブ│
+　│┌──────┐　　　　　　┌────────┐　　　　　│ビデオ　　　　　　　　　│ロ│
+　││ＣＤバッファ├─────→│ＭＰＥＧデバイス├─────┤データ　　　　　　　　　│ッ│
+　│└──────┘ＭＰＥＧ　　└────┬───┘　　　　　│　　　　　　　　　　　　│ク│
+　│　　　　　　　　ストリーム　　　　　　│オーディオデータ　│　　　　　　　　　　　　│　│
+　└───────────────────┼─────────┼────────────┴─┘
+　　　　　　　　　　　　　　　　　　　　　↓　　　　　　　　　↓　　　　　┌─────┐
+　　　　　　　　　　　　　　　　　　　┌────┐　　　　┌────┐　　│　　　　　│
+　　　　　　　　　　　　　　　　　　　│ＳＣＳＰ│　　　　│ＶＤＰ２├─→│ＴＶモニタ│
+　　　　　　　　　　　　　　　　　　　└────┘　　　　└────┘　　│　　　　　│
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　└─────┘
+　MPEGを再生して実際に映像と音声を出力するには、別途VDP2とSCSPの設定が必要です。
+　設定方法については、VDP2とSCSPのマニュアルを参照のこと。
+</PRE>
+
+	<P><DD>　ＣＤパートとMPEGパートで、CDC関数とＣＤブロックコマンドを次のように略称する。</P>
+	<DD><UL TYPE=DISC>
+	<LI>ＣＤ通信関数：ＣＤパートのＣＤ通信インタフェース関数
+	<LI>ＣＤコマンド：ＣＤパートのＣＤブロックコマンド
+	<LI>MPEG通信関数：MPEGパートのＣＤ通信インタフェース関数
+	<LI>MPEGコマンド：MPEGパートのＣＤブロックコマンド</UL></P>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>1.2　機能と特徴</H3>
+	<DD>　下記（１）はＣＤ通信インタフェースの機能、（２）〜（８）はＣＤブロックの機能です。</P>
+
+	<P><DT><B>　（１）ＣＤブロックのMPEGパートとの通信機能</B>
+	<P><DD><OL TYPE=a>
+	<B><LI></B>ホストとMPEGパートの通信を行う、Ｃ言語のインタフェース関数群です。
+	<B><LI></B>MPEGパートに対してコマンドを発行し、レスポンスを受け取る。
+	<B><LI></B>MPEGコマンドとほぼ１対１に対応する。
+	</OL></P>
+
+	<P><DT><B>　（２）MPEG動画の再生機能</B>
+	<DD>　バッファ区画に格納されたMPEGストリーム（ビデオ／オーディオ）をデコードし、動画を再生する。ビデオとオーディオのストリームは、それぞれ別のバッファ区画に格納される。<BR>
+　バッファ区画へのストリームの読み込み・格納はＣＤパートの機能を使用する。</P>
+
+	<P><DT><B>　（３）出力先の切り替え機能</B>
+	<DD>　デコードされたイメージデータを以下の方法で出力できる。</P>
+	<P><DD><OL TYPE=a>
+	<B><LI></B>VDP2を通して直接ＴＶモニタに出力する。（1600万色）
+	<B><LI></B>ホスト領域に転送し、VDPを使って出力する。（32000色）
+	</OL></P>
+
+	<P><DT><B>　（４）ストリームの切り替え機能</B>
+	<DD>　２つのストリームを別のバッファ区画に格納しておき、一定のタイミングで一方から他方にスムーズに再生を切り替える。</P>
+
+	<P><DT><B>　（５）表示画面の制御機能</B>
+	<DD><OL TYPE=a>
+	<P><B><LI></B>ウィンドウ機能<BR>　デコードされた映像の表示範囲をウィンドウとして設定し、さらに拡大縮小できる。</P>
+	<P><B><LI></B>映像効果<BR>　デコードされた映像に「モザイク」、「ぼかし」、「ルミネッセンスキー」などの映像効果をかけることができる。</P>
+	</OL>
+
+	<P><DT><B>　（６）静止画の再生機能</B>
+	<DD>　すべてＩピクチャから構成されるMPEGストリームを順次デコードすることで、静止画を再生する。（JPEGと同等）</P>
+
+	<P><DT><B>　（７）MPEGフレームバッファ機能</B>
+	<DD>　MPEGフレームバッファ内のデコードされた画像データをバッファ区画に読み込んだり、逆にバッファ区画内の画像データをMPEGフレームバッファに書き出したりすることができる。</P>
+
+	<P><DT><B>　（８）MPEGセクタバッファ機能</B>
+	<DD>　MPEGデコーダを停止させて、MPEGバッファをデータ格納用のMPEGセクタバッファとして利用できる。MPEGセクタバッファは、バッファ区画との間でセクタ単位の読み書きをする。<BR>（１セクタ2048バイト、全256セクタ）</P>
+</DL>
+<HR NOSHADE>
+<B>■　　
+｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

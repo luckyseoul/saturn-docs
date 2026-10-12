@@ -1,0 +1,87 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/86&gt;VDP2 User's Manual/3.2VRAM Bank Division</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">VDP2 User's Manual</a> ★ <A HREF="p03_10.htm">Chapter 3 RAM</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p03_30.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 3 RAM</b><HR NOSHADE>
+<DL>
+<A NAME="no3_20"></A><P><DT><H2> ■3.2 VRAM bank division</H2><DD> VDP2 allows you to simultaneously access four banks, VRAM-A0, VRAM-A1, VRAM-B0, and VRAM-B1, by dividing VRAM-A and VRAM-B into two. Therefore, it is possible to obtain more image data at once than when not dividing the image into two parts, and it is possible to increase the number of scroll screens that can be displayed at the same time, and to display screens with a large number of colors. However, there are restrictions on specifying VRAM read/write access by the CPU during the display period. Therefore, if you want to perform many read/write accesses by the CPU during the display period, do not divide the VRAM into two, but in normal cases, divide it into two for more efficient access.</P>
+<A NAME="no3_21"></A><P><DT><H3> ●RAM control register</H3><DD> The RAM control register specifies the VRAM bank division, the purpose of VRAM usage for the rotary scroll screen, and the color RAM mode. This is a 16-bit readable and writable register located at address 18000EH. The value is cleared to 0 after power-on or reset, so be sure to set it.</P>
+<A NAME="RAMCTL_"></A><P><DD> <B><FONT SIZE=5>RAMCTL</font> <FONT SIZE=4>18000EH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH> <A HREF="#CRKTE_">CRKTE</a></TH><TH> -</TH><TH> <A HREF="#CRMD_">CRMD1</a></TH><TH> <A HREF="#CRMD_">CRMD0</a></TH><TH> -</TH><TH> -</TH><TH> <A HREF="#VRBMD_">VRBMD</a></TH><TH> <A HREF="#VRAMD_">VRAMD</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH> <A HREF="#RDBSx_">RDBSB11</a></TH><TH> <A HREF="#RDBSx_">RDBSB10</a></TH><TH> <A HREF="#RDBSx_">RDBSB01</a></TH><TH> <A HREF="#RDBSx_">RDBSB00</a></TH><TH> <A HREF="#RDBSx_">RDBSA11</a></TH><TH> <A HREF="#RDBSx_">RDBSA10</a></TH><TH> <A HREF="#RDBSx_">RDBSA01</a></TH><TH> <A HREF="#RDBSx_">RDBSA00</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="CRKTE_"></A><P><DT> <B>Color RAM</b> coefficient table enable bit (CRKTE), bit 15<DD> Please refer to " <A HREF="p06_40.htm"><B>6.4 Coefficient table control</b></a> ".</P>
+<A NAME="CRMD_"></A><P><DT> <B>Color RAM mode bit</b> : Color RAM mode bit (CRMD1, CRMD0), bits 13, 12<DD> Please refer to " <A HREF="p03_40.htm"><B>3.4 Color RAM Mode</b></a> ".</P>
+<P><DD> When the CRKTE bit is set to 1, set the color RAM mode to mode 1. At that time, the second half of the color RAM (100800H to 100FFFH) is used for coefficient table data, so color data cannot be stored.</P>
+<A NAME="VRAMD_"></A><A NAME="VRBMD_"></A><P><DT> <B>VRAM mode bit</b> : VRAM mode bit (VRBMD, VRAMD)<DD> Controls VRAM bank division.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=110><PRE> VRAMD</TH><TD><PRE> 18000EH</TD><TD><PRE> bit 8</TD><TD WIDTH=220><PRE> For VRAM-A</TD></TR>
+<TR><TH><PRE> VRBMD</TH><TD><PRE> 18000EH</TD><TD><PRE> bit 9</TD><TD><PRE> For VRAM-B</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> VRxMD</TH><TH WIDTH=250><PRE> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Do not split into two banks</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Split into two banks</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> A or B is entered for x in the bit name. </P>
+<A NAME="RDBSx_"></A><A NAME="RDBSA0_"></A><A NAME="RDBSA1_"></A><A NAME="RDBSB0_"></A><A NAME="RDBSB1_"></A><P><DT> <B>Rotation data bank selection bit</b> : RBG0 data bank select bit (RDBSA00 to RDBSB11), bits 7 to 0<DD> Please refer to " <A HREF="p06_20.htm"><B>6.2 Rotational scroll screen display control</b></a> ".<BR>
+ When the CRKTE bit is set to 1, do not specify that the 4 banks of VRAM be used as RAM for coefficient table data. </P>
+<!-- 97/01/01あけましておめでとうございます。追加(STN-13)やれやれやっと本文に追加されたか -->
+<A NAME="no3_22"></A><P><DT><H3> ●Storage location of pattern name data</H3><DD> The pattern name data storage location on the scroll surface has the following restrictions, regardless of whether it is a normal scroll surface or a rotating scroll surface.<BR>
+ <A HREF="#t3_2">Table 3.2</a> below shows the restrictions on VRAM mode bits and pattern name data storage locations.<BR>
+ Note that there are no restrictions on the storage location of character pattern data or bitmap pattern data.</P>
+<P><DT><OL>
+<LI> <B>When neither VRAM-A nor VRAM-B is divided into two</b><DT> Can only be stored in either VRAM-A or VRAM-B</P>
+<P><LI> <B>When dividing only VRAM-A into two</b><DT> a) When storing in VRAM-B, it may be stored in VRAM-A1.<DT> b) If not stored in VRAM-B, it can be stored in either VRAM-A0 or A1.</P>
+<P><LI> <B>When dividing only VRAM-B into two</b><DT> a) When storing in VRAM-A, it may be stored in VRAM-B1.<DT> b) If not stored in VRAM-A, it can be stored in either VRAM-B0 or B1.</P>
+<P><LI> <B>When dividing both VRAM-A and VRAM-B into two</b><DT> It can only be stored in either VRAM-A0 or VRAM-B0, and either VRAM-A1 or VRAM-B1.</P>
+</OL>
+<A NAME="t3_2"></A><P><DD> <B>Table 3.2 Limitations on pattern name data storage location</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2><PRE> VRAM mode bit setting value</TH><TH COLSPAN=4><PRE> Pattern name data storage location</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2> VRAMD</TH><TH ROWSPAN=2> VRBMD</TH><TH COLSPAN=2> VRAM-A</TH><TH COLSPAN=2> VRAM-B</TH></TR>
+<TR ALIGN=CENTER><TH> VRAM-A0</TH><TH> VRAM-A1</TH><TH> VRAM-B0</TH><TH> VRAM-B1</TH></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> 0</TD><TD ROWSPAN=2> 0</TD><TD COLSPAN=2> ○</TD><TD COLSPAN=2> ×</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2> ×</TD><TD COLSPAN=2> ○</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> 1</TD><TD ROWSPAN=2> 0</TD><TD> ×</TD><TD> ○</TD><TD COLSPAN=2> ○</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ○</TD><TD COLSPAN=2> ×</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> 0</TD><TD ROWSPAN=2> 1</TD><TD COLSPAN=2> ○</TD><TD> ×</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2> ×</TD><TD> ○</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=4> 1</TD><TD ROWSPAN=4> 1</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD> ×</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> ×</TD><TD> ×</TD><TD> ○</TD><TD> ○</TD></TR>
+</TABLE>
+<DD> ○: Can be stored<DD> ×: Cannot be stored<DD> <B>[Note]</b> If there are multiple locations where it can be stored, it is not necessary to store it in all of them.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p03_30.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no3">VDP2 User's Manual</a> ★ <A HREF="p03_10.htm">Chapter 3 RAM</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

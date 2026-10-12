@@ -1,0 +1,142 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/12&gt;FAQ/Sound related/ADPCM</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no8">Sound related</a><HR>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Sound related</b><H2 ALIGN=CENTER> ADPCM</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_01"><HR></a><DL>
+<H3> Please tell me which library and method to use to play ADPCM.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me which library and method to use to play ADPCM.<P><DT> <FONT SIZE=5>A)</font><DD> The ADPCM encoder provided by SEGA outputs data in accordance with the CD-ROM XA standard. Since the ADPCM level and mode are not recorded in the encoded file, it is necessary to remember the level/mode used when creating the data and set it in the subheader when creating the CD-ROM (Mode2 Form 2).</P>
+<P> This playback can only be done from the CD-ROM, and the STM library is required for this reading.<BR>
+ This is because the GFS library cannot obtain subheader information.<BR>
+ This playback example is included in the sample program of the PCM library, so please refer to it (SMPPCM2).</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_02"><HR></a><DL>
+<H3> Please tell me about ADPCM.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me about ADPCM.<P><DT> <FONT SIZE=5>A)</font><DD> ADPCM is <B>an</b> abbreviation for Adaptive <B>Delta</b> <B>Pulse Code</b> <B>Modulation</b> , which predicts the current data using a certain algorithm from previous data, and stores the data in the form of the error between the predicted value and the actual value <B>.</b> This is a data format that aims to compress data and is included in the CD-ROM XA standard.</P>
+<P> Even when playing ADPCM data, predicted values must first be calculated and data correction must be performed, so decoding one sample of data takes more time than PCM data.</P>
+<P> Some devices perform this decoding in hardware, but the Sega Saturn does not have such a chip, so all decoding is done by software.<BR>
+ For this reason, please note that ADPCM playback is a very demanding job on the Sega Saturn.<BR>
+ CD-ROM XA has two ADPCM levels, B and C, depending on data compression conditions.</P>
+<P><PRE>
+ Level B → Sample frequency 37.8kHz 4bit FM level sound quality Level C → Sample frequency 18.9kHz 4bit AM level sound quality</PRE></P>
+<P> Each of the above is divided into STEREO/MONO modes.</P>
+<P> This information is not attached to the file, but is recorded in the submode of the subheader part according to the CD-ROM XA standard (Mode2 Form2).<BR>
+ Therefore, for playback, it is necessary to refer to this subheader to obtain information about which level (B or C) and mode (STEREO or MONO).<BR>
+ With the library provided by SEGA, this information acquisition work can be performed using the STM library.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_03"><HR></a><DL>
+<H3> I created ADPCM data, but what kind of tool should I use?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If there is any software you recommend as an encoder for XA data, please let me know.<P><DT> <FONT SIZE=5>A)</font><DD> Currently, ADPCM encoders include a tool called AudioStack from CRC Research Institute and SEGA ADPCM Encoder provided here.<BR>
+ Each tool outputs slightly different data formats, so you need to use them depending on the playback style.<BR>
+ Audio Stack outputs ADPCM data in AIFF data format, so it is possible to perform On Memory playback using PCM/ADPCM playback library samples that require header information. If you remove this header information and create pure ADPCM data, you can play ADPCM in CDROM-XA format.<BR>
+ The data created with SEGA ADPCM Encoder is pure ADPCM data without a header, so it can play ADPCM in CDROM-XA format, but since there is no header information on the data side, On Memory using the PCM/ADPCM playback library sample Cannot be played.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_04"><HR></a><DL>
+<H3> What is the bit width of AIFF used for ADPCM data?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How many bits is the input AIFF format file when compressing to ADPCM format?<P><DT> <FONT SIZE=5>A)</font><DD> It will be 16 bit.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_05"><HR></a><DL>
+<H3> What is the bit width of ADPCM unit sample?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How many bits does one sample in ADPCM format have after being encoded into ADPCM format?<P><DT> <FONT SIZE=5>A)</font><DD> It will be 4 bits.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_06"><HR></a><DL>
+<H3> What is the bit width of the restored sample when ADPCM data is expanded?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How many bits is the output data when ADPCM format data is expanded?<P><DT> <FONT SIZE=5>A)</font><DD> It will be 16 bit.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_07"><HR></a><DL>
+<H3> How much is the load different between ADPCM and PCM streams?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How much does the transfer load increase when using ADPCM compared to playing a PCM stream from a CD?<P><DT> <FONT SIZE=5>A)</font><DD> It will take about twice as long.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_08"><HR></a><DL>
+<H3> Noise due to encoder differences</H3><P><DT> <FONT SIZE=5>Q)</font><DD> AudioStack generates noise that does not occur with the ADPCM encoder provided by SEGA.<BR>
+ Find out the difference between the two and the cause of the noise.<BR>
+ The data with noise is "AIFF, 18.9KHz, 16Bit, mono".<P><DT> <FONT SIZE=5>A)</font><DD> The audio stack has an AIFF-compliant header, so you can use the file system. Each sector contains data that is not used during playback, so this may be the cause of noise.<BR>
+ The encoder provided by SEGA simply arranges solid ADPCM data and is small in size.<BR>
+ However, it can only be used with stream systems.<BR>
+ There may be a problem with the AIFF of the material, so please try resampling it with another tool (SD2 or Alchemy).<BR>
+ Since the output format of AIFF marker chunks differs depending on the tool, our encoder changes this chunk to match the specifications of the tone editor when converting.<BR>
+ In the case of solid ADPCM data, the two tools may output the same data or different data depending on which compression algorithm is used internally.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_09"><HR></a><DL>
+<H3> Please tell me how to play ADPCM data on CD-XA.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to play ADPCM data on CD-XA.<P><DT> <FONT SIZE=5>A)</font><OL>
+<P><B><LI></b> Compress using the ADPCM encoder provided by our company.<P><B><LI></b> Write the created data in the VCD script file.<BR>
+ However, please note that CD-XA can only be used with FORM2 of MODE2.</P>
+<P> <B>(Example)</b> When not interleaving (37.8KHz, Mono)<PRE>
+ File SAMPLE1.XA;1
+     FileSource  "SAMPLE1.ADP"
+     RealTime
+     DataType    FORM2
+     SourceType  MONO_B
+     CodingInformation  0
+     EndFileSource
+ EndFile
+</PRE></P>
+<P><B><LI></b>The file on the built disk image will be played.<BR>
+ For details, please refer to the SGL document "SGL\DOC\ADPCM.TXT".</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_10"><HR></a><DL>
+<H3> Please tell me how to play ADPCM data on-memory.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me how to play ADPCM data on-memory.<P><DT> <FONT SIZE=5>A)</font><DD> The "ADPCM encoder" provided by our company can only output solid ADPCM data without header information, so on-memory playback that requires header information is not possible.<BR>
+ Use "AudioStack" for on-memory playback.<BR>
+ This is output as AIFF data format, so it can be played using the ``PCM/ADPCM playback library''.<BR>
+ For details, refer to the sample program "SGL\SAMPLE\SMPPCM3".</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_11"><HR></a><DL>
+<H3> Please tell me the procedure for creating the data used during ADPCM playback.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me the procedure for creating the data used during ADPCM playback.<P><DT> <FONT SIZE=5>A)</font><DD> There are two types of ADPCM data: CD-XA compliant ADPCM method and ADPCM method with header.<BR>
+ There are only two sampling rates: 18.9kHz (B MODE) and 37.8kHz (C MODE).<BR>
+ To create it, resample the sampled AIFF waveform to the above sampling rate using a commercially available waveform editing tool.<BR>
+ When compressing using the ADPCM method, use our ADPCM encoder provided by Nifty.<BR>
+ In the case of APCM method,</P>
+<P><CENTER>
+<H3> CRC Research Institute</H3><H4> TEL:03-5634-5678</H4></CENTER>
+</P>
+<P> Create data by compressing it using a tool called "AudioStack" sold by .</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no8_12"><HR></a><DL>
+<H3> With PCM, the sound is played properly, but with ADPCM, the end is cut off.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Regardless of the size, AIFF normally plays all the way to the end of audio data, but when I try to compress it with the audio stack and play it back, the end gets cut off.<BR>
+ The playback program calls a task at the timing of slSync() without using any loop playback mode.<BR>
+ I tried removing the termination judgment and adding a process that waits about 0.5 seconds after the status changes, but there was no change in the symptoms.<P><DT> <FONT SIZE=5>A)</font><DD> The reason why the last part is not played properly is due to a sampling rate problem.<BR>
+ There is no problem if the rate is only a divisor of 44.1KHz or an integer part such as 16KHz, but if the rate is 18.9KHz or 37.8KHz, an error will occur in the pitch calculation below.<BR>
+ This is a hardware restriction and there is nothing that can be done about it.</P>
+<P><PRE>
+<B>Calculation formula</b>
+             -oct
+       FNS=(2    ×1024×Fs)/44.1-1024
+
+<B>oct value</b>
+       5.5125KHz → -3
+      11.0250KHz → -2
+      22.0500KHz → -1
+      44.1000KHz →  0
+      88.2000KHz →  1
+
+ For example, if the rate is "18.9KHz", the OCT value will be -2 and the FNS value will be:
+         -(-2)
+ FNS = (2     ×1024×18.9)/44.1-1024
+     = (4     ×1024×18.9)/44.1-1024
+     = 731.4285714
+</PRE></P>
+<P>Therefore, errors will occur whether the FNS setting is 2DB or 2DC.<BR>
+ To avoid this, add silent data at the end of the data to avoid being affected by the error.<BR>
+ You should be fine if you add about 0.21 seconds for 1000 samples, which is equivalent to one ring buffer, to the data size.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no8">Sound related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

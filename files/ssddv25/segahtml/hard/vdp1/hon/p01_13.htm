@@ -1,0 +1,56 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/54&gt;VDP1 User's Manual/1.VDP1 Features</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p01_12.htm">Back</a> ｜ <A HREF="p01_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 1 VDP1 Functions</b><HR NOSHADE>
+<DL>
+<A NAME="no1_13"></A><P><DT><H3> ●Color</H3><DD> Color-related functions and special features are as follows.</P>
+<DD><UL TYPE=DISC>
+<LI> Number of colors per texture part: 16, 64, 128, 256, 32768 colors<LI> In RGB mode, half-brightness, semi-transparent, Gouraud shading, and shadow color calculations are possible.<LI> Mesh (tiling)</UL>
+<P><P><DD> There are two ways to represent the colors of pixels drawn (written) to the frame buffer: the color bank method and the RGB code method. The color bank method can express 16, 64, 128, and 256 colors in one character, and the RGB code method can express 32,768 colors in one character.</P>
+<A NAME="no1_13_1"></A><P><DT> <B>◆Color bank method</b><DD> The color bank method combines a 16, 64, 128, or 256 color palette code with a color bank to refer to the colors stored in the VDP2's color RAM. When using 16 colors, the character pattern pixel data represents the palette code in 4 bits, the upper 12 bits are added from the color bank, and 16 bit data is written to the frame buffer. When it is 8bit/pixel, the lower 8bits are written. For 64, 128, and 256 colors, the character pattern is 8 bits/pixel, and for 64, 128, and 256 colors, the lower 6, 7, and 8 bits are valid, respectively. The top 10, 9, and 8 bits of the color bank are added.<BR>
+ Data written using the color bank method is divided into the following functional bits and processed on the VDP2 side. Please refer to <A HREF="../../vdp2/hon/p010.htm">the VDP2 manual</a> /for details.</P>
+<A NAME="z1_10"></A><P><DD> <B>Figure 1.10 Bit configuration of color bank method</b><PRE><B>
+MSB LSB
+┌──┬──┬──────────┬──────────────┐
+│  │  │Color bank│ Palette code │
+└──┴──┴──────────┴──────────────┘
+ │  │　
+ │  └→Priority　
+ ↓　
+color calculation　
+</b></PRE></P>
+<A NAME="no1_13_2"></A><P><DT><B>◆RGB code method</b><DD> The RGB code system represents colors using 5 bits of brightness for each of RGB (red, green, blue). The brightness of each RGB is expressed as 00H to 1FH, the closer it gets to 00H, the darker it gets, and the closer it gets to 1FH, it gets brighter. There are 32768 colors that can be expressed using RGB codes. RGB code is 16-bit data, whose most significant bit (MSB) is 1.</P>
+<A NAME="no1_13_3"></A><P><DT> <B>◆Parts color</b><DD> Sprites are colored using color banks, color lookup tables, or RGB codes. For non-textured polygons, polylines, and lines, set the non-textured color. Set for each part.</P>
+<A NAME="no1_13_4"></A><P><DT> <B>◆Color lookup table</b><DD> The color lookup table refers to the 16-color color lookup table and exchanges the 4bit data of the character pattern into 16bit data.<BR>
+ Since the 16-bit data on the table is written to the frame buffer as is, there is no distinction between color bank code and RGB code as texture data.<BR>
+ When read to VDP2, when the 16-bit MSB is 0, it is treated as a color bank code, and when it is 1, it is treated as an RGB code.</P>
+<A NAME="no1_13_5"></A><P><DT> <B>◆Non-texture color</b><DD> Non-texture colors are treated as pixel data. I don't use color banks or color lookup tables.</P>
+<A NAME="no1_13_6"></A><P><DT> <B>◆8bit/pixel color</b><DD> When using high resolution, or when rotating the frame buffer and specifying a bit width of 8 bits/pixel, data is written to the frame buffer at 8 bits/pixel. At this time, when using the color lookup table method or non-texture color, the lower 8 bits of 16 bits are written to the frame buffer.<BR>
+ Hereinafter, it will be abbreviated as 8bit/pixel (high resolution or rotation 8).</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_12.htm">Back</a> ｜ <A HREF="p01_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

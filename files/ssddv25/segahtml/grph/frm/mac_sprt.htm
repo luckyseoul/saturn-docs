@@ -1,0 +1,201 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>Sprite Editor binary format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR NOSHADE>
+<CENTER>
+<H1> Sprite Editor</H1><H3> binary format</H3><H5> Binary File Format</H5></CENTER>
+<A NAME="top"><HR></a><DL>
+<P><DT><H3> ■File layout</H3><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> Explanation</Th></TR>
+<TR><TD><PRE> $000</TD><TD><PRE> $100</TD><TD><PRE> <A HREF="#no1">header</a></TD></TR>
+<TR><TD><PRE> $100</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no2">pallet data</a></TD></TR>
+<TR><TD><PRE> variable</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no3">sprite data</a></TD></TR>
+<TR><TD><PRE> variable</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no4">pattern data</a> </TD></TR>
+</TABLE>
+</DL>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no1"><HR></a><DL>
+<P><DT><H3> ■Header</H3><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</Th></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> $10</TD><TD><PRE> Identifier="SEGA_SPRED_01.00"("_"=$20)</TD></TR>
+<TR><TD><PRE> $10</TD><TD><PRE> long</TD><TD><PRE> Palette data offset address</TD></TR>
+<TR><TD><PRE> $14</TD><TD><PRE> long</TD><TD><PRE> Palette data size (bytes)</TD></TR>
+<TR><TD><PRE> $20</TD><TD><PRE> long</TD><TD><PRE> sprite data offset address</TD></TR>
+<TR><TD><PRE> $24</TD><TD><PRE> long</TD><TD><PRE> Sprite data size (bytes)</TD></TR>
+<TR><TD><PRE> $30</TD><TD><PRE> long</TD><TD><PRE> Pattern data offset address</TD></TR>
+<TR><TD><PRE> $34</TD><TD><PRE> long</TD><TD><PRE> Pattern data size (bytes)</TD></TR>
+<TR><TD><PRE> $38</TD><TD><PRE> $C8</TD><TD><PRE> Dummy data (all $00) </TD></TR>
+</TABLE>
+</DL>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no2"><HR></a><DL>
+<P><DT><H3> ■Palette data</H3><DD><TABLE BORDER=1>
+<TR><Th> offset</Th><TH><PRE> size</Th><Th><PRE> function</Th></TR>
+<TR><TD> $00</TD><TD><PRE> word</TD><TD><PRE> Color RAM mode</TD></TR>
+<TR><TD> $02</TD><TD><PRE> $0E</TD><TD><PRE> Dummy data (all $00)</TD></TR>
+<TR><TD> $10</TD><TD><PRE> variable</TD><TD><PRE> color code</TD></TR>
+</TABLE>
+<DL>
+<P><DT> <B>●Color RAM mode</b><DD><TABLE>
+<TR><TD><PRE> Mode 0 (0x0000)</TD><TD><PRE> 16bit x 1024 colors</TD></TR>
+<TR><TD><PRE> Mode 1 (0x1000)</TD><TD><PRE> 16bit x 2048 colors</TD></TR>
+<TR><TD><PRE> Mode 2 (0x2000)</TD><TD><PRE> 32bit x 1024 colors</TD></TR>
+</TABLE>
+<P><DT> <B>●Color code</b><DD><PRE>
+MSB                           LSB
+│ │    B    │    G    │    R    │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│*│4│3│2│1│0│4│3│2│1│0│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+<B>*Can be set freely (usually 1b)</b>
+</PRE></DL>
+</DL>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no3"><HR></a><DL>
+<P><DT><H3> ■Sprite data</H3><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</Th></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> word</TD><TD><PRE> Number of registered sprites</TD></TR>
+<TR><TD><PRE> $02</TD><TD><PRE> $0E</TD><TD><PRE> Dummy data (all $00)</TD></TR>
+<TR><TD><PRE> $10</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no2_1">Sprite header x number of registered sprites</a></TD></TR>
+<TR><TD><PRE> variable</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no2_2">CG data</a></TD></TR>
+</TABLE>
+<DL>
+<A NAME="no2_1"></A><P><DT> <B>●Sprite header</b><DD><TABLE BORDER=1>
+<TR><TD><PRE> offset</TD><TD><PRE> size</TD><TD><PRE> function</TD></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> word</TD><TD><PRE> Sprite H size</TD></TR>
+<TR><TD><PRE> $02</TD><TD><PRE> word</TD><TD><PRE> Sprite V size</TD></TR>
+<TR><TD><PRE> $04</TD><TD><PRE> word</TD><TD><PRE> color mode</TD></TR>
+<TR><TD><PRE> $06</TD><TD><PRE> word</TD><TD><PRE> Color offset address *1</TD></TR>
+<TR><TD><PRE> $08</TD><TD><PRE> long</TD><TD><PRE> CG data offset address *2</TD></TR>
+<TR><TD><PRE> $0C</TD><TD><PRE> long</TD><TD><PRE> CG data size (bytes) *3</TD></TR>
+</TABLE>
+<DD> <B>*1</b> Relative address from the beginning of color RAM<DD> <B>*2</b> Relative address from the beginning of CG data<DD> <B>*Apply 0x20Byte boundary to every 3</b> sprites<A NAME="no2_2"></A><P><DT> <B>●CG data</b><DD> When color mode = 0x0000,0x0001(4bit/dot)<PRE>
+MSB           LSB
+│Even   │Odd    │
+│coord  │coord  │
+│code   │code   │
+┌─┬─┬─┬─┬─┬─┬─┬─┐
+│3│2│1│0│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><P><DD>When color mode = 0x0002, 0x0003, 0x0004 (8bit/dot)<PRE>
+MSB           LSB
+│Pallete code   │
+┌─┬─┬─┬─┬─┬─┬─┬─┐
+│7│6│5│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><P><DD>When color mode = 0x0005 (16bit/dot)<PRE>
+MSB                           LSB
+│ │    B    │    G    │    R    │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│*│4│3│2│1│0│4│3│2│1│0│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><B>*Can be set freely (usually 1b)</b></DL>
+<A NAME="no4"></A><P><DT><H3> ■Pattern data</H3><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</TD></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> word</TD><TD><PRE> Number of registered patterns</TD></TR>
+<TR><TD><PRE> $02</TD><TD><PRE> $0E</TD><TD><PRE> Dummy data (all $00)</TD></TR>
+<TR><TD><PRE> $10</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no4_1">Pattern header</a> x number of registered patterns</TD></TR>
+<TR><TD><PRE> variable</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no4_2">Sprite placement data</a></TD></TR>
+</TABLE>
+<DL>
+<A NAME="no4_1"></A><P><DT> <B>●Pattern header</b><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</Th></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> long</TD><TD><PRE> Sprite placement data offset address*</TD></TR>
+<TR><TD><PRE> $04</TD><TD><PRE> word</TD><TD><PRE> Number of sprite entries</TD></TR>
+<TR><TD><PRE> $06</TD><TD><PRE> $0A</TD><TD><PRE> Dummy data (all $00)</TD></TR>
+</TABLE>
+<DD> <B>*Relative address from the beginning of sprite placement data</b><A NAME="no4_2"></A><P><DT> <B>●Sprite arrangement data</b><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</Th></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_1">Reversal information</a></TD></TR>
+<TR><TD><PRE> $02</TD><TD><PRE> word</TD><TD><PRE> Dummy data ($0000)</TD></TR>
+<TR><TD><PRE> $04</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_2">color mode</a></TD></TR>
+<TR><TD><PRE> $06</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_3">Color RAM offset address</a></TD></TR>
+<TR><TD><PRE> $08</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_4">CG data offset address</a></TD></TR>
+<TR><TD><PRE> $0A</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_5">sprite size</a></TD></TR>
+<TR><TD><PRE> $0C</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_6">Offset A (H coordinate)</a></TD></TR>
+<TR><TD><PRE> $0E</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_6">Offset A (V coordinate)</a></TD></TR>
+<TR><TD><PRE> $10</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_6">Offset B (H coordinate)</a></TD></TR>
+<TR><TD><PRE> $12</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_6">Offset B (V coordinate)</a></TD></TR>
+<TR><TD><PRE> $14</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_6">Offset C (H coordinate)</a></TD></TR>
+<TR><TD><PRE> $16</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_6">Offset C (V coordinate)</a></TD></TR>
+<TR><TD><PRE> $18</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_6">Offset D (H coordinate)</a></TD></TR>
+<TR><TD><PRE> $1A</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no4_2_6">Offset D (V coordinate)</a></TD></TR>
+<TR><TD><PRE> $1C</TD><TD><PRE> word</TD><TD><PRE> Dummy data ($FFFF)</TD></TR>
+<TR><TD><PRE> $1E</TD><TD><PRE> word</TD><TD><PRE> sprite number</TD></TR>
+</TABLE>
+<A NAME="no4_2_1"></A><P><DD> <B>Reversal information</b><DD><PRE>
+MSB                           LSB
+│                   │Reverse │  │
+│Unused             │   │Unused │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│0│0│0│0│0│0│0│0│0│0│V│H│0│0│0│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+V: VF=vertical inversion H:HF=horizontal inversion</PRE><A NAME="no4_2_2"></A><P><DD> <B>color mode</b><DD><PRE>
+MSB                              LSB
+│                   │Color   │     │
+│Unused             │mode    │     │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┼──┬──┬──┬─┬─┬─┐
+│0│0│0│0│0│0│0│0│0│0│b2│b1│b0│0│0│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴──┴──┴──┴─┴─┴─┘
+b2 b1 b0
+0  0  0  Mode 0  16 colors (color bank)
+0  0  1  Mode 1  16 colors (lookup table)
+0  1  0  Mode 2  64 colors (color bank)
+0  1  1  Mode 3  128 colors (color bank)
+1  0  0  Mode 4  256 colors (color bank)
+1  0  1  Mode 5  32K color (RGB)
+</PRE><A NAME="no4_2_3"></A><P><DD><B>Color RAM offset address</b><DD><PRE>
+MSB                                         LSB
+│Color RAM offset address */8H 
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬─┬─┐
+│aD│aC│aB│aA│a9│a8│a7│a6│a5│a4│a3│a2│a1│a0│0│0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴─┴─┘
+<B>*Relative address from the beginning of color RAM</b></PRE><A NAME="no4_2_4"></A><P><DD> <B>CG data offset address</b><PRE>
+MSB                                         LSB
+│CG data offset address */8H 
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬─┬─┐
+│aD│aC│aB│aA│a9│a8│a7│a6│a5│a4│a3│a2│a1│a0│0│0│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴─┴─┘
+<B>*Relative address from the beginning of CG data</b></PRE><A NAME="no4_2_5"></A><P><DD> <B>sprite size</b><PRE>
+MSB                                         LSB
+│   │H size/8H        │V size                 │
+┌─┬─┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│0│0│h5│h4│h3│h2│h1│h0│v7│v6│v5│v4│v3│v2│v1│v0│
+└─┴─┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><A NAME="no4_2_6"></A><P><DD><B>Offset A~D</b><DD> Relative coordinate values between the pattern origin and each vertex of the sprite<BR>
+ Each vertex of A to D corresponds to the following position.<PRE>
+A        B
+ ┏━━━━━━┓ 
+ ┃      ┃ 
+ ┃      ┃ 
+ ┃      ┃ 
+ ┃      ┃ 
+ ┃      ┃ 
+ ┗━━━━━━┛ 
+D        C
+</PRE></DL>
+</DL>
+<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

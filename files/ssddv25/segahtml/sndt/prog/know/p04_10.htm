@@ -1,0 +1,126 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 5&gt; Sound development know-how/DSP related and DSPLinker</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm">Sound development know-how collection</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound development know-how collection</b><H2 ALIGN="CENTER"> Chapter 4 Regarding DSP related and DSPLinker</H2><HR NOSHADE>
+<ul>
+<li> If the start address of DSP WORK RAM is not set in units of 2000h, the sound may be significantly distorted (SndSim only allows you to specify the start address in units of 2000h).<BR>
+ Regarding the size, it does not need to be in units of 2000h. For example, if the Free Area Required size is 10040H, you can specify exactly that size (considering memory efficiency).<p><li> Please set the MIXER level of Output channels not used by the DSP linker to the minimum value of 0. If it is other than "0", the normal effect may not be output (for example, the DC component is added to the original sound, resulting in a clipped sound).<p><li> If you use the DPS linker to violently change the values using the parameter tabs, SCSI communication will not go well and the MAC will likely jump, so please do not do this. This frequency is especially high during MIDI sound.<p><li> It is recommended that the PEQ Q of Linker and eLinker is Q>=1.0. If Gain is negative or a positive number that is not very large, it can be less than 1.0.<p><li> To apply a DSP effect, you need to perform both Effect Change and MIXER Change. If MIXER Change is not performed, the DSP output level will not increase and the Effect sound will not be played.<p><li> Do not use DSP software modulation. Sound driver is not supported.<p><li> Depending on how you create the data, you can apply different effects to the song and SE, or switch between multiple effects within the song. Please, try it.<p><li> The DSP has a higher priority for accessing the DRAM bus than the 68000. Also, since the DSP accesses the same DRAM as the 68000, if you use a delay type effect (with Tap processing that reads/writes the delay RAM many times), the processing of the 68000 will be postponed, causing the song to slow down, Situations may occur where commands are not accepted.<BR>
+ This is especially likely to happen with eLinker (extended linker) reverb, early reflections, etc., and you should also be careful when using FM that uses many slots.<p><li> About SCSP DSP operation<BR>
+ SCSP's DSP is constantly processing 128 step instructions. In the initial state, all 128 steps are written as NOP (No OPeration), so the DSP effect just idles without producing any sound. By patching the effect module with DSPLinker and executing Link from the Process menu, an instruction code (a file with an .EXB extension) to be written to the DSP on MACINTOSH is created. Then, the instruction code is written to the DSP using Download from the Process menu, and the DSP starts executing instructions that operate the patched module (REVERB for REVERB). This Download operation corresponds to Effect Change on the actual device.<p><li> About RingBuffer in the Option menu<BR>
+ The "RingBuffer" menu item is used to set the size of the ring buffer (delay memory) used by the algorithm currently being edited. RingBuffer is taken in 4Mbit of sound RAM. If the setting value here is too small, an error will occur when linking is executed. In addition, in order to reduce the size of the sound WORK RAM used even if the link is successful, we recommend that you refer to the information displayed in the link result information dialog and set the settings to the minimum necessary.<p><li> Number of steps used for DSP EFFECT module<BR>
+<table border cellpadding="2">
+<tr><td> INPUT</td><td> 2</td></tr>
+<tr><td> OUTPUT</td><td> 2</td></tr>
+<tr><td> REVERB</td><td> 30</td></tr>
+<tr><td> EARLY REFLACTION</td><td> 54</td></tr>
+<tr><td> DELAY</td><td> 20</td></tr>
+<tr><td> PITCH SHIFT</td><td> 24</td></tr>
+<tr><td> CHORUS</td><td> 24</td></tr>
+<tr><td> FLANGER</td><td> 28</td></tr>
+<tr><td> SYMPHONIC</td><td> 24</td></tr>
+<tr><td> SURROUND</td><td> 38</td></tr>
+<tr><td> VOICE CANCEL</td><td> 38</td></tr>
+<tr><td> AUTO PAN</td><td> 6</td></tr>
+<tr><td> PHASER</td><td> 18</td></tr>
+<tr><td> DISTORTION</td><td> 24</td></tr>
+<tr><td> FILTER</td><td> 8</td></tr>
+<tr><td> DYNAMIC FILTER</td><td> 20</td></tr>
+<tr><td> PARAMETRIC EQ</td><td> 8</td></tr>
+<tr><td> MIXER2</td><td> 4</td></tr>
+<tr><td> MIXER3</td><td> 4</td></tr>
+<tr><td> MIXER4</td><td> 6</td></tr>
+<tr><td> MIXER6</td><td> 8</td></tr>
+<tr><td> MIXER8</td><td> 10</td></tr>
+</table>
+<p> You can freely patch effects as long as the total of these does not exceed 128 steps.<p> ***reference***<BR>
+ AUTOPAN can be used as a gate. If you don't want the sound to spread to the left or right, try changing the pitch of the AUTOPAN VOICE, or adjust the MIXER pan.<p><li> Memory access count and number of voices used for DSP EFFECT module (including expansion)<p><table border cellpadding="2">
+<tr><td> REVERB</td><td> 10</td></tr>
+<tr><td> EARLY REFLACTION</td><td> 21</td></tr>
+<tr><td> DELAY</td><td> 3</td></tr>
+<tr><td> PITCH SHIFT</td><td> 3 +4 voices</td></tr>
+<tr><td> CHORUS</td><td> 3 +1 voice</td></tr>
+<tr><td> FLANGER</td><td> 4 +1 voice</td></tr>
+<tr><td> SYMPHONIC</td><td> 3 +2 voices</td></tr>
+<tr><td> SURROUND</td><td> 15</td></tr>
+<tr><td> VOICE CANCEL</td><td> 0</td></tr>
+<tr><td> AUTO PAN</td><td> 0 +2 voices</td></tr>
+<tr><td> PHASER</td><td> 3 +1 voice</td></tr>
+<tr><td> DISTORTION</td><td> 0</td></tr>
+<tr><td> FILTER</td><td> 0</td></tr>
+<tr><td> DYNAMIC FILTER</td><td> 5 +1 voice</td></tr>
+<tr><td> PARAMETRIC EQ</td><td> 0</td></tr>
+<tr><td> MIXER2</td><td> 0</td></tr>
+<tr><td> MIXER3</td><td> 0</td></tr>
+<tr><td> MIXER4</td><td> 0</td></tr>
+<tr><td> MIXER6</td><td> 0</td></tr>
+<tr><td> MIXER8</td><td> 0</td></tr>
+<tr><td> REVERB E</td><td> 29</td></tr>
+<tr><td> EARLY REFLACTION E</td><td> 29</td></tr>
+<tr><td> DELAY E</td><td> 4</td></tr>
+<tr><td> PITCH SHIFT</td><td> 4 +12 voices</td></tr>
+<tr><td> CHORUS E</td><td> 4 +3 voices</td></tr>
+<tr><td> DIST E</td><td> 0</td></tr>
+<tr><td> Q-SOUND4</td><td> 0</td></tr>
+<tr><td> Q-SOUND8</td><td> 0</td></tr>
+<tr><td> YAMAHA3D-SOUND</td><td> 0</td></tr>
+</table>
+<p> The more memory accesses a DSP EFFECT module makes, the more load it places on the sound driver. Specifically, the sound will stop if the song slows down or if too many SEs sound at the same time.<BR>
+ Specifically, the extended linker's reverbs have a fairly heavy load.<BR>
+ In that case, what to do is<BR>
+<ol>
+<li> Thin out the song sequence data.<li> If you hear an FM tone (especially chords), stop.<li> Change to an effect that requires fewer memory accesses.</ol>
+ Please do something like this.<p> Also, since sound driver version 2.00, the driver operation has become lighter, so there should be fewer cases where songs are stuck compared to 1.xx machines.<BR>
+ The meaning of the number of voices used is that the number of voices used is reduced by this number from the maximum polyphony of 32 voices.<BR>
+ Also, if you use multiple effects at the same time, these numbers will add up.<p><li> What to do when using the DSP EFFECT Q-SOUND8 module<p> If you try to link or download as is, an error message will appear. In this case, please follow the steps below.<ol>
+<li> Select the Send Level of the Input module in the window and invert it.<li> Select GLBf100 in Alter To Global from the Global Coef menu, highlight it, and press the Alter button.<p><img srcset="../image/alter.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p><li> The Send Level display changes to GLBf100.<p><img srcset="../image/alter2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p><li> Perform the above steps for the eight Input modules.</ol>
+<p><li> Q sound<BR>
+ Control with control change $50 (80).<BR>
+ Input channels 0 to 7 of the Q Sound module are controlled corresponding to MIDI channels 1 to 8, respectively.<BR>
+ Therefore, when using MIDI to control Q Sound input channel 2, perform a control change on MIDI channel 3.<BR>
+ The relationship between the parameters set by control changes and the effects is as follows.<BR>
+<pre>
+Left ~ Center ~ Right 0 - 15 - 30
+</pre><p><li>yamaha 3d sound<BR>
+ Set three parameters using control changes $51, $52, and $53.<BR>
+ This module has only one channel, so it can be controlled regardless of the MIDI channel.<BR>
+ The relationship between control changes, parameters, and effects is as follows.<p><dl compact>
+<dt> distance<dd> Control change $51 (81)<pre>
+Around me ~ far away $00 - $7F
+</pre><dt>Direction<dd> Control change $52 (82)<pre>
+Front ~ Right 90° ~ Rear ~ Left 90° ~ Front $00 - $20 - $40 - $60 - $7F
+</pre><dt>height<dd> Control change $53 (83)<pre>
+Directly above ~ Eye level ~ Directly below ~ Rear eye level ~ Directly above $00 - $20 - $40 - $60 - $7F
+</pre></dl>
+<p>For details about sound control command = 11H (YAMAHA 3D sound) and sound control command = 12H (Q sound), refer to <B><A HREF="../drve/sndcmd0.htm">the sound control command</a></b> , <B><A HREF="../drve/sndctrl.htm#no2_51">Q sound</a></b> , and <B><A HREF="../drve/sndctrl.htm#no2_52">YAMAHA 3D sound</a></b> in the " <B>Sound Driver Ver. 2.20 Programmer's Guide</b> ".<p><li> Regarding noise during EFFECT CHANGE<BR>
+ Due to the specifications of the chip, there will be some noise during EFECT CHANGE, so use host commands such as SOUND INITIAL and MIXER CHANGE to reduce the EFECT return level.<BR>
+ The steps to minimize noise during EFFECT CHANGE with sound driver version 1.28 or earlier are as follows.<p> Prepare MIXER data (MIXER0) in which the EFFECT RETURN level is all 0 and data (MIXER1) in which the RETURN level is raised in the tone bank data.<p><ol>
+<li> sequence off<li> all notes off<li> Mixer change (MIXER0) Lower the EFFECT level<BR>
+<li> effect change<li> Wait about 50mSec<li> Mixer change (MIXER1) Increase the EFFECT level<li> Sequence start</ol>
+<p> This process is not necessary for sound driver versions 1.31 and later. The driver manages this. Therefore, the rise of the effect sound will be delayed by up to 64 msec at SEQ_START, but this should not cause any audible problems.<p></ul>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm">Sound development know-how collection</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

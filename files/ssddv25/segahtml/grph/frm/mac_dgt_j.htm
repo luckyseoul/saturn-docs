@@ -1,0 +1,107 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>DGTデータフォーマット</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm">Graphic Tools Guide</A>
+★<a href="../index_j.htm#frm">フォーマット一覧</A>
+<HR NOSHADE>
+<CENTER>
+<H1>DGTデータフォーマット</H1>
+</CENTER>
+<HR>
+<DL>
+<P><DT><H3>■ファイルレイアウト</H3>
+<DD><TABLE BORDER=1>
+<TR><TH><PRE>オフセット</TH><TH><PRE>サイズ</TH><TH><PRE>ファンクション</TH></TR>
+<TR><TD><PRE>$000</TD><TD><PRE>$100</TD><TD><PRE><A HREF="#no1">ヘッダ</A></TD></TR>
+<TR><TD><PRE>$100</TD><TD><PRE>$ 20</TD><TD><PRE><A HREF="#no2">ディレクトリ</A></TD></TR>
+<TR><TD><PRE>$120</TD><TD><PRE>可変</TD><TD><PRE><A HREF="#no3">CLUT</A>(カラールックアップテーブル)</TD></TR>
+<TR><TD><PRE>不定</TD><TD><PRE>可変</TD><TD><PRE><A HREF="#no4">ビットマップデータ</A></TD></TR>
+</TABLE>
+
+<A NAME="no1"></A>
+<P><DT><B>　◆ヘッダ</B>
+<DD><TABLE BORDER=1>
+<TR><TH><PRE>オフセット</TH><TH><PRE>サイズ</TH><TH><PRE>解　説</TH></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> ワード</TD><TD><PRE> ヘッダサイズ＝$100</TD></TR>
+<TR><TD><PRE> $07</TD><TD><PRE> バイト</TD><TD><PRE> ディレクトリエントリ数＝$01</TD></TR>
+<TR><TD><PRE> $08</TD><TD><PRE> ロング</TD><TD><PRE> ヘッダを除いたファイルサイズ</TD></TR>
+<TR><TD><PRE> $10</TD><TD><PRE> $10</TD>   <TD><PRE> 識別子＝"DIGITIZER_3_Ver2"("_"はスペース＝$20)</TD></TR>
+<TR><TD><PRE> $20</TD><TD><PRE> $E0</TD>   <TD><PRE> ダミーデータ、すべて$00</TD></TR>
+</TABLE>
+
+<A NAME="no2"></A>
+<P><DT><B>　◆ディレクトリ</B>
+<DD><TABLE BORDER=1>
+<TR><TH><PRE>オフセット</TH><TH><PRE> サイズ </TH><TH><PRE> 解　　説 </TH></TR>
+<TR><TD><PRE> $00 </TD><TD><PRE> ロング</TD><TD><PRE> ディレクトリサイズ＝ $20+CLUTサイズ(可変)</TD></TR>
+<TR><TD><PRE> $04 </TD><TD><PRE> ワード</TD><TD><PRE> 水平方向表示位置(通常は$0000)</TD></TR>
+<TR><TD><PRE> $06 </TD><TD><PRE> ワード</TD><TD><PRE> 垂直方向表示位置(通常は$0000)</TD></TR>
+<TR><TD><PRE> $08 </TD><TD><PRE> ワード</TD><TD><PRE> 水平方向イメージサイズ</TD></TR>
+<TR><TD><PRE> $0A </TD><TD><PRE> ワード</TD><TD><PRE> 垂直方向イメージサイズ</TD></TR>
+<TR><TD><PRE> $10 </TD><TD><PRE> $10</TD>   <TD><PRE> ダミーデータ(すべて$00)</TD></TR>
+</TABLE>
+<DD>●「ディレクトリ名」の空き番地は$20です。
+<DD>●「ディレクトリ名」を除く空き番地はすべて$00です。
+
+<A NAME="no3"></A>
+<P><DT><B>　◆CLUT</B>
+<DD>パレットモード・ランレングスモードの場合存在する。
+<DD><TABLE BORDER=1>
+<TR><TH><PRE>オフセット</TH><TH><PRE> サイズ </TH><TH><PRE>ファンクション</TH></TR>
+<TR><TD><PRE> $00 </TD><TD><PRE>ロング×パレット数</TD><TD><PRE> CLUTデータ</TD></TR>
+</TABLE>
+<DD>●「ロング×１６色」で１パレットが構成されます。
+<DD>●１色でも使用されていると、１パレット分のデータが確保されます。
+
+<P><DD><B>CLUTデータ</B>
+<PRE>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+│　│　　　　　　　　　　パレット番号　　　　　　　　　　　　　　
+┌─┼─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│※│Ｅ│Ｄ│Ｃ│Ｂ│Ａ│９│８│７│６│５│４│３│２│１│０│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+│　　　　　　　　　　　　カラーデータ　　　　　　　　　　　ＬＳＢ
+│　│Ｂ│Ｇ│Ｒ│　　　Ｂ　　　│　　　Ｇ　　　│　　　Ｒ　　　│
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│※│０│０│０│４│３│２│１│４│３│２│１│４│３│２│１│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+※＝未使用
+</PRE>
+<DD>●CLUTがあってもビットマップデータ上に使用されていないパレット番号に対しては、
+カラーコードが$FFFFとなります。このことにより、CLUTから使用されていないパレット番号を
+知ることができます。
+
+
+<A NAME="no4"></A>
+<P><DT><B>　◆ビットマップデータ</B>
+<DD><TABLE BORDER=1>
+<TR><TH><PRE>オフセット</TH><TH><PRE> サイズ </TH><TH><PRE>ファンクション</TH></TR>
+<TR><TD><PRE> $00〜 </TH><TH><PRE>ワード×イメージサイズ</TH><TH><PRE>各ピクセルのパレット番号</TH></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm">Graphic Tools Guide</A>
+★<a href="../index_j.htm#frm">フォーマット一覧</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

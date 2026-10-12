@@ -1,0 +1,239 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/11&gt;VDP1ライブラリ/6.VDP1　3Dリファレンス</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no6">VDP1ライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p05_11.htm">戻る</A>｜
+<A HREF="p06_11.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ライブラリ</B>
+<H2 ALIGN=CENTER>6.VDP1　3Dリファレンス</H2>
+<HR NOSHADE>
+<A NAME="no6_10"></A>
+<H3>6.1　データ仕様</H3>
+
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no1"><HR></A><DL>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>クラスタ定義</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>SprCluster</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4> </H4></TD>
+</TR></TABLE>
+<DD><PRE>typedef     struct SprCluster {
+     Uint16          no;           /*     クラスタ番号　　　　　　　　　　　　　　  */
+     Uint16          angleSeq;     /*     回転順序　　　　　　　　　　　　　　　　  */
+     MthXyz          angle;        /*     親クラスタの座標系における回転　　　　　  */
+     MthXyz          point;        /*     親クラスタの座標系における原点の座標　　  */
+     SprObject3D     *object       /*     3Dオブジェクト　　　　　　　　　　　　　  */
+     SprCluster      *next;        /*     次クラスタ　　　　　　　　　　　　　　　  */
+     SprCluster      *child;       /*     子クラスタ　　　　　　　　　　　　　　　  */
+     SprInbetInf     *inbetInf;    /*     オブジェクト間接続ポリゴン情報　　　　　  */
+     void            (*transStart)(SprCluster*);
+                                   /*     座標変換開始前ユーザコールバックルーチン  */
+     void            (transEnd)(SprCluster*, SprObject3D*, MthMatrix*, MthXyz*);
+                                   /*     座標変換終了後ユーザコールバックルーチン  */
+     void            *context;     /*     ユーザコンテキストエリア　　　　　　　　  */
+} SprCluster;</PRE><P>
+noはユーザコールバックルーチンがクラスタテーブルを識別するためのもので、設定は任意です。<P>
+<PRE>angleSeq = ROT_SEQ_ZYX : オブジェクトの回転操作をZ→Y→Xの順番で行う
+           = ROT_SEQ_ZXY : 　　　　　　　”　　　　Z→X→Y　　”
+           = ROT_SEQ_YZX : 　　　　　　　”　　　　Y→Z→X　　”
+           = ROT_SEQ_YXZ : 　　　　　　　”　　　　Y→X→Z　　”
+           = ROT_SEQ_XYZ : 　　　　　　　”　　　　X→Y→Z　　”
+           = ROT_SEQ_XZY : 　　　　　　　”　　　　X→Z→Y　　”</PRE><P>
+<PRE>3Dオブジェクト、次クラスタおよび子クラスタが接続されない場合、各々
+object、next、childを0にします。<P>
+オブジェクト間接続ポリゴン情報がない場合は、inbetInfを0にします。<P>
+transStartはこのクラスタの座標変換開始前に呼び出されるユーザのコールバック
+ルーチンを指定します。ルーチン内ではクラスタの移動、オブジェクトデータの
+変更などを行います。コールバックルーチンがない場合には0にします。<P>
+[transStartルーチンのコーリングシーケンス]
+void transStart(SprCluster *cluster);<BR>
+     cluster          ：自クラスタテーブル<BR></PRE>
+
+<DD><PRE>transEndはこのクラスタの座標変換終了後に呼び出されるユーザのコールバック
+ルーチンを指定します。このコールバックルーチンはクラスタに接続される3D
+オブジェクト毎に呼び出されます。コールバックルーチンがない場合には0にします。<P>
+[transStartルーチンのコーリングシーケンス]
+void  transEnd(SprCluster *cluster, SprObject3D *object,<BR>
+                            MthMatrix *worldMatrix, MthXyz *worldVertPoint);<BR>
+     cluster         ：自クラスタテーブル
+     object          ：3Dオブジェクトテーブル
+     worldMatrix     ：ワールド座標系への変換マトリックス(3行4列)
+     worldVertPoint  ：ワールド座標系での頂点座標値テーブル
+                    (3Dスプライトワークエリア定義マクロで
+                     #define SPR_3NEED_WORLD_VERTを定義した場合に返す。)<P>
+contextはユーザコールバックルーチンがクラスタ別に使用するコンテキストエリ
+アを指定します。ない場合には0にします。</PRE>
+
+</DL>
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no2"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>オブジェクト定義</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>SprObject3D</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4> </H4></TD>
+</TR></TABLE>
+<DD><PRE>typedef     struct SprObject3D {
+     Uint16          no;               /*     オブジェクト番号　　　　　　　　　   */
+     Uint16          dispFlag          /*     表示フラグ　　　　　　　　　　　　   */
+     Uint16          vertCount;        /*     頂点数　　　　　　　　　　　　　　   */
+     Uint16          surfaceCount;     /*     面数　　　　　　　　　　　　　　　   */
+     MthXyz          *vertPoint;       /*     頂点座標テーブル　　　　　　　　　   */
+     MthXyz          *vertNormal;      /*     頂点の法線ベクトルテーブル　　　　   */
+     SprSurface     *surface;          /*     面定義テーブル　　　　　　　　　　   */
+     MthXyz           *surfaceNormal;  /*     面の法線ベクトルテーブル　　　　　   */
+     MthXyz          *surfaceVert;     /*     面代表点座標テーブル　　　　　　　   */
+     Uint16          **shdIdxTbl;      /*     シェーディングインデックステーブル   */
+     Fixed32          surfNormK;       /*     面法線ベクトルの計算補正値　　　　   */
+     SprObject3D     *next;            /*     次3Dオブジェクト　　　　　　　　　   */
+} SprObject3D;</PRE><P>
+noはユーザコールバックルーチンがオブジェクトテーブルを識別するためのもので、設定は任意です。<BR>
+<PRE>dispFlag b15,b14 = 00 :      ポリゴン表示
+                 = 10 :      ポリライン表示<P>
+             b12 =  1 :      両面ポリゴン<P>
+           b9,b8 = 00 :      シェーディングなし
+                   01 :      フラットシェーディング
+                   10 :      グーローシェーディング<P>
+              b4 =  1 :      オブジェクト間接続ポリゴンオブジェクト</PRE><P>
+<PRE>vertNormal    ： グーローシェーディングを行うときに設定します。
+surface       ： 面を構成する頂点や、カラー情報を面ごとに定義したテーブルのポインタ
+surfaceNormal ： 面ごとの法線を定義したテーブルのポインタ
+surfaceVert   ： 面の輝度計算をするときに参照される面の代表点(中心点)座標テーブルのポインタを設
+              　 定します。0を設定すると面定義の最初の頂点を代表点として使用します。
+shdIdxTbl     ： シェーディングテーブルによるフラットシェーディングを行う場合に、シェーディング
+              　 テーブルのインデックステーブルを設定します。グーローシェーディング指定の場合に、
+              　 このパラメータが指定されるとshdIdxTbl[０]をグーローシェーディングのグレイコー
+              　 ドテーブルとします。フラットシェーディングでかつ面定義の描画モードがテクスチャ
+              　 指定の場合に、このパラメータが指定されるとshdIdxTbl[０]をフラットシェーディン
+              　 グのグレイコードテーブルとします。
+surfNormK     ： このオブジェクトに対してSPR_３SetNormVect()ルーチンにより面の法線ベクトルを計
+              　 算する時、またはこのオブジェクトがオブジェクト間接続ポリゴンオブジェクトの場合
+              　 に指定します。詳しくは数学計算ライブラリのMTH_ComputeNormVect()ルーチンのsur
+              　 fNormKパラメータを参照してください。
+              　 オブジェクト間接続ポリゴンオブジェクトの場合はマイナス値を指定します。</PRE><BR>
+
+<DD>頂点の法線ベクトルテーブル、シェーディングインデックステーブルおよび次オブジェクトが接続されない場合、各々vertNormal、shdIdxTbl、nextを0にします。<P>
+シェーディングテーブルは次の形式でRGBコードの32階調で指定します。<P>
+Uint16 shadingTbl[32];      0←暗 明→31<P>
+両面ポリゴン指定を1にすると、片面ポリゴンデータを両面表示します。<P>
+</DL>
+
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no3"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>面定義</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>SprSurface</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4> </H4></TD>
+</TR></TABLE>
+<DD><PRE>typedef     struct SprSurface {
+     Uint16     vertNo[4];     /*     面を構成する頂点番号　　　　　　*/
+     Uint16     drawMode;      /*     描画モード　　　　　　　　　　　*/
+     Uint16     color;         /*     カラーデータ　　　　　　　　　　*/
+} SprSurface;</PRE><P>
+<PRE>
+drawMode    b15,b14 = 00 :  colorはカラーコード
+                      01 :  colorはテクスチャのキャラクタ番号
+                      10 :  colorはシェーディングテーブルのインデックス番号
+                      11 :  colorは自動シェーディングの元RGBコード<P>
+            b13,b12 = 00 :  座標変換後の4頂点のうち最小値をZソートの対象点とします。
+                      01 :  座標変換後の4頂点のうち最大値をZソートの対象点します。
+                      10 :  座標変換後の4頂点のうち中心値をZソートの対象点とします。<P>
+            b11-b0       :  スプライトの描画モードワードと同じです。
+drawModeでテクスチャーを指定した場合、colorのビットは次のようになります。
+color b15,b14ではテクスチャーの反転モードを指定します。
+      b15,b14 =00   ：反転なし
+              =01   ：左右反転
+              =10   ：上下反転
+              =11   ：上下左右反転<P>
+      b13-b0        ：ラクスチャのキャラクタ番号</PRE><P>
+
+</DL>
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no4"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>オブジェクト間接続ポリゴン情報</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>SprInbetInf</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4> </H4></TD>
+</TR></TABLE>
+<DD><PRE>typedef     struct SprInbetInf {
+     Sint32               vertCount;         /*  取り出し頂点数　　　　　　　　　　*/
+     SprObject3D          *fromObj;          /*  接続頂点データ取り出しオブジェクト*/
+     Uint16               *fromVertNo;       /*  取り出し頂点番号配列　　　　　　　*/
+     SprObject3D          *toObj;            /*  接続頂点データ設定オブジェクト　　*/
+     Uint16               *toVertNo;         /*  設定頂点番号配列　　　　　　　　　*/
+     SprInbetInf          *next;             /*  次オブジェクト間接続ポリゴン情報　*/
+} SprTexture;<P>
+　次のオブジェクト間接続ポリゴン情報がない場合はnextを0にします。</PRE><P>
+</DL>
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no5"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>テクスチャテーブル</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>SprTexture</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4> </H4></TD>
+</TR></TABLE>
+<DD><PRE>typedef     struct SprTexture {
+     Uint16               charNo;            /*  キャラクタ番号　　　　　　　　　　*/
+     Uint16               colorMode;         /*  カラーモード　　　　　　　　　　　*/
+     Uint16               color;             /*  カラーデータ　　　　　　　　　　　*/
+     Uint16               width;             /*  キャラクタの幅　　　　　　　　　　*/
+     Uint16               height;            /*  キャラクタの高さ　　　　　　　　　*/
+     Uint8                *charData;         /*  キャラクタデータのポインタ　　　　*/
+     SprLookupTbl         *lookupTbl;        /*  ルックアップテーブルのポインタ　　*/
+} SprTexture;<P>
+SprTexture texture[n];   最終エントリの charNo は 0xffff(ストッパです) にします。<P>
+colorMode      : b5 - b3 はスプライト描画モードワードと同じです。
+color          :カラーデータ
+                カラーモード=1の時はルックアップテーブル番号
+                カラーモード=0、2、3、4の時はカラーバンクコード
+                カラーモード=5の時は無視</PRE><P>
+</DL>
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no6"><HR></A><DL>
+<DT><TABLE BORDER><TR>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>3D環境データテーブル</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>Spr3dStatus</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4> </H4></TD>
+</TR></TABLE>
+<DD><PRE>typedef     struct Spr3dStatus {
+     MthXyz          lightAngle;            /*  光源アングル　　　　　　　　　　　  */
+     MthXyz          viewCoordPoint;        /*  視点座標系内の視点位置　　　　　　  */
+     MthXyz          viewPoint;             /*  視点座標　　　　　　　　　　　　　  */
+     MthXyz          viewAngle;             /*  視点アングル　　　　　　　　　　　  */
+     Sint32          viewAngleSeq;          /*  視点アングル回転操作　　　　　　　  */
+     Sint32          zSortMode;             /*  ZソートZ座標値の採用モード　　　　　*/
+     Fixed32         zSortZMin;             /*  Zソート現視点座標系Z最小値　　　　　*/
+     Fixed32         zSortZMax;             /*  Zソート現視点座標系Z最大値　　　　　*/
+     Fixed32         clipZMin;              /*  視点座標系クリップZ最小値　　　　　 */
+     Fixed32         clipZMax;              /*  視点座標系クリップZ最大値　　　　　 */
+     Sint32          clipLevel;             /*  クリッピングレベル　　　　　　　　  */
+     MthXy           unitPixel;             /*  x,y1.0に対するスクリーンのピクセル数*/
+} Spr3dStatus;</PRE><P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p05_11.htm">戻る</A>｜
+<A HREF="p06_11.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no6">VDP1ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

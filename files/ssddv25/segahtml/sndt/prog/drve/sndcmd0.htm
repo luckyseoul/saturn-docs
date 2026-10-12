@@ -1,0 +1,98 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/17&gt; Sound driver Ver2.10 guide/3. Sound control command</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no3">Sound Driver Programmer's Guide</a><HR>
+ <B>▲ <A HREF="sndctrl.htm">Back</a> ｜ <A HREF="sndcmd_.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound Driver Programmer's Guide</b><H2 ALIGN=CENTER> 3. Sound control command</H2><HR NOSHADE>
+<DL>
+<P> Control commands are issued to the command block area below. Write the command code and required parameters (P1--P14) in the 16-byte command block. There are 8 command blocks, so up to 8 commands can be issued at the same time.<BR>
+<P ALIGN=CENTER> <B>System interface area</b><BR>
+<img srcset="../image/soundif.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+ Sound control follows an operating procedure in which the sound program responds by writing "commands" that instruct operations and "parameters" as necessary information accompanying them to the host interface (RAM areas 0x25a00700 to 0x25a0077f). Masu. In addition, eight virtual drivers called pronunciation management numbers are used as playback formats, allowing each to be played and played in a different dimension.<BR>
+ The important thing here is the concept of pronunciation management number. The pronunciation control numbers (0 to 7) are designed to make it appear as if a program that performs eight pieces is playing each piece independently. However, in reality, there are not eight separate programs, and operations that exceed the limits of SCSP are not possible.<BR>
+ For example, play BGM with pronunciation control number 0. If you want to stop this BGM or fade it out, all you have to do is issue a command to this management number 0.<BR>
+ The program for each pronunciation control number can only execute one operation. Sound requests always trigger new actions. In other words, if you want to emit a sound effect while playing, you must specify a program with a management number other than 0 that is currently being played. Even with number 0, the sound effect will be emitted, but the BGM will immediately stop playing and switch to the next request, which is to emit the sound effect.<BR>
+ In this way, since the processing is independent, it is possible to play multiple BGMs at the same time or to emit sound effects while playing a PCM stream.<p> The host interface roughly looks like the image below. Write the command number in the CMD part. This will be explained in detail on the next page. P1,P2…set parameters. The number of parameters varies depending on the command. There are also commands that do not require parameters.<p><table border width="100%">
+<tr align="center"><td> address</td><td> CMD</td><td> P1</td><td> P2</td><td> P3</td><td> P4</td><td> P5</td><td> P6</td><td> P7</td><td> P8</td><td> P9</td><td> P10</td><td> P11</td><td></td><td></td><td></td><tr align="center"><td> 0X0700 </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><tr align="center"><td>0X0710 </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><tr align="center"><td>0X0720 </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><tr align="center"><td>0X0730 </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><tr align="center"><td>0X0740 </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><tr align="center"><td>0X0750 </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><tr align="center"><td>0X0760 </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><tr align="center"><td>0X0770 </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></table>
+ *The second byte is not used.<p> There are two methods for issuing commands: "timing flag handshake" and "command code handshake." Timing flag handshake is a method of issuing commands that ensures that the order of commands written by the main system is reproduced. However, the command code handshake is for compatibility with sound drivers Ver1.00 to Ver1.29, so normally use the timing flag handshake. This is because if the command code handshake is used, 68000 may not be able to keep up with continuous requests, which may cause trouble. More on this later.<BR>
+ Set the timing flag handshake as follows:<p><center>
+ Write 0x80 as a byte to 0x25A004E1 and start 68000</center>
+<p> Issuing a command using timing flags is as follows.<p> <b>Main system processing (issuing commands)</b><ol>
+<li> If the timing flag (7th bit of 0x25A004E0) is "0", write as many commands as you want to issue into the command block (up to 8 commands, command blocks may be used at intervals).<li> Set the timing flag to "1".</ol>
+ <b>Sound driver processing (picking up and executing commands)</b><ol>
+<li> If the timing flag is "1", commands will start executing in order from command block 1. (Command blocks are executed in order from 1 to 8, and blocks with command code "00h" do nothing and proceed to the next block)<li> The command block that completes command execution returns the command code to "00h".<li> When all processing up to command block 8 is completed, return the timing flag to "0".</ol>
+<p><CENTER>
+<PRE>
+Bit 76543210　
+＊・・・・・・・・・　
+↑　
+｜　
+Timing flag 0:Id1e　
+1: Command set completed</PRE></CENTER>
+ Once the timing flag mode is set, it cannot be undone. Please note that if you want to restore this, the only way is to reload the sound driver. Also note that Cinepac specifically does not support timing flag mode. If you leave it in timing flag mode, it will definitely stop at the cine pack part. For games that use a combination of Cinepack + built-in sound source during the game, the only way to do this is to forcibly lower the timing flag bit or not use the timing flag mode.<BR>
+ If you are using a software library, there is no function provided to set timing flags because the library functions handle this automatically internally. In the case of SGL, it automatically enters timing flag mode, but in the case of SBL it does nothing.<p> Next, I will also touch on the command code handshake.<BR>
+ This method checks whether the command code (first byte of the command block) is "00h" and issues the command. The main system checks that the command code is "00h" and issues commands in the order from block 1 to block 8. Similarly, the sound driver simply repeats the process of checking blocks 1 to 8 in order, and if a command code is written, processing that command.<BR>
+ The command code is cleared by the sound driver when processing is completed, so if the command code is not cleared to "00h" yet, it means that the command is still being processed or is waiting for processing to start. means. Conversely, if the issued command code is cleared to "00h", it means that the sound driver's command processing has completed completely. However, due to a mistake on the command issuing side, if the next request is written before the sound driver that received the request clears the command code to 0, there is a possibility that the newer command code will be set to 0 ( Ver-2.04 has taken some measures to prevent this phenomenon, but since there is a considerable speed difference between SH2 and 68000, it cannot be completely prevented.)<BR>
+ Due to the nature of the game being a real-time game using a control pad, most of the problems caused by command code handshakes are due to sound effects. A typical phenomenon that often occurs is ``Sometimes the sound effects don't come out.'' Please be careful.<BR>
+ When issuing a command, write all command parameters and then write the command code last. The sound driver takes command parameters as soon as it detects a command code, so if you write a command code for the first time, processing may be performed with unexpected command parameters.<BR>
+ The sound driver checks blocks 1 to 8 in order, so if you simply search for an empty block and set a command, the commands may be executed in a different order than the order in which they were written by the main system. If the execution order is swapped, the system may malfunction, so if you are executing a process that has a fixed execution order, set the commands so that the order will not be swapped.<BR>
+ In this procedure, the main system and sound driver process asynchronously, so even if you follow the above precautions, the order of commands may be swapped. If you need to preserve the order of execution, you can avoid this by using only one command block and making sure that the previous command has been processed before issuing the next command.<p><A NAME="CommandList"><HR></a><H3> Command list</H3><TABLE>
+<TR><TH> 01H</TH><TD> <A HREF="sndcmd_.htm#01">SEQUENCE START</a></TD><TD> Start playing music and sound effects</TD></TR>
+<TR><TH> 02H</TH><TD> <A HREF="sndcmd_.htm#02">SEQUENCE STOP</a></TD><TD> Stop playing songs and sound effects</TD></TR>
+<TR><TH> 03H</TH><TD> <A HREF="sndcmd_.htm#03">PAUSE</a></TD><TD> Pausing songs and sound effects</TD></TR>
+<TR><TH> 04H</TH><TD> <A HREF="sndcmd_.htm#04">PAUSE OFF</a></TD><TD> Unpause songs and sound effects</TD></TR>
+<TR><TH> 05H</TH><TD> <A HREF="sndcmd_.htm#05">SEQUENCE VOLUME</a></TD><TD> Adjust volume or fade in/out</TD></TR>
+<TR><TH> 06H</TH><TD> <A HREF="sndcmd_.htm#06">STOP ALL</a></TD><TD> Stop all playing</TD></TR>
+<TR><TH> 07H</TH><TD> <A HREF="sndcmd_.htm#07">TEMPO CHANGE</a></TD><TD> Changing the tempo of songs and sound effects</TD></TR>
+<TR><TH> 08H</TH><TD> <A HREF="sndcmd_.htm#08">MAP CHANGE</a></TD><TD> Perform a map change</TD></TR>
+<TR><TH> 09H</TH><TD> <A HREF="sndcmd_.htm#09">DIRECT MIDI CONTROL</a></TD><TD> Send MIDI events as commands</TD></TR>
+<TR><TH> 0AH</TH><TD> <A HREF="sndcmd_.htm#10">START VOLUME ANALYZER</a></TD><TD> Start input level analysis of Digital Audio In</TD></TR>
+<TR><TH> 0BH</TH><TD> <A HREF="sndcmd_.htm#11">STOP VOLUME ANALYZER</a></TD><TD> Digital Audio In input level analysis completed</TD></TR>
+<TR><TH> 0CH</TH><TD> <A HREF="sndcmd_.htm#12">DSP STOP</a></TD><TD> Stopping and initializing DSP</TD></TR>
+<TR><TH> 0DH</TH><TD> <A HREF="sndcmd_.htm#13">ALL NOTE OFF</a></TD><TD> All pronunciation stopped</TD></TR>
+<TR><TH> 0EH</TH><TD> <A HREF="sndcmd_.htm#14">SEQUENCE PAN</a></TD><TD> Control PANPOT from the game</TD></TR>
+<TR><TH> 10H</TH><TD> <A HREF="sndcmd_.htm#15">SOUND INITIALIZE</a></TD><TD> Initialize the sound driver</TD></TR>
+<TR><TH> 11H</TH><TD> <A HREF="sndcmd_.htm#16">YAMAHA 3D CONTROL</a></TD><TD> YAMAHA 3D sound controls</TD></TR>
+<TR><TH> 12H</TH><TD> <A HREF="sndcmd_.htm#17">QSOUND CONTROL</a></TD><TD> Qsound control</TD></TR>
+<TR><TH> 13H</TH><TD> <A HREF="sndcmd_.htm#18">YAMAHA 3D INITIALIZE</a></TD><TD> YAMAHA 3D,Qsound localization initialization</TD></TR>
+<TR><TH> 14H</TH><TD> <A HREF="sndcmd_.htm#19">TEMPO MODE</a></TD><TD> Setting the tempo mode</TD></TR>
+<TR><TH> 15H</TH><TD> <A HREF="sndcmd_.htm#20">TEMPO RATIO</a></TD><TD> Setting relative tempo values</TD></TR>
+<TR><TH> 80H</TH><TD> <A HREF="sndcmd_.htm#21">CD-DA LEVEL</a></TD><TD> Adjust CD-DA level</TD></TR>
+<TR><TH> 81H</TH><TD> <A HREF="sndcmd_.htm#22">CD-DA PAN</a></TD><TD> CD-DA output Panpot settings</TD></TR>
+<TR><TH> 82H</TH><TD> <A HREF="sndcmd_.htm#23">TOTAL VOLUME</a></TD><TD> Setting the total volume</TD></TR>
+<TR><TH> 83H</TH><TD> <A HREF="sndcmd_.htm#24">EFFECT CHANGE</a></TD><TD> Switching effects</TD></TR>
+<TR><TH> 85H</TH><TD> <A HREF="sndcmd_.htm#25">START PCM STREAM</a></TD><TD> PCM stream playback starts</TD></TR>
+<TR><TH> 86H</TH><TD> <A HREF="sndcmd_.htm#26">STOP PCM STREAM</a></TD><TD> PCM stream playback stop</TD></TR>
+<TR><TH> 87H</TH><TD> <A HREF="sndcmd_.htm#27">MIXER CHANGE</a></TD><TD> Mixer switching</TD></TR>
+<TR><TH> 88H</TH><TD> <A HREF="sndcmd_.htm#28">MIXER PARAMETER CHANGE</a></TD><TD> Switching mixer parameters</TD></TR>
+<TR><TH> 89H</TH><TD> <A HREF="sndcmd_.htm#29">HARDWARE CHECK</a></TD><TD> Check the hardware</TD></TR>
+<TR><TH> 8AH</TH><TD> <A HREF="sndcmd_.htm#30">PCM PARAMETER CHANGE</a></TD><TD> Parameter switching for the PCM stream being played</TD></TR>
+<TR><TH> 8BH</TH><TD> <A HREF="sndcmd_.htm#31">PCM SLOT ALLOCATION</a></TD><TD> Reserve a slot for PCM stream</TD></TR>
+<TR><TH> 8CH</TH><TD> <A HREF="sndcmd_.htm#32">PCM SLOT RELEASE</a></TD><TD> Free up slots for PCM streams</TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="sndctrl.htm">Back</a> ｜ <A HREF="sndcmd_.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no3">Sound Driver Programmer's Guide</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

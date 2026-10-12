@@ -1,0 +1,135 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/11&gt;VDP1 Library/1.VDP1 Basic Processing Guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">VDP1 library</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 library</b><H2 ALIGN=CENTER> 1.VDP1 basic processing guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Purpose</H3><DT><UL TYPE="DISK">
+<P><LI> It hides hardware-related processing such as VDP1 initialization and register operations, reducing the burden on application creators.</P>
+<P><LI> The basic processing library does not write commands to VRAM, as the processing method for speeding up may vary depending on the application. The application is notified of the VRAM address, so the application can freely manage and write to it (writing to and managing VRAM is supported by the extended processing library).</P>
+</UL>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 Explanation</H3><DT> <B>[Initial processing]</b><DT><UL TYPE="DISK">
+<P><LI> Set the TV mode, frame buffer erase area and erase data for each frame change.</P>
+</UL>
+<P><DT> <B>[V-BLANK interrupt processing function]</b><DT><UL TYPE="DISK">
+<P><LI> SPR_WaitDrawEnd() is used within the V_BLANKVDP interrupt handling routine to check for the end of VDP1 drawing.</P>
+</UL>
+<A NAME="no1_30"></A><P><DT><H3> 1.3 How to change the sprite execution environment</H3><DD> Slave SH and DSP are used to perform high-speed 3D and 2D processing, but depending on the application, you may not want to use them on the library side. In this case, you can change the sprite execution environment by defining or commenting out the following #define defined at the beginning of <B>sega_spr.h</b> and rebuilding the sprite and scroll library.</P>
+<P><DD><PRE>
+/*---------------------------------------
+ * Select 3D & Sprite Execute Environment
+ *----------------------------------------*/
+ #define <A HREF="#SPR_SYNC_VB_OUT">SPR_SYNC_VB_OUT</a>
+ #define <A HREF="#USE_SLAVE">USE_SLAVE</a>
+ #define <A HREF="#USE_DSP">USE_DSP</a>
+ #define <A HREF="#USE_INBETWEEN_OBJECT">USE_INBETWEEN_OBJECT</a>
+ #define <A HREF="#USE_DEBUG_INFO">USE_DEBUG_INFO</a>
+</PRE></P>
+<P><DD>A description of each #define is provided below.<DL>
+<A NAME="SPR_SYNC_VB_OUT"></A><P><DT> <B>(1) SPR_SYNC_VB_OUT</b><DD> When this is defined, the frame buffer switching wait for the sprite in SCL_DisplayFrame() becomes V blanked out, increasing the processing time for one field.<BR>
+ Scroll register writing is performed at V blank-in without waiting for SCL_DisplayFrame().<BR>
+ If you comment out, scrolling and sprites will be synchronized using V blank in as usual.</P>
+<A NAME="USE_SLAVE"></A><P><DT> <B>(2) USE_SLAVE</b><DD> Defining this will use the slave CPU to perform parallel processing with the main CPU.<BR>
+ If you comment it out, the slave CPU will not be used.</P>
+<A NAME="USE_DSP"></A><P><DT> <B>(3) USE_DSP</b><DD> If this is defined, matrix synthesis of coordinate transformation will be performed on the DSP, and processing will be performed in parallel with the CPU side.<BR>
+ If commented out, DSP will not be used.</P>
+<A NAME="USE_INBETWEEN_OBJECT"></A><P><DT> <B>(4) USE_INBETWEEN_OBJECT</b><DD> By defining this, you can process connection polygons between objects. If there are no connecting polygons between objects, you can slightly improve the shape of the 3D library by commenting out this definition.</P>
+<A NAME="USE_DEBUG_INFO"></A><P><DT> <B>(5) USE_DEBUG_INFO</b><DD> When this is defined, the number of polygons calculated and drawn by SPR_3DrawModel() will be set in the following variables.<BR>
+ This value is a cumulative value, so please clear it on the application side as necessary.</P>
+<P><PRE>
+extern int dbgComputePol; /* Number of calculation polygons */
+extern int dbgDrawPol; /* Number of polygons to draw */
+</PRE></P>
+<P>This variable is already defined in <B>sega_spr.h</b> .</P>
+</DL>
+<A NAME="no1_40"></A><P><DT><H3> 1.4 Program description example</H3><DD><PRE>
+#include&lt; machine.h&gt;
+#include "saga_spr.h"
+#include "sega_scl.h"
+#include "sega_int.h"
+
+extern void vbStart(void); /* V-BLANK IN interrupt routine */
+extern void vbEnd(void); /* V-BLANK OUT interrupt routine */
+main()
+
+{
+     Uint8 *vram; /* VRAM address storage area */
+
+     set_imask(0); /* Enable interrupts */
+
+     SCL_Vdp2Init(); /* Scroll and priority initialization */
+     SCL_SetPriority(SCL_SP0|SCL_SP1|SCL_SP2|SCL_SP3|SCL_SP4|
+                     SCL_SP5|SCL_SP6|SCL_SP7,7);
+     SCL_SetSpriteMode(SCL_TYPE1,SCL_MIX,SCL_SP_WINDOW);
+     SPR_Initial(&vram); /* Initialize sprite */
+
+     INT_ChgMsk(INT_MSK_NULL, INT_MSK_VBL_IN | INT_MSK_VBL_OUT);
+                                    /* Disable V-BLANK interrupt */
+     INT_SetFunc(INT_SCU_VBLK_IN, &vbStart);     
+                                    /* Register V-BLANK IN interrupt routine */
+     INT_SetFunc(INT_SCU_VBLK_OUT, &vbEnd);     
+                                    /* Register V-BLANK OUT interrupt routine */
+     INT_ChgMsk(INT_MSK_VBL_IN | INT_MSK_VBL_OUT, INT_MSK_NULL);
+                                    /* Enable V-BLANK interrupt */
+
+     SCL_SetFrameInterval(2); /* Set frame change interval */
+                                    /* set to 2/60 seconds */
+
+     for(;;){
+           memcpy(vram,command,sizeof(command));
+                                    /* Set sprite command to VRAM */
+
+              -------- /* Scroll data set */
+           SCL_DisplayFrame(); /* Waiting for V-BLANK interrupt */
+                                    /* Display sprite and perform scrolling */
+     }
+ }
+</PRE></P>
+−V blank processing routine (source file separate from the main above) −<P><P><DD><PRE>
+#include&lt; machine.h&gt;
+#include "sega_spr.h"
+#include "sega_scl.h"
+
+#pragma interrupt(VbStart)
+#pragma interrupt(VbEnd)
+
+void VbStart(void)
+{
+     SCL_VblankStart(); /* V blank start VDP interrupt processing */
+
+             -------- /* Other V blank start processing */
+}
+
+void VbEnd(void)
+{
+     SCL_VblankEnd(); /* V blank end VDP interrupt processing */
+     -------- /* Other V blank end processing */
+}
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">VDP1 library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

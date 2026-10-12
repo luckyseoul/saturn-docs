@@ -1,0 +1,321 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 4&gt;SGL Tutorial DATA/4.Data Format</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">データの受け渡し</A>
+<HR>
+<B>▲<a href="p003_j.htm">戻る</A>｜　　</A>■</B>
+<HR NOSHADE>
+<B>データの受け渡し</B>
+<H2 ALIGN=CENTER>4.データ構造</H2>
+<HR NOSHADE>
+<P>　本章ではセガサターンで扱うモデルデータ、マテリアル名の仕様、テクスチャデータの構造について解説します。</P>
+<DL>
+<A NAME="no4_10"></A>
+	<P>	<DT><H2>4-1.　モデルデータの仕様</H2>
+		<DD>　ここでいうモデルデータとは、３次元座標(x,y,x)のポイントデータ、その内の４点で形成されるポリゴンデータ、そのポリゴンの属性を表すアトリビュートデータの３つのデータの集合をいいます。<BR>
+		以下にモデル名を仮に“label”とした場合の一般的なフォーマットを示します。</P>
+
+<A NAME="no4_11"></A>
+	<P>	<DT><H3>ポイントデータ</H3>
+
+	<P><CENTER><HR NOSHADE WIDTH=40%><PRE>
+POINT point_label[]={   
+      POStoFIXED(x,y,z),
+      POStoFIXED(x,y,z),
+      POStoFIXED(x,y,z),
+      POStoFIXED(x,y,z),
+           .............
+      };                
+	<HR NOSHADE WIDTH=40%>
+POINT:ポイントデータ　　
+x,y,z:フロート型の座標値
+</PRE></CENTER></P>
+
+	<P>	<DD>　上から順番に０、１、２、３のポイントデータのインデックスとなります。</P>
+
+<A NAME="no4_12"></A>
+	<P>	<DT><H3>ポリゴンデータ</H3>
+
+	<P><CENTER><HR NOSHADE WIDTH=40%><PRE>
+POLYGON polygon_label[]={
+     NORMAL(x,y,z),      
+     VERTICES(0,1,2,3),  
+                         
+     NORMAL(x,y,z),      
+     VERTICES(0,1,2,3),  
+          .............  
+    };                   
+	<HR NOSHADE WIDTH=40%>
+NORMAL   :法線ベクトル　　　　　　　　　　　　　
+x,y,z    :フロート型の座標値　　　　　　　　　　
+VERTICES :ポリゴンを形成する４点のポイントデータ
+</PRE></CENTER></P>
+
+	<P>	<DD>　３角形ポリゴンの場合は、最後の１点を繰り返し、４点のポリゴンデータとします。</P>
+
+	<P>	<DT>　例）４角形ポリゴンの場合
+		<DD><B>VERTICES(0,1,2,3)</B>
+
+	<P>	<DT>　例）３角形ポリゴンの場合
+		<DD><B>VERTICES(0,1,2,2)</B>
+
+<A NAME="no4_13"></A>
+	<P><DT><H3>アトリビュートデータ</H3>
+<A NAME="db4_1"></A>
+	<P><CENTER><HR NOSHADE WIDTH=60%><PRE>
+ATTR attribute_label=[]={                                           
+        ATTRIBUTE(Plane,Sort,Texture,Color,Gouraud,Mode,Dir,Option),
+         .......   ....  .....  ...  ... .....  ...  .....          
+                                                                    
+        };                                                          
+	<HR NOSHADE WIDTH=60%>
+ATTR    : 属性　　　　　　　　　　　
+Plane   : 裏面判定ありかなしかの属性
+Sort    : Ｚソートの代表点　　　　　
+Texture : テクスチャ名（Ｎｏ．）　　
+Color   : カラーデータ　　　　　　　
+Gouraud : グーローシェーデングの属性
+Mode    : 描画モード　　　　　　　　
+Dir     : ポリゴンやテクスチャの状態
+Option  : オプション、その他の機能　
+</PRE></CENTER></P>
+
+	<P>	<DD>　属性には以上の８つのパラメータがあります。ここでそれぞれのパラメータで実際出力されるべきシンボルとその内容を記します。</P>
+
+	<P>	<DT><B>　[Plane] </B>
+		<DD>Single_Plane：裏面判定あり
+		<DD>Dual_Plane：裏面判定なし</P>
+
+	<P>	<DT><B>　[Sort]</B>
+		<DD>SORT_MIN：最近点
+		<DD>SORT_CEN：中心点
+		<DD>SORT_MAX：最遠点
+		<DD>SORT_BFR：直前に登録したポリゴンの手前で表示</P>
+
+<A NAME="db4_2"></A>
+	<P>	<DT><B>　[Texture] </B>
+		<DD>No_Texture：ポリゴンの場合
+		<DD>テクスチャ名：テクスチャの場合（テクスチャデータを示すマクロ）</P>
+	<P>	<DD>詳細については、“<A HREF="#no4_30">4-3項</A>：テクスチャデータの仕様”を参照してください。</P>
+
+	<P>	<DT><B>　[Color]</B>
+		<DD>No_Palet：テクスチャの場合
+		<DD>C_RGB( r, g, b：ポリゴンの場合のカラーデータ<BR>
+			r,g,bはそれぞれ三原色を示し、0〜31の十進数値が入ります。</P>
+
+	<P>	<DT><B>　[Gouraud]</B>
+		<DD>No_Gouraud：グーローなし
+		<DD>アドレス：グーローシェーディングテーブルの相対アドレス
+
+<A NAME="db4_4"></A>
+	<P>	<DT><B>　[Mode]</B>
+　		<DD><TABLE BORDER=1>
+		<TR><TH>グループ</TH><TH>　マ　ク　ロ　</TH><TH>　　　　　　内　　容　　　　　　</TH></TR>
+		<TR></TR>
+		<TR><TH ROWSPAN=3><B>【１】</B></TH>
+				<TD>No_Window  </TD><TD>Window内の制限を受けない <B>(default)</B> </TD></TR>
+				<TD>Window_In  </TD><TD>Windowの内側に表示する  </TD></TR>
+				<TD>Window_Out </TD><TD>Windowの外側に表示する  </TD></TR>
+		<TR></TR>
+		<TR><TH ROWSPAN=2><B>【２】</B></TH>
+				<TD>MESHoff    </TD><TD>通常表示  <B>(default)</B>  </TD></TR>
+				<TD>MESHon     </TD><TD>メッシュで表示する  </TD></TR>
+		<TR></TR>
+		<TR><TH ROWSPAN=2><B>【３】</B></TH>
+				<TD>ECdis      </TD><TD>EndCodeを無効にする  </TD></TR>
+				<TD>ECenb      </TD><TD>EndCodeを有効にする  <B>(default)</B>  </TD></TR>
+		<TR></TR>
+		<TR><TH ROWSPAN=2><B>【４】</B></TH>
+				<TD>SPdis      </TD><TD>透明ピクセルも表示する <B>(default)</B></TD></TR>
+				<TD>SPenb      </TD><TD>透明ピクセルは表示しない  </TD></TR>
+		<TR></TR>
+		<TR><TH ROWSPAN=6><B>【５】</B></TH>
+				<TD>CL16Bnk    </TD><TD>16色　カラーバンクモード <B>(default)</B>   </TD></TR>
+				<TD>CL16Look   </TD><TD>16色　ルックアップテーブルモード  </TD></TR>
+				<TD>CL64Bnk    </TD><TD>64色　カラーバンクモード  </TD></TR>
+				<TD>CL128Bnk   </TD><TD>128色　カラーバンクモード  </TD></TR>
+				<TD>CL256Bnk   </TD><TD>256色　カラーバンクモード  </TD></TR>
+				<TD>CL32KRGB   </TD><TD>32768色　RGBモード  </TD></TR>
+		<TR></TR>
+		<TR><TH ROWSPAN=5><B>【６】</B></TH>
+				<TD>CL_Replace </TD><TD>上書き（標準）モード  <B>(default)</B>  </TD></TR>
+				<TD>CL_Shadow  </TD><TD>影モード  </TD></TR>
+				<TD>CL_Half    </TD><TD>半輝度モード  </TD></TR>
+				<TD>CL_Trans   </TD><TD>半透明モード  </TD></TR>
+				<TD>CL_Gouraud</TD><TD>グーローシェーディングモード  </TD></TR>
+		</TABLE></P>
+
+<A NAME="db4_3"></A>
+	<P>	<DT><B>　[Dir]</B>
+		<DD><TABLE BORDER=1>
+		<TR><TH>　マ　ク　ロ　</TH><TH>　　　　　　内　　容　　　　　　</TH></TR>
+		<TR></TR>
+		<TR><TD>sprNoflip </TD><TD>テクスチャを通常表示します </TD></TR>
+		<TR><TD>sprHflip </TD><TD>テクスチャを左右反転します </TD></TR>
+		<TR><TD>sprVflip </TD><TD>テクスチャを上下反転します </TD></TR>
+		<TR><TD>sprHVflip </TD><TD>テクスチャを上下左右反転します</TD></TR>
+		<TR><TD>sprPorygon </TD><TD>ポリゴンを表示します </TD></TR>
+		<TR><TD>sprPolyLine </TD><TD>ポリラインを表示します </TD></TR>
+		<TR><TD>sprLine </TD><TD>初めの2点を利用した直線を表示します </TD></TR>
+		</TABLE></P>
+
+<A NAME="db4_5"></A>
+	<P>	<DT><B>　[Option]</B>
+　		<DD><TABLE BORDER=1>
+		<TR><TH>　マ　ク　ロ　</TH><TH>　　　　　　内　　容　　　　　　</TH></TR>
+		<TR></TR>
+		<TR><TD>UseLight  </TD><TD>光源計算を行う </TD></TR>
+		<TR><TD>UseClip   </TD><TD>頂点が画面外に出たら表示しない </TD></TR>
+		<TR><TD>UsePalette</TD><TD>ポリゴンのカラーがパレット形式であることを示す </TD></TR>
+		</TABLE></P>
+
+
+	<P>	<DD>　上記のパラメータの内、<B>Plane</B>、 <B>Sort</B> 、<B>Mode</B> は、次項のマテリアル名に指定することによって得られます。</P>
+
+<A NAME="no4_14"></A>
+	<P>	<DT><H3>PDATA構造体</H3>
+
+	<P><CENTER><HR NOSHADE WIDTH=60%><PRE>
+PDATA pdata_label[]={   
+       point_label,n1,  
+       polygon_label,n2,
+       attribute_label  
+      };                
+	<HR NOSHADE WIDTH=60%>
+pdata_label    :ＳＧＬに渡すＰＤＡＴＡ型のアドレスを示します。
+point_label    :ＰＯＩＮＴ型のアドレスを示します。　　　　　　
+nl             :ポイント数を示します。　　　　　　　　　　　　
+polygon_label  :ＰＯＬＹＧＯＮ型のアドレスを示します。　　　　
+n2             :ポリゴン数を示します。　　　　　　　　　　　　
+attribute_label:ＡＴＴＲ型のアドレスを示します。　　　　　　　
+</PRE><HR NOSHADE WIDTH=60%></CENTER></P>
+
+<A NAME="no4_15"></A>
+	<P>	<DT><H3>OBJECT構造体</H3>
+	<P><CENTER><HR NOSHADE WIDTH=60%><PRE>
+OBJECT object_label[]={   
+       pdata_label,       
+       TRANSLATION(x,y,z),
+       ROTATION(x,y,z),   
+       SCALING(x,y,z),    
+       object_child,      
+       object_sibling,    
+<HR NOSHADE WIDTH=60%>
+pdata_label    :ＰＤＡＴＡ型のアドレスを示します。　　　　
+TRANSLATION    :移動量を示します。　　　　　　　　　　　　
+ROTATION       :回転量を示します。　　　　　　　　　　　　
+SCALING        :拡大量を示します。　　　　　　　　　　　　
+object_child   :子供のＯＢＪＥＣＴ型のアドレスを示します。
+object_sibling :兄弟のＯＢＪＥＣＴ型のアドレスを示します。
+</PRE></CENTER></P>
+
+	<P>	<DD>　この構造体の使い方については“design 3”　のサンプルソースを参照してください。</P>
+<A NAME="no4_20"></A>
+	<P>	<DT><H2>4-2. マテリアル名の仕様</H2>
+		<DD>　マテリアル名には１文字ごとに意味を持たせています。その内容がそのままアトリビュートデータに反映されることになります。その仕様を以下に示します。</P>
+
+	<P>	<DD>　一般的には下記のようになっています。
+		<DD><B>[Plane][Sort][Mesh]</B>　（[]  には１文字が入り、マテリアル名は例えば“SSN”のように３文字で表されます。）</P>
+
+	<P>	<DD>　それぞれの文字の属性は、</P>
+
+	<P>	<DT><B>　[Plane]</B>
+		<DD>S：Single_Plane
+		<DD>D：Dual_Plane</P>
+
+	<P>	<DT><B>　[Sort]</B>
+		<DD>N：SORT_MIN
+		<DD>C：SORT_CEN
+		<DD>F：SORT_MAX
+		<DD>B：SORT_BFR</P>
+
+	<P>	<DT><B>　[Mesh]</B>
+		<DD>O：MESHon
+		<DD>N：MESHoff</P>
+
+	<P>	<DD>　例）マテリアル名が“SCN”であるならばアトリビュートデータは、</P>
+　
+	<P>	<DD><B>ATTRIBUTE( Single_Plane, SORT_CEN, No_Texture, C_RGB( r, g, b ), No_Gouraud, MESHoff, sprNoflip, NoOption )</B></P>
+
+	<P>となります。</P>
+<A NAME="no4_30"></A>
+	<P>	<DT><H2>4-3. テクスチャデータの仕様</H2>
+		<DD>　これはテクスチャの場合にのみ必要なデータです。アトリビュートデータの“Texture”でのテクスチャ名はこのデータを基にしています。</P>
+
+	<P>	<DD>　テクスチャとするＤＧＴファイルが“sample.dgt”とすると、</P>
+
+	<P><CENTER><HR NOSHADE WIDTH=50%><PRE>
+TEXDAT sample[]={                      
+        rgb,rgb,rgb,rgb,rgb,rgb,rgb,rgb
+        rgb,rgb,rgb,rgb,rgb,rgb,rgb,rgb
+        .............................  
+        };                             
+<HR NOSHADE WIDTH=50%>
+TEXTB       :テクスチャのテーブル　　　　　　　　　　　　　　　　　　　　
+sample      :テクスチャデータのあるラベルを示します（ファイル名そのまま）
+hsize,vsize :テクスチャのサイズです（ｈｓｉｚｅは常に８の倍数）　　　　　
+bgr         :テクスチャデータの１ピクセル　　　　　　　　　　　　　　　　
+</PRE></CENTER></P>
+
+	<P>	<DD>　また、３原色はそれぞれ、０〜３１の値で５ビットで表現されます。<BR>
+		データ形式は以下の通りです。</P>
+
+	<P>	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD> </TD><TD COLSPAN=5>B</TD><TD COLSPAN=5>G</TD><TD COLSPAN=5>R</TD></TR>
+	<TR ALIGN=CENTER><TD>1</TD><TD>4</TD><TD>3</TD><TD>2</TD><TD>1</TD><TD>0</TD><TD>4</TD><TD>3</TD><TD>2</TD><TD>1</TD><TD>0</TD><TD>4</TD><TD>3</TD><TD>2</TD><TD>1</TD><TD>0</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>例）sample.dgtというグラフィックデータファイルが、下図のような８×２サイズの白と黒のチェッカーのテクスチャだったとします。</P>
+
+<A NAME="z4_1"></A>
+	<P ALIGN=CENTER><B>図4-1　チェッカー模様のテクスチャ</B><BR>
+	<img srcset="../grp/p6_3_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　するとこのテクスチャに対するテクスチャデータは以下のようになります。</P>
+
+	<P><CENTER><HR NOSHADE WIDTH=65%><PRE>
+TEXDAT sample[]={                                               
+        0xffff,0x8000,0xffff,0x8000,0xffff,0x8000,0xffff,0x8000,
+        0x8000,0xffff,0x8000,0xffff,0x8000,0xffff,0x8000,0xffff 
+        };                                                      
+	</PRE><HR NOSHADE WIDTH=65%></CENTER></P>
+
+	<P>	<DD>　このテクスチャを貼ったマテリアル名“SCN”のポリゴンのアトリビュートデータは、</P>
+
+	<P>	<DD><B>ATTRIBUTE(Single_Plane, SORT_CEN, SAMPLE, No_Palet, No_Gouraud, MESHoff, SprNoflip, NoOption)</B></P>
+
+	<P>	<DD>　となります。</P>
+
+	<P>	<DD><B>注意</B><BR>
+		<DD>　テクスチャに際して、Ｈサイズは８の倍数でなければいけません。これはサターンのハードの仕様による制限です。</P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p003_j.htm">戻る</A>｜　　</A>■</B>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">データの受け渡し</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

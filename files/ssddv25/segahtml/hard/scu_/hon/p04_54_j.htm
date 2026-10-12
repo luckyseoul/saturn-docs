@@ -1,0 +1,263 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;24/31&gt;SCUユーザーズマニュアル/5.DSP命令詳細</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCUユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p04_53_j.htm">戻る</A>｜
+     <a href="p04_55_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCUユーザーズマニュアル／第４章　DSP制御</B>
+<H2 ALIGN=CENTER>演算命令</H2>
+<H3 ALIGN=CENTER>D1-Bus制御命令</H3>
+　D1-Bus制御命令は、D1-Busに接続されているメモリ間のデータのやりとりを制御します。
+<HR NOSHADE>
+
+<!-- --------------------------------------------------------- -->
+<A NAME="d1bus_nop"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><a href="p04_02_j.htm#d1bus">一覧表</A>|
+▲<a href="p04_53_j.htm#ybus_mov_sa">戻る</A>|
+  <A HREF="#d1bus_simm">次へ</A>▼
+|<a href="dspasm_j.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>NOP</H1>
+		<DD><H3>D1-Busノーオペレーション</H3></P>
+
+	<P>	<DT><B>動作内容</B>
+		<DD>　　　D1-Bus部が未処理になります。</P>
+
+	<P>	<DT><B>記述式</B>
+		<DD>label: NOP</P>
+
+	<P>	<DT><B>インストラクションコード</B>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>　</TD><TD>　</TD><TD>13</TD><TD>12</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+</TR></TABLE>
+
+	<P>	<DT><B>フラグ</B>
+		<DD>変化しません。</P>
+
+	<P>	<DT><B>備　考</B>
+		<DD>なし。</P>
+</DL>
+
+<!-- --------------------------------------------------------- -->
+<A NAME="d1bus_simm"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><a href="p04_02_j.htm#d1bus">一覧表</A>|
+▲<A HREF="#d1bus_nop">戻る</A>|
+  <A HREF="#d1bus_mov_sd">次へ</A>▼
+|<a href="dspasm_j.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>MOV SImm,[d]</H1>
+		<DD><H3>転送(SImm→[destination])</H3></P>
+
+
+
+	<P>	<DT><B>動作内容</B>
+		<DD>SImmデータを、[destination]で指定したRAMまたはレジスタに転送します。
+		<DD>SImmデータは、符号付8bitデータです。</P>
+
+	<P>	<DT><B>記述式</B>
+		<DD>label: MOV SImm,[Destination]
+		<DD>　　　Destination =  MC0〜MC3,RX,PL,RA0,WA0,LOP,TOP,TC0〜TC3</P>
+
+  <P><DT><B>インストラクションコード</B>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>　</TD><TH>　</TH><TH>　</TH><TH>　</TH><TD>　</TD><TD>　</TD><TD>　</TD><TH>　</TH>
+<!--15         14         13         12         11         10         09         08  -->
+<TH>　</TH><TH>　</TH><TD>13</TD><TD>12</TD><TH>11</TH><TH>10</TH><TH>９</TH><TH>８</TH>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>０</TD><TD>１</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD COLSPAN=8>SImmデータ</TD>
+</TR></TABLE></P>
+<P><CENTER>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4>ビットデータ</TH><TH ROWSPAN=2>　[d]　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit11</TH><TH>bit10</TH><TH>bit９</TH><TH>bit８</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0,CT0++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1,CT1++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2,CT2++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3,CT3++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>0</TD><TD>[RX] </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>1</TD><TD>[PL] </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>0</TD><TD>[RA0] </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>1</TD><TD>[WA0] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>未使用 </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>1</TD><TD>未使用 </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>0</TD><TD>[LOP] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>1</TD><TD>[TOP] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>0</TD><TD>[CT0] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>1</TD><TD>[CT1] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>0</TD><TD>[CT2] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>1</TD><TD>[CT3] </TD></TR>
+</TABLE></CENTER>
+</P>
+
+
+
+
+  <P><DT><B>フラグ</B>
+  <DD>[d]選択肢により選択されたエリア;Immデータになります。</P>
+
+  <P><DT><B>備　考</B>
+  <DD>[MCx(x=0〜3)]は、DATA RAMx(x0〜3)を指定し、転送後、[CTx(x=0〜3)]をインクリメントします。 </P>
+
+</DL>
+
+<!-- --------------------------------------------------------- -->
+<A NAME="d1bus_mov_sd"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><a href="p04_02_j.htm#d1bus">一覧表</A>|
+▲<A HREF="#d1bus_simm">戻る</A>|
+  <a href="p04_55_j.htm#mvi_imm_d">次へ</A>▼
+|<a href="dspasm_j.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>MOV [s],[d]</H1>
+		<DD><B>転送([source]→[destination])</B>
+
+	<P>	<DT><B>動作内容</B>
+		<DD>[source]で指定したRAMまたはレジスタのデータを、[destination]で指定したRAMまたはレジスタに転送します。
+
+	<P>	<DT><B>記述式</B>
+		<DD>label: MOV [source],[destination]
+  <P ALIGN=CENTER>Sourse = MC0〜MC3,MC0〜MC3,ALH,ALL　　　　　　　　　　<BR>
+                  Destination = MC0〜MC3,RX,PL,RA0,WA0,LOP,TOP,TC0〜TC3</P>
+
+  <P><DT><B>インストラクションコード</B>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>　</TD><TH>　</TH><TH>　</TH><TH>　</TH><TD>　</TD><TD>　</TD><TD>　</TD><TH>　</TH>
+<!--15         14         13         12         11         10         09         08  -->
+<TH>　</TH><TH>　</TH><TD>13</TD><TD>12</TD><TH>11</TH><TH>10</TH><TH>９</TH><TH>８</TH>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>３</TH><TH>２</TH><TH>１</TH><TH>０</TH>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>０</TD><TD>１</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TR></TABLE></P>
+<P><CENTER>
+	<TABLE BORDER=0><TR><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4>ビットデータ</TH><TH ROWSPAN=2>　[d]　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit11</TH><TH>bit10</TH><TH>bit９</TH><TH>bit８</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0,CT0++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1,CT1++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2,CT2++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3,CT3++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>0</TD><TD>[RX] </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>1</TD><TD>[PL] </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>0</TD><TD>[RA0] </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>1</TD><TD>[WA0] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>未使用 </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>1</TD><TD>未使用 </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>0</TD><TD>[LOP] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>1</TD><TD>[TOP] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>0</TD><TD>[CT0] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>1</TD><TD>[CT1] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>0</TD><TD>[CT2] </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>1</TD><TD>[CT3] </TD></TR>
+</TABLE>
+		</TD><TD>　　</TD><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=4>ビットデータ</TH><TH ROWSPAN=2>　[d]　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit1３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>0</TD><TD>DATA RAM3,CT0++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>1</TD><TD>DATA RAM3,CT1++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>0</TD><TD>DATA RAM3,CT2++ </TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3,CT3++ </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>未使用 </TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>1</TD><TD>[ALU LOW]</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>0</TD><TD>[ALU HIGHT]<BR>48ビット中、上位側32ビット</TD></TR>
+</TABLE>
+		</TD></TR></TABLE>
+</CENTER>
+</P>
+
+
+  <P><DT><B>フラグ</B>
+  <DD>　[d]選択肢により選択されたエリア;[s]選択肢により選択されたエリアのデータになります。
+
+  <P><DT><B>備　考</B>
+     <DD>　[Mx(x=0〜3)]は、DATA RAMx(x0〜3)を指定します。
+     <DD>　[MCx(x=0〜3)]は、DATA RAMx(x0〜3)を指定し、転送後、[CTx(x=0〜3)]をインクリメントします。 
+
+</DL>
+
+<HR NOSHADE>
+<B>▲<a href="p04_53_j.htm">戻る</A>｜
+     <a href="p04_55_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCUユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

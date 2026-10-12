@@ -21,6 +21,11 @@ Curated **offline** collection of Sega Saturn engineering specs, programmer guid
 | Antime ST- / Hitachi / tools PDFs | [`files/*.pdf`](files/) (103 files) |
 | Antime index HTML snapshot | [`files/html/antime-docs-index.html`](files/html/antime-docs-index.html) |
 | Copetti Saturn architecture | [`files/html/copetti-saturn.html`](files/html/copetti-saturn.html) |
+| Developer’s Documentation v2.50 (EN+JP, 1997-08-25) | [`files/ssddv25/index.html`](files/ssddv25/index.html) |
+| Developer’s Documentation v2.50 (original Japanese) | [`files/ssddv25-jp/index.htm`](files/ssddv25-jp/index.htm) |
+| Developer’s Documentation Vol. 1 Rel. 1 (Japanese, A19-1000, 1996-04-20) | [`files/ssddv1-jp/HYOUSI.HTM`](files/ssddv1-jp/HYOUSI.HTM) |
+| Same Vol. 1, 2019 English translation | [`files/ssddv1-en/hyousi.htm`](files/ssddv1-en/hyousi.htm) |
+| Saturn PAL service manuals | [`files/service/`](files/service/) |
 
 ## Core Official Manuals (quick links)
 
@@ -95,4 +100,21 @@ Curated **offline** collection of Sega Saturn engineering specs, programmer guid
 
 Official ST- documents are **local PDFs** (no external download required for the Antime set). Markdown under `hardware/`, `software/`, and `reverse-engineering/` synthesizes manuals + validated emulator RE (Ymir/Kronos-class).
 
-Last updated: 2026-08-04 — recovered/rebuilt after accidental deletion; PDFs re-mirrored from Antime.
+## Japanese electronic manuals (later than the Antime ST set)
+
+The Antime PDFs are the English ST- series. Sega of Japan’s last kit is the August 1997 Developer Tool Kit, documentation **version 2.50** (SBL 6.21 / SGL 3.20 era). Nemesis’s bilingual HTML mirror is under [`files/ssddv25/`](files/ssddv25/) (open `index.html`). The original Japanese tree, whose paths differ, is [`files/ssddv25-jp/`](files/ssddv25-jp/).
+
+Volume 1 Release 1 (CD A19-1000, 1996-04-20) is the earlier electronic edition: Japanese in [`files/ssddv1-jp/`](files/ssddv1-jp/), English translation in [`files/ssddv1-en/`](files/ssddv1-en/). Volume 2 (B20-1000) is dumped on redump.org and is still not in public file form, so it is not here.
+
+PAL service scans from the Exodus technical-docs Drive mirrors:
+
+| File | What it is |
+|------|------------|
+| [`files/service/Sega_Saturn_Service_Manual_PAL.pdf`](files/service/Sega_Saturn_Service_Manual_PAL.pdf) | Saturn PAL service manual |
+| [`files/service/Sega_Saturn_Service_Manual_PAL_013-01_part1.pdf`](files/service/Sega_Saturn_Service_Manual_PAL_013-01_part1.pdf) | 013-01 (1995-06), part 1 |
+| [`files/service/Sega_Saturn_Service_Manual_PAL_013-01_part2.pdf`](files/service/Sega_Saturn_Service_Manual_PAL_013-01_part2.pdf) | 013-01, part 2 |
+| [`files/service/Sega_Saturn_Service_Manual_VA13_PAL_partial.pdf`](files/service/Sega_Saturn_Service_Manual_VA13_PAL_partial.pdf) | VA-13 PAL, partial |
+
+`files/ssddv25/` includes `segahtml/info/hon/sh_dual.exe`, a small dual-SH sample that shipped inside that manual tree.
+
+Last updated: 2026-10-12 — v2.50 and Vol. 1 HTML manuals, plus PAL service scans. The 103 Antime PDFs are unchanged.

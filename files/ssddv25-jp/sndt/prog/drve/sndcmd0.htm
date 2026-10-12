@@ -1,0 +1,127 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/17&gt;サウンドドライバVer2.10ガイド/３.サウンドコントロールコマンド</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm#sndt"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#prog">SOUND Manual</A>
+★<A HREF="index.htm#no3">サウンドドライバプログラマーズガイド</A>
+<HR>
+<B>▲
+<A HREF="sndctrl.htm">戻る</A>｜
+<A HREF="sndcmd_.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>サウンドドライバプログラマーズガイド</B>
+<H2 ALIGN=CENTER>３.サウンドコントロールコマンド</H2>
+<HR NOSHADE>
+<DL>
+
+<P>　コントロールコマンドの発行は下記のコマンドブロックエリアに対して行います。16バイトのコマンドブロックに、コマンドコードと必要なパラメータ(P1--P14)を書き込んでください。コマンドブロックは8ブロックありますので、最大8コマンドまでを同時に発行することができます。<br>
+
+<P ALIGN=CENTER><B>システムインタフェース領域</B><BR><IMG SRC="../image/soundif.gif"></P>
+
+　サウンドコントロールは動作を指示する「コマンド」とそれに付随する必要な情報として「パラメータ」をホストインターフェース（RAMエリア0x25a00700〜0x25a0077f）へ書き込んでやることによってサウンドプログラムがそれに反応するといった動作手順を踏んでいます。また、再生形態として発音管理番号という８つの仮想ドライバにより、それぞれを別次元で演奏、再生できます。<br>
+　ここで大切なことは発音管理番号という概念です。発音管理番号（0〜7）とは８本の演奏を行なうプログラムが、あたかもそれぞれが独立して演奏をしているように見せようと設計されたものです。ただし、実際にはプログラムが別々に８本あるわけではなく、SCSPの限界を超えるような動作はできません。<br>
+　たとえば、発音管理番号０でBGMを演奏させます。このBGMを止めたい、あるいはフェードアウトさせたいというときにはこの管理番号０に対してコマンドを発行すればよいわけです。<br>
+　各発音管理番号のプログラムはひとつの動作しか実行できません。サウンドリクエストは常に新しいものに対して動作を起こします。つまり、演奏中に効果音を発声させたい場合には現在演奏中の管理番号０以外のプログラムを指定しなければなりません。０番でも効果音は発声しますが、BGMはただちに演奏終了し、次の要求である効果音の発声という処理に切り替わってしまいます。<br>
+　このように、処理が独立しているので、複数のBGMを同時に演奏させたり、PCMストリーム再生中に効果音を発声させたりすることが可能となっています。<p>
+　ホストインターフェースはだいたい次のようなイメージです。CMD部分にコマンド番号を書き込みます。これについては次のページから詳しく解説します。P1,P2…はパラメータをセットします。パラメータの数はコマンドによって異なります。また、パラメータを必要としないコマンドも存在します。<p>
+<table border width="100%">
+<tr align="center"><td>アドレス</td><td>CMD</td><td>P1</td><td>P2</td><td>P3</td><td>P4</td><td>P5</td><td>P6</td><td>P7</td><td>P8</td><td>P9</td><td>P10</td><td>P11</td><td>　</td><td>　</td><td>　</td>
+<tr align="center"><td>0X0700</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td>
+<tr align="center"><td>0X0710</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td>
+<tr align="center"><td>0X0720</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td>
+<tr align="center"><td>0X0730</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td>
+<tr align="center"><td>0X0740</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td>
+<tr align="center"><td>0X0750</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td>
+<tr align="center"><td>0X0760</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td>
+<tr align="center"><td>0X0770</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td><td>　</td>
+</table>
+　＊２バイト目は使用しません。<p>
+　コマンドの発行方法には、「タイミングフラグハンドシェイク」と「コマンドコードハンドシェイク」の2種類の方法があります。タイミングフラグハンドシェイクとはメインシステムの書き込んだコマンドの順番が確実に再現されるように考慮されたコマンドの発行方法です。但しコマンドコードハンドシェイクは、サウンドドライバ Ver1.00 から Ver1.29 までの互換用ですので、通常はタイミングフラグハンドシェイクの方を使用してください。コマンドコードハンドシェイクですと連続リクエストに68000が間に合わず、トラブルが発生することがあるためです。これについては後述します。<br>
+　タイミングフラグハンドシェイクは次のようにして設定します。<p>
+<center>0x25A004E1へバイトで0x80を書き込み68000をスタート</center><p>
+　タイミングフラグを使ったコマンドの発行は次の要領で行います。<p>
+<b>メインシステムの処理（コマンドの発行）</b>
+<ol>
+<li>タイミングフラグ（0x25A004E0の第７ビット）が「0」なら、コマンドブロックにコマンドを出したい分だけ書き込む（最大8コマンドまでで、コマンドブロックは間をあけて使用してもも良い）。
+<li>タイミングフラグを「1」にする。
+</ol>
+<b>サウンドドライバの処理（コマンドの引き取りと実行）</b>
+<ol>
+<li>タイミングフラグが「1」なら、コマンドブロック1から順番にコマンドの実行を開始する。
+　（コマンドブロックは1から8へと順番に実行され、コマンドコードが「00h」のブロックはなにもしないで次のブロックへと進む）
+<li>コマンドの実行が終わったコマンドブロックはコマンドコードを「00h」にもどす。
+<li>コマンドブロック8までの処理が全て終わったら、タイミングフラグを「0」にもどす。
+</ol>
+<p>
+<CENTER><PRE>
+ビット　７６５４３２１０　　　　　　　　　　　
+　　　　＊・・・・・・・　　　　　　　　　　　
+　　　　↑　　　　　　　　　　　　　　　　　　
+　　　　｜　　　　　　　　　　　　　　　　　　
+　　　　タイミングフラグ　0:Ｉｄ１ｅ　　　　　
+　　　　　　　　　　　　　1:コマンドセット完了
+</PRE></CENTER>
+
+　タイミングフラグモードは、一度でも設定を行なってしまうと、元へ戻すことができません。これを元へ戻したい場合にはサウンドドライバを再ロードする以外に方法はありませんので注意してください。また、特にシネパックがタイミングフラグモードに対応していないということに注意してください。タイミングフラグモードのままにしておくと、シネパック部分で確実にストップしてしまいます。ゲーム中にシネパック+内蔵音源という組み合わせを用いるゲームにおいてはタイミングフラグビットを強制的に降ろしてやるか、タイミングフラグモードを使用しないという方法しかありません。<br>
+　ソフトウェアライブラリを使用している場合には、タイミングフラグをセットするための関数は用意されていませんが、これはライブラリ関数が内部で自動的に処理しているためです。SGLの場合、自動的にタイミングフラグモードになりますが、SBLの場合にはなにもしません。<p>
+　次にコマンドコードハンドシェイクについても触れておきます。<br>
+　コマンドコード（コマンドブロックの先頭の１バイト目）が「00h」であるかをチェックしてコマンドを発行する方法です。メインシステムはコマンドコードが「00h」であることを確認して、ブロック1からブロック8までの順番を守ってコマンドを発行します。サウンドドライバも同様に、ブロック1からブロック8までを順番にチェックして、コマンドコードが書かれていたらそのコマンドを処理するという動作を単純に繰り返します。<br>
+　コマンドコードは処理が終わった時点でサウンドドライバによってクリアされますので、コマンドコードがまだ「00h」にクリアされていない場合は、まだコマンドの処理中であるか処理の開始待ちの状態であることを意味します。逆に発行したコマンドコードが「00h」にクリアされたということは、サウンドドライバのコマンド処理が完全に終了したということを意味します。しかし、コマンド発行側のミスで、リクエストを受け取ったサウンドドライバがコマンドコードを０クリアする前に次のリクエストが書き込まれてしまった場合、新しいほうのコマンドコードを０にしてしまう可能性があります（ver-2.04ではこの現象に対してある程度の対策を施していますが、SH2と68000にかなりの速度差がある以上、完全に防ぐことはできません）。<br>
+　ゲームがコントロールパッドを使用したリアルタイムなものであるという性質上、コマンドコードハンドシェイクによって起こるトラブルはそのほとんどが効果音なのです。代表的なものとして「たまに効果音が出ないことがある」などの現象がよく発生するようです。十分注意してください。<br>
+　コマンド発行時にはコマンドパラメータを全て書き込んだ後に、最後にコマンドコードを書き込んでください。サウンドドライバはコマンドコードを検出するとすぐにコマンドパラメータを引き取りますので、最初にコマンドコードを書き込むと予期せぬコマンドパラメータで処理が行われる場合があります。<br>
+　サウンドドライバはブロック１からブロック８までを順番にチェックしていますから、単に空きブロックを探してコマンドをセットすると、メインシステムの書き込んだ順番とは違った順番でコマンドが実行される場合があります。実行順序が入れ替わるとシステムが誤動作する場合がありますので、実行順序が決まっているような処理を実行する場合には順番が入れ替わらないようにコマンドをセットしてください。<br>
+　本手順ではメインシステムとサウンドドライバは非同期に処理を行っていますので、上記注意事項を守ってもコマンド順が入れ替わってしまう場合があります。実行順序を守る必要がある場合にはコマンドブロックをひとつだけ使って、前のコマンドが処理されたことを確かめてから次のコマンドを発行するという方法でこれを回避してください。<p>
+
+<A NAME="CommandList"><HR></A>
+<H3>コマンド一覧</H3>
+<TABLE>
+<TR><TH>01H</TH><TD><A HREF="sndcmd_.htm#01"> SEQUENCE START</A></TD><TD>曲、効果音の演奏開始</TD></TR>
+<TR><TH>02H</TH><TD><A HREF="sndcmd_.htm#02"> SEQUENCE STOP</A></TD><TD>曲、効果音の演奏停止</TD></TR>
+<TR><TH>03H</TH><TD><A HREF="sndcmd_.htm#03"> PAUSE</A></TD><TD>曲、効果音の一時停止</TD></TR>
+<TR><TH>04H</TH><TD><A HREF="sndcmd_.htm#04"> PAUSE OFF</A></TD><TD>曲、効果音の一時停止を解除</TD></TR>
+<TR><TH>05H</TH><TD><A HREF="sndcmd_.htm#05"> SEQUENCE VOLUME</A></TD><TD>音量調整またはフェードイン／アウト</TD></TR>
+<TR><TH>06H</TH><TD><A HREF="sndcmd_.htm#06"> STOP ALL</A></TD><TD>すべての演奏停止</TD></TR>
+<TR><TH>07H</TH><TD><A HREF="sndcmd_.htm#07"> TEMPO CHANGE</A></TD><TD>曲、効果音のテンポを変える</TD></TR>
+<TR><TH>08H</TH><TD><A HREF="sndcmd_.htm#08"> MAP CHANGE</A></TD><TD>マップチェンジを行なう</TD></TR>
+<TR><TH>09H</TH><TD><A HREF="sndcmd_.htm#09"> DIRECT MIDI CONTROL</A></TD><TD>ＭＩＤＩイベントをコマンドとして送る</TD></TR>
+<TR><TH>0AH</TH><TD><A HREF="sndcmd_.htm#10"> START VOLUME ANALYZER</A></TD><TD>Digital Audio Inの入力レベル解析開始</TD></TR>
+<TR><TH>0BH</TH><TD><A HREF="sndcmd_.htm#11"> STOP VOLUME ANALYZER</A></TD><TD>Digital Audio Inの入力レベル解析終了</TD></TR>
+<TR><TH>0CH</TH><TD><A HREF="sndcmd_.htm#12"> DSP STOP</A></TD><TD>DSPの停止、初期化</TD></TR>
+<TR><TH>0DH</TH><TD><A HREF="sndcmd_.htm#13"> ALL NOTE OFF</A></TD><TD>全発音停止</TD></TR>
+<TR><TH>0EH</TH><TD><A HREF="sndcmd_.htm#14"> SEQUENCE PAN</A></TD><TD>ゲーム上からPANPOTをコントロールする</TD></TR>
+<TR><TH>10H</TH><TD><A HREF="sndcmd_.htm#15"> SOUND INITIALIZE</A></TD><TD>サウンドドライバの初期化を行なう</TD></TR>
+<TR><TH>11H</TH><TD><A HREF="sndcmd_.htm#16"> YAMAHA 3D CONTROL</A></TD><TD>YAMAHA  3D soundのコントロール</TD></TR>
+<TR><TH>12H</TH><TD><A HREF="sndcmd_.htm#17"> QSOUND CONTROL</A></TD><TD>Qsound　コントロール</TD></TR>
+<TR><TH>13H</TH><TD><A HREF="sndcmd_.htm#18"> YAMAHA 3D INITIALIZE</A></TD><TD>YAMAHA 3D,Qsound　定位の初期化</TD></TR>
+<TR><TH>14H</TH><TD><A HREF="sndcmd_.htm#19"> TEMPO MODE</A></TD><TD>テンポモードの設定</TD></TR>
+<TR><TH>15H</TH><TD><A HREF="sndcmd_.htm#20"> TEMPO RATIO</A></TD><TD>相対テンポ値の設定</TD></TR>
+<TR><TH>80H</TH><TD><A HREF="sndcmd_.htm#21"> CD-DA LEVEL</A></TD><TD>CD-DAのレベルを調整</TD></TR>
+<TR><TH>81H</TH><TD><A HREF="sndcmd_.htm#22"> CD-DA PAN</A></TD><TD>CD-DA出力Panpotの設定</TD></TR>
+<TR><TH>82H</TH><TD><A HREF="sndcmd_.htm#23"> TOTAL VOLUME</A></TD><TD>トータルボリュームの設定</TD></TR>
+<TR><TH>83H</TH><TD><A HREF="sndcmd_.htm#24"> EFFECT CHANGE</A></TD><TD>エフェクトの切り換え</TD></TR>
+<TR><TH>85H</TH><TD><A HREF="sndcmd_.htm#25"> START PCM STREAM</A></TD><TD>PCMストリーム再生開始</TD></TR>
+<TR><TH>86H</TH><TD><A HREF="sndcmd_.htm#26"> STOP PCM STREAM</A></TD><TD>PCMストリーム再生停止</TD></TR>
+<TR><TH>87H</TH><TD><A HREF="sndcmd_.htm#27"> MIXER CHANGE</A></TD><TD>ミキサの切り換え</TD></TR>
+<TR><TH>88H</TH><TD><A HREF="sndcmd_.htm#28"> MIXER PARAMETER CHANGE</A></TD><TD>ミキサパラメータの切り換え</TD></TR>
+<TR><TH>89H</TH><TD><A HREF="sndcmd_.htm#29"> HARDWARE CHECK</A></TD><TD>ハードウェアのチェック</TD></TR>
+<TR><TH>8AH</TH><TD><A HREF="sndcmd_.htm#30"> PCM PARAMETER CHANGE</A></TD><TD>再生中のPCMストリームに対してのパラメータ切り換え</TD></TR>
+<TR><TH>8BH</TH><TD><A HREF="sndcmd_.htm#31"> PCM SLOT ALLOCATION</A></TD><TD>PCMストリーム用のスロットを確保する</TD></TR>
+<TR><TH>8CH</TH><TD><A HREF="sndcmd_.htm#32"> PCM SLOT RELEASE</A></TD><TD>PCMストリーム用スロットを解放する</TD></TR>
+</TABLE>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="sndctrl.htm">戻る</A>｜
+<A HREF="sndcmd_.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm#sndt"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#prog">SOUND Manual</A>
+★<A HREF="index.htm#no3">サウンドドライバプログラマーズガイド</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

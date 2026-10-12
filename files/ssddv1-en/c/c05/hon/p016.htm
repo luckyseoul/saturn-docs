@@ -1,0 +1,33 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p015.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p017.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H4> (1) Immediate return access to a single file </H4>
+<DD> For single file access, GFS_NwExecOne is a server function. <BR>
+The following is an example of a program that accesses one file in an immediate return type. In this example, GFS_NwFread is the request function. <P>
+<PRE> [Example]
+#define BUF_SIZE  2048*2<P>
+GfsHn gfs; / * File handle * /
+Sint32 nsct = 2; / * Number of read sectors * /
+Sint32 stat; / * Server status * /
+Uint32 buf [BUF_SIZE / 4]; / ​​* Reading area * / <P>
+gfs = GFS_Open (fid); / * Open file * /
+/ * Request function * /
+GFS_NwFread (gfs, nsct, buf, BUF_SIZE); / * Read nsct sector to buf * /
+                                        / * Immediate return * / <P>
+for (;;) {
+     / * Server function * /
+     stat = GFS_NwExecOne (gfs); / * Execution of reading * /
+     if (stat == GFS_SVR_COMPLETED) {/ * Reading complete? * /
+          break;
+     }
+     user (); / * Arbitrary user processing * /
+}<P>
+GFS_Close (gfs); / * File close * / </PRE> <BR>
+</DL><P><P><HR>
+<A HREF=p015.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p017.htm> Go to next page </A>
+</BODY>
+</HTML>

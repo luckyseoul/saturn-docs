@@ -1,0 +1,120 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/86&gt;VDP2ユーザーズマニュアル/4.1画面表示制御</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>★
+<A HREF="../index.htm#no4">VDP2ユーザーズマニュアル</A>
+<HR>
+<B>▲
+<A HREF="p03_40.htm">戻る</A>｜
+<A HREF="p04_20.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第４章　スクロール画面</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P>	<DT><H2>■4.1　画面表示制御</H2>
+		<DD>　スクロール画面は、画面ごとに表示用VRAMアクセスを制御することで表示しない画面を指定することができます。また、表示する画面の透明ドットとなるドットカラーコード(透明コード)を無効にするかどうかを画面ごとに指定することができます。</P>
+
+<A NAME="no4_10"></A>
+	<P>	<DT><H3>　●画面表示イネーブルレジスタ</H3>
+		<DD>　画面表示イネーブルレジスタは、画面表示と透明コードを制御します。書き込み専用の16ビットのレジスタで、180020H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="BGON_"></A>
+<P>	<DD><B><FONT SIZE=5>BGON</FONT>　<FONT SIZE=4>180020H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>-</TH>
+<TH><PRE>-</TH>
+<TH><PRE>-</TH>
+<TH><PRE><A HREF="#R0TPON_">R0TPON</A></TH>
+<TH><PRE><A HREF="#N3TPON_">N3TPON</A></TH>
+<TH><PRE><A HREF="#N2TPON_">N2TPON</A></TH>
+<TH><PRE><A HREF="#N1TPON_">N1TPON</A></TH>
+<TH><PRE><A HREF="#N0TPON_">N0TPON</A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>-</TH>
+<TH><PRE>-</TH>
+<TH><PRE><A HREF="#R1ON_">R1ON</A></TH>
+<TH><PRE><A HREF="#R0ON_">R0ON</A></TH>
+<TH><PRE><A HREF="#N3ON_">N3ON</A></TH>
+<TH><PRE><A HREF="#N2ON_">N2ON</A></TH>
+<TH><PRE><A HREF="#N1ON_">N1ON</A></TH>
+<TH><PRE><A HREF="#N0ON_">N0ON</A></TH>
+</TR></TABLE></P>
+
+
+<A NAME="R0TPON_">　</A>
+<A NAME="N3TPON_">　</A>
+<A NAME="N2TPON_">　</A>
+<A NAME="N1TPON_">　</A>
+<A NAME="N0TPON_">　</A>
+	<P><DT><B>透明表示イネーブルビット</B>：Transparent enable bit (N0TPON0, N1TPON, N2TPON, N3TPON, R0TPON)
+	<DD>　透明コードを無効にするかどうかを指定します。透明コードについては、「<B><A HREF="p04_30.htm">4.3　セル</A></B>」の「<B>透明ドット</B>」を参照してください。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD WIDTH=120><PRE>N0TPON</TD><TD><PRE>180020H</TD><TD><PRE>ビット8</TD><TD WIDTH=200><PRE>NBG0用(またはRBG1用)</TD></TR>
+	<TR><TD><PRE>N1TPON</TD><TD><PRE>180020H</TD><TD><PRE>ビット9</TD><TD><PRE>NBG1用(またはEXBG用)</TD></TR>
+	<TR><TD><PRE>N2TPON</TD><TD><PRE>180020H</TD><TD><PRE>ビット10</TD><TD><PRE>NBG2用</TD></TR>
+	<TR><TD><PRE>N3TPON</TD><TD><PRE>180020H</TD><TD><PRE>ビット11</TD><TD><PRE>NBG3用</TD></TR>
+	<TR><TD><PRE>R0TPON</TD><TD><PRE>180020H</TD><TD><PRE>ビット12</TD><TD><PRE>RBG0用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>xxTPON</TH><TH><PRE>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>透明コードを有効にする(透明コードのドットは透明になります)</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>透明コードを無効にする(透明コードのドットは、そのデータ値にしたがって表示されます)</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、またはR0が入ります。</P>
+
+
+
+<A NAME="R1ON_">　</A>
+<A NAME="R0ON_">　</A>
+<A NAME="N3ON_">　</A>
+<A NAME="N2ON_">　</A>
+<A NAME="N1ON_">　</A>
+<A NAME="N0ON_">　</A>
+	<P>	<DT><B>画面表示イネーブルビット</B>：On bit (N0ON, N1ON, N2ON, N3ON, R0ON, R1ON)
+		<DD>　各スクロール画面を表示するかどうかを指定します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD WIDTH=120><PRE>N0ON</TD><TD><PRE>180020H</TD><TD><PRE>ビット0</TD><TD WIDTH=200><PRE>NBG0用</TD></TR>
+	<TR><TD><PRE>N1ON</TD><TD><PRE>180020H</TD><TD><PRE>ビット1</TD><TD><PRE>NBG1用</TD></TR>
+	<TR><TD><PRE>N2ON</TD><TD><PRE>180020H</TD><TD><PRE>ビット2</TD><TD><PRE>NBG2用</TD></TR>
+	<TR><TD><PRE>N3ON</TD><TD><PRE>180020H</TD><TD><PRE>ビット3</TD><TD><PRE>NBG3用</TD></TR>
+	<TR><TD><PRE>R0ON</TD><TD><PRE>180020H</TD><TD><PRE>ビット4</TD><TD><PRE>RBG0用</TD></TR>
+	<TR><TD><PRE>R1ON</TD><TD><PRE>180020H</TD><TD><PRE>ビット5</TD><TD><PRE>RBG1用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>xxON</TH><TH WIDTH=400><PRE>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>表示できません(表示のためのVRAMアクセスを行いません)</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>表示できます</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、またはR1が入ります。</P>
+
+	<P>	<DD>　このビットが0になっている画面のアクセスコマンドがVRAMサイクルパターンレジスタに設定されている場合、そのアクセスコマンドは無視され、その画面を表示するためのVRAMアクセスは行われません。<BR>
+　R0ONが0のときにR1ONを1にしないでください。<BR>
+　R0ONとR1ONのどちらも1にした場合は、ノーマルスクロール画面は表示できなくなります。このとき、VRAM-B0はRBG1のキャラクタパターンテーブル用RAMに、VRAM-B1はRBG1のパターンネームテーブル用RAMに固定されます。<BR>
+　レジスタの設定によって特定の画面が表示できなくなるような場合は、その画面のビットを0にしてください。例えば、R0ONとR1ONをどちらも1にした場合には、N0ON、N1ON、N2ON、N3ONビットは0にしてください。<BR>
+　回転スクロール画面については、「<B><A HREF="p06_20.htm">6.2　回転スクロール画面表示制御</A></B>」を参照してください。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p03_40.htm">戻る</A>｜
+<A HREF="p04_20.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>
+<A HREF="../index.htm#no4">VDP2ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

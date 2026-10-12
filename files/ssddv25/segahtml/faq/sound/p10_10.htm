@@ -1,0 +1,61 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/12&gt;FAQ/Sound related/CDDA</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no10">Sound related</a><HR>
+ <B>▲ <A HREF="p09_10.htm">Back</a> ｜ <A HREF="p11_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Sound related</b><H2 ALIGN=CENTER> CDDA</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no10_01"><HR></a><DL>
+<H3> How do you create CDDA data?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> After converting the data into data that can actually be handled by a computer, how do you convert it into a format that can be embedded in CD-DA?<P><DT> <FONT SIZE=5>A)</font><DD> Assuming a Macintosh, generally,</P>
+<UL TYPE=DISC>
+<P><LI> Use Digidesign's Sound Designer II (SD II) to record in HD or convert existing AIFF files to SD II format.</P>
+<P><LI> Transfer SD II files to DOS or Unix.</P>
+<P><LI> You can use it with VCD etc. by converting the endian using SWAP.EXE etc. that comes with VCD.</P>
+</UL>
+<P> The CD-DA data to be passed to the VCD etc. should be of any type as long as the 44.1KHz 16bit Stereo PCM data is arranged as shown below.</P>
+<UL TYPE=DISC>
+<P><LI> One frame consists of two words. Word is 16bit, little endian.</P>
+<P><LI> The first word is the left channel, the next word is the right channel.</P>
+</UL>
+<PRE>
++0       +1       +2       +3       +4       +5       +6       +7 byte
+ -------- -------- -------- -------- -------- -------- -------- --------
+|&lt;---------- frame 0 --------------&gt;|&lt;---------- frame 1 ---------------
+|&lt;------left-----&gt;|&lt;----right------&gt;|&lt;------left-----&gt;|&lt;----right-------
+|&lt;-low--&gt;|&lt;-high-&gt;|&lt;-low--&gt;|&lt;-high-&gt;|&lt;-low--&gt;|&lt;-high-&gt;|&lt;-low--&gt;|&lt;-high--
+</PRE><P>Then add each to each CD-DA file in the script to build the CD.<P><PRE>
+ Track           CDDA
+    Pause             150
+    FileSource        \sample.da
+    EndFileSource
+ EndTrack 
+</PRE></P>
+<P>I will write something like this.<BR>
+ Never change the "Pause 150" part in the above description.<BR>
+ One is required for each CD-DA data.<BR>
+ Also, be sure to set the PostGap of the track immediately before the CD-DA track to 150.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p09_10.htm">Back</a> ｜ <A HREF="p11_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no10">Sound related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

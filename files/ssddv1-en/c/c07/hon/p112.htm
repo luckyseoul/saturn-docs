@@ -1,0 +1,40 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p111.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p113.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H1> 4. Programming notes </H1>
+<DD> The following are precautions for playback using this library. <P>
+<B> (1) Notes on creating an application </B> <BR>
+<UL TYPE = "DISK"> <LI> This library uses CPU DMA and timer. Do not use CPU DMA and timer when operating this library. <BR>
+The frequency of calling <LI> PCM_Task should be at least the frequency of V blank interrupt (1 time / 16ms) or more. <BR>
+If the same sound occurs twice, it is possible that PCM_Task is called less frequently. <P></UL>
+<B> (2) Relationship with other libraries </B> <BR>
+<UL TYPE = "DISK"> <LI> This library uses a file system, stream system, DMA library, and ADPCM decompression library. Please link these libraries. <P></UL>
+<B> (3) How to remove buffer </B> <BR>
+<UL TYPE="DISK"><LI>
+Ensure the following size. <P>
+<UL> Work buffer: Size of the work structure. <BR>
+Ring buffer: Minimum (sector size) * 10 [byte]. An integer multiple of the sector size. <BR>
+1 sector = 2324 bytes for CD-ROM XA Audio playback. <BR>
+* 1. Otherwise, 1 sector = 2048 bytes. <BR>
+PCM buffer: 4096 * 2 to 4096 * 4 [sample / 1ch]. <BR>
+Pause processing work: Minimum 4096 [sample]. The same size as the PCM buffer is optimal. <P></UL></UL>
+<B> (4) Seamless branch </B> <BR>
+When seamless branching is performed with <UL TYPE = "DISK"> <LI> PCM_EntryNext, the PCM volume and PAN will be the same as the previous handle. <BR>
+When seamless branching with <LI> PCM_EntryNext, continuous playback is possible for up to 60 minutes. Further continuous playback is not possible. <BR>
+<LI> For seamless branching, pre-read the file with an application program. <BR>
+When using the <LI> file system, the seamless branch function cannot be used. <BR>
+<LI> Seamless branch can only be performed during single playback. Cannot be executed during multi playback. <P></UL>
+<B> (5) Multi playback </B> <BR>
+<UL TYPE = "DISK"> <LI> Set the PCM stream playback number to a different number for multi playback. <BR>
+To play multiple files on the <LI> CD at the same time, perform file interleaving or channel interleaving. In that case, use the stream system. <BR>
+<LI> Multiple playback of the same file is not possible. Please specify a different file. <BR>
+<LI> Multiple playback can be performed up to four at the same time. <BR>
+<LI> Only one ADPCM compressed data can be played. <P></UL>
+</DL><P><P><HR>
+<A HREF=p111.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p113.htm> Go to next page </A>
+</BODY>
+</HTML>

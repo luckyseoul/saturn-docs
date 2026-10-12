@@ -1,0 +1,59 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;27/29&gt;SCSP User's Manual/4.2.13DMA transfer</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p04_2c.htm">Back</a> ｜ <A HREF="p04_30.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/4.2 Sound source register</b><HR NOSHADE>
+<DL>
+<A NAME="no4_2d"></A><P><DT><H3> ■DMA transfer register</H3><DD> The SCSP's built-in DMA can only perform transfers between the SCSP's built-in control registers and sound memory. Therefore, the longest continuous transfer byte count is 3812 bytes (EE4H) (memory space from 100000H to 100EE3H is allocated to internal registers). Additionally, the DMA-related registers explained below are prohibited from being changed by DMA transfer. During DMA transfer, addresses always change in an increasing direction. The following are precautions to be taken when performing DMA transfer.</P>
+<P><DT> <B>Notes</b><P><DD><UL TYPE=DISC>
+<LI> While DMA is running, the operating speed of the main CPU and sound CPU may slow down.</P>
+<P><LI> Accessing the control registers of the DMA controller through DMA transfer is absolutely prohibited. We cannot guarantee the operation of this transfer at all.</P>
+<P><LI> DMA transfer is a word (16bit) transfer.</UL>
+</P>
+<A NAME="DGATE_"></A><P><DT> <B>DGATE(R/W) ; Dma GATE (and "0")</b><DD> The block diagram of the DMA controller is shown in Figure 4.59. Initializes the SCSP built-in control register or any area in the sound memory to "0". When this bit is "1B", execute "0" clear (to actually start, "DEXE" must be executed).<BR>
+ Erasing transfers (writing "0") using DGATE does not affect the data at the transfer source. Also, no data will be lost.<P><A NAME="z4_59"></A><P ALIGN=CENTER> <B>Figure 4.59 DMA controller block diagram</b><BR>
+<img srcset="../grp/i101_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="DDIR_"></A><P><DT> <B>DDIR(R/W) ; Dma (transferring) DIRection</b><DD> Specifies the direction of DMA transfer. When this bit is "0B", it specifies the transfer from the sound memory to the LSI internal register, and when it is "1B", it specifies the reverse.</P>
+<A NAME="t4_32"></A><P><DD> <B>Table 4.32 DMA transfer direction</b><DD><TABLE BORDER=1>
+<TR><TD ALIGN=CENTER> DDIR</TD><TD ALIGN=CENTER> Transfer direction</TD></TR>
+<TR><TD ALIGN=CENTER> 0</TD><TD> Transfer from sound memory to LSI internal register</TD></TR>
+<TR><TD ALIGN=CENTER> 1</TD><TD> Transfer from LSI internal register to sound memory</TD></TR>
+</TABLE>
+</P>
+<A NAME="DEXE_"></A><P><DT> <B>DEXE(R/W) ; Dma EXEcution</b><DD> Instructs to start DMA transfer. DMA transfer starts when this bit is "1B". Writing "0B" is invalid. Also, when the DMA transfer is completed, it automatically becomes "0B".</P>
+<A NAME="t4_33"></A><P><DD> <B>Table 4.33 DMA transfer</b><DD><TABLE BORDER=1>
+<TR><TD ALIGN=CENTER> DEXE</TD><TD ALIGN=CENTER> Transfer status</TD></TR>
+<TR><TD ALIGN=CENTER> 0</TD><TD> Invalid or transfer ended</TD></TR>
+<TR><TD ALIGN=CENTER> 1</TD><TD> DMA transfer start</TD></TR>
+</TABLE>
+</P>
+<A NAME="DMEA_"></A><P><DT> <B>DMEA[19:1](W) ; Dma MEmory start Address</b><DD> Specifies the sound memory address (in word units) at which to start DMA transfer.</P>
+<A NAME="DRGA_"></A><P><DT> <B>DRGA[11:1](W) ; Dma ReGister start Address</b><DD> Specify the address (in word units) of the LSI internal register to start DMA transfer.</P>
+<A NAME="DTLG_"></A><P><DT> <B>DTLG[11:1](W) ; Dma (Transferring) LenGth</b><DD> Specify the number of transfer words for DMA transfer. At this time, care must be taken to ensure that the transfer source and transfer destination areas do not exceed the sound memory area or LSI internal register area.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_2c.htm">Back</a> ｜ <A HREF="p04_30.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

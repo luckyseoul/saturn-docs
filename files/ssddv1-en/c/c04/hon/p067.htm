@@ -1,0 +1,37 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p066.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p068.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 4.2 CD drive operation </H2>
+<DT> <H4> (1) 〈PLAY〉 frame address </H4>
+<DD> The frame address (current FAD) notified during CD playback indicates the sector being read. <BR>
+* The current FAD sector is not stored in the CD buffer and cannot be retrieved. <BR>
+∙ The host can access up to the sector before the current FAD. (CD-ROM) <P>
+<IMG SRC="hyou/i067-01.gif"><BR>
+<B> Figure 4.3 Sector indicated by current FAD </B> <P>
+* When playback ends, FAD = playback end position + 1. <BR>
+(This is also true when the playback end position is at the disc end, and FAD indicates the lead-out area.) <P>
+<DT> <H4> (2) Transition from 〈PLAY〉 state and storage of sectors </H4>
+<DD> When transitioning from 〈PLAY〉 state to another state, whether the sector being read is stored is undefined. If the state transits to a state other than 〈BUSY〉, the sector to be stored is determined. <BR>
+When issuing the pause command in the 〈PLAY〉 state and transitioning to the 〈PAUSE〉 state, the FAD for the storage sector + 1 is notified as in (1). <P>
+<DT> <H4> (3) CD playback repeat processing </H4>
+<DD> As shown below, repeat processing is performed when the current position goes out of the playback range during CD playback. <BR>
+<UL TYPE = "DISK"> <LI> When playing back the frame at the end position (FAD = end position + 1) <BR>
+<LI> If the FAD is outside the playback range due to a change in the playback range <BR>
+<LI> When pause release (resume playback) while paused outside the playback range </UL> <P>
+The repeat notification count (0H to EH) and the maximum specified count (0H to FH) are both expressed in 4 bits. <BR>
+The repeat processing procedure (with / without repeat) is shown below. <P>
+<PRE> (a) Repeat count ＜ Maximum repeat count.
+S Seek to the start position and enter the 〈PLAY〉 state.
+At that time, if the number of repeats ＜ EH (14 times), increase the number of repeats by one. <P>
+(B) No repeat if repeat count ≥ maximum repeat count.
+The 〈PAUSE〉 state is entered at the current position, and the PEND flag in the interrupt factor register is set to 1. </PRE><P>
+If the playback range or maximum repeat count is changed, the repeat count is cleared to zero. <BR>
+The number of repeats and the playback range do not depend on the opening / closing of the tray or the seek operation during playback. <BR>
+</DL><P><P><HR>
+<A HREF=p066.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p068.htm> Go to next page </A>
+</BODY>
+</HTML>

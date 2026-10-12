@@ -1,0 +1,58 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGASATURN Developer's Information STN-18</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn05.htm">STN-5</a> | <A HREF="stn06.htm">STN-6</a> | <A HREF="stn09.htm">STN-9</a> | <B>STN-18</b> | <A HREF="stn19.htm">STN-19</a> | <A HREF="stn21.htm">STN-21</a> | <A HREF="stn22.htm">STN-22</a> ▼<HR NOSHADE>
+<H1 ALIGN=CENTER> STN-18</H1><H2 ALIGN=CENTER> Usage restrictions regarding system programs</H2><HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> issue number:</TH><TD> STN-18</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> date of issue:</TH><TD> 95/01/20</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> media:</TH><TD> ●Common</TD><TD> ○CD-ROM</TH><TD> ○Cartridge</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> connection:</TH><TD> ●Program</TD><TD> ○Hard</TD><TD> ○Manual</TD><TD> ○Tools</TD><TD> ○Game</TD><TD> ○ Bug</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Information distinction:</TH><TD> ●New</TD><TD> ○Change</TD><TD> ○Addition</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> importance:</TH><TD> ●Strict observance</TD><TD> ○Recommended</TD><TD> ○Reference</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> attached file:</TH><TD> ●No</TH><TD> ○ Yes</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Subject supplement:</TH><TD COLSPAN=7> Restrictions on the use of the SYS_SETSINT() function from slave CPUs</TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER> Contents</H3><P> When the SYS_SETSINT() function is used from the slave SH, the correct default value will not be written to the corresponding vector in the slave vector table indicated by vector number Num.<BR>
+ Do not use the default registration method of specifying the address as 0 from the slave SH.<BR>
+ There is no problem in operating the master and slave vector tables from the master SH. Also, if you need to return the slave vector to the default registration, use the method below.</P>
+<DL>
+<P><DT><H3> ■How to operate</H3><DT> <B>●When the slave SH operates the slave vector independently</b><DD> In a case where the slave SH program resides in work RAM, if the slave automatically uses different interrupt handling depending on the situation, at the beginning (when the default can be obtained),</P>
+<P><DD> <B>func_org = <A HREF="../../prgg/sysg/prog/hon/p02_11.htm#no1_3">SYS_GETSINT(Num);</a></b></P>
+<P><DD> After saving in a variable and registering and updating the desired processing routine,</P>
+<P><DD> <B><A HREF="../../prgg/sysg/prog/hon/p02_11.htm#no1_1">SYS_SETSINT(Num, func_1st);</a></b><BR>
+ <B>:</b><BR>
+ <B>SYS_SETSINT(Num, func_2nd);</b><BR>
+ <B>:</b></P>
+<P><DD> To return to the default, register the first address.</P>
+<P><DD> <B>SYS_SETSINT(Num, func_org);</b></P>
+<P><DT> <B>●When the master SH operates the slave vector</b><DD> In cases where the slave SH program is reread at each stage, and the master frequently turns the slave ON/OFF, it is sufficient to initialize the slave vector before the master turns the slave ON or after turning it OFF. , from the master SH at the timing mentioned above,</P>
+<P><DD> <B>SYS_SETSINT(Num+0x100, 0);</b></P>
+<P><DD> Execute.<BR>
+ By adding 0x100 to the vector number, the method of manipulating the slave vector from the master SH can also be used for normal processing routine registration.</P>
+</DL>
+ that's all<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn05.htm">STN-5</a> | <A HREF="stn06.htm">STN-6</a> | <A HREF="stn09.htm">STN-9</a> | <B>STN-18</b> | <A HREF="stn19.htm">STN-19</a> | <A HREF="stn21.htm">STN-21</a> | <A HREF="stn22.htm">STN-22</a> ▼<HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

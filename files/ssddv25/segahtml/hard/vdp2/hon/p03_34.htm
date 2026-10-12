@@ -1,0 +1,77 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/86&gt;VDP2 User's Manual/3.3 How to access VRAM during display period-5</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">VDP2 User's Manual</a> ★ <A HREF="p03_10.htm">Chapter 3 RAM</a><HR>
+ <B>▲ <A HREF="p03_33.htm">Back</a> ｜ <A HREF="p03_35.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 3 RAM/■3.3 How to access VRAM during the display period</b><HR NOSHADE>
+<DL>
+<A NAME="no3_35"></A><P><DT><H3> ●VRAM cycle pattern register specification procedure</H3><DD> The procedure for specifying the VRAM cycle pattern to the register is as follows.</P>
+<P><DD><OL>
+<LI> Determines the TV screen mode.</P>
+<P><LI> Decide whether to divide VRAM into two.</P>
+<P><LI> Determine the number of character colors and reduction settings for the scroll screen to be displayed.<BR>
+ Also decide whether to use the vertical cell scrolling feature.</P>
+<P><LI> Determine the VRAM bank to store the image data (pattern name data, character pattern data, bitmap pattern data) required for each scroll screen.<BR>
+ When using the vertical cell scroll function, also determine the VRAM bank that will store the vertical cell scroll table data.</P>
+<P><LI> Decide whether to perform read/write access by the CPU.</P>
+<P><LI> Specify access commands in the VRAM cycle pattern register so as to adhere to the specified restrictions for each access timing.</P>
+</OL>
+<P><DD> Figure 3.8 shows an example of specifying the VRAM cycle pattern register.</P>
+<A NAME="z3_8"></A><P><DD> <B>Figure 3.8 VRAM cycle pattern specification example</b><DD>&#65308; <B>conditions</b>&#65310;<UL TYPE=DISC>
+<LI> Set TV screen mode to normal mode<LI> Split both VRAM-A and VRAM-B<LI> Set the scroll screen as shown in the table below.</P>
+<P><TABLE BORDER=1>
+<TR><TH> screen name</TH><TH> Number of character colors</TH><TH> Reduce settings</TH><TH> Vertical cell scrolling function</TH></TR>
+<TR ALIGN=CENTER><TD> NBG0</TD><TD> 256 colors</TD><TD> 1/2 times</TD><TD> do not use</TD></TR>
+<TR ALIGN=CENTER><TD> NBG1</TD><TD> 256 colors</TD><TD> 1x</TD><TD> use</TD></TR>
+<TR ALIGN=CENTER><TD> NBG3</TD><TD> 16 colors</TD><TD> 1x</TD><TD> -</TD></TR>
+</TABLE>
+</P>
+<P><LI> The banks that store each data on the scroll screen should be as shown in the table below.</P>
+<P><TABLE BORDER=1>
+<TR><TH> screen name</TH><TH> pattern name</TH><TH> charactor<BR>
+ pattern</TH><TH> Vertical cell scroll<BR>
+ table</TH></TR>
+<TR ALIGN=CENTER><TD> NBG0</TD><TD> A0</TD><TD> B0,B1</TD><TD> -</TD></TR>
+<TR ALIGN=CENTER><TD> NBG1</TD><TD> A0,A1</TD><TD> B0,B1</TD><TD> A0</TD></TR>
+<TR ALIGN=CENTER><TD> NBG3</TD><TD> A1</TD><TD> A1,B0</TD><TD> -</TD></TR>
+</TABLE>
+<DT> <B>A0:</b> VRAM-A0 <B>A1:</b> VRAM-A1<DT> <B>B0:</b> VRAM-B0 <B>B1:</b> VRAM-B1</P>
+<P><LI> Enable read/write access to VRAM-A by CPU</P>
+</UL>
+<P><DD>&#65308; <B>VRAM cycle pattern register</b>&#65310;<DD><TABLE BORDER=1>
+<TR><TH></TH><TH><PRE> T0</TH><TH><PRE> T1</TH><TH><PRE> T2</TH><TH><PRE> T3</TH><TH><PRE> T4</TH><TH><PRE> T5</TH><TH><PRE> T6</TH><TH><PRE> T7</TH></TR>
+<TR ALIGN=CENTER><TH> For VRAM-A0<BR>
+ (or for VRAM-A)</TH><TD> N1CE</TD><TD> N0PN</TD><TD> N1PN</TD><TD> N0PN</TD><TD> N.A.</TD><TD> CPU</TD><TD> CPU</TD><TD> N.A.</TD></TR>
+<TR ALIGN=CENTER><TH> For VRAM-A1<BR>
+</TH><TD> N3CE</TD><TD> N.A.</TD><TD> N1PN</TD><TD> N.A.</TD><TD> N.A.</TD><TD> CPU</TD><TD> CPU</TD><TD> N3CG</TD></TR>
+<TR ALIGN=CENTER><TH> For VRAM-B0<BR>
+ (or for VRAM-B)</TH><TD> N0CG</TD><TD> N0CG</TD><TD> N1CG</TD><TD> N1CG</TD><TD> N.A.</TD><TD> N0CG</TD><TD> N0CG</TD><TD> N3CG</TD></TR>
+<TR ALIGN=CENTER><TH> For VRAM-B1<BR>
+</TH><TD> N0CG</TD><TD> N0CG</TD><TD> N1CG</TD><TD> N1CG</TD><TD> N.A.</TD><TD> N0CG</TD><TD> N0CG</TD><TD> N.A.</TD></TR>
+</TABLE>
+<DD> N1=NBG1 N2=NBG2 N3=NBG3<DD> PN=Pattern name data read<DD> CG=Character pattern data read<DD> CE=Vertical cell scroll table data read<DD> CPU=CPU read/write<DD> NA=Do not access</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_33.htm">Back</a> ｜ <A HREF="p03_35.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no3">VDP2 User's Manual</a> ★ <A HREF="p03_10.htm">Chapter 3 RAM</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

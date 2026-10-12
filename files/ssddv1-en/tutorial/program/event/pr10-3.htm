@@ -1,0 +1,90 @@
+﻿<HTML>
+<HEAD>
+<TITLE> Add event list change event </TITLE>
+</HEAD><BODY>
+
+<P> <A HREF="pr10-2.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr10-4.htm"> Go to next page </A> </BR> </P> <HR>
+
+
+<H2>
+10-3. Changing the event list
+</H2>
+<H3>
+ <A NAME="NO1"> Add event </A>
+ </H3>
+<P>
+Events can be added to events registered in the event list. <BR>
+<The event is added to the end of the event list. <BR>
+To add an event, use the same library function “slSetEvent” used for event registration.
+</P>
+
+<H4> Figure 10-8 Add event </H4>
+<IMG SRC="p10-09-1.gif">
+
+<DL>
+<DT> <B> [EVENT * slSetEvent (void (* func) ());] </B>
+<DD> Reserves an EVENT structure (128 bytes) in the event RAM area, and adds and registers new events at the end of the event list. For the parameter, substitute the execution address value of the event to be registered. <BR>
+The function “slSetEvent” returns the start address of the registered EVENT structure as a return value. <BR>
+If event registration fails, NULL is returned.
+</DL>
+
+<H3>
+<A NAME="NO2"> Insert event </A>
+</H3>
+
+<P>
+Events can be inserted into events registered in the event list. <BR>
+The event is inserted after the specified event. <BR>
+To insert an event, use the library function “slSetEventNext”.
+</P>
+
+<H4> Figure 10-9 Insert event </H4>
+<IMG SRC="p10-09-2.gif">
+
+<DL>
+<DT> <B> [EVENT * slSetEventNext (EVENT * evptr, void (* func) ());] </B>
+<DD> Reserves an EVENT structure (128 bytes) in the event RAM area, and inserts / registers a new event in the middle of the event list. For the parameter, substitute the start address of the EVENT structure immediately before the event is inserted and the execution address of the event to be inserted / registered. <BR>
+The function “slSetEventNext” returns the start address of the registered EVENT structure as a return value. <BR>
+If event registration fails, NULL is returned.
+</DL>
+
+<H3>
+<A NAME="NO3"> Delete event </A>
+</H3>
+
+<P>
+Events registered in the event list can be deleted from the event list. <BR>
+To delete an event, use the library function “slCloseEvent”.
+</P>
+
+<H4> Figure 10-10 Delete event </H4>
+<IMG SRC="p10-10-1.gif">
+
+<DL>
+<DT> <B> [void slCloseEvent (EVENT * evptr);] </B>
+Deletes the event specified by the <DD> parameter from the event list. <BR>
+At the same time, if the member “work” of the specified event is not NULL, all attached works are returned to the system as if there is a work list. <BR>
+For the parameter, assign the start address of the EVENT structure to be deleted. <BR>
+The function “slCloseEvent” does not check whether the area to be returned is an EVENT structure registered. For this reason, even if the extended user area is returned to the system by mistake, it will not be understood. <BR>
+In this case, various problems may occur, and the CPU may stop in the worst case (refer to “10-5: Notes on event processing” for details).
+</DL>
+
+<H3>
+<A NAME="NO4"> Change event list during event </A>
+</H3>
+
+<P>
+If you try to change the event list in any way while executing the event list that has been registered (for example, changing the event list in the event), the changed event will be affected as shown in the following figure.
+</P>
+
+<H4> Figure 10-11 Changing the event list during event execution </H4>
+<IMG SRC="p10-10-2.gif">
+
+<P>
+Changes to the (executed) event list prior to the currently running event are applied the next time the event list is executed.
+Changes to the event list that is currently executed (after not being executed) are executed according to the order of the event list that was changed during the current event execution.
+Any changes to the addition / insertion / deletion of events will be performed under this application.
+</P>
+
+<HR>
+<P> <A HREF="pr10-2.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr10-4.htm"> Go to next page </A> </BR> </P> </BODY> </HTML>

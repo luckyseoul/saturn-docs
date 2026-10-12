@@ -1,0 +1,795 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/30&gt;SGL Programmer's Tutorial/4.座標変換</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<A HREF="p03_10.htm">戻る</A>｜<A HREF="demo_a.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PROGRAMMER'S TUTORIAL</B>
+<H2 ALIGN=CENTER>4.座標変換</H2>
+<HR NOSHADE>
+
+<P>　本章では、３Ｄグラフィックスの基礎となる考え方とそれを実現するサブルーチンについて説明します。
+また、本章では主に座標変換と呼ばれる数学的手法を用いて話を進めていきます。行列式の演算など、
+通常とは少し異なる手法を多用しますので読解が困難とは思いますが、３Ｄグラフィックスの基礎となる部分ですので、
+何度も読んで理解するようにしてください。<BR>
+　３Ｄグラフィックスによって映し出されるオブジェクトは、おおむね次の４つによって定義されます。</P>
+
+<UL>
+ <LI>座標系　→　オブジェクトや視点の位置と向きを決定します。
+ <LI>投影変換　→　どのような方法で投影面に影像を映じるかを定義します。
+ <LI>モデリング変換　→　座標系内での移動、回転、拡大縮小を定義します。
+ <LI>ビューイング変換　→　視点とその移動を定義します（詳細は“<A HREF="p06_10.htm">第６章　カメラ</A>”参照）。</UL>
+
+<P>　この４つを組み合わせることによって、３Ｄグラフィックスはモニターに映像を映し出すことが可能になります。
+そこで本章では、ビューイング変換を除いた３つを順に説明し、その後で更に詳しい説明を付け加えていくことにします。</P>
+
+<DL>
+<A NAME="no4_10"></A>
+  <P><DT><H3>4-1. 座標系</H3>
+     <DD>　セガサターンでは、一般に右手座標系と呼ばれる３Ｄ座標系を採用しています。これは、画面奥にＺ軸の正方向を据えたとき、
+	Ｙ軸の正方向を画面下方、Ｘ軸の正方向を画面右とする座標系を指します。また、回転の方向は軸に対して右向き（時計回り）
+	が正方向となります。</P>
+
+  <P ALIGN=CENTER><B>＜図4-1　セガサターンが用いる座標系＞</B><BR>
+  <IMG SRC="../grp/p04_02_1.gif"></P>
+
+
+  <P><DD>　またこれとは別にＳＧＬには、ＴＶモニターと画面モード（解像度）に対応した画面座標と呼ばれる２Ｄ座標系が存在します。
+	これは、主にスクロールやスプライトなど、２Ｄグラフィックスを扱うのに使用しますが、
+	“<A HREF="#no4_50">4-5　ウィンドウ</A>”でウィンドウを設定するときにも使用します。</P>
+
+ <P ALIGN=CENTER><B>＜図4-2　画面座標系＞</B><BR>
+ <IMG SRC="../grp/p04_02_2.gif"></P>
+
+<A NAME="no4_20"></A>
+  <P><DT><H3>4-2. 投影変換</H3>
+     <DD>　座標がどのように画面に現れるかを解説し、投影の設定法について説明します。</P>
+
+<A NAME="no4_21"></A>
+  <P><DT><B>透視投影</H3>
+     <DD>　ここでは、変換の基礎となる透視投影について説明します。まず最初に視点を設定し、
+	その視点の延長線上に視線と垂直に置かれた立方体がある場合の投影結果を下図に示します。</P>
+
+ <P ALIGN=CENTER><B>＜図4-3　投影の考え方＞</B><BR>
+ <IMG SRC="../grp/p04_03_1.gif"></P>
+
+  <P><DD>　透視投影において、映像は投影面と呼ばれる平面に対する写像として定義されます。投影面とは、
+	影絵を映し出すスクリーンのようなものだと考えてください。<BR>
+	視点とオブジェクトの点を結ぶ線分と、投影面の交わるところに、オブジェクトの点は描画されます。
+	空間内のオブジェクトの点全てにこの操作を行うことで、始めて空間は投影面に描画されます。</P>
+
+ <P ALIGN=CENTER><B>図4-4　ＳＧＬにおける投影面</B><BR>
+ <IMG SRC="../grp/p04_03_2.gif"></P>
+
+
+  <P><DD>　ＳＧＬにおける投影面とは、つまりＴＶモニターを指します。仮想３Ｄ空間に配置された
+	オブジェクト群は透視投影された後、画面座標系への写像が行われ、ＴＶモニターに描画されます。</P>
+
+
+<A NAME="no4_22"></A>
+  <P><DT><H3>ビューイングボリューム</H3>
+     <DD>　投影面に投影される範囲をビューイングボリュームと言います。<BR>
+	ＳＧＬの場合、このビューイングボリュームを制御するパラメータとして画角と表示レベル
+	というものがあります。<BR>ここでは、それら２つを紹介していきます。</P>
+
+	<P>	<DT><B>１）画角</B>
+		<DD>パースとは視点を原点として左右方向にどれくらいの広がりを持った映像を投影面に投影するかを決定するパラメータです。<BR>
+	この値を大きくすると、投影面に投影されるオブジェクトの密度が高くなり、ちょうど魚眼レンズで覗いたような映像になります。<BR>
+	なお、上下方向の広がりは、画角値と画面モードによる解像度とによって決定されます。
+
+	 <P ALIGN=CENTER><B>＜図4-5　画角イメージモデル＞</B><BR>
+	 <IMG SRC="../grp/p04_04_1.gif"></P>
+
+
+	<P>SGL上で透視投影の設定を変更するには、関数“slPerspective”を使用してください。</P>
+
+	<P><DT><B>【void slPerspective ( ANGLE  perspective_angle) ;】</B>
+	<DD>この関数のパラメータを変化させることにより、投影面に投影する空間領域を制御することができます。<BR>
+パラメータには、投影する空間領域を決定する角値（10＜angle＜160）を代入します。この値の範囲を逸脱するとオーバーフローしてしまいます。
+
+ <P ALIGN=CENTER><B>＜図4-6　画角値による映像の差異＞</B><BR>
+ <IMG SRC="../grp/p04_04_2.gif"></P>
+
+
+	<P>	<DT><B>２）表示レベル</B>
+		<DD>表示レベルとは、投影面の後方、どの程度のレベルまでを投影面に投影するかを決定するためのパラメータです。<BR>
+		投影面後方のオブジェクトも、投影面奥の映像と同様の手法で投影面に投影されます。
+
+	<P>表示レベルの設定は、関数“slZdspLevel”で行います。<BR>
+	表示レベルは、視点と投影面の分割点のどの位置からを投影するかで決定されます。</P>
+
+	<P>	<DT><B>【void slZdspLevel ( Uint16 level) ;】</B>
+	<DD>ビューイングボリュームの表示レベルを決定します。<BR>
+	パラメータには、表示レベルに応じて下表の値を代入します。
+
+<A NAME="t4_1"></A>
+	<P>	<DT><TABLE BORDER=1>
+	<CAPTION><B>表4-1　表示レベル代入値（level）</B></CAPTION>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>　</TD><TH COLSPAN=3>表示レベル</TH></TR>
+	<TR ALIGN=CENTER>                     <TH>1/2</TH><TH>1/4</TH><TH>1/8</TH></TR>
+	<TR ALIGN=CENTER><TD>代入値</TD><TD>１</TD><TD>２</TD><TD>３</TD></TR></TABLE></P>
+
+	<P>	<DD>下図は、表示レベルのイメージモデルです。</P>
+
+
+	<P ALIGN=CENTER><B>図4-7　表示レベル</B><BR>
+	<IMG SRC="../grp/p04_05_2.gif"></P>
+
+
+	<P>	<DD>次のリスト4-1は、画面中央に立方体を配し、パースペクティブパラメータである画角値を20〜160度の間で変化させることにより、立方体がどのように見えるかを示したものです。</P>
+
+	<P ALIGN=CENTER><B>リスト4-1　sample_4_2：パースによる映像の変化</B><BR>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Perspective Control						*/
+/*----------------------------------------------------------------------*/
+#include "sgl.h"
+
+extern	PDATA PD_CUBE;
+
+void ss_main(void){
+	static ANGLE	ang[XYZ];
+	static ANGLE	angper[XYZ];
+	static FIXED	pos[XYZ];
+	static ANGLE	tmp = DEGtoANG(90.0);
+	static ANGLE	adang = DEGtoANG(0.5);
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 4.2" , slLocate(6,2));
+
+	ang[X] = DEGtoANG(30.0);
+	ang[Y] = DEGtoANG(45.0);
+	ang[Z] = DEGtoANG( 0.0);
+	pos[X] = toFIXED(50.0);
+	pos[Y] = toFIXED(40.0);
+	pos[Z] = toFIXED(20.0);
+
+	slPrint("Perspective : " , slLocate(4,5));
+	while(-1){
+		slPerspective(tmp);
+		slPrintHex(slAng2Dec(tmp) , slLocate(18,5));
+
+		tmp += adang;
+		if (tmp &gt; DEGtoANG(160.0)) 
+			adang = DEGtoANG(-0.5);
+		if (tmp &lt; DEGtoANG(20.0))
+			adang = DEGtoANG(0.5);
+
+		slPushMatrix();
+		{
+			FIXED dz;
+
+			dz = slDivFX(slTan(tmp &gt;&gt; 1), toFIXED(170.0));
+			slTranslate(pos[X] , pos[Y] , pos[Z] + dz);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			slPutPolygon(&PD_CUBE);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+</PRE>
+
+	<P ALIGN=CENTER><B>フロー4-1　sample_4_2：パースによる映像変化のフローチャート</B><BR>
+	<IMG SRC="../grp/p04_07.gif"></P>
+
+<A NAME="no4_30"></A>
+	<P>	<DT><H3>4-3. モデリング変換</H3>
+		<DD>　ここでは空間内のオブジェクトの配置と変換について説明します。オブジェクトに対する変換には、移動、回転、拡大縮小の３種類があります。<BR>
+		これを用いることにより、オブジェクトを自由に配置することができます。<BR>
+		では、次に各変換操作を順にサンプルプログラムとともに解説していきます。</P>
+
+ <P ALIGN=CENTER><B>＜図4-8　オブジェクトに対する各種変換操作＞</B><BR>
+ <IMG SRC="../grp/p04_08.gif"></P>
+
+
+<BLOCKQUOTE><P>
+注）角度及び変数は便宜上、度数表示とフローティングで示してあります。
+</P></BLOCKQUOTE>
+
+<A NAME="no4_31"></A>
+	<P>	<DT><H3>オブジェクトの回転</H3>
+		<DD>　空間内でオブジェクトを回転させるには、ライブラリ関数“slRotX,slRotY,slRotZ”を用います。それぞれ関数名末尾の座標軸に対応した回転を制御します。<BR>
+		オブジェクトの回転は、回転マトリクスと呼ばれる変換行列をオブジェクトの各頂点座標に掛け合わせることで実現されます。</P>
+
+	<P>	<DT><B>【void slRotX ( ANGLE angx ) ;】</B>
+		<DD>オブジェクトにＸ軸回りの回転を加えます。パラメータには回転角値を代入します。
+
+	<P>	<DT><B>【void slRotY ( ANGLE angy ) ;】</B>
+		<DD>オブジェクトにＹ軸回りの回転を加えます。パラメータには回転角値を代入します。
+
+	<P>	<DT><B>【void slRotZ ( ANGLE angz ) ;】</B>
+		<DD>オブジェクトにＺ軸回りの回転を加えます。パラメータには回転角値を代入します。
+
+	<P>次のリスト 4-2 は、第2章のリスト2-1 で描画した正方形ポリゴンをライブラリ関数“slRotY”を用いてＹ軸で回転させる（単軸回転）プログラムです。回転マトリクスは次式で表されます。</P>
+
+	<P ALIGN=CENTER><IMG SRC="../grp/p04_09.gif"></P>
+
+ <P ALIGN=CENTER><B>＜リスト4-2　sample_4_3_1：正方形ポリゴン単軸回転ルーチン＞</B><BR>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Rotation of 1 Polygon [Y axis]					*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+extern PDATA PD_PLANE1;
+
+void ss_main(void)
+{
+	static ANGLE	ang[XYZ];
+	static FIXED	pos[XYZ];
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 4.3.1" , slLocate(9,2));
+
+	ang[X] = ang[Y] = ang[Z] = DEGtoANG(0.0);
+	pos[X] = toFIXED( 0.0);
+	pos[Y] = toFIXED( 0.0);
+	pos[Z] = toFIXED(220.0);
+
+	while(-1){
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			ang[Y] += DEGtoANG(5.0);
+			slPutPolygon(&PD_PLANE1);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+</PRE>
+
+ <P ALIGN=CENTER><B>フロー4-2　sample_4_3_1：正方形ポリゴン単軸回転ルーチンフローチャート</B><BR>
+ <IMG SRC="../grp/p04_11.gif"></P>
+
+	<P>	<DD>次にあげるリスト 4-3 は、２軸回転を実現するためのプログラムです。正方形ポリゴンをＸ軸とＹ軸の２軸で回転させます。<BR>
+		単軸回転、２軸回転、あるいは３軸回転においても実際に行う操作は同一です。各軸に対応した回転操作関数の角値を操作することで、オブジェクトは回転を加えられた状態で描画されます。</P>
+
+ <P ALIGN=CENTER><B>リスト4-3　sample_4_3_2：正方形ポリゴン２軸回転ルーチン</B><BR>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Rotation of 1 Polygon [X & Y axis]				*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+extern PDATA PD_PLANE1;
+
+void ss_main(void)
+{
+	static ANGLE	ang[XYZ];
+	static FIXED	pos[XYZ];
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 4.3.2" , slLocate(9,2));
+
+	ang[X] = ang[Y] = ang[Z] = DEGtoANG(0.0);
+	pos[X] = toFIXED(  0.0);
+	pos[Y] = toFIXED(  0.0);
+	pos[Z] = toFIXED(220.0);
+
+	while(-1){
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			ang[X] += DEGtoANG(4.0);
+			ang[Y] += DEGtoANG(2.0);
+			slPutPolygon(&PD_PLANE1);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+</PRE>
+
+<A NAME="no4_32"></A>
+	<P>	<DT><H3>オブジェクトの移動</H3>
+		<DD>　ＳＧＬで空間内のオブジェクトを移動させるには、ライブラリ関数“slTranslate”を用います。<BR>
+		パラメータとして現地点からのＸＹＺ各軸に対する移動量を代入することで、３Ｄ空間内の任意の座標にオブジェクトを表示させることができます。</P>
+
+	<P>	<DT><B>【void slTranslate ( FIXED tx , ty , tz ) ;】</B>
+		<DD>オブジェクトを指定された座標に移動させ表示します。<BR>
+		パラメータには、定義座標または現地点からのＸＹＺ各軸に対する移動量をそれぞれ代入します。
+
+	<P>次のリスト 4-4 は、ライブラリ関数“slTranslate”を用いて、Ｘ軸に対して平行な移動を実現しています。移動パラメータの制御には、Sin値を使用しています。角値tmpの変化がＸ座標値の変化を制御します。<BR>
+		“slTranslate”による平行移動は次式で表されます。</P>
+
+	<P ALIGN=CENTER><IMG SRC="../grp/p04_13.gif"></P>
+
+	<P ALIGN=CENTER><B>リスト4-4　sample_4_3_3：正方形ポリゴン平行移動ルーチン</B><BR>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Parallel Translation of 1 Polygon [X axis]			*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+#define		POS_Z		50.0
+
+extern PDATA PD_PLANE1;
+
+void ss_main(void)
+{
+	static ANGLE	ang[XYZ];
+	static FIXED	pos[XYZ];
+	static ANGLE	tmp = DEGtoANG(0.0);
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 4.3.3" , slLocate(9,2));
+
+	ang[X] = ang[Y] = ang[Z] = DEGtoANG(0.0);
+	pos[X] = toFIXED(  0.0);
+	pos[Y] = toFIXED(  0.0);
+	pos[Z] = toFIXED(220.0);
+
+	while(-1){
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			tmp += DEGtoANG(5.0);
+			pos[X] = slMulFX(toFIXED(POS_Z), slSin(tmp));
+			slPutPolygon(&PD_PLANE1);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+</PRE>
+
+ <P ALIGN=CENTER><B>＜フロー4-3　sample_4_3_3：正方形ポリゴン平行移動フローチャート＞</B><BR>
+ <IMG SRC="../grp/p04_15.gif"></P>
+
+<A NAME="no4_33"></A>
+	<P>	<DT><H3>オブジェクトの拡大縮小</H3>
+		<DD>ＳＧＬで空間内のオブジェクトを拡大縮小させるには、ライブラリ関数“slScale”を用います。パラメータは、各軸方向のスケール比率として渡されます。</P>
+
+	<P>	<DT><B>【void slScale ( FIXED sx , sy , sz ) ;】</B>
+		<DD>オブジェクトを各軸単位でスケーリングして表示します。<BR>
+		パラメーターには、ＸＹＺ軸それぞれの軸方向に対するスケール値（任意倍率）を代入してください。<BR>
+		オブジェクトは、スケール値によって下表のように変化します。
+
+<A NAME="t4_2"></A>
+	<P ALIGN=CENTER>
+	<P>	<DT><TABLE BORDER=1><CAPTION><B>表4-2　スケール値によるオブジェクトの変化</B></CAPTION>
+	<TR ALIGN=CENTER><TH ROWSPAN=2></TH><TH COLSPAN=5>パラメータ範囲</TH></TR>
+	<TR ALIGN=CENTER><TH>scale＜0.0</TH><TH>scale=0.0</TH><TH>0.0＜scale＜1.0</TH><TH>scale=1.0</TH><TH>1.0＜scale</TH></TR>
+	<TR ALIGN=CENTER><TH>変換結果</TH><TD>鏡像</TD><TD>消失</TD><TD>縮小</TD><TD>等倍</TD><TD>拡大</TD></TR>
+	</TABLE></P>
+
+<BLOCKQUOTE>
+注）”scale”はスケールパラメータを指します。
+</BLOCKQUOTE>
+
+	<P>	<DT><H3>スケール値によるオブジェクトの変化</H3>
+		<DD>スケール値が0.0の場合、オブジェクトはスケール指定された軸方向に対する厚みが無いものとして描画されます。<BR>
+		また、0.0未満の負の値の場合、オブジェクトはスケール指定された軸方向に対する鏡像として描画されます</P>
+
+	<P>次のリスト 4-5 は、拡大縮小を実現するプログラムです。正方形ポリゴンのＸ軸方向、Ｙ軸方向のスケール比を変化させています。</P>
+
+<A NAME="l4_5"></A>
+	<P ALIGN=CENTER><B>リスト4-5　sample_4_3_4：正方形ポリゴン拡大縮小ルーチン</B><BR>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Expansion & Reduction of 1 Polygon [X & Y axis]			*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+extern PDATA PD_PLANE1;
+
+void ss_main(void)
+{
+	static ANGLE	ang[XYZ];
+	static FIXED	pos[XYZ];
+	static FIXED	sclx, scly, sclz, tmp = toFIXED(0.0);
+	static Sint16	flag = 1;
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 4.3.4" , slLocate(9,2));
+
+	ang[X] = ang[Y] = ang[Z] = DEGtoANG(0.0);
+	pos[X] = toFIXED(  0.0);
+	pos[Y] = toFIXED(  0.0);
+	pos[Z] = toFIXED(220.0);
+	sclx = scly = sclz = toFIXED(1.0);
+
+	while(-1){
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			if (flag == 1) tmp += toFIXED(0.1);
+			else tmp -= toFIXED(0.1);
+			if (tmp > toFIXED( 1.0)) flag = 0;
+			if (tmp < toFIXED(-1.0)) flag = 1;
+			slScale(sclx + tmp , scly - tmp , sclz);
+			slPutPolygon(&PD_PLANE1);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+</PRE>
+
+<A NAME="f4_4"></A>
+ <P ALIGN=CENTER><B>＜フロー4-4　sample_4_3_4：正方形ポリゴン拡大縮小フローチャート＞</B><BR>
+ <IMG SRC="../grp/p04_18.gif"></P>
+
+<A NAME="no4_34"></A>
+	<P>	<DT><H3>特殊なモデリング変換</H3>
+		<DD>　ここで、少し特殊なモデリング変換操作を行うライブラリ関数を紹介します。ここに紹介するのは、いずれもオブジェクトデータに回転操作を加えるものですが、パラメータの設定が前述した回転操作用ライブラリ関数と異なります。</P>
+
+	<P>	<DT><B>【void slRotXSC ( FIXED sin , FIXED cos ) ;】</B>
+		<DD><P>正弦値、余弦値を代入してＸ軸回りの回転を加えます。<BR>
+		パラメータには、それぞれSin値、Cos値をFIXED型の数値で代入します。</P>
+
+	<P>	<DT><B>【void slRotYSC ( FIXED sin , FIXED cos ) ;】</B>
+		<DD><P>正弦値、余弦値を代入してＹ軸回りの回転を加えます<BR>
+		パラメータには、それぞれSin値、Cos値をFIXED型の数値で代入します。</P>
+
+	<P>	<DT><B>【void slRotZSC ( FIXED sin , FIXED cos ) ;】</B>
+		<DD><P>正弦値、余弦値を代入してＺ軸回りの回転を加えます。<BR>
+		パラメータには、それぞれSin値、Cos値をFIXED型の数値で代入します。</P>
+
+	<P>	<DT><B>【void slRotAX ( VECTOR vx , vy , vz , ANGLE anga ) ;】</B>
+		<DD><P>原点を通る任意軸回りの回転を加えます（軸単位はベクトル値として指定）。<BR>
+		パラメータには、回転軸を表す単位ベクトル値（ＸＹＺ）及び回転角値を代入します。<BR>
+		回転軸を表すベクトル値は、常に単位ベクトルとなるような値を代入してください。<BR>
+		単位ベクトルとは、常に大きさが１となるようなベクトルを指します。</P>
+
+<A NAME="no4_35"></A>
+	<P>	<DT><H3>変換順序による結果の相違</H3>
+		<DD>　３Ｄグラフィックスの場合、モデリング変換に代表される各種変換は、マトリクスと呼ばれる変換行列を用いて行われます。そのため、変換の順序を理解した上で変換操作を行わないと、意図したものとは異なった結果でオブジェクトが描画されることがあります		。次の図はともに回転、移動の変換操作を行ったものですが、変換順序が異なるため、最終的な描画結果は大きく異なっています。</P>
+
+	<P ALIGN=CENTER><B>＜図4-9　変換順序による結果の相違＞</B><BR>
+	<IMG SRC="../grp/p04_20.gif"></P>
+
+
+<BLOCKQUOTE><P>
+注）角度及び変数は便宜上、度数表示とフローティングで示してあります。
+</P></BLOCKQUOTE>
+
+<A NAME="no4_40"></A>
+	<P><DT><H3>4-4. クリッピング</H3>
+		<DD>　表示領域（実際に投影面に投影される領域）からはみ出した部分を取り去り、非表示にすることをクリッピングといいます。ＳＧＬではこの観念を利用して、投影面に対しウィンドウというものを設定することができます。
+	そこで最初にクリッピングの概念を説明し、次にＳＧＬ上でのウィンドウ設定の実際を解説していきます。</P>
+
+<A NAME="no4_41"></A>
+	<P><DT><H3>２Ｄクリッピング</H3>
+		<DD>　最初にクリッピングの概念を、２Ｄグラフィックスの例で説明していきます。２Ｄグラフィックスの場合、区切られた矩形領域の内と外で表示・非表示を切り替えます。<BR>
+		下図の例では、矩形領域として与えられた表示領域の内外に表示すべきオブジェクトが配置された場合の表示例を示したものです。</P>
+
+	<P ALIGN=CENTER><B>＜図4-10　２Ｄクリッピングの例＞</B><BR>
+	<IMG SRC="../grp/p04_21.gif"></P>
+
+
+<BLOCKQUOTE><P>
+注）クリッピング境界によって閉じられた投影面を表示領域とした場合
+</P></BLOCKQUOTE>
+
+	<P>上図のように、クリッピングの対象となったオブジェクトはクリッピング領域の内外で表示・非表示を切り替えられます。この例の場合、１つのオブジェクトがクリッピング領域の双方にかかった場合、オブジェクトの一部（領域内）が表示され、一部（領域外）が表示		されないようになっています。</P>
+
+<BLOCKQUOTE>
+<P><B>注意</B><BR>
+場合により、計算速度、描画速度の問題から、１つのオブジェクトがクリッピング領域に含まれる割合によって、表示・非表示が切り替えられることもあります。
+</BLOCKQUOTE>
+
+<A NAME="no4_42"></A>
+	<P>	<H3><DT>３Ｄクリッピング</H3>
+		<DD>　３Ｄグラフィックスでは通常、透視変換マトリクスで視野ピラミッドを決定し、このピラミッド内を表示領域、ピラミッド外を非表示領域として定義します。表示領域内のオブジェクトは投影面に投影され、モニターに映し出されます。<BR>
+	この視野ピラミッドは、次の６平面によって囲まれた閉空間（ビューイングボリューム）によってクリッピングされます。</P>
+
+	<P>	<DD><TABLE>
+	<TR><TD>視野の左側面</TD><TD>：クリッピング平面（画角値により決定）</TD></TR>
+	<TR><TD>視野の右側面</TD><TD>：クリッピング平面（画角値により決定）</TD></TR>
+	<TR><TD>視野の上面　</TD><TD>：クリッピング平面（画角値及び画面モードにより決定）</TD></TR>
+	<TR><TD>視野の下面　</TD><TD>：クリッピング平面（画角値及び画面モードにより決定）</TD></TR>
+	<TR><TD>視野の前面　</TD><TD>：前方限界面（関数“slZdspLevel”で決定）</TD></TR>
+	<TR><TD>視野の後面　</TD><TD>：後方限界面（関数“slWindow”中のパラメータ“Zlimit”で決定）</TD></TR></TABLE></P>
+
+	<P>	<DD>　ＳＧＬの場合これに加えて、さらにクリップ平面を追加することが可能です（詳細は“<A HREF="#no4_50">4.5 項：ウィンドウ</A>”参照）。</P>
+
+<A NAME="z4_11"></A>
+ <P ALIGN=CENTER><B>図4-11　３Ｄクリッピングによる表示領域の定義</B><BR>
+ <IMG SRC="../grp/p04_22.gif"></P>
+
+<A NAME="z4_12"></A>
+ <P ALIGN=CENTER><B>図4-12　３Ｄクリッピングの例</B><BR>
+ <IMG SRC="../grp/p04_23.gif"></P>
+
+<A NAME="no4_50"></A>
+	<P><DT><H3>4-5. ウィンドウ</H3>
+		<DD>　ＳＧＬでは、クリッピングの概念を使用して、ウィンドウと呼ばれる表示制限のための矩形領域を、投影面に対して設定することができます。オブジェクトは、この領域の内と外で表示・非表示を切り替えることができます。<BR>
+			ウィンドウは１画面中に最大２面まで保持することが可能です。この内の１面は、デフォルトウィンドウとして最初から設定してあります。このウィンドウは投影面（ＴＶモニター）と同サイズであり、プログラム中での再設定も可能です。</P>
+
+<A NAME="no4_51"></A>
+	<P>	<DT><H3>ウィンドウの概念</H3>
+		<DD>　ＳＧＬではウィンドウは、下図のように定義されます。</P>
+
+<A NAME="z4_13"></A>
+	<P ALIGN=CENTER><B>＜図4-13　ウィンドウの概念＞</B><BR>
+	<IMG SRC="../grp/p04_24.gif"></P>
+
+	<P>	<DD>　ＳＧＬでは、ウィンドウは投影面中の矩形領域として定義されます。これを３次元的に解釈すれば、ビューイングボリューム中、投影面の矩形領域に投影されるべき領域のことを指します（図中：濃い網掛け部）。ウィンドウ領域を指定することにより、この内外			でオブジェクトの表示・非表示を決定するわけです。<BR>
+			ウィンドウ・サイズは、最大で、投影面と同サイズまで設定できます。</P>
+
+<A NAME="no4_52"></A>
+	<P>	<DT><H3>ＳＧＬにおけるウィンドウ設定</H3>
+		<DD>　ＳＧＬでウィンドウを実際に設定するためには、ライブラリ関数“slWindow”を用います。またＳＧＬは、初期状態（slWindowを使用しない状態）で、すでに投影面と同サイズの再設定可能なデフォルトウィンドウをセットしています。</P>
+
+	<P>	<DT><B>【void slWindow ( left , top , right , bottom , Zlimit , CENTER_X , CENTER_Y ) ;】</B>
+		<DD>ライブラリ関数slWindowは、投影面にウィンドウ領域を設定します。各パラメータは、投影面におけるウィンドウの左上・右下の画面座標、後方限界座標、視線方向を決定する画面座標をそれぞれセットします。各パラメータを図説したものが下図になります。
+
+<A NAME="z4_14"></A>
+	<P ALIGN=CENTER><B>図4-14　“slWindow”におけるパラメータの意味</B><BR>
+	<IMG SRC="../grp/p04_25.gif"></P>
+
+<BLOCKQUOTE><P>
+注）left , top , right , bottom , CENTER_X , CENTER_Y は、モニターに対するＸＹ座標値を示します。
+</P></BLOCKQUOTE>
+
+	<P>	<DD>　ライブラリ関数“slWindow”のパラメータは、次のように定義されます。</P>
+
+	<P>	<DT><B>【Sint16 left , top , right , bottom】</B>
+		<DD>ウィンドウの投影面（モニター）に対する左上・右下の画面座標値をそれぞれ示します。<BR>
+			値の範囲は画面モードによって異なります（最大値は、画面モードによる解像度フルサイズ）。<BR>
+			デフォルト・ウィンドウでは、ウィンドウサイズとモニターサイズが同じに設定されています（最大値）。
+
+	<P>	<DT><B>【Zlimit】</B>
+		<DD>ウィンドウの投影限界値を指定します。<BR>
+			投影限界値とは、関数“slZdspLevel”で指定された前方限界面からどの程度の奥行きを持った空間を、実際に投影面に投影するかを決定するためのパラメータです（後方限界面の指定）。<BR>
+			“Zlimit = -1”が代入された場合、直前にセットされたウィンドウのZlimit値が使用されます。<BR>
+			以前にウィンドウがセットされていない場合は、デフォルトウィンドウの値（7FFF）が使用されます。
+
+	<P>	<DT><B>【CENTER_X , CENTER_Y】</B>
+		<DD>視線方向を決定するものでパラメータは画面座標値として表されます。この値を変化させることにより、遠方のオブジェクト群が画面のどこに収束するかを決定できるわけです。<BR>
+			この点を３Ｄグラフィックスの世界では一般的に「消失点」と呼びます。<BR>
+			デフォルトウィンドウでは、「消失点」は画面の中心に設定されています。
+
+	<P>	<DT><H3>画面座標について</H3>
+		<DD>　画面座標とは、投影面であるＴＶモニターに対応した２Ｄ座標系です。<BR>
+			左上を原点とし、Ｘ軸は右方、Ｙ軸は下方をそれぞれ正方向とします。値の範囲は画面モードによって異なりますが、通常（横：３２０×縦：２２４）で表現されます。 </P>
+
+<A NAME="z4_15"></A>
+	<P ALIGN=CENTER><B>図4-15　CENTER_X、CENTER_Yによる映像の差異</B><BR>
+	<IMG SRC="../grp/p04_26_1.gif"></P>
+
+
+<BLOCKQUOTE><P>
+注）オブジェクト、視点などの条件はａ）ｂ）ともに同じ
+</P></BLOCKQUOTE>
+
+<A NAME="no4_53"></A>
+	<P>	<DT><H3>デフォルトウィンドウの再設定</H3>
+		<DD>　何らかの理由でデフォルトウィンドウを書き換えた後、再びデフォルトウィンドウを設定する場合は、ライブラリ関数“slWindow”に次の値を入れてください。<BR>
+			ただし、下図の例では、画面サイズは（横320×縦224）であると仮定します。</P>
+
+<A NAME="z4_16"></A>
+	<P>	<DD><B>図4-16　デフォルトウィンドウの再設定</B>
+<PRE>
+●画面モード(横320×縦240)の場合
+<H2>
+slWindow(0,0,319,223,0x7FFF,160,112);
+         |           |      |
+         |           |      消失点座標値：画面中心
+         |           Zlimit
+         ウィンドウ範囲指示座標値
+</H2></PRE></P>
+
+	<P>	<DD>　デフォルトウィンドウとは、つまりはモニターと同サイズのウィンドウを指します。<BR>
+			ウィンドウサイズはモニターと同サイズ（画面モードによって値は変化）、後方限界座標値は“0x7FFF”、消失点はモニター中央にセットされます。</P>
+
+<A NAME="no4_54"></A>
+	<P>	<DT><H3>サンプルプログラム</H3>
+		<DD>　下図は、ウィンドウを利用したサンプルプログラム“sample_4_5”によるオブジェクトの表示例です。
+			オブジェクト 1 を長方形の板ポリゴン、オブジェクト 2 を立方体ポリゴンとし、あるＺ座標で、お互いが交差するように配置してあります。<BR>
+			これに、ライブラリ関数“slWindow”を用いてウィンドウをセットした場合の表示が、下図中のｄ）です。
+			オブジェクト 1 はウィンドウ領域外で表示、オブジェクト 2 はウィンドウ領域内で表示するように設定されています（この設定については後述）。</P>
+
+<A NAME="z4_17"></A>
+	<P ALIGN=CENTER><B>図4-17　ウィンドウを利用したオブジェクト表示例</B><BR>
+	<IMG SRC="../grp/p04_27.gif"></P>
+
+
+<BLOCKQUOTE><P>
+注１）オブジェクト1 は、ウィンドウ外で表示<BR>
+注２）オブジェクト2 は、ウィンドウ内で表示
+</P></BLOCKQUOTE>
+
+<A NAME="l4_6></A>
+	<P ALIGN=CENTER><B>リスト4-6　sample_4_5：ウィンドウを使用したオブジェクトの表示例</B><BR>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Window & Clipping						*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+#define Zlimit		150
+#define CENTER_X	160
+#define CENTER_Y	112
+
+extern PDATA PD_PLANE, PD_CUBE;
+
+void ss_main(void)
+{
+	static ANGLE     ang1[XYZ], ang2[XYZ];
+	static FIXED     pos1[XYZ], pos2[XYZ];
+	static Sint16    left = 130, top = 30, right = 190, bottom = 80;
+	static Sint16    v_move = 1, h_move = 1;
+
+	slInitSystem(TV_320x224,NULL,1);
+	slPrint("Sample program 4.5" , slLocate(9,2));
+
+	ang1[X] = ang1[Y] = ang1[Z] = DEGtoANG(0.0);
+	ang2[X] = DEGtoANG(30.0);
+	ang2[Y] = ang2[Z] = DEGtoANG(0.0);
+	pos1[X] = pos2[X] = toFIXED(  0.0);
+	pos1[Y] = pos2[Y] = toFIXED(  0.0);
+	pos1[Z] = pos2[Z] = toFIXED(190.0);
+
+	while(-1){
+		left += v_move;
+		top += h_move; 
+		right += v_move;
+		bottom += h_move;
+
+		if (left == 0) v_move = 1;
+		if (top == 0) h_move = 1;
+		if (right == 319) v_move = -1;
+		if (bottom == 223) h_move = -1;
+
+		slWindow(left , top , right , bottom , Zlimit ,CENTER_X , CENTER_Y);
+
+		slPushMatrix();
+		{
+			slTranslate(pos1[X] , pos1[Y] , pos1[Z]);
+			slRotX(ang1[X]);
+			slRotY(ang1[Y]);
+			slRotZ(ang1[Z]);
+			slPutPolygon(&PD_PLANE);
+		}
+		slPopMatrix();
+
+		slPushMatrix();
+		{
+			slTranslate(pos2[X] , pos2[Y] , pos2[Z]);
+			slRotX(ang2[X]);
+			slRotY(ang2[Y]);
+			slRotZ(ang2[Z]);
+			slPutPolygon(&PD_CUBE);
+		}
+		slPopMatrix();
+
+		ang2[Y] += DEGtoANG(1.0);
+
+		slSynch();
+	}
+}
+</PRE>
+
+<A NAME="f4_5></A>
+ <P ALIGN=CENTER><B>フロー4-5　sample_4_5：ウィンドウ表示フローチャート</B><BR>
+ <IMG SRC="../grp/p04_29.gif"></P>
+
+	<P>	<DD>　ＳＧＬでは、ウィンドウの内外でオブジェクトの表示・非表示を切り替えることができます。この切り替えは、ポリゴンの属性として１ポリゴン面単位で設定可能です。<BR>
+			詳細は“第7章: ポリゴンの面属性”に譲りますが、ここでは、サンプルプログラムで用いたデータファイル“polygon.c”中でポリゴンの面属性に該当する部分を紹介しておきます。</P>
+
+<A NAME="l4_7"></A>
+ <P><DD><B>リスト4-7　polygon.c：ウィンドウ表示に関わるポリゴン属性</B>
+<PRE>
+/*　前略　*/
+
+ATTR attribute_PLANE[] = {
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(16,16,16), No_Gouraud, MESHoff|Window_Out, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(00,31,31), No_Gouraud, MESHoff|Window_Out, sprPolygon,No_Option),
+};
+
+ATTR attribute_CUBE[] = {
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,31,31), No_Gouraud, MESHoff|Window_In, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,00,00), No_Gouraud, MESHoff|Window_In, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(00,31,00), No_Gouraud, MESHoff|Window_In, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(00,00,31), No_Gouraud, MESHoff|Window_In, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(31,31,00), No_Gouraud, MESHoff|Window_In, sprPolygon,No_Option),
+	ATTRIBUTE(Single_Plane, SORT_MIN, No_Texture, C_RGB(00,31,31), No_Gouraud, MESHoff|Window_In, sprPolygon,No_Option),
+};
+
+/*　後略　*/
+</PRE>
+
+<A NAME="no4_56"></A>
+	<P>	<DT><H3>ウィンドウによる影響範囲</H3>
+		<DD>　関数“slWindow ”は、１フレーム中に２つしか使用できません。<BR>
+			関数“slPutPolygon”、“slPutSprite”等を呼び出すと、その時点で１つ目のウィンドウが使用され、それ以降ではあと１回しか“slWindow”を呼び出せません。<BR>
+		（前記関数を呼び出すとデフォルトウィンドウの設定が変わります）</P>
+
+	<P>ウィンドウの設定は、同時に一つしか作用しません。
+	また、関数“slWindow”を呼び出すと、それ以前のポリゴン（スプライト）とそれ以降のものとはプライオリティが切り離され、この場合、後のものが常に優先されます。</P>
+
+<A NAME="l4_8"></A>
+	<P>	<DD><B>リスト4-8　ウィンドウ設定の影響範囲</B>
+<PRE>
+		:			/*　ウィンド１(デフォルト)　*/
+	slPutPolygon(<B>object1</B>);
+		:
+	slPutPolygon(<B>object2</B>);
+		:
+slWindow(.....);	←
+		:			/*　ウィンド２　*/
+	slPutPolygon(<B>object3</B>);
+		:
+slWindow(.....);	←エラー
+		:			/*　ウィンド２のまま　*/
+	slPutPolygon(<B>object4</B>);
+		:
+	slPutPolygon(<B>object5</B>);
+		:
+</PRE></P>
+
+	<P><DD><UL TYPE=DISC>
+		<LI><B>例の場合</B><BR>
+			最初にデフォルトウィンドによって<B>object1</B>、<B>object2</B>が表示され、その後にウィンド２がセットされます。
+		<LI>これを受けて投影面に対し、デフォルトウィンドによるウィンド１と、新たにセットされたウィンド２が現れます。<BR>
+			この状態で描画された<B>object3</B>は、新しいウィンドの影響を受けることになります。
+		<LI>さらに　slWindow　を実行すると、すでに２つのウィンドが使われているため<B>エラー</B>となり、新しく設定することはできません。
+		<LI><B>object4</B>、<B>object5</B>は、ウィンド２の影響を受けて、投影面に描画されます。</P>
+		</UL>
+
+<A NAME="no4_f"></A>
+	<P>	<DT><H3>付記　本章に登場したＳＧＬライブラリ関数</H3>
+		<DD>　本章では、次表の関数を解説しました。</P>
+
+<A NAME="t4_3"></A>
+	<P>	<DT><TABLE BORDER=1>
+	<CAPTION><B>表4-3　本章に登場したＳＧＬライブラリ関数</B></CAPTION>
+	<TR ALIGN=CENTER><TH><PRE>　関数型　</TH><TH><PRE>　関数名　</TH><TH><PRE>　パラメータ　</TH><TH><PRE>　　　　　　機　　能　　　　　　</TH></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slPerspective</TD><TD>ANGLE angp </TD><TD>透視変換テーブルの諸設定 </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slRotX       </TD><TD>ANGLE angx </TD><TD>ポリゴンデータのX軸回りの回転 </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slRotY       </TD><TD>ANGLE angy </TD><TD>ポリゴンデータのY軸回りの回転 </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slRotZ       </TD><TD>ANGLE angz </TD><TD>ポリゴンデータのZ軸回りの回転 </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slRotXSC     </TD><TD>FIXED sn,FIXED cs </TD><TD>Sin,Cosを指定してX軸回りの回転 </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slRotYSC     </TD><TD>FIXED sn,FIXED cs </TD><TD>Sin,Cosを指定してY軸回りの回転 </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slRotZSC     </TD><TD>FIXED sn,FIXED cs </TD><TD>Sin,Cosを指定してZ軸回りの回転 </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slRotAX      </TD><TD>FIXED vx,vy,cz,ANGLE a </TD><TD>原点を通過する任意軸回りの回転(軸単位:ベクトル) </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slScale      </TD><TD>FIXED sx,sy,sz </TD><TD>ポリゴンデータの拡大縮小 </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slWindow     </TD><TD>lft,top,rgt,btm,Zlimit,CNTX,CNTY </TD><TD>ウィンド設定 </TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slZdspLevel  </TD><TD>level </TD><TD>ビューイングボリュームの表示レベル指定 </TD></TR>
+	</TABLE></P>
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p03_10.htm">戻る</A>｜<A HREF="demo_a.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,319 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 5&gt;CDビルダスクリプト文法補足説明</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<B>▲
+<a href="p21_10_j.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>CDビルダスクリプト文法補足説明</B>
+<H2 ALIGN=CENTER></H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no5_00"></A>
+	<P><DT><H3>５．スクリプト記述例</H3>
+	<DD>　スクリプトによるディスク構成の決め方の例を示します。パラメータに使用する出力ファイル名等の正確な表記方法は既発行のマニュアルに定義してあります。ここでは例えば出力ファイル名であれば、単に出力ファイル名を記述するということだけを意味します。</P>
+	<P><DD>＜　＞optは省略可能であることを、｛ ｜ ｝は選択肢を、；以降は注釈を示します。</P>
+</DL>
+<!---------------------------------------------------------------------------->
+<A NAME="no5_01"><HR></A><DL>
+
+	<DT><B>　●CD-ROM(MODE1＋CD-DA)ディスクのサンプルスクリプト</B>
+	<DD><PRE>
+Disc             出力ファイル名
+Session          CDROM        ＜出力ファイル名＞opt
+LeadIn           MODE1
+EndLeadIn
+；
+＜SystemArea MSDOSファイル名＞opt
+；
+Track         MODE1
+    Volume    ISO9660        出力ファイル名
+    PrimaryVolume    0:2:16
+              ＜PVD定義行＞opt                           ；‥‥‥<B><A HREF="#no5_11">(1)</A></B>
+    EndPrimaryVolume
+    ＜SupplementaryVolume    相対時間＞opt
+              ＜SVD定義行＞opt                           ；‥‥‥<B><A HREF="#no5_12">(2)</A></B>
+    ＜EndSupplementaryVolume＞opt
+    ＜BootRecord             相対時間＞opt
+              ＜ブートレコード定義行＞opt                 ；‥‥‥<B><A HREF="#no5_13">(3)</A></B>
+    ＜EndBootRecord＞opt
+    EndVolume
+；
+    File      ISO9660ファイル名    ＜出力ファイル名＞opt
+              ＜ファイル定義行＞opt　　　                 ；‥‥‥<B><A HREF="#no5_14">(4)</A></B>
+    FileSource               入力ファイル名
+              ＜ファイルソース定義行＞opt                 ；‥‥‥<B><A HREF="#no5_15">(5)</A></B>
+    EndFileSource
+    EndFile
+    ；
+    ；        File 〜 EndFile
+    ；
+    PostGap   75
+EndTrack
+；
+Track         CDDA
+    Pause     150
+    FileSource               入力ファイル名
+              ＜ファイルソース定義行＞opt                ；‥‥‥<B><A HREF="#no5_15">(5)</A></B>
+    EndFileSource
+EndTrack
+；
+；    Track 〜 EndTrack
+；
+；
+LeadOut        CDDA
+Empty          300
+EndLeadOut
+EndSession
+EndDisc
+</PRE></P>
+</DL>
+
+<!--------------------------------------------------------------------------->
+<A NAME="no5_02"><HR></A><DL>
+	<P><DT><B>　●CD-ROM XA(MODE1＋MODE2＋CD-DA)ディスクのサンプルスクリプト</B>
+	<DD><PRE>
+Disc            出力ファイル名
+Session         SEMIXA          ＜出力ファイル名＞opt
+LeadIn          MODE1
+EndLeadIn
+；
+＜SystemArea    MSDOSファイル名＞opt
+；
+Track          MODE1
+    Volume    ISO9660          出力ファイル名
+    PrimaryVolume              0:2:16
+              ＜ＰＶＤ定義行＞opt　　　　　           ；‥‥‥<B><A HREF="#no5_11">(1)</A></B>
+    EndPrimaryVolume
+    ＜SupplementaryVolume    相対時間＞opt
+              ＜ＳＶＤ定義行＞opt　　　　　           ；‥‥‥<B><A HREF="#no5_12">(2)</A></B>
+    ＜EndSupplementaryVolume＞opt
+    ＜BootRecord              相対時間＞opt
+              ＜ブートレコード定義行＞opt             ；‥‥‥<B><A HREF="#no5_13">(3)</A></B>
+    ＜EndBootRecord＞opt
+    EndVolume
+；
+    FileISO9660ファイル名    ＜出力ファイル名＞opt
+              ＜ファイル定義行＞opt　　　             ；‥‥‥<B><A HREF="#no5_14">(4)</A></B>
+    File    Source              入力ファイル名
+              ＜ファイルソース定義行＞opt             ；‥‥‥<B><A HREF="#no5_15">(5)</A></B>
+    EndFileSource
+    EndFile
+    ；
+    ；          File 〜 EndFile
+    ；
+    PostGap          75
+EndTrack
+；
+Track          MODE2
+    PreGap          150
+    File            ISO9660ファイル名    ＜出力ファイル名＞opt
+；SectorRate行を使ったチャネルインタリーブの例
+    SectorRate          ＜正の整数＞opt          ；MPEG定義する場合必須
+    MpegMultiplex             ＜出力ファイル名＞opt
+          ＜RealTime＞opt                    ；MpegStream行でDATA指定する場合
+          MpegStream          ソースファイル名          ｛ AUDIO | VIDEO | DATA｝
+          BitRate             ビットレート               ＜順序番号＞opt
+          ＜DataType          { FORM1 | FORM2 }＞opt          ；MpegStream行で
+          ＜MpegFlush＞opt                                            DATA指定の場合
+          EndMpegStream
+          MpegStream          ソースファイル名          ｛ AUDIO | VIDEO | DATA｝
+              ：
+          EndMpegStream
+    EndMpegMultiplex
+    EndFile
+
+    File              ISO9660ファイル名    ＜出力ファイル名＞opt
+；UnitSize行、GapSize行を使ったチャネルインタリーブの例
+    Channel                    チャネル番号
+          FileSource           入力ファイル名
+          UnitSize             ユニットサイズ
+          GapSize              ギャップサイズ
+          ：
+          EndFileSource
+    EndChannel
+    Channel                    チャネル番号
+          FileSource           入力ファイル名
+          UnitSize             ユニットサイズ
+          GapSize              ギャップサイズ
+          ：
+          EndFileSource
+    EndChannel
+    EndFile
+    Extent          ＜相対時間＞opt
+          FileInterleave    ユニットサイズ          ギャップサイズ
+          File              ISO9660ファイル名       ＜出力ファイル名＞opt
+          FileSource              入力ファイル名
+          EndFileSource
+          EndFile
+          EndFileInterleave
+          FileInterleave    ユニットサイズ          ギャップサイズ
+          File              ISO9660ファイル名       ＜出力ファイル名＞opt
+          FileSource              入力ファイル名
+          EndFileSource
+          EndFile
+          EndFileInterleave
+    EndExtent
+    Directory          ディレクトリ名
+    ＜ディレクトリ属性定義＞opt
+          Directory    ディレクトリ名
+          File              ISO9660ファイル名        ＜出力ファイル名＞opt
+          FileSource              入力ファイル名
+          EndFileSource
+          EndFile
+          EndDirectory
+    EndDirectory
+PostGap          75
+EndTrack
+；
+Track          CDDA
+    Pause    150
+    FileSource          入力ファイル名
+              ＜ファイルソース定義行＞opt              ；‥‥‥<B><A HREF="#no5_15">(5)</A></B>
+    EndFileSource
+EndTrack
+；
+；    Track 〜 EndTrack
+；
+LeadOut        CDDA
+Empty          300
+EndLeadOut
+EndSession
+EndDisc
+</PRE></P>
+</DL>
+
+<A NAME="no5_11"><HR></A><DL>
+<DT><H4>(1).PVD定義行</H4>
+<DD><PRE>
+＜SystemIdentifier                    Ａ識別子＞opt
+＜VolumeIdentifier                    Ｄ識別子＞opt
+＜LogicalBlockSize                    ブロック数＞opt
+＜OptionalLPath＞opt
+＜OptionalMPath＞opt
+＜VolumeSetIdentifier                 Ｄ識別子＞opt
+＜PublisherIdentifier                 Ａ識別子＞opt
+＜DataPreparerIdentifier              Ａ識別子＞opt
+＜ApplicationIdentifier               Ａ識別子＞opt
+＜CopyrightFileIdentifier             Ｄ+識別子＞opt
+＜AbstractFileIdentifier              Ｄ+識別子＞opt
+＜BibliographicFileIdentifier         Ｄ+識別子＞opt
+＜VolumeCreationDate                  日付＞opt
+＜VolumeModificationDate              日付＞opt
+＜VolumeExpirationDate                日付＞opt
+＜VolumeEffectiveDate                 日付＞opt
+＜ApplicationUse                      MS-DOSファイル名＞opt
+</PRE><P>
+</DL>
+<!--------------------------------------------------------------------------->
+<A NAME="no5_12"><HR></A><DL>
+	<P><DT><H4>(2).SVD定義行</H4>
+	<DD><PRE>
+＜SystemIdentifier                    Ａ識別子＞opt
+＜VolumeIdentifier                    Ｄ識別子＞opt
+＜LogicalBlockSize                    ブロック数＞opt
+＜EscapeSequences                     漢字コード＞opt
+＜OptionalLPath＞opt
+＜OptionalMPath＞opt
+＜VolumeSetIdentifier                 Ｄ識別子＞opt
+＜PublisherIdentifier                 Ａ識別子＞opt
+＜DataPreparerIdentifier              Ａ識別子＞opt
+＜ApplicationIdentifier               Ａ識別子＞opt
+＜CopyrightFileIdentifier             Ｄ+識別子＞opt
+＜AbstractFileIdentifier              Ｄ+識別子＞opt
+＜BibliographicFileIdentifier         Ｄ+識別子＞opt
+＜VolumeCreationDate                  日付＞opt
+＜VolumeModificationDate              日付＞opt
+＜VolumeExpirationDate                日付＞opt
+＜VolumeEffectiveDate                 日付＞opt
+＜ApplicationUse                      MS-DOSファイル名＞opt
+</PRE></P>
+</DL>
+<!--------------------------------------------------------------------------->
+<A NAME="no5_13"><HR></A><DL>
+	<P><DT><H4>(3).ブートレコード定義行</H4>
+	<DD><PRE>
+＜BootSystemIdentifier                Ａ識別子＞opt
+＜BootIdentifier                      Ａ識別子＞opt
+</PRE></P>
+</DL>
+<!--------------------------------------------------------------------------->
+<A NAME="no5_14"><HR></A><DL>
+	<P><DT><H4>(4).ファイル定義行</H4>
+	<DD><PRE>
+＜BeginTimeS              相対時間＞opt
+＜EndTimeS                相対時間＞opt
+＜Attributes              { HIDDEN | NOHIDDEN }{ RECORD | NOTRECORD }＞opt
+＜RecordingDate           日付＞opt
+＜MinLength               { バイト数 | セクタ数 } ＞opt
+＜Trigger                 相対時間＞opt
+＜Eors                    相対時間＞opt
+＜Pack＞opt
+＜SectorRate              { 正の製数値 } ＞opt
+＜FileNo                  ファイル番号＞opt      ；1 〜 255
+＜BeginTimeE              { 相対時間 | + } ＞opt
+＜EndTimeE                { 相対時間 | - } ＞opt
+＜SameName                ディレクトリ名ファイル名＞opt
+＜SysOwnerID              数字列＞opt
+＜SysReadAttributes       { OWNER | NOTOWNER }{ GROUP | NOTGROUP }
+　                        { WORLD | NOTWORLD }＞opt
+＜SysExecuteAttributes    { OWNER | NOTOWNER }{ GROUP | NOTGROUP }
+　                        { WORLD | NOTWORLD }＞opt
+</PRE></P>
+</DL>
+
+<!--------------------------------------------------------------------------->
+<A NAME="no5_15"><HR></A><DL>
+	<P><DT><H4>(5).ファイルソース定義行</H4>
+<DD><PRE>
+＜SubHeader＞opt
+＜Offset入力位置       　　入力長＞opt
+＜BitRate                 ビットレート  ＜順序番号＞opt ＞opt
+＜UnitSize                ユニットサイズ＞opt
+＜GapSize                 ギャップサイズ＞opt
+＜RealTime＞opt
+＜BeginTimeF              { 相対時間 | + } ＞opt
+＜EndTimeF                { 相対時間 | - } ＞opt
+＜DataType                { FORM1 | FORM2 }＞opt
+＜AutoEOR＞opt
+＜CodingInformation       コーディング情報＞opt
+＜SourceType              {  MONO_A | MONO_B | MONO_C | STEREO_A | STEREO_B |
+　                                      STEREO_C | CDDA | AUDIO | ISO11172 | MPEG_VIDEO |
+　                                      VIDEO | DATA  } ＞opt
+　                                              ；Track行でMODE2が指定された場合のみ有効
+＜SubSource               ファイル名＞opt
+＜SubEmpty                ブロック数＞opt
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p21_10_j.htm">戻る</A>｜
+　　■</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

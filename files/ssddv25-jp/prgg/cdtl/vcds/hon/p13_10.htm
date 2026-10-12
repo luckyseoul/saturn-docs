@@ -1,0 +1,176 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/14&gt;バーチャルCDシステム/</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no2">バーチャルCDシステム</A>
+<HR>
+<B>▲
+<A HREF="p12_10.htm">戻る</A>｜
+<A HREF="p14_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>バーチャルCDシステムユーザーズマニュアル/第５章　ＣＤエミュレーション関連ツール</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no5_30"></A>
+<P><DT><H3>5.3　TOC情報診断ツール　TOCCHK</H3>
+	<P><DT><H3>5.3.１　概要</H3>
+	<DD>　TOCCHKはTOCファイル(VCDMKTOCの出力ファイル "〜.TOC"）をチェックしてTOC情報として異常がないか診断メッセージを標準出力へ出力する。</P>
+
+	<P><DT><B>　チェック項目</B>
+　　<DD><TABLE BORDER=0>
+	<TR><TD>(1)</TD><TD>トラックサイズチェック　　　　 </TD><TD>（４秒以上であること）</TD><TD></TD></TR>
+	<TR><TD>(2)</TD><TD>プレギャップサイズチェック　 　</TD><TD>（２秒以上であること）</TD><TD></TD></TR>
+	<TR><TD>(3)</TD><TD>ポストギャップサイズチェック　 </TD><TD>（１秒以上であること）</TD><TH>※注意</TH></TR>
+	<TR><TD>(4)</TD><TD>オーディオトラックの先頭ポーズ </TD><TD>（２秒以上であること）</TD><TD></TD></TR>
+	</TABLE>
+
+	<P><DT><B>　※注意</B>
+	<DD>　ここでいうポストギャップはCD-ROM XA規格に示されるものです。<BR>
+	CD-ROM 規格(YELLOW BOOK)によれば、オーディオトラックに先行する
+     データトラックの最後には、２秒以上のポストギャップが必要ですが、
+     このポストギャップは、ＴＯＣファイルに情報が反映されないため
+     チェックされません。</P>
+	<P>　 バーチャルＣＤのスクリプト上、データトラックの最後に以下の記述が
+　　 あることを確認してください。</P>
+
+	<P><DD><PRE>
+CDDA直前のデータトラック
+　｜　　       :
+　｜　　     <B>PostGap 150</B>    ; <----- ２秒以上のポストギャップを確認
+　↓　　 EndTrack
+━━━　 Track CDDA
+　｜　　     Pause 150
+　｜　　     FileSource 〜.DAT
+　｜　　     EndFileSource
+　↓　　       :
+CDDAトラック
+</PRE></P>
+
+	<P><DT><H3>5.3.2　コマンド仕様</H3>
+
+    TOCCHK  TOCファイル名　　　（拡張子".TOC"は省略可）
+	<P><DT><B>コマンド：</B><DD>TOCCHK </P>
+	<P><DT><B>コマンド名：</B><DD>TOCファイル診断</P>
+	<P><DT><B>書式：</B><DD>SWAP△ファイル名</P>
+	<P><DT><B>引数：</B> <DD>ファイル名：VCDMKTOC.EXEによって作成されたTOCファイル名</P>
+	<P><DT><B>オプション：</B><DD>なし</P>
+	<P><DT><B>機能：</B> <DD>　指定されたTOCファイルの診断をします。 </P>
+
+	<P><DT><B>使用例:</B>
+	<DD>　VCDMKTOC.EXEによって作成されたTOCファイル「SAMPLE.TOC」をチェックし結果をチェックファイル「SAMPLE.TCK」に出力する場合は以下のようにします。</P>
+
+	<P><DD><PRE><B>
+C:¥&gt;TOCCHK SAMPLE.TOC &gt;SAMPLE.TCK
+</B></PRE>
+	（ドライブＣのルートディレクトリで作業をしているものとします。）</P>
+
+	<P><DT><H3>5.3.3　出力形式（サンプル）</H3>
+<DD><PRE>
+TOCCHK.EXE Ver.1.02 1995-04-25
+Copyright(c) SEGA ENTERPRISES, LTD. 1995
+Copyright(c) CSK Research Institute Corp. 1995
+
+OFFSET : CONTROL   TNO/X   FORM     TIME      DUMP(HEX)
+ 0000H : DATA  --- LeadIn  MODE1    00:00:00  41 00 00 02 00 00 00 00
+ 0008H : DATA  --- 01/00   MODE1    00:00:00  41 01 00 02 00 00 00 00
+ 0010H : DATA  --- 01/01   MODE1    00:02:00  41 01 01 02 00 00 02 00
+ 0018H : AUDIO -2- LeadOut MODE1    00:22:52  01 AA 01 02 00 00 22 52
+               |||                            |  |  |  |  |  |  |  |
+               |||                            |  |  |  |  |  MM:SS:FF
+               ||+-- e: Emphasis flag         |  |  |  |  +--ZERO
+               |+-- 2: 2ch / 4: 4ch           |  |  |  +--FORM
+               +-- c: digital Copy permitted  |  |  +--X
+                                              |  +--TNO
+                                              +--CONTROL/ADR
+DIAGNOSIS
+V01.TOC(0018H) : FORM is not consistent with CONTROL
+    |      |         |
+    |      |         +---メッセージ本体
+    |      +--- OFFSET
+    +---------- ファイル名
+</PRE></P>
+
+	<P><DT><B>　メッセージ一覧</B>
+
+	<P><DT><B>　( 1)    TNO=?? size XXX < 300 (4 sec)</B>
+	<DD>トラック??のサイズが４秒以下である。</P>
+
+	<P><DT><B>　( 2)    POST-GAP missing</B>
+	<DD>ポストギャップが無い。<BR>ここでいうポストギャップはCD-ROM XA規格に示されるもの。<BR>TNO→TNO+1、X→0と変化してもFORMバイトが変化しない時点をプレギャップ開始、FORMバイトが変化した時点をポストギャップの終了、と判断している。</P>
+
+	<P><DT><B>　( 3)    POST-GAP smaller than 1 sec</B>
+	<DD>ポストギャップが１秒以下である。（CD-ROM XA規格）</P>
+
+	<P><DT><B>　( 4)    PRE-GAP missing</B>
+	<DD>プレギャップが無いのにFormバイトが変化した。</P>
+
+	<P><DT><B>　( 5)    PRE-GAP smaller than 2 sec</B>
+	<DD>プレギャップが２秒以下である。（CD-ROM XA規格）</P>
+
+	<P><DT><B>　( 6)    PAUSE Missing</B>
+	<DD>オーディオトラックにポーズが無い。</P>
+
+	<P><DT><B>　( 7)    PAUSE smaller than 2 sec</B>
+	<DD>プレギャップが２秒以下である。（CD-ROM XA規格）</P>
+
+	<P><DT><B>　( 8)    LeadIn Control(??H) is not DATA</B>
+	<DD>LeadIn領域のControlがDATA形式でない。（Saturn形式）<BR>（音楽ＣＤの時はAUDIO形式となる）</P>
+
+	<P><DT><B>　( 9)    LeadIn FORM(??H) is not CD-ROM</B>
+	<DD>LeadIn領域のFORMがCD-ROM形式でない。（Saturn形式）</P>
+
+	<P><DT><B>　(10)    LeadIn ATIME is not 00:00:00</B>
+	<DD>LeadIn領域のATIMEが 00:00:00 でない。</P>
+
+	<P><DT><B>　(11)    Illegal Disc Type (??H)</B>
+	<DD>LeadIn領域のDisc Type がCD-ROM / CD-ROM XA / CD-I形式でない。</P>
+
+	<P><DT><B>　(12)    Illegal TNO/X=(??/??) at PAUSE</B>
+	<DD>先頭のポーズのTNO/Xが01/00でない。（Saturn形式）</P>
+
+	<P><DT><B>　(13)    Illegal Control(??H) at PAUSE</B>
+	<DD>先頭のポーズのControlがDATA形式でない。（Saturn形式）</P>
+
+	<P><DT><B>　(14)    Illegal ATIME ??:??:?? at PAUSE</B>
+	<DD>先頭のポーズのATIMEが00:00:00でない。（Saturn形式）</P>
+
+	<P><DT><B>　(15)    Illegal TNO/X=(??/??) at 1st TRACK</B>
+	<DD>先頭トラックのTNO/Xが01/01でない。（Saturn形式）</P>
+
+	<P><DT><B>　(16)    Illegal CONTROL(??H) at 1st TRACK</B>
+	<DD>先頭トラックのCONTROLがDATA形式でない。（Saturn形式）</P>
+
+	<P><DT><B>　(17)    Illegal ATIME ??:??:?? at 1st TRACK</B>
+	<DD>先頭トラックのATIMEが00:02:00でない。（Saturn形式）</P>
+
+	<P><DT><B>　(18)    Illegal CONTROL(??H)</B>
+	<DD>CONTROLが許されない値である。（Saturn形式）</P>
+
+	<P><DT><B>　(19)    TNO/X=(??/??) Sequence error</B>
+	<DD>トラック番号／インデックスが昇順でない。</P>
+
+	<P><DT><B>　(20)    ATIME=(??:??:??) Sequence error</B>
+	<DD>ATIMEが昇順でない。</P>
+
+	<P><DT><B>　(21)    FORM is not consistent with CONTROL</B>
+	<DD>FORMバイトとCONTROLに不整合がある。<BR>（CDDAならばAUDIO、その他ならDATA）</P>
+
+	<P><DT><B>　(22)    Illegal FORM (??H)</B>
+	<DD>：Formバイトの値が不正である。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p12_10.htm">戻る</A>｜
+<A HREF="p14_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no2">バーチャルCDシステム</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

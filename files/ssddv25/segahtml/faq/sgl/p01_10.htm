@@ -1,0 +1,151 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 8&gt;FAQ/SGL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm">SGL programming related</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SGL programming related</b><H2 ALIGN=CENTER> sprite/polygon</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_01"><HR></a><DL>
+<H3> I want to temporarily suspend sprite drawing.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to temporarily interrupt sprite drawing.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There is a system variable in SGL called PauseFlag. When this is turned ON, the transfer from the sprite buffer to VDP1, which is performed by the SGL system within V-Blank, will not be performed. This allows for the effect of not displaying the sprite during a pose, for example.</P>
+<P> Please declare extern and use SGL system variables, not just PauseFlag.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_02"><HR></a><DL>
+<H3> I want to change the ratio of sprite color calculations.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How do I set the color calculation ratio (for example, semi-transparent) on the sprite screen?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> slColRate() is provided as a function. Also, a macro using this function</P>
+<P><DD> <B>slColRate*</b><P><DD> <B>(example)</b><BR>
+ slColRateNBG0</P>
+<P> there is.<BR>
+ This is described in SL_DEF.H. You can use this function or these macros to set the sprite's color calculation percentage.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_03"><HR></a><DL>
+<H3> I want to prioritize sprite display.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When displaying 2D sprites with slPutSprite, I would like to give priority to two sprites at the same coordinates, but if I change the coordinates in the direction of the camera position, the display positions will be different when converted to transparent coordinates. .</P>
+<P> Is there a way to use slPutSprite to arbitrarily assign priority when displaying at the same coordinates?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> In SGL, if you try to display at the same Z coordinate, the item (sprite or polygon) registered later in the Z buffer will have a higher priority (that is, it will be closer).<BR>
+ For polygons, this can be avoided to some extent by selecting a representative value for Z, but sprites have no concept of depth, so the only way to change it is through the order of function execution.<BR>
+ If you have enough processing time and have decided on the priority you want to assign, I think the most effective method is to calculate the position and display scale on the user side, and have the user adjust the Z position using slDispSprite().</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_04"><HR></a><DL>
+<H3> I want to change the display position to another location using the sprite drawing function.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> slPutSprite and slDispSprite treat the center point of the data as the reference point, but is it possible to change this to the top left or bottom of the center?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> With the slPutSprite or slDispSprite functions, basically you cannot set the drawing reference point to anything other than the center.<BR>
+ If you want to do something like this, specify it using slSetSprite or slDispSprite4P.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_05"><HR></a><DL>
+<H3> Polygons disappear or line-like noise appears on the screen.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When polygons get close to the front in SGL, they may disappear due to clipping, or line-like noise may appear on the screen.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD><OL>
+<P> <B><LI>Change the second argument (sorting settings) of the ATTR structure when setting polygons.</li>
+</b><BR>
+ By default, the sorting setting for SOFTIMAGE Export is SORT_CEN, but if you set this to SORT_MAX, it will be the farthest point from the Z sorting reference point, so the missing polygons will be a little closer.</P>
+<P> <B><LI>Increase the argument given to slZdspLevel.</li>
+</b><BR>
+ slZdspLevel contains values from 0 to 7. The higher the value, the closer the image will be displayed.</P>
+<P> <B><LI>Reduce the coordinate values that make up the polygon.</li>
+</b><BR>
+ Inside SGL, clipping is applied to the Z-axis of the polygon coordinates, but no clipping processing is performed for the XY components, which causes overflow or underflow in the frame buffer space and Noise may occur. This process is to avoid this.</P>
+<P> <B><LI>Change the number of polygons of the model in the front and back.</li>
+</b><BR>
+ Specifically, it means dividing the polygon that came to the front.<BR>
+ Of course, if textures are pasted, the textures will also be divided, so the application needs to prepare multiple model patterns and textures for one model.</P>
+</OL>
+<P><DT> <B>supplement</b><DD> Utilize the near clipping function of SGL Ver 3.0 or later.<BR>
+ However, in this case, you can still use the techniques in <B>steps 1.</b> to <B>4.</b> above.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_06"><HR></a><DL>
+<H3> It seems like the display of sprites and polygons is delayed by one tempo.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When displaying sprites on SGL, I thought that the sprites that executed display functions in that frame (slDispSprite, slPutPolygon, etc.) would be displayed in the next frame, but it doesn't seem to work properly.</P>
+<P> In other words,</P>
+<P><PRE>
+slDispSprite(...);
+slSynch();
+OtherProc(); ←It should be displayed at this point, but slSynch();
+OtherProc(); ←It actually looks like it's displayed here</PRE></P>
+<P> This phenomenon occurs. Why?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> VDP1 is delayed by one processing frame compared to VDP2, so as you pointed out, it will not be displayed unless you run slSynch twice.</P>
+<P> This is because VDP1 has a double frame buffer, and what the user writes to the command buffer is written to the back frame buffer in the next frame.<BR>
+ Therefore, the contents of the back buffer will be displayed in the next frame after writing to the command buffer.<BR>
+ In other words,</P>
+<P><PRE>
+slDispSprite(...);
+slSynch(); ←At this time, the contents of the command are reflected in the underlying frame buffer.
+OtherProc();
+slSynch(); ←At this point, overlap the contents of the back frame buffer with the VDP2 video.
+OtherProc(); ←Displayed here.
+</PRE></P>
+<P>This is how it goes.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_07"><HR></a><DL>
+<H3> I want to define a new texture by changing the system variable FormTbl.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to load model data and texture data into the game at any time as the game progresses.I would like to rewrite the table of the TEXTURE structure, but I do not know the specific method.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD>&#65308; <B>About the system variable FormTbl and drawing polygons and sprites</b>&#65310; When using polygon or sprite drawing request functions, FormTbl is referenced within the function, and these functions issue commands by checking the contents of the cache.<P> In other words, in normal usage, the contents of FormTbl cannot be changed within one unit of processing.<P> There are two possible ways to avoid this:<P><DL>
+<P><DT> <B>Method 1: Change the address itself shown in FormTbl</b><DT> <B>[Step 1]</b> Purge the cache on the slave side.<DD> Before reconfiguring FormTbl, purge the cache from the slave side and reflect the updated results to enable the above program to operate. Specifically, first confirm that slave processing has finished. To know the slave activity status,<P> <B>ComRdPtr, ComWrPtr</b><P> Refer to the contents of the two system variables.<BR>
+ These two system variables are data that is referenced when the slave is performing processing such as slPutPolygon, and when they match, the slave is not performing <B>SGL processing</b> .<P> However, since the slave CPU always looks at the cache area, the address to be compared must also be in the cache. That is, the system variable<P> <B>ComWrPtr, ComRdPtr</b><P> rather than looking at it as it is<P> <B>ComWrPtr+0x20000000</b><BR>
+ <B>ComRdPtr+0x20000000</b><P> Must see.<BR>
+ These registers point to the addresses where the slave is reading and writing commands, and if these values are the same, the slave can be considered to be in a standby state, so first, check these two registers. Compare the values and wait until they are the same.<BR>
+ Next, run slCashePurge from the slave side to purge the cache. For this, use slSlaveFunction.<P><P><DT> <B>[Step 2]</b> Purge the cache on the slave side.<P><DT> <B>Method 2: Change FormTbl.</b><DD> Change the contents of the structure indicated by FormTbl.<BR>
+ This method is to change the original data without changing FormTbl at all.<P> for example,<BR>
+ slInitStstem( TV_320x224, TEXTURE_TBL, 1 )<BR>
+ If you specify FormTbl, as in<P> TEXTURE_TBL[ i ].Hsize = ....<BR>
+ TEXTURE_TBL[ i ].Vsize = ....<BR>
+ TEXTURE_TBL[ i ].CGadr = ....<BR>
+ TEXTURE_TBL[ i ].HVsize = ....<BR>
+<P> This is how to change it. If you use this method, you won't need to know the state of the slave, but you will need to prepare enough space for the TEXTURE structure array (that is, the MAX for display sprites) at the first stage of passing it to slInitSystem. there is.<P> *Please note that depending on the timing of character data transfer, the displayed characters may be garbled. This seems to be because when VDP1 transfers character data to the frame buffer, the VRAM data is rewritten by the character data transfer (even though it is still in use).<P> To avoid such things, please transfer character data, lookup table data, and Gouraud data within the function specified by slIntFunction, or wait for VDP1 to finish drawing before transferring.<P> You can determine when VDP1 has finished drawing by looking at the VDP1 transfer end status register (see <A HREF="../../hard/vdp1/hon/p04_16.htm">4.6 Transfer End Status Register</a> in the VDP1 User's Manual).</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_08"><HR></a><DL>
+<H3> What is the Z position given to the sprite drawing function?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Q8) What is the Z position used in the sprite drawing function?<P><DT> <FONT SIZE=5>A)</font><DD> A8 ) The Z position is only used to determine the priority between sprites. There is no change in scale when changing the Z position.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_09"><HR></a><DL>
+<H3> I want to save the contents of the framebuffer.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Q9) I would like to use SGL to leave the previous content in the VDP1 frame buffer and overwrite the sprite on top of it (without erasing it).What settings should I make?<P><DT> <FONT SIZE=5>A)</font><DD> A9 ) There is a function called slGetFrameData, although the processing may be slightly different from what you want. This function allows you to save the frame buffer data and use it in the next frame. However, there is a limit to memory, and the contents of VDP2 are not reflected, so when using it, you should consider that it is almost impossible to use it to fill the entire screen.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_10"><HR></a><DL>
+<H3> Can I use the UseLight option for palettes and color lookups?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Q10) In SGL, if I specify light source calculation processing for a polygon with a specified texture (simply called a texture in the manual), will the result be reflected correctly when it is actually drawn?<P><DT> <FONT SIZE=5>A)</font><DD> A10 ) Basically, the USE_LIGHT option works with SGL polygons only if the texture is written in RGB mode. This is a VDP1 specification, so it is not limited to SGL. However, even in the palette format, there are ways to achieve this by directly manipulating the palette.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_11"><HR></a><DL>
+<H3> Please tell me how to use the slSetSprite function.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Q11 ) I don't really understand how to use the slSetSprite function.<P><DT> <FONT SIZE=5>A)</font><DD> A11 ) slSetSprite is a function for directly manipulating data in the VDP1 command table, and its details match the VDP1 commands. If you would like to know how it is used, and if you are using Cinepak, please refer to the Cinepak sample program. Please also take a look at the included sample program.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_12"><HR></a><DL>
+<H3> I want to give priority to scrolling for each sprite.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I don't know how to give priority to sprites in an SGL environment.<BR> When I do something like slPriority(scnSPR0,7), where <FONT SIZE=5">(and how)</font> do I set for each sprite that this is SPR0 and this is SPR1?<BR> Is it possible to display sprites across the BG screen using SGL?<P><DT> <FONT SIZE=5>A)</font><DD> <B>--- Regarding sprite types and priorities ---</b> When sprite data is sent to VDP2, it is recognized as 8 types of data, each of high resolution and low resolution, depending on the type. VDP2 sets scrolling and sprite priorities according to each type. Sprites and scrolls can be displayed in order by setting the relationship between the 8 types of scrolls and their priorities.<P> In addition to sprite and scroll priorities, you can also set shadows and color calculations between the two.<BR> This type of sprite is called a sprite type in VDP2.<P><DT> <B>reference</b><DD> VDP1 User's Manual <A HREF="../../hard/vdp1/hon/p06_40.htm">6.4 CMDCOLR Color Bank</a><DD> VDP2 User's Manual <A HREF="../../hard/vdp2/hon/p09_10.htm">9.1 Sprite Data</a><P> Sprite types can be assigned to each sprite when setting up VDP1. In SGL, this setting can be made when setting the color palette.<BR> Let's see an example below.<P> First, select the sprite type you want to use.<BR> By default, it is sprite type 3. To change it, call the slSpriteType() function with the sprite type as an argument.<P> next<P><PRE>
+#define PrioNo0 (0&lt;&lt; 12)
+#define PrioNo1 (1&lt;&lt; 12)
+#define PrioNo2 (2&lt;&lt; 12)
+#define PrioNo3 (3&lt;&lt; 12)
+#define PrioNo4 (4&lt;&lt; 12)
+#define PrioNo5 (5&lt;&lt; 12)
+#define PrioNo6 (6&lt;&lt; 12)
+#define PrioNo7 (7&lt;&lt; 12)
+</PRE><P>Suppose that is defined.<P><B>・For polygons</b><BR><PRE>
+ATTRIBUTE( Single_Plane, SORT_CEN, tex1, <B>PrioNo4|0x0010</b> , No_Gouraud,..
+</PRE>Here, the priority number of the polygon is set to 4. In other words, priority numbers 0 to 7 can be set by ORing the pallet number.<P><B>・For slPutSprite, slDispSprite*</b><BR><PRE>
+SPR_ATTRIBUTE( 0, <B>SprType6|0x0000</b> , No_Gouraud, CL256Bnk, sprNofilp );
+</PRE><P>This also specifies the use of sprite type 6 when specifying the palette.<P> In any of the above cases, specify it in the colno member of the ATTR and SPR_ATTR structures.<P><B>・For slSetSprite</b><BR><PRE>
+SPRITE spr;
+spr.CTRL = FUNC_Sprite;
+spr.PMOD = MSBOn | WindowIn | MESHoff | ECenb;
+spr.COLR = <B>PrioNo2 | 0x0020;</b>
+                  :
+                  :
+</PRE>Specify the priority number (2 in this case) together with the palette (also using OR) in the color control word of the VDP1 command table, as shown in the following example.<P> Also, the priority settings for each sprite type can be set using slPriority or slPrioritySpr? Use functions. (slPrioritySpr? is a macro.)<BR> As an example,<P> slPriority( scnSPR6, 5 );<P> Or,<P> slPrioritySpr6( 5 );<P> will do.<BR> Is the scroll side slPriorityNBG? Use functions such as or slPriorityRBG0.</DL><!-----------------------------------------------------------------------------><A NAME="no1_13"><HR></a><DL><H3> When I rotate the sprite, it shifts by 1 dot.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I rotate a sprite using a sprite drawing function such as slPutSprite, slDispSpirte, or slSetSprite, the sprite appears shifted by one dot. How can I fix this?</P><P><DT> <FONT SIZE=5>A)</font><DD> When rotating a sprite, the center of rotation is the center.<BR> On the Sega Saturn, the number of dots in the horizontal direction of a sprite is based on a multiple of 8, so if you look at it in units of dots, there is no exact center dot. Therefore, when rotating the sprite, it inevitably shifts by one dot.</P><P> There is nothing that can be done about this as it is a Sega Saturn specification, but to avoid the dots shifting, you can either change the display position according to the rotation in the program, or change the dots by changing the dots due to the rotation when designing the sprite design. Please take this into account by drawing a shape that takes this into account.</P></DL><!-----------------------------------------------------------------------------><A NAME="no1_14"><HR></a><DL><H3> When a sprite is displayed, it looks 1 dot larger.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When displaying a sprite with slDispSprite, the picture was displayed one dot larger than the specified size. What is the cause.</p><P><DT> <FONT SIZE=5>A)</font><DD> If you specify 1.00 for the scale with the slDispSprite function, the image will be displayed 1 dot larger than the original image.</P><P> This is because the hardware displays one dot larger than the specified display size, so if you want to avoid this, specify 0.99999 for the scale. This value is defined in SL_DEF.H by a macro called ORIGINAL.</P></DL><HR NOSHADE> <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR><A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm">SGL programming related</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS></BODY></HTML>
+

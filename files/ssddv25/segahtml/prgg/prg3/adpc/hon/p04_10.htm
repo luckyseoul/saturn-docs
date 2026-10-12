@@ -1,0 +1,118 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 8&gt;PCM/ADPCM playback library/4.Programming notes</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no4">PCM/ADPCM playback library</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>PCM/ADPCM playback library</b><H2 ALIGN=CENTER> 4.Programming notes</H2><HR NOSHADE>
+<DL>
+<P><DD> The following are precautions when playing back using this library.<P><A NAME="no4_10"></A><P><DT> <B>(1) Notes on creating applications</b><DT><UL TYPE="DISK">
+<P><LI> This library uses CPU DMA and timer. When operating this library, do not use the CPU's DMA and timer.</P>
+<P><LI> The frequency of calling <A HREF="p06_11.htm#no2_7">PCM_Task</a> should be at least the frequency of V blank interrupts (1 time/16ms).<BR>
+ If the same sound occurs twice, it may be because <A HREF="p06_11.htm#no2_7">PCM_Task</a> is called infrequently.</P>
+<P><LI> <A HREF="p06_11.htm#no2_7">PCM_Task</a> You can set the upper limit of the amount to be processed in one call using the function <A HREF="p06_11.htm#no4_9">PCM_Set1TaskSample</a> . This allows you to stabilize the load on <A HREF="p06_11.htm#no2_7">the PCM_Task</a> function.</P>
+</UL>
+<A NAME="no4_20"></A><P><DT> <B>(2) Relationship with other libraries</b><DT><UL TYPE="DISK">
+<P><LI> This library uses the file system, stream system, DMA library, and ADPCM decompression library. Please link these libraries.</P>
+</UL>
+<A NAME="no4_30"></A><P><DT> <B>(3) How to take a buffer</b><DT><UL TYPE="DISK">
+<P><LI> Please ensure the following sizes.</P>
+<P><TABLE BORDER=0>
+<TR><TD><PRE> work buffer</TD><TD><PRE> : Size of work structure.</TD></TR>
+<TR><TD><PRE> ring buffer<BR><BR></TD><TD><PRE> :Minimum (sector size)*10 [byte]. An integer multiple of the sector size.<BR> For CD-ROM XA Audio playback, 1 sector = 2324 bytes.<BR> Otherwise, 1 sector = 2048 bytes.</TD></TR>
+<TR><TD><PRE> PCM buffer</TD><TD><PRE> :4096*2 ~ 4096*4 [sample/1ch].</TD></TR>
+<TR><TD><PRE> Pose processing work</TD><TD><PRE> :Minimum 4096 [sample]. The same size as the PCM buffer is optimal.</TD></TR>
+</TABLE>
+</P>
+</UL>
+<A NAME="no4_40"></A><P><DT> <B>(4) Seamless branch</b><DT><UL TYPE="DISK">
+<P><LI> When seamless branching with <A HREF="p06_11.htm#no3_4">PCM_EntryNext</a> , the PCM volume and PAN will be the same as the previous handle.</P>
+<P><LI> When seamless branching with <A HREF="p06_11.htm#no3_4">PCM_EntryNext</a> , you can play continuously for up to 60 minutes. Continuous playback is not possible beyond this point.</P>
+<P><LI> When seamless branching, please pre-read files in the application program.</P>
+<P><LI> If you use a file system, you cannot use seamless branching.</P>
+<P><LI> Seamless branching can only be performed during single playback. Cannot be executed during multi playback.</P>
+</UL>
+<A NAME="no4_50"></A><P><DT> <B>(5)Multi playback</b><DT><UL TYPE="DISK">
+<P><LI> When playing multiple streams, set the PCM stream playback number to a different number.</P>
+<P><LI> When playing multiple files on a CD at the same time, use file interleaving or channel interleaving. In that case, use the stream system.</P>
+<P><LI> The same file cannot be played multiple times. Please specify a different file.</P>
+<P><LI> Multi playback can be performed on up to 4 at the same time.</P>
+<P><LI> Only one piece of ADPCM compressed data can be played.</P>
+</UL>
+<A NAME="no4_60"></A><P><DT> <B>(6) ADPCM compatible</b><DT><UL TYPE="DISK">
+<P><LI> Please link the ADPCM decompression library SEGA_ADP.LIB.</P>
+<P><LI> Call the ADPCM use declaration <A HREF="p06_11.htm#no1_3">PCM_DeclareUseAdpcm</a> after the initialization function.</P>
+</UL>
+<P><DD> ◆Playback of specified ADPCM format<DD><UL TYPE="DISK">
+<P><LI> It can be played using exactly the same procedure (same program) as the AIFF format. However, please note that the CPU load will be higher than in the case of AIFF format.</P>
+</UL>
+<P><DD> ◆CD-ROM XA Audio format playback<DD><UL TYPE="DISK">
+<P><LI> The library determines the playback frequency and number of channels (stereo/monaural) from the coding information in the subheader area. Please make sure it is written correctly.</P>
+<P><LI> Stream keys are set by the library user.</P>
+<P><LI> The ring buffer should be an integral multiple of the sector size of 2324 bytes.</P>
+<P><LI> Please set the playback information with <A HREF="p06_11.htm#no4_8">PCM_SetInfo</a> .</P>
+<P><LI> When playing CD_ROM XA Audio, only stream playback mode can be used.</P>
+<P><LI> Please refer to the sample program smppcm5.c.</P>
+</UL>
+<A NAME="no4_70"></A><P><DT> <B>(7) How to use functions</b><DT><UL TYPE="DISK">
+<P><LI> Be sure to call <A HREF="p06_11.htm#no1_1">PCM_Init</a> at the beginning of your program.</P>
+<P><LI> Be sure to call <A HREF="p06_11.htm#no2_8">PCM_VblIn</a> within the V blank IN interrupt.</P>
+<P><LI> <A HREF="p06_11.htm#no3_1">PCM_Start</a> can only be executed once for a handle.<BR>
+ If you want to play the same file multiple times, generate a handle each time.</P>
+<P><LI> Call <A HREF="p06_11.htm#no4_1">PCM_SetLoadNum</a> and <A HREF="p06_11.htm#no4_5">PCM_SetPcmStreamNo</a> before starting playback.</P>
+<P><LI> For the handle created with <A HREF="p06_11.htm#no2_1">PCM_CreateMemHandle</a> , be sure to notify the amount of data supplied to the ring buffer using <A HREF="p06_11.htm#no6_2">PCM_NotifyWriteSize</a> .</P>
+<P><LI> When using the pose function, it is necessary to specify the work for pose processing using <A HREF="p06_11.htm#no4_6">PCM_SetPauseWork</a> in advance. This work does not need to be prepared for each handle.<BR>
+ This work is a work area that is used temporarily during pause-on processing, so you can reserve the area immediately before pause-on processing and release the area immediately after.</P>
+<P><LI> Data transfer method from CD block to ring buffer By default, data is transferred using CPU DMA.<BR>
+ <A HREF="p06_11.htm#no4_7">PCM_SetTrModeCd</a> allows you to specify program transfer, CPU DMA, or SCU DMA.<BR>
+ Call <A HREF="p06_11.htm#no4_7">PCM_SetTrModeCd</a> after creating the handle and before calling the task function for the first time.</P>
+<P><LI> When playing CD-ROM XA Audio, be sure to set the playback information using <A HREF="p06_11.htm#no4_8">PCM_SetInfo</a> .</P>
+</UL>
+<A NAME="no4_80"></A><P><DT> <B>(8)About SaturnPCM format</b><A NAME="no4_8a"></A><P><DT> <B>(a) Data creation</b><DT><UL TYPE=DISC"><P><LI> Convert and create AIFF files using the conversion tool AIF2SAP.</P></UL><DL><DT> <B>[Format]</b><DD> aif2sap aiffile [sapfile]<DT> <B>[input]</b><DD> aiffile: AIFF file name<BR> sapfile: SaturnPCM file name<DT> <B>[function]</b><DD> Convert AIFF files to SaturnPCM files (SAP files).<BR> If you do not enter a SaturnPCM file name, a SaturnPCM file will be created with the file name that is the base name of the AIFF file name with the extension " <B>
+SAP</b> " added.</P>
+</DL>
+<A NAME="no4_8b"></A><P><DT> <B>(b) Data format</b><DT><UL TYPE=DISC>
+<P><LI> It is uncompressed PCM.</P>
+<P><LI> Adopts sector boundary structure.</P>
+<P><LI> The first 2048 bytes are the header area. Thereafter, PCM data is arranged in the order of L channel and R channel in units of 4096 samples.</P>
+</UL>
+<A NAME="no4_8c"></A><P><DT> <B>(c) How to use</b><DT><UL TYPE=DISC>
+<P><LI> The SaturnPCM format has two playback modes: file playback mode (using file system) and stream playback mode (using stream system).</P>
+<P><LI> After the initialization function, you can use the SaturnPCM format by calling the function <A HREF="p06_11.htm#no1_4">PCM_DeclareUseSapGfs</a> , which declares the use of SaturnPCM in file playback mode, or the function <A HREF="p06_11.htm#no1_5">PCM_DeclareUseSapStm</a> in stream playback mode.</P>
+<P><LI> After declaring the use of SaturnPCM, it can be used in the same way as the AIFF format.</P>
+<P><LI> For specific usage, please refer to the sample programs smppcm41.c (file playback mode) and smppcm21.c (stream playback mode).</P>
+</UL>
+<A NAME="no4_8d"></A><P><DT> <B>(d) Regarding resources used</b><DT><UL TYPE=DISC>
+<LI> The default setting is to transfer data from the CD buffer to the sound memory using SCU-DMA (channel 0). The data transfer method can be specified as program transfer, CPU-DMA, or SCU-DMA using the function <A HREF="p06_11.htm#no4_7">PCM_SetTrModeCd</a> .</P>
+</UL>
+<A NAME="no4_8e"></A><P><DT> <B>(e) Work area</b><DT><UL TYPE=DISC>
+<P><LI> The SaturnPCM format does not require a ring buffer; instead, it requires an extended work buffer (the size of the extended work buffer is 2048 bytes).</P>
+</UL>
+<A NAME="no4_8f"></A><P><DT> <B>(f) Restrictions</b><DT><UL TYPE=DISC>
+<P><LI> SaturnPCM format and AIFF / ADPCM / CD-ROM XA Audio format cannot be used at the same time. After declaring the use of SaturnPCM, all PCM files to be played will be in SaturnPCM format.</P>
+</UL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no4">PCM/ADPCM playback library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

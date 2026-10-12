@@ -1,0 +1,256 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;21/29&gt;SCSPユーザーズマニュアル/4.2.7MIXER</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p04_26.htm">戻る</A>
+｜   <A HREF="p04_28.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCSPユーザーズマニュアル/4.2　音源部レジスタ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_27"></A>
+	<P>	<DT><H3>■MIXERレジスタ</H3>
+		<DD>　デジタルミキサは、SCSPにおいて各音声信号のレベル・バランス調整を行うブロックです。デジタルミキサは、ダイレクト音声調整部・DSP入力段調整部・DSP出力段調整部</A>・最終段出力調整部の4つの部分から構成されています。
+		図4.47にデジタルミキサブロック図を示し、各ブロックの説明を行います。</P>
+
+<A NAME="z4_47"></A>
+	<P ALIGN=CENTER><B>図4.47　デジタルミキサブロック図</B><BR><IMG SRC="../grp/i080_01.gif"></P>
+
+<A NAME="4_27_00"></A>
+	<P><DT><B>　ダイレクト音声調整部</B>
+	<DD>　各スロットの出力が、直接DAC出力につながる経路を管理するミキサブロックです。各スロットごとに出力レベル("DISDL")と出力バランス（"DIPAN"）をコントロールすることができます。</P>
+
+<A NAME="4_27_01"></A>
+	<P><DT><B>　DSP入力段調整部</B>
+	<DD>　各スロットの出力をDSP("MIXS")へ入力するためのミキシングを行います。実際には、各スロットの"ISEL"でもって、音声信号を入力する"MIXS"を選択して、"IMXL"で入力レベルを調整します。
+			"ISEL"で複数の音声をミキシングする場合、各音のバランスをとることが必要です。
+			"MIXS"は、複数のスロット出力をミキシングして入力することができるので、BGMのリバーブのように複数の音声に対して同じエフェクト処理を行うことができます。また、DSPでエフェクトをかける場合は、音声データを"MIXS"に転送してください。<P>
+
+<A NAME="4_27_02"></A>
+	<P><DT><B>　DSP出力段調整部</B>
+	<DD>　DSPでエフェクトをかけられた音声や、外部デジタル入力により取り込まれた音声を、最終的にミキシング処理を通してステレオにまとめます。DSPに相当する"EFREG"および、
+			外部デジタルオーディオ入力を受ける"EXTS"から出力される音声信号に対して、出力レベル("EFSDL")および、出力バランス（"EFPAN"）の調整を行うことができます。ここでまとめられたデータは、ダイレクト音声成分ともミキシングされます。</P>
+
+<A NAME="4_27_03"></A>
+	<P><DT><B>　最終段出力調整部</B>
+	<DD>　音声のダイレクト成分とエフェクト成分をまとめて、DACへの出力レベルを調整します。最終出力レベルは"MVOL"で調整します。</P>
+
+<A NAME="4_27_04"></A>
+	<P>	<DD><B>※ダイレクト成分とエフェクト成分について</B>
+		<DD>　音声にエフェクトをかけた場合、エフェクトをかけない音(ドライ)とエフェクトをかけた音（ウェット）を、各場面に応じた適切なバランスでミキシングを行います。
+			搭載しているエフェクトプログラムは、DSP内部でドライとウェットに分け、最終的にミキシングしているので、DSP内でドライ成分とウェット成分を作り出している場合は、ダイレクト成分を出力する必要はありません。
+			これはDISDLを"0"に設定することで、未出力となります。図4.48にダイレクト成分とエフェクト成分の経路を示します。</P>
+
+<A NAME="z4_48"></A>
+	<P ALIGN=CENTER><B>図4.48　ダイレクト成分とエフェクト成分の経路</B><BR><IMG SRC="../grp/i081_01.gif"></P>
+
+	<P>	<DD>　DSPのプログラムの書き換えの時は、DSPの動作が不安定となり"EFREG"からは音声が正しく出力されないので、"EFSDL"を"0H"に設定して音声が出力されないようにしてください。</P>
+
+	<P>	<DD><B>※定位について</B>
+		<DD>　SCSPのデジタルミキサは、31段階のパンニング機能をサポートしていますが、更に細かく設定を行う場合は、図4.49のように、SCSP内蔵のDSPを使用してパンニング処理を行ってください。</P>
+
+<A NAME="z4_49"></A>
+	<P ALIGN=CENTER><B>図4.49　DSPによる定位演算</B><BR><IMG SRC="../grp/i082_01.gif"></P>
+
+	<P>	<DD>　図5.56にデジタルミキサのブロックダイアグラムを示します。</P>
+
+<A NAME="z4_50"></A>
+	<P ALIGN=CENTER><B>図4.50　デジタルミキサブロックダイアグラム</B><BR><IMG SRC="../grp/i083_01.gif">
+
+	<P>	<DD>　次に、図4.50の詳細図に基づいて、各パラメータの設定方法について説明します。<BR>
+		"IMXL" "ISEL" "DISDL" "EPSDL"の設定は、かなりの音数を発音させた場合のオーバフローを防ぐことと、あまり音数出力しなかった場合に、全体の音量が小さくならないようにするため、以下に述べる設定方法が必要となります。</P>
+
+	<P>	<DD><B>(a) DSP入力側のミキサ</B>
+		<DD>　DSP入力側のミキサに相当するものは、"IMXL"と"ISEL"のパラメータです。<BR>
+			　"MIXS"(ミックススタックの説明は後述)は複数のスロット出力を入力させることができます。このレジスタには、複数のデータを混合させる機能があります。この時、入力するスロット数により"IMXL"を適当な値に設定して、
+			"MIXS"がオーバフローを起こさないように注意してください。<BR>
+			　"IMXL"の値を変えたときの入力可能音数は、表4.18のようになります。例えば入力されるソースに対して"IMXL"を"7H"に設定し、"MIXS"に入力されるレベルを"0[dB]"とした場合に、
+			"MIXS"に入力可能なスロット数は１音分になります。</P>
+
+<A NAME="t4_18"></A>
+	<P>	<DD><B>表4.18　IMXLとMIXSに入力できるソース数の関係</B>
+		<DD><TABLE BORDER>
+		<TR ALIGN=CENTER><TD ROWSPAN=2>"IMXL"値[2:0]</TD><TD COLSPAN=2>レベル</TD><TD ROWSPAN=2>入力可能な音数(ソース数)</TD></TR>
+		<TR ALIGN=CENTER><TD>[dB]</TD><TD>倍率</TD></TR>
+		<TR ALIGN=CENTER><TD>0H</TD><TD>-MAX</TD><TD>×0.000000</TD><TD>--音</TD></TR>
+		<TR ALIGN=CENTER><TD>1H</TD><TD>-36</TD><TD>×0.015625</TD><TD>64音</TD></TR>
+		<TR ALIGN=CENTER><TD>2H</TD><TD>-30</TD><TD>×0.031250</TD><TD>32音</TD></TR>
+		<TR ALIGN=CENTER><TD>3H</TD><TD>-24</TD><TD>×0.062500</TD><TD>16音</TD></TR>
+		<TR ALIGN=CENTER><TD>4H</TD><TD>-18</TD><TD>×0.125000</TD><TD>8音</TD></TR>
+		<TR ALIGN=CENTER><TD>5H</TD><TD>-12</TD><TD>×0.250000</TD><TD>4音</TD></TR>
+		<TR ALIGN=CENTER><TD>6H</TD><TD>-6</TD><TD>×0.500000</TD><TD>2音</TD></TR>
+		<TR ALIGN=CENTER><TD>7H</TD><TD>-0</TD><TD>×1.000000</TD><TD>1音</TD></TR>
+		</TABLE></P>
+
+	<P>	<DD><B>(b) "DISDL"および"EFSDL"</B>
+		<DD>　"DISDL"と"EFSDL"に関しては"IMXL"と同じ考え方ですが、更にこの２つは、サウンド出力の総数を考慮して決定します。<BR>
+			　サウンド出力の総数とは、音を出力する状態にあるダイレクト成分・エフェクト成分および外部入力成分の総和のことをいいます。
+			これは、図4.50においてL・R累積加算部に音を出力しているソースの数(L・Rの組を１つとして考えます)を指しています。
+			つまり音を出力しているスロットの総和とは等しくないことを表わしています。</P>
+
+	<P>	<DD><B>(c) "DIPAN"および"EFPAN"</B>
+		<DD>　これらのレジスタは、設定値が"00H"または"10H"の時に、中央に定位します。<BR>
+		　最上位ビットを"0B"にしたまま下位4ビットの値を大きくしていくと、定位は右側に移動していきます。<BR>
+		　最上位ビットを"1B"にしたまま下位4ビットの値を大きくしていくと、定位は左側に移動していきます。</P>
+
+<A NAME="IMXL_"></A>
+	<P>	<DT><B>　IMXL[2:0](Ｒ／Ｗ) ; Input MiXing Level</B>
+		<DD>　サウンドスロット出力データをDSPのミックススタック("MIXS")が入力する際の、ミックススタック入力レベルをスロット別に指定します。</P>
+
+<A NAME="t4_19"></A>
+	<P>	<DD><B>表4.19  ミックススタックレジスタ入力レベル</B>
+		<DD><TABLE BORDER=1>
+		<TR ALIGN=CENTER><TD>IMXL</TD><TD WIDTH=150>レベル(dB)</TD></TR>
+		<TR ALIGN=CENTER><TD>0</TD><TD>-MAX(ミックスしない)</TD></TR>
+		<TR ALIGN=CENTER><TD>1</TD><TD>-36</TD></TR>
+		<TR ALIGN=CENTER><TD>2</TD><TD>-30</TD></TR>
+		<TR ALIGN=CENTER><TD>3</TD><TD>-24</TD></TR>
+		<TR ALIGN=CENTER><TD>4</TD><TD>-18</TD></TR>
+		<TR ALIGN=CENTER><TD>5</TD><TD>-12</TD></TR>
+		<TR ALIGN=CENTER><TD>6</TD><TD>-6</TD></TR>
+		<TR ALIGN=CENTER><TD>7</TD><TD>-0</TD></TR>
+		</TABLE></P>
+
+<A NAME="ISEL_"></A>
+	<P>	<DT><B>　ISEL[3:0](Ｒ／Ｗ) ; Input SELect</B>
+		<DD>　サウンドスロット出力データをDSPのミックススタックレジスタ("MIXS")に入力する際の、ミックススタック番号を、スロット別に指定します。</P>
+
+	<P>	<DD>　ミックススタック("MIXS")は、全スロット分の入力の総和を求め、DSPの入力とします。ミックススタックは、オーバフローにおけるプロテクト機能がありませんので、全スロット分の総和が "0［d B］" を超えないように設定してください。</P>
+
+<A NAME="DISDL_"></A>
+	<P>	<DT><B>　DISDL[2:0](Ｒ／Ｗ) ; DIrect SenD Level</B>
+		<DD>　ダイレクトデータをD/Aコンバータに出力する際の、送出レベルをスロット別に指定します。</P>
+
+<A NAME="t4_20"></A>
+	<P>	<DD><B>表4.20　D/Aコンバータ出力レベル</B>
+		<DD><TABLE BORDER=1>
+		<TR ALIGN=CENTER><TD>DISDL</TD><TD>レベル(dB)</TD></TR>
+		<TR ALIGN=CENTER><TD>0</TD><TD>-∞(送出しない)</TD></TR>
+		<TR ALIGN=CENTER><TD>1</TD><TD>-36</TD></TR>
+		<TR ALIGN=CENTER><TD>2</TD><TD>-30</TD></TR>
+		<TR ALIGN=CENTER><TD>3</TD><TD>-24</TD></TR>
+		<TR ALIGN=CENTER><TD>4</TD><TD>-18</TD></TR>
+		<TR ALIGN=CENTER><TD>5</TD><TD>-12</TD></TR>
+		<TR ALIGN=CENTER><TD>6</TD><TD>-6</TD></TR>
+		<TR ALIGN=CENTER><TD>7</TD><TD>-0</TD></TR>
+		</TABLE></P>
+
+<A NAME="DIPAN_"></A>
+	<P>	<DT><B>　DIPAN[4:0](Ｒ／Ｗ) ; DIrect PANpot</B>
+		<DD>　ダイレクトデータを送出する際の、定位をスロット別に指定します。</P>
+
+<A NAME="t4_21"></A>
+	<P>	<DD><B>表4.21　DIPANによる定位データ</B>
+		<DD><TABLE BORDER=1>
+		<TR ALIGN=CENTER><TD>DIPAN</TD><TD>左定位(dB)</TD><TD>右定位(dB)</TD><TD><PRE></TD><TD>DIPAN</TD><TD>左定位(dB)</TD><TD>右定位(dB)</TD></TR>
+		<TR ALIGN=CENTER><TD>00H</TD><TD>-00.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>10H</TD><TD>-00.0</TD><TD>-00.0</TD></TR>
+		<TR ALIGN=CENTER><TD>01H</TD><TD>-03.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>11H</TD><TD>-00.0</TD><TD>-03.0</TD></TR>
+		<TR ALIGN=CENTER><TD>02H</TD><TD>-06.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>12H</TD><TD>-00.0</TD><TD>-06.0</TD></TR>
+		<TR ALIGN=CENTER><TD>03H</TD><TD>-09.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>13H</TD><TD>-00.0</TD><TD>-09.0</TD></TR>
+		<TR ALIGN=CENTER><TD>04H</TD><TD>-12.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>14H</TD><TD>-00.0</TD><TD>-12.0</TD></TR>
+		<TR ALIGN=CENTER><TD>05H</TD><TD>-15.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>15H</TD><TD>-00.0</TD><TD>-15.0</TD></TR>
+		<TR ALIGN=CENTER><TD>06H</TD><TD>-18.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>16H</TD><TD>-00.0</TD><TD>-18.0</TD></TR>
+		<TR ALIGN=CENTER><TD>07H</TD><TD>-21.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>17H</TD><TD>-00.0</TD><TD>-21.0</TD></TR>
+		<TR ALIGN=CENTER><TD>08H</TD><TD>-24.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>18H</TD><TD>-00.0</TD><TD>-24.0</TD></TR>
+		<TR ALIGN=CENTER><TD>09H</TD><TD>-27.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>19H</TD><TD>-00.0</TD><TD>-27.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0AH</TD><TD>-30.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1AH</TD><TD>-00.0</TD><TD>-30.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0BH</TD><TD>-33.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1BH</TD><TD>-00.0</TD><TD>-33.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0CH</TD><TD>-36.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1CH</TD><TD>-00.0</TD><TD>-36.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0DH</TD><TD>-39.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1DH</TD><TD>-00.0</TD><TD>-39.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0EH</TD><TD>-42.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1EH</TD><TD>-00.0</TD><TD>-42.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0FH</TD><TD>-∞</TD><TD>-00.0</TD><TD><PRE></TD><TD>1FH</TD><TD>-00.0</TD><TD>-∞</TD></TR>
+		</TABLE></P>
+
+<A NAME="EFSDL_"></A>
+	<P>	<DT><B>　EFSDL[2:0](Ｒ／Ｗ) ; EFfect SenD Level</B>
+		<DD>　DSPを通してエフェクト処理を行なった波形データ(エフェクトデータ)と外部からの入力波形データのD/Aコンバータへの送出レベルを指定します。</P>
+
+<A NAME="t4_22"></A>
+		<P>	<DD><B>表4.22　D/Aコンバータへの送出レベル</B>
+			<DD><TABLE BORDER=1>
+		<TR ALIGN=CENTER><TD>EFSDL</TD><TD WIDTH=150>レベル(dB)</TD></TR>
+		<TR ALIGN=CENTER><TD>0</TD><TD>-∞(送出しない)</TD></TR>
+		<TR ALIGN=CENTER><TD>1</TD><TD>-36</TD></TR>
+		<TR ALIGN=CENTER><TD>2</TD><TD>-30</TD></TR>
+		<TR ALIGN=CENTER><TD>3</TD><TD>-24</TD></TR>
+		<TR ALIGN=CENTER><TD>4</TD><TD>-18</TD></TR>
+		<TR ALIGN=CENTER><TD>5</TD><TD>-12</TD></TR>
+		<TR ALIGN=CENTER><TD>6</TD><TD>-6</TD></TR>
+		<TR ALIGN=CENTER><TD>7</TD><TD>-0</TD></TR>
+		</TABLE></P>
+
+<A NAME="EFPAN_"></A>
+	<P>	<DT><B>　EFPAN[4:0](Ｒ／Ｗ) ; EFfect PANpot</B>
+		<DD>　DSPを通してエフェクト処理を行なった波形データ(エフェクトデータ)と外部からの入力波形データの定位を指定します。</P>
+
+<A NAME="t4_23"></A>
+	<P>	<DD><B>表4.23　EFPANによる定位データ</B>
+		<DD><TABLE BORDER=1>
+		<TR ALIGN=CENTER><TD>EFPAN</TD><TD>左出力(dB)</TD><TD>右出力(dB)</TD><TD><PRE></TD><TD>EFPAN</TD><TD>左出力(dB)</TD><TD>右出力(dB)</TD></TR>
+		<TR ALIGN=CENTER><TD>00H</TD><TD>-00.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>10H</TD><TD>-00.0</TD><TD>-00.0</TD></TR>
+		<TR ALIGN=CENTER><TD>01H</TD><TD>-03.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>11H</TD><TD>-00.0</TD><TD>-03.0</TD></TR>
+		<TR ALIGN=CENTER><TD>02H</TD><TD>-06.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>12H</TD><TD>-00.0</TD><TD>-06.0</TD></TR>
+		<TR ALIGN=CENTER><TD>03H</TD><TD>-09.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>13H</TD><TD>-00.0</TD><TD>-09.0</TD></TR>
+		<TR ALIGN=CENTER><TD>04H</TD><TD>-12.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>14H</TD><TD>-00.0</TD><TD>-12.0</TD></TR>
+		<TR ALIGN=CENTER><TD>05H</TD><TD>-15.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>15H</TD><TD>-00.0</TD><TD>-15.0</TD></TR>
+		<TR ALIGN=CENTER><TD>06H</TD><TD>-18.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>16H</TD><TD>-00.0</TD><TD>-18.0</TD></TR>
+		<TR ALIGN=CENTER><TD>07H</TD><TD>-21.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>17H</TD><TD>-00.0</TD><TD>-21.0</TD></TR>
+		<TR ALIGN=CENTER><TD>08H</TD><TD>-24.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>18H</TD><TD>-00.0</TD><TD>-24.0</TD></TR>
+		<TR ALIGN=CENTER><TD>09H</TD><TD>-27.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>19H</TD><TD>-00.0</TD><TD>-27.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0AH</TD><TD>-30.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1AH</TD><TD>-00.0</TD><TD>-30.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0BH</TD><TD>-33.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1BH</TD><TD>-00.0</TD><TD>-33.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0CH</TD><TD>-36.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1CH</TD><TD>-00.0</TD><TD>-36.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0DH</TD><TD>-39.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1DH</TD><TD>-00.0</TD><TD>-39.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0EH</TD><TD>-42.0</TD><TD>-00.0</TD><TD><PRE></TD><TD>1EH</TD><TD>-00.0</TD><TD>-42.0</TD></TR>
+		<TR ALIGN=CENTER><TD>0FH</TD><TD>-∞</TD><TD>-00.0</TD><TD><PRE></TD><TD>1FH</TD><TD>-00.0</TD><TD>-∞</TD></TR>
+		</TABLE></P>
+
+	<P>	<DD>　"EFSDL"と"EFPAN"は、各"EFREG"および"EXTS"に対して個別の設定を行うことが可能です。各"EFREG"、"EXTS"に対応する"EFSDL"と"EFPAN"のレジスタのアドレスは、表4.24の通りです。</P>
+
+<A NAME="t4_24"></A>
+	<P>	<DD><B>表4.24　各EFREG,EXTSに対応するEFSDL,EFPANのレジスタアドレス</B>
+		<TABLE BORDER=1>
+		<TR ALIGN=CENTER><TD ROWSPAN=2>ソース</TD><TD ROWSPAN=2>アドレス</TD><TD COLSPAN=8>データ</TD><TD ROWSPAN=2>ソース</TD><TD ROWSPAN=2>アドレス</TD><TD COLSPAN=8>データ</TD></TR>
+		<TR ALIGN=CENTER><TD>7</TD><TD>6</TD><TD>5</TD><TD>4</TD><TD>3</TD><TD>2</TD><TD>1</TD><TD>0</TD><TD>7</TD><TD>6</TD><TD>5</TD><TD>4</TD><TD>3</TD><TD>2</TD><TD>1</TD><TD>0</TD></TR>
+		<TR ALIGN=CENTER><TD>EFREG0</TD><TD>100017H</TD><TD COLSPAN=3>EFSDL0</TD><TD COLSPAN=5>EFPAN0</TD><TD>EFREG9</TD><TD>100137H</TD><TD COLSPAN=3>EFSDL9</TD><TD COLSPAN=5>EFPAN9</TD></TR>
+		<TR ALIGN=CENTER><TD>EFREG1</TD><TD>100037H</TD><TD COLSPAN=3>EFSDL1</TD><TD COLSPAN=5>EFPAN1</TD><TD>EFREG10</TD><TD>100157H</TD><TD COLSPAN=3>EFSDL10</TD><TD COLSPAN=5>EFPAN10</TD></TR>
+		<TR ALIGN=CENTER><TD>EFREG2</TD><TD>100057H</TD><TD COLSPAN=3>EFSDL2</TD><TD COLSPAN=5>EFPAN2</TD><TD>EFREG11</TD><TD>100177H</TD><TD COLSPAN=3>EFSDL11</TD><TD COLSPAN=5>EFPAN11</TD></TR>
+		<TR ALIGN=CENTER><TD>EFREG3</TD><TD>100077H</TD><TD COLSPAN=3>EFSDL3</TD><TD COLSPAN=5>EFPAN3</TD><TD>EFREG12</TD><TD>100197H</TD><TD COLSPAN=3>EFSDL12</TD><TD COLSPAN=5>EFPAN12</TD></TR>
+		<TR ALIGN=CENTER><TD>EFREG4</TD><TD>100097H</TD><TD COLSPAN=3>EFSDL4</TD><TD COLSPAN=5>EFPAN4</TD><TD>EFREG13</TD><TD>1001B7H</TD><TD COLSPAN=3>EFSDL13</TD><TD COLSPAN=5>EFPAN13</TD></TR>
+		<TR ALIGN=CENTER><TD>EFREG5</TD><TD>1000B7H</TD><TD COLSPAN=3>EFSDL5</TD><TD COLSPAN=5>EFPAN5</TD><TD>EFREG14</TD><TD>1001D7H</TD><TD COLSPAN=3>EFSDL14</TD><TD COLSPAN=5>EFPAN14</TD></TR>
+		<TR ALIGN=CENTER><TD>EFREG6</TD><TD>1000D7H</TD><TD COLSPAN=3>EFSDL6</TD><TD COLSPAN=5>EFPAN6</TD><TD>EFREG15</TD><TD>1001F7H</TD><TD COLSPAN=3>EFSDL15</TD><TD COLSPAN=5>EFPAN15</TD></TR>
+		<TR ALIGN=CENTER><TD>EFREG7</TD><TD>1000F7H</TD><TD COLSPAN=3>EFSDL7</TD><TD COLSPAN=5>EFPAN7</TD><TD>EXTS0</TD><TD>100217H</TD><TD COLSPAN=3>EFSDL16</TD><TD COLSPAN=5>EFPAN16</TD></TR>
+		<TR ALIGN=CENTER><TD>EFREG8</TD><TD>100117H</TD><TD COLSPAN=3>EFSDL8</TD><TD COLSPAN=5>EFPAN8</TD><TD>EXTS1</TD><TD>100237H</TD><TD COLSPAN=3>EFSDL17</TD><TD COLSPAN=5>EFPAN17</TD></TR>
+	</TABLE></P>
+
+<A NAME="MVOL_"></A>
+	<P>	<DT><B>　MVOL[3:0](Ｗ) ; Master VOLume</B>
+		<DD>　D/Aコンバータへの出力マスターボリュームを表します。<BR>
+		　全体的な出力レベルをコントロールするためのもので、出力オーバフローしたものに対して"MVOL"の設定値を低くして利得を下げても、クリッピングノイズは消えません(クリッピングノイズを無くすためには、
+		"DISDL"と"EFSDL"の設定をし直して、オーバフローを解消するようにしてください)。</P>
+
+<A NAME="DAC18B_"></A>
+	<P><DT><B>　DAC18B(Ｗ) ; DAC out 18Bit</B>
+	<DD>　デジタル出力を、18ビットD/Aコンバータのインタフェースとする時、このビットを"1B"にセットします。16ビットの時は、"0B"をセットします。(基本的に16ビットタイプのD/Aコンバータを接続するので、レジスタには"0B"を設定してください。)</P>
+
+<A NAME="z4_51"></A>
+	<P ALIGN=CENTER><B>図4.51　SCSPとDACの接続</B><BR><IMG SRC="../grp/i088_01.gif"></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p04_26.htm">戻る</A>
+｜   <A HREF="p04_28.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

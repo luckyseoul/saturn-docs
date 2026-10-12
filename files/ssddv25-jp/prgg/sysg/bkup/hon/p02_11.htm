@@ -1,0 +1,483 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 3&gt;バックアップライブラリユーザーズマニュアル/詳細仕様</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">バックアップライブラリユーザーズマニュアル</A>
+<HR>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>バックアップライブラリユーザーズマニュアル/リファレンス</B>
+<H2 ALIGN=CENTER>詳細仕様</H2>
+<HR NOSHADE>
+<A NAME="no2_12"></A>
+<H2>■データ仕様</H2>
+<!-- ------------------------------------------------------------------------------------- -->
+<DL><P><A NAME="no1_1"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=220><PRE>Data<BR><H4>記憶装置接続情報</H4></TD>
+<TD WIDTH=180><PRE>Data Name<BR><H3>BupConfig</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1</H4></TD>
+</TR></TABLE>
+	<P>	<DD><PRE>
+typedef　struct BupConfig {
+  Uint16  unit_id;    /*  ユニットＩＤ　　　*/
+  Uint16  partition;  /*  パーティション数　*/
+} BupConfig;
+</PRE></P>
+
+	<P>	<DD>※unit_idが０の場合は、未接続を表します。</P>
+
+	<P>	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH WIDTH=150><PRE>装置種類</TH><TH WIDTH=100><PRE>unit_id</TH><TH WIDTH=100><PRE>partition</TH></TR>
+	<TR ALIGN=CENTER><TD><PRE>内蔵メモリ</TD><TD><PRE>1</TD><TD><PRE>1</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>外付けカートリッジ</TD><TD><PRE>2</TD><TD><PRE>1</TD></TR></TABLE></P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no1_2"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=220><PRE>Data<BR><H4>ステータス情報</H4></TD>
+<TD WIDTH=180><PRE>Data Name<BR><H3>BupStat</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2</H4></TD>
+</TR></TABLE>
+<DD><PRE>
+typedef  struct  BupStat {
+  Uint32  totalsize;  /*　全容量()　　　　　　　*/
+  Uint32  totalblock; /*　ブロック数　　　　　　*/
+  Uint32  blocksize;  /*　１ブロックのサイズ()　*/
+  Uint32  freesize;   /*　空き容量　　　　　　　*/
+  Uint32  freeblock;  /*　空きブロック数　　　　*/
+  Uint32  datanum;    /*　書き込み可能件数　　　*/
+} BupStat;
+</PRE>
+<P>	<DD>datanumは、BUP_Stat()でdatasizeを指定したサイズに対しての値が格納される。</P>
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no1_3"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=220><PRE>Data<BR><H4>日付時間</H4></TD>
+<TD WIDTH=180><PRE>Data Name<BR><H3>BupDate</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3</H4></TD>
+</TR></TABLE>
+<DD><PRE>
+typedef  struct  BupDate {
+  Uint8  year;   /* 年　　(西暦から1980引いた値)　*/
+  Uint8  month;  /* 月　　(1〜12)　　　　　　　　 */
+  Uint8  day;    /* 日　　(1〜31)　　　　　　　　 */
+  Uint8  time;   /* 時　　(0〜23)　　　　　　　　 */
+  Uint8  min;    /* 分　　(0〜59)　　　　　　　　 */
+  Uint8  week;   /* 曜日　(日0〜土6)　　　　　　　*/
+} BupDate;
+</PRE>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no1_4"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=220><PRE>Data<BR><H4>ディレクトリ情報</H4></TD>
+<TD WIDTH=180><PRE>Data Name<BR><H3>BupDir</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4</H4></TD>
+</TR></TABLE>
+	<DD><PRE>
+typedef  struct  BupDir {
+  Uint8  filename[12];  /* ファイル名                         */
+                        /*（アスキー11文字＋NULの計12バイト)  */
+  Uint8  comment[11];   /* コメント                           */
+                        /*（アスキー10文字＋NULの計11バイト)  */
+  Uint8  language;      /* コメントの言語種類                 */
+                        /*  日本語　　：BUP_JAPANESE          */
+                        /*  英語　　　：BUP_ENGLISH           */
+                        /*  フランス語：BUP_FRANCAIS          */
+                        /*  ドイツ語　：BUP_DEUTSCH           */
+                        /*  スペイン語：BUP_ESPANOL           */
+                        /*  イタリア語：BUP_ITALIANO          */
+  Uint32  date;         /* 日付時間データ                     */
+  Uint32  datasize;     /* データのサイズ(単位：バイト)       */
+  Uint16  blocksize;    /* データのサイズ(単位：ブロック)     */
+} BupDir;
+</PRE>
+</DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR NOSHADE>
+<A NAME="no2_13"></A>
+<H2>■関数仕様</H2>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_1"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>バックアップライブラリの初期化</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_Init</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式</B>
+	<DD>void　BUP_Init(Uint32 *libaddr,Uint32 *workbuff,BupConfig conf[3])
+	<DT><B>　入　力</B>
+	<DD><B>libaddr：</B>　ライブラリをロードするアドレスを指定ライブラリの大きさは16Kバイトです。
+	<DD><B>workbuff：</B>　ライブラリの作業領域のポインタ作業領域の大きさは8192バイト必要です。ロングワードアクセスすることもありますので必ずUint32で確保してください。
+	<DT><B>　出　力　　</B>
+	<DD>conf：接続されている記憶装置の情報を得ます。
+	<DT><B>　機　能　　</B>
+	<DD>バックアップライブラリを指定されたメモリ領域上へ読み込み、使用するための前処理を行います。接続記憶装置の情報が得られます。3つのテーブルにはそれぞれ、以下の装置番号に対応しています。
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH><PRE>装置番号</TH><TH><PRE>装置種類</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>内蔵メモリカートリッジ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>メモリカートリッジまたはパラレルインタフェース</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>2</TD><TD><PRE>シリアルインタフェース</TD></TR></TABLE></P>
+
+	<DT><B>　備　考</B>
+	<DD>記憶装置接続情報テーブルは、必ず3つ用意してください。
+	<DT><B>　例</B>
+	<DD><PRE>
+#define  BUP_START_ADDR　0x6??????
+#include  "sega_bup.h"
+Uint32  workmemory[2048+30];
+
+  void　sample()
+  {
+    BupConfig　conf[3];
+
+    BUP_Init(BUP_START_ADDR, workmemory, conf);
+    ...............
+  }
+</PRE>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_2"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>パーティションの選択</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_SelPart</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+	<DD>Sint32　BUP_SelPart(Uint32 device,Uint16 num)
+	<DT><B>　入　力　　</B>
+	<DD>device：装置番号
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>装置番号</TH><TH>記憶装置</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>内蔵メモリ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>メモリカートリッジorパラレルインタフェース</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>2</TD><TD><PRE>シリアルインタフェース</TD></TR></TABLE>
+	<DD>num：パーティション番号
+	<DD>　０〜(パーティション数−１)
+	<DT><B>　出　力　　</B>
+	<DD>なし
+	<DT><B>　関数値　</B>
+	<DD>０：成功
+	<DD>他：失敗
+	<DT><B>　機　能　　</B>
+	<DD>パーティションの選択を行います。初期状態では、パーティション０が選択されています。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_3"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>フォーマットの実行</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_Format</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+	<DD>Sint32　BUP_Format(Uint32 device)
+	<DT><B>　入　力　　</B>
+	<DD>device：装置番号
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>装置番号</TH><TH>記憶装置</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>内蔵メモリ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>メモリカートリッジorパラレルインタフェース</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>2</TD><TD><PRE>シリアルインタフェース</TD></TR></TABLE>
+	<DT><B>　出　力　　</B>
+	<DD>なし
+	<DT><B>　関数値　</B>
+	<DD>０：成功
+	<DD>BUP_WRITE_PROTECT：ライトプロテクト有り
+	<DD>他：失敗
+	<DT><B>　機　能　　</B>
+	<DD>バックアップ記憶装置の初期化を行います。
+	<DD>パーティションで区切られているバックアップ記憶装置に関しては、現在のパーティションに対してだけフォーマットします。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_4"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>ステータスの取得</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_Stat</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+	<DD>Sint32　BUP_Stat(Uint32 device,Uint32 datasize,BupStat *stat)
+	<DT><B>　入　力　　</B>
+	<DD>device：装置番号
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>装置番号</TH><TH>記憶装置</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>内蔵メモリ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>メモリカートリッジorパラレルインタフェース</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>2</TD><TD><PRE>シリアルインタフェース</TD></TR></TABLE>
+	<DD>datasize：書き込みたいデータのサイズを単位で指定
+	<DT><B>　出　力</B>
+	<DD>stat：ステータス情報
+	<DT><B>　関数値</B>
+	<DD>装置の状態を返す
+	<DD>０：成功
+	<DD>BUP_NON：未接続
+	<DD>BUP_UNFORMAT：未フォーマット
+	<DT><B>　機　能　　</B>
+	<DD>ステータス情報を取得します。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_5"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>データの書き込み</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_Write</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>5</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+	<DD>Sint32　BUP_Write(Uint32 device,BupDir *dir,Uint8 *data,Uint8 owsw)
+	<DT><B>　入　力　　</B>
+	<DD>device：装置番号
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>装置番号</TH><TH>記憶装置</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>内蔵メモリ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>メモリカートリッジorパラレルインタフェース</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>2</TD><TD><PRE>シリアルインタフェース</TD></TR></TABLE>
+	<DD><PRE>
+dir   ：ファイル管理情報(dir.blocksize以外の入力)
+data  ：書き込みデータのポインタ
+owsw  ：オーバーライトチェックモード
+ON    ：同名のファイルが存在したら書き込まない。
+OFF   ：同名のファイルが存在したら上書きする。
+</PRE>
+
+	<DT><B>　出　力</B>
+	<DD>なし
+	<DT><B>　関数値</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>　関　数　値　</TH><TH><PRE>　意　味　</TH></TR>
+	<TR><TD><PRE>0</TD><TD><PRE>成功</TD></TR>
+	<TR><TD><PRE>BUP_NON</TD><TD><PRE>未接続</TD></TR>
+	<TR><TD><PRE>BUP_UNFORMAT</TD><TD><PRE>未フォーマット</TD></TR>
+	<TR><TD><PRE>BUP_WRITE_PROTECT</TD><TD><PRE>ライトプロテクト有り</TD></TR>
+	<TR><TD><PRE>BUP_FOUND</TD><TD><PRE>同名のファイルが存在する。</TD></TR>
+	<TR><TD><PRE>他</TD><TD><PRE>失敗</TD></TR></TABLE>
+
+	<DT><B>　機　能</B>
+	<DD>バックアップ記憶装置へデータを書き込む
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_6"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>データの読み込み</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_Read</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式</B>
+	<DD>Sint32　BUP_Read(Uint32 device, Uint8 *fname,Uint8 *data)
+	<DT><B>　入　力</B>
+	<DD>device：装置番号
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>装置番号</TH><TH>記憶装置</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>内蔵メモリ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>メモリカートリッジorパラレルインタフェース</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>2</TD><TD><PRE>シリアルインタフェース</TD></TR></TABLE>
+	<DD>fname ：ファイル名の指定(必ずアスキーで11文字必要)
+	<DT><B>　出　力</B>
+	<DD>data  ：読み込み先バッファのポインタ
+	<DT><B>　関数値</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>　関　数　値　</TH><TH><PRE>　意　味　</TH></TR>
+	<TR><TD><PRE>0</TD><TD><PRE>成功</TD></TR>
+	<TR><TD><PRE>BUP_NON</TD><TD><PRE>未接続</TD></TR>
+	<TR><TD><PRE>BUP_UNFORMAT</TD><TD><PRE>未フォーマット</TD></TR>
+	<TR><TD><PRE>BUP_NOT_FOUND</TD><TD><PRE>ファイルが見つからない</TD></TR>
+	<TR><TD><PRE>BUP_BROKEN</TD><TD><PRE>ファイルがこわれている</TD></TR>
+	<TR><TD><PRE>他</TD><TD><PRE>失敗</TD></TR></TABLE>
+
+	<DT><B>　機　能</B>
+	<DD>バックアップ記憶装置からデータを読み込む。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_7"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>データの削除</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_Delete</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式</B>
+	<DD>Sint32　BUP_Delete(Uint32 device, Uint8 *fname)
+	<DT><B>　入　力</B>
+	<DD>device：装置番号
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>装置番号</TH><TH>記憶装置</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>内蔵メモリ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>メモリカートリッジorパラレルインタフェース</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>2</TD><TD><PRE>シリアルインタフェース</TD></TR></TABLE>
+	<DD>fname ：ファイル名(必ずアスキーで11文字必要)
+	<DT><B>　出　力</B>
+	<DD>なし
+	<DT><B>　関数値</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>　関　数　値　</TH><TH><PRE>　意　味　</TH></TR>
+	<TR><TD><PRE>0</TD><TD><PRE>成功</TD></TR>
+	<TR><TD><PRE>BUP_NON          </TD><TD><PRE>未接続</TD></TR>
+	<TR><TD><PRE>BUP_UNFORMAT     </TD><TD><PRE>未フォーマット</TD></TR>
+	<TR><TD><PRE>BUP_NOT_FOUND    </TD><TD><PRE>ファイルが見つからない</TD></TR>
+	<TR><TD><PRE>BUP_WRITE_PROTECT</TD><TD><PRE>ライトプロテクト有り</TD></TR>
+	<TR><TD><PRE>他               </TD><TD><PRE>失敗</TD></TR></TABLE>
+
+	<DT><B>　機　能</B>
+	<DD>バックアップ記憶装置上のデータを削除する。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_8"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>ディレクトリ情報の取得</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_Dir</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>8</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式</B>
+	<DD>Sint32　BUP_Dir(Uint32 device, Uint8 *fname,Uint16 dirsize,BupDir *dir)
+	<DT><B>　入　力</B>
+	<DD>device ：装置番号
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>装置番号</TH><TH>記憶装置</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>内蔵メモリ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>メモリカートリッジorパラレルインタフェース</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>2</TD><TD><PRE>シリアルインタフェース</TD></TR></TABLE>
+	<DD>fname  ：ファイル名の指定(アスキーで11文字以内)
+	<DD>dirsize：確保したディレクトリ情報の数を指定
+	<DT>　出　力</B>
+	<DD>dir：ディレクトリ情報が格納される
+	<DT><B>　関数値</B>
+	<DD>ディレクトリ情報のヒット件数。
+	<DT><B>　機　能</B>
+	<DD>ファイル名を前方一致で検索してディレクトリ情報をテーブルに格納する。
+	<DD>検索によりヒットしたディレクトリ情報の件数が、関数値として返る。
+	<DD>負の場合は、テーブルサイズが不足していることを表し、符号反転することで件数が確認できる。
+	<DD>(tbsizeを10と設定して検索した結果11件だった場合は、-11が返される)
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_9"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>データの照合</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_Verify</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>9</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式</B>
+	<DD>Sint32　BUP_Verify(Uint32 device,Uint8 *filename,Uint8 *data)
+	<DT><B>　入　力</B>
+	<DD>device  ：装置番号
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>装置番号</TH><TH>記憶装置</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>内蔵メモリ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>メモリカートリッジorパラレルインタフェース</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>2</TD><TD><PRE>シリアルインタフェース</TD></TR></TABLE>
+	<DD>filename：ファイル名(必ずアスキーで11文字必要)
+	<DD>data    ：照合データのポインタ
+	<DT><B>　出　力</B>
+	<DD>なし
+	<DT><B>　関数値</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH><PRE>　関　数　値　</TH><TH><PRE>　意　味　</TH></TR>
+	<TR><TD><PRE>0</TD><TD><PRE>成功</TD></TR>
+	<TR><TD><PRE>BUP_NON</TD><TD><PRE>未接続</TD></TR>
+	<TR><TD><PRE>BUP_UNFORMAT</TD><TD><PRE>未フォーマット</TD></TR>
+	<TR><TD><PRE>BUP_NO_MATCH</TD><TD><PRE>データが一致しない</TD></TR>
+	<TR><TD><PRE>BUP_NOT_FOUND</TD><TD><PRE>ファイルが見つからない</TD></TR>
+	<TR><TD><PRE>BUP_BROKEN</TD><TD><PRE>ファイルがこわれている</TD></TR></TABLE>
+	<DT><B>　機　能</B>
+	<DD>バックアップファイルに書き込んだデータを照合する。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_10"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>日付時間データの展開</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_GetDate</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>10</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式</B>
+	<DD>void  BUP_GetDate(Uint32 pdate,BupDate *date)
+	<DT><B>　入　力</B>
+	<DD>pdate：ディレクトリ情報の日付時間データ
+	<DD>date ：日付時間テーブル
+	<DT><B>　出　力</B>
+	<DD>なし
+	<DT><B>　関数値</B>
+	<DD>なし
+	<DT><B>　機　能</B>
+	<DD>ディレクトリ情報テーブル中の日付時間データを展開する。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_11"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_11">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=220><PRE>Func<BR><H4>日付時間データの圧縮</H4></TD>
+<TD WIDTH=180><PRE>Function <BR><H3>BUP_SetDate</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>11</H4></TD>
+</TR></TABLE>
+	<DT><B>　書　式</B>
+	<DD>Uint32  BUP_SetDate(BupDate *date)
+	<DT><B>　入　力</B>
+	<DD>date：日付時間
+	<DT><B>　出　力</B>
+	<DD>なし
+	<DT><B>　関数値</B>
+	<DD>ディレクトリ情報テーブル中の日付時間データ形式のデータ
+	<DT><B>　機　能</B>
+	<DD>ディレクトリ情報テーブル中の日付時間データを圧縮する。
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+　　■</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">バックアップライブラリユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

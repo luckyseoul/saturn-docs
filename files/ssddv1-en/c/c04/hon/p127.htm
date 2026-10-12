@@ -1,0 +1,49 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p126.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p128.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT><table border cellpadding=5>
+<td width = 150> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220> <pre> <B> Function </B> <br> Retention file information range </Td> <td width = 160> <pre> <B> Function Name </B> [S-] <br> CDC_GetFileScope </td> <td width = 60> <pre> <B> No </B><br>8.3</td>
+</table><P>
+<DD><PRE>
+<B> format </B> Sint32 CDC_GetFileScope (Sint32 * fid, Sint32 * infnum, Bool * drend)
+<B> Input </B> None
+<B> Output </B> fid: First file identifier held
+<B>: </B> infnum: Number of stored file information
+<B>: </B> drend: Last directory record retention flag
+<B> Function value </B> Returns an error code.
+<B> Function </B> Returns the range of file information currently held by the CD block. <P>
+<UL> <UL> <B> (1) Last directory record retention flag </B> <P>
+現在 の Current retention file information range is the last directory record in the directory block.
+Notify if it contains. This allows you to determine if there are subsequent directory records. </PRE><P>
+<table border cellpadding=5>
+<th width = 100 align = "center"> <pre> constant name </th> <th width = 420 align = "center"> <pre> description </th> <tr>
+<td align = "left"> <pre> TRUE </td> <td align = "left"> <pre> Holds the last directory record. </td><tr>
+<td align = "left"> <pre> FALSE </td> <td align = "left"> <pre> The last directory record is not retained. </td>
+</table></UL></UL><P>
+<PRE> <B> Remarks </B> Since you and your parent directory are always retained, they are not included in the number of file information. </PRE><P>
+<DT><table border cellpadding=5>
+<td width = 150> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220> <pre> <B> Function </B> <br> Get </td> <td width = 160> <pre> <B> Function Name </B> [S-] <br> CDC_TgetFileInfo </td> <td width = 60> <pre> <B> No </B><br>8.4</td>
+</table><P>
+<DD><PRE>
+<B> format </B> Sint32 CDC_TgetFileInfo (Sint32 fid, CdcFile * file)
+<B> Input </B> fid: File identifier (CDC_NUL_FID: Indicates all file information)
+<B> Output </B> file: File information
+<B> Function value </B> Returns an error code.
+<B> Function </B> Get file information (12 bytes) by specifying a file identifier from the range of retained file information
+<B> </B>.
+<B> </B> If CDC_NUL_FID is specified as the file identifier, all file information held by the CD block
+<B> Get </B> information (up to 254 excluding yourself and parents). <P>
+<B> Note: Immediately after issuing the Read File (CDC_ReadFile) command, the command is overwritten.
+Please be sure to leave at least 16.7ms to prevent it. </B><P>
+<B> Example </B> CdcFile file; / * Secure one file information storage area * /
+<B> </B> ret = CDC_TgetFileInfo (fid, & file); <P>
+<B>: </B> CdcFile allfile [254]; / ​​* Secure all file information storage area * /
+<B>: </B> ret = CDC_TgetFileInfo (CDC_NUL_FID, allfile); </PRE> <BR>
+</DL><P><P><HR>
+<A HREF=p126.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p128.htm> Go to next page </A>
+</BODY>
+</HTML>

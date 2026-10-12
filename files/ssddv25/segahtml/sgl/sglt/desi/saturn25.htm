@@ -1,0 +1,167 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>About saturnExport v2.5</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><BR>
+<DL>
+<DT><FONT SIZE="+2"><CENTER>
+ About saturnExport v2.5</CENTER>
+</DT><BR><BR>
+ <STRONG>
+Things to keep in mind when converting data.</strong><BR>
+ Scaling and Viewing Problems<BR>
+ If you convert a hierarchy where the model has a scale value other than (1,1,1) and use <STRONG>
+the Viewer→saturnViewer</strong>
+ command, the results will be different between the CartDev+DevSaturn environment and Softimage.<BR>
+ This is because Saturn uses a classical transform, whereas Softimage uses a non-classical transform by default. The order of translation, rotation, scaling, etc. is different between Saturn and Softimage.<BR>
+<UL>
+<LI> non-classical<BR>
+ S <I>
+<SMALL>
+model</small>
+</i>
+ XS <I>
+<SMALL>
+parent</small>
+</i>
+ XR <I>
+<SMALL>
+model</small>
+</i>
+ XT <I>
+<SMALL>
+model</small>
+</i>
+ XR <I>
+<SMALL>
+parent</small>
+</i>
+ XT <I>
+<SMALL>
+parent</small>
+</i>
+<LI> classical<BR>
+ S <I>
+<SMALL>
+model</small>
+</i>
+ XR <I>
+<SMALL>
+model</small>
+</i>
+ XT <I>
+<SMALL>
+model</small>
+</i>
+ XS <I>
+<SMALL>
+parent</small>
+</i>
+ XR <I>
+<SMALL>
+parent</small>
+</i>
+ XT <I>
+<SMALL>
+parent</small>
+</i>
+</UL>
+ (S=Scale, R=Rotation, T=Translation)<BR><BR>
+ There is no easy way to convert from a non-classical transformation to a classical transformation. When converting from Softimage to Saturn format, objects appear in their normal positions on the Saturn and create a new local transformation so that they are calculated correctly.<BR><BR>
+ There are two options for this problem.<BR>
+<UL>
+<LI> Use <STRONG>
+the Effect → Freeze → Scaling</strong>
+ command in the Model module before converting.<LI> Model with Classical transformations by selecting <STRONG>
+the Preferences→Classic Scaling</strong>
+ command.</UL><BR><BR>
+<HR>
+ <STRONG>
+Generate Geometry (.mdl)</strong><BR>
+ The Generate Geometry option can output geometry and material information in SGL format.<BR>
+<IMG SRC=mdl.gif><BR><BR>
+ <I>
+Model Shading</i><BR>
+ The Model Shading option allows you to add SGL shading information to the converted model.<BR><BR>
+ <I>
+Convert Coordinate Systems</i><BR>
+ Turning this option on will convert the Softimage coordinate system to the Saturn coordinate system. Inverts the Y and Z values for the following items.<BR>
+<UL>
+<LI> Vertex coordinate value<LI> polygon normal<LI> Object position and rotation values</UL><BR>
+ <I>
+Saturn vs. Softimage Units</i><BR>
+ You can apply scaling when converting from Softimage to SGL format.<BR><BR>
+<HR>
+ <STRONG>
+Generate Texture (.txr)</strong><BR>
+ The Genrate Texture option can output texture information in SGL format.<BR>
+<IMG SRC=txr.gif><BR><BR>
+ <I>
+Smoothing</i><BR>
+ The Smoothing option controls color smoothing when the texture is resampled. When this option is selected, a bilinear interpolation method is used to improve the quality of the texture slices created; when this option is not selected, the colors of the closest pixels of the original texture are used. Masu.<BR>
+ <STRONG>
+(Note)</strong>
+ When using this option, the smoothing process may create colors that were not used in the original texture.<BR><BR>
+ <I>
+Save PIC files</i><BR>
+ You can save the texture sliced .pic file in the specified directory.<BR><BR>
+ Texture Slice Density Control<BR>
+ <A HREF="plysur.htm"><I>Polygon Surface</i></a><BR>
+ Determines the texture size from the polygon size when slicing the texture. The advantage of this technique is that the density of the sliced texture is uniform over the model size. The size of the texture becomes independent of the original texture data. The default value is set to 25 pixels per Softimage unit.<BR>
+ <A HREF="texres.htm"><I>Texture resolution</i></a><BR>
+ Determines the size of the sliced texture based on the UV texture coordinates of the texture-mapped polygon. The size of the sliced texture varies depending on the resolution of the original texture. The Density Factor (default 1.0) determines the resolution of the texture.<BR>
+ <I>
+Maximum Slice Size</i><BR>
+ You can set the maximum X and Y values of the texture to be texture sliced.<BR>
+ (By default, both X and Y are 256 pixels)<BR><BR>
+<HR>
+ <STRONG>
+Generate Animation (.mtn)</strong><BR>
+ The Generate Animation option can output animation information as text data. (Not SGL compliant)<BR>
+<IMG SRC=mtn.gif><BR><BR>
+ <I>
+Compression</i><BR>
+ Compress animation data. If the number does not change, the data is omitted.<BR><BR>
+ Hierarchy Filtering Options (not available in v2.2)<BR>
+ <I>
+Selected Models Only</i><BR>
+ Selected models only.<BR><BR>
+ Non Polygonal Models (for models other than polygon mesh)<BR>
+ In this example, a keyframe animation is set on the skeleton's effector.<BR><BR>
+ <I>
+Remove and Propagate Animation</i><BR>
+ Remove models other than polygon meshes (such as skeletons) from the hierarchy and propagate the animation to another model.<BR>
+<IMG SRC=rm_prop.gif><BR><BR>
+ <I>
+Replace by Nulls and Preserve Animation</i><BR>
+ Replaces non-polygon mesh models with Null and preserves animation. The models named <STRONG>
+jnt1_3</strong>
+ and <STRONG>
+jnt1_4</strong>
+ on the right side of the diagram have animations. These two are Null.<BR>
+<IMG SRC=rep_pres.gif><BR><BR>
+ <I>
+Replace by Nulls and Propagate Animation</i><BR>
+ Replace non-polygon mesh models with Null and transfer the animation to another model.<BR>
+<IMG SRC=rep_prop.gif><BR><BR>
+<P><BR>
+<HR>
+<P><A HREF="main.htm">Top</a><P></BODY>
+</HTML>

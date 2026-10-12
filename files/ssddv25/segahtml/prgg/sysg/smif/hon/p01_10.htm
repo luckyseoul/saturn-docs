@@ -1,0 +1,53 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 5&gt;SMPC Interface User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">SMPC Interface User's Manual</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC Interface User's Manual</b><H2 ALIGN=CENTER> overview</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H3> ■Purpose</H3><DD> This library uses the functions of SMPC (System Management & Peripheral Control).</P>
+<A NAME="no1_11"></A><P><DT><H3> ■Features</H3><DD><UL TYPE=DISC>
+<!--HIRANO 削除 -->
+<!--LI>
+メインCPUの負担を大幅に減らすことができます。--><!--HIRANO 削除END -->
+<LI> The interface between the main CPU and SMPC is a software handshake method that uses SMPC registers.</UL>
+</P>
+<A NAME="no1_12"></A><P><DT><H3> ■Function overview</H3><DD> SMPC functions can be classified into system management type and peripheral control type.</P>
+<P><DT> <B>●System management system</b><DD> The system management system can reset hardware (CPU, sound, etc.), set and retrieve the clock, etc.</P>
+<P><DT> <B>●Peripheral control system</b><DD> The peripheral control system automatically collects data from peripherals connected to the peripheral I/F and returns it to the main CPU.</P>
+<A NAME="no1_13"></A><P><DT><H3> ■Processing overview</H3><DD> The interface between SMPC and main CPU is handshake. To execute a function (command), first write the required parameters to the SMPC register, then write the command. When you write a command, SMPC executes the process according to the command. There are two types of processing: into-back and non-int-back.</P>
+<P><DT> <B>●Into back</b><DD> Intoback is a process in which a command is passed to SMPC and the result is returned by an interrupt (SMPC interrupt). SMPC interrupt processing and its registration are done inside the library. Also, other interrupts are prohibited while SMPC interrupt processing is in progress. The timing of command issuance varies depending on the function.</P>
+<P><DT> <B>●Non-intback</b><DD> Non-intoback is processing that only passes commands to SMPC. The library function waits for SMPC processing to finish. (Please refer to the SMPC User's Manual for details on each SMPC processing time.)<BR>
+ The functions that can be used in this process are functions that do not require receiving the result after passing the command (such as reset). The processing systems that can be used with each function are shown below.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TD WIDTH=200><PRE></TD><TH WIDTH=150><PRE> into back</TD><TH WIDTH=150><PRE> non-intoback</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> system management</TD><TD><PRE> ○</TD><TD><PRE> ○</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> peripheral control</TD><TD><PRE> ○</TD><TD><PRE> ×</TD></TR>
+</TABLE>
+<DD> <B>○:</b> Processed, <B>×:</b> No process</P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">SMPC Interface User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

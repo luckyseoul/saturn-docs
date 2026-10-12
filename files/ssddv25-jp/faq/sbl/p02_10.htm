@@ -1,0 +1,291 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 4&gt;FAQ/SBLプログラミング関連</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#sbl">FAQ</A>
+★<A HREF="index.htm#SOUND">SBLプログラミング関連</A>
+<HR>
+<B>▲
+<A HREF="p01_10.htm">戻る</A>｜
+<A HREF="p03_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/SBLプログラミング関連</B>
+<H2 ALIGN=CENTER>SOUND</H2>
+<HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_01"><HR></A><DL>
+<H3>マルチプレイヤーで設定しているステレオ/モノラル情報の取得方法について。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>マルチプレイヤで設定しているステレオ/モノラル情報をどのように取得
+      すればいいですか。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>マルチプレイヤで設定した音声出力(ステレオ、モノラル)情報はSMPC内に
+      バックアップされています。この情報を取得する方法としてSMPC I/Fライブラリ
+      にアクセスマクロがありますので、以下のようにして取得してください。</P>
+
+<P><DD>　ret = PER_GS_SM(data) &amp; PER_MSK_STEREO;</P>
+
+<P>      実行前には、SMPCのシステム情報取得処理(PER_LInit関数でイントバック種別
+      PER_KD_SYSを発行)を行っておく必要があります。PER_Init関数は
+      使用禁止です。</P>
+
+<P>      この情報を取得後、サウンドドライバに対してステレオ/モノラルの設定
+      をする必要があります。設定は、SND_SET_SND_CTRLマクロを使用します。
+      (サウンドI/FライブラリのSEGALIB¥MAN¥MANSND.DOCに記載しています)<BR>
+      詳しい内容は、</P>
+<P><DT><B>参照</B>
+<DD>『ハードウェアマニュアル　SMPCユーザーズマニュアル』<BR>
+第2章SMPCコマンド <A HREF="../../hard/smpc/hon/p02_30.htm#c1_04">NO.4 SNDON</A>、<A HREF="../../hard/smpc/hon/p02_30.htm#c1_05">NO.5 SNDOFF</A>及び<BR>
+<A HREF="../../hard/smpc/hon/p02_40.htm">2.4非リセット系システムマネージメントコマンド</A>
+       を御覧ください。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_02"><HR></A><DL>
+<H3>STEREO/MONOの設定はどうやるの？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>ゲームスタート時にSTEREO/MONOの切り換えをするのに
+      MAIN側でどこのフラグを操作したら良いか教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>サウンドドライバのステレオ/モノラルビットを操作することで
+      切り替えることができます。(SystemInterfacework 483H)
+      切り替え方法としては、</P>
+<DL>
+<P><DT><B>書　式</B>
+	<DD> void SND_SET_SND_CTRL(Uint8 snd_ctrl)
+
+<P><DT><B>入力</B>
+	<DD>サウンドコントロール値
+	<DD>SND_CTRL_OUTPUT_STEREO  ：ステレオ
+	<DD>SND_CTRL_OUTPUT_MONO    ：モノラル
+
+<P><DT><B>出　力</B>
+	<DD>    なし
+
+<P><DT><B>関数値</B>
+	<DD>  なし
+
+<P><DT><B>機　能</B>
+	<DD>    サウンドコントロール値を設定します。現在はステレオ/モノラルの
+              モードを選択し設定できます。<BR>
+      というマクロが用意されているので、こちらをご使用ください。</P>
+	</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_03"><HR></A><DL>
+<H3>"SND_SetSeqVl"の"fade"の設定方法</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SND_SetSeqVl を使用して音量の変更を行いたいのですが、fade の数値が
+      今一つわかりません。マニュアルには1で最長、255で最短と書いて
+      ありますが、具体的にどのくらいの長さなのでしょうか？(長短が逆)
+      フレーム単位なのか、それ以外のものが基準なのか教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>数値の1がサウンドCPUである68000の状態にもよりますが最速で
+      2m秒にあたり、指定した時間が過ぎるとボリュームが1つずつ変化して
+      いきます。正確な同期をとるのは難しいので、フェード中にストップの
+      コマンドを発行したりして調節するのが普通です。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_04"><HR></A><DL>
+<H3>PCMストリーム再生時に終端でループする</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>セガサターン上でPCMストリーム再生をしているのだが、ストップさせよう
+      としても最後でループしたままになってしまう。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SBLのPCMライブラリのバグでデータが4バイト境界になっていないと
+      上記症状が発生します。バグ修正した Ver1.16 以降を使用してください。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_05"><HR></A><DL>
+<H3>シーケンス再生時の音色バンク切替方法</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>シーケンスサウンドのシーケンスデータ、音色バンクデータを両方同時に
+      切り替えるにはどのようにすればよいでしょうか？</P>
+<P>      現在、サウンドメモリ中に複数のシーケンスデータ、音色バンクデータを
+      置き、曲を切り替えることを試みています。<BR>
+      シーケンスデータの切替は SND_StartSeq の引数指定で
+      音色バンクの切替は SND_ChgMix にて行っているのですが
+      実際にはシーケンスのみが切り替わり、音色バンクは変化しません。<BR>
+      音色バンクを切り替えるにはどのようにするのでしょう？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>"SND_ChgMix"は音色バンク内のミキサ(音量と定位を持つDSPからの出力先)
+      の選択を切り替えるものでメモリ中の音色バンクデータを切り替えるもの
+      ではありません。<BR>音色バンクデータの指定はシーケンスデータ内にある
+      コントロールコマンドで行うものでプログラム的に変更はできません。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_06"><HR></A><DL><!--@-->
+<H3>SND_CtrlDirMidi()の使い方を教えて。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>PROGRAMMER'S GUIDE VOL.1 <BR>
+『サウンドI/Fライブラリ』のMIDIダイレクトコントロール <A HREF="../../prgg/prg3/sund/hon/p02_13.htm#no19">SND_CtrlDirMidi()</A><BR>
+  の詳細について御教え願えますでしょうか。</P>
+
+<!--あ1997-04-15「プログラムライブラリ ユーザーズガイド3/Ver.1.0 Rel.3」の23ページの」→「『サウンドI/Fライブラリ』」-->
+
+<P>      8つのMIDIコマンドを、直接制御できる関数と思っているのですが、
+      各パラメータの設定値についての詳しいことがわかりません。<BR>
+      サウンドドライバのドキュメントなども見ましたが、MIDIコマンド自体の内容に
+      ついては見当たりせんでした。(バンクにも変換済み)<BR>
+      鳴らなくなってしまうのです。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>ダイレクトMIDIは68000上にシーケンスデータを持たせず、発音のon/offを
+      SH2からコントロール可能にしようというものです。<BR>SH2でシーケンサを作成
+      し、68000サウンドドライバはSCSPを発音させるためのみに使用するなどと
+      いうことも可能です。また、波形だけをサウンドRAMへロードして、発音の
+      on/offをSH2で行うということもできます。</P>
+<P>      68000へ送信するデータはMIDIデータをセガサターン用に変形させたものを使用します。
+      このフォーマットは以下のようになります。</P>
+<HR>
+<P><DD>表１<TABLE BORDER=1>
+<TR><TH>bit</TH><TH>7</TH><TH>6</TH><TH>5</TH><TH>4</TH><TH>3</TH><TH>2</TH><TH>1</TH><TH>0</TH></TR>
+<TR><TH>0</TH><TD COLSPAN=5><B>*</B>Priority</TD><TD COLSPAN=3>CMD</TD></TR>
+<TR><TH>1</TH><TD COLSPAN=3>KNo</TD><TD COLSPAN=5>MIDI Ch</TD></TR>
+<TR><TH>2</TH><TD COLSPAN=8>MIDI Data #1</TD></TR>
+<TR><TH>3</TH><TD COLSPAN=8>MIDI Data #2</TD></TR>
+</TABLE>
+<DD><B>*</B>Priority (level) は使用しません。常に0です。</P>
+
+<P><DD>表２<TABLE BORDER=1>
+<TR><TD>　Priority level </TD><TH><PRE> 0-31  </TH><TD> Sequence Start 時の発音優先順位</TD></TR>
+<TR><TD>　CMD            </TD><TH><PRE> 0-7   </TH><TD> MIDI command</TD></TR>
+<TR><TD>　Kno            </TD><TH><PRE> 0-7   </TH><TD> 発音管理番号</TD></TR>
+<TR><TD>　MIDI Ch        </TD><TH><PRE> 0-31  </TH><TD> MIDI channel</TD></TR>
+<TR><TD>　MIDI data #1   </TD><TH><PRE> 0-127 </TH><TD> MIDI data byte #1</TD></TR>
+<TR><TD>　MIDI data #2   </TD><TH><PRE> 0-127 </TH><TD> MIDI data byte #2</TD></TR>
+</TABLE></P>
+<HR>
+<P><DD>実際の MIDI Event との対応</P>
+<DD>表３<TABLE BORDER=1>
+<TR><TH>CMDの値</TH><TH>対応する MIDI Event</TH></TR>
+<TR><TH>0</TH><TD>(80-8Fh) Note Off Event</TD></TR>
+<TR><TH>1</TH><TD>(90-9Fh) Note On Event</TD></TR>
+<TR><TH>2</TH><TD>(A0-AFh) After Touch</TD></TR>
+<TR><TH>3</TH><TD>(B0-BFh) Control Change</TD></TR>
+<TR><TH>4</TH><TD>(C0-CFh) Program Change</TD></TR>
+<TR><TH>5</TH><TD>(D0-DFh) Channel Pressure</TD></TR>
+<TR><TH>6</TH><TD>(E0-EFh) Pitch Wheel</TD></TR>
+<TR><TH>7</TH><TD>(F0-FFh) System Message</TD></TR>
+</TABLE></P>
+<HR>
+<P><DD>
+        具体的な例をあげた方が理解しやすいでしょうから、以下に簡単な手順を
+      説明します。<BR>では、バンク0の0番目の効果音をダイレクトMIDIコマンドを
+      使用して発音させてみます。</P>
+<P>        まず、サウンドの初期化、マップチェンジ、エフェクトチェンジ、ミキサ
+      チェンジなどの演奏を開始する以前に必要となる基本的な処理は通常の
+      リクエストによって完了させておきます。これらのことはプログラマーズ
+      ガイドを参照して行ってください。</P>
+
+<P>        では、バンク0、0番目の効果音を発音管理番号1、MIDIチャネル０で
+      発音させてみます。「表1」に対する1stバイトとして Note on をセット
+      します。Note on は発音開始の意味ですので「表3」から CMD の値として
+      1を選択すればよいことになります。プライオリティは使用しませんので
+      1stバイトは 0x01 となります。</P>
+
+<P>        同様に2ndバイトは発音管理番号=1、MIDIチャネル=0ですから 0x20
+      となります。</P>
+
+<P>        3rdバイトはノートナンバをセットします。ノートナンバとは音階データ
+      を7ビットで表すデータです。詳しくはMIDIの専門書を参照してください。
+      ここでは 0x40 としておきます。</P>
+
+<P>        4thバイトは velocity です。velocity とは強弱を表す7ビットのデータ
+      です。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_07"><HR></A><DL>
+<H3>SBLでシーケンスへのPAN設定をするにはどうすればよいのでしょう？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SBLでシーケンスへのPAN設定をするにはどうすればよいのでしょう？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>以下のサウンドI/Fライブラリ関数を使用してください。</P>
+
+<P><DD><B>SndRet SND_SetSeqPan(SndSeqNum P1, Uint8 P2, Uint8 P3);</B>
+<DL>
+<DT>P1：<DD>発音管理番号（0-7）
+<DT>P2：<DD>00h→PAN Control ON 
+		<DD>80h→PAN Control OFF
+<DT>P3：<DD>MIDI PANデータ(00h-7Fh)</DL>
+
+<P><DD>パラメータ3(P3)については以下の表を参考に設定してください。</P>
+
+<P><DD><B>表1　MIDI PANデータの詳細(SCSPのPANとの対応)</B>
+<TABLE BORDER=1>
+<TR><TH>MIDI PAN </TH>
+<TH><pre> 0</TH><TH><pre> 1</TH><TH><PRE> 2</TH><TH><PRE> 3</TH>
+<TH><pre> 4</TH><TH><pre> 5</TH><TH><PRE> 6</TH><TH><PRE> 7</TH>
+<TH><pre> 8</TH><TH><pre> 9</TH><TH><PRE> A</TH><TH><PRE> B</TH>
+<TH><pre> C</TH><TH><pre> D</TH><TH><PRE> E</TH><TH><PRE> F</TH>
+</TR>
+<TR><TH>00h - 0Fh</TH><TD>1F</TD><TD>1F</TD><TD>1F</TD><TD>1F</TD><TD>1E</TD><TD>1E</TD><TD>1E</TD><TD>1E</TD><TD>1D</TD><TD>1D</TD><TD>1D</TD><TD>1D</TD><TD>1C</TD><TD>1C</TD><TD>1C</TD><TD>1C</TD></TR>
+<TR><TH>10h - 1Fh</TH><TD>1B</TD><TD>1B</TD><TD>1B</TD><TD>1B</TD><TD>1A</TD><TD>1A</TD><TD>1A</TD><TD>1A</TD><TD>19</TD><TD>19</TD><TD>19</TD><TD>19</TD><TD>18</TD><TD>18</TD><TD>18</TD><TD>18</TD></TR>
+<TR><TH>20h - 2Fh</TH><TD>17</TD><TD>17</TD><TD>17</TD><TD>17</TD><TD>16</TD><TD>16</TD><TD>16</TD><TD>16</TD><TD>15</TD><TD>15</TD><TD>15</TD><TD>15</TD><TD>14</TD><TD>14</TD><TD>14</TD><TD>14</TD></TR>
+<TR><TH>30h - 3Fh</TH><TD>13</TD><TD>13</TD><TD>13</TD><TD>13</TD><TD>12</TD><TD>12</TD><TD>12</TD><TD>12</TD><TD>11</TD><TD>11</TD><TD>11</TD><TD>11</TD><TD>10</TD><TD>10</TD><TD>10</TD><TD>10</TD></TR>
+<TR><TH>40h - 4Fh</TH><TD>00</TD><TD>00</TD><TD>00</TD><TD>00</TD><TD>01</TD><TD>01</TD><TD>01</TD><TD>01</TD><TD>02</TD><TD>02</TD><TD>02</TD><TD>02</TD><TD>03</TD><TD>03</TD><TD>03</TD><TD>03</TD></TR>
+<TR><TH>50h - 5Fh</TH><TD>04</TD><TD>04</TD><TD>04</TD><TD>04</TD><TD>05</TD><TD>05</TD><TD>05</TD><TD>05</TD><TD>06</TD><TD>06</TD><TD>06</TD><TD>06</TD><TD>07</TD><TD>07</TD><TD>07</TD><TD>07</TD></TR>
+<TR><TH>60h - 6Fh</TH><TD>08</TD><TD>08</TD><TD>08</TD><TD>08</TD><TD>09</TD><TD>09</TD><TD>09</TD><TD>09</TD><TD>0A</TD><TD>0A</TD><TD>0A</TD><TD>0A</TD><TD>0B</TD><TD>0B</TD><TD>0B</TD><TD>0B</TD></TR>
+<TR><TH>70h - 7Fh</TH><TD>0C</TD><TD>0C</TD><TD>0C</TD><TD>0C</TD><TD>0D</TD><TD>0D</TD><TD>0D</TD><TD>0D</TD><TD>0E</TD><TD>0E</TD><TD>0E</TD><TD>0E</TD><TD>0F</TD><TD>0F</TD><TD>0F</TD><TD>0F</TD></TR>
+</TABLE>
+<UL TYPE=DISC>
+<LI>表内の数値がSCSPのPANデータ(00h-1Fh:32段階)です。
+<LI>MIDI PANデータは128段階ですので、SCSPのPANデータに変換する際に下位2ビットは無視されます。</UL></P>
+
+<P><DD><B>MIDI PANデータのイメージ図</B>
+<PRE>
+Left                    Center                     Right
+00h  &lt;-----------------&gt; 40h &lt;--------------------&gt; 7Fh
+</PRE>
+
+<P><DD><B>表2　SCSP PANとMIDI PANの対応</B>
+<TABLE BORDER=1>
+<TR><TH>PAN</TH><TH>L(db)</TH><TH>R(db)</TH><TH>定位</TH><TH> </TH><TH>PAN</TH><TH>L(db)</TH><TH>R(db)</TH><TH>定位</TH></TR>
+<TR><TD>00h</TD><TD>-00.0</TD><TD>-00.0</TD><TD>C   </TD><TD> </TD><TD>10h</TD><TD>-00.0</TD><TD>-00.0</TD><TD>C   </TD></TR>
+<TR><TD>01h</TD><TD>-03.0</TD><TD>-00.0</TD><TD>R1  </TD><TD> </TD><TD>11h</TD><TD>-00.0</TD><TD>-03.0</TD><TD>L1  </TD></TR>
+<TR><TD>02h</TD><TD>-06.0</TD><TD>-00.0</TD><TD>R2  </TD><TD> </TD><TD>12h</TD><TD>-00.0</TD><TD>-06.0</TD><TD>L2  </TD></TR>
+<TR><TD>03h</TD><TD>-09.0</TD><TD>-00.0</TD><TD>R3  </TD><TD> </TD><TD>13h</TD><TD>-00.0</TD><TD>-09.0</TD><TD>L3  </TD></TR>
+<TR><TD>04h</TD><TD>-12.0</TD><TD>-00.0</TD><TD>R4  </TD><TD> </TD><TD>14h</TD><TD>-00.0</TD><TD>-12.0</TD><TD>L4  </TD></TR>
+<TR><TD>05h</TD><TD>-15.0</TD><TD>-00.0</TD><TD>R5  </TD><TD> </TD><TD>15h</TD><TD>-00.0</TD><TD>-15.0</TD><TD>L5  </TD></TR>
+<TR><TD>06h</TD><TD>-18.0</TD><TD>-00.0</TD><TD>R6  </TD><TD> </TD><TD>16h</TD><TD>-00.0</TD><TD>-18.0</TD><TD>L6  </TD></TR>
+<TR><TD>07h</TD><TD>-21.0</TD><TD>-00.0</TD><TD>R7  </TD><TD> </TD><TD>17h</TD><TD>-00.0</TD><TD>-21.0</TD><TD>L7  </TD></TR>
+<TR><TD>08h</TD><TD>-24.0</TD><TD>-00.0</TD><TD>R8  </TD><TD> </TD><TD>18h</TD><TD>-00.0</TD><TD>-24.0</TD><TD>L8  </TD></TR>
+<TR><TD>09h</TD><TD>-27.0</TD><TD>-00.0</TD><TD>R9  </TD><TD> </TD><TD>19h</TD><TD>-00.0</TD><TD>-27.0</TD><TD>L9  </TD></TR>
+<TR><TD>0Ah</TD><TD>-30.0</TD><TD>-00.0</TD><TD>R10 </TD><TD> </TD><TD>1Ah</TD><TD>-00.0</TD><TD>-30.0</TD><TD>L10 </TD></TR>
+<TR><TD>0Bh</TD><TD>-33.0</TD><TD>-00.0</TD><TD>R11 </TD><TD> </TD><TD>1Bh</TD><TD>-00.0</TD><TD>-33.0</TD><TD>L11 </TD></TR>
+<TR><TD>0Ch</TD><TD>-36.0</TD><TD>-00.0</TD><TD>R12 </TD><TD> </TD><TD>1Ch</TD><TD>-00.0</TD><TD>-36.0</TD><TD>L12 </TD></TR>
+<TR><TD>0Dh</TD><TD>-39.0</TD><TD>-00.0</TD><TD>R13 </TD><TD> </TD><TD>1Dh</TD><TD>-00.0</TD><TD>-39.0</TD><TD>L13 </TD></TR>
+<TR><TD>0Eh</TD><TD>-42.0</TD><TD>-00.0</TD><TD>R14 </TD><TD> </TD><TD>1Eh</TD><TD>-00.0</TD><TD>-42.0</TD><TD>L14 </TD></TR>
+<TR><TD>0Fh</TD><TD>-無限</TD><TD>-00.0</TD><TD>R15 </TD><TD> </TD><TD>1Fh</TD><TD>-00.0</TD><TD>-無限</TD><TD>L15 </TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p01_10.htm">戻る</A>｜
+<A HREF="p03_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#sbl">FAQ</A>
+★<A HREF="index.htm#SOUND">SBLプログラミング関連</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

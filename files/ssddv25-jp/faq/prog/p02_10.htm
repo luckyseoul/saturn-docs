@@ -1,0 +1,60 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 7&gt;FAQ/プログラム全般</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#prog">FAQ</A>
+★<A HREF="index.htm">プログラム全般</A>
+<HR>
+<B>▲
+<A HREF="p01_10.htm">戻る</A>｜
+<A HREF="p03_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/プログラム全般</B>
+<H2 ALIGN=CENTER>Work RAM High &amp; Low</H2>
+<HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no2_01"><HR></A><DL>
+<H3>High-RAMとLow-RAMの違いは何?</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>「High RAM」と「Low RAM」どれほどの差があるのでしょうか？
+      ウェイトサイクルや、RAMの速度等、ハードウェア的な観点からお答え
+      いただけるとありがたいのですが...<BR>
+      また、実際に使用する際にはキャッシュが効いてくると思うのですが、
+      キャッシュがそれらのRAMにどの程度効果があるのでしょうか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>まず、両者の置かれているアドレスですが、WORKRAM-HはシンクロナスDRAMを利用しており、06000000Hから1Mbyte、WORKRAM-LはDRAMを使用しており、00200000Hから1MByteとなっています。</P>
+
+<P>これは、キャッシュ時のアドレスであり、キャッシュスルー時にはそれぞれWORKRAM-Hは26000000Hから1Mbyte、WORKRAM-Lは20200000Hから1MByteとなっています。<BR>
+(HARDWARE MANUAL<A HREF="../../hard/scu_/hon/p01_02.htm">■1.2　SCUマッピング</A>の項参照)</P>
+
+<P>読み出し動作では、 WORKRAM-Hではキャッシュヒットの場合、ウェイトなしで読み出せますが、キャッシュミスの場合には16バイト分でアクセスが必要に
+なります。<BR>WORKRAM-Hで使用しているシンクロナスDRAMでは、キャッシュミスヒット時のアクセスは大変高速で行われ、7クロック程度で16バイト分の情報を取得できます。<BR>
+しかし、WORKRAM-Lの空間は14(long Wordあたりのクロック数)×4 クロック分(56クロック)かかります。<BR>
+
+<P>書き込み時は、1ロングワードの場合、WORKRAM-Hで4クロック、WORKRAM-Lで14クロック(1ワードの場合は7クロック)かかりますが、1ロングワード分の
+ライトバッファを設けているため、連続書き込みの場合はこれよりも早くなります。</P>
+
+<P>以上のように、WORKRAM-HとWORKRAM-Lのキャッシュを速度が違うため、できるだけWORKRAM-H側にプログラムをおくことを推奨します。
+その他、WORKRAM-LはSCUのDMA転送を使用することができません(転送先、転送元共に)ので<A HREF="../../hard/scu_/hon/p02_10.htm#no1_32">ご注意</A>ください。</P>
+
+<!--    WORKRAM-LがSCU DMAでは使用できない旨は、サターンデベロッパーズニュースレターSTN-10(4)「SCU仕様変更による制限事項・注意事項」に掲載されています。--><!--1997/04/04 ソフ技・あおき-->
+
+<P>これは、このWORKRAM-Lの空間がSCUの制御外の空間になっているためです。<BR>
+SH2のプログラムの高速化の手法としては、パイプライン処理を意識したプログラミングと、キャッシュを効率よく活用することを念頭に置いてプログラムの記述を行えばよいでしょう。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p01_10.htm">戻る</A>｜
+<A HREF="p03_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#prog">FAQ</A>
+★<A HREF="index.htm">プログラム全般</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

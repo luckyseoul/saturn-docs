@@ -1,0 +1,376 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/13&gt;バーチャルCDシステム/5.CDエミュレーション関連ツール</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">バーチャルCDシステム</A>
+<HR>
+<B>▲
+<a href="p10_10_j.htm">戻る</A>｜
+<a href="p12_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>バーチャルCDシステムユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第５章　ＣＤエミュレーション関連ツール</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A>
+	<P><DT><H3>5.1　CDビルダ</H3>
+	<DT><H3>5.1.1　CDビルダについて</H3>
+	<DD>　CDビルダは、作成するCDのデータ配置を記述したスクリプトを解釈し、CDイメージファイルを出力します。作成したCDイメージファイルは、ＣＤエミュレーションやライトワンスＣＤへの書き込みに利用されます。</P>
+
+	<P>　CDビルダには、<B>XBLD</B>とこれまで提供してきたVCDBUILDがあります。<BR>
+　XBLDはVCDBUILDに対して上位互換性を持ち、VCDBUILD用に作成したスクリプトファイルをそのまま使用できます。また、オンザフライ書き込みをサポートするなど機能拡張が施されています。<BR>
+　<B>XBLDについては「<a href="../../xbld/index_j.htm">ＣＤビルダXBLDユーザーズマニュアル</A>」で詳しく説明します。</B><BR>
+　VCDBUILDについては次節で説明します。</P>
+
+	<P>　CD上のデータ配置を指定するスクリプトは、複数のコマンド行から構成され、コマンド行はキーワードとそれに続く0個以上のパラメータから構成されます。<BR>
+　<B>スクリプトのスクリプト構文については「<a href="../../xscr/index_j.htm">CDビルダスクリプト文法マニュアル</A>」で詳しく説明します。</B></P>
+
+	<P><B>※ＣＤイメージ作成にはXBLDをお使いください。<BR>
+　これまでと同じ環境でCDを作成する必要がある場合にのみVCDBUILDをお使いください。</B></P>
+
+<A NAME="no5_12"></A>
+	<P><DT><H3>5.1.2　VCDBUILDコマンド仕様</H3>
+	<P><DT><B>コマンド:</B><DD>VCDBUILD</P>
+	<P><DT><B>コマンド名:</B><DD>CDイメージファイル作成</P>
+	<P><DT><B>書　式:</B><DD>VCDBUILD△起動ファイル△[ /i/c/d/f/p/a/e/n/s]</P>
+	<P><DT><B>引　数:</B><DL>
+		<DT>起動ファイル:
+		<DD>起動ファイルによりスクリプトファイルとディスク構成情報ファイルを指定する</P></DL>
+
+	<P><DT><B>オプション:</B><DD><TABLE BORDER=0>
+	<TR><TD>/i</TD><TD>　ISO9660関連処理の表示</TD></TR>
+	<TR><TD>/c</TD><TD>　チャネルインターリーブ配置テーブル表示</TD></TR>
+	<TR><TD>/d</TD><TD>　入力DOSファイル処理の表示</TD></TR>
+	<TR><TD>/f</TD><TD>　ファイルインターリーブ配置テーブル表示</TD></TR>
+	<TR><TD>/p</TD><TD>　ダイレクトＤＯＳファイルアクセスでＣＤエミュレーションを行う</TD></TR>
+	<TR><TD>/a</TD><TD>　/i, /c, /f, /d を一括指定</TD></TR>
+	<TR><TD>/e</TD><TD>　ディスクイメージにECCデータを設定する（デフォルト）</TD></TR>
+	<TR><TD>/n</TD><TD>　ディスクイメージにECCデータを設定しない</TD></TR>
+	<TR><TD>/s</TD><TD>　サイレンスモード。作業中メッセージを表示しない</TD></TR></TABLE></P>
+
+	<P><DT><B>機　能:</B><DD>指定されたスクリプトファイルからスクリプトを入力し、ディスクの構成を表現しているディスク構成情報ファイルとCDイメージを出力します。</P>
+
+	<P><DT><B>使用例:</B><DD>　　VCDBUILD　TSTGAME.PRM
+	<P><DD>起動ファイルTSTGAME.PRMの内容</P>
+<HR WIDTH=50% ALIGN=LEFT><PRE>
+SCR TSTGAME.SCR
+RTI TSTGAME.RTI
+</PRE><HR WIDTH=50% ALIGN=LEFT>
+
+	<P><DT><B>備　考:</B><DD>コマンド入力時に起動ファイルの拡張子を指定しない場合、スクリプトファイルをTSTGAME.SCR、RTIファイルをTSTGAME.RTIとして処理する。</P>
+
+	<P><DT><H3>起動時のメッセージ</H3>
+<DD><PRE>
+PreProcess for VCDEMU &lt;VCDBUILD&gt; Ver n.nn Released at dd-mmm-yyyy
+Copyright (c) 1994 Victor Company of Japan&lt;JVC)
+
+script file = xxxxxxxxxx
+rti　　file = xxxxxxxxxx
+vds, path table and directory records output to xxxxxxxxxx
+</PRE></P>
+
+	<P><DT><B>/iオプション指定時のメッセージ</B>
+<DD><PRE>
+nnnnnn: write System Area
+nnnnnn: write Primary Volume Descriptor
+nnnnnn: Boot Record
+nnnnnn: Volume Partition Descriptor
+nnnnnn: write Volume Description Terminatior
+nnnnnn: write M-path Table
+nnnnnn: write L-path Table
+nnnnnn: write Directory Records for Directory &lt;root&gt;
+nnnnnn: write Directory Records for Directory xxxxxxxxxx
+nnnnnn: Extent Begin
+nnnnnn: ISO-file xxxxxxxxxx Begin
+</PRE></P>
+
+	<P><DT><B>/dオプション指定時のメッセージ</B>
+<DD><PRE>
+nnnnnn: source dos-file xxxxxxxxxx
+nnnnnn: Open Subsource file
+nnnnnn: LeadOut Begin
+</PRE></P>
+
+	<P><DT><B>/fオプション指定時のメッセージ</B>
+<DD><PRE>
+------: Disposition pattern for File Interleave
+nnnn]nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:
+　　:
+nnnnn]nnn:GAP:nnn:nnn:nnn:GAP:nnn:nnn:nnn:GAP:nnn:nnn:nnn:GAP:DMY:DMY:<P>
+</PRE></P>
+
+	<P><DT><B>/cオプション指定時のメッセージ</B>
+<DD><PRE>
+------: Disposition pattern for Channel Interleave
+nnnn]nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:nnn:
+　　:
+nnnn]nnn:GAP:nnn:nnn:nnn:GAP:nnn:nnn:nnn:GAP:nnn:nnn:nnn:GAP:DMY:DMY:
+</PRE></P>
+
+	<P><DT><H3>VCDBUILDのエラーメッセージ</H3>
+	<DD>エラーメッセージの意味と対応について。<BR>(注：****は文字列、**は数字が入ることを意味します。)</P>
+
+	<P><DT><B>一般エラー</B>
+	<DD>一般的な字句、構文エラーです。</P>
+	<DD><DL>
+	<P><DT><B>String length error</B>
+	<DD>　文字列が長すぎます。１行の最大文字数は255バイトです。</P>
+
+	<P><DT><B>Out of memory space</B>
+	<DD>　確保できるメモリがなくなりました。ドライバ等をはずすなどしてメモリ領域を広げるより手はありません。</P>
+
+	<P><DT><B>Illegal character</B>
+	<DD>　不正なキャラクターコードが文字列の中に入っています。</P>
+
+	<P><DT><B>Syntax error</B>
+	<DD>　構文エラーです。</P>
+
+	<P><DT><B>Cannot open File ****</B>
+	<DD>　****で示されるファイル名がオープンできません。ファイル名が実際に存在するか、確認してください。</P>
+
+	<P><DT><B>Illegal token</B>
+	<DD>　構文エラーです。エラー原因としては行の始めの予約語が間違っている可能性があります。</P>
+
+	<P><DT><B>Illegal parameter **</B>
+	<DD>　構文エラーです。エラー原因としては、**で示される数字番目のパラメータの型が違っている可能性があります。</P>
+
+	<P><DT><B>Illegal nesting of Include</B>
+	<DD>　Includeのネストが多すぎます。Includeは２層迄しかできません。</P>
+	</DL>
+
+	<P><DT><B>ブロックエラー</B>
+	<DD>以下のエラーはBlockとEndBlockの対応が取れていないとき、発生します。このエラーが発生するとそれ以降のブロックの対応がずれている可能性があるので、同じ様なエラーがそれ以降発生します。したがって、始めのエラーを修正すると後ろのエラーも直る場合があります。</P>
+	<DD><DL>
+	<P><DT><B>Illegal nesting of Block</B>
+	<DD>　ブロックのネストが多すぎます。</P>
+
+	<P><DT><B>Illegal definition of Endblock</B>
+	<DD>　EndBlockの定義が多すぎます。</P>
+
+	<P><DT><B>Expected ****</B>
+	<DD>　****で示されるブロック宣言がないようです。****が宣言されていないか、不必要なEnd****があるかもしれません。</P>
+
+	<P><DT><B>Illegal difinition in **** block</B>
+	<DD>　このコマンドは****のブロック内でしか定義できません。</P>
+
+	<P><DT><B>Illegal nesting of Directory</B>
+	<DD>　ディレクトリのネストが深すぎます。ディレクトリレベルは８レベルまでです。</P>
+
+	<P><DT><B>**** block is not closed</B>
+	<DD>　****のブロックは閉じていません。****が余分である場合があります。</P>
+	</DL>
+
+	<P><DT><B>パラメータエラー</B>
+	<DD>パラメータの文字の綴りが違うとか、とりうる値の範囲を越えているというような場合に発生します。</P>
+	<DD><DL>
+	<P><DT><B>Illegal MS-DOS filename ****</B>
+	<DD>　****で示される文字列は、MS-DOSのファイル名として使用できる以外の文字、または構文となっています。</P>
+
+	<P><DT><B>Illegal ISO filename ****</B>
+	<DD>　****で示される文字列は、ISO9660のファイル名として使用できる以外の文字、または構文となっています。</P>
+
+	<P><DT><B>Illegal Directory name ****</B>
+	<DD>　****で示される文字列は、ISO9660のディレクトリ名として使用できる以外の文字、または構文となっています。</P>
+
+	<P><DT><B>Illegal Disc type ****</B>
+	<DD>　ディスクタイプ****が間違っています。</P>
+
+	<P><DT><B>Illegal Track type ****</B>
+	<DD>　トラックタイプ****が間違っています。</P>
+
+	<P><DT><B>Illegal Offset</B>
+	<DD>　相対位置の指定が間違っています。</P>
+
+	<P><DT><B>Illegal Stream type ****</B>
+	<DD>　ストリームタイプが間違っています。</P>
+
+	<P><DT><B>Illegal Volume type ****</B>
+	<DD>　ボリュームタイプが間違っています。</P>
+
+	<P><DT><B>Illegal location of Primary Volume Descriptor</B>
+	<DD>　プライマリボリュームの相対時間は00:02:16以上でなければいけません。</P>
+
+	<P><DT><B>Illegal Catalog number</B>
+	<DD>　カタログナンバーに数字以外の文字が書かれています。</P>
+
+	<P><DT><B>Illegal Switch ****</B>
+	<DD>　スイッチはTRUE，またはFALSEしか取れません。</P>
+
+	<P><DT><B>Illegal Attribute ****</B>
+	<DD>　属性定義****が間違っています。</P>
+
+	<P><DT><B>Illegal Date or Time</B>
+	<DD>　日付または時間の値のどれかが定義できる範囲を越えています。</P>
+
+	<P><DT><B>Illegal FileNo</B>
+	<DD>　FileNoが1-255の値ではありません。</P>
+
+	<P><DT><B>Illegal Source type ****</B>
+	<DD>　ソースタイプ****が間違っています。</P>
+
+	<P><DT><B>Illegal Data type ****</B>
+	<DD>　データタイプ****が間違っています。</P>
+
+	<P><DT><B>Illegal CodingInformation</B>
+	<DD>　コーディング情報が0-255の値ではありません。</P>
+
+	<P><DT><B>Illegal character in Identifier ****</B>
+	<DD>　識別子****の中に使用できない文字が含まれています。</P>
+
+	<P><DT><B>Illegal Escape Sequence ****</B>
+	<DD>　Escape Sequence****が間違っています。</P>
+
+	<P><DT><B>Illegal Unit size</B>
+	<DD>　ユニットサイズが0です。ユニットサイズに0を設定することはできません。</P>
+	
+	<P><DT><B>Illegal Channel count</B>
+	<DD>　チャネル数は2または4だけです。</P>
+
+	<P><DT><B>Illegal Channel number</B>
+	<DD>　チャネル番号は0-255の値でなければいけません。</P>
+
+	<P><DT><B>Illegal MinLength</B>
+	<DD>　MInLengthの値が0ではいけません。</P>
+
+	<P><DT><B>Illegal SectorRate</B>
+	<DD>　セクターレートは75または150しか取ることができません。</P>
+
+	<P><DT><B>Illegal BitRate</B>
+	<DD>　ビットレートの値に0をとることはできません。</P>
+
+	<P><DT><B>Illegal Logical Block size</B>
+	<DD>　LogicalBlockSizeは512または1024または2048のどれかの値しかとることはできません。</P>
+	</DL>
+
+	<P><DT><B>属性エラー</B>
+	<DD>構文的には正しいが、条件等による制限にたいするエラーです。</P>
+	<DD><DL>
+	<P><DT><B>**** is already defined</B>
+	<DD>　****で示されるものは既に定義されています。</P>
+
+	<P><DT><B>CDDA cannot be defined in the first track</B>
+	<DD>　CDDAのトラックを第１トラックにすることはできません。</P>
+
+	<P><DT><B>Illegal command in the CDDA track</B>
+	<DD>　このコマンドはCDDAトラック内では定義できません。トラックタイプを確認してください。</P>
+
+	<P><DT><B>This command can be defined in the CDDA track only</B>
+	<DD>　このコマンドはCDDAトラック内でしか定義できません。トラックタイプを確認してください。</P>
+
+	<P><DT><B>BeginTime and EndTime cannot be defined in a block</B>
+	<DD>　同一ブロック内にBeginTimeＸとEndTimeＸを両方定義することはできません。</P>
+
+	<P><DT><B>Filesource type error in an ISO-file</B>
+	<DD>　１つのISOファイルの中で、違う種類のファイルソースが定義されています。</P>
+
+	<P><DT><B>Filesource type error in a Channel</B>
+	<DD>　１つのチャネルの中で、違う種類のファイルソースが定義されています。</P>
+
+	<P><DT><B>Definition error of BeginTimeE and EndTimeE</B>
+	<DD>　BeginTimeEとEndTimeEはExtentブロック内でしか定義できません。</P>
+
+	<P><DT><B>Definition error of **** in a Channel block</B>
+	<DD>　**** はチャネルブロック内でしか定義できません。</P>
+
+	<P><DT><B>Illegal BeginTimeS</B>
+	<DD>　BeginTimeSは00:02:16以上の値でなければいけません。</P>
+
+	<P><DT><B>Illegal ExtentTime</B>
+	<DD>　ExtentTimeは00:02:17以上の値でなければいけません。</P>
+
+	<P><DT><B>SameName can be used when the SupplementaryVolume is defined</B>
+	<DD>　SameNameはSupplementaryVolumeが定義されているとき有効です。</P>
+
+	<P><DT><B>PrimaryVolume is not defined </B>
+	<DD>　PrimaryVolumeが１つも定義されていません。PrimaryVolumeは必ず１つは定義しなければいけません。</P>
+
+	<P><DT><B>LeadIn is not defined </B>
+	<DD>　Trackの定義の前にLeadInが定義されていません。</P>
+
+	<P><DT><B>Illegal LeadOut tracktype </B>
+	<DD>　LeadOutのトラックタイプが最後のトラックと同じではありません。LeadOutのトラックタイプは最終トラックのトラックタイプと同じでなければいけません。</P>
+
+	<P><DT><B>MpegMultiplex can be defined once in a block </B>
+	<DD>　MpegMultiplexは１つのブロック内で１度しか定義できません。</P>
+
+	<P><DT><B>Disc is not defined </B>
+	<DD>　Discが定義されていません。</P>
+
+	<P><DT><B>BitRateis not defined </B>
+	<DD>　BitRateが定義されていません。</P>
+
+	<P><DT><B>**** block is not defined </B>
+	<DD>　****ブロックが定義されていません。</P>
+
+	<P><DT><B>Illegal track number </B>
+	<DD>　トラックの数が多すぎます。トラックの数は99個までです。</P>
+
+	<P><DT><B>Any track is not defined before LeadOut area is start </B>
+	<DD>　LeadOutの前にTrackが定義されていません。</P>
+
+	<P><DT><B>Filesource definition error in the CDDA track </B>
+	<DD>　CDDAのトラックにファイルソースとファイル定義が混在しています。</P>
+
+	<P><DT><B>Illegal track type on DiscType　"CDROM" </B>
+	<DD>　ディスクタイプがCDROMの時、トラックタイプにMODE2をとることはできません。</P>
+
+	<P><DT><B>This command can be used in the MODE2 track only </B>
+	<DD>　このコマンドはトラックタイプがMODE2のとき有功です。</P>
+
+	<P><DT><B>Illegal track type in LeadIn area </B>
+	<DD>　LeadInのトラックタイプはMODE1だけです。</P>
+
+	<P><DT><B>Illegal track type in first track </B>
+	<DD>　Track 1 のトラックタイプはMODE1だけです。</P>
+
+	<P><DT><B>Channel number is already defined </B>
+	<DD>　そのチャネル番号はすでに定義されています。</P>
+
+	<P><DT><B>Expected CloseBracket </B>
+	<DD>　マクロ定義で" [ " が閉じていません。</P>
+
+	<P><DT><B>Macro **** is not defined </B>
+	<DD>　マクロ名 **** が定義されていません。</P>
+
+	<P><DT><B>All FileNos are not defined </B>
+	<DD>　全FileNoの定義がされていません。</P>
+
+	<P><DT><B>FileNo error </B>
+	<DD>　ファイルインターリーブにおいて同じFileNoが定義されています。</P>
+
+	<P><DT><B>Too many ISOFiles </B>
+	<DD>　ファイルインターリーブにおいてISOファイルの定義が多すぎます。</P>
+
+	<P><DT><B>ISOFile definition error </B>
+	<DD>　ひとつのファイルインターリーブ内にISOファイルが複数定義されています。</P>
+	</DL>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p10_10_j.htm">戻る</A>｜
+<a href="p12_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">バーチャルCDシステム</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

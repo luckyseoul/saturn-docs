@@ -1,0 +1,66 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;15/86&gt;VDP2ユーザーズマニュアル/3.3表示期間中のVRAMアクセス方法-4</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<B>▲
+<a href="p03_32_j.htm">戻る</A>｜
+<a href="p03_34_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第３章　ＲＡＭ/■3.3　表示期間中のVRAMアクセス方法</B>
+</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_34"></A>
+	<P>	<DT><H3>　●CPUによるリード／ライトアクセス</H3>
+		<DD>　画面表示期間中にCPUによるVRAMへのリード／ライトアクセスを行う場合は、そのタイミングをVRAMサイクルパターンレジスタに設定しなければいけません。VDP2は、CPUによるVRAMアクセスが要求された場合、CPUリード／ライトアクセスに指定されたタイミングになるまで待ち、そのタイミングにのみアクセスを許可します。CPUによるリード／ライトアクセスが要求されなかった場合には、指定されたタイミングになってもVRAMに対して何も行いません。また、CPUによるアクセスがリードアクセスの場合には、リードできる</P>
+
+	<P>	<DD>までCPUにウェイトサイクルが挿入されますが、ライトアクセスの場合には、2ワードのライトアクセス2回までであればウェイトサイクルは挿入されません。<BR>
+　CPUによるVRAMアクセスは、VRAM-AへのアクセスまたはVRAM-Bへのアクセスという単位でしか指定できず、バンク単位では指定できません。<BR>
+　2分割しないVRAMに対してCPUによるVRAMアクセスを指定する場合には、アクセスを行うタイミングのVRAMサイクルパターンレジスタに、CPUリード／ライトのアクセスコマンドを指定してください。このときに、CPUリード／ライトのアクセスコマンドのかわりに、アクセスしないというアクセスコマンドを指定しても同じになります。また、画面表示イネーブルレジスタにおいて、表示しないように設定された画面用のアクセスコマンド(パターンネームデータリード、キャラクタパターンデータリードまたはビットマップパターンデータリード)が設定されいる場合も、CPUリード／ライトアクセスになります。画面表示イネーブルレジスタについては、「<B>4.1　画面表示制御</B>」を参照してください。<BR>
+　2分割しないVRAMの全てのアクセスタイミングに、CPUリード／ライトまたはアクセスしないというアクセスコマンドを指定すると、CPUによるアクセスは画面表示期間中いつでも可能になります。これを利用して、一方のVRAMを補助用のワークRAMとして使用することができます。また、絵の表示に使用するVRAMをフレームバッファのように切り替えることで、絵を高速に書き換えながら表示することもできます。<BR>
+　例えば、VRAM-Aを2バンクに分割しない場合に、T2とT4にCPUリード／ライトアクセスを行う場合のVRAMサイクルパターンレジスタの指定は図3.6のようになります。</P>
+
+<A NAME="z3_6"></A>
+	<P ALIGN=CENTER><B>図3.6　VRAMを2バンクに分割しない場合のCPUリード／ライトアクセス　指定例</B><BR><img srcset="../grp/i036_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　2分割するVRAMに対してCPUリード／ライトアクセスを設定する場合には、アクセスを行うタイミングの、バンク0用とバンク1用両方のVRAMサイクルパターンレジスタに、CPUリード／ライトのアクセスコマンドを設定しなければいけません。さらに、CPUリード／ライトのアクセスコマンドを設定するタイミングの1つ前のタイミングのバンク0用とバンク1用両方のレジスタには、アクセスしないというアクセスコマンドを必ず指定しなければいけません。ただし、CPUリード／ライトアクセスを連続したタイミングに指定する場合には、その連続したアクセスの先頭になるタイミングの1つ前のタイミングにのみ指定するだけでかまいません。</P>
+
+	<P>	<DD>　例えば、VRAM-Bを2分割する場合に、T4とT5に連続したCPUリード／ライトアクセスを行う場合のVRAMサイクルパターンレジスタの指定は、図3.7のようになります。</P>
+
+<A NAME="z3_7"></A>
+	<P ALIGN=CENTER><B>図3.7　VRAMを2バンクに分割する場合のCPUリード／ライトアクセス指定例</B><BR><img srcset="../grp/i037_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p03_32_j.htm">戻る</A>｜
+<a href="p03_34_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

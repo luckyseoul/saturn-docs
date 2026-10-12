@@ -1,0 +1,65 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/29&gt;SCSP User's Manual/3.SCSP Function</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual</b><H1 ALIGN=CENTER> Chapter 3 SCSP function</H1><HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A><P><DT><H3> ■3.1 Interface</H3><DD> SCSP has two built-in CPU interfaces (main CPU and sound CPU).<BR>
+ The priority of the main CPU interface is higher, so the processing speed of the sound CPU depends on the operation of the main CPU.</P>
+<A NAME="no3_11"></A><P><DT> <B>●Sound CPU interface</b><DD> The sound CPU interface is a block with specialized functions that allows you to connect a sound CPU. By providing this interface, the sound CPU can be connected to the SCSP without any external circuitry.<BR>
+ Sound CPU programs reside in sound memory. Therefore, all CPU programs are placed in the address space of the sound CPU.</P>
+<A NAME="no3_12"></A><P><DT> <B>●Main CPU interface</b><DD> Figure 3.1 shows the access between the main CPU and the interface.</P>
+<A NAME="z3_1"></A><P ALIGN=CENTER> <B>Figure 3.1 Access overview</b><BR>
+<img srcset="../grp/i018_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The interface starts when the select signal (MCCSN) from the main CPU falls, and ends when the select signal rises. Also, when "1" is output to the ready signal (MCRDYN) to the main CPU, the select signal (MCCSN) from the main CPU and the main CPU data bus (MCD[7:0]) do not change.</P>
+<P><DT> <B>●Notes on interfacing with the main CPU</b><DD><UL TYPE=DISC>
+<P><LI> Read and write in 16-bit units (word units).<BR>
+ → Access in 8-bit units (byte units) is not possible from the main CPU.</P>
+<P><LI> When there is a read/write request, the address and data are loaded into the buffer within SCSP. As a result, "1" is output to the ready signal (MCRDYN) to the main CPU and a wait occurs. This wait continues until the LSI's internal processing is completed, so please avoid using continuous writes, which cause frequent waits, except when the power is turned on.</P>
+<P><LI> When the power is turned on, the time required to initialize the sound memory by continuous writing is approximately 100msec with 4Mbit DRAM.</P>
+</UL>
+<A NAME="no3_20"></A><P><DT><H3> ■3.2 Memory access control</H3><DD> When accessing sound memory from SCSP, the following priorities are maintained.</P>
+<DD><OL>
+<B><LI></b> PCM data read by PCM sound source, access by DSP<B><LI></b> DRAM refresh cycle<B><LI></b> DMA transfer<B><LI></b> Access by main CPU<B><LI></b> Access by sound CPU</OL>
+</P>
+<P><DD> If there is a higher priority access request, weight is given to the lower priority access request. In addition, the decision as to which device memory access should be granted to a device requesting memory access (PCM sound source section, DSP section, main CPU, sound CPU, DMA, etc.) is made before the actual memory access is performed. has also been executed before, so a higher-ranked access request will not occur while a lower-ranked access request is being executed.</P>
+<A NAME="z3_2"></A><P ALIGN="CENTER"> <B>Figure 3.2 Memory access priority</b><BR>
+<img srcset="../grp/i020_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> SCSP/sound CPU performance is determined by memory cycle allocation.<BR>
+ Memory cycles are performed 128 times during one sample (1 / 44.1K≒22.68μsec), and these 128 cycles are distributed to each device. Since the number of CPU accesses varies depending on the application, there is no best method for memory access, but please note the following:</P>
+<P><DT> <B>●Notes on memory access</b><DD><UL TYPE=DISC>
+<P><LI> Sound memory uses DRAM, so a refresh cycle is required.</P>
+ Since the Saturn Sound System requires two free cycles between each sample, the number of memory cycles available to other devices is 126.</P>
+<P><LI> The sound source and DSP memory cycles have the highest priority memory cycle.</P>
+<P><LI> The sound source uses two memory cycles for each slot sound, so a total of 64 memory cycles are used for up to 32 slots.<BR>
+ When the EG is in the maximum attenuation state ("3FFH"), the sound source does not access memory. Please set KEY_OFF for slots that do not output audio.</P>
+<P><LI> The DSP performs up to 64 memory accesses. This depends on the DSP application. When you want to temporarily store data in a DSP, use registers inside the DSP as much as possible.</P>
+<P><LI> When using SCSP's built-in DMA, a considerable amount of weight is placed on the sound CPU, which slows down the sound CPU.</P>
+</UL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

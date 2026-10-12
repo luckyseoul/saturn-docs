@@ -1,0 +1,39 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p001.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p003.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 1.4 Preparation for performance </H2>
+<H3> [Sequence] </H3>
+<DD> It is necessary to transfer the sequence data (song data, sound effect data) to be executed by the sound control function to the sound memory. Please transfer according to the current sound area map. For the sound area map, see the sound development manual. The calling sequence is shown in “Sound Control”. <P>
+<DT><H3>[PCM]</H3>
+<DD> For the preparation of PCM performance, see the sound driver system interface in the sound development manual. <P>
+<DT> <H2> 1.5 Sound control </H2>
+<H3> [Function Overview] </H3> <BR>
+<DD> Sound control function writes commands to sound memory. There are 8 command buffers. Sound control functions can be used without being aware of the command buffer. <P>
+<PRE> <UL TYPE = "DISK"> <LI> sequence
+Sequence data playback start / end, volume setting, etc. can be performed.
+<LI>PCM
+You can start and stop playback of PCM data.
+<LI>CD
+CD data volume setting, PAN setting, volume analysis, effect change, etc. can be performed. </PRE></UL><P>
+<DT> <H3> [Calling sequence] </H3>
+<DD> The following calling sequence is the process up to the start of the sequence. <P>
+<PRE>void sndCnt()
+{
+     sndStart (); / * Sound system start (see above item) * /
+     SND_ChgMap (2); / * Change sound area map * /
+     SND_MoveData((Uint16 *)0x22005000, 0xffff, SND_KD_SEQ, 2);
+                                        / * Sound data transfer (sequence) * /
+     SND_MoveData((Uint16 *)0x22005500, 0xffff, SND_KD_TONE, 2);
+                                        / * Sound data transfer (tone) * /
+     SND_SetTlVl (15); / * Set the overall volume * /
+     SND_StartSeq (0, 2, 5, 0); / * Sequence start * /
+     ...
+}</PRE><P>
+</DL><P><P><HR>
+<A HREF=p001.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p003.htm> Go to next page </A>
+</BODY>
+</HTML>

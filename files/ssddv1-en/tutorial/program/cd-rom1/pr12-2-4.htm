@@ -1,0 +1,85 @@
+﻿<HTML>
+<HEAD>
+<TITLE> About the look-ahead feature </TITLE>
+</HEAD><BODY>
+
+<P> <A HREF="pr12-2-3.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr12-2-5.htm"> Go to next page </A> </BR> </P> <HR>
+
+
+<H3>
+About the prefetch function
+</H3>
+
+<P>
+When reading data from a CD-ROM, the mechanical operation of the CD drive is involved, so the data is not actually read at the next moment when reading is started. The function that minimizes this waiting time is the look-ahead function. Sega Saturn has an area to temporarily store data read from CD-ROM. This area is called the CD buffer. When the next file to be read is determined, data is read into the CD buffer and transferred to memory when data is needed.
+</P>
+
+<H4> Figure 12-3 CD buffer </H4>
+<IMG SRC="p12-12.gif">
+
+<P>
+When the address of the function “slCdLoadFile” already described is set to NULL, the size of the read area is set to 0, and the return value of the function “slCdGetStatus” is “CDSTAT_WAIT”, the prefetching is completed. After this, when the address and size of the load area are set with the function “slCdLoadFile”, the transfer starts immediately. You can also set the read area address and size before pre-reading to the CD buffer is complete.
+</P>
+
+<DL>
+<DT><B>【 Sint32 slCdLoadFile (CDHN cdhn, CDBUF buf[]);】</B>
+<DD> Specify the following to read ahead in the CD buffer.
+<PRE>
+buf[ i ]. type = CDBUF_COPY;
+buf[ i ]. trans.copy.addr = NULL;
+buf[ i ]. trans.copy.unit = CDBUF_FORM1;
+buf[ i ]. trans.copy.size = 0;
+</PRE>
+</DL>
+
+<P>
+After specifying all the transfer areas, specify “CDBUF_TERM” as the last “type”.
+</P>
+
+<P>
+Sample program 3 shows an example of prefetching program.
+</P>
+
+<P>
+This sample program is a process for reading a file on a CD-ROM, and is a basic use example of a library process for pre-reading a file from a CD-ROM. The procedure is described along Flow 12-3.
+</P>
+
+<OL>
+<LI> Performs initialization of graphics and other systems.
+
+<LI> Initializes the CD-ROM system.
+
+<LI> Opens a file. <BR>
+Since there is key information for classifying data in the input parameter of the function that performs file opening, set this information as necessary.
+
+<LI> The file is read using the file handle and read area information of the return value of the file open function as parameters. <BR>
+At this time, set NULL to the read destination area address of the read area information and set the size to 0 to prefetch the file.
+
+<LI> Executes the graphic library (function “slSynch ()”).
+
+<LI> Get status information and check if it is waiting for transfer. <BR>
+If waiting for transfer, end the loop. <BR>
+Call the function “slSynch ()” in this loop.
+
+<LI> Read the file again. <BR>
+At this time, the address is set to the read destination area address of the read area information, and the file is read.
+
+<LI> Executes the graphic library (function “slSynch ()”). <BR>
+The file specified by reading the file is actually read at this time.
+
+<LI> Get status information and check if the file has been read. <BR>
+If the file has not been read, it loops until the status is read. <BR>
+In this loop, call the function “slSynch ()”.
+</OL>
+
+<H4> Flow 12-3 Sample program 3 (look ahead sample_cd3 / main.c) </A> </H4>
+<IMG SRC="p12-14.gif">
+
+<H4> <A NAME="LIST12-3"> List 12-3 Sample program 3 (look ahead sample_cd3 / main.c) </H4>
+</B><IMG SRC="p12-15.gif">
+
+<H4> List 12-3 Sample program 3 (look ahead sample_cd3 / main.c) (continued) </H4>
+<IMG SRC="p12-16.gif">
+
+<HR>
+<P> <A HREF="pr12-2-3.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr12-2-5.htm"> Go to next page </A> </BR> </P> </BODY> </HTML>

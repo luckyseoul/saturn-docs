@@ -1,0 +1,290 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/30&gt;SGL Programmer's Tutorial/8-9.回転スクロール画面</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<A HREF="p08_80.htm">戻る</A>｜<A HREF="p08_a0.htm">進む</A>▼</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no8_90"></A>
+  <P><DT><H3>8-9. 回転スクロール画面</H3>
+     <DD>　回転スクロール画面“RBG0”は、スクロールの拡大縮小と回転が可能です。<BR>
+	また、ノーマルスクロールとは考え方が異なりますが、スクロールの縦横それぞれへの移動も実行可能です。<BR>
+	ここでは、回転スクロールの移動、拡大縮小、回転機能をサンプルプログラムと共に解説していきます。</P>
+
+<A NAME="no8_91"></A>
+  <P><DT><H3>回転スクロールの移動</H3>
+     <DD>　回転スクロールの移動も、実際はスクロール表示位置の変化として実現されます。<BR>
+	関数“slLookR”を利用することで、見かけ上、スクロールがモニターに対して上下左右それぞれに移動しているように見せることができます。</P>
+
+<A NAME="z8_21"></A>
+  <A ALIGN=CENTER><B>図8-21　回転スクロールの移動イメージ</B><BR>
+  <IMG SRC="../grp/p08_41.gif"></P>
+
+<A NAME="no8_92"></A>
+  <P><DT><H3>　回転スクロール画面の拡大縮小</H3>
+     <DD>　ＳＧＬでは、回転スクロール画面の拡大縮小操作も可能になっています。回転スクロール画面の拡大縮小はノーマルスクロール画面の拡大縮小と異なり、常に任意倍率での拡大縮小が可能です。<BR>
+	また、回転スクロール画面の場合、後述するスクロール回転操作、拡大縮小操作、移動操作との併用も可能です。<BR>
+	ＳＧＬで回転スクロール画面の拡大縮小を実行したい場合は、ライブラリ関数“slZoomR”を使用してください。</P>
+
+  <P><DT><B>【void slZoomR ( FIXED scale_x , FIXED scale_y ) ;】</B>
+     <DD>　回転スクロール画面”RBG0”の拡大縮小を行い、現在の状態をカレント回転パラメータに保存します（カレントパラメータは関数“slCurRpara”で切り替え可能）。<BR>
+	パラメータには、スクロール縦横の倍率を逆数で代入します。<BR>
+	例えば、２倍に拡大したい場合はパラメータに1/2を代入、1/2倍に縮小したい場合は２を代入します。<BR>
+	回転スクロールの場合、拡大縮小は常に任意倍率で設定可能です。</P>
+
+<A NAME="no8_93"></A>
+  <P><DT><H3>　回転スクロール画面の回転</H3>
+     <DD>　セガサターンでは、回転スクロール画面に対して任意軸・任意角値でのスクロール回転が可能になっています<BR>（下図はイメージモデル）。</P>
+
+<A NAME="z8_22"></A>
+  <A ALIGN=CENTER><B>図8-22　スクロール回転イメージ</B><BR>
+  <IMG SRC="../grp/p08_42_1.gif"></P>
+
+  <P><DT><B>●２Ｄ回転（Ｚ軸回転）</B>
+     <DD>　ＳＧＬで回転スクロール画面の２Ｄ回転操作（Ｚ軸回転）を行いたい場合、ライブラリ関数“slZrotR”を使用してください。<BR>
+	回転の中心となる点（スクロールマップ上の一点）は、ライブラリ関数“slDispCenterR”で設定された点を使用します。</P>
+
+  <P><DT><B>【void slZrotR ( ANGLE z_angle ) ;】</B>
+     <DD>　回転スクロール画面“RBG0”を、Ｚ軸に対して回転させます。<BR>
+	パラメータには、カレント回転パラメータのＺ軸回転角を指定します。<BR>
+	回転角は、現在の状態からの回転角値ではなく、絶対的な回転角値を代入してください。<BR>
+	（カレントパラメータは関数“slCurRpara”で切り替え可能）。<BR>
+	また、回転中心はライブラリ関数“slLookR”で設定された点を使用します。</P>
+
+
+<A NAME="z8_23"></A>
+  <A ALIGN=CENTER><B>図8-23　スクロール回転の実際の動作</B><BR><IMG SRC="../grp/p08_42_2.gif"></P>
+
+  <P><DT><B>関数使用上の注意</B>
+     <DD>　回転スクロールの変換操作操作に使用される関数群“slZrotR”、“slZoomR”、“slLookR”は、同じく回転スクロールの各種変換操作（３Ｄ回転含む）を行う関数“slScrMatSet”と、同一の回転パラメータにおいて、併用できませんので注意してください。<BR>
+	これは、前記関数群が回転パラメータの特定領域の書き換えを行うのに対して、後記関数群は回転パラメータ全域に対する書き換えを実行するためです。</P>
+
+  <P>　次のサンプルプログラム（リスト8-5）は、ＳＧＬライブラリ関数を用いて、実際に回転スクロール画面の回転操作を行った例です。</P>
+
+<A NAME="l8_5"></A>
+	<P ALIGN=CENTER><B>リスト8-5　sample_8_9_1：スクロールの２Ｄ回転</B>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Graphic Rotation						*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+#include	"ss_scrol.h"
+
+#define		RBG0_CEL_ADR		VDP2_VRAM_A0
+#define		RBG0_MAP_ADR		VDP2_VRAM_B0
+#define		RBG0_COL_ADR		( VDP2_COLRAM + 0x00200 )
+#define		RBG0_PAR_ADR		( VDP2_VRAM_A1 + 0x1fe00 )
+#define		BACK_COL_ADR		( VDP2_VRAM_A1 + 0x1fffe )
+
+void ss_main(void)
+{
+	ANGLE yama_angz = DEGtoANG(0.0);
+	FIXED posx = toFIXED(128.0) , posy = toFIXED(64.0);
+	
+	slInitSystem(TV_320x224,NULL,1);
+	slTVOff();
+	slPrint("Sample program 8.9.1" , slLocate(9,2));
+
+	slColRAMMode(CRM16_1024);
+	slBack1ColSet((void *)BACK_COL_ADR , 0);
+
+	slRparaInitSet((void *)RBG0_PAR_ADR);
+	slCharRbg0(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageRbg0((void *)RBG0_CEL_ADR , 0 , PNB_1WORD|CN_10BIT);
+	slPlaneRA(PL_SIZE_1x1);
+	sl1MapRA((void *)RBG0_MAP_ADR);
+	slOverRA(2);
+	Cel2VRAM(yama_cel , (void *)RBG0_CEL_ADR , 31808);
+	Map2VRAM(yama_map , (void *)RBG0_MAP_ADR , 32 , 16 , 1 , 0);
+	Pal2CRAM(yama_pal , (void *)RBG0_COL_ADR , 256);
+
+	slDispCenterR(toFIXED(160.0) , toFIXED(112.0));
+	slLookR(toFIXED(128.0) , toFIXED(64.0));
+
+	slScrAutoDisp(NBG0ON | RBG0ON);
+	slTVOn();
+
+	while(1){
+		slZrotR(yama_angz);
+		yama_angz += DEGtoANG(1.0);
+		slSynch();
+	} 
+}
+</PRE>
+
+<A NAME="f8_6"></A>
+  <H4>フロー8-6　sample_8_9_1：スクロールの２Ｄ回転</H4>
+  <IMG SRC="../grp/p08_44.gif">
+
+  <P><DT><B>●カレントマトリクスを使用した３Ｄ回転</B>
+     <DD>　ＳＧＬでカレントマトリクスを利用した回転スクロール画面の３Ｄ回転操作（全軸回転）を行うには、以下の手順を踏む必要があります。</P>
+
+  <P><DT><B>１）回転スクロール諸設定</B>
+     <DD>　回転パラメータ設定、画面オーバー処理、係数テーブル設定など、回転スクロール使用に際し必要となる諸設定を済ませます。</P>
+
+  <P><DT><B><A NAME="ZAHYO">２）座標演算</B>
+     <DD>　回転スクロールに掛け合わせる３Ｄ回転操作を、まず、カレントマトリクスに対して実行します。<BR>
+	使用する関数群は、“slRorX”、“slTranslate”、“slScale”など同じものを使用します。<BR>
+	ただし、回転・移動・拡大縮小操作の操作順序は、通常の座標変換操作とは逆になります（変換操作順序は“第４章：座標変換”を参照してください）。<BR>
+	また、スクロール座標系はＺ軸の正負が逆で左手座標系になりますが、スクロールに対してモニターが回転移動するイメージで捉えられるため、見かけ上は全く同じに映ります。<BR>
+	通常の座標変換操作と同じマトリクス操作手順で座標変換操作を行いたい場合は、マトリクスデータの転送の前に関数“slScrMatConv”を使用するようにしてください。<BR>
+	関数“slScrMatConv”は、通常の座標変換手順で変換されたカレントマトリクスを、スクロール用座標変換マトリクスにコンバートしカレントマトリクスとします。</P>
+
+  <P><DT><B>【void slScrMatConv ( void ) ;】</B>
+     <DD>カレントマトリクスをスクロール用座標変換データにコンバートし、カレントマトリクスを置き換えます。<BR>
+	当然のことながら、スクロール用座標変換操作を実行した後のカレントマトリクスに、当該関数を使用すれば、カレントマトリクスは通常の座標変換用マトリクスに置き換わります。</P>
+
+  <P><DT><B>３）演算結果を回転パラメータに転送</B>
+     <DD>　カレントマトリクスに対して実行された座標演算結果を、回転パラメータに転送します。<BR>
+	回転スクロールは、演算結果を転送された回転パラメータのデータを元に変形・描画されます。<BR>
+	データの転送には、関数“slScrMatSet”を使用します。</P>
+
+  <P><DT><B>【void slScrMatSet ( void ) ;】</B>
+     <DD>　カレント回転パラメータにカレントマトリクスのデータを転送します。<BR>
+	回転スクロールに合わせて座標変換操作を施されたカレントマトリクスの転送に使用してください。</P>
+
+<A NAME="f8_7">
+  <H4>フロー8-7　カレントマトリクスを使用した３Ｄ回転操作の手順</H4>
+  <IMG SRC="../grp/p08_46.gif">
+
+  <P><DT><B>●係数テーブルを使用したズーム比率の制御</B>
+     <DD>　回転スクロールの３Ｄ回転操作実行時、回転スクロールは、スクロールの奥行きに応じてスクロールをスケーリングさせます。通常、このスケール比率は透視変換など３Ｄ座標演算に使用される各パラメータを元に計算し、
+	スクロールを変形させますが、この変形比率をライン単位あるいはドット単位であらかじめ設定しておき、スクロールの変形実行時に利用することができ、これを係数テーブルと呼びます。<BR>
+	係数テーブルの使用に際しては、次の２つの関数が必要になります。</P>
+
+  <P><DT><B>１）係数テーブルの作成</B>
+     <DD>　まず最初に、VRAM領域中に係数テーブル用の領域を確保しておく必要があります。<BR>
+	係数テーブルは、必ずVRAM中に作成するようにしてください。<BR>
+	また、係数テーブルはVRAM領域中の１バンクを占有します。これは、係数テーブルが、１バンク当たりの最大アクセス回数（８回）でVRAM領域を参照しにいくためです。</P>
+
+  <P><DT><B>【void slMakeKtable ( void *adr ) ;】</B>
+     <DD>　指定されたアドレスに３Ｄ回転操作で使用する係数テーブルを作成します。<BR>
+	パラメータには係数テーブルを作成する領域の先頭アドレスを代入します。<BR>
+	また、係数テーブルは必ずVRAM領域中に確保される必要があります。</P>
+
+  <P><DT><B>２）係数テーブル使用モードの設定</B>
+     <DD>　係数テーブルとして指定された領域を係数テーブルとして使用する際、係数テーブルをどのように使用するかの使用モードを決定します。</P>
+
+  <P><DT><B>【void slKtableRA,RB ( void *table_adr , Uint16 mode ) ;】</B>
+     <DD>　使用する係数テーブルのアドレスを指定し、更に係数テーブルの使用内容を決定します。<BR>
+	パラメータには、係数テーブルの先頭アドレス、係数テーブルの使用モードを表す下図の値（ｏｒ演算子“｜”で連結使用可能）をそれぞれ代入してください。<BR>
+	関数“slKtableRA”は回転パラメータＡの使用する係数テーブルの設定、関数“slKtableRB”は回転パラメータＢの使用する係数テーブルの設定をそれぞれ実行します。</P>
+
+<A NAME="z8_24"></A>
+	<P>	<DD><B>図8-24　“slKtableRA,RB”のパラメータ代入値（mode）</B>
+		<DD><TABLE BORDER=0>
+		<TR><TD>テーブル使用：    </TD><TD>[K_OFF     | K_ON   ]|</TD></TR>
+		<TR><TD>係数データサイズ：</TD><TD>[K_2WORD   | K_1WORD]|</TD></TR>
+		<TR><TD>係数モード：      </TD><TD>[K_MODE0   | K_MODE1 | K_MODE2 | K_MODE3]|</TD></TR>
+		<TR><TD>ラインカラー：    </TD><TD>[K_LINECOL          ]|</TD></TR>
+		<TR><TD>変形単位：        </TD><TD>[K_DOT     | K_LINE ]|</TD></TR>
+		<TR><TD>係数固定：        </TD><TD>[K_FIX              ]|</TD></TR>
+		</TABLE></P>
+  <P><DT><B>注）</B>
+     <DD>　パラメータに係数固定を指定した場合、係数テーブルがあらかじめ用意されているものとしリアルタイムでの係数テーブルの計算を実行しません。</P>
+
+  <P><DT><B>参照</B><BR>
+     <DD>　係数テーブルの詳細は“HARDWARE MANUAL vol.2：VDP2ユーザーズマニュアル ”を参照してください。</P>
+
+<A NAME="l8_6"></A>
+	<P ALIGN=CENTER><B>リスト8-6　sample_8_9_2：３Ｄ回転</B>
+	<P>	<DD>
+<PRE>
+#include	"sgl.h"
+#include	"ss_scrol.h"
+
+#define		RBG0RB_CEL_ADR			(VDP2_VRAM_A0            )
+#define		RBG0RB_MAP_ADR			(VDP2_VRAM_B0            )
+#define		RBG0RB_COL_ADR			(VDP2_COLRAM    + 0x00200)
+#define		RBG0RA_CEL_ADR			(RBG0RB_CEL_ADR + 0x06e80)
+#define		RBG0RA_MAP_ADR			(RBG0RB_MAP_ADR + 0x02000)
+#define		RBG0RA_COL_ADR			(RBG0RB_COL_ADR + 0x00200)
+#define		RBG0_KTB_ADR			(VDP2_VRAM_A1            )
+#define		RBG0_PRA_ADR			(VDP2_VRAM_A1   + 0x1fe00)
+#define		RBG0_PRB_ADR			(RBG0_PRA_ADR   + 0x00080)
+#define		BACK_COL_ADR			(VDP2_VRAM_A1   + 0x1fffe)
+
+void ss_main(void)
+{
+	FIXED	posy = toFIXED(0.0);
+	ANGLE	angz = DEGtoANG(0.0);
+	ANGLE	angz_up = DEGtoANG(0.0);
+
+	slInitSystem(TV_320x224,NULL,1);
+	slTVOff();
+	slPrint("Sample program 8.9.2" , slLocate(9,2));
+
+	slColRAMMode(CRM16_1024);
+
+	slRparaInitSet((void *)RBG0_PRA_ADR);
+	slMakeKtable((void *)RBG0_KTB_ADR);
+	slCharRbg0(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageRbg0((void *)RBG0RB_CEL_ADR , 0 , PNB_1WORD|CN_12BIT);
+	slPlaneRA(PL_SIZE_1x1);
+	sl1MapRA((void *)RBG0RA_MAP_ADR);
+	slOverRA(0);
+	slKtableRA((void *)RBG0_KTB_ADR , K_FIX | K_DOT | K_2WORD | K_ON);
+	Cel2VRAM(tuti_cel , (void *)RBG0RA_CEL_ADR , 65536);
+	Map2VRAM(tuti_map , (void *)RBG0RA_MAP_ADR , 64 , 64 , 2 , 884);
+	Pal2CRAM(tuti_pal , (void *)RBG0RA_COL_ADR , 160);
+
+	slPlaneRB(PL_SIZE_1x1);
+	sl1MapRB((void *)RBG0RB_MAP_ADR);
+	slOverRB(0);
+	slKtableRB((void *)RBG0_KTB_ADR , K_FIX | K_DOT | K_2WORD | K_ON);
+	Cel2VRAM(sora_cel , (void *)RBG0RB_CEL_ADR , 28288);
+	Map2VRAM(sora_map , (void *)RBG0RB_MAP_ADR , 64 , 20 , 1 , 0);
+	Pal2CRAM(sora_pal , (void *)RBG0RB_COL_ADR , 256);
+
+	slRparaMode(K_CHANGE);
+
+	slBack1ColSet((void *)BACK_COL_ADR , 0);
+
+	slScrAutoDisp(NBG0ON | RBG0ON);
+	slTVOn();
+
+	while(1)
+	{
+		slCurRpara(RA);
+		slUnitMatrix(CURRENT);
+		slTranslate(toFIXED(0.0) , toFIXED(0.0) + posy , toFIXED(100.0));
+		posy -= toFIXED(5.0);
+		slRotX(DEGtoANG(-90.0));
+		slRotZ(angz);
+		slScrMatSet();
+
+		slCurRpara(RB);
+		slUnitMatrix(CURRENT);
+		slTranslate(toFIXED(160.0) , toFIXED(155.0) , toFIXED(100.0));
+		slRotZ(angz);
+		slScrMatSet();
+
+		angz_up += DEGtoANG(0.5);
+		angz = (slSin(angz_up) &gt;&gt; 4);
+
+		slSynch();
+	} 
+}
+</PRE>
+<A NAME="f8_8"></A>
+  <H4>フロー8-8　sample_8_9_2：３Ｄ回転</H4>
+  <IMG SRC="../grp/p08_49.gif">
+
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p08_80.htm">戻る</A>｜<A HREF="p08_a0.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

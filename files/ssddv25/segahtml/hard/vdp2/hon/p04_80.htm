@@ -1,0 +1,76 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;28/86&gt;VDP2 User's Manual/4.8 Map-1</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no4">VDP2 User's Manual</a> ★ <A HREF="p04_10.htm">Chapter 4 Scroll screen</a><HR>
+ <B>▲ <A HREF="p04_70.htm">Back</a> ｜ <A HREF="p04_81.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 4 Scroll screen</b><HR NOSHADE>
+<DL>
+<A NAME="no4_80"></A><P><DT><H2> ■4.8 Map</H2><DD> A map is a square pattern made up of 2x2 or 4x4 planes. The map on the normal scrolling screen consists of 2x2 planes, and the map on the rotating scrolling screen consists of 4x4 planes. Specify how the planes are arranged by specifying the pattern name table start address in each plane's register.</P>
+<A NAME="no4_81"></A><P><DT><H3> ●Map specification register</H3><DD> The map consists of 4 planes (normal scroll screen) or 16 planes (rotary scroll screen), and each screen has a 6-bit map register that specifies the start address of the pattern name table for each plane. I have each number of planes. It also has one 3-bit map offset register attached to the upper part of the map register. The map specification register has a total of 9 bits, and the bits used and the address value indicated by the register change depending on the pattern name data size and character size. Figure 4.14 shows the relationship between the map register and map offset register.</P>
+<A NAME="z4_14"></A><P><DD> <B>Figure 4.14 Map specification register</b><PRE>
+┌───────────┐ ┌───────────────────────┐
+│Map offset │ │    Map register A     │
+│ Register  │ ├───┬───┬───┬───┬───┬───┤
+├───┬───┬───┤ │ 5 │ 4 │ 3 │ 2 │ 1 │ 0 │
+│ 8 │ 7 │ 6 │ └───┴───┴───┴───┴───┴───┘
+└───┴───┴───┘ ┌───────────────────────┐
+      │       │    Map register B     │
+      │       ├───┬───┬───┬───┬───┬───┤
+      │       │ 5 │ 4 │ 3 │ 2 │ 1 │ 0 │
+      │       └───┴───┴───┴───┴───┴───┘
+      └──┐                ： 
+         │                : 
+         │                │ 
+         │                │ 
+         ↓                ↓ 
+      ┌───────────┬───────────────────────┐
+      │Map offset │      Map register     │
+      │ Register  │                       │
+      ├───┬───┬───┼───┬───┬───┬───┬───┬───┤
+      │ 8 │ 7 │ 6 │ 5 │ 4 │ 3 │ 2 │ 1 │ 0 │
+      └───┴───┴───┴───┴───┴───┴───┴───┴───┘
+</PRE><P><DD>Table 4.8 shows the bits used in the map specification register and register address values based on pattern name data size and character size.</P>
+<A NAME="t4_8"></A><P><DD> <B>Table 4.8 Address values of map specification registers depending on settings</b><DD><TABLE BORDER>
+<TR><TH> plain size</TH><TH> pattern name<BR>
+ Data size</TH><TH> character size</TH><TH> bits used and actual<BR>
+ address value</TH></TR>
+<TR><TD ROWSPAN=4> 1 page horizontal x 1 page vertical</TD><TD ROWSPAN=2> 1 word</TD><TD> 1 cell horizontal x 1 cell vertical</TD><TD> (value of bits 6 to 0) x 2000H</TD></TR>
+<TR><TD> 2 cells horizontally x 2 cells vertically</TD><TD> (value of bits 8 to 0) x 800H</TD></TR>
+<TR><TD ROWSPAN=2> 2 words</TD><TD> 1 cell horizontal x 1 cell vertical</TD><TD> (value of bits 5 to 0) x 4000H</TD></TR>
+<TR><TD> 2 cells horizontally x 2 cells vertically</TD><TD> (value of bits 7 to 0) x 1000H</TD></TR>
+<TR><TD ROWSPAN=4> 2 pages horizontally x 1 page vertically</TD><TD ROWSPAN=2> 1 word</TD><TD> 1 cell horizontal x 1 cell vertical</TD><TD> (value of bits 6 to 1) x 4000H</TD></TR>
+<TR><TD> 2 cells horizontally x 2 cells vertically</TD><TD> (value of bits 8 to 1) x 1000H</TD></TR>
+<TR><TD ROWSPAN=2> 2 words</TD><TD> 1 cell horizontal x 1 cell vertical</TD><TD> (value of bits 5 to 1) x 8000H</TD></TR>
+<TR><TD> 2 cells horizontally x 2 cells vertically</TD><TD> (value of bits 7 to 1) x 2000H</TD></TR>
+<TR><TD ROWSPAN=4> 2 pages horizontally x 2 pages vertically</TD><TD ROWSPAN=2> 1 word</TD><TD> 1 cell horizontal x 1 cell vertical</TD><TD> (value of bits 6 to 2) x 8000H</TD></TR>
+<TR><TD> 2 cells horizontally x 2 cells vertically</TD><TD> (value of bits 8 to 2) x 2000H</TD></TR>
+<TR><TD ROWSPAN=2> 2 words</TD><TD> 1 cell horizontal x 1 cell vertical</TD><TD> (value of bits 5 to 2) x 10000H</TD></TR>
+<TR><TD> 2 cells horizontally x 2 cells vertically</TD><TD> (value of bits 7 to 2) x 4000H</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> When the VRAM capacity is set to 4M bits, the most significant bit of the bits used is not used.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_70.htm">Back</a> ｜ <A HREF="p04_81.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no4">VDP2 User's Manual</a> ★ <A HREF="p04_10.htm">Chapter 4 Scroll screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

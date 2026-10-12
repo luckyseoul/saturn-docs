@@ -1,0 +1,104 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/18&gt;Stream system library/5.Stream access example</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">Stream system library</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>stream system library</b><H2 ALIGN=CENTER> 5. Stream access example</H2><HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A><P><DT><H3> 5.1 Basic program</H3><P><DT> <B>(1) Reading the stream</b><DD> Read streams A, B, and C into a_buf, b_buf, and c_buf.<BR>
+ (A_BUFSIZE, B_BUFSIZE, C_BUFSIZE are buffer sizes in sectors)</P>
+<P><DD><PRE>
+Uint8 work[STM_WORK_SIZE(STMGRP_OPEN_MAX, STM_OPEN_MAX)]; /* Work area */
+Sint32 a_id, b_id, c_id; /* File identifier */
+StmGrpHn abc_grp; /* Stream group handle */
+StmHn a_stm, b_stm, c_stm; /* Stream handle */
+StmKey key; /* Stream key */
+Uint8 a_buf[A_BUFSIZE * STM_UNIT_FORM1]; /* Transfer area A */
+Uint8 b_buf[B_BUFSIZE * STM_UNIT_FORM2]; /* Transfer area B */
+Uint8 c_buf[C_BUFSIZE * STM_UNIT_FORM1]; /* Transfer area C */<P>
+GFS_Init(･･･); /* Initialize the file system */
+STM_Init(STMGRP_OPEN_MAX, STM_OPEN_MAX, work); /* Initialize the stream system */
+a_id = GFS_NameToId(･･･); /* Get file identifier */
+・
+・
+・
+abc_grp = STM_OpenGrp(); /* Open stream group */
+                                                             /* Stream key settings */
+STM_KEY_CN(&key) = STM_KEY_NONE; /* Channel number */
+STM_KEY_CIMSK(&key) = STM_KEY_CIVAL(&key) = STM_KEY_NONE; /* Coding information */
+/* Open stream by file identifier */
+STM_KEY_SMMSK(&key) = STM_KEY_SMVAL(&key) = STM_SM_VIDEO; /* Video stream */
+a_stm = STM_OpenFid(abc_grp, a_id, &key, STM_LOOP_NOREAD); /* Stream A */
+STM_KEY_SMMSK(&key) = STM_KEY_SMVAL(&key) = STM_SM_AUDIO; /* Audio stream */
+b_stm = STM_OpenFid(abc_grp, b_id, &key, STM_LOOP_NOREAD); /* Stream B */
+STM_KEY_SMMSK(&key) = STM_KEY_SMVAL(&key) = STM_SM_DATA; /* Data stream */
+c_stm = STM_OpenFid(abc_grp, c_id, &key, STM_LOOP_NOREAD); /* Stream C */<P>
+/* Transfer area settings */
+STM_SetTrBuf(a_stm, a_buf, A_BUFSIZE, STM_UNIT_FORM1);
+STM_SetTrBuf(b_stm, b_buf, B_BUFSIZE, STM_UNIT_FORM2);
+STM_SetTrBuf(c_stm, c_buf, C_BUFSIZE, STM_UNIT_FORM1);<P>
+/* Stream access */
+STM_SetExecGrp(abc_grp); /* Set execution group */
+while (1) {
+    if (STM_ExecServer() == STM_EXEC_COMPLETED) {
+        break; /* Stream access ends */
+    }
+    user(); /* User processing */
+}
+STM_CloseGrp(abc_grp); /* Close stream group */</PRE><BR>
+</PRE></P><P><DT> <B>(2) Transfer area settings</b><DD> When setting the transfer area, the following two processing methods are different.</P><P><DD> (a) STM_SetTrBuf(stm, buffer, A_BUFSIZE, STM_UNIT_FORM1)</P><P><DD> (b) STM_SetTrBuf(stm, buffer, A_BUFSIZE * STM_UNIT_FORM1, STM_UNIT_WORD)</P><P><DD> <B>(a) When the transfer area size is in sectors</b><DD> Since the number of sectors that can be retrieved from a partition within a CD block is known in advance, it can be processed as follows.</P><A NAME="z5_1"></A><P ALIGN=CENTER> <B>Figure 5.1 Transfer processing in sector units</b><BR><img srcset="../grp/i064_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P><P><DD> <B>(b) When the size of the transfer area is not in sectors</b><DD> Since the number of sectors that can be retrieved from the partition in the CD block is unknown, proceed as follows.</P><A NAME="z5_2"></A><P ALIGN=CENTER> <B>Figure 5.2 Transfer processing when not in sector units</b><BR><img srcset="../grp/i064_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P><P><DD> The next stream cannot be transferred while the dotted line loop is repeated. Therefore, when accessing two or more streams at the same time, you should use method (a) to transfer them, except in special cases.<BR> If Form1 and Form2 sectors are mixed in one stream, method (b) is the only way to transfer them.</P><P><DT> <B>(3) Transfer function settings</b><DD> In program (1), if you want to transfer the data of stream B to read_buf while decompressing it using the function "decodeFunc", make the following changes.</P><P><DD> (a) Change STM_SetTrBuf in the dotted line to STM_SetTrFunc.<P><P><DD> STM_SetTrFunc(b_stm, decodeFunc, read_buf);</P><P><DD> This will cause decodeFunc to start every time the server function STM_ExecServer attempts to transfer stream B data.</P><P><DD> (b) “decodeFunc” will be as follows.</P><P><DD><PRE>
+Uint8 read_buf[READBUF_SIZE];
+
+Sint32 decodeFunc(void *obj, StmHn stm, Sint32 nsct)
+{
+	Sint32 i;
+	Sint32 read_len; /* Number of longwords transferred by subFunc */
+	Sint32 nlongword; /* Number of longwords to be transferred */
+	Uint32 *src; /* Source address */
+	Sint32 dadr; /* Address/variation per longword transfer */
+	Uint32 *buffer; /* Transfer area */
+
+	/* Conversion from number of sectors to number of words (call before starting transfer) */
+	nlongword = STM_SctToWord(stm, nsct) / 2;
+
+	src = STM_StartTrans(stm, &dadr); /* Start transfer */
+	buffer = (Uint8 *)obj; /* The third argument of STM_SetTrFunc is passed to obj */
+
+	for (i = 0; i&lt; nlongword; i += read_len) {
+
+		/* Function that returns the number of expanded bytes */
+		buffer += subFunc(src, dadr, buffer, &read_len);
+		src += read_len * dadr;
+	}
+	return (nsct); /* Return the number of transferred sectors */
+}
+</PRE></P><P><DD>(c) Must be transferred sector by sector.</P><P><DD> (d) If the data has not been transferred when decodeFunc finishes, (-1) must be returned.<BR> In this case, other streams cannot be transferred until the data has been transferred. After transferring data, return the number of transferred sectors. STM_StartTrans must not be called during this time.</P><A NAME="z5_3"></A><P ALIGN=CENTER> <B>Figure 5.3 Operation when using transfer function</b><BR><img srcset="../grp/i066_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P><!-- +++ Add CRI ：5.(1) --><P><DT><H4> (4) Closing the stream in which the transfer function is registered</H4><DD> If you close the stream immediately after the transfer function returns (-1), the stream system will keep calling the transfer function until the transfer function returns a value greater than or equal to 0. Please return a value greater than or equal to 0 when the transfer is complete.</P><!-- --- Add CRI ：5.(1) --><A NAME="no5_20"></A><P><DT><H3> 5.2 Use with file systems</H3><DD> If you want to read from a CD using the file system while using the stream system, you must pause the drive. There are two ways to do this:</P><P><DD> (a) Execute STM_SetExecGrp(NULL). (Completion return)</P><P><DD> (b) Execute STM_NwSetExecGrp(NULL) and set the function value of STM_ExecServer to<BR> Call server functions until STM_EXEC_TSKEND. (Immediate return) After the file system has finished reading, resume reading the stream using STM_SetExecGrp(grp).</P><P><DD>&#65308; example&#65310; Transfer read-ahead stream data while reading in the file system<DD><PRE>
+         ・
+         ・ /* Read ahead the stream */
+STM_SetExecGrp(NULL); /* Pause the drive */
+GFS_NwFread(………);
+while (1) {
+	if (GFS_NwExecOne(gfs) == GFS_SVR_COMPLETED) /* Read file */
+		break;
+	STM_ExecTrans(stm); /* Transfer stream data */
+}
+STM_SetExecGrp(grp); /* Resume reading stream */</PRE><BR></PRE></P></DL><HR NOSHADE> <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">Stream system library</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

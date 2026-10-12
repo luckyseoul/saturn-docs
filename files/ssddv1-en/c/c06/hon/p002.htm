@@ -1,0 +1,54 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p001.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p003.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 1.3 Program description example </H2>
+<DD><PRE>#include &lt;machine.h&gt;
+#include "saga_spr.h"
+#include "sega_scl.h"
+#include "sega_int.h"<P>
+extern void vbStart (void); / * V-BLANK IN interrupt routine * /
+extern void vbEnd (void); / * V-BLANK OUT interrupt routine * / <P>
+main()
+{
+     Uint8 * vram; / * VRAM address storage area * / <P>
+     set_imask (0); / * Enable interrupts * / <P>
+     SCL_Vdp2Init (); / * Scroll and priority initialization * /
+     SCL_SetPriority(SCL_SP0|SCL_SP1|SCL_SP2|SCL_SP3|SCL_SP4|
+                     SCL_SP5|SCL_SP6|SCL_SP7,7);
+     SCL_SetSpriteMode(SCL_TYPE1,SCL_MIX,SCL_SP_WINDOW);
+     SPR_Initial (& vram); / * Initialize sprite * / <P>
+     INT_ChgMsk(INT_MSK_NULL, INT_MSK_VBL_IN | INT_MSK_VBL_OUT);
+                                    / * Disable V-BLANK interrupt * /
+     INT_SetFunc(INT_SCU_VBLK_IN, &vbStart);     
+                                    / * Register V-BLANK IN interrupt routine * /
+     INT_SetFunc(INT_SCU_VBLK_OUT, &vbEnd);     
+                                    / * Register V-BLANK OUT interrupt routine * /
+     INT_ChgMsk(INT_MSK_VBL_IN | INT_MSK_VBL_OUT, INT_MSK_NULL);
+                                    / * Enable V-BLANK interrupt * / <P>
+     SCL_SetFrameInterval (2); / * Frame change interval * /
+                                    / * Set to 2/60 seconds * / <P>
+     for(;;){
+           memcpy(vram,command,sizeof(command));
+                                    / * Set sprite command in VRAM * / <P>
+              -------- / * Scroll data set * /
+           SCL_DisplayFrame (); / * Wait for V-BLANK interrupt * /
+                                    / * Display sprite and scroll * /
+     }
+ }<P>
+−V blank processing routine (source file different from the above main) − <P>
+#include <machine.h>  
+#include "sega_spr.h"
+#include "sega_scl.h"<P>
+#pragma  interrupt(VbStart)
+#pragma  interrupt(VbEnd)<P>
+void VbStart(void)
+{
+     SCL_VblankStart (); / * V blank start VDP interrupt handling * / </PRE>
+</DL><P><P><HR>
+<A HREF=p001.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p003.htm> Go to next page </A>
+</BODY>
+</HTML>

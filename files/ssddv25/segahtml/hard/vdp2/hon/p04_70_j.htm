@@ -1,0 +1,175 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;27/86&gt;VDP2ユーザーズマニュアル/4.7プレーン</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no4">VDP2ユーザーズマニュアル</A>★
+<a href="p04_10_j.htm">第４章　スクロール画面</A>
+<HR>
+<B>▲
+<a href="p04_62_j.htm">戻る</A>｜
+<a href="p04_80_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第４章　スクロール画面</B>
+<HR NOSHADE>
+<DL>
+	<P>	<DT><H2>■4.7　プレーン</H2>
+		<DD>　プレーンは、パターンネームテーブル(ページ)を、1×1、2×1、または2×2の大きさに並べたもので、その大きさはそれぞれのレジスタに指定します。</P>
+
+<A NAME="no4_71"></A>
+	<P>	<DT><H3>　●プレーンサイズ</H3>
+		<DD>　プレーンが複数のパターンネームテーブル(ページ)で構成される場合、一つのプレーンに使用されるパターンネームテーブルは、VRAMに連続して格納してください。プレーンサイズ(プレーンのページ数)によるパターンネームテーブルの配置とパターンネームテーブルの関係を図4.13に示します。</P>
+
+<A NAME="z4_13"></A>
+	<P><DD><B>図4.13　プレーンサイズによるパターンネームテーブルの配置</B>
+<DD>
+<PRE>
+　　　　　　キャラクタパターンテーブル　　　　　　　　　　　　　　　　　　　　　　　
+指定された─→┌────────┐　　　　　　　　　　　　　　　　　　　　　　　　　
+キャラクタ　　│　　　　　　　　│　　●横１ページ×縦１ページの場合　　　　　　　　
+パターンの　　│　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　
+アドレス　　　│　　ページ０　　│　　　　┌──────┐┬　　　　　　　　　　　　
+　　　　　　　│　　　　　　　　│　　　　│　　　　　　││　　　　　　　　　　　　
+　　　　　　　│　　　　　　　　│　　　　│　ページ０　││６４セル　　　　　　　　
+　　　　　　　├────────┤　　　　│　　　　　　││　　　　　　　　　　　　
+　　　　　　　│　　　　　　　　│　　　　└──────┘┴　　　　　　　　　　　　
+　　　　　　　│　　　　　　　　│　　　　├──────┤　　　　　　　　　　　　　
+　　　　　　　│　　ページ１　　│　　　　　　６４セル　　　　　　　　　　　　　　　
+　　　　　　　│　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　│　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　├────────┤　　●横２ページ×縦１ページの場合　　　　　　　　
+　　　　　　　│　　　　　　　　│　　　　┌──────┬──────┐┬　　　　　
+　　　　　　　│　　　　　　　　│　　　　│　　　　　　│　　　　　　││　　　　　
+　　　　　　　│　　ページ２　　│　　　　│　ページ０　│　ページ１　││６４セル　
+　　　　　　　│　　　　　　　　│　　　　│　　　　　　│　　　　　　││　　　　　
+　　　　　　　│　　　　　　　　│　　　　└──────┴──────┘┴　　　　　
+　　　　　　　├────────┤　　　　├─────────────┤　　　　　　
+　　　　　　　│　　　　　　　　│　　　　　　　　　１２８セル　　　　　　　　　　　
+　　　　　　　│　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　│　　ページ３　　│　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　│　　　　　　　　│　　●横２ページ×縦２ページの場合　　　　　　　　
+　　　　　　　│　　　　　　　　│　　　　┌──────┬──────┐┬　　　　　
+　　　　　　　├────────┤　　　　│　　　　　　│　　　　　　││　　　　　
+　　　　　　　│　　　　　　　　│　　　　│　ページ０　│　ページ１　││　　　　　
+　　　　　　　│　　　　　　　　│　　　　│　　　　　　│　　　　　　││　　　　　
+　　　　　　　│　　ページ４　　│　　　　├──────┼──────┤│１２８セル
+　　　　　　　│　　　　　　　　│　　　　│　　　　　　│　　　　　　││　　　　　
+　　　　　　　│　　　　　　　　│　　　　│　ページ２　│　ページ３　││　　　　　
+　　　　　　　├────────┤　　　　│　　　　　　│　　　　　　││　　　　　
+　　　　　　　│　　　　　　　　│　　　　└──────┴──────┘┴　　　　　
+　　　　　　　│　　　　　　　　│　　　　├─────────────┤　　　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　１２８セル　　　　　　　　　　　
+</PRE>
+
+<A NAME="no4_72"></A>
+	<P><DT><H3>　●プレーンサイズレジスタ</H3>
+	<DD>　プレーンサイズレジスタは、プレーンサイズと、回転スクロール画面の画面オーバー処理の指定を制御します。書き込み専用の16ビットのレジスタで、18003AH番地にあります。
+	電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PLSZ_"></A>
+<P>	<DD><B><FONT SIZE=5>PLSZ</FONT>　<FONT SIZE=4>18003AH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#RBOVR_">RBOVR1 </A></TH>
+<TH><PRE><A HREF="#RBOVR_">RBOVR0 </A></TH>
+<TH><PRE><A HREF="#RBPLSZ_">RBPLSZ1 </A></TH>
+<TH><PRE><A HREF="#RBPLSZ_">RBPLSZ0 </A></TH>
+<TH><PRE><A HREF="#RAOVR_">RAOVR1 </A></TH>
+<TH><PRE><A HREF="#RAOVR_">RAOVR0 </A></TH>
+<TH><PRE><A HREF="#RAPLSZ_">RAPLSZ1</A></TH>
+<TH><PRE><A HREF="#RAPLSZ_">RAPLSZ0</A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#N3PLSZ_">N3PLSZ1</A></TH>
+<TH><PRE><A HREF="#N3PLSZ_">N3PLSZ0</A></TH>
+<TH><PRE><A HREF="#N2PLSZ_">N2PLSZ1</A></TH>
+<TH><PRE><A HREF="#N2PLSZ_">N2PLSZ0</A></TH>
+<TH><PRE><A HREF="#N1PLSZ_">N1PLSZ1</A></TH>
+<TH><PRE><A HREF="#N1PLSZ_">N1PLSZ0</A></TH>
+<TH><PRE><A HREF="#N0PLSZ_">N0PLSZ1</A></TH>
+<TH><PRE><A HREF="#N0PLSZ_">N0PLSZ0</A></TH>
+</TR></TABLE></P>
+
+
+<A NAME="N0PLSZ_">　</A>
+<A NAME="N1PLSZ_">　</A>
+<A NAME="N2PLSZ_">　</A>
+<A NAME="N3PLSZ_">　</A>
+<A NAME="RAPLSZ_">　</A>
+<A NAME="RBPLSZ_">　</A>
+	<DT><B>プレーンサイズビット</B>：Plane size bit
+	<DD>(N0PLSZ1, N0PLSZ0, N1PLSZ1, N1PLSZ0, N2PLSZ1, N2PLSZ0, N3PLSZ1, N3PLSZ0, RAPLSZ1, RAPLSZ0, RBPLSZ1, RBPLSZ0)<BR>
+	　各スクロール画面のプレーンサイズ(ページ数)を指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD>N0PLSZ1、N0PLSZ0</TD><TD>18003AH</TD><TD>ビット1,0</TD><TD>NBG0用</TD></TR>
+	<TR><TD>N1PLSZ1、N1PLSZ0</TD><TD>18003AH</TD><TD>ビット3,2</TD><TD>NBG1用</TD></TR>
+	<TR><TD>N2PLSZ1、N2PLSZ0</TD><TD>18003AH</TD><TD>ビット5,4</TD><TD>NBG2用</TD></TR>
+	<TR><TD>N3PLSZ1、N3PLSZ0</TD><TD>18003AH</TD><TD>ビット7,6</TD><TD>NBG3用</TD></TR>
+	<TR><TD>RAPLSZ1、RAPLSZ0</TD><TD>18003AH</TD><TD>ビット9,8</TD><TD>回転パラメータA用</TD></TR>
+	<TR><TD>RBPLSZ1、RBPLSZ0</TD><TD>18003AH</TD><TD>ビット13,12</TD><TD>回転パラメータB用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TH>xxPLSZ1</TH><TH>xxPLSZ0</TH><TH>プレーンサイズ</TH></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TD>横1ページ×縦1ページ</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TD>横2ページ×縦1ページ</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TD>設定禁止（設定しないでください）</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TD>横2ページ×縦2ページ</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、RA、またはRBが入ります。</P>
+
+	<P>	<DD>　NBG0、NBG1において、1/4まで縮小表示が可能なように設定した場合は、その画面のプレーンサイズは横2ページ×縦2ページにしないでください。</P>
+
+<A NAME="RAOVR_">　</A>
+<A NAME="RBOVR_">　</A>
+	<DT><B>画面オーバー処理ビット</B>：Over bit (RAOVR1, RAOVR0, RBOVR1, RBOVR0)
+	<DD>　回転スクロール画面において、表示座標値が表示エリアを超えた場合の処理(画面オーバー処理)を指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD>RAOVR1,RAOVR0</TD><TD>18003AH</TD><TD>ビット11,10</TD><TD>回転パラメータA用</TD></TR>
+	<TR><TD>RBOVR1,RBOVR0</TD><TD>18003AH</TD><TD>ビット15,14</TD><TD>回転パラメータB用</TD></TR>
+	</TABLE></P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH>RxOVR1</TH><TH>RxOVR0</TH><TH>画面オーバー処理</TH></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TD>表示エリア外は、表示エリアに設定された画像を繰り返す</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TD>表示エリア外は、画面オーバーパターンネームレジスタで指定したキャラ<BR>クタパターンを繰り返す（回転スクロール画面がセル形式の場合のみ）</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TD>表示エリア外は、すべて透明にする</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TD>表示エリアをプレーンサイズやビットマップサイズに関係なく強制的に0≦<BR>X＜512、0≦Y＜512にして、そのエリア外をすべて透明にする</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxには、A、またはBが入ります。</P>
+
+	<P><DD>　回転スクロール画面がビットマップ形式の場合は、画面オーバーパターンネームレジスタで指定したキャラクタパターンを繰り返す処理を設定しないでください。<BR>
+　回転スクロール画面がビットマップ形式で、ビットマップの縦のサイズが256ドットの場合、表示エリアを強制的に0≦X＜512、0≦Y＜512にしてそのエリア外をすべて透明にする処理を設定すると、垂直方向に256ドットずつ2回同じ画像を表示します。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p04_62_j.htm">戻る</A>｜
+<a href="p04_80_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no4">VDP2ユーザーズマニュアル</A>★
+<a href="p04_10_j.htm">第４章　スクロール画面</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

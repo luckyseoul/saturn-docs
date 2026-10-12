@@ -1,0 +1,189 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/17&gt;MPEGライブラリ/4.ライブラリの利用方法</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no4">MPEGライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>MPEGライブラリ</B>
+<H2 ALIGN=CENTER>4.ライブラリの利用方法</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P><DT><H3>4.1　ライブラリの構成</H3>
+	<DD>　MPEGアプリケーションは、MPEGライブラリとストリームシステムライブラリを利用することを想定しています。</P>
+
+<A NAME="z4_1"></A>
+	<P><CENTER><B>図4.1　モジュール構成図</B>
+	<TABLE BORDER=1><TR><TH COLSPAN=2 WIDTH=300>　<BR>　<BR>アプリケーション<BR>　<BR>　<BR></TH></TR>
+	<TR><TH WIDTH=150>　<BR>　<BR>ストリームシステム<BR>ライブラリ<BR>　<BR></TH><TH WIDTH=150>　<BR>　<BR>MPEGライブラリ<BR>　<BR>　<BR></TH></TR></TABLE></CENTER></P>
+
+	<P><DD>　MPEG動画は、以下の2段階の処理で再生されます。</P>
+
+	<P><DT><B>　(1)ストリームシステムライブラリ</B>
+	<DD>　CDからバッファへデータを読み込みます。</P>
+
+	<P><DT><B>　(2)MPEGライブラリ</B>
+	<DD>　CDバッファのデータをデコードし、イメージデータとして出力します。</P>
+
+	<P ALIGN=CENTER><IMG SRC="../grp/i106_02.gif"></P>
+
+	<P><DD>　ストリームシステムからMPEGライブラリへは、CDバッファを通してデータを供給します。従って、ストリームシステムによって生成したストリームハンドルを、MPEGライブラリに渡します。MPEGライブラリは、このストリームハンドルからデータを取り出しデコードします。<BR>　本ライブラリを使うには以下のライブラリを同時にリンクする必要があります。</P>
+
+	<P><DD><UL TYPE="DISK">
+	<LI>SEGA_STM.LIB：ストリームシステムライブラリ
+	<LI>SEGA_GFS.LIB：ファイルシステムライブラリ
+	<LI>SEGA_CDC.LIB：CD通信インタフェースライブラリ
+	<LI>SEGA_DMA.LIB：DMAライブラリ
+	<LI>SEGA_CSH.LIB：キャッシュライブラリ</UL></P>
+
+<A NAME="no4_20"></A>
+	<P><DT><H3>4.2　MPEGシステムの状態の取り込み</H3>
+	<DD>　MPEGライブラリは、CDブロック内のMPEGシステムの最新の状態を取り込み、内部状態を更新する必要があります。<BR> したがって、VSYNC毎に以下のどちらかのタイミングでMPG_CaptStat関数を呼び、MPEGシステムの状態を取り込んでください。</P>
+
+	<DD><OL TYPE=a>
+	<P><LI>VBLANK-IN割り込みでMPCMフラグをクリアし、ONになるのを待って呼ぶ</P>
+	<P><LI>VBLANK-OUT割り込みで呼ぶ</P></OL>
+
+	<P><DT><B>　注意</B>
+	<DD>　以下の関数を実行中は、割り込み処理内でMPG_CaptStat関数を実行することを禁止します。</P>
+
+	<P><DT>　《MPEGシステム制御》
+	<DD><UL TYPE="DISK">
+	<LI>MPG_Init
+	<LI>MPG_ResetMp
+	<LI>MPG_CaptStat
+	</UL></P>
+
+	<P><DT>　《動画再生》
+	<DD><UL TYPE="DISK">
+	<LI>MPG_MvStart
+	<LI>MPG_MvStopVideo
+	<LI>MPG_MvGetVideoStat
+	<LI>MPG_MvEntryNext
+	<LI>MPG_MvStop
+	<LI>MPG_MvStopAudio
+	<LI>MPG_MvGetAudioStat
+	<LI>MPG_MvChange
+	</UL></P>
+
+	<P><DT>　《静止画再生》
+	<DD><UL TYPE="DISK">
+	<LI>MPG_SpStart
+	<LI>MPG_SpGetVideoStat
+	<LI>MPG_SpStop
+	</UL><P>
+
+<A NAME="no4_30"></A>
+	<P><DT><H3>4.3　VDP2出力モード</H3>
+	<DD>　VDP2に直接出力する場合、MPEGライブラリの各機能は、VSYNCの立ち下がりで有効になります。タイムコードなどの情報は、現在表示中の情報を得ることができます。<BR>　本ゲーム機ではアプリケーションソフトウェアがVSYNCのタイミングを得ることは難しいため、VBLANK-OUTのタイミングからMPEG関連の処理を行うことを推奨します。</P>
+
+<A NAME="z4_2"></A>
+	<P ALIGN=CENTER><B>図4.2　VDP2出力時の処理のタイミング</B><BR><IMG SRC="../grp/i107_01.gif"></P>
+
+	<P><DD><B>処理の一例</B>
+	<DD><OL>
+	<LI>VBLANK-OUTを待ちます。
+	<LI>MPG_CaptStat関数を呼びます。
+	<LI>タイムコードを取得します。
+	<LI>タイムコードに対応するコリジョンデータを得ます。
+	<LI>当たり判定等を行い、結果に対応するMPEG関係の設定を行います。
+	<LI>次のフレームで(5)の設定が有効になります。</OL></P>
+
+<A NAME="no4_40"></A>
+	<P><DT><H3>4.4　ホスト転送モード</H3>
+	<DD>　フレームバッファ内のイメージデータは、MPG_WnTrans関数を呼ぶことによってホスト領域に転送されます。例えば、スプライトのテキスチャ領域にディスプレイウィンドウを開き、周期的にMPG_WnTrans関数を呼ぶことによって、スプライトのテキスチャを動画にすることができます。</P>
+
+<A NAME="no4_50"></A>
+	<P><DT><H3>4.5　状態遷移</H3>
+	<DD>　MPEGシステムは、MPEGハンドルを通して制御します。<BR>　MPEGハンドルは、ビデオの動作状態とオーディオの動作状態を保持しています。動作状態は、ビデオ、オーディオともに以下のように遷移します。<BR>　再生の開始及び停止には、以下の関数を使用します。</P>
+
+	<DD><OL TYPE=a>
+	<P><LI>再生の開始関数
+		<UL TYPE="DISK">
+		<LI>MPG_MvStart
+		<LI>MPG_SpStart</UL></P>
+
+	<P><LI>再生の停止関数
+		<UL TYPE="DISK">
+		<LI>MPG_MvStop, MPG_MvStopVideo, MPG_MvStopAudio
+		<LI>MPG_SpStop</UL></P>
+
+<A NAME="z4_3"></A>
+	<P ALIGN=CENTER><B>図4.3　MPEGハンドルの状態遷移図</B><BR><IMG SRC="../grp/i108_01.gif"></P>
+
+<!-- +++ ADD by CRI ：2.4(2) -->
+	<P><LI>再生停止関数の動作
+	<OL>
+	<LI>再生停止関数内でデコーダを初期化した場合、MPEG画面表示はライブラリ内でONに設定されます。
+	<LI>MPG_MvStop関数、MPG_MvStopVideo関数、MPG_SpStop関数の中でVBVバッファのクリアを行います。
+	<LI>動画の再生を停止させたとき、MPEGシステムに対して次発ストリームの取り消しを行います。
+	</OL>
+<!-- --- ADD by CRI ：2.4(2) -->
+	</OL>
+
+
+<A NAME="no4_60"></A>
+	<P><DT><H3>4.6　ハングアップの検出</H3>
+	<DD>　MPEGライブラリは、MPEG/Video LSIのハングアップを検出するための関数を用意しています。<BR>　ハングアップの検出は、MPG_ResetHng関数を一度呼んでから、VSYNC毎にMPG_CheckHng関数を呼ぶことによって行います。<BR>　もしハングアップした場合は、MPEGの再生を停止してからもう一度MPEGの再生を開始してください。この処置を実行しても回復しない場合は、MPG_Init関数で初期化してください。</P>
+
+<A NAME="no4_70"></A>
+	<P><DT><H3>4.7　ユーザ転送関数の登録</H3>
+	<DD>　ホスト転送モードにおいて、画像データの転送を行う転送関数を登録することができます。<BR>　転送関数の仕様は以下のとおりです。</P>
+<!-- +++ Update by CRI ：2.1 --> 
+<PRE>
+［書　式］　Sint32 trFunc(void *dst, void *src, Sint32 nbyte)
+［入　力］　dst     ：転送先アドレス
+　　　　　　src     ：転送元アドレス
+　　　　　　nbyte   ：転送バイト数
+［関数値］　エラーコード
+</PRE>
+	<DD><OL>
+	<B><LI></B>dstには、MPG_WnSetOutputMode関数で設定した転送領域のアドレスが入ります。
+	<B><LI></B>転送関数は、MPG_WnTrans関数を実行したときにMPEGライブラリから呼び出されます。
+	<B><LI></B>転送関数を登録するには、MPG_WnEntryTrFunc関数を使用します。
+	<B><LI></B>転送関数には、デフォルトでSCUによるB-Bus上へのDMA転送関数が登録されています。
+	<B><LI></B>デフォルトの転送関数は、DMA転送が終了しない場合は約２秒でタイムアウトします。
+	</OL>
+<!-- --- Update by CRI ：2.1 --> 
+
+<A NAME="no4_80"></A>
+	<P><DT><H3>4.8　使用上の注意</H3>
+	<DD>　本ライブラリを使用する際の主な注意点を以下に示します。</P>
+
+	<P><DT><B>　(1)オーディオ／ビデオ同期再生時の制限</B>
+	<DD>　オーディオ／ビデオ同期再生時に以下の関数を呼ぶとオーディオとビデオの同期がずれます。</P>
+
+	<H3 ALIGN=CENTER>MPG_MvSetVideoId</H3>
+
+	<P><DD>　これを回避するには、上記の関数実行前に動画の再生を停止し、上記の関数実行後に
+<B>MPG_MvStart関数</B>によって再生を再開してください。</P>
+
+	<P><DT><B>　(2)オーディオ／ビデオ再生停止方法の制限</B>
+	<DD>　オーディオ／ビデオ同期再生時の再生停止は、MPG_MvStop関数を呼ぶか、または以下の手順を実行してください。ビデオを先に停止させてはいけません。</P>
+
+	<P><DD><OL>
+	<LI>MPG_MvStopAudio関数を呼びます。
+	<LI>MPG_MvGetAudioStat関数によって、オーディオが停止中であることを確認します。
+	<LI>MPG_MvStopVideo関数を呼びます。</OL></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no4">MPEGライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

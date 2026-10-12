@@ -1,0 +1,158 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/19&gt;SMPCユーザーズマニュアル/3.1INTBACKコマンドのコマンドパラメータ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p03_12_j.htm">戻る</A>｜
+     <a href="p03_14_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SMPCユーザーズマニュアル/3.1　SMPCコントロールモード</B>
+<H2>◆INTBACKコマンドのコマンドパラメータ</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　INTBACKコマンドによってペリフェラルデータを取得する際のコマンドパラメータを以下に説明します。</P>
+
+<A NAME="no3_13_01"></A>
+	<P>	<DT><H3>　●IREG0</H3>
+		<DD>　IREG0の設定には、INTBACKコマンド発行時とコンティニュー、ブレイク要求時の2種類があります。</P>
+
+	<P>	<DT><B>　(1)INTBACKコマンド発行時</B>
+		<DD>　IREG0は、SMPCステータス取得スイッチに使用します。</P>
+
+<A NAME="z3_6"></A>
+	<P>	<DD><B>図3.6　IREG0(INTBACKコマンド発行時)</B>
+		<DD><TABLE BORDER=1>
+		<TR ALIGN=CENTER><TH>IREG0    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+		<TR ALIGN=CENTER><TH>20100001H</TH><TD COLSPAN=8>SMPCステータス取得スイッチ(<B>00H</B>または<B>01H</B>)<BR>初期値不定／Write Only</TD></TR>
+		</TABLE></P>
+
+	<P>	<DD><B>IREG0:SMPCステータス取得スイッチの設定値</B>
+		<DD><TABLE BORDER=1>
+		<TR><TH>IREG0設定値</TH><TH>　　　説　明　　　</TH></TR>
+		<TR><TH ALIGN=CENTER>00H</TH><TD>日時、カートリッジコード、エリアコード、端子状態、SMEM、<BR>リセットボタンの各データを返さない </TD></TR>
+		<TR><TH ALIGN=CENTER>01H</TH><TD>日時、カートリッジコード、エリアコード、端子状態、SMEM、<BR>リセットボタンの各データを返す </TD></TR>
+		</TABLE></P>
+
+	<P>	<DD>INTBACKコマンドを使用する際は、必ず上記設定値のいずれかを設定してください。</P>
+
+
+	<P>	<DT><B>　(2)コンティニュー、ブレイク要求時</B>
+		<DD>　IREG0は、SMPCへのコンティニュー要求およびブレイク要求に使用します。<BR>
+			　SMPCはコンティニュー要求があったときは残りペリフェラルデータ収集を開始します。ブレイク要求があった時はペリフェラルデータ収集を終了し、INTBACKコマンドを終了します。</P>
+
+<A NAME="z3_7"></A>
+	<P>	<DD><B>図3.7　IREG0(コンティニュー要求、ブレイク要求時)</B>
+		<DD><TABLE BORDER=1>
+		<TR ALIGN=CENTER><TH>IREG0    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+		<TR ALIGN=CENTER><TH>20100001H</TH><TD>CONT</TD><TD>BR</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD></TR>
+		</TABLE>
+	<TABLE>
+	<TR><TD><PRE><B>CONT</B></TD><TD><PRE>:コンティニュー要求ビット(<B>反転</B>させるとコンティニュー要求)</TD></TR>
+	<TR><TD><PRE><B>BR</B></TD><TD><PRE>:ブレイク要求ビット(<B>"1B"</B>にするとブレイク要求)</TD></TR>
+	<TR><TD><PRE><B>−</B></TD><TD><PRE>:"1B","0B"どちらでも可</TD></TR></TABLE></P>
+
+	<P>	<DT><TABLE><TR>
+	<TD><img srcset="../../../what/atto_j.png 5x"></TD>
+	<TD><B>CONT,BRの要求が共に満たされる値をIREG0に書き込んだ場合、SMPCの動作は、どちらを実行するか保証できません。</B>
+		(<a href="p03_10_j.htm#t3_2">表3.2</A>を参照)</TD></TR></TABLE></P>
+
+<A NAME="no3_13_02"></A>
+	<P>	<DT><H3>　●IREG1</H3>
+		<DD>　IREG1は、ペリフェラルデータ収集モードの設定に使用します。</P>
+
+	<P>	<DT><B>　●IREG1</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH>IREG1    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+	<TR ALIGN=CENTER><TH ROWSPAN=2>20100003H</TH>
+	<TD>P2MD1</TD><TD>P2MD0</TD><TD>P1MD1</TD><TD>P1MD0</TD><TD>PEN</TD><TD>0</TD><TD>OPE</TD><TD>0</TD></TR>
+	<TR ALIGN=CENTER><TD>不定<BR>W</TD><TD>不定<BR>W</TD><TD>不定<BR>W</TD><TD>不定<BR>W</TD><TD>不定<BR>W</TD><TD>不定<BR>-</TD><TD>不定<BR>W</TD><TD>不定<BR>-</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER=1>
+	<CAPTION><B>ビット7,6:ポート2モード</B></CAPTION>
+	<TR><TH>ビット７</TH><TH>ビット６</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+	<TR><TH>P2MD1</TH><TH>P2MD0</TH></TR>
+	<TR><TH>0</TH><TH>0</TH><TD>15バイトモード </TD></TR>
+	<TR><TH>0</TH><TH>1</TH><TD>255バイトモード </TD></TR>
+	<TR><TH>1</TH><TH>0</TH><TD>SEGA RESERVED(<B>設定禁止</B>) </TD></TR>
+	<TR><TH>1</TH><TH>1</TH><TD>0バイトモード </TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER=1>
+	<CAPTION><B>ビット5,4:ポート1モード</B></CAPTION>
+	<TR><TH>ビット５</TH><TH>ビット４</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+	<TR><TH>P1MD1</TH><TH>P1MD0</TH></TR>
+	<TR><TH>0</TH><TH>0</TH><TD>15バイトモード </TD></TR>
+	<TR><TH>0</TH><TH>1</TH><TD>255バイトモード </TD></TR>
+	<TR><TH>1</TH><TH>0</TH><TD>SEGA RESERVED(<B>設定禁止</B>) </TD></TR>
+	<TR><TH>1</TH><TH>1</TH><TD>0バイトモード </TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER=1>
+	<CAPTION><B>ビット3:ペリフェラルデータイネーブル</B></CAPTION>
+	<TR><TH>ビット３</TH><TH ROWSPAN=2>　　　　　　　説　明　　　　　　　</TH></TR>
+	<TR><TH>PEN</TH></TR>
+	<TR><TH>0</TH><TD>ペリフェラルデータを返さない</TD></TR>
+	<TR><TH>1</TH><TD>ペリフェラルデータを返す</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER=1>
+	<CAPTION><B>ビット1:ペリフェラルデータ取得時間の最適化</B></CAPTION>
+	<TR><TH>ビット１</TH><TH ROWSPAN=2>　　　　　　　説　明　　　　　　　</TH></TR>
+	<TR><TH>OPE</TH></TR>
+	<TR><TH>0</TH><TD>最適化をする</TD></TR>
+	<TR><TH>1</TH><TD>最適化をしない</TD></TR>
+	</TABLE></P>
+
+	<P>	<DT><TABLE><TR>
+	<TD><img srcset="../../../what/atto_j.png 5x"></TD>
+	<TD><B>SH-2ダイレクトモードとSMPCコントロールモードを併用する場合は、INTBACKコマンド発行時にSH-2ダイレクトモードで使用するポートを0バイトモードで使用してください。
+	</B></TD></TR></TABLE></P>
+
+	<P>	<DD><B>例</B>:ポート1=SH-2ダイレクトモード、ポート2=SMPCコントロールモード等</P>
+
+<A NAME="no3_13_03"></A>
+	<P>	<DT><H3>　●IREG2</H3>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH>IREG2    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+	<TR ALIGN=CENTER><TH>20100005H</TH>
+	<TD COLSPAN=8><B>F0H</B><BR>初期値:不定　Write Only</TD></TR>
+	</TABLE></P>
+
+	<P>	<DT><TABLE><TR>
+	<TD><img srcset="../../../what/atto_j.png 5x"></TD>
+	<TD><B>INTBACKコマンドを発行するときは、IREG2に0FHを必ずセットしてください。
+	</B></TD></TR></TABLE></P>
+
+
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p03_12_j.htm">戻る</A>｜
+     <a href="p03_14_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

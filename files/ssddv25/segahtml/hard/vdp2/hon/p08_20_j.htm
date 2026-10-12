@@ -1,0 +1,334 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;56/86&gt;VDP2ユーザーズマニュアル/8.2ウィンドウ処理</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no8">VDP2ユーザーズマニュアル</A>★
+<a href="p08_10_j.htm">第８章　ウィンドウ</A>
+<HR>
+<B>▲
+<a href="p08_12_j.htm">戻る</A>｜
+<a href="p09_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第８章　ウィンドウ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no8_20"></A>
+	<P>	<DT><H2>■8.2　ウィンドウ処理</H2>
+		<DD>　ウィンドウ処理には、つぎの3つがあります。</P>
+
+	<OL>
+		<LI>透明処理ウィンドウ
+		<LI>回転パラメータウィンドウ
+		<LI>カラー演算ウィンド</P>
+	</OL>
+
+	　透明処理ウィンドウは、指定されたウィンドウ有効領域を強制的に透明にするウィンドウで、各画面ごとに使用できます。</P>
+
+	　回転パラメータウィンドウは、RBG0画面を表示する場合に、回転パラメータAによって得られた画像を表示する領域と回転パラメータBによって得られた画像のどちらを表示するかを指定するウィンドウです。指定されたウィンドウ有効領域には、回転パラメータBによって得られた画像が表示され、ウィンドウ有効領域以外には、回転パラメータAによって得られた画像が表示されます。</P>
+
+	　カラー演算ウィンドウは、指定されたウィンドウ有効領域においてカラー演算を行わないようにするウィンドウで、カラー演算機能を使用する画面に対して有効になります。</P>
+
+	ウィンドウ処理を図8.7に示します。</P>
+
+<A NAME="z8_7_1"></A>
+	<P ALIGN=CENTER><B>図8.7.1　ウィンドウ処理・１</B><BR><img srcset="../grp/i191_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z8_7_2"></A>
+	<P ALIGN=CENTER><B>図8.7.2　ウィンドウ処理・２</B><BR><img srcset="../grp/i191_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z8_7_3"></A>
+	<P ALIGN=CENTER><B>図8.7.3　ウィンドウ処理・３</B><BR><img srcset="../grp/i192_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no8_21"></A>
+	<P>	<DT><H3>　●ウィンドウコントロールレジスタ</H3>
+		<DD>　ウィンドウコントロールレジスタは、各画面に対するウィンドウの使用方法を指定します。書き込み専用の16ビットのレジスタで、1800D0H〜1800D6H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。<P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WCTLA_"></A>
+<P><DD><B><FONT SIZE=5>WCTLA</FONT>　<FONT SIZE=4>1800D0H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#NxLOG_">N1LOG  </A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxSWE_">N1SWE  </A></TH>
+<TH><PRE><A HREF="#NxSWA_">N1SWA  </A></TH>
+<TH><PRE><A HREF="#NxW1E_">N1W1E  </A></TH>
+<TH><PRE><A HREF="#NxW1A_">N1W1A  </A></TH>
+<TH><PRE><A HREF="#NxW0E_">N1W0E  </A></TH>
+<TH><PRE><A HREF="#NxW0A_">N1W0A  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#NxLOG_">N0LOG  </A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxSWE_">N0SWE  </A></TH>
+<TH><PRE><A HREF="#NxSWA_">N0SWA  </A></TH>
+<TH><PRE><A HREF="#NxW1E_">N0W1E  </A></TH>
+<TH><PRE><A HREF="#NxW1A_">N0W1A  </A></TH>
+<TH><PRE><A HREF="#NxW0E_">N0W0E  </A></TH>
+<TH><PRE><A HREF="#NxW0A_">N0W0A  </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WCTLB_"></A>
+<P><DD><B><FONT SIZE=5>WCTLB</FONT>　<FONT SIZE=4>1800D2H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#NxLOG_">N3LOG  </A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxSWE_">N3SWE  </A></TH>
+<TH><PRE><A HREF="#NxSWA_">N3SWA  </A></TH>
+<TH><PRE><A HREF="#NxW1E_">N3W1E  </A></TH>
+<TH><PRE><A HREF="#NxW1A_">N3W1A  </A></TH>
+<TH><PRE><A HREF="#NxW0E_">N3W0E  </A></TH>
+<TH><PRE><A HREF="#NxW0A_">N3W0A  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#NxLOG_">N2LOG  </A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxSWE_">N2SWE  </A></TH>
+<TH><PRE><A HREF="#NxSWA_">N2SWA  </A></TH>
+<TH><PRE><A HREF="#NxW1E_">N2W1E  </A></TH>
+<TH><PRE><A HREF="#NxW1A_">N2W1A  </A></TH>
+<TH><PRE><A HREF="#NxW0E_">N2W0E  </A></TH>
+<TH><PRE><A HREF="#NxW0A_">N2W0A  </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WCTLC_"></A>
+<P><DD><B><FONT SIZE=5>WCTLC</FONT>　<FONT SIZE=4>1800D4H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#NxLOG_">SPLOG  </A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxSWE_">SPSWE  </A></TH>
+<TH><PRE><A HREF="#NxSWA_">SPSWA  </A></TH>
+<TH><PRE><A HREF="#NxW1E_">SPW1E  </A></TH>
+<TH><PRE><A HREF="#NxW1A_">SPW1A  </A></TH>
+<TH><PRE><A HREF="#NxW0E_">SPW0E  </A></TH>
+<TH><PRE><A HREF="#NxW0A_">SPW0A  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#NxLOG_">R0LOG  </A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxSWE_">R0SWE  </A></TH>
+<TH><PRE><A HREF="#NxSWA_">R0SWA  </A></TH>
+<TH><PRE><A HREF="#NxW1E_">R0W1E  </A></TH>
+<TH><PRE><A HREF="#NxW1A_">R0W1A  </A></TH>
+<TH><PRE><A HREF="#NxW0E_">R0W0E  </A></TH>
+<TH><PRE><A HREF="#NxW0A_">R0W0A  </A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WCTLD_"></A>
+<P><DD><B><FONT SIZE=5>WCTLD</FONT>　<FONT SIZE=4>1800D6H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#NxLOG_">CCLOG  </A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxSWE_">CCSWE  </A></TH>
+<TH><PRE><A HREF="#NxSWA_">CCSWA  </A></TH>
+<TH><PRE><A HREF="#NxW1E_">CCW1E  </A></TH>
+<TH><PRE><A HREF="#NxW1A_">CCW1A  </A></TH>
+<TH><PRE><A HREF="#NxW0E_">CCW0E  </A></TH>
+<TH><PRE><A HREF="#NxW0A_">CCW0A  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#NxLOG_">RPLOG  </A></TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxSWE_">RPSWE  </A></TH>
+<TH><PRE><A HREF="#NxSWA_">RPSWA  </A></TH>
+<TH><PRE><A HREF="#NxW1E_">RPW1E  </A></TH>
+<TH><PRE><A HREF="#NxW1A_">RPW1A  </A></TH>
+<TH><PRE><A HREF="#NxW0E_">RPW0E  </A></TH>
+<TH><PRE><A HREF="#NxW0A_">RPW0A  </A></TH>
+</TR></TABLE></P>
+
+<A NAME="NxLOG_">　</A>
+	<DT><B>ウィンドウロジックビット</B>：Logic bit
+	<DD>(N0LOG, N1LOG, N2LOG, N3LOG, R0LOG, SPLOG, RPLOG, CCLOG)<BR>
+　各画面に使用するウィンドウの重ね合わせ方を指定します。</P>
+
+	<TABLE BORDER>
+	<TR><TD>N0LOG</TD><TD>1800D0H</TD><TD>ビット7</TD><TD>透明処理ウィンドウのNBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1LOG</TD><TD>1800D0H</TD><TD>ビット15</TD><TD>透明処理ウィンドウのNBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2LOG</TD><TD>1800D2H</TD><TD>ビット7</TD><TD>透明処理ウィンドウのNBG2用</TD></TR>
+	<TR><TD>N3LOG</TD><TD>1800D2H</TD><TD>ビット15</TD><TD>透明処理ウィンドウのNBG3用</TD></TR>
+	<TR><TD>R0LOG</TD><TD>1800D4H</TD><TD>ビット7</TD><TD>透明処理ウィンドウのRBG0用</TD></TR>
+	<TR><TD>SPLOG</TD><TD>1800D4H</TD><TD>ビット15</TD><TD>透明処理ウィンドウのスプライト用</TD></TR>
+	<TR><TD>RPLOG</TD><TD>1800D6H</TD><TD>ビット7</TD><TD>回転パラメータウィンドウ用</TD></TR>
+	<TR><TD>CCLOG</TD><TD>1800D6H</TD><TD>ビット15</TD><TD>カラー演算ウィンドウ用</TD></TR>
+	</TABLE></P>
+
+	<TABLE BORDER>
+	<TR><TH>xxLOG</TH><TH>重ね合わせ論理</TH></TR>	
+	<TR><TH>0</TH><TD ALIGN=CENTER>OR</TD></TR>
+	<TR><TH>1</TH><TD ALIGN=CENTER>AND</TD>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、SP、RP、またはCCが入ります。</P>
+
+	　W0、W1、SWのウィンドウイネーブルビットがすべて0の場合に、このビットを0にすると、画面全てがウィンドウ有効領域でなくなり、1にすると画面全てがウィンドウ有効領域になります。</P>
+
+<A NAME="NxW0E_">　</A>
+	<P>	<DT><B>ウィンドウイネーブルビット(W0用)</B>：W0 enable bit
+		<DD>(N0W0E, N1W0E, N2W0E, N3W0E, R0W0E, SPW0E, RPW0E, CCW0E)<BR>
+　各画面に、ノーマルウィンドウW0を使用するかどうかを指定します。</P>
+
+	<TABLE BORDER>
+	<TR><TD>N0W0E</TD><TD>1800D0H</TD><TD>ビット1</TD><TD>透明処理ウィンドウのNBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1W0E</TD><TD>1800D0H</TD><TD>ビット9</TD><TD>透明処理ウィンドウのNBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2W0E</TD><TD>1800D2H</TD><TD>ビット1</TD><TD>透明処理ウィンドウのNBG2用</TD></TR>
+	<TR><TD>N3W0E</TD><TD>1800D2H</TD><TD>ビット9</TD><TD>透明処理ウィンドウのNBG3用</TD></TR>
+	<TR><TD>R0W0E</TD><TD>1800D4H</TD><TD>ビット1</TD><TD>透明処理ウィンドウのRBG0用</TD></TR>
+	<TR><TD>SPW0E</TD><TD>1800D4H</TD><TD>ビット9</TD><TD>透明処理ウィンドウのスプライト用</TD></TR>
+	<TR><TD>RPW0E</TD><TD>1800D6H</TD><TD>ビット1</TD><TD>回転パラメータウィンドウ用</TD></TR>
+	<TR><TD>CCW0E</TD><TD>1800D6H</TD><TD>ビット9</TD><TD>カラー演算ウィンドウ用</TD></TR>
+	</TABLE></P>
+
+	<TABLE BORDER>
+	<TR><TH>xxW0E</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>W0ウィンドウを使用しない</TD></TR>
+	<TR><TH>1</TH><TD>W0ウィンドウを使用する</TD>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、SP、RP、またはCCが入ります。</P>
+
+<A NAME="NxW1E_"></A>
+	<P>	<DT><B>ウィンドウイネーブルビット(W1用)</B>：W1 enable bit
+		<DD>(N0W1E, N1W1E, N2W1E, N3W1E, R0W1E, SPW1E, RPW1E, CCW1E)<BR>
+　各画面に、ノーマルウィンドウW1を使用するかどうかを指定します。</P>
+
+	<TABLE BORDER>
+	<TR><TD>N0W1E</TD><TD>1800D0H</TD><TD>ビット3</TD><TD>透明処理ウィンドウのNBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1W1E</TD><TD>1800D0H</TD><TD>ビット11</TD><TD>透明処理ウィンドウのNBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2W1E</TD><TD>1800D2H</TD><TD>ビット3</TD><TD>透明処理ウィンドウのNBG2用</TD></TR>
+	<TR><TD>N3W1E</TD><TD>1800D2H</TD><TD>ビット11</TD><TD>透明処理ウィンドウのNBG3用</TD></TR>
+	<TR><TD>R0W1E</TD><TD>1800D4H</TD><TD>ビット3</TD><TD>透明処理ウィンドウのRBG0用</TD></TR>
+	<TR><TD>SPW1E</TD><TD>1800D4H</TD><TD>ビット11</TD><TD>透明処理ウィンドウのスプライト用</TD></TR>
+	<TR><TD>RPW1E</TD><TD>1800D6H</TD><TD>ビット3</TD><TD>回転パラメータウィンドウ用</TD></TR>
+	<TR><TD>CCW1E</TD><TD>1800D6H</TD><TD>ビット11</TD><TD>カラー演算ウィンドウ用</TD></TR>
+	</TABLE></P>
+
+	<TABLE BORDER>
+	<TR><TH>xxW1E</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>W1ウィンドウを使用しない</TD></TR>
+	<TR><TH>1</TH><TD>W1ウィンドウを使用する</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、SP、RP、またはCCが入ります。</P>
+
+<A NAME="NxSWE_"></A>
+	<P>	<DT><B>ウィンドウイネーブルビット(SW用)</B>：SW enable bit
+		<DD>(N0SWE, N1SW, N2SWE, N3SWE, R0SWE, SPSWE, CCSWE)<BR>
+　各画面に、スプライトウィンドウSWを使用するかどうかを指定します。</P>
+
+	<TABLE BORDER>
+	<TR><TD>N0SWE</TD><TD>1800D0H</TD><TD>ビット5</TD><TD>透明処理ウィンドウのNBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1SWE</TD><TD>1800D0H</TD><TD>ビット13</TD><TD>透明処理ウィンドウのNBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2SWE</TD><TD>1800D2H</TD><TD>ビット5</TD><TD>透明処理ウィンドウのNBG2用</TD></TR>
+	<TR><TD>N3SWE</TD><TD>1800D2H</TD><TD>ビット13</TD><TD>透明処理ウィンドウのNBG3用</TD></TR>
+	<TR><TD>R0SWE</TD><TD>1800D4H</TD><TD>ビット5</TD><TD>透明処理ウィンドウのRBG0用</TD></TR>
+	<TR><TD>SPSWE</TD><TD>1800D4H</TD><TD>ビット13</TD><TD>透明処理ウィンドウのスプライト用</TD></TR>
+	<TR><TD>CCSWE</TD><TD>1800D6H</TD><TD>ビット13</TD><TD>カラー演算ウィンドウ用</TD></TR>
+	</TABLE></P>
+
+	<TABLE BORDER>
+	<TR><TH>xxSWE</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>SWウィンドウを使用しない</TD></TR>
+	<TR><TH>1</TH><TD>SWウィンドウを使用する</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、SP、またはCCが入ります。</P>
+
+	　スプライトウィンドウを使用する場合は、スプライトコントロールレジスタのスプライトウィンドウイネーブルビット(SPWINEN)を1にしてください。</P>
+
+<A NAME="NxW0A_"></A>
+	<P>	<DT><B>ウィンドウエリアビット(W0用)</B>：W0 area bit
+		<DD>(N0W0A, N1W0A, N2W0A, N3W0A, R0W0A, SPW0A, RPW0A, CCW0A)<BR>
+　各画面に使用するノーマルウィンドウW0の有効領域をどちらにするかを指定します。</P>
+
+	<TABLE BORDER>
+	<TR><TD>N0W0A</TD><TD>1800D0H</TD><TD>ビット0</TD><TD>透明処理ウィンドウのNBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1W0A</TD><TD>1800D0H</TD><TD>ビット8</TD><TD>透明処理ウィンドウのNBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2W0A</TD><TD>1800D2H</TD><TD>ビット0</TD><TD>透明処理ウィンドウのNBG2用</TD></TR>
+	<TR><TD>N3W0A</TD><TD>1800D2H</TD><TD>ビット8</TD><TD>透明処理ウィンドウのNBG3用</TD></TR>
+	<TR><TD>R0W0A</TD><TD>1800D4H</TD><TD>ビット0</TD><TD>透明処理ウィンドウのRBG0用</TD></TR>
+	<TR><TD>SPW0A</TD><TD>1800D4H</TD><TD>ビット8</TD><TD>透明処理ウィンドウのスプライト用</TD></TR>
+	<TR><TD>RPW0A</TD><TD>1800D6H</TD><TD>ビット0</TD><TD>回転パラメータウィンドウ用</TD></TR>
+	<TR><TD>CCW0A</TD><TD>1800D6H</TD><TD>ビット8</TD><TD>カラー演算ウィンドウ用</TD>
+	</TABLE></P>
+
+	<TABLE BORDER>
+	<TR><TH>xxW0A</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>W0ウィンドウの内側を有効にする</TD></TR>
+	<TR><TH>1</TH><TD>W0ウィンドウの外側を有効にする</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、SP、RP、またはCCが入ります。</P>
+
+<A NAME="NxW1A_"></A>
+	<P>	<DT><B>ウィンドウエリアビット(W1用)</B>：W1 area bit
+		<DD>(N0W1A, N1W1A, N2W1A, N3W1A, R0W1A, SPW1A, RPW1A, CCW1A)<BR>
+　各画面に使用するノーマルウィンドウW1の有効領域をどちらにするかを指定します。</P>
+
+	<TABLE BORDER>
+	<TR><TD>N0W1A</TD><TD>1800D0H</TD><TD>ビット2</TD><TD>透明処理ウィンドウのNBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1W1A</TD><TD>1800D0H</TD><TD>ビット10</TD><TD>透明処理ウィンドウのNBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2W1A</TD><TD>1800D2H</TD><TD>ビット2</TD><TD>透明処理ウィンドウのNBG2用</TD></TR>
+	<TR><TD>N3W1A</TD><TD>1800D2H</TD><TD>ビット10</TD><TD>透明処理ウィンドウのNBG3用</TD></TR>
+	<TR><TD>R0W1A</TD><TD>1800D4H</TD><TD>ビット2</TD><TD>透明処理ウィンドウのRBG0用</TD></TR>
+	<TR><TD>SPW1A</TD><TD>1800D4H</TD><TD>ビット10</TD><TD>透明処理ウィンドウのスプライト用</TD></TR>
+	<TR><TD>RPW1A</TD><TD>1800D6H</TD><TD>ビット2</TD><TD>回転パラメータウィンドウ用</TD></TR>
+	<TR><TD>CCW1A</TD><TD>1800D6H</TD><TD>ビット10</TD><TD>カラー演算ウィンドウ用</TD></TR>
+	</TABLE></P>
+
+	<TABLE BORDER>
+	<TR><TH>xxW1A</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>W1ウィンドウの内側を有効にする</TD></TR>
+	<TR><TH>1</TH><TD>W1ウィンドウ外側を有効にする</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、SP、RP、またはCCが入ります。</P>
+
+<A NAME="NxSWA_"></A>
+	<P>	<DT><B>ウィンドウエリアビット(SW用)</B>：SW area bit
+		<DD>(N0SWA, N1SWA, N2SWA, N3SWA, R0SWA, SPSWA, CCSWA)<BR>
+　各画面に使用するスプライトウィンドウSWの有効領域をどちらにするかを指定します。</P>
+
+	<DD><TABLE BORDER>
+	<TR><TD>N0SWA</TD><TD>1800D0H</TD><TD>ビット4</TD><TD>透明処理ウィンドウのNBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1SWA</TD><TD>1800D0H</TD><TD>ビット12</TD><TD>透明処理ウィンドウのNBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2SWA</TD><TD>1800D2H</TD><TD>ビット4</TD><TD>透明処理ウィンドウのNBG2用</TD></TR>
+	<TR><TD>N3SWA</TD><TD>1800D2H</TD><TD>ビット12</TD><TD>透明処理ウィンドウのNBG3用</TD></TR>
+	<TR><TD>R0SWA</TD><TD>1800D4H</TD><TD>ビット4</TD><TD>透明処理ウィンドウのRBG0用</TD></TR>
+	<TR><TD>SPSWA</TD><TD>1800D4H</TD><TD>ビット12</TD><TD>透明処理ウィンドウのスプライト用</TD></TR>
+	<TR><TD>CCSWA</TD><TD>1800D6H</TD><TD>ビット12</TD><TD>カラー演算ウィンドウ用</TD></TR>
+	</TABLE></P>
+
+	<TABLE BORDER>
+	<TR><TH>xxSWA</TH><TH>処　理</TH></TR>
+	<TR><TH>0</TH><TD>SWウィンドウの内側を有効にする</TD></TR>
+	<TR><TH>1</TH><TD>SWウィンドウの外側を有効にする</TD>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxxには、N0、N1、N2、N3、R0、SP、またはCCが入ります。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p08_12_j.htm">戻る</A>｜
+<a href="p09_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no8">VDP2ユーザーズマニュアル</A>★
+<a href="p08_10_j.htm">第８章　ウィンドウ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

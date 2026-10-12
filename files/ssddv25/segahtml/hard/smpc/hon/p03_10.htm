@@ -1,0 +1,72 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/19&gt;SMPC User's Manual/Chapter 3 Peripheral Control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p02_50.htm">Back</a> ｜ <A HREF="p03_11.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual</b><H1 ALIGN=CENTER> Chapter 3 Peripheral Control</H1><HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A><P><DT><H2> ■3.1 Peripheral control mode</H2><DD> SH-2 can control peripherals via SMPC. There are two peripheral control methods:</P>
+<P><DD> (1)SMPC control mode<DD> (2)SH-2 direct mode</P>
+<A NAME="no3_11"></A><P><DT><H2> ◆SMPC control mode</H2><A NAME="no3_11_0"></A><DD><H4> ●Block diagram</H4><DD> Figure 3.1 shows the block diagram of SMPC control mode. SMPC control mode is activated by setting the command parameter in IREG of the SH-2 interface register and issuing the INTBACK command. The peripheral data collection results are output to OREG as result parameters.</P>
+<A NAME="z3_1"></A><P ALIGN=CENTER> <B>Figure 3.1 Block diagram of SMPC control mode</b><BR>
+<img srcset="../grp/i048_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no3_11_1"></A><P><DD><H4> ●Features</H4><DD> This is an effective method when you want to minimize the overhead of accessing peripherals within your application.</P>
+<A NAME="no3_11_2"></A><P><DD><H4> ●Settings for using SMPC control mode</H4><DD> Figure 3.2 shows an example configuration for using SMPC control mode.<DD> Figure 3.2 shows an example configuration for port 1. Note that mode settings can be set independently for each port.</P>
+<A NAME="z3_2"></A><P ALIGN=CENTER> <B>Figure 3.2 Setting example of SMPC control mode</b><BR>
+<img srcset="../grp/i049_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no3_11_3"></A><P><DD><H4> ●Default value of parallel I/O register at power ON</H4><DD> When power is turned on, the parallel I/O registers are set to the default values shown in Table 3.1.</P>
+<A NAME="t3_1"></A><P><DD><TABLE BORDER>
+<CAPTION> <B>Table 3.1 Parallel I/O register default values at power-on</b></CAPTION>
+<TR><TD ALIGN="CENTER"><PRE> register name</TD><TD ALIGN="CENTER"><PRE> Setting value</TD><TD WIDTH=400 ALIGN="CENTER"><PRE> Contents</TD></TR>
+<TR><TD><PRE> IOSEL1/2</TD><TD ALIGN="CENTER"><PRE> 0H</TD><TD WIDTH=400><PRE> SMPC control mode</TD></TR>
+<TR><TD><PRE> EXL1/2</TD><TD ALIGN="CENTER"><PRE> 0H</TD><TD WIDTH=400><PRE> PAD interrupt, VDP2 external latch disabled</TD></TR>
+<TR><TD><PRE> DDR1/2</TD><TD ALIGN="CENTER"><PRE> 00H</TD><TD WIDTH=400><PRE> All bit input</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_11_4"></A><P><DD><H4> ●How to use SMPC control mode</H4><DD> When acquiring peripheral data using the INTBACK command, the collected peripheral data is output to OREG as a result parameter. However, the peripheral data may exceed the OREG capacity. Therefore, in SMPC control mode, peripheral data collection is interrupted every time OREG becomes full. When OREG becomes full with peripheral data, SMPC generates an SMPC interrupt and requests SH-2 to acquire peripheral data.<BR>
+ Also, if there is peripheral data left to collect, the status register will indicate that there is remaining data. After SH-2 acquires peripheral data, it requests continue from SMPC, and SMPC resumes peripheral data collection. Additionally, if the remaining peripheral data is not needed, peripheral data collection can be terminated by a break request. The above sequence is shown in Figure 3.3 and Figure 3.4.</P>
+<A NAME="no3_12_0"></A><P><DD><B>・Continue request</b><DD> Continuation from SH-2 to SMPC can be requested by toggling bit 7 of IREG0.</P>
+<A NAME="no3_12_1"></A><P><DD><B>・Break request</b><DD> A break from SH-2 to SMPC can be requested by writing "1" to bit 6 of IREG0.</P>
+<A NAME="no3_12_2"></A><P><DD><B>・Notes on continue and break requests</b><DD> Please note the conditions listed in Table 3.2 when requesting continues and breaks.</P>
+<A NAME="t3_2"></A><P><DD><TABLE BORDER>
+<CAPTION> <B>Table 3.2 Conditions for issuing continues and breaks</b></CAPTION>
+<TR><TD COLSPAN=2 ALIGN="CENTER"><PRE> request to issue</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE> Reception conditions</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE> SMPC operation</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> conti<BR> new</TD><TD ALIGN="CENTER"><PRE> break</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> ×</TD><TD ALIGN="CENTER"><PRE> ×</TD><TD><PRE> on hold</TD><TD><PRE> Waiting for request</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> ×</TD><TD ALIGN="CENTER"><PRE> ○</TD><TD><PRE> break</TD><TD><PRE> Peripheral data collection is interrupted and INTBACK command is terminated.</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> ○</TD><TD ALIGN="CENTER"><PRE> ×</TD><TD><PRE> Continue</TD><TD><PRE> Continued peripheral data collection</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> ○</TD><TD ALIGN="CENTER"><PRE> ○</TD><TD><PRE> Ban</TD><TD><PRE> No warranty</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_12_3"></A><P><DD><B>・Termination conditions for INTBACK command to acquire peripheral data</b><DD> The INTBACK command that acquires peripheral data terminates under the following conditions.</P>
+<P><DD> (1) When all peripheral data collection is completed<DD> (2) When peripheral data collection could not be completed by V-BLANK-IN (timeout)<DD> (3) When peripheral data collection is finished due to a break request from SH-2</P>
+<A NAME="z3_3"></A><P ALIGN=CENTER> <B>Figure 3.3 All peripheral data acquisition sequence</b><BR>
+<img srcset="../grp/i051_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z3_4"></A><P ALIGN=CENTER> <B>Figure 3.4 Peripheral data acquisition cancellation sequence due to break request</b><BR>
+<img srcset="../grp/i052_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_50.htm">Back</a> ｜ <A HREF="p03_11.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,56 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p014.htm> Return to previous page </A> ｜ <A HREF=../../c05/mokuzi.htm> Return to menu </A> ｜ <A HREF=p016.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150 ALIGN = "LEFT"> <PRE> <B> Title </B> <BR> Function specifications </TD> <TD WIDTH = 220 ALIGN = "LEFT"> <PRE> <B> Function </B> <BR> Set branch destination information </TD> <TD WIDTH = 160 ALIGN = "LEFT"> <PRE> <B> Function Name </B> <BR> BPL_SetBranchInfo </TD> <TD WIDTH = 60 ALIGN="LEFT"><PRE><B>No</B><BR>1.5</TD>
+</TABLE><P>
+<DD><UL><PRE>
+Format Sint32 BPL_SetBranchInfo (Sint32 batmid, Sint32 nbranch, Sint32 * brtbl)
+Input bstmid: Branch stream identifier
+Nbranch: Number of branch destinations
+Brbrt: Branch table
+No output
+Function value Error code
+Function Sets branch destination information (branch destination candidates) for a branch stream.
+Remarks (a) The branch stream identifier of the branch candidate is set in the branch table.
+To set without branch destination, specify BPL_BR_NONE for the branch table element.
+That thing.
+: Brtbl [0] = BSTMID_A;
+: Brtbl [1] = BPL_BR_NONE; / * No branch destination (end of branch playback) * /
+Brtbl [2] = BSTMID_B;
+Nbranch = 3;
+Branch destination is specified by the BPL_SelectBranch function and the branch number (position in the branch table).
+Stipulated.
+In this example, branch processing is as follows depending on the selected branch destination. </PRE>
+<UL><UL><UL><TABLE BORDER CELLPADDING=5>
+<TH WIDTH = 160 ALIGN = "CENTER"> <PRE> Selected branch destination </TH> <TH ALIGN = "CENTER"> <PRE> Branch processing (when the server function branch execution switch is ON) </TH> <TR>
+<TD ALIGN = "LEFT"> <PRE> branch number 0 </TD> <TD ALIGN = "LEFT"> <PRE> Branch to branch stream identifier BSTMID_A. </TD><TR>
+<TD ALIGN = "LEFT"> <PRE> Branch number 1 </TD> <TD ALIGN = "LEFT"> <PRE> Branch playback ends. (Immediately after selection, there is no branch destination.) </TD> <TR>
+<TD ALIGN = "LEFT"> <PRE> branch number 2 </TD> <TD ALIGN = "LEFT"> <PRE> Branch to branch stream identifier BSTMID_B. </TD><TR>
+<TD ALIGN = "LEFT"> <PRE> Other </TD> <TD ALIGN = "LEFT"> <PRE> (BPL_SelectBranch returns BPL_ERR_BRNO error and selection disabled) </TD>
+</TABLE></UL></UL></UL><P>
+<PRE> (b) The number of streams must satisfy the following conditions.
+X + Y ≦ Z
+X: Number of stream keys set in X: bstmid
+, Y: Total number of branch stream keys
+Z: Maximum number of streams that can be opened simultaneously (specified by the STM_Init function) </PRE> </UL> <P>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150 ALIGN = "LEFT"> <PRE> <B> Title </B> <BR> Function specifications </TD> <TD WIDTH = 220 ALIGN = "LEFT"> <PRE> <B> Function </B> <BR> Get branch destination information </TD> <TD WIDTH = 160 ALIGN = "LEFT"> <PRE> <B> Function Name </B> <BR> BPL_GetBranchInfo </TD> <TD WIDTH = 60 ALIGN="LEFT"><PRE><B>No</B><BR>1.6</TD>
+</TABLE><P>
+<DD><UL><PRE>
+Format Sint32 BPL_GetBranchInfo (Sint32 bstmid, <BR>
+(Sint32 * nbrabch, Sint32 * brtbl, Sint32 nelem)
+Input bstmid: Branch stream identifier
+Nelem: Number of elements in the branch table
+Output nbranch: Number of branch destinations (0 if there is no branch candidate)
+Brbrt: Branch table (stores the maximum number of nelem branch candidates from the top)
+Function value error code <BR>
+Function Acquires branch destination information set in the branch stream. </PRE></UL><P>
+</DL><P><P><HR>
+<A HREF=p014.htm> Return to previous page </A> ｜ <A HREF=../../c05/mokuzi.htm> Return to menu </A> ｜ <A HREF=p016.htm> Go to next page </A>
+</BODY>
+</HTML>

@@ -1,0 +1,218 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 15/22&gt; <!-- Number of pages/total number of pages -->
+ SGL function reference/scl_rot function <!-- Title name -->
+ </TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#scl_rot">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRparaInitSet"><HR NOSHADE></a><H4> function</H4><H1> slRparaInitSet</H1><HR>
+<H3> Store rotation parameter table in VRAM area</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#ROTSCROLL"><I>ROTSCROLL</i></a> *addr_A;
+
+    void slRparaInitSet( addr_A );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#ROTSCROLL"><I>ROTSCROLL</i></a> *addr_A - VRAM start address where rotation parameter table is stored</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Rotation parameter table (size: 60H) used for rotation scrolling in VRAM
+    Store in area. Parameter B is stored from the position of parameter A+20H, so a total of E0H is required for parameters A and B.<BR>
+    The default storage address when this function is not used is 25E3FF00H.<BR>
+    Be sure to specify an absolute address for addr_A.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/scl_rot.htm#slRparaInitSet"><I>slRparaInitSet</i></a> ( ( void * )( 0x25e5fe00 ) );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/scl_rot.htm#slMakeKtable">slMakeKtable</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slKtableRA">slKtableRA</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slKtableRB">slKtableRB</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaReadCtrlRA">slRparaReadCtrlRA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaReadCtrlRB">slRparaReadCtrlRB</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeX">MsScreenSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeY">MsScreenSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#Resolution">Resolution</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system06.htm#VDP2_RPTA">VDP2_RPTA</a></TD><TD><PRE> <A HREF="../mem/system08.htm#ScrRotPtr">ScrRotPtr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#rpara_vram_adr">rpara_vram_adr</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParA">RotScrParA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#RotScrParB">RotScrParB</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#scl_rot">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slCurRpara"><HR NOSHADE></a><H4> function</H4><H1> slCurRpara</H1><HR>
+<H3> Specify the parameter to manipulate the rotation parameter</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode;
+
+    void slCurRpara( mode );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode - rotation parameters</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Specify the parameter to be manipulated among rotation parameters A and B.<BR>
+    The following parameters are included in mode.<BR>
+        <A HREF="../struct/constscl.htm#RA"><I>RA</i></a> : Rotation parameter A
+        <A HREF="../struct/constscl.htm#RB"><I>RB</i></a> : Rotation parameter B
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    /* Manipulate rotation coefficient A */
+    <A HREF="../func/scl_rot.htm#slCurRpara"><I>slCurRpara</i></a> ( <A HREF="../struct/constscl.htm#RA"><I>RA</i></a> );
+    <A HREF="../func/matrix.htm#slUnitMatrix"><I>slUnitMatrix</i></a> ( <A HREF="../struct/constspr.htm#CURRENT"><I>CURRENT</i></a> );
+    <A HREF="../func/matrix.htm#slTranslate"><I>slTranslate</i></a> ( <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 10.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 20.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 15.0 ) );
+    <A HREF="../func/matrix.htm#slRotZ"><I>slRotZ</i></a> ( <A HREF="../struct/macro.htm#DEGtoANG"><I>DEGtoANG</i></a> ( 10.0 ) );
+    <A HREF="../func/sclnorm.htm#slScrMatSet"><I>slScrMatSet</i></a> ();
+
+    /* Manipulate rotation coefficient B */
+    <A HREF="../func/scl_rot.htm#slCurRpara"><I>slCurRpara</i></a> ( <A HREF="../struct/constscl.htm#RB"><I>RB</i></a> );
+    <A HREF="../func/matrix.htm#slUnitMatrix"><I>slUnitMatrix</i></a> ( <A HREF="../struct/constspr.htm#CURRENT"><I>CURRENT</i></a> );
+    <A HREF="../func/matrix.htm#slTranslate"><I>slTranslate</i></a> ( <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 100.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( -100.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 15.0 ) );
+    <A HREF="../func/matrix.htm#slRotZ"><I>slRotZ</i></a> ( <A HREF="../struct/macro.htm#DEGtoANG"><I>DEGtoANG</i></a> ( 10.0 ) );
+    <A HREF="../func/sclnorm.htm#slScrMatSet"><I>slScrMatSet</i></a> ();
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaMode">slRparaMode</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../mem/system08.htm#ScrRotPtr">ScrRotPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#RotScrParA">RotScrParA</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParB">RotScrParB</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#scl_rot">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRparaMode"><HR NOSHADE></a><H4> function</H4><H1> slRparaMode</H1><HR>
+<H3> Specify rotation parameter usage mode</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode;
+
+    void slRparaMode( mode );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode - Rotation parameter mode (described later).<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Specify the usage mode of rotation parameters A and B.<BR>
+    The following parameters are entered in mode.<BR>
+        <A HREF="../struct/constscl.htm#RA"><I>RA</i></a> : Only rotation parameter A is used <A HREF="../struct/constscl.htm#RB"><I>RB</i></a> : Only rotation parameter B is used <A HREF="../struct/constscl.htm#K_CHANGE"><I>K_CHANGE</i></a> : Image switching based on the coefficient data of rotation parameter A <A HREF="../struct/constscl.htm#W_CHANGE"><I>W_CHANGE</i></a> : Image switching using the rotation parameter window</PRE></P>
+<P><DT><H3> example</H3><DD><PRE>
+    <A HREF="../func/scl_rot.htm#slRparaMode"><I>slRparaMode</i></a> ( <A HREF="../struct/constscl.htm#RA"><I>RA</i></a> );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/scl_rot.htm#slCurRpara">slCurRpara</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaMode">slRparaMode</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaReadCtrlRA">slRparaReadCtrlRA</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaReadCtrlRB">slRparaReadCtrlRB</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system06.htm#VDP2_RPMD">VDP2_RPMD</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#scl_rot">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slMakeKtable"><HR NOSHADE></a><H4> function</H4><H1> slMakeKtable</H1><HR>
+<H3> Create a table of coefficients</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void *addr_A;
+
+    void slMakeKtable( *addr_A );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void *addr_A - VRAM address of coefficient table</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Create a table of coefficients to use in 3D rotation.<BR>
+    2 Create one bank of Word size data. When using this function,
+    Function <A HREF="../func/scl_rot.htm#slKtableRA"><I>slKtableRA</i></a> ( <A HREF="../struct/constscl.htm#K_2WORD"><I>K_2WORD</i></a> | <A HREF="../struct/constscl.htm#K_ON"><I>K_ON</i></a> | <A HREF="../struct/constscl.htm#K_DOT"><I>K_DOT</i></a> | <A HREF="../struct/constscl.htm#K_FIX"><I>K_FIX</i></a> )
+      <A HREF="../func/scl_rot.htm#slKtableRB"><I>slKtableRB</i></a> ( <A HREF="../struct/constscl.htm#K_2WORD"><I>K_2WORD</i></a> | <A HREF="../struct/constscl.htm#K_ON"><I>K_ON</i></a> | <A HREF="../struct/constscl.htm#K_DOT"><I>K_DOT</i></a> | <A HREF="../struct/constscl.htm#K_FIX"><I>K_FIX</i></a> )
+    Please use together.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/scl_rot.htm#slRparaInitSet"><I>slRparaInitSet</i></a> ( ( void * )( 0x25e5fe00 ) );
+    <A HREF="../func/scl_rot.htm#slKtableRA"><I>slKtableRA</i></a> ( ( void * )( 0x25e40000 ), <A HREF="../struct/constscl.htm#K_2WORD"><I>K_2WORD</i></a> | <A HREF="../struct/constscl.htm#K_ON"><I>K_ON</i></a> | <A HREF="../struct/constscl.htm#K_DOT"><I>K_DOT</i></a> | <A HREF="../struct/constscl.htm#K_FIX"><I>K_FIX</i></a> );
+    <A HREF="../func/scl_rot.htm#slMakeKtable"><I>slMakeKtable</i></a> ( ( void * )( 0x25e40000 ) );
+
+    <A HREF="../func/scl_rot.htm#slRparaMode"><I>slRparaMode</i></a> ( <A HREF="../struct/constscl.htm#K_CHANGE"><I>K_CHANGE</i></a> );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaInitSet">slRparaInitSet</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slKtableRA">slKtableRA</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slKtableRB">slKtableRB</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaReadCtrlRA">slRparaReadCtrlRA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaReadCtrlRB">slRparaReadCtrlRB</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_KTAOF">VDP2_KTAOF</a></TD><TD><PRE> <A HREF="../mem/system08.htm#k_table_adr">k_table_adr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#scl_rot">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slKtableRA"><HR NOSHADE></a><H4> function</H4><H1> slKtableRA </H1></PRE></P><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#scl_rot">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slKtableRB"><HR NOSHADE></a><H4> function</H4><H1> slKtableRB</H1><HR><H3> Setting the coefficient table address</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void *addr_A;
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode;
+
+    void slKtableRA( addr_A, mode );
+    void slKtableRB( addr_A, mode );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    void *addr_A - VRAM address of coefficient table<br>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> mode - Coefficient table control mode (described later)
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+
+</PRE></P><P><DT><H3>function</H3><DD>
+    Set the address of the coefficient table in the register and at the same time write the usage of the coefficient table,
+    Specify the configuration.<BR>
+
+    The following parameters are included in mode. 
+<PRE>        <A HREF="../struct/constscl.htm#K_OFF"><I>K_OFF</i></a> | <A HREF="../struct/constscl.htm#K_ON"><I>K_ON</i></a> : Table use
+        <A HREF="../struct/constscl.htm#K_2WORD"><I>K_2WORD</i></a> | <A HREF="../struct/constscl.htm#K_1WORD"><I>K_1WORD</i></a> : Coefficient data size
+        <A HREF="../struct/constscl.htm#K_MODE0"><I>K_MODE0</i></a> | <A HREF="../struct/constscl.htm#K_MODE1"><I>K_MODE1</i></a> | <A HREF="../struct/constscl.htm#K_MODE2"><I>K_MODE2</i></a> | <A HREF="../struct/constscl.htm#K_MODE3"><I>K_MODE3</i></a> : Coefficient mode
+        <A HREF="../struct/constscl.htm#K_LINECOL"><I>K_LINECOL</i></a> : Line color
+        <A HREF="../struct/constscl.htm#K_DOT"><I>K_DOT</i></a> | <A HREF="../struct/constscl.htm#K_LINE"><I>K_LINE</i></a> : Transformation unit
+        <A HREF="../struct/constscl.htm#K_FIX"><I>K_FIX</i></a> : Fixed coefficient Change the above value according to the function to be used with "|" Please specify by connecting.<BR>
+
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Use mode 0 (pick up the x and y expansion factors from the coefficient table),
+    When using a coefficient of 2 in Word mode, per dot.<BR>
+
+    #define RBG0RA_RPARA_ADR ( void * )VDP2_VRAM_A0
+    void <A HREF="../func/scl_rot.htm#slKtableRA"><I>slKtableRA</i></a> ( RBG0RA_RPARA_ADR, <A HREF="../struct/constscl.htm#K_ON"><I>K_ON</i></a> | <A HREF="../struct/constscl.htm#K_2WORD"><I>K_2WORD</i></a> | <A HREF="../struct/constscl.htm#K_MODE0"><I>K_MODE0</i></a> | <A HREF="../struct/constscl.htm#K_DOT"><I>K_DOT</i></a> );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaInitSet">slRparaInitSet</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaReadCtrlRA">slRparaReadCtrlRA</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_KTCTL">VDP2_KTCTL</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaReadCtrlRB">slRparaReadCtrlRB</a></TD></TR><TR><TD><PRE> <A HREF="../mem/system06.htm#VDP2_KTAOF">VDP2_KTAOF</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParA">RotScrParA</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParB">RotScrParB</a> </TD></TR></TABLE></P></DL><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#scl_rot">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slRparaReadCtrlRA"><HR NOSHADE></a><H4> function</H4><H1> slRparaReadCtrlRA </H1></PRE></P><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#scl_rot">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slRparaReadCtrlRB"><HR NOSHADE></a><H4> function</H4><H1> slRparaReadCtrlRB</H1><HR><H3> Specifying how to read rotation parameters</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> type;
+
+    void slRparaReadCtrlRA( type );
+    void slRparaReadCtrlRB( type );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> type - How to read rotation parameters (described later).<BR>
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P><P><DT><H3>function</H3><DD>
+    Specify whether to reread the rotation parameters Xst, Yst, and KAst for each line.<BR>
+    For type,
+        <A HREF="../struct/constscl.htm#LnRd_Xst"><I>LnRd_Xst</i></a> , <A HREF="../struct/constscl.htm#LnRd_Yst"><I>LnRd_Yst</i></a> , <A HREF="../struct/constscl.htm#LnRd_KAst"><I>LnRd_KAst</i></a>
+    Specify by connecting them with '|'.<BR>
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/scl_rot.htm#slRparaReadCtrlRB"><I>slRparaReadCtrlRB</i></a> ( <A HREF="../struct/constscl.htm#LnRd_Yst"><I>LnRd_Yst</i></a> );
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/scl_rot.htm#slRparaInitSet">slRparaInitSet</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slKtableRA">slKtableRA</a></TD><TD><PRE> <A HREF="../func/scl_rot.htm#slKtableRB">slKtableRB</a></TD><TD><PRE> <A HREF="../mem/system06.htm#VDP2_RPRCTL">VDP2_RPRCTL</a></TD></TR></TABLE></DL><HR NOSHADE> <A HREF="index.htm">return</a><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

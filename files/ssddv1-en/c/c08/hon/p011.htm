@@ -1,0 +1,37 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p010.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p012.htm> Go to next page </A>
+<HR><P><P>
+<H3> 3.2 Sequence playback </H3>
+<H4> 3.2.1 Map change </H4>
+<UL> There are many scenes in the game, and the area maps are usually different. <BR>
+Therefore, you must specify an area map before playing a sequence. Select the desired area map from the sound area map and change the map. After the map change is over, transfer the sound data according to the map. Preparation for sequence playback is now complete. <P>
+Be sure to change the map once after starting the sound driver. Thereafter, it must be done every time the area map changes. Follow the steps 1 to 6 below for map changes. <P>
+<B> Map change method </B> <BR>
+<table border cellpadding=5>
+<td align = "center"> <pre> Order </td> <td align = "center"> <pre> Processing content </td> <td align = "center"> <pre> Description </td> <tr>
+<td align = "left"> <pre> 1 </td> <td align = "left"> <pre> Stop all pronunciation </td> <td align = "left"> <pre> "Sound Issue the “Initial (10h)” command. <br> Parameters specify all sound stop and all initialization. </td><tr>
+<td align = "left"> <pre> 2 </td> <td align = "left"> <pre> Switch area map </td> <td align = "left"> <pre> "Map Change (08h ) "Command. <br> Specify the area map number to be switched in the parameter. </td><tr>
+<td align = "left"> <pre> 3 </td> <td align = "left"> <pre> Transfer sound data </​​td> <td align = "left"> <pre> Sound data Transfer from SH address 25A0B000. <br> If you have sound data divided into multiple files, <br> transfers each data according to the area map. </td><tr>
+<td align = "left"> <pre> 4 </td> <td align = "left"> <pre> Notify transfer completion </td> <td align = "left"> <pre> Sound area map CRNT Set all the transferred bits of the work (from the SH address 25A00500h) to “1” for the amount of transfer completed. </td><tr>
+<td align = "left"> <pre> 5 </td> <td align = "left"> <pre> Set the DSP </td> <td align = "left"> <pre> If necessary Issue the “Effect Change (83h)” command. </td><tr>
+<td align = "left"> <pre> 6 </td> <td align = "left"> <pre> Set the mixer </td> <td align = "left"> <pre> "Mixer Change ( 87h) ”command. <br> Be sure to set the mixer even if you are not using a DSP. </td>
+</table><P></UL>
+<H4> 3.2.2 Sequence playback method </H4>
+<UL> You can play the sequence at any time after the map change is over. For sequence playback, issue sound control commands (sequence start, sequence stop, etc.) that control sequence playback. For details on how to issue commands and their details, refer to “Chapter 4 Commands and Status”. <P>
+<PRE> <B> Note 1: Change the area map while the sound is still playing, or use the sound
+If the data is replaced, the system may run out of control. Shiken
+Even if the sound playback is stopped and no sound is heard, the release sound is processed internally.
+Since there may be cases, be sure to perform step 1 above. <P>
+Note 2: Since the DSP workram is used for DSP internal processing, the DSP operates.
+During this time, the contents of this area are constantly rewritten by the DSP. DSP word
+Be careful when changing an area map that changes the size or address of the crumb
+    Is required. If the DSP is running, use it as a DSP workram until just before
+Sound data transferred to the place where it was placed will be destroyed. </B></PRE></UL><P>
+<P><P><HR>
+<A HREF=p010.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p012.htm> Go to next page </A>
+</BODY>
+</HTML>

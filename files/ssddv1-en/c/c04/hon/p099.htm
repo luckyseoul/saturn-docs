@@ -1,0 +1,37 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p098.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p100.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H1> 8. Function specifications </H1>
+<DD> Describes the function specification of the CD communication interface. <P>
+<DT> <H4> (1) Format </H4>
+<DD> In the figure, the reserved area is indicated by “-”. Specify 0 for the reserved area. <P>
+<DT> <H4> (2) Initial value of parameter </H4>
+<DD> The initial value of the parameter stored in the CD block is equal to the default value specified by the host unless otherwise specified. <P>
+<DT> <H4> (3) Retention of CD status information (status and CD report) </H4>
+<DD> The CD communication interface holds the status and CD report when the CD block command is issued. Information by periodic response is not retained. The initial value of the stored contents is all 0. <BR>
+∙ Retention status / CD report update function is indicated by the following symbols. <P>
+<UL><UL><IMG SRC="hyou/i099-02.gif"></UL></UL><BR>
+<DT><table border cellpadding=5>
+<td width = 150> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220> <pre> <B> Function </B> <br> CD playback </td> <td width = 160> <pre> <B> Function Name </B> [SR] <br> CDC_CdPlay </td> <td width = 60> <pre> <B> No </B> <br >2.1</td>
+</table><P>
+<DD> However, nothing is updated when an error occurs (when the error code is other than CDC_ERR_OK). <P>
+<DT> <H4> (4) Data transfer inside function </H4>
+<DD> Among the functions that acquire information, those that are transferring data inside the function will have the function name written as Tget. The data transfer method is software transfer by the CPU. <BR>
+<< Example >> Obtaining TOC information (CDC_TgetToc) <P>
+These functions internally call the following functions: <BR>
+<UL TYPE = "DISK"> <LI> Waiting for data transfer start (CDC_DataReady) <BR>
+<LI> End of data transfer (CDC_DataEnd) </UL> <P>
+<DT> <H4> (5) Command end flag (in interrupt factor register) </H4>
+<DD> If there is a related command end flag, enter it in the item field called end flag. <BR>
+<Example> End flag ESEL flag <P>
+These functions check the command end flag when the command is issued and clear it to 0. If it cannot be issued, a CDC_ERR_CMDBUSY error will occur. In exceptional cases, the command end flag may only be cleared to 0 or checked. (Exclusive processing for issuing commands) <BR>
+When the processing corresponding to the issued command is completed, the command end flag will be 1. However, it should be noted that it is not 1 at REJECT or WAIT. <BR>
+For details, refer to “3.2 Communication Method”. <P>
+</DL><P><P><HR>
+<A HREF=p098.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p100.htm> Go to next page </A>
+</BODY>
+</HTML>

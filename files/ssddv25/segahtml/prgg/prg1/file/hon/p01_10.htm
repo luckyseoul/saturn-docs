@@ -1,0 +1,133 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/17&gt;Programmer's Guide/File System Library/1. overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><H2 ALIGN=CENTER> 1. overview</H2><HR NOSHADE>
+<DL>
+<P><DD> This section describes libraries for accessing files on CDs.</P>
+<!-- +++ Update by CRI ：7.2 -->
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Features</H3><DD> This library has the following features.<P><DT> <B>(1) Target CD-ROM</b><DD><OL TYPE=a>
+<LI> ISO9660 level file access is possible.<LI> This library does not cover access using CD-ROM XA subheader information.</OL>
+</P>
+<P><DT> <B>(2) Data buffering</b><DD><OL TYPE=a>
+<LI> Access is performed assuming the CD block buffer management mechanism.<LI> In addition to simple file reading, it is possible to read ahead using a buffer.</OL>
+</P>
+<P><DT> <B>(3) File identifier</b><DD><OL TYPE=a>
+<LI> Access is based on file identifier (order number within the directory).<LI> Eliminate the slowdown caused by directory searches. ><LI> Access by file name is possible by using the file name to file identifier conversion function.</OL>
+</P>
+<P><DT> <B>(4) Development support function</b><DD><OL TYPE=a>
+<LI> Memory files and DOS files can be accessed as a development support function.<LI> If it is a small amount of data, a memory file can replace the file on the CD.<LI> DOS files on IBM-PC can be accessed like memory files via SCSI.<BR>
+ Even if the data is too large to fit in the SIMM, it can be used as a substitute for files on the CD.<LI> We provide two types of libraries: one for product embedding and one that includes development support functions.</OL>
+</P>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 Functional overview</H3><DD> This section provides an overview of the functionality of the file system library. The functions of this library are classified into the following six types.</P>
+<P><DT> <B>(1)Directory operations</b><DD> It provides the following functions such as library initialization, reading directory information, and setting the current directory.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH><PRE> function</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> GFS_Init</TD><TD><PRE> Library initialization and CD mounting process</TD></TR>
+<TR><TD><PRE> GFS_LoadDir</TD><TD><PRE> Load directory information</TD></TR>
+<TR><TD><PRE> GFS_SetDir</TD><TD><PRE> Setting the current directory</TD></TR>
+<TR><TD><PRE> GFS_NameToId</TD><TD><PRE> File name → file identifier conversion</TD></TR>
+<TR><TD><PRE> GFS_IdToName</TD><TD><PRE> File identifier → file name conversion</TD></TR>
+<TR><TD><PRE> GFS_GetDirInfo</TD><TD><PRE> Get directory information</TD></TR>
+<TR><TD><PRE> GFS_Reset</TD><TD><PRE> Resetting the file system</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(2) File operations</b><DD> Perform common file operations such as opening, closing, and seeking files.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH><PRE> function</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> GFS_Open</TD><TD><PRE> Open file</TD></TR>
+<TR><TD><PRE> GFS_Close</TD><TD><PRE> Close file</TD></TR>
+<TR><TD><PRE> GFS_Seek</TD><TD><PRE> Moving the access point</TD></TR>
+<TR><TD><PRE> GFS_Tell</TD><TD><PRE> Get access pointer</TD></TR>
+<TR><TD><PRE> GFS_IsEof</TD><TD><PRE> Check if the access pointer is at the end of the file</TD></TR>
+<TR><TD><PRE> GFS_ByteToSct</TD><TD><PRE> Conversion from byte to sector</TD></TR>
+<TR><TD><PRE> GFS_GetFileSize</TD><TD><PRE> Get file size</TD></TR>
+<TR><TD><PRE> GFS_GetFileInfo</TD><TD><PRE> Get file information</TD></TR>
+<TR><TD><PRE> GFS_GetNumCdbuf</TD><TD><PRE> Obtaining the number of sectors in the CD buffer partition</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(3) Completion return type reading</b><DD> Read data from file. In this case, control will not return from the function until data loading is complete.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH><PRE> function</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> GFS_Fread</TD><TD><PRE> Reads data from the opened file.</TD></TR>
+<TR><TD><PRE> GFS_Load</TD><TD><PRE> Reads data by specifying a file identifier.</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(4) Immediate return type reading</b><DD> The request and server functions read data from the file. The server function processes requests issued by the request function in processing units.<BR>
+ Server functions must be called repeatedly. By inserting application processing into the server function call loop, you can execute application processing until data loading is complete.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH><PRE> function</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> GFS_NwFread</TD><TD><PRE> Issuing a data load request</TD></TR>
+<TR><TD><PRE> GFS_NwCdRead</TD><TD><PRE> Issuing a read request to the CD buffer</TD></TR>
+<TR><TD><PRE> GFS_NwIsComplete</TD><TD><PRE> Check for completion of loading process</TD></TR>
+<TR><TD><PRE> GFS_NwStop</TD><TD><PRE> Aborting the loading process</TD></TR>
+<TR><TD><PRE> GFS_NwGetStat</TD><TD><PRE> Get access status</TD></TR>
+<TR><TD><PRE> GFS_NwExecOne</TD><TD><PRE> Server function for one file</TD></TR>
+<TR><TD><PRE> GFS_NwExecServer</TD><TD><PRE> Server functions for multiple files</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(5) Reading parameter settings</b><DD> Set various parameters for the completion return and immediate return read functions. You can change how to use the CD buffer, transfer method (DMA, CPU, etc.), and transfer unit.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH><PRE> function</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> GFS_SetGmode</TD><TD><PRE> Setting the ejecting method from the CD buffer</TD></TR>
+<TR><TD><PRE> GFS_SetTmode</TD><TD><PRE> Transfer method settings</TD></TR>
+<TR><TD><PRE> GFS_SetReadPara</TD><TD><PRE> Setting the reading unit to the CD buffer</TD></TR>
+<TR><TD><PRE> GFS_SetTransPara</TD><TD><PRE> Transfer unit setting from CD buffer</TD></TR>
+<TR><TD><PRE> GFS_SetTrFunc</TD><TD><PRE> Registering a transfer function</TD></TR>
+<TR><TD><PRE> GFS_StartTrans</TD><TD><PRE> Transfer start in transfer function</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(6) Others</b><DD> Provides CD pickup control, error processing function registration, and error status acquisition functions. Error handling functions are called when an error occurs.</P>
+<!------1997/08/27テクサポ：平野／追加----------->
+ It also provides a CD-DA track number conversion function when using the DSS system.<!------ここまで--------------------------------->
+<P><DD><TABLE BORDER=1>
+<TR><TH><PRE> function</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> GFS_CdMovePickup</TD><TD><PRE> Moving the CD pickup</TD></TR>
+<TR><TD><PRE> GFS_SetErrFunc</TD><TD><PRE> Registering an error handling function</TD></TR>
+<TR><TD><PRE> GFS_GetErrStat</TD><TD><PRE> Get error status</TD></TR>
+<TR><TD><PRE> GFS_ConvTno</TD><TD><PRE> Track number conversion </TD></TR>
+<!---1997/08/27平野：追加--->
+<!-- *** Update by CRI ：7.3 -->
+</TABLE>
+</P>
+<A NAME="no1_30"></A><P><DT><H3> 1.3 Module configuration</H3><DD> Figure 1.1 shows the positioning of this library in relation to hardware and other software. The dotted lines are modules included in the debugging library.</P>
+<A NAME="z1_1"></A><P ALIGN=CENTER> <B>Figure 1.1 Module configuration diagram</b><BR>
+<img srcset="../grp/i004_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> To use this library, you need to link the following libraries at the same time.</P>
+<DD><UL TYPE=DISC>
+<P><LI> <B>SHCNPIC.LIB</b><BR>
+ Library for SH7600 that does not support position independent code</P>
+<P><LI> <B>SEGA_CDC.LIB</b><BR>
+ CD communication interface library</P>
+<P><LI> <B>SEGA_DMA.LIB</b><BR>
+ DMA library</P>
+<P><LI> <B>SEGA_CSH.LIB</b><BR>
+ cache library</P>
+</UL>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

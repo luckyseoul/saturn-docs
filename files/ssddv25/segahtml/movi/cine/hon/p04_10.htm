@@ -1,0 +1,99 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/11&gt;Cinepak for SEGASaturn User's Manual/4. Cinepak Library</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">MOVIE TOOLS GUIDE</a> ★ <A HREF="../index.htm">Cinepak for SEGASaturn</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p04_101.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Cinepak for SEGA Saturn</b><H2 ALIGN=CENTER> Four. Cinepak Library</H2><HR NOSHADE>
+<DL>
+<P> Cinepak library is a library that allows you to easily play QuickTime (Cinepak compressed) movies on SEGASATURN.</P>
+<A NAME="no4_10"></A><P><DT><H2> 4.1 Library configuration</H2><DD> Figure 4.1 shows the configuration diagram of the Cinepak library.</P>
+<P ALIGN=CENTER> <B>Figure 4.1 Cinepak library configuration diagram</b><BR>
+<img srcset="../grp/i022_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The Cinepak library does not control streams, so opening files and moving pickups (reading ahead of files) should be done by the application program.<BR>
+ Also, since display control is not performed, initialize sprites and set sprite commands, etc. in the application program.<BR>
+ The Cinepak library extracts files from movie files in memory or on a CD to specified addresses and plays audio while synchronizing AV.</P>
+<A NAME="no4_20"></A><P><DT><H2> 4.2 Movie playback procedure</H2><P><DB>
+ <B>(1) Playback procedure</b><DD> Figure 4.2 shows the steps to play a movie using the stream system.</P>
+<P ALIGN=CENTER> <B>Figure 4.2 Movie playback procedure during memory playback</b><BR>
+<img srcset="../grp/i023_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(2) Program example</b><DD> The following is an example program that uses the stream system to play a movie.</P>
+<P><DD><PRE>
+#define WORK_BUF_SIZE 200*1024L
+#define PCM_ADDR ((void*)0x25a20000)
+#define PCM_SIZE (4096L*16)<P>
+/* work buffer */
+Uint32 movie_work[CPK_24WORK_DSIZE];
+/* ring buffer */
+Uint32 movie_buf[WORK_BUF_SIZE/sizeof(Uint32)];
+StmHn stm;
+CpkHn cpk;
+Sint32 movie_x = 320;<P>
+/* Initialization */
+CPK_Init();<P>
+/* Screen display settings */
+Set the V blank IN interrupt using INT_???.
+Call CPK_VblIn(); within the V blank IN interrupt.
+Configure sprite commands, etc.<P>
+/* File initialization */
+GFS_Init(‥);
+STM_Init(‥);
+STM_OpenGrp();
+STM_SetExecGrp(‥);
+/* Open stream */
+stm = STM_OpenFid(‥);<P>
+/* Generate movie handle */
+CPK_PARA_WORK_ADDR(&amp;para) = movie_work;
+CPK_PARA_WORK_SIZE(&amp;para) = CPK_24WORK_BSIZE;
+CPK_PARA_BUF_ADDR(&amp;para) = movie_buf;
+CPK_PARA_BUF_SIZE(&amp;para) = WORK_BUF_SIZE;
+CPK_PARA_PCM_ADDR(&amp;para) = PCM_ADDR;
+CPK_PARA_PCM_SIZE(&amp;para) = PCM_SIZE;
+cpk = CPK_CreateStmMovie(&amp;para, stm);<P>
+/* Setting the number of display colors */
+CPK_SetColor(cpk, CPK_COLOR_15BIT);
+/* Setting destination address */
+CPK_SetDecodeAddr(cpk, ADDR_VRAM, 2 * movie_x);
+/* Start playing the movie */
+CPK_Start(cpk);
+  while(TRUE) {
+  /* Movie playback process */
+  CPK_Task(cpk);
+  if (CPK_IsDispTime(cpk) == TRUE) {
+    /* Waiting for frame buffer switching */
+    SCL_DisplayFrame();
+    CPK_CompleteDisp(cpk);
+    }
+    /* Movie end determination */
+    if (CPK_GetPlayStatus(cpk)==CPK_STAT_PLAY_END) break;
+}
+/* Movie abandonment */
+CPK_DestroyStmMovie(cpk);
+/* Close stream */
+STM_Close(stm);
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p04_101.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">MOVIE TOOLS GUIDE</a> ★ <A HREF="../index.htm">Cinepak for SEGASaturn</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

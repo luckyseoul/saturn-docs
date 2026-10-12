@@ -1,0 +1,134 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;15/19&gt;SMPC User's Manual/3.1 Saturn Peripheral ID</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p03_16.htm">Back</a> ｜ <A HREF="p03_18.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/3.1 SMPC Control Mode</b><H2> ◆Saturn Peripheral ID</H2><HR NOSHADE>
+<DL>
+<A NAME="no3_17_1"></A><P><DT><H3> ●Saturn peripheral ID configuration</H3><DD> The Saturn peripheral ID consists of the peripheral type and data size. Saturn Peripheral ID allows you to recognize the configuration and content of peripheral data. Figure 3.15 shows the configuration of the Saturn peripheral ID.</P>
+<A NAME="z3_15"></A><P><DD> <B>Figure 3.15 Saturn peripheral ID configuration</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=4> Sega Saturn<BR>
+ Peripheral type</TD><TD COLSPAN=4> Data size</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_17_11"></A><P><DD> <B>saturn peripheral type</b><DD> Saturn Peripheral Type indicates the type of peripheral. Therefore, it can be used to recognize how peripheral data is ordered. Saturn currently defines four peripheral types and presents them in a standard format. See the Saturn Peripheral Standard Format section for more information.</P>
+<A NAME="no3_17_12"></A><P><DD> <B>Data size</b><DD> The data size indicates how many bytes of peripheral data are output after the Saturn peripheral ID. Therefore, by using the data size, you can recognize how many bytes the peripheral data table consists of.<BR>
+ You can also recognize where the beginning of the data table for the next peripheral is.</P>
+<A NAME="no3_17_2"></A><P><DT><H3> ●Details of Saturn Peripheral ID</H3><P><DT>&#65308; <B>If a peripheral is connected directly to the peripheral port</b>&#65310;<DD> Saturn peripherals define data sizes up to 255 bytes.<BR>
+ Saturn peripherals include peripherals with 15 bytes or less, and peripherals with 16 bytes or more and 255 bytes or less. There are also 15-byte mode and 255-byte mode for port mode. Therefore, there are four possible combinations of peripheral data size and port mode as shown in Table 3.8, and the configuration of Saturn peripheral ID and peripheral data is as shown in Figures 3.16 to 3.18.</P>
+<A NAME="t3_8"></A><P><DD> <B>Table 3.8 Peripheral data size and port mode combinations</b><DD> (If a peripheral is connected directly to the peripheral port)<DD><TABLE BORDER=1>
+<TR><TD ROWSPAN=2 COLSPAN=2><PRE></TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> Port mode (IREG1 setting)</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 15</TD><TD ALIGN="CENTER"><PRE> 255</TD></TR>
+<TR><TD ROWSPAN=2><PRE> peripheral data<BR> Size [bytes]</TD><TD ALIGN="CENTER"><PRE> 15</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> Peripheral data configuration 1</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 16-255</TD><TD ALIGN="CENTER"><PRE> peripheral<BR> Data structure 2</TD><TD ALIGN="CENTER"><PRE> peripheral<BR> Data structure 3</TD></TR>
+</TABLE>
+</P>
+<A NAME="z3_16"><HR></a><P><DD> <B>Figure 3.16 Peripheral data configuration 1</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> saturn peripheral id</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=4> <B>0H～EH</b><BR>
+ saturn peripheral type</TD><TD COLSPAN=4> <B>1H～FH</b><BR>
+ Data size</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=5><PRE> Peripheral data table</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> Peripheral data 1st</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> Peripheral data 2nd</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> :<BR>
+ :<BR>
+ :</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> peripheral data nth</TD></TR>
+</TABLE>
+<DD> nth is indicated by the data size and can be up to 15.<A NAME="z3_17"><HR></a><P><DD> <B>Figure 3.17 Peripheral data configuration 2</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> saturn peripheral id</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=4> <B>0H～EH</b><BR>
+ saturn peripheral type</TD><TD COLSPAN=4> <B>0H</b><BR>
+ Data size</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> Extended data size</TH><TD COLSPAN=4> <B>0H</b><TD COLSPAN=4> <B>F0H</b></TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=5><PRE> Peripheral data table</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> Peripheral data 1st</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> Peripheral data 2nd</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> :<BR>
+ :<BR>
+ :</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> peripheral data nth</TD></TR>
+</TABLE>
+<P><DD> Limit extended data size to 15 bytes.<DD> Peripheral developers do not allow combinations in which the extended data size is <B>0FH</b> when accessed in 255-byte mode.<A NAME="z3_18"><HR></a><P><DD> <B>Figure 3.18 Peripheral data configuration 3</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> saturn peripheral id</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=4> <B>0H～EH</b><BR>
+ saturn peripheral type</TD><TD COLSPAN=4> <B>0H</b><BR>
+ Data size</TD></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> Extended data size</TH><TD COLSPAN=8> <B>10H~FFH</b></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=5><PRE> Peripheral data table</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> Peripheral data 1st</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> Peripheral data 2nd</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> :<BR>
+ :<BR>
+ :</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> peripheral data nth</TD></TR>
+</TABLE>
+<P><DD> nth is indicated by the extended data size, with a maximum <B>of n=255</b> .</P>
+<P><DT>&#65308; <B>If a multi-tap is connected to the peripheral port</b>&#65310;<DD> When connected to a multi-tap, the port mode indicates the maximum data size to collect from the peripherals connected to each tap. (This is not the total number of data collected from the entire multi-tap.)<BR>
+ If the connected peripheral is 15 bytes or less, it will be peripheral data configuration 1 regardless of whether the port mode is 15 byte mode or 255 byte mode.<BR>
+ If the connected peripheral is 16 bytes or more and the port mode is 15 byte mode, only up to 15 bytes will be collected as per peripheral data configuration 2.<BR>
+ If the connected peripheral is 16 bytes or more and the port mode is 255 byte mode, all data will be collected as per peripheral data configuration 3.<BR>
+ Also, if the specifications of the multi-tap itself is a maximum of 15 bytes for each tap, data of 16 bytes or more will be cut.<BR>
+ A mix of peripherals of 15 bytes or less and peripherals of 16 bytes or more may be connected to a multitap. However, when issuing the INTBACK command, the port mode can only be set to either 15 bytes or 255 bytes.<BR>
+ Therefore, the multi-tap specifications define the maximum data size that each tap can collect. When using multi-tap, set the port mode according to the maximum data size of the tap. In other words, if the multi-tap specification is a maximum of 15 bytes, set the port mode to 15-byte mode, and if the multi-tap specification is a maximum of 255 bytes, set the port mode to 255-byte mode.<BR>
+ The Saturn 6P multi-tap has a maximum of 15 bytes per tap. Use port mode in 15-byte mode.<BR>
+ Table 3.9 shows the combinations of multi-tap data size and port mode. Peripheral data configurations 1 to 3 in Table 3.9 are similar to those shown in Figures 3.16 to 3.18.<BR>
+ When using multi-tap, the connection status of each tap is indicated by the Saturn peripheral ID of each tap. When not connected to a tap or when an UNKNOWN device is connected to a tap, the Saturn peripheral ID is output in the configuration shown in Figure 3.19 and Figure 3.20.</P>
+<A NAME="t3_9"></A><P><DD> <B>Table 3.9 Peripheral data size and port mode combinations (multi-tap)</b><DD><TABLE BORDER=1>
+<TR><TD ROWSPAN=2 COLSPAN=2><PRE></TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> Port mode (IRG1 setting)</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 15</TD><TD ALIGN="CENTER"><PRE> 255</TD></TR>
+<TR><TD ROWSPAN=4 ALIGN="CENTER"><PRE> peripheral data<BR> Size [byte]</TD><TD ALIGN="CENTER"><PRE> 15</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> Peripheral data configuration 1</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 16-255</TD><TD ALIGN="CENTER"><PRE> peripheral<BR> Data structure 2</TD><TD ALIGN="CENTER"><PRE> peripheral<BR> Data structure 3</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> disconnected</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> Tap peripheral not connected</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> UNKNOWN</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> tap peripheral<BR> UNKNOWN</TD></TR>
+</TABLE>
+</P>
+<A NAME="z3_19"></A><P><DD> <B>Figure 3.19 Saturn peripheral ID when no peripheral is connected to the tap</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> saturn peripheral id</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=8> FFH</TD></TR>
+</TABLE>
+</P>
+<A NAME="z3_20"></A><P><DD> <B>Figure 3.20 Saturn peripheral ID when UNKNOWN peripheral is connected to tap</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> saturn peripheral id</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=4> FH<BR>
+ saturn peripheral type</TD><TD COLSPAN=4> 0H～EH<BR>
+ Data size</TD></TR>
+</TABLE>
+<P><DD> Outputs the Mega Drive peripheral ID in the data size.<DD> It can be treated in the same way as SMPC UNKNOWN.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_16.htm">Back</a> ｜ <A HREF="p03_18.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

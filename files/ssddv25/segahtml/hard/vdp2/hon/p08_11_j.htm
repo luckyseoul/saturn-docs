@@ -1,0 +1,271 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;54/86&gt;VDP2ユーザーズマニュアル/8.1ウィンドウ領域-2</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no8">VDP2ユーザーズマニュアル</A>★
+<a href="p08_10_j.htm">第８章　ウィンドウ</A>
+<HR>
+<B>▲
+<a href="p08_10_j.htm">戻る</A>｜
+<a href="p08_12_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第８章　ウィンドウ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no8_13"></A>
+	<P><DT><H3>　●ノーマルラインウィンドウ</H3>
+	<DD>　ノーマルラインウィンドウは、ウィンドウのラインごとの水平方向の始点座標と終点座標をテーブルとしてVRAMに格納し、垂直方向の始点座標と終点座標を<a href="p08_10_j.htm#no8_12">ウィンドウポジションレジスタ</A>に指定することで得られます。指定した座標で囲まれた領域が内側、それ以外の領域が外側です。ウィンドウの境界線は内側とみなされます。ノーマルラインウィンドウを図8.2に示します。</P>
+
+	<P><DD>　水平方向の始点座標と終点座標のテーブル(ラインウィンドウテーブル)に格納するデータのビット構成を図8.3に示します。<BR>
+　ノンインタレース、倍密インタレースモードでは1ラインごとに座標を指定できますが、単密インタレースモードでは2ラインごとにしか指定できません。ノーマルラインウィンドウテーブルの構成を図8.4に示します。<BR>
+　水平方向、垂直方向のどちらか一方でも、始点座標が終点座標より大きいと画面全てがウィンドウの外側の領域として判断されます。</P>
+
+<A NAME="z8_2"></A>
+	<P ALIGN=CENTER><B>図8.2　ノーマルラインウィンドウ</B><BR><img srcset="../grp/i184_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z8_3"></A>
+	<P>	<DD><B>図8.3　ノーマルラインウィンドウテーブルデータのビット構成</B>
+<P><TABLE BORDER><TR><TH ROWSPAN=2>+0</TH>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+<TR><TH COLSPAN=6></TH><TH COLSPAN=10>水平方向始点座標　10ビット</TH></TR></TABLE></P>
+
+	<P><TABLE BORDER><TR><TH ROWSPAN=2>+2</TH>
+	<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR><TH COLSPAN=6></TH><TH COLSPAN=10>水平方向終点座標　10ビット</TH></TR></TABLE>
+	<DD><TABLE><TR><TD>
+	<TABLE BORDER CELLSPACING=5><TR><TD></TD></TR></TABLE>
+	</TD><TD>部は無視されます。</TD></TR></TABLE></P>
+
+<A NAME="z8_4"></A>
+	<DD><B>図8.4　ノーマルラインウィンドウテーブルの構成</B><BR>
+
+	<P><DD>　●ノンインタレースおよび倍密インタレースモード
+	<DD><TABLE BORDER=1>
+	<TR><TD><PRE>　　　</TD><TH><PRE>ビット15　←　バック画面テーブル(VRAM)　→　0</TH></TR>
+	<TR><TH>+00H<BR>+02H</TH><TD ALIGN=CENTER>１ライン目の水平方向始点座標<BR>１ライン目の水平方向終点座標</TD></TR>
+	<TR><TH>+04H<BR>+06H</TH><TD ALIGN=CENTER>２ライン目の水平方向始点座標<BR>２ライン目の水平方向終点座標</TD></TR>
+	<TR><TH>+08H<BR>+0AH</TH><TD ALIGN=CENTER>３ライン目の水平方向始点座標<BR>３ライン目の水平方向終点座標</TD></TR>
+	<TR><TH>:<BR>:</TH><TD ALIGN=CENTER>:<BR>:</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>倍密インタレースの場合、偶数フィールドと奇数フィールドのラインのデータを一緒に格納します</P>
+
+
+	<P><DD>　●単密インタレースモード
+		<DD><TABLE BORDER=1>
+	<TR><TD><PRE>　　　</TD><TH><PRE>ビット15　←　バック画面テーブル(VRAM)　→　0</TH></TR>
+	<TR><TH>+00H<BR>+02H</TH><TD ALIGN=CENTER>１，２ライン目の水平方向始点座標<BR>１，２ライン目の水平方向終点座標</TD></TR>
+	<TR><TH>+04H<BR>+06H</TH><TD ALIGN=CENTER>３，４ライン目の水平方向始点座標<BR>３，４ライン目の水平方向終点座標</TD></TR>
+	<TR><TH>+08H<BR>+0AH</TH><TD ALIGN=CENTER>５，６ライン目の水平方向始点座標<BR>５，６ライン目の水平方向終点座標</TD></TR>
+	<TR><TH>:<BR>:</TH><TD ALIGN=CENTER>:<BR>:</TD></TR>
+	</TABLE>
+
+	<P><DD>　●垂直方向の設定
+	<DD>　垂直方向の設定は、ウィンドウポジションレジスタに始点座標と終点座標を指定することで得られます。
+	ただし、水平方向（WPSXn,WPEXn）については任意の値を設定してください。この設定値は無視されますが始点、終点が逆転していると正しく表示されません。<BR>
+	関係は、WPSXn≦WPEXn　となります。
+
+	<P><DD>ウィンドポジションレジスタ
+	<TABLE BORDER><TR><TH ROWSPAN=2><PRE>WPSXn</TH>
+	<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR><TH COLSPAN=6></TH><TH COLSPAN=10>任意値<FONT SIZE=2><B>(注)</B></FONT></TH></TR></TABLE></P>
+
+	<P><TABLE BORDER><TR><TH ROWSPAN=2><PRE>WPSYn</TH>
+	<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR><TH COLSPAN=6></TH><TH COLSPAN=10>垂直方向開始ライン　10ビット</TH></TR></TABLE></P>
+
+	<TABLE BORDER><TR><TH ROWSPAN=2><PRE>WPEXn</TH>
+	<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR><TH COLSPAN=6></TH><TH COLSPAN=10>任意値<FONT SIZE=2><B>(注)</B></FONT></TH></TR></TABLE></P>
+
+	<P><TABLE BORDER><TR><TH ROWSPAN=2><PRE>WPEYn</TH>
+	<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+	<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+	<TR><TH COLSPAN=6></TH><TH COLSPAN=10>垂直方向終了ライン　10ビット</TH></TR></TABLE>
+	<DD>n=0,1(ウィンド０、１)
+	<DD><B>(注)</B>WPSXnとWPEXnの関係　WPSXn≦WPEXn　
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="no8_14"></A>
+	<P>	<DT><H3>　●ラインウィンドウテーブルアドレスレジスタ</H3>
+		<DD>　ラインウィンドウテーブルアドレスレジスタは、ノーマルウィンドウをラインウィンドウにするかどうかと、そのテーブルの先頭アドレスを指定します。書き込み専用の16ビットのレジスタで、1800D8H〜1800DEH番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LWTA0U_"></A>
+<P>	<DD><B><FONT SIZE=5>LWTA0U</FONT>　<FONT SIZE=4>1800D8H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#W0LWE_">W0LWE  </A></TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA18</A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA17</A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA16</A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LWTA0L_"></A>
+<P>	<DD><B><FONT SIZE=5>LWTA0L</FONT>　<FONT SIZE=4>1800DAH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA15</A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA14</A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA13</A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA12</A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA11</A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA10</A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA9 </A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA7 </A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA6 </A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA5 </A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA4 </A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA3 </A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA2 </A></TH>
+<TH><PRE><A HREF="#W0LWTA_">W0LWTA1 </A></TH>
+<TH><PRE>   -    </TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LWTA1U_"></A>
+<P>	<DD><B><FONT SIZE=5>LWTA1U</FONT>　<FONT SIZE=4>1800DCH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#W1LWE_">W1LWE  </A></TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE>   -    </TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA18</A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA17</A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA16</A></TH>
+</TR></TABLE></P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LWTA1L_"></A>
+<P>	<DD><B><FONT SIZE=5>LWTA1L</FONT>　<FONT SIZE=4>1800DEH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA15</A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA14</A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA13</A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA12</A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA11</A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA10</A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA9 </A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA8 </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA7 </A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA6 </A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA5 </A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA4 </A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA3 </A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA2 </A></TH>
+<TH><PRE><A HREF="#W1LWTA_">W1LWTA1 </A></TH>
+<TH><PRE>   -    </TH>
+</TR></TABLE></P>
+
+<A NAME="W0LWE_">　</A>
+<A NAME="W1LWE_">　</A>
+	<DT><B>ラインウィンドウイネーブルビット</B>：Line window enable bit (W0LWE, W1LWE)
+	<DD>　ノーマルウィンドウをラインウィンドウにするかどうかを指定します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>W0LWE</TD><TD>1800D8H</TD><TD>ビット15</TD><TD>W0用</TD></TR>
+	<TR><TD>W1LWE</TD><TD>1800DCH</TD><TD>ビット15</TD><TD>W1用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TH>WxLWE</TH><TH>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TD>ノーマルウィンドウをラインウィンドウにしない</TD></TR>
+	<TR><TH><PRE>1</TH><TD>ノーマルウィンドウをラインウィンドウにする</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxには、0または1が入ります。</P>
+
+	<P>	<DD>　このビットが1のときには、必ずラインウィンドウテーブルをVRAMに格納してください。</P>
+
+<A NAME="W0LWTA_">　</A>
+<A NAME="W1LWTA_">　</A>
+	<DT><B>ラインウィンドウテーブルアドレスビット</B>：Line window table address bit
+	<DD>(W0LWTA18〜W0LWTA1, W1LWTA18〜W1LWTA1)<BR>
+　VRAM上のラインウィンドウテーブルの先頭アドレスを指定します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>W0LWTA18〜W0LWTA16</TD><TD>1800D8H</TD><TD>ビット2〜0</TD><TD>W0用</TD></TR>
+	<TR><TD>W0LWTA15〜W0LWTA1</TD><TD>1800DAH</TD><TD>ビット15〜1</TD><TD>W0用</TD></TR>
+	<TR><TD>W1LWTA18〜W1LWTA16</TD><TD>1800DCH</TD><TD>ビット2〜0</TD><TD>W1用</TD></TR>
+	<TR><TD>W1LWTA15〜W1LWTA1</TD><TD>1800DEH</TD><TD>ビット15〜1</TD><TD>W1用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　実際の先頭アドレスは、以下の式で計算されます。VRAMの容量が4Mビットの場合、アドレスの最上位ビットは無視されます。</P>
+
+	<P>	<DD><PRE><B>
+(ラインウィンドウテーブルの先頭アドレス)
+           ＝(ラインウィンドウテーブルアドレスレジスタ値18ビット)×4Ｈ
+</B></PRE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p08_10_j.htm">戻る</A>｜
+<a href="p08_12_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no8">VDP2ユーザーズマニュアル</A>★
+<a href="p08_10_j.htm">第８章　ウィンドウ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

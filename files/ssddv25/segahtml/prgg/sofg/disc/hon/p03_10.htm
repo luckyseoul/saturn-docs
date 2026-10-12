@@ -1,0 +1,147 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 9&gt;DISC format standard specification/DISC logical format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sofg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no3">DISC format standard specifications</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>DISC format standard specifications</b><H2 ALIGN=CENTER> DISC logical format</H2><HR NOSHADE>
+<DL>
+<A NAME="no3_11"></A><P><DT><H3> ■Summary</H3><DD> The CD-ROM area and CD-ROM XA area consist of a system area and a data area.<BR>
+ At the beginning of the data area, a set of volume descriptors, directories, and path tables are recorded to describe the volume/file structure of the disk. (Figure 3.1)<BR>
+ The system area, volume descriptor set, root directory, and path table must be recorded on the Mode1 track.</P>
+<A NAME="z3_1"></A><P ALIGN=CENTER> <B>Figure 3.1 Overview of CD-ROM area and CD-ROM XA area</b><BR>
+<img srcset="../grp/i015_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no3_12"></A><P><DT><H3> ■Volume/file structure</H3><A NAME="no3_121"></A><P><DT> <B>●Summary</b><DD> The volume/file structure complies with ISO9660.<BR>
+ Information has been added to the system area of the directory record.<P><A NAME="no3_122"></A><P><DT> <B>●Symbols representing data types</b><DD> The following abbreviations are used to represent volume/file structures.</P>
+<A NAME="t3_1"></A><P><DD> <B>Table 3.1 Abbreviations representing data types</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> Abbreviation</TH><TH><PRE> Model name</TH><TH><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> N</TD><TD><PRE> Numeric Value</TD><TD><PRE> 8 bit binary number</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> N.L.</TD><TD><PRE> Least Significant Byte First</TD><TD><PRE> LSBF notation 16/32 bit binary number<BR> Example) Recorded as hexadecimal number 1234 → 34 12</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> N.M.</TD><TD><PRE> Most Significant Byte First</TD><TD><PRE> MSBF notation 16/32 bit binary number<BR> Example) Hexadecimal number 1234 → recorded as 12 34</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> N.B.</TD><TD><PRE> Both-type orders</TD><TD><PRE> LSBF notation + MSBF notation<BR> Example) Hexadecimal number 1234→34 12 12 34 is recorded</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> N.D.</TD><TD><PRE> Any digit from ZERO-NINE</TD><TD><PRE> Numeric value in decimal notation</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> A</TD><TD><PRE> A-characters</TD><TD><PRE> ASCII string (20-22/25-3F/41-5A/5F)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> D</TD><TD><PRE> D-characters</TD><TD><PRE> Directory string (30-3F/41-5A/5F)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> DS</TD><TD><PRE> D-characters, SEPARATOR1,<BR> SEPARATOR2</TD><TD><PRE> D-characters+'.;'(2E/3B)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> D.E.</TD><TD><PRE> Directory Entry</TD><TD><PRE> directory entry format</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> A1</TD><TD><PRE> A1-characters</TD><TD><PRE> A-characters+Kanji</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> D1</TD><TD><PRE> D1-characters</TD><TD><PRE> D-characters+Kanji</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> D1S</TD><TD><PRE> D1-characters,SEPARATOR1,<BR> SEPARATOR2</TD><TD><PRE> D1-characters+'.;'(2E/3B)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 00</TD><TD><PRE> Zero fill</TD><TD><PRE> Fill unused and reserved areas with (00)</TD></TR>
+</TABLE>
+</P>
+<A NAME="z3_2"></A><P ALIGN=CENTER> <B>Figure 3.2 File management data structure in CD-ROM (ISO9660)</b><BR>
+<img srcset="../grp/i017_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD><UL TYPE=DISC>
+<LI> <B>volume descriptor</b><BR>
+ Arranged from the beginning of the data area. Fixed length depending on type.</P>
+<P><LI> <B>path table</b><BR>
+ A collection of path table records. The size and address of the path table are recorded in the volume descriptor.</P>
+<P><LI> <B>path table record</b><BR>
+ Supports one directory (root, sub). The position of the record becomes the directory number. (1 to n) Directory information is written in the directory block.</P>
+<P><LI> <B>directory block</b><BR>
+ A collection of directory records. Treats a directory block as one file. (Directory file) The size of the directory block is recorded in the file size of the directory record at the beginning of the block. (size of own directory file)<P><LI> <B>directory record</b><BR>
+ Supports one file (including directory).</P>
+</UL>
+<A NAME="no3_13"></A><P><DT><H3> ■Volume Descriptor Set</H3><DD> A volume descriptor set is a collection of volume descriptors recorded in consecutive sectors starting from logical sector number 16 (FAD=166).<BR>
+ There are five types of volume descriptors: Of these, volume partition descriptors are not used.</P>
+<A NAME="z3_3"></A><P ALIGN=CENTER> <B>Figure 3.3 Volume descriptor</b><BR>
+<img srcset="../grp/i018_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no3_131"></A><P><DT> <B>●Boot record</b><A NAME="t3_2"></A><P><DD> <B>Table 3.2 Boot record structure</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> Byte position</TH><TH WIDTH=50><PRE> mold</TH><TH WIDTH=200><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 1<BR> 2~6<BR> 7<BR> 8～39<BR> 40～71<BR> 71～2048</TD><TD ALIGN=CENTER><PRE> N<BR><BR> N<BR> A<BR> A<BR><BR></TD><TD><PRE> Volume Descriptor Type<BR> Standard Identifier<BR> Volume Descriptor Version<BR> Boot System Identifier<BR> Boot Identifier<BR> Boot System Use</TD><TD><PRE> volume descriptor type<BR> Standard identifier 'CD001'<BR> Volume descriptor version number<BR> boot system identifier<BR> boot identifier<BR> Not stipulated</TD></TR>
+</TABLE>
+</P>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>In a normal GAME-CD, one sector each of the basic volume descriptor and volume descriptor set terminator is recorded.</b><BR>
+ <B>These two sectors must be recorded.</b></TD></TR>
+</TABLE>
+</P>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>Be sure to fully understand how to use the secondary volume descriptor and boot record before using them.</b></TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_132"></A><P><DT> <B>●Primary Volume Descriptor</b><DD> A volume descriptor set contains one basic volume descriptor. The basic volume descriptor describes volume attributes, the location of the root directory, the location of path tables, etc.<BR>
+ Table 3.3 shows details of the basic volume descriptor.</P>
+<A NAME="t3_3"></A><P><DD> <B>Table 3.3 Basic volume descriptor structure</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=150><PRE> Byte position</TH><TH WIDTH=50><PRE> mold</TH><TH><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 1<BR> 2~6<BR> 7<BR> 8<BR> 9～40<BR> 41～72<BR> 73～80<BR> 81〜88<BR> 89〜120<BR> 121〜124<BR> 125〜128<BR> 129〜132<BR> 133〜140<BR> 141〜144<BR><BR> 145〜148<BR><BR> 149〜152<BR><BR> 153〜156<BR><BR> 157〜190<BR> 191〜318<BR> 319〜446<BR> 447〜574<BR> 575〜702<BR> 703〜739<BR> 740〜776<BR> 777〜813<BR> 814〜830<BR> 831〜847<BR> 848〜864<BR> 865〜881<BR> 882<BR> 883<BR> 884～1395<BR> 1396~2048</TD><TD ALIGN=CENTER><PRE> N<BR><BR> N<BR> 00<BR> A<BR> D<BR> 00<BR> N.B.<BR> 00<BR> N.B.<BR> N.B.<BR> N.B.<BR> N.B.<BR> N.L.<BR><BR> N.L.<BR><BR> N.M.<BR><BR> N.M.<BR><BR> D.E.<BR> D<BR> A<BR> A<BR> A<BR> DS<BR> DS<BR> DS<BR> N.D.<BR> N.D.<BR> N.D.<BR> N.D.<BR> N<BR> 00<BR><BR></TD><TD><PRE> Volume Descriptor Type<BR> Standard Identifier<BR> Volume Descriptor Version<BR> Unused Field<BR> System Identifier<BR> Volume Identifier<BR> Unused Field<BR> Volume Space Size<BR> Unused Field<BR> Volume Set Size<BR> Volume Sequence Number<BR> Logical block size<BR> Path Table Size<BR> Location of Occurrence of<BR> Type L Path Table<BR> Location of Optional<BR> Occurrence of Type L Path Table<BR> Location of Occurrence of<BR> Type M Path Table<BR> Location of Optional Occurrence of<BR> Type M Path Table<BR> Directory Record for Root Directory<BR> Volume Set Identifier<BR> Publisher Identifier<BR> Data Preparer Identifier<BR> Application Identifier<BR> Copyright File Identifier<BR> Abstract File Identifier<BR> Bibliographic File Identifier<BR> Volume Creation Date and Time<BR> Volume Modification Date and Time<BR> Volume Expiration Date and Time<BR> Volume Effective Date and Time<BR> File Structure Version<BR> Reserved for future standardization<BR> Application Use<BR> Reserved for future standardization</TD><TD><PRE> Volume descriptor type = 01<BR> Standard identifier 'CD001'<BR> Volume descriptor version number<BR> unused<BR> Systems using LSN 0-15<BR> volume name<BR> unused<BR> Number of sectors in the entire volume<BR> unused<BR> Number of volumes during multi-volume = 1<BR> Volume serial number during multi-volume<BR> Logical block length<BR> Number of bytes in entire path table<BR> Path table position in LSBF notation<BR><BR> spare<BR><BR> Path table location in MSBF notation<BR><BR> spare<BR><BR> directory record for root directory<BR> Overall name during multi-volume<BR> publisher identifier<BR> Data editor identifier<BR> Identification of how data is used<BR> Copyright file name<BR> Abstract (abstract) file name<BR> Bibliographic file name<BR> Creation date and time<BR> Update date and time<BR> Expiration date, time<BR> Effective date and time<BR> File structure version number<BR> Reserved for future standardization<BR> Compliant with CD-ROM XA standard<BR> Reserved for future standardization</TD></TABLE>
+</P>
+<P><DD> The CD-ROM XA standard specifies the following areas as disc labels.</P>
+<A NAME="t3_4"></A><P><DD> <B>Table 3.4 Disc label on CD-ROM XA</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> Byte position</TH><TH WIDTH=50><PRE> mold</TH><TH WIDTH=200><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 1025~1032<BR> 1033~1034<BR> 1035~1042<BR> 1043~1050</TD><TD ALIGN=CENTER><PRE><BR><BR> D<BR> 00</TD><TD><PRE> Identifying Signature<BR> CD-ROM XA Flags<BR> Startup Directory<BR> Reserved</TD><TD><PRE> 'CD-XA001'<BR> reserved area<BR> startup directory name<BR> reserved area</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_133"></A><P><DT> <B>●Supplementary Volume Descriptor</b><DD> A volume descriptor set includes any number of secondary volume descriptors. The secondary volume descriptor describes volume attributes, root directory location, path table group location, etc.<BR>
+ When Japanese characters are used in identifiers such as volume names and publisher identifiers, they are recorded in the secondary volume descriptor. Table 3.5 shows details of the secondary volume descriptor.</P>
+<A NAME="t3_5"></A><P><DD> <B>Table 3.5 Structure of secondary volume descriptor</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> Byte position</TH><TH WIDTH=50><PRE> mold</TH><TH WIDTH=200><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 1<BR> 2~6<BR> 7<BR> 8<BR> 9～40<BR> 41～72<BR> 73～80<BR> 81〜88<BR> 89〜120<BR> 121〜124<BR> 125〜128<BR> 129〜132<BR> 133〜140<BR> 141〜144<BR><BR> 145〜148<BR><BR> 149〜152<BR><BR> 153〜156<BR><BR> 157〜190<BR> 191〜318<BR> 319〜446<BR> 447〜574<BR> 575〜702<BR> 703〜739<BR> 740〜776<BR> 777〜813<BR> 814〜830<BR> 831〜847<BR> 848〜864<BR> 865〜881<BR> 882<BR> 883<BR> 884～1395<BR> 1396~2048</TD><TD ALIGN=CENTER><PRE> N<BR><BR> N<BR><BR> A1<BR> D1<BR> 00<BR> N.B.<BR> 00<BR> N.B.<BR> N.B.<BR> N.B.<BR> N.B.<BR> N.L.<BR><BR> N.L.<BR><BR> N.M.<BR><BR> N.M.<BR><BR> D.E.<BR> D1<BR> A1<BR> A1<BR> A1<BR> D1S<BR> D1S<BR> D1S<BR> N.D.<BR> N.D.<BR> N.D.<BR> N.D.<BR> N<BR> 00<BR><BR></TD><TD><PRE> Volume Descriptor Type<BR> Standard Identifier<BR> Volume Descriptor Version<BR> Volume Flag<BR> System Identifier<BR> Volume Identifier<BR> Unused Field<BR> Volume Space Size<BR> Unused Field<BR> Volume Set Size<BR> Volume Sequence Number<BR> Logical block size<BR> Path Table Size<BR> Location of Occurrence of<BR> Type L Path Table<BR> Location of Optional<BR> Occurrence of Type L Path Table<BR> Location of Occurrence of<BR> Type M Path Table<BR> Location of Optional Occurrence of<BR> Type M Path Table<BR> Directory Record for Root Directory<BR> Volume Set Identifier<BR> Publisher Identifier<BR> Data Preparer Identifier<BR> Application Identifier<BR> Copyright File Identifier<BR> Abstract File Identifier<BR> Bibliographic File Identifier<BR> Volume Creation Date and Time<BR> Volume Modification Date and Time<BR> Volume Expiration Date and Time<BR> Volume Effective Date and Time<BR> File Structure Version<BR> Reserved for future standardization<BR> Application Use<BR> Reserved for future standardization</TD><TD><PRE> volume descriptor type<BR> Standard identifier 'CD001'<BR> Volume descriptor version number<BR> volume flag<BR> Systems using LSN 0-15<BR> volume name<BR> unused<BR> Number of sectors in the entire volume<BR> unused<BR> Number of volumes during multi-volume = 1<BR> Volume serial number during multi-volume<BR> Logical block length<BR> Number of bytes in entire path table<BR> Path table position in LSBF notation<BR><BR> spare<BR><BR> Path table location in MSBF notation<BR><BR> spare<BR><BR> directory record for root directory<BR> Overall name during multi-volume<BR> publisher identifier<BR> Data editor identifier<BR> Identification of how data is used<BR> Copyright file name<BR> Abstract (abstract) file name<BR> Bibliographic file name<BR> Creation date and time<BR> Update date and time<BR> Expiration date, time<BR> Effective date and time<BR> File structure version number<BR> Reserved for future standardization<BR> Not stipulated<BR> Reserved for future standardization</TD></TABLE>
+</P>
+<A NAME="no3_14"></A><P><DT><H3> ■Directory</H3><DD> A directory is recorded as a single file consisting of multiple directory records. Each directory record is uniquely identified within the same directory by its file identification.<BR>
+ File identification represents a file name or directory name and is stored in the following format.</P>
+<P><DD><PRE>
+                          Up to 8 characters 
+                          |          Up to 3 characters, can be omitted 
+                          |          |           Number from 1 to 32767 (Always set to 1)
+                          ↓          ↓           ↓ 
+File identification → file name. Extension; version number 
+                    ↑          ↑          ↑ 
+                    |          |          Delimiter 2 “Semicolon” 
+                    |          Number of delimiters: 1 “period” 
+                    |          
+               Directory name: Up to 8 characters 
+               (The root directory is 1 byte 00H)　
+</PRE></P>
+<DD><B>Table 3.6 Directory record</b><DD><TABLE BORDER CELLPADDING=5>
+<TR><TH WIDTH=100><PRE> Byte position</TH><TH WIDTH=50><PRE> mold</TH><TH WIDTH=200><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 1<BR> 2<BR> 3-10<BR> 11-18<BR> 19-25<BR> 26<BR> 27<BR> 28<BR> 29-32<BR> 33<BR> 34~<BR> (33+LEN_FI)<BR><BR> 34+LEN_FI<BR></TD><TD ALIGN=CENTER><PRE> N<BR> N<BR> N.B.<BR> N.B.<BR> N<BR><BR> N<BR> N<BR> N.B.<BR> N<BR> D1S<BR><BR><BR> 00<BR></TD><TD><PRE> Length of Directory Record<BR> Extended Attribute Record Length<BR> Location of Extent<BR> Data length<BR> Recording Date and Time<BR> File Flags<BR> File unit size<BR> Interleave Gap Size<BR> Volume Sequence Number<BR> Length of File Identifier<BR> File Identifier<BR><BR><BR> Padding Field<BR> System use</TD><TD><PRE> directory record length<BR> Extended attribute record length<BR> Extent location (LSN)<BR> Data length<BR> Recording date/time<BR> file flag<BR> file unit size<BR> Interleaving gap size<BR> volume sequence number<BR> File identification length<BR> file identification<BR>&#12539; file name. Extension; version number<BR>&#12539; Directory name<BR> embedded<BR> System information</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_141"></A><P><DT> <B>●Format of recording date and time</b></P>
+<A NAME="t3_7"></A><P><DD> <B>Table 3.7 Recording date/time format</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> Byte position</TH><TH WIDTH=50><PRE> mold</TH><TH WIDTH=200><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 1<BR> 2<BR> 3<BR> 4<BR> 5<BR> 6<BR> 7<BR><BR></TD><TD ALIGN=CENTER><PRE> N<BR> N<BR> N<BR> N<BR> N<BR> N<BR> N<BR><BR></TD><TD><PRE> Number of years since 1900<BR> Month of the year from 1 to 12<BR> Day of the month from 1 to 31<BR> Hour of the day from 0 to 23<BR> Minute of the hour from 0 to 59<BR> Second of the minute from 0 to 59<BR> Offset from Greenwich Mean Time<BR> in number of 15 min intervals<BR> from-48 (West) to +52 (East)</TD><TD><PRE> Years since 1900<BR> Month<BR> Day<BR> Time<BR> minutes<BR> seconds<BR> Difference from Greenwich Mean Time<BR> -48 (west) to +52 (east) in 15 minute increments<BR></TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_142"></A><P><DT> <B>●File flag</b></P>
+<A NAME="t3_8"></A><P><DD> <B>Table 3.8 File flags</b><DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> bit position</TH><TH WIDTH=200><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0<BR> 1<BR> 2<BR> 3<BR> 4<BR> 5<BR> 6<BR> 7</TD><TD><PRE> Existence<BR> Directory<BR> Associated File<BR> Record<BR> Protection<BR> Reserved<BR> Reserved<BR> Multi-Extent</TD><TD><PRE> invisible file<BR> directory file<BR> Related files (=0)<BR> Extended attribute record structure file<BR> Protected file (=0)<BR><BR><BR> Multiple extent file (=0)</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_143"></A><P><DT> <B>●File identification</b><DD> The file name or directory name is stored according to the value of the directory bit (bit 1) of the file flag.<BR>
+ Directory bit = 0: Specify identification information for the file.</P>
+<A NAME="t3_9"></A><P><DD> <B>Table 3.9 File identification</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> Directory bit value</TH><TH WIDTH=200><PRE> format</TH><TH WIDTH=200><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 0</TD><TD ALIGN=CENTER><PRE> file name. Extension; version number<BR> 《Example》aaaaaaaa.bbb;1<BR> xxxxxxx;1</TD><TD><PRE> File name: Up to 8 characters<BR> Extension: Up to 3 characters (optional)<BR> Version number: Always 1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> 1</TD><TD ALIGN=CENTER><PRE> Directory name</TD><TD><PRE> Directory name: Up to 8 characters<BR> The root directory is 1 byte 00H</TD></TR>
+</TABLE>
+</P>
+<P><DD> If the file identification length is an even number, 1 byte (00H) is inserted.</P>
+<A NAME="no3_144"></A><P><DT> <B>●System information</b><DD> The following extensions will be made to the ISO9660 standard.</P>
+<A NAME="t3_10"></A><P><DD> <B>Table 3.10 Information for the system</b><DD><TABLE BORDER CELLPADDING=5>
+<TR><TH WIDTH=100><PRE> Byte position</TH><TH WIDTH=50><PRE> mold</TH><TH WIDTH=200><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> 14<BR> 5～6<BR> 7<BR> 8<BR> 9<BR> 10-14</TD><TD ALIGN=CENTER><PRE> N.M.<BR><BR><BR><BR> N<BR> 00</TD><TD><PRE><BR> Owner ID<BR> Attributes<BR> Signature byte 1<BR> Signature byte 2<BR> File Number<BR> Reserved</TD><TD><PRE> Owner group ID, owner ID<BR> attribute bit<BR> 'X'($58)<BR> 'A'($41)<BR> file number<BR> reserved area</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_145"></A><P><DT> <B>●Attribute bit</b></P><A NAME=t3_11"></A><P><DD> <B>Table 3.11 Attribute bits</b><DD><TABLE BORDER=1><TR><TH WIDTH=100><PRE> bit position</TH><TH WIDTH=200><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR><TR><TD ALIGN=CENTER><PRE> 0<BR> 1<BR> 2<BR> 3<BR> Four<BR> Five<BR> 6<BR> 7<BR> 8<BR> 9<BR> Ten<BR> 11<BR> 12<BR> 13<BR> 14<BR> 15</TD><TD><PRE> Owner Read<BR> Reserved<BR> Owner execute<BR> Reserved<BR> Group read<BR> Reserved<BR> Group execution<BR> Reserved<BR> World read<BR> Reserved<BR> World execute<BR> File contains Form 1 sectors<BR> File contains Form 2 sectors<BR> File contains interleaved sector<BR> CD-DA file<BR> Directory </TD><TD><PRE><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR> Form contains 1 sector<BR> Contains Form 2 sectors<BR> Contains interleaved sectors<BR> CD-DA file<BR> directory file</TD></TR></TABLE></P><A NAME="no3_15"></A><P><DT><H3> ■Pass table</H3><DD> A path table record is recorded for each directory in the directory hierarchy. Path table records are numbered starting with 1, with the first record indicating the root directory.<BR> The details of the path table record are shown below.</P><A NAME="t3_12"></A><P><DD> <B>Table 3.12 Path table record</b><DD><TABLE BORDER=1><TR><TH WIDTH=100><PRE> Byte position</TH><TH WIDTH=50><PRE> mold</TH><TH WIDTH=200><PRE> Field name</TH><TH WIDTH=200><PRE> explanation</TH></TR><TR><TD ALIGN=CENTER><PRE> 1<BR> 2<BR> 3-6<BR> 7~8<BR> 9～<BR> (8+LEN_DI)<BR> 9+LEN_DI</TD><TD ALIGN=CENTER><PRE> N<BR> N<BR> N<BR> N<BR> D1<BR><BR> 00</TD><TD><PRE> Length of Directory Identifier<BR> Extended Attribute Record Length<BR> Location of Extent<BR> Parent Directory Number<BR> Directory Identifier<BR><BR> Padding Field</TD><TD><PRE> Directory name length<BR> Extended attribute record length<BR> LSN at the beginning of the extent<BR> Parent directory entry number<BR> Directory name<BR><BR> Only if the directory name is an odd number</TD></TR></TABLE></P><A NAME="no3_16"></A><P><DT><H3> ■User file</H3><DD> User files are placed in the data area.<BR> One file is not necessarily placed consecutively, but is generally placed interleaved. Mode2 sectors are a mixture of Form1 and Form2, but each sector is converted to a file size of 2048 bytes.<BR> For convenience, Mode1 sectors are formally treated as Form1 sectors with a subheader of 0.<BR> Form2 sector data must be in units of 2324 bytes, and fractional bytes are not allowed.</P><A NAME="no3_17"></A><P><DT><H3> ■Others</H3><A NAME="no3_171"></A><DT> <B>●Directory structure</b><DD> GAME-CD also supports subdirectory structures.</P><A NAME="no3_172"></A><P><DT> <B>●Multi volume</b><DD> Not supported.</P><A NAME="no3_173"></A><P><DT> <B>●Multi-session</b><DD> Not supported.</P></DL><HR NOSHADE> <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sofg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no3">DISC format standard specifications</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

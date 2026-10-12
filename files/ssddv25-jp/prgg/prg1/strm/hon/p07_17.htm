@@ -1,0 +1,252 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;15/18&gt;ストリームシステムライブラリ/7.関数仕様-7</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p07_16.htm">戻る</A>｜
+<A HREF="p07_18.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ストリームシステムライブラリ</B>
+<H2 ALIGN=CENTER>7.関数仕様-7</H2>
+<HR NOSHADE>
+
+<A NAME="no7_70"></A>
+<H3>7.7　ストリームサーバ実行</H3>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no7_1"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>サーバ実行グループの指定（即時復帰）</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_NwSetExecGrp</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.1</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Bool STM_NwSetExecGrp(StmGrpHn grp)
+<DT><B>　入　力</B><DD>grp：ストリームグループハンドル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD><TABLE>
+<TR><TD><PRE>TRUE</TD><TD><PRE>：処理が受け付けられた場合</TD></TR>
+<TR><TD><PRE>FALSE</TD><TD><PRE>：処理が完了していない場合</TD></TR></TABLE><!-- *** Update by CRI ：3.2.1 -->
+
+<DT><B>　機　能</B><DD>ストリームサーバが実行すべきストリームグループを指定します。即時復帰なので、サーバ関数を呼び出す必要があります。
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>処理を登録したら即時復帰します。</P>
+<P><B><LI></B>ファイルシステムを使用するためNULLを指定した場合は、以下の手順でドライブがポーズ状態になることを確認した後、GFS関数を呼び出してください。</P>
+<PRE>
+　　　　　.
+　　　　　.
+tsk = STM_NwSetExecGrp(NULL);
+if (tsk == FALSE)	return;
+do {
+	stat = STM_ExecServer();
+	user();
+} while (stat != STM_EXEC_TSKEND);
+　　　　　.
+　　　　　.
+</PRE>
+
+<P><LI>NULLを指定した場合、ストリームサーバは、STM_EXEC_TSKENDを経由してSTM_EXEC_PAUSEとなります。必ずSTM_EXEC_TSKENDになるまでサーバ関数を呼び続けてください。</P>
+<P><LI>ファイルシステムを使用する場合、NULLを指定し、停止させてください。</P>
+<P><LI>ストリームグループのアクセスを再開すると停止位置から読み込みます。</P></OL>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no7_2"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>サーバ実行グループの指定（完了復帰）</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_SetExecGrp</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.2</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Bool STM_SetExecGrp(StmGrpHn grp)
+<DT><B>　入　力</B><DD>grp：ストリームグループハンドル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD><TABLE>
+<TR><TD><PRE>TRUE</TD><TD><PRE>：処理が受け付けられた場合</TD></TR>
+<TR><TD><PRE>FALSE</TD><TD><PRE>：処理が完了していない場合</TD></TR></TABLE>
+
+<DT><B>　機　能</B><DD>ストリームサーバが実行するストリームグループを指定します。完了復帰なので、処理が完了するまで本関数は終了しません。
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>本関数内でドライブがポーズ状態になるまで待機します。</P>
+<P><B><LI></B>NULLを指定した場合、ストリームサーバは、STM_EXEC_PAUSEとなります。</P>
+<P><B><LI></B>ファイルシステムを使用する場合、NULLを指定し、停止させてください。</P>
+<P><B><LI></B>ストリームグループのアクセスを再開するときは、停止位置から読み込みます。</P></OL>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no7_3"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>サーバの実行</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_ExecServer</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.3</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 STM_ExecServer(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>ストリームアクセス状態 (StmAcStat)<br>即時復帰型関数を実行中の場合、関数ID (StmFuncId)<br>エラーの場合、エラーコード (StmErrCode)<!-- *** Update by CRI ：7.3 -->
+<DT><B>　機　能</B><DD>ストリームサーバを実行します。
+<DT><B>　備　考</B><DD>毎秒１回以上本関数を呼び出してください。
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no7_4"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>再生位置の設定</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_MovePickup</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.4</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>voidSTM_MovePickup(StmHn stm, Sint32 ofs)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>stm</TD><TD><PRE>：ストリームハンドル</TD></TR>
+<TR><TD><PRE>ofs</TD><TD><PRE>：ストリーム先頭からのオフセット(セクタ単位)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>ストリームが属するストリームグループの再生位置を設定します。
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>移動先FAD = ストリーム先頭FAD + オフセット。</P>
+<P><B><LI></B>ピックアップの位置は、STM_ExecServerを実行することによって移動します。</P></OL>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no7_5"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ループ開始ストリームの指定</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_SetLoop</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.5</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Bool STM_SetLoop(StmGrpHn grp, StmHn loopstm, Sint32 loopmax)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>grp</TD><TD><PRE>：ストリームグループハンドル</TD></TR>
+<TR><TD><PRE>loopstm</TD><TD><PRE>：ループ開始ストリーム<BR>(ループしない場合、NULL。先頭ストリームの場合、STM_LOOP_DFL)</TD></TR>
+<TR><TD><PRE>loopmax</TD><TD><PRE>：ループ回数(無限回の場合、STM_LOOP_ENDLESS)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD><TABLE>
+<TR><TD><PRE>TRUE</TD><TD><PRE>：正しく設定できた場合</TD></TR>
+<TR><TD><PRE>FALSE</TD><TD><PRE>：常駐ストリームの場合</TD></TR></TABLE>
+
+<DT><B>　機　能</B><DD>ストリームグループのループ開始ストリーム、ループ回数を指定します。
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>デフォルトのループ開始ストリームは、最も前方のストリーム。ループ回は、無限回です。</P>
+<P><B><LI></B>ループ開始ストリームをクローズした場合は、先頭のストリームがループ開始ストリームとなります。</P>
+<P><B><LI></B>ループカウンタは、初期化されます。</P>
+<P><B><LI></B>常駐ストリームをループ開始ストリームに指定することはできません。</P></OL>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no7_6"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ループカウンタの取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_GetLoopCnt</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.6</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　STM_GetLoopCnt(StmGrpHn grp)
+<DT><B>　入　力</B><DD>grp：ストリームグループハンドル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>ループカウンタ
+<DT><B>　機　能</B><DD>ループした回数を取得します。
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no7_7"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>実行状態の取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_GetExecStat</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.7</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　STM_GetExecStat(StmGrpHn grp, Sint32 *fad)
+<DT><B>　入　力</B><DD>grp：ストリームグループハンドル
+<DT><B>　出　力</B><DD>fad：再生中のFAD
+<DT><B>　関数値</B><DD>ストリームアクセス状態 (StmAcStat)
+<DT><B>　機　能</B><DD>指定したストリームグループの実行状態を取得します。
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no7_8"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ストリームアクセス終了のチェック</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_IsComplete</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.8</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Bool　STM_IsComplete(StmHn stm)
+<DT><B>　入　力</B><DD>stm：ストリームハンドル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD><TABLE>
+<TR><TD><PRE>TRUE</TD><TD><PRE>：ストリームアクセスが終了している場合</TD></TR>
+<TR><TD><PRE>FALSE</TD><TD><PRE>：ストリームアクセスが終了していない場合</TD></TR></TABLE>
+
+<DT><B>　機　能</B><DD>指定したストリームのアクセスが終了したかどうかチェックします。
+<DT><B>　備　考</B><DD>ストリームアクセスが終了するタイミングは以下のとおりです。
+<DD><table border>
+<TR><TH width=100 align="center"><pre>転送ゲート</TH><TH width=250 align="center"><pre>タイミング</TH></tr>
+<TR><td><pre>閉じている</td><td><pre>読み込みが終了した時点</td></tr>
+<TR><td><pre>開いている</td><td><pre>転送が終了した時点</td></TR></table>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no7_9	"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ストリームデータの転送</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_ExecTrans</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.9</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Bool　STM_ExecTrans(StmHn stm)
+<DT><B>　入　力</B><DD>stm：ストリームハンドル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD><TABLE>
+<TR><TD><PRE>TRUE</TD><TD><PRE>：転送を開始した</TD></TR>
+<TR><TD><PRE>FALSE</TD><TD><PRE>：転送を開始しなかった</TD></TR></TABLE>
+
+<DT><B>　機　能</B><DD>指定したストリームのデータをCDバッファ区画から取り出して転送します。
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>転送ゲートが閉じている場合は、常にFALSEです。</P>
+<P><B><LI></B>設定されている転送モードや、最大転送セクタ数は有効です。</P>
+<P><B><LI></B>DMA転送を指定している場合、STM_IsTransにより転送中でなくなるまで本関数を繰り返し呼んでください。</P></OL>
+</DL>
+
+
+
+<HR NOSHADE>
+<B>▲
+<A HREF="p07_16.htm">戻る</A>｜
+<A HREF="p07_18.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

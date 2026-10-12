@@ -1,0 +1,157 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 8&gt;PCM・ADPCM再生ライブラリ/2.仕様</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no2">PCM・ADPCM再生ライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p01_10.htm">戻る</A>｜
+<A HREF="p03_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PCM・ADPCM再生ライブラリ</B>
+<H2 ALIGN=CENTER>2.仕様</H2>
+<HR NOSHADE>
+<DL>
+	<P><DD>　本ライブラリの仕様を次の表に示します。</P>
+
+<A NAME="t2_1"></A>
+	<P><DD><B>表2.1　ライブラリ仕様</B>
+	<DT><TABLE BORDER>
+<TR><TH><PRE>項　目</TH><TH><PRE>仕　様</TH><TH><PRE>備　考</TH></TR>
+
+<TR><TD><PRE>サンプリング周波数</TD><TD><PRE>最大　44.1kHz</TD><TD>　</TD></TR>
+
+<TR><TD><PRE>量子化ビット数</TD><TD><PRE>8bit,16bit</TD><TD>　</TD></TR>
+
+<TR><TD><PRE>チャネル数</TD><TD><PRE>モノラル，ステレオ</TD><TD>　</TD></TR>
+
+<TR><TD><PRE>ファイル形式</TD>
+	<TD><PRE>AIFF形式<BR>指定ADPCM形式<B><A HREF="#_1">1)</A></B><BR>CD-ROM XA Audio形式<B><A HREF="#_2">2)</A></B><BR>SaturnPCM 形式<B><A HREF="#_3">3)</A></B></TD>
+	<TD>PCM非圧縮<BR>ADPCM圧縮<BR>ADPCM圧縮<BR>PCM非圧縮</TD></TR>
+
+<TR><TD><PRE>CD-ROMフォーマット</TD><TD><PRE>CD-ROM XA Audio形式の場合<BR>Mode2Form2、<BR>それ以外の場合Modelまたは<BR>Mode2Form1</TD><TD>　</TD></TR>
+
+<TR><TD><PRE>再生モード</TD>
+	<TD><PRE>メモリ再生モード（メモリ上のデータを再生）<BR>ファイル再生モード（CDから読んで再生）<BR>ストリーム再生モード（CDから読んで再生）</TD>
+	<TD><B><A HREF="#_4">4)</A></B><BR>ファイルシステムを使用<BR>ストリームシステムを使用</TD></TR>
+
+<TR><TD WIDTH=170><PRE>機能</TD>
+	<TD><PRE>分岐再生，連続再生，ループ再生<B><A HREF="#_5">5)</A></B><BR>マルチ再生（4本まで同時再生可能）<BR>ポーズ，中断，ボリューム／パンの指定</TD>
+	<TD><PRE>ADPCMは1本のみ</TD></TR>
+<TR><TD><PRE>連続再生時間</TD><TD><PRE>最大1時間</TD><TD>　</TD></TR>
+
+<TR><TD><PRE>使用ライブラリ</TD>
+	<TD><PRE>ファイルシステム，ストリームシステム，DMAライブラリ，<BR>ADPCM伸張ライブラリ</TD>
+	<TD>本ライブラリと同時にこれらをリンク指定すること<B><A HREF="#_6">6)</A></B></TD></TR>
+
+<TR><TD><PRE>CPUタイマ<BR>(FRT)の使用</TD>
+	<TD><PRE>本ライブラリはCPUのタイマ（FRT)を分周数128で使用して<BR>います。PCM_Init関数内で一度だけ初期化します。ユーザ<BR>側のFRT初期化や設定は禁止。</TD>
+	<TD>TIM_FRT_GET_16などで、値を取得することは可能</TD></TR>
+
+<TR><TD><PRE>DMAの使用</TD>
+	<TD><PRE>CPU-DMA(チャネル１)、あるいは<BR>SCU-DMA(チャネル０)を使用。</TD>
+	<TD><PRE><B><A HREF="#_7">7)</A></B></TD></TR>
+
+<TR><TD><PRE>サウンドドライバ</TD>
+	<TD>ユーザ側があらかじめ初期設定（68000リセット，サウンドドライバの転送など）を行う。
+本ライブラリは、PCM再生に関するコマンド発行（PCMスタート、ストップ、パラメータチェンジ)を行う。
+サウンドドライバへのコマンド発行は、全て<A HREF="../../sund/index.htm">サウンドI/Fライブラリ</A>を使用して行う。</TD>
+	<TD>『<A HREF="../../../../sndt/prog/drve/index.htm">セガサターンサウンドドライバ2.20プログラマーズガイド</A>』を参照。</TD></TR>
+
+ <TR><TD><PRE>バッファの確保</TD>
+	<TD><PRE>ワークバッファ：ワーク構造体分（約530byte）<BR>拡張ワークバッファ：2048byte<BR>リングバッファ：セクタサイズ＊10byte〜<BR>PCMバッファ：4096＊2〜4096＊4sample/1ch<BR>ポーズ処理用ワーク：4096sample〜PCMバッファサイズ</TD>
+	<TD><PRE>固定サイズ<BR><B><A HREF="#_8">8）</A></B>SaturnPCM形式時のみ<BR><B><A HREF="#_9">9）</A></B><BR><B><A HREF="#_10">10）   </A></B><BR>ポーズ実行時のみ必要</TD></TR>
+
+ <TR><TD><PRE>CPU負荷<BR>|再生開始後の|<BR>|タスク関数の|<BR>|ＣＰＵ占有率|<BR><B><A HREF="#_11">11)</A></B></TD>
+	<TD><PRE>PCM非圧縮 44kHzステレオ 16bit：10％<BR>PCM非圧縮 44kHzモノラル 16bit：6％<BR>ADPCM圧縮 44kHzステレオ 16bit：33％<BR>ADPCM圧縮 37.8kHzステレオ 16bit：29％<BR>ADPCM圧縮 22kHzステレオ 16bit：17％<BR>ADPCM圧縮 11kHzステレオ 16bit：8％<BR>ADPCM圧縮 11kHzモノラル 16bit：4％</TD>
+	<TD>これは、CD→ワークメモリ→サウンドメモリのデータ転送など、ADPCMの場合は伸張処理も含む全ての処理時間を計測した値です。</TD></TR>
+
+ <TR><TD><PRE>PCM_Task（タスク<BR>関数）の仕様</TD>
+	<TD><B>・</B>Ｖブランク割り込みの頻度（1回／16ms）と同等以上の頻度でコールする。<BR>
+<B>・</B>1回のタスク関数の最大処理時間<BR>　PCM非圧縮　ステレオ 16bit：15ms<BR>　PCM非圧縮　モノラル 16bit：8ms<BR>　ADPCM圧縮　ステレオ 16bit：34ms<BR>　ADPCM圧縮　モノラル 16bit：15ms</TD>
+	<TD>適当な頻度でコールしていれば、長い処理時間となるのは数回に1度です</TD></TR>
+</TABLE></P>
+
+<!-- 注釈 -->
+<A NAME="_1"></A>
+	<P><DT><B>　　1)</B>
+	<DD>指定ADPCM形式は、CRC総合研究所のAudio Starckというツール（AIFF→ADPCM変換ツール）で出力されたデータに対応しています。</P>
+
+<A NAME="_2"></A>
+	<P><DT><B>　　2)</B>
+	<DD>CD-ROM XA Audio は、16bitのPCMデータが4bitにADPCM圧縮されおり、次の形式があります。詳細は、CD-ROM XA 規格書を参照してください。
+	<DD><UL TYPE=DISC>
+	<LI>Bモード(37.8kHz) ステレオ/モノラル
+	<LI>Cモード(18.9kHz) ステレオ/モノラル</UL>
+	<DD>CD-ROM XA Audio を再生する場合は、ストリーム再生モードだけが使用できます。</P>
+
+<A NAME="_3"></A>
+	<P><DT><B>　　3)</B>SaturnPCM形式
+	<DD>SaturnPCM形式ファイルは、ＡＩＦＦファイルを変換ツールAIF2SAPで変換し作成します。<BR>SaturnPCM形式の特徴は次の通りです。</P>
+	<DD><UL TYPE=DISC>
+	<LI>CDブロックから直接サウンドメモリにSCU-DMAによるデータ転送を行うため、CPU負荷が軽減される。
+	<LI>リングバッファを必要としないため、メインメモリを圧迫することがない。</UL></P>
+	<P><DD><B>※</B>SaturnPCM形式の使用方法は「<A HREF="p04_10.htm#no4_80">4.プログラミング上の注意事項/(8)項</A>」を参照してください。</P>
+
+<A NAME="_4"></A>
+	<P><DT><B>　　4)</B>
+	<DD>メモリ再生モードには2つの使用方法があります。
+	<DL><B>常駐再生：</B>
+		<DD>メモリ上にファイル全体をあらかじめ読み込んだ、小さなファイルを再生
+	<DT><B>逐次供給再生：</B>
+		<DD>ユーザがＣＤから読んだデータを逐次リングバッファへ供給しながら再生</DL>
+
+<A NAME="_5"></A>
+	<P><DT><B>　　5)</B>
+	<DD>ループ再生機能は、メモリ再生モード（常駐再生方式）、またはファイル再生モードでのみ使用できます。</P>
+
+<A NAME="_6"></A>
+	<P><DT><B>　　6)</B>
+	<DD>使用する関数によっては、リンクされないものもあります。<BR>ADPCM使用宣言 PCM_DeclareUseAdpcm をしなければ、ADPCM伸張ライブラリはリンクされません。<BR>メモリ再生モードでは、ファイルシステム、ストリームシステムはリンクされません。<BR>ファイル再生モードでは、ストリームシステムはリンクされません。<BR>ストリーム再生モードでは、ファイルシステム、ストリームシステムの両方がリンクされます。</P>
+
+<A NAME="_7"></A>
+	<P><DT><B>　　7)</B>
+	<DD>CDブロックからリングバッファへのデータ転送をCPU-DMAにより行うよう、
+    デフォルト設定されています（SaturnPCM形式以外。SaturnPCM形式では、CDブロックからサウンドメモリへの転送をSCU-DMAで行うようデフォルト設定されています）。<BR>関数 PCM_SetTrModeCdにより、プログラム転送、CPU-DMA、SCU-DMAのいずれかを指定できます。</P>
+
+<A NAME="_8"></A>
+	<P><DT><B>　　8)</B>
+	<DD>SaturnPCM形式を使用する時にのみ拡張ワークバッファが必要となります。<BR>SaturnPCM形式は拡張ワークバッファを使用しますが、リングバッファを必要としません。</P>
+
+<A NAME="_9"></A>
+	<P><DT><B>　　9)</B>
+	<DD>分岐再生のときや、メモリ再生でユーザがリングバッファへのデータ供給を行うときに、リングバッファを大きくとると途切れたりする危険性が低くなります。<BR>大きいほど、PCM再生にとっては、安全性が高くなるといえますが、1回のタスク処理時間が多少不安定になる欠点があります。<BR>メモリ再生でファイル全体がメモリ上に用意されている場合は、そのアドレスとファイルサイズを指定します。このときはセクタサイズの整数倍である必要はありません。</P>
+
+<A NAME="_10"></A>
+	<P><DT><B>　　10)</B>
+	<DD>PCMバッファサイズは特別な理由がなければ 4096*2 [sample/1ch] で十分です。<BR>これを大きく取ることで、タスク関数を規定の頻度でコールできなかったときでも再生が乱れずに済むことがあります。</P>
+
+<A NAME="_11"></A>
+	<P><DT><B>　　11)</B>
+	<DD>CPU負荷(再生開始後のタスク関数のCPU占有率)の定義を次に示します。
+	<DD>
+<PRE>
+<FONT SIZE=6>R＝(100×Ttask)/Tplay</FONT>
+┌      　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　┐
+│ R    ：ＣＰＵ負荷【％】　　　　　　　　　　　　　　　　　　　　　│
+│ Ttask：再生開始から再生終了までのＰＣＭ＿Ｔａｓｋの処理時間の総計│
+│ Tplay：再生時間　　　　　　　　　　　　　　　　　　　　　　　　　│
+└      　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　┘
+</PRE>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p01_10.htm">戻る</A>｜
+<A HREF="p03_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no2">PCM・ADPCM再生ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,218 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 5&gt; Sound development know-how collection/2. Regarding sound drivers</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm">Sound development know-how collection</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound development know-how collection</b><H2 ALIGN="CENTER"> Chapter 2 About sound drivers</H2><HR NOSHADE>
+<UL>
+<P><LI> There are only 8 levels of volume control when fading in and out of CD-DA. This is too rough, but fine and smooth control requires some extra effort.<P><P><OL>
+<LI> use master volume<BR>
+ Master volume can be controlled in 16 levels. However, since the master is located at the last stage, the volume of other sounds that are being sounded at the same time will also change.</P>
+<LI> Send it to the DSP and control it by rewriting the coefficient from SH2.<BR>
+ You must know the addresses of the coefficients, etc. Also, there is no precedent for this method.</OL>
+</P>
+<P><LI> There is a bug regarding pitch bending in sequence data with complicated note-on and note-off.</P>
+<P><LI> Currently, if a pause is applied while a note with a long gate time is being played, all notes will be note-off at that point, and the remaining notes will not be played even if the pause is released.</P>
+<P><LI> The sound driver on a Mac has a TEXT attribute, so if you bring it to a DOS environment via the internet or disk, you must be careful not to convert the driver to text.</P>
+<P><LI> MIDI ConTRol Change EFFECT VOL and EFFECT PAN at numbers 17 and 71 are valid regardless of the pronunciation control number. The upper 3 bits of MIDI EFFECT VOL0-127 correspond to EFFECT RETURN VOL0-7, and MIDI Channels 1-16 correspond to EFFECT RETURN VOL Channels 0-15.<BR>
+ The 32-step stereo location of EFFECT RETURN PAN corresponds to the upper 5 bits of MIDI EFFECT PAN0-127, and MIDI Channels 1-16 correspond to Channels 0-15 of EFFECT RETURN PAN.<BR>
+ Even when the sequence ends, the set values will be retained and will not return to the settings in the tone data. If EFFECT VOL, EFFECT PAN or MIXER Change is issued subsequently, it will change again.</P>
+<P> *Rather than using MIDI to control EFFECT VOL and EFFECT PAN, we recommend creating multiple MIXERs and switching between them using MIXER Change.</P>
+<P><LI> About PAL compatibility<BR>
+ Regarding sound, there is no need to change the driver or data at all.<BR>
+ If you are performing special control by modifying the sound driver, etc., please contact technical support.</P>
+<P><LI> When using ADPCM playback<BR>
+ There are two types of ADPCM data.</P>
+<P><OL>
+<LI> CD-XA compliant ADPCM method<BR>
+ With this method, there are only two sampling rates.<BR>
+ 18.9kHz (B MODE)<BR>
+ 37.8kHz (C MODE)</P>
+<LI> APCM method with header<BR>
+ Sampling rate can be set freely.<BR>
+ Also, currently the load on SH2 for ADPCM playback is quite high, and it seems that the limit is playing one sound at a time.</OL>
+</P>
+<P><LI> Even if the number of simultaneous polyphony does not exceed 32 notes, it is possible that a note that should be played may not be produced, or the release of a note that is currently being produced may be cut off. If you don't want the sound to stutter, try increasing the key-on time instead of using a long release.</P>
+<P><LI> About the stereo/monaural switch<BR>
+ If you want to reflect the stereo/monaural switching settings on Saturn's multiplayer to the game, you can do so by rewriting the setting bits in the sound WORK RAM from SH2.<BR>
+ When the setting is monaural, after initializing the sound, set Bit 7 of 0x25A00443 of the sound WORK RAM from SH2.<BR>
+ All subsequent controls are performed by the sound driver.<BR>
+ You can also monitor monaural playback on the sound simulator. Please use it to check the volume balance when monaural.</P>
+<P><LI> If a Note on event is issued from HOST by MIDI Direct conTRol command (09H) without transferring the tone bank, a triangular wave will be output.<BR>
+ Example: If the following MIDI Direct conTRol command (09H) issues a Note on event, the driver will output a 441Hz sound.</P>
+<P><DL>
+<dt> pronunciation data<dd> P1,P2,P3,P4 = 01H,00H,3CH,7FH<dt> off data<dd> P1,P2,P3,P4 = 01H,00H,3CH,00H</DL>
+</P>
+<P> You can use this to determine whether the sound driver is working or not.<BR>
+ (However, it is not supported by the development driver "SDDRV.TSK".)</P>
+<P><LI> The DSP has a higher priority for accessing the DRAM bus than the 68000. Also, since the DSP accesses the same DRAM as the 68000, if you use a delay type effect (with Tap processing that reads/writes the delay RAM many times), the processing of the 68000 will be postponed, causing the song to slow down, Situations may occur where commands are not accepted.<BR>
+ This is particularly likely to happen with eLinker (extended linker) reverb, early reflections, etc., and care must be taken when using FM with many simultaneous slots.</P>
+<P><LI> The maximum number of samples that can be played with SCSP is 0ffffh samples. When using Reverse or Alternate, changing the pitch may shift the read address, resulting in a different sound or noise than the original.</P>
+<P><LI> The tempo of the sequence song should not exceed the quarter note range of 40 to 300.</P>
+<P><LI> Saturn's sound driver processing is based on 2msec, so even if you create sequence data that treats 1 beat as 480 clocks, when converted playback, 1 beat will have a resolution equivalent to 250 clocks (if the tempo is 120). .<BR>
+ As a result, the playback sounds as if it has been quantized, but there should be no problem with hearing it.</P>
+<P><LI> As the sound driver was upgraded from version 1.33B to version 2.04, the volume calculation algorithm was changed to reduce the load on the driver. As a result, sequence playback is no longer compatible with data from versions 2.00 and earlier.<BR>
+ This is compatibility in a relatively strict sense, as the balance of volume changes is slightly different from before for the data values (0-127) of Volume of MIDI control change number 7 and Expression of number 11. , the basic sound driver behavior is exactly the same as before. Of course, as long as the volume balance between MIDI channels during sequence playback is not a concern, there is no need to mess with the sequence data.<BR>
+ If you want to use past sequence data as is and place emphasis on volume balance between tracks, please use sound driver version 1.33B.</P>
+<P><LI> There are the following types of sound drivers for Saturn (including Titan).</P>
+<P><DL>
+<DD> SDDRV.TSK+SYSTBL.TSK (used only when developing sound with SoundBox)<DD> SDDRVS.TSK (used when developing with CartDev and when incorporating into the actual game)<DD> SDDRVT.TSK (for ST-V Titan. Almost equivalent to SDDRVS.TSK)</DL>
+</P>
+<P> Please do not change the file name. When SndSimulator starts up, it searches to see if SoundBox or CartDev is connected, and checks if SDDRV.TSK exists in the same folder for SoundBox and SDDRVS.TSK for CartDev.<BR>
+ If it exists, transfer the sound driver there, or if not, transfer it inside SndSimulator to the target.<BR>
+ If you want to use the Titan driver on a Mac, connect CartDev, change the file name to SDDRVS.TSK, and place it in the same folder as SndSimulator.</P>
+<P> The sound drivers inside SndSimulator vary depending on the version and may be old, so please put the latest sound driver in the same folder as the simulator.<BR>
+ To find out the version of the sound driver currently being transferred by the simulator, look at "About this SndSimulator" from the Apple menu.</P>
+<P><LI> The method of specifying a tone is the same as the previous sound driver, by specifying the voice number of the tone bank in the sound RAM. MIDI control change Bank change number 32 specifies the tone bank, and program change specifies the VOICE.<BR>
+ Currently, if a bank change is used to specify a tone bank that does not exist in the sound RAM, tone bank number 0 is assigned as the default. Even if you place tone data in tone bank number 0 and send a bank change for a tone bank that does not exist on the sound RAM, for example, number 3, the sound driver version 2.00 or earlier will not change the tone data to tone bank number 0. So, Saturn pronounced it correctly. However, in sound driver versions 2.00 and later, the sequence data is checked more strictly and an error is returned if such an incorrect bank specification is made.<BR>
+ Originally, tone banks should be specified accurately in MIDI sequence data. During the sound data production process, if you do not want to modify the tone bank number of the MIDI sequence data for work efficiency reasons, please take measures such as setting a dummy tone bank on the map using the sound simulator.</P>
+<P> If there is a problem with the sequence data, the following values will be displayed on the status display on the sound simulator.</P>
+<P><TABLE BORDER CELLSPACING="1" CELLPADDING="3">
+<TR><TD> $00</TD><TD> No abnormality</TD></TR>
+<TR><TD> $80</TD><TD> Resolution exceeds Saturn's capabilities</TD></TR>
+<TR><TD> $81</TD><TD> No tempo data</TD></TR>
+<TR><TD> $82</TD><TD> No tempo data</TD></TR>
+<TR><TD> $83</TD><TD> The specified tempo exceeds Saturn's capabilities.</TD></TR>
+<TR><TD> $84</TD><TD> There is no control in the sequence data.</TD></TR>
+<TR><TD> $85</TD><TD> You specified a bank that does not exist on the map.</TD></TR>
+<TR><TD> $86</TD><TD> A program that does not exist on the tone bank was specified.</TD></TR>
+<TR><TD> $87</TD><TD> A program change was performed without a tone bank set.</TD></TR>
+<TR><TD> $88</TD><TD> Volume bias value is too large for Total level. The total level of the layer is set outside the specified range.</TD></TR>
+<TR><TD> $89</TD><TD> A mixer change was performed on a bank that does not exist.</TD></TR>
+<TR><TD> $8a</TD><TD> A setting other than POLY mode was used for PLAY MODE in the Voice parameter of tone data.</TD></TR>
+<TR><TD> $8b</TD><TD> Layer is not set on the Tone editor.</TD></TR>
+<TR><TD> $8c</TD><TD> Because the number of simultaneous pronunciations exceeded 32, the oldest key-on was forcibly destroyed.</TD></TR>
+<TR><TD> $8d</TD><TD> A layer that does not exist was specified.</TD></TR>
+<TR><TD> $8e</TD><TD> Trouble occurred in DSP</TD></TR>
+<TR><TD> $8f</TD><TD> An unsupported MIDI event was issued.</TD></TR>
+<TR><TD> $91</TD><TD> All note off has been processed. Please note that this is an error except during development.</TD></TR>
+<TR><TD> $92</TD><TD> There were some notes that could not be played because there were too many FM sound source channels.</TD></TR>
+<TR><TD> $93</TD><TD> Double assignment of slot (program error)</TD></TR>
+<TR><TD> $94</TD><TD> An attempt was made to play on a MIDI channel other than 1-16.</TD></TR>
+<TR><TD> $97</TD><TD> *Due to a large number of simultaneous polyphony, there were slots where the end of the release was ignored.</TD></TR>
+<TR><TD> $98</TD><TD> *The number of simultaneous pronunciations within the same pronunciation management number exceeded 32.Fatal error when creating song data.</TD></TR>
+<TR><TD> $99</TD><TD> NOTE ON was canceled because all slots were filled with FM.</TD></TR>
+</TABLE>
+</P>
+<P> Items with ( <B>*</b> ) are only compatible with SDDRV.TSK.</P>
+<P><LI> Most sequencers handle each instrument's parts in units called tracks, but there are some things to keep in mind due to the structure of SMF (Type 1).</P>
+<P> On a sequencer, tracks and MIDI channels are usually independent, so different tracks can be set to the same MIDI channel. However, when outputting as SMF (Type 1), MIDI channels 1 to 16 are assigned in order from MIDI channel track 1. Therefore, tracks after the 17th track are ignored and will not be sounded.</P>
+<P ALIGN=CENTER> <B>DP1</b><BR>
+<img srcset="../image/dp1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P> Track-17 data in the figure is ignored.</P>
+<P> For example, for ease of editing, note-on data and control change (expression, pan, etc.) tracks may be separated and output on the same MIDI channel, but in such cases, if the tracks are different, the MIDI channel will also be different. Because of this change, phenomena such as the expression effect not being applied to the note data may occur.</P>
+<P ALIGN=CENTER> <B>DP2</b><BR>
+<img srcset="../image/dp2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P> The MIDI event on Track-6 in the diagram is treated as MIDI channel 6, so it will no longer affect the MIDI event on Track-5.</P>
+<P> Therefore, there are three points to be careful of.</P>
+<OL>
+<P><LI> When outputting SMF from a sequencer, tracks on the same MIDI channel must be merged.<P><LI> The maximum number of tracks is 16 (excluding tempo tracks).<BR>
+ Each sequencer handles SMF output slightly differently, with some sequencers automatically merging tracks on the same MIDI channel, and some sequencers inserting empty tracks if the MIDI channel is missing. Please check your sequencer once.<BR>
+ There are also sequencers that automatically output SMF type 0 when a sequence with only one track is output as SMF. In that case, you will need to take measures such as creating another dummy track.<P><LI> If the MIDI channel number is important, you need to create data with the final track number in mind. For example:<P><DL>
+<DD> No. 17 Effect pan<DD> No. 71 Effect volume<DD> No. 80 Q-sound localization</DL>
+</P>
+</OL>
+<P><LI> The function of the sequence volume (05h Sequence Volume) command has changed.</P>
+<DL>
+<P><DT> P1<DD> Pronunciation control number (0-7)</P>
+<P><DT> P2<DD> Volume (0-255) Around 128, the higher the value, the louder the volume. Previously, the default was 127, and the volume could only be lowered, but from Ver-2.00 onwards, it is possible to increase the volume higher than the sampled volume. However, please be careful as setting an extremely large value may cause distortion. Default value is 128. If you want to return the sequence volume to the initial setting, please set it to 128.</P>
+<P><DT> P3<DD> Fade Rate (0-255) Specify the time to reach the specified sequence volume from the current sequence volume as a rate (0 to 255). The larger the value, the slower the change, with 255 being the longest and 1 being the shortest. (If it is 0, there will be no fade and only the sequence volume will be set.) The fade will be performed from the current sequence volume to the specified sequence volume. Fade-in or fade-out is determined by whether the specified sequence volume is larger or smaller than the current sequence volume.</P>
+</DL>
+<P> Fade in and fade out using sequence volume commands are effective even during note-on.<BR>
+ Additionally, a bug in the sound driver versions 1.31 and earlier that prevented real-time volume control during note-on using MIDI control changes has been fixed.</P>
+<P><LI> Additional changes to TempoConTRol<BR>
+ If you perform TempoConTRol during a loop using control change number 31, the tempo will return to the initial tempo when you return to the beginning of the loop. To prevent this, tempo processing now has three modes.</P>
+<OL>
+<P><LI> Normal mode<BR>
+ Tempo processing will be performed in the same way as before.</P>
+<P><LI> Ignore mode<BR>
+ The tempo remains the same as when the sequence started, and the tempo will not change even if the tempo changes during the sequence. Tempo change commands from the host are accepted.</P>
+<P><LI> ratio mode<BR>
+ Tempo changes during a song will also be affected by tempo changes by the host (separate command from the previous tempo change).</P>
+</OL>
+<P> As a result, the following host commands have been added.</P>
+<DL>
+<P><DD><TABLE BORDER=1>
+<TR><TH COLSPAN=2> $14 Tempo mode</TH></TR>
+<TR><TD> P1: Management number</TD><TD></TD></TR>
+<TR><TD> P2: Tempo mode</TD><TD> 00: Normal</TD></TR>
+<TR><TD></TD><TD> ＋ :Ignoa</TD></TR>
+<TR><TD></TD><TD> − :Ratio</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH COLSPAN=2> $15 Tempo ratio set</TH></TR>
+<TR><TD> P1: Management number<TD></TD></TR>
+<TR><TD> P2: Ratio</TD><TD> (-32768~+32767)<BR>
+ The effect is the same as changing the tempo.</TD></TR>
+</TABLE>
+</DL>
+<P> Also, the above tempo mode and tempo ratio work will be reset by starting the sequence.</P>
+<P><LI> The problem with the damper of control change number 64 has been resolved in Ver2.00. No more special data modification.</P>
+<P><LI> The addition result of TL+VolBias must not be less than 0. If it is less than 0, the driver returns an error number to Status and does not play the sequence.</P>
+<P><LI> Do not use multiple versions of sound drivers in one game. This will cause confusion.</P>
+<P><LI> About map data limitations<BR>
+ One map file can contain up to 128 maps, but the map information can only be stored in the sound driver's system area up to 4096 Bytes (1000h).<BR>
+ When performing "Map Binary File Creation" from the Sound Simulator's File menu, if the map binary size exceeds 4KByte (1000h), SndSim (Ver. 2.10 or later) will issue an alert. In this case, no sound will be produced even if you change the map.<BR>
+ In such a case, please split the map file into multiple files. Also, the size can be displayed in the Make Binary File menu of SndSimulator, so please check the current size from time to time.<BR>
+ As a guide, if there are more than 500 blocks in the map, the size will exceed 4KByte (1000h).</P>
+<P> <B>***Reference***</b> Calculation method<BR>
+ The size of one block is 8 bytes. One byte is added as an end code for each map.<BR>
+ If the total number of blocks is 150 and there are 12 maps, then</P>
+<P><H3> 150×8+12×1+1=1213(&lt; 4096)</H3></P>
+<P> So, it will be 1213 bytes.</P>
+<P><TABLE BORDER>
+<TR align="center"><th> sample frequency</th><th> Base Note</th><th> Fine Tune</th></TR>
+<TR align="center"><TD> 44100</TD><TD> 60</TD><TD> 00</TD></TR>
+<TR align="center"><TD> 40000</TD><TD> 62</TD><TD> 41</TD></TR>
+<TR align="center"><TD> 38000</TD><TD> 63</TD><TD> 55</TD></TR>
+<TR align="center"><TD> 36000</TD><TD> 64</TD><TD> 63</TD></TR>
+<TR align="center"><TD> 34000</TD><TD> 65</TD><TD> 63</TD></TR>
+<TR align="center"><TD> 32000</TD><TD> 66</TD><TD> 58</TD></TR>
+<TR align="center"><TD> 30000</TD><TD> 67</TD><TD> 44</TD></TR>
+<TR align="center"><TD> 28000</TD><TD> 68</TD><TD> 20</TD></TR>
+<TR align="center"><TD> 26000</TD><TD> 69</TD><TD> -18</TD></TR>
+<TR align="center"><TD> 24000</TD><TD> 71</TD><TD> 62</TD></TR>
+<TR align="center"><TD> 22050</TD><TD> 72</TD><TD> 0</TD></TR>
+<TR align="center"><TD> 22000</TD><TD> 72</TD><TD> -Five</TD></TR>
+<TR align="center"><TD> 20000</TD><TD> 74</TD><TD> 40</TD></TR>
+<TR align="center"><TD> 18000</TD><TD> 76</TD><TD> 63</TD></TR>
+<TR align="center"><TD> 16000</TD><TD> 78</TD><TD> 58</TD></TR>
+<TR align="center"><TD> 14000</TD><TD> 80</TD><TD> 17</TD></TR>
+<TR align="center"><TD> 12000</TD><TD> 83</TD><TD> 59</TD></TR>
+<TR align="center"><TD> 11025</TD><TD> 84</TD><TD> 0</TD></TR>
+<TR align="center"><TD> 10000</TD><TD> 86</TD><TD> 40</TD></TR>
+<TR align="center"><TD> 9000</TD><TD> 88</TD><TD> 63</TD></TR>
+<TR align="center"><TD> 8000</TD><TD> 90</TD><TD> 58</TD></TR>
+<TR align="center"><TD> 7000</TD><TD> 92</TD><TD> 17</TD></TR>
+<TR align="center"><TD> 6000</TD><TD> 95</TD><TD> 60</TD></TR>
+<TR align="center"><TD> 5000</TD><TD> 98</TD><TD> 40</TD></TR>
+<TR align="center"><TD> 4000</TD><TD> 102</TD><TD> 56</TD></TR>
+</TABLE>
+</P>
+<P> These are the Base Note and Fine Tune settings when playing at the standard pitch with Base Note 60.</P>
+</UL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm">Sound development know-how collection</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

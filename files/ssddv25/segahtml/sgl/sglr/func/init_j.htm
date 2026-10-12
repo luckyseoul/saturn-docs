@@ -1,0 +1,889 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/22&gt;          <!-- 何ページ目／総ページ数 -->
+SGL関数リファレンス/init関数  <!-- タイトルネーム　-->
+</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#init">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slInitSystem"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slInitSystem</H1>
+<HR><H3>SGLシステムの初期化</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A>  mode;
+    <a href="../struct/types_j.htm#TEXTURE"><I>TEXTURE</I></A> *form_tbl;
+    <a href="../struct/types_j.htm#Sint8"><I>Sint8</I></A>   cnt;
+
+    void slInitSystem( mode, form_tbl , cnt );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A>  mode      - 画面モード。<BR>
+    <a href="../struct/types_j.htm#TEXTURE"><I>TEXTURE</I></A> *form_tbl - テクスチャ定義テーブル。<BR>
+    <a href="../struct/types_j.htm#Sint8"><I>Sint8</I></A>   cnt       - フレーム切替のカウント。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    システム全体の初期化、テクスチャ定義テーブルの登録、フレーム切り替え
+    カウントの設定を行います。<BR>
+    画面モード「mode」には、
+        <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A>、<a href="../struct/constenm_j.htm#TV_320x240"><I>TV_320x240</I></A>、<a href="../struct/constenm_j.htm#TV_320x256"><I>TV_320x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_352x224"><I>TV_352x224</I></A>、<a href="../struct/constenm_j.htm#TV_352x240"><I>TV_352x240</I></A>、<a href="../struct/constenm_j.htm#TV_352x256"><I>TV_352x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_640x224"><I>TV_640x224</I></A>、<a href="../struct/constenm_j.htm#TV_640x240"><I>TV_640x240</I></A>、<a href="../struct/constenm_j.htm#TV_640x256"><I>TV_640x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_704x224"><I>TV_704x224</I></A>、<a href="../struct/constenm_j.htm#TV_704x240"><I>TV_704x240</I></A>、<a href="../struct/constenm_j.htm#TV_704x256"><I>TV_704x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_320x448"><I>TV_320x448</I></A>、<a href="../struct/constenm_j.htm#TV_320x480"><I>TV_320x480</I></A>、<a href="../struct/constenm_j.htm#TV_320x512"><I>TV_320x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_352x448"><I>TV_352x448</I></A>、<a href="../struct/constenm_j.htm#TV_352x480"><I>TV_352x480</I></A>、<a href="../struct/constenm_j.htm#TV_352x512"><I>TV_352x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_640x448"><I>TV_640x448</I></A>、<a href="../struct/constenm_j.htm#TV_640x480"><I>TV_640x480</I></A>、<a href="../struct/constenm_j.htm#TV_640x512"><I>TV_640x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_704x448"><I>TV_704x448</I></A>、<a href="../struct/constenm_j.htm#TV_704x480"><I>TV_704x480</I></A>、<a href="../struct/constenm_j.htm#TV_704x512"><I>TV_704x512</I></A>
+    が入ります。<BR>
+    また、引数form_tblの値は、システム変数「<a href="../mem/system01_j.htm#FormTbl"><I>FormTbl</I></A>」にセットされます。<BR>
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>() を実行した際に設定されるもの。<BR>
+    スプライト、及び、ポリゴン用のウィンドウサイズ、消失点位置
+        Left             : 0
+        Top              : 0
+        Right            : ScreenXSize - 1
+        Bottom           : ScreenYSize - 1
+        Zlimit           : 0x7fff
+        CenterX          : ScreenXSize / 2
+        CenterY          : ScreenYSize / 2
+        PersAngle        : 90゜
+        ZdspLevel        : 1
+        ClipSizeX        : 320
+        ClipSizeY        : 512
+     スクロール関係
+        表示されるスクロール面          : NBG0 , NBG1 , RBG0
+        スクロールのプライオリティ      : NBG0 NBG1 NBG2 NBG3 RBG0
+                                           7    7    2    1    4
+        スプライト0(ポリゴン)の
+                       プライオリティ   : 6
+        その他のスプライト              : 5
+        スクロールの色数                : 各面とも256色モード
+        カラーRAMモード                 : 1(32768色中2048色)
+        VRAM分割                        : バンクA、Bともに分割
+        キャラクタデータ                : NBG0、NBG1 25E60000〜
+                                        : RBG0 25E00000〜
+        キャラクタサイズ                : 各面とも8x8ドット
+        パターンネームデータ            : NBG0 25E76000〜
+                                        : NBG1 25E78000〜
+                                        : RBG0 PA 25E40000〜
+                                        : RBG0 PB 25E50000〜
+        パターンネームサイズ            : NBG0 1ワード
+                                        : セルごとに反転付き10ビット
+                                          パターンネーム
+                                        : NBG1 及び、RGB0 1ワード
+                                        : 反転無し、12ビットパターンネーム
+        プレーンサイズ                  : 各面とも64x64セル
+        バック画面カラー                : 25E3FFFE に 黒(R=0、G=0、B=0)
+        回転パラメータ                  : 25E3FF00 から
+        スプライトデータ                : パレットとRGB形式との混在
+        モザイク、カラーオフセット等の特殊効果機能は使用せず
+        SCU 割り込み優先度(SCUのデフォルトではありません)
+          高      名称         SCU割り込みマスクレジスタ
+           ^  H Blank In          FFFF
+           |  レベル2 DMA終了     FFFB (SGLで予約)
+           |  レベル1 DMA終了     FDFB (SGLで予約)
+           |  レベル0 DMA終了     F9FB (SGLで予約)
+           |  DMAイリーガル       F1FB
+           |  V Blank In          E1FB (SGLで予約)
+           |  V Blank Out         E1FA (SGLで予約)
+           |  タイマ0             E1F8
+           |  タイマ1             E1F0
+           |  DSP終了             E1E0
+           |  サウンドリクエスト  E1C0 (SGLで予約)
+           |  SMPC                E180 (SGLで予約)
+           |  Pad                 E100
+          低  スプライト描画終了  E000
+    サウンドの初期化は行なわれませんのでサウンド関連の関数を使用する場合、
+    それぞれのライブラリのサウンド初期化関数で初期化を行なってください。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    テクスチャ(スプライト)を使わない時。(ポリゴンは使用できる。)
+    ss_main() {
+      <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_352x224"><I>TV_352x224</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                        :
+
+    テクスチャを使用する場合。<BR>
+    extern <a href="../struct/types_j.htm#TEXTURE"><I>TEXTURE</I></A> textbl[];
+
+    ss_main() {
+      <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_320x240"><I>TV_320x240</I></A>, textbl, 1 );
+                        :
+
+    ダイナミックフレーム(描画待ちフレーム切替え)モードを使用する時。<BR>
+    ss_main() {
+      <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_320x240"><I>TV_320x240</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, -3 );
+                        :
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は全てのSGL関数を実行する前に必ず実行してください。<BR>
+    未初期化のシステム領域を他のSGL関数がアクセスした場合バグの温床となります。<BR>
+    解像度(TVモード)によってシステムクロックを切り替えるため、VRAM等の
+    内容が壊れる場合がありますので、システムスタートの直後に1度だけ実行して
+    ください。<BR>
+    フレーム切り替えカウントにマイナスを指定した場合、切り替えカウント経過
+    (-2であれば2ブランキング)の後、VDP1のフレームバッファへの書き込み終了を
+    チェックし、書き込み完了を待って切り替えを行ないます。ただし、
+    インターレースモードを指定した場合にはこの指定は無視されます。<BR>
+
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>()実行時、画面モードの変更によって SH2 の動作クロック
+    が変更される場合、クロックチェンジが発生します。この時、家庭用TVの機種に
+    よって同期が瞬間的に取れなくなる事があります。<BR>
+    SH2の動作クロックが 26MHz になるのは、
+       横解像度 320 又は 640 DOT
+    の場合です。<BR>
+    SH2の動作クロックが 28MHz になるのは、
+       横解像度 352 又は 704 DOT
+    の場合です。<BR>
+    クロックチェンジによって影響を受けるデバイスの内、注意が必要なのは、
+    次の通りです。<BR>
+
+    ・VDP1 VDP2
+      全てのレジスタおよび VRAM が無保証となります。<BR>
+      <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>()の内部にてレジスタの再設定が行われますが、ユーザの
+      データは再度ロードし直す必要があります。<BR>
+    ・WORKRAM-LOW(1Mバイト)
+      メモリ内容は無保証となります。<BR>
+      必ず全てのデータを再ロードしてください。<BR>
+    ・サウンドブロック
+      68000 および SCSP の両方ともリセットされます。<BR>
+      また、SOUND-RAMの内容は全て無保証となりますので、<a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>()が
+      終了次第、サウンドドライバ等の再ロードを行い、68000 を再起動させる
+      必要があります。<BR>
+    ・SCU
+      全ての設定が初期化されます。<BR>
+    ・スレーブSH
+      リセット後、SGLの管理下に戻ります。<BR>
+      ユーザ登録関数は、再登録する必要があります。<BR>
+    本関数をクロックチェンジ以外の目的で何度も呼び出すのは、
+    アプリケーションの製作上あまり思わしくありませんので、クロックチェンジ
+    をする以外は、出来るだけ他の関数を用いて初期化を行なうようにしてください。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/init_j.htm#slDynamicFrame">slDynamicFrame</A></TD>
+<TD><PRE><a href="../func/init_j.htm#slSetTVMode">slSetTVMode</A></TD>
+<TD><PRE><a href="../func/init_j.htm#slSetScrTVMode">slSetScrTVMode</A></TD>
+<TD><PRE><a href="../func/init_j.htm#slSetSprTVMode">slSetSprTVMode</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/per_j.htm#slInitPeripheral">slInitPeripheral</A></TD>
+<TD><PRE><a href="../func/per_j.htm#slGetStatus">slGetStatus</A></TD>
+<TD><PRE><a href="../func/per_j.htm#slGetPeripheral">slGetPeripheral</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#SprbufBias">SprbufBias</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#MsLightVector">MsLightVector</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenDist">MsScreenDist</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#SlScreenDist">SlScreenDist</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsZlimit">MsZlimit</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#WindowNumber">WindowNumber</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#TotalPolygons">TotalPolygons</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#TotalVertices">TotalVertices</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenLeft">MsScreenLeft</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenTop">MsScreenTop</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenRight">MsScreenRight</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenBottom">MsScreenBottom</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MXPolygons">MXPolygons</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MXVertices">MXVertices</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeX">FrameSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeY">FrameSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinXAdder">MsWinXAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinYAdder">MsWinYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinXAdder">SlWinXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinYAdder">SlWinYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipXAdder">MsClipXAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipYAdder">MsClipYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMAEndFlag">DMAEndFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMASetFlag">DMASetFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#Resolution">Resolution</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#NbPCMBf">NbPCMBf</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#PCMBufFlag">PCMBufFlag</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_VRSIZE">VDP2_VRSIZE</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_HCNT">VDP2_HCNT</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_VCNT">VDP2_VCNT</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_RAMCTL">VDP2_RAMCTL</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CYCA0L">VDP2_CYCA0L</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CYCA0U">VDP2_CYCA0U</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CYCA1L">VDP2_CYCA1L</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CYCA1U">VDP2_CYCA1U</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CYCB0L">VDP2_CYCB0L</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CYCB0U">VDP2_CYCB0U</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CYCB1L">VDP2_CYCB1L</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CYCB1U">VDP2_CYCB1U</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_BGON">VDP2_BGON</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_MZCTL">VDP2_MZCTL</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_SFSEL">VDP2_SFSEL</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_SFCODE">VDP2_SFCODE</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CHCTLA">VDP2_CHCTLA</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_CHCTLB">VDP2_CHCTLB</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_BMPNA">VDP2_BMPNA</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_BMPNB">VDP2_BMPNB</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_PNCN0">VDP2_PNCN0</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_PNCN1">VDP2_PNCN1</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_PNCN2">VDP2_PNCN2</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_PNCN3">VDP2_PNCN3</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_PNCR">VDP2_PNCR</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_PLSZ">VDP2_PLSZ</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_MPOFN">VDP2_MPOFN</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_MPOFR">VDP2_MPOFR</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPABRA">VDP2_MPABRA</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPCDRA">VDP2_MPCDRA</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPEFRA">VDP2_MPEFRA</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPGHRA">VDP2_MPGHRA</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPIJRA">VDP2_MPIJRA</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPKLRA">VDP2_MPKLRA</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPMNRA">VDP2_MPMNRA</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPOPRA">VDP2_MPOPRA</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPABRB">VDP2_MPABRB</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPCDRB">VDP2_MPCDRB</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPEFRB">VDP2_MPEFRB</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPGHRB">VDP2_MPGHRB</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPIJRB">VDP2_MPIJRB</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPKLRB">VDP2_MPKLRB</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPMNRB">VDP2_MPMNRB</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_MPOPRB">VDP2_MPOPRB</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_SCXN0">VDP2_SCXN0</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_SCXIN0">VDP2_SCXIN0</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_SCXDN0">VDP2_SCXDN0</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_SCYN0">VDP2_SCYN0</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_SCYIN0">VDP2_SCYIN0</A></TD>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_SCYDN0">VDP2_SCYDN0</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system05_j.htm#VDP2_SCXN1">VDP2_SCXN1</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCXIN1">VDP2_SCXIN1</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCXDN1">VDP2_SCXDN1</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCYN1">VDP2_SCYN1</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCYIN1">VDP2_SCYIN1</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCYDN1">VDP2_SCYDN1</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCXN2">VDP2_SCXN2</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCYN2">VDP2_SCYN2</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCXN3">VDP2_SCXN3</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCXN3">VDP2_SCXN3</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_ZMCTL">VDP2_ZMCTL</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_SCRCTL">VDP2_SCRCTL</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_VCSTA">VDP2_VCSTA</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_LSTA0">VDP2_LSTA0</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_LSTA1">VDP2_LSTA1</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_LCTA">VDP2_LCTA</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_BKTA">VDP2_BKTA</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_RPMD">VDP2_RPMD</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_RPRCTL">VDP2_RPRCTL</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_KTCTL">VDP2_KTCTL</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_KTAOF">VDP2_KTAOF</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_OVPNRA">VDP2_OVPNRA</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_OVPNRB">VDP2_OVPNRB</A></TD>
+<TD><PRE><a href="../mem/system06_j.htm#VDP2_RPTA">VDP2_RPTA</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WPSX0">VDP2_WPSX0</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WPSY0">VDP2_WPSY0</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WPEX0">VDP2_WPEX0</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WPEY0">VDP2_WPEY0</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WPSX1">VDP2_WPSX1</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WPEX1">VDP2_WPEX1</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WCTLA">VDP2_WCTLA</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WCTLB">VDP2_WCTLB</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WCTLC">VDP2_WCTLC</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_WCTLD">VDP2_WCTLD</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_LWTA0">VDP2_LWTA0</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_LWTA1">VDP2_LWTA1</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_SPCTL">VDP2_SPCTL</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_SDCTL">VDP2_SDCTL</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_CRAOFA">VDP2_CRAOFA</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_CRAOFB">VDP2_CRAOFB</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_LNCLEN">VDP2_LNCLEN</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_SFPRMD">VDP2_SFPRMD</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_SFCCMD">VDP2_SFCCMD</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_CCCTL">VDP2_CCCTL</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_PRISA">VDP2_PRISA</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_PRISB">VDP2_PRISB</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_PRISC">VDP2_PRISC</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_PRISD">VDP2_PRISD</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_PRINA">VDP2_PRINA</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_PRINB">VDP2_PRINB</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_PRIR">VDP2_PRIR</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CCRSA">VDP2_CCRSA</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CCRSB">VDP2_CCRSB</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CCRSC">VDP2_CCRSC</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CCRSD">VDP2_CCRSD</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CCRNA">VDP2_CCRNA</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CCRNB">VDP2_CCRNB</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CCRR">VDP2_CCRR</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CCRLB">VDP2_CCRLB</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CLOFEN">VDP2_CLOFEN</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_CLOFSL">VDP2_CLOFSL</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_COAR">VDP2_COAR</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_COAG">VDP2_COAG</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_COAB">VDP2_COAB</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_COBR">VDP2_COBR</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_COBG">VDP2_COBG</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#VDP2_COBB">VDP2_COBB</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#ScrRotPtr">ScrRotPtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#nbg0_char_adr">nbg0_char_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#nbg1_char_adr">nbg1_char_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#nbg2_char_adr">nbg2_char_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#nbg3_char_adr">nbg3_char_adr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#nbg0_char_adr">nbg0_char_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#ra_char_adr">ra_char_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#rb_char_adr">rb_char_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#nbg0_page_adr">nbg0_page_adr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#nbg1_page_adr">nbg1_page_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#nbg2_page_adr">nbg2_page_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#nbg3_page_adr">nbg3_page_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#ra_page_adr">ra_page_adr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#rb_page_adr">rb_page_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#rpara_vram_adr">rpara_vram_adr</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParA">RotScrParA</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParB">RotScrParB</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#Nbg2_PosX">Nbg2_PosX</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#Nbg2_PosY">Nbg2_PosY</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#Nbg3_PosX">Nbg3_PosX</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#Nbg3_PosY">Nbg3_PosY</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#init">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slSetTVMode"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slSetTVMode</H1>
+<HR><H3>解像度の切替え</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slSetTVMode( mode );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode - TVモード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    指定されたTVモードに設定します。<BR>
+    システムクロックを切り替えるような場合、<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A> を返します。<BR>
+    システムクロックは2つ用意されており、横方向の解像度によって切り替わります。<BR>
+         320、640ドット <--> 352、704ドット
+         (26.84MHz)             (28.64MHz)                &lt;NTSC&gt;
+         (26.66MHz)             (28.44MHz)                &lt;PAL&gt;
+    このため、320ドットモードから640ドットモードへは切り替えることが
+    できますが、352ドットに切り替えようとするとエラーになります。<BR>
+    また、縦方向の解像度を448または480ラインにする場合にはインターレースと
+    なるため、2インタラプトで1フレームになりますので、フレームの切り替え
+    カウンタが2の倍数になるように調整されます。もし、インターレースモードを
+    1インタラプトで処理したい場合には本関数を実行したのち、
+    (<a href="../struct/types_j.htm#Sint8"><I>Sint8</I></A>)<a href="../mem/system01_j.htm#SynchConst"><I>SynchConst</I></A>を1にし、<a href="../func/int_j.htm#slInitSynch"><I>slInitSynch</I></A>関数を実行してください。<BR>
+    本関数では 指定された解像度により、スプライト用ウィンドウの初期化(全画
+    面サイズ)、パースの変更(画角90゜)、スプライトデータタイプの変更が行
+    われます。<BR>
+    スプライトデータタイプは 4ビットの内、ビット3のみを変更します。<BR>
+    画面モード「mode」には、
+        <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A>、<a href="../struct/constenm_j.htm#TV_320x240"><I>TV_320x240</I></A>、<a href="../struct/constenm_j.htm#TV_320x256"><I>TV_320x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_352x224"><I>TV_352x224</I></A>、<a href="../struct/constenm_j.htm#TV_352x240"><I>TV_352x240</I></A>、<a href="../struct/constenm_j.htm#TV_352x256"><I>TV_352x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_640x224"><I>TV_640x224</I></A>、<a href="../struct/constenm_j.htm#TV_640x240"><I>TV_640x240</I></A>、<a href="../struct/constenm_j.htm#TV_640x256"><I>TV_640x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_704x224"><I>TV_704x224</I></A>、<a href="../struct/constenm_j.htm#TV_704x240"><I>TV_704x240</I></A>、<a href="../struct/constenm_j.htm#TV_704x256"><I>TV_704x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_320x448"><I>TV_320x448</I></A>、<a href="../struct/constenm_j.htm#TV_320x480"><I>TV_320x480</I></A>、<a href="../struct/constenm_j.htm#TV_320x512"><I>TV_320x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_352x448"><I>TV_352x448</I></A>、<a href="../struct/constenm_j.htm#TV_352x480"><I>TV_352x480</I></A>、<a href="../struct/constenm_j.htm#TV_352x512"><I>TV_352x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_640x448"><I>TV_640x448</I></A>、<a href="../struct/constenm_j.htm#TV_640x480"><I>TV_640x480</I></A>、<a href="../struct/constenm_j.htm#TV_640x512"><I>TV_640x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_704x448"><I>TV_704x448</I></A>、<a href="../struct/constenm_j.htm#TV_704x480"><I>TV_704x480</I></A>、<a href="../struct/constenm_j.htm#TV_704x512"><I>TV_704x512</I></A>
+    が入ります。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_352x224"><I>TV_352x224</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                     :
+    <a href="../func/init_j.htm#slSetTVMode"><I>slSetTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_352x480"><I>TV_352x480</I></A> );
+                             OK.
+
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_352x224"><I>TV_352x224</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                     :
+    <a href="../func/init_j.htm#slSetTVMode"><I>slSetTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A> );
+                             NG.   
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    本関数では以下の設定は変更されません。本関数実行後に必要に応じて設定して
+    ください。<BR>
+      ○ VDP2サイクルモード
+      ○ スクロール画面用のウィンドウ
+      ○ スプライト表示前方限界値(ZdspLevel)
+    また、画面にノイズが入ることがありますので、必要に応じて<a href="../func/scroll_j.htm#slTVOff"><I>slTVOff</I></A>
+    関数を実行してください。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/init_j.htm#slInitSystem">slInitSystem</A></TD>
+<TD><PRE><a href="../func/init_j.htm#slSetScrTVMode">slSetScrTVMode</A></TD>
+<TD><PRE><a href="../func/init_j.htm#slSetSprTVMode">slSetSprTVMode</A></TD>
+<TD><PRE><a href="../func/scroll_j.htm#slTVOff">slTVOff</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scroll_j.htm#slTVOn">slTVOn</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenDist">MsScreenDist</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#WindowNumber">WindowNumber</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#WinUseFlag">WinUseFlag</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenLeft">MsScreenLeft</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenTop">MsScreenTop</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenRight">MsScreenRight</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenBottom">MsScreenBottom</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsScreenSizeX">MsScreenSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsScreenSizeY">MsScreenSizeY</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeX">MsWindowSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeY">MsWindowSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinXAdder">MsWinXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinYAdder">MsWinYAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinXAdder">SlWinXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinYAdder">SlWinYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipXAdder">MsClipXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipYAdder">MsClipYAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipXAdder">SlClipXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipYAdder">SlClipYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#Resolution">Resolution</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_TVSTAT">VDP2_TVSTAT</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_SPCTL">VDP2_SPCTL</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParA">RotScrParA</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParB">RotScrParB</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#init">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slSetScrTVMode"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slSetScrTVMode</H1>
+<HR><H3>VDP2の解像度の切替え</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slSetScrTVMode( mode );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode - TVモード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    スクロール制御(VDP2)に関する部分のTVモードを設定します。<BR>
+    上記の <a href="../func/init_j.htm#slSetTVMode"><I>slSetTVMode</I></A>関数と同様にシステムクロックを切り替えるような
+    場合<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A> を返します。<BR>
+    画面モード「mode」には、
+        <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A>、<a href="../struct/constenm_j.htm#TV_320x240"><I>TV_320x240</I></A>、<a href="../struct/constenm_j.htm#TV_320x256"><I>TV_320x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_352x224"><I>TV_352x224</I></A>、<a href="../struct/constenm_j.htm#TV_352x240"><I>TV_352x240</I></A>、<a href="../struct/constenm_j.htm#TV_352x256"><I>TV_352x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_640x224"><I>TV_640x224</I></A>、<a href="../struct/constenm_j.htm#TV_640x240"><I>TV_640x240</I></A>、<a href="../struct/constenm_j.htm#TV_640x256"><I>TV_640x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_704x224"><I>TV_704x224</I></A>、<a href="../struct/constenm_j.htm#TV_704x240"><I>TV_704x240</I></A>、<a href="../struct/constenm_j.htm#TV_704x256"><I>TV_704x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_320x448"><I>TV_320x448</I></A>、<a href="../struct/constenm_j.htm#TV_320x480"><I>TV_320x480</I></A>、<a href="../struct/constenm_j.htm#TV_320x512"><I>TV_320x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_352x448"><I>TV_352x448</I></A>、<a href="../struct/constenm_j.htm#TV_352x480"><I>TV_352x480</I></A>、<a href="../struct/constenm_j.htm#TV_352x512"><I>TV_352x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_640x448"><I>TV_640x448</I></A>、<a href="../struct/constenm_j.htm#TV_640x480"><I>TV_640x480</I></A>、<a href="../struct/constenm_j.htm#TV_640x512"><I>TV_640x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_704x448"><I>TV_704x448</I></A>、<a href="../struct/constenm_j.htm#TV_704x480"><I>TV_704x480</I></A>、<a href="../struct/constenm_j.htm#TV_704x512"><I>TV_704x512</I></A>
+    が入ります。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_352x224"><I>TV_352x224</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                     :
+    <a href="../func/init_j.htm#slSetScrTVMode"><I>slSetScrTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_352x480"><I>TV_352x480</I></A> );
+                             OK.
+
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_352x448"><I>TV_352x448</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                     :
+    <a href="../func/init_j.htm#slSetScrTVMode"><I>slSetScrTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_320x448"><I>TV_320x448</I></A> );
+                             NG.   
+
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_352x448"><I>TV_352x448</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                     :
+    <a href="../func/init_j.htm#slSetScrTVMode"><I>slSetScrTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_352x240"><I>TV_352x240</I></A> );
+                             NG.
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    スプライトがインターレースモードで表示される場合、スクロールも必ず
+    インターレースモードにしてください。<BR>
+    これは EvenFrame と OddFrame とをVDP2のステータスから得ているため
+    です。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/init_j.htm#slInitSystem">slInitSystem</A></TD>
+<TD><PRE><a href="../func/init_j.htm#slSetSprTVMode">slSetSprTVMode</A></TD>
+<TD><PRE><a href="../func/init_j.htm#slSetTVMode">slSetTVMode</A></TD>
+<TD><PRE><a href="../func/scroll_j.htm#slTVOff">slTVOff</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/scroll_j.htm#slTVOn">slTVOn</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#Resolution">Resolution</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_TVSTAT">VDP2_TVSTAT</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#init">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slSetSprTVMode"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slSetSprTVMode</H1>
+<HR><H3>VDP1の解像度の切替え</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slSetSprTVMode( mode );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode - TVモード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    スプライト制御(VDP1)に関する部分のTVモードを設定します。<BR>
+    上記の <a href="../func/init_j.htm#slSetTVMode"><I>slSetTVMode</I></A>関数と同様にシステムクロックを切り替えるような
+    場合<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A> を返します。<BR>
+    また、インターレースモードに切り替える場合には、2インタラプトで
+    1フレームとなるようにカウンタを調整します。<BR>
+    スプライト用ウィンドウの初期化、パース設定(画角90°)、スプライト
+    データタイプの変更が行なわれます。<BR>
+    スプライトデータタイプは 4ビットの内、ビット3のみを変更します。<BR>
+    画面モード「mode」には、
+        <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A>、<a href="../struct/constenm_j.htm#TV_320x240"><I>TV_320x240</I></A>、<a href="../struct/constenm_j.htm#TV_320x256"><I>TV_320x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_352x224"><I>TV_352x224</I></A>、<a href="../struct/constenm_j.htm#TV_352x240"><I>TV_352x240</I></A>、<a href="../struct/constenm_j.htm#TV_352x256"><I>TV_352x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_640x224"><I>TV_640x224</I></A>、<a href="../struct/constenm_j.htm#TV_640x240"><I>TV_640x240</I></A>、<a href="../struct/constenm_j.htm#TV_640x256"><I>TV_640x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_704x224"><I>TV_704x224</I></A>、<a href="../struct/constenm_j.htm#TV_704x240"><I>TV_704x240</I></A>、<a href="../struct/constenm_j.htm#TV_704x256"><I>TV_704x256</I></A>
+        <a href="../struct/constenm_j.htm#TV_320x448"><I>TV_320x448</I></A>、<a href="../struct/constenm_j.htm#TV_320x480"><I>TV_320x480</I></A>、<a href="../struct/constenm_j.htm#TV_320x512"><I>TV_320x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_352x448"><I>TV_352x448</I></A>、<a href="../struct/constenm_j.htm#TV_352x480"><I>TV_352x480</I></A>、<a href="../struct/constenm_j.htm#TV_352x512"><I>TV_352x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_640x448"><I>TV_640x448</I></A>、<a href="../struct/constenm_j.htm#TV_640x480"><I>TV_640x480</I></A>、<a href="../struct/constenm_j.htm#TV_640x512"><I>TV_640x512</I></A>
+        <a href="../struct/constenm_j.htm#TV_704x448"><I>TV_704x448</I></A>、<a href="../struct/constenm_j.htm#TV_704x480"><I>TV_704x480</I></A>、<a href="../struct/constenm_j.htm#TV_704x512"><I>TV_704x512</I></A>
+    が入ります。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_352x448"><I>TV_352x448</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                     :
+    <a href="../func/init_j.htm#slSetSprTVMode"><I>slSetSprTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_352x240"><I>TV_352x240</I></A> );
+                             OK.   
+
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_352x224"><I>TV_352x224</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                     :
+    <a href="../func/init_j.htm#slSetSprTVMode"><I>slSetSprTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_352x480"><I>TV_352x480</I></A> );
+                             NG.
+
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_352x448"><I>TV_352x448</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                     :
+    <a href="../func/init_j.htm#slSetSprTVMode"><I>slSetSprTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_320x448"><I>TV_320x448</I></A> );
+                             NG.   
+
+    <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_320x448"><I>TV_320x448</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                     :
+    <a href="../func/init_j.htm#slSetScrTVMode"><I>slSetScrTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A> );
+    <a href="../func/init_j.htm#slSetSprTVMode"><I>slSetSprTVMode</I></A>( <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A> );
+                             OK.   
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    スクロールがインターレースモードでない場合スプライトをインターレースモード
+    にすることは出来ません。<BR>
+    これは EvenFrame と OddFrame とをVDP2のステータスから得ているため
+    です。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/init_j.htm#slInitSystem">slInitSystem</A></TD>
+<TD><PRE><a href="../func/init_j.htm#slSetScrTVMode">slSetScrTVMode</A></TD>
+<TD><PRE><a href="../func/init_j.htm#slSetTVMode">slSetTVMode</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenDist">MsScreenDist</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#WindowNumber">WindowNumber</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#WinUseFlag">WinUseFlag</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenLeft">MsScreenLeft</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenTop">MsScreenTop</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenRight">MsScreenRight</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenBottom">MsScreenBottom</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsScreenSizeX">MsScreenSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsScreenSizeY">MsScreenSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeX">MsWindowSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeY">MsWindowSizeY</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinXAdder">MsWinXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinYAdder">MsWinYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinXAdder">SlWinXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinYAdder">SlWinYAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipXAdder">MsClipXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipYAdder">MsClipYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipXAdder">SlClipXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipYAdder">SlClipYAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#Resolution">Resolution</A></TD>
+<TD><PRE><a href="../mem/system04_j.htm#VDP2_TVSTAT">VDP2_TVSTAT</A></TD>
+<TD><PRE><a href="../mem/system07_j.htm#VDP2_SPCTL">VDP2_SPCTL</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParA">RotScrParA</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParB">RotScrParB</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#init">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slDynamicFrame"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slDynamicFrame</H1>
+<HR><H3>描画終了待ちモードの設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> flag;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slDynamicFrame( flag );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> flag - ダイナミックフレームモードの切替え
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーステータス
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    一定周期のフレームチェンジとVDP1の描画終了待ち(ダイナミック)フレーム
+    チェンジとを切り替えます。<BR>
+    flag には <a href="../struct/constenm_j.htm#ON"><I>ON</I></A> または <a href="../struct/constenm_j.htm#OFF"><I>OFF</I></A> のいずれかを指定します。<BR>
+    インターレースモードの場合には <a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A> を返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    固定インターバル→不定インターバル
+      /* 1 int固定から 2 intベース不定モードに切り替える */
+      extern <a href="../struct/types_j.htm#Uint8"><I>Uint8</I></A> <a href="../mem/system01_j.htm#SynchConst"><I>SynchConst</I></A>; /* signed intではなくunsigned int */
+                               /* ^^^^^^            ^^^^^^^^     */
+      <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, 1 );
+                  :
+                  :
+      /* 不定インターバルモード-2を設定 */
+      <a href="../func/init_j.htm#slDynamicFrame"><I>slDynamicFrame</I></A>( <a href="../struct/constenm_j.htm#ON"><I>ON</I></A> );
+      <a href="../mem/system01_j.htm#SynchConst"><I>SynchConst</I></A> = 2; /* -2ではない */
+      <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>();
+
+    不定インターバル→固定インターバル
+      /* 1 int不定インターバルから 1 int固定インターバルに変更 */
+      <a href="../func/init_j.htm#slInitSystem"><I>slInitSystem</I></A>( <a href="../struct/constenm_j.htm#TV_320x224"><I>TV_320x224</I></A>, <a href="../struct/const_j.htm#NULL"><I>NULL</I></A>, -1 );
+                   :
+                   :
+      /* 固定インターバルモード 1を設定 */
+      <a href="../func/init_j.htm#slDynamicFrame"><I>slDynamicFrame</I></A>( <a href="../struct/constenm_j.htm#OFF"><I>OFF</I></A> );
+      /* <a href="../mem/system01_j.htm#SynchConst"><I>SynchConst</I></A>を変更する必要はない */
+      <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>();
+
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    固定インターバルから不定インターバル(ダイナミックフレームモード)に変更
+    する時、システム変数「<a href="../mem/system01_j.htm#SynchConst"><I>SynchConst</I></A>」には、負数ではなく正数を入れます。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/init_j.htm#slInitSystem">slInitSystem</A></TD>
+<TD><PRE><a href="../mem/system01_j.htm#SynchConst">SynchConst</A></TD>
+<TD><PRE><a href="../mem/system01_j.htm#SynchCount">SynchCount</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#Resolution">Resolution</A></TD>
+</TR>
+</TABLE>
+</DL>
+
+<HR NOSHADE>
+<A HREF="index_j.htm">戻る</A><ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

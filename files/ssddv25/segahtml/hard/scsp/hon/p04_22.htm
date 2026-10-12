@@ -1,0 +1,83 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/29&gt;SCSP User's Manual/4.2.2EG</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p04_21.htm">Back</a> ｜ <A HREF="p04_23.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/4.2 Sound source register</b><HR NOSHADE>
+<DL>
+<A NAME="no4_22"></A><P><DT><H3> ■EG register</H3><DD> EG represents the change in sound attenuation over time. EG has the following four states.</P>
+<DL>
+<A NAME="no4_22_0"></A><P><DT> <B>Attack state (attack segment)</b><DD> This refers to the state at which the sound begins (starting up).</P>
+<A NAME="no4_22_1"></A><P><DT> <B>Decay 1 state (Decay 1 segment)</b><DD> This is a state in which the volume decreases from the maximum volume.</P>
+<A NAME="no4_22_2"></A><P><DT> <B>Decay 2 state (Decay 2 segment)</b><DD> This is a state in which the signal decays further from the Decay 1 state. However, if DR2 is set to "0", the sound will not attenuate and will become a sustained sound.</P>
+<A NAME="no4_22_3"></A><P><DT> <B>Release state (release segment)</b><DD> This is a state in which the sound attenuates and disappears from the moment KEY_OFF is turned off.</P>
+</DL>
+<P><DD> However, in all cases of sound generation states, the EG does not transition through the four states, but draws various envelope curves depending on the timing of KEY_OFF. An example is explained below.</P>
+<P><DT> <B>(a) When KEY_OFF is performed during attack state transition (Figure 4.6)</b><A NAME="z4_6"></A><P ALIGN=CENTER> <B>Figure 4.6 KEY_OFF during attack state transition</b><BR>
+<img srcset="../grp/i040_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> When you perform KEY-OFF, the level at that point (KEY_OFF LEVEL) will attenuate (increase as an EG value) according to the release rate ("RR") setting. Therefore, the envelope curve in this case looks like the Decay 1 and Decay 2 states are omitted. In this case, the EG value does not reach "000H" and increases to "3FFH" after KEY_OFF.</P>
+<P><DT> <B>(b) When KEY_OFF is performed during decay 1 segment transition (Figure 4.7)</b><A NAME="z4_7"></A><P ALIGN=CENTER> <B>Figure 4.7 KEY-OFF during decay state transition</b><BR>
+<img srcset="../grp/i041_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> When entering the Decay 1 state, the signal will attenuate toward DL (Decay Level) according to the D1R (Decay 1 Rate) setting. If KEY_OFF is executed during this process, the level at the time of KEY_OFF (KEY_OFF-LEVEL) will be attenuated according to the RR (release rate) setting value.</P>
+<P><DT> <B>AR[4:0](R/W) ; Attack Rate</b><DD> Specifies the amount of EG change in the attack state.</P>
+<P><DD> <B>Contents of AR register</b><DD> When "AR"="00H", the amount of change (level increase) is minimum (0)<DD> When "AR"="1FH", the amount of change (level increase) maximum (MAX)</P>
+<A NAME="EGHOLD_"></A><P><DT> <B>EGHOLD(R/W) EG HOLD mode</b><DD> Specifies whether to keep or change the value on attack. As shown in <A HREF="#z4_6">Figure 4.6</a> , when this bit is "1B", the value at attack is held at "000H". Also, when the bit is "0B", it changes according to the value specified in the AR register. When in hold mode, the time that EG holds "000H" (time until moving to segment 2) is determined by the value of "AR".</P>
+<A NAME="z4_8"></A><P ALIGN=CENTER> <B>Figure 4.8 Change in attenuation</b><BR>
+<img srcset="../grp/i042_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>D1R[4:0](R/W); Decay-1 Rate</b><DD> Specifies the amount of EG change in Decay 1 state.</P>
+<P><DD> <B>Contents of D1R register</b><DD> When "D1R"="00H", the amount of change (level attenuation) is minimum (0)<DD> When "D1R"="1FH", the amount of change (level attenuation) maximum (MAX)</P>
+<P><DT> <B>D2R[4:0](R/W) ; Decay-2 Rate</b><DD> Specifies the amount of EG change in Decay 2 state.<P><DD> <B>D2R register contents</b><DD> When "D2R"="00H", the amount of change (level attenuation) is minimum (0)<DD> When "D2R"="1FH", the amount of change (level attenuation) maximum (MAX)</P>
+<A NAME="RR_"></A><P><DT> <B>RR[4:0](R/W); Release Rate</b><DD> Specifies the amount of EG change in the release state.</P>
+<P><DD> <B>Contents of RR register</b><DD> When "RR"="00H", the amount of change (level attenuation) is minimum (0)<DD> When "RR"="1FH", the amount of change (level attenuation) maximum (MAX)</P>
+<A NAME="DL_"></A><P><DT> <B>DL[4:0](R/W) ; Decay Level</b><DD> Specify the upper 5 bits of the attenuation level (EG) that transitions from Decay 1 state to Decay 2 state. When the upper 5 bits of the attenuation level become equal to the DL value in the Decay 1 state, the state transitions to Decay 2.</P>
+<P><DD> <B>DL register contents</b><DD> When "DL"="00H", maximum level (MAX)<DD> When "DL"="1FH", level minimum (MIN)</P>
+<A NAME="KRS_"></A><P><DT> <B>KRS[3:0](R/W) Key Rate Scaling</b><DD> Specifies the degree of EG key rate scaling.<P><DD> <B>KRS register contents</b><DD> Minimum scaling at 00H<DD> 0EH represents maximum scaling.<DD> When set to 0FH, designates scaling OFF.</P>
+<A NAME="LPSLNK_"></A><P><DT> <B>LPSLNK(R/W) ; LooP Start LiNK</b><DD> The function of "LPSLNK" (loop start link) is to synchronize the start of the loop and the transition from the EG attack state to the decay 1 state.</P>
+<P><DD> <B>Contents of the LPSLNK register</b><DD> "LPSLNK"="0B": EG state transition and loop start point position are unrelated.<DD> "LPSLNK"="1B": The following changes can be seen.</P>
+<P><DD> When EG reaches "000H" in the attack state, before the waveform read address reaches the loop start point ("SA" + "LSA"),</P>
+<DD><OL>
+<LI> If it was early in time<LI> If it is late in time</OL>
+</P>
+<P><DT> <B>When the EG reaches "000H" in the attack state, if the waveform read address is earlier than the loop start point ("SA" + "LSA") (Figure 4.9)</b><DD> In this case, the EG will reach the MAX level first (P.1). However, since it is not possible to transition to the next segment (decay 1 state) until the waveform read address reaches the loop start point, the EG continues to hold the MAX level.<BR>
+ Next, when the waveform read address reaches the loop start point (P.2), the EG will transition to the Decay 1 state.</P>
+<A NAME="z4_9"></A><P ALIGN=CENTER> <B>Figure 4.9 Transition from attack state to decay 1 (1)</b><BR>
+<img srcset="../grp/i044_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P ALIGN=CENTER> <B>Figure 4.9 Transition from attack state to decay 1 (1)</b><BR>
+<img srcset="../grp/i044_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>When EG reaches "000H" in attack state, if the waveform read address is later than reaching the loop start point ("SA" + "LSA")</b><DD> This pattern has two more variations.</P>
+<P><DT> <B>pattern 1</b><DD> When the waveform read address reaches the loop start point and "SCL" (EG level) at this point is larger than "DL" (decay level) (it is the opposite when comparing with the actual EG value) (Figure 4.10)</P>
+<A NAME="z4_10"></A><P ALIGN=CENTER> <B>Figure 4.10 Transition from attack state to decay 1 (2)</b></BR>
+<img srcset="../grp/i044_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P ALIGN=CENTER> <B>Figure 4.10 Transition from attack state to decay 1 (2)</b></BR>
+<img srcset="../grp/i044_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> After the waveform read address reaches the loop start point, the EG transitions to the Decay 1 state (P.1). Next, when the EG value reaches DL (decay level), it will transition to the Decay 2 state (P.2).</P>
+<P><DT> <B>pattern 2</b><DD> When the waveform read address reaches the loop start point and "SCL" (EG level) at this point is smaller than "DL" (decay level) (it is the opposite when comparing the actual EG value) (Figure 4.11)</P>
+<A NAME="z4_11"></A><P ALIGN=CENTER> <B>Figure 4.11 Transition from attack state to decay 1 (3)</b></BR>
+<img srcset="../grp/i045_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> After the waveform read address reaches the loop start point, the EG transitions to the Decay 1 state (P.1). After that, the EG value will never reach "DL" (decay level), so it will continue to maintain level 0 (EG value "3FFH") without transitioning to the Decay 2 state.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_21.htm">Back</a> ｜ <A HREF="p04_23.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

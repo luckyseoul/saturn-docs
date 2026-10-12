@@ -1,0 +1,29 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p003.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p005.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H3> SCU interrupt routine priority change </H3>
+<DD> BOOT ROM has an interrupt priority management table for the SCU interrupt processing service, and it is possible to rewrite it. <P>
+<PRE> <B> Caution This is a dangerous service and the system hangs if there is a priority conflict in the table contents
+May be up! ! ! </B></PRE><P>
+This allows you to optimize interrupt handling (using SYS_SETUINT) for your application. <P>
+For this purpose, the application should prepare data with the same structure as the table and call SYS_CHGUIPR. <P>
+The table is 32 long words, and 1 long word has the following contents. <P>
+<TABLE BORDER CELLPADDING=5>
+<TD ALIGN = "LEFT" WIDTH = 180> <PRE> SH2 SR lower word value </TD>
+<TD ALIGN = "CENTER" WIDTH = 250> <PRE> SCU interrupt mask lower word value </TD>
+</TABLE><P>
+<TABLE> <TD WIDTH = 180> Value set in SR when interrupt processing starts <BR> </TD> <TD WIDTH = 250> When interrupt processing starts, the current mask setting value is stored in the SCU interrupt mask register Value written with logical OR (OR) </TD> </TABLE> <P>
+The position of this longword in the table corresponds to 30 SCU interrupt factors. <BR>
+(V-Blank In is the first, V-Blank Out is the second, but includes 2 longwords corresponding to vectors 4EH and 4FH) <P>
+Actually, the table should be created so that there is no contradiction between SR and SCU interrupt masks and interrupt factors with the utmost care. <P>
+For example, BOOT ROM uses the following table as the default settings. <P>
+<TABLE>
+<TD> <PRE> Uint32 PRITab [32] = {<BR> 0x00F0FFFF, / * VBI SR = 15 All prohibited (highest priority) <BR> 0x00E0FFFE, / * VBO SR = 14 Allowed only for VBI <BR> 0x00D0FFFC, / * HBI SR = 13 Allow VBI, VBO <BR>: <BR>: <BR> 0x0070FE00 / * External 15 SR = 7 SCU interrupt specific priority All masks <BR> / * A bus interrupt specific priority The degree is 7, 4, or 1 depending on the factor, but it is 7 for shared 1-bit masks. <BR>}; </TD> <TD> <PRE> <BR> * / <BR> * / <BR> * / <BR> <BR> <BR> * / <BR> * / <BR> </TD> </TABLE> <P>
+</DL><P><P><HR>
+<A HREF=p003.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p005.htm> Go to next page </A>
+</BODY>
+</HTML>

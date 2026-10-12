@@ -1,0 +1,80 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;40/86&gt;VDP2 User's Manual/6.2 Rotational scroll screen display control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no6">VDP2 User's Manual</a> ★ <A HREF="p06_10.htm">Chapter 6 Rotating scroll screen</a><HR>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p06_30.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 6 Rotating scroll screen</b><HR NOSHADE>
+<DL>
+<P><DT><H2> ■6.2 Rotational scroll screen display control</H2><DD> The rotating scroll screen has two sides, RBG0 and RBG1, and if you want to display only one side, display RBG0. If you want to display RBG1, you must also display RBG0, and in that case, the normal scroll screen will not be able to be displayed at all.<BR>
+ When displaying a rotating scroll screen, the image data (pattern name table, character pattern table, or bitmap pattern) cannot be used in common with the image data for the normal scroll screen. It is also not possible to share the image data of RBG0 and RBG1. Additionally, the image data for each rotating scroll screen must be stored in separate VRAMs. Of the image data, the RBG1 pattern name table is stored in VRAM-B1, and the character pattern table is stored in VRAM-B0.</P>
+<P><DD> When RBG0 only needs coefficient data line by line, the coefficient table can be stored in any bank of VRAM, but when it is needed by dot, it must be stored in a separate bank from the image data. It won't.<BR>
+ The registers that control the display of the rotating scroll screen include the screen display enable register and the RAM control register. The screen display enable register controls the screen display and transparency code. The contents of the register are the same as the normal scroll screen. For details, see " <B><A HREF="p04_10.htm">4.1 Screen Display Control</a></b> ."</P>
+<A NAME="no6_21"></A><P><DT><H3> ●RAM control register</H3><DD> The RAM control register specifies the VRAM bank division, the purpose of VRAM usage for the rotating scroll screen, and the color RAM mode. This is a 16-bit readable and writable register located at address 18000EH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="RAMCTL_"></A><P><DD> <B><FONT SIZE=5>RAMCTL</font> <FONT SIZE=4>18000EH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#CRKTE_">CRKTE</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#CRMD_">CRMD1</a></TH><TH><PRE> <A HREF="#CRMD_">CRMD0</a></TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#VRBMD_">VRBMD</a></TH><TH><PRE> <A HREF="#VRAMD_">VRAMD</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#RDBS_">RDBSB11</a></TH><TH><PRE> <A HREF="#RDBS_">RDBSB10</a></TH><TH><PRE> <A HREF="#RDBS_">RDBSB01</a></TH><TH><PRE> <A HREF="#RDBS_">RDBSB00</a></TH><TH><PRE> <A HREF="#RDBS_">RDBSA11</a></TH><TH><PRE> <A HREF="#RDBS_">RDBSA10</a></TH><TH><PRE> <A HREF="#RDBS_">RDBSA01</a></TH><TH><PRE> <A HREF="#RDBS_">RDBSA00</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="CRKTE_"></A><P><DT> <B>Color RAM coefficient table enable bit</b> : Color RAM coefficient table enable bit (CRKTE), bit 15<DD> Please refer to " <B><A HREF="p06_40.htm">6.4 Coefficient table control</a></b> ".</P>
+<A NAME="CRMD_"></A><P><DT> <B>Color RAM mode bit</b> : Color RAM mode bit (CRMD1, CRMD0), bits 13, 12<DD> Please refer to " <B><A HREF="p03_40.htm">3.4 Color RAM Mode</a></b> ".<BR>
+ When the CRKTE bit is set to 1, set the color RAM mode to mode 1. At that time, the second half of the color RAM (100800H to 100FFFH) is used for coefficient table data, so color data cannot be stored.</P>
+<A NAME="VRAMD_">　</A><A NAME="VRBMD_">　</A><P><DT><B>VRAM mode bit</b> : VRAM mode bit (VRAMD, VRBMD), bits 9, 8<DD> Please refer to " <B><A HREF="p03_20.htm">3.2 VRAM Bank Division</a></b> ".</P>
+<A NAME="RDBS_"></A><P><DT> <B>Rotation data bank selection bit</b> : Data bank select bit<DD> (RDBSA01, RDBSA00, RDBSA11, RDBSA10, RDBSB01, RDBSB00, RDBSB11, RDBSB10)<BR>
+ Specify the purpose of VRAM usage on the rotating scroll screen. This bit is only valid when displaying a rotating scroll screen.</P>
+<P><DD><TABLE BORDER CELLPADDING=5>
+<TR><TD> RDBSA00,RDBSA01</TD><TD> 18000EH</TD><TD> bit 1,0</TD><TD> For VRAM-A0 (or for VRAM-A)</TD></TR>
+<TR><TD> RDBSA10,RDBSA11</TD><TD> 18000EH</TD><TD> bit 3,2</TD><TD> For VRAM-A1</TD></TR>
+<TR><TD> RDBSB00,RDBSB01</TD><TD> 18000EH</TD><TD> bit 5,4</TD><TD> For VRAM-B0 (or for VRAM-B)</TD></TR>
+<TR><TD> RDBSB10,RDBSB11</TD><TD> 18000EH</TD><TD> bit 7,6</TD><TD> For VRAM-B1</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER CELLPADDING=5>
+<TR><TH> RDBSx1</TH><TH> RDBSx0</TH><TH> VRAM usage purpose</TH></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 0</TH><TD> Not used as RAM for RBG0</TD></TR>
+<TR><TH><PRE> 0</TH><TH><PRE> 1</TH><TD> RAM for coefficient table of RBG0</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 0</TH><TD> RAM for RBG0 pattern name table</TD></TR>
+<TR><TH><PRE> 1</TH><TH><PRE> 1</TH><TD> For RBG0 character pattern table (or bitmap pattern)<BR>
+ RAM</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> x in the bit name can be A0, A1, B0, or B1.</P>
+<P><DD> If VRAM is not divided into banks, the bits for VRAM-A0 are used for VRAM-A, and the bits for VRAM-B0 are used for VRAM-B.<BR>
+ If you do not need coefficient data for each dot, there is no need to set the coefficient table RAM (01B).<BR>
+ When displaying in bitmap format, there is no need to set RAM (10B) for the pattern name table.<BR>
+ The settings of the VRAM cycle pattern register of the VRAM bank specified as the rotary scroll RAM are ignored.<BR>
+ If the image data read address is not within the specified bank, the data will not be read and the screen will not be displayed correctly.<BR>
+ When displaying RBG1, be sure to set 00B to the bits for VRAM-B0 and VRAM-B1.<BR>
+ The coefficient data read address was not within the specified bank.</P>
+<P><DD> If this happens, the coefficient data will not be read and the screen display will not be correct.<BR>
+ When storing the coefficient table in color RAM, do not set the coefficient table RAM (01B) of RBG0.<BR>
+ When the CRKTE bit is set to 1, do not specify the 4 banks of VRAM to be used as RAM for coefficient table data.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p06_30.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no6">VDP2 User's Manual</a> ★ <A HREF="p06_10.htm">Chapter 6 Rotating scroll screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

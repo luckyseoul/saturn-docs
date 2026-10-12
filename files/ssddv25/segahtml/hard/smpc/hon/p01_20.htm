@@ -1,0 +1,135 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/19&gt;SMPC User's Manual/1.2 SH-2 Interface</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p02_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/Chapter 1 Overview</b><HR NOSHADE>
+<DL>
+<A NAME="no1_20"></A><P><DT><H2> ■1.2 SH-2 interface</H2><A NAME="no1_21"></A><P><DT><H3> ◆SH-2 interface register</H3><DD> The SH-2 interface register is a register used for commands from the SH-2, setting command parameters, displaying status, and outputting result parameters.<DD> Figure 1.3 shows the address map of the SH-2 interface register.</P>
+<A NAME="z1_3"></A><DD> <B>Figure 1.3 SH-2 interface register address map</b><DD><PRE>
+      bit7                0   
+         ┌────────────────┐   
+2010001FH│     <A HREF="#no1_21_0">COMREG</A>     │W  
+         └────────────────┘   
+      bit7                0   
+         ┌────────────────┐   
+20100061H│      <A HREF="#no1_21_1">S  R</A>      │R  
+         └────────────────┘   
+      bit7                0   
+         ┌─┬─┬─┬─┬─┬─┬─┬──┐   
+20100063H│             │<A HREF="#no1_21_2">SF</A>│R/W
+         └─┴─┴─┴─┴─┴─┴─┴──┘   
+      bit7                0   
+         ┌────────────────┐┐  
+20100001H│     <A HREF="#no1_21_3">IREG0</A>      ││  
+         ├────────────────┤│  
+20100003H│     <A HREF="#no1_21_3">IREG1</A>      ││  
+         ├────────────────┤│  
+20100005H│     <A HREF="#no1_21_3">IREG2</A>      ││  
+         ├────────────────┤│  
+20100007H│     <A HREF="#no1_21_3">IREG3</A>      │W  
+         ├────────────────┤│  
+20100009H│     <A HREF="#no1_21_3">IREG4</A>      ││  
+         ├────────────────┤│  
+2010000BH│     <A HREF="#no1_21_3">IREG5</A>      ││  
+         ├────────────────┤│  
+2010000DH│     <A HREF="#no1_21_3">IREG6</A>      ││  
+         └────────────────┘┘  
+      bit7                0            bit7                0
+         ┌────────────────┐┐              ┌────────────────┐┐
+20100021H│     <A HREF="#no1_21_4">OREG0</A>      ││     20100041H│     <A HREF="#no1_21_4">OREG16</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+20100023H│     <A HREF="#no1_21_4">OREG1</A>      ││     20100043H│     <A HREF="#no1_21_4">OREG17</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+20100025H│     <A HREF="#no1_21_4">OREG2</A>      ││     20100045H│     <A HREF="#no1_21_4">OREG18</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+20100027H│     <A HREF="#no1_21_4">OREG3</A>      ││     20100047H│     <A HREF="#no1_21_4">OREG19</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+20100029H│     <A HREF="#no1_21_4">OREG4</A>      ││     20100049H│     <A HREF="#no1_21_4">OREG20</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+2010002BH│     <A HREF="#no1_21_4">OREG5</A>      ││     2010004BH│     <A HREF="#no1_21_4">OREG21</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+2010002DH│     <A HREF="#no1_21_4">OREG6</A>      ││     2010004DH│     <A HREF="#no1_21_4">OREG22</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+2010002FH│     <A HREF="#no1_21_4">OREG7</A>      ││     2010004FH│     <A HREF="#no1_21_4">OREG23</A>     ││
+         ├────────────────┤R              ├────────────────┤R
+20100031H│     <A HREF="#no1_21_4">OREG8</A>      ││     20100051H│     <A HREF="#no1_21_4">OREG24</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+20100033H│     <A HREF="#no1_21_4">OREG9</A>      ││     20100053H│     <A HREF="#no1_21_4">OREG25</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+20100035H│     <A HREF="#no1_21_4">OREG10</A>     ││     20100055H│     <A HREF="#no1_21_4">OREG26</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+20100037H│     <A HREF="#no1_21_4">OREG11</A>     ││     20100057H│     <A HREF="#no1_21_4">OREG27</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+20100039H│     <A HREF="#no1_21_4">OREG12</A>     ││     20100059H│     <A HREF="#no1_21_4">OREG28</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+2010003BH│     <A HREF="#no1_21_4">OREG13</A>     ││     2010005BH│     <A HREF="#no1_21_4">OREG29</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+2010003DH│     <A HREF="#no1_21_4">OREG14</A>     ││     2010005DH│     <A HREF="#no1_21_4">OREG30</A>     ││
+         ├────────────────┤│              ├────────────────┤│
+2010003FH│     <A HREF="#no1_21_4">OREG15</A>     ││     2010005FH│     <A HREF="#no1_21_4">OREG31</A>     ││
+         └────────────────┘┘              └────────────────┘┘
+         <FONT SIZE=6>★Only byte access is possible for all registers</font></PRE><P><DD> The details of the SH-2 interface registers are shown below.<A NAME="no1_21_0"></A><P><DT> <B>COMREG(W)：COMmand REGister</b><DD> This is an 8-bit register for receiving various commands from SH-2. SMPC parses and executes the command as soon as the command is written. SMPC provides reset system management commands, non-reset system management commands, and RTC commands. Please access byte from SH-2.</P>
+<A NAME="no1_21_1"></A><P><DT> <B>SR(R)：Status Register</b><DD> This is an 8-bit register used by SMPC to display the status after command execution. It is possible to read from SH-2 at any time regardless of commands issued. During peripheral control, various statuses of peripheral control are shown. Please access byte from SH-2.<A NAME="no1_21_2"></A><P><DT> <B>SF(R/W)：Status Flag</b><DD> Flags for managing command issuance. The SH-2 sets the flag before issuing the command, and the SMPC resets it when the command ends. From SH-2, only set is possible. When setting, please write 01H. When reading, all bits other than bit0 are undefined. This flag can be used to manage duplicate issuance of commands. Please access byte from SH-2.</P>
+<A NAME="no1_21_3"></A><P><DT> <B>IREG0~IREG6(W): Input REGister 0~6</b><DD> This is an 8-bit register for receiving command parameters from SH-2. SMPC has seven IREGs. Please access byte from SH-2.</P>
+<A NAME="no1_21_4"></A><P><DT> <B>OREG0~OREG31(R): Output REGister 0~31</b><DD> This is an 8-bit register for outputting result parameters and peripheral data to SH-2. SMPC has 32 OREGs, which are used to obtain cartridge code, area code, peripheral data, current time, etc. Please access byte from SH-2.</P>
+<A NAME="no1_22"></A><P><DT><H3> ◆Parallel I/O register</H3><DD> This register is used to control the peripheral interface in SMPC. Figure 1.4 shows the parallel I/O register address map. Please note that write-only registers cannot be read.</P>
+<A NAME="z1_4"></A><P ALIGN=CENTER> <B>Figure 1.4 Parallel I/O register address map</b><BR>
+<img srcset="../grp/i007_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><BR>
+ <B>*Only byte access is possible for all registers!</b></P>
+<A NAME="_z1_40"></A><P><DT> <B>DDR1(W)：Data Direction Register 1</b><DD> This is a 7-bit register that sets the input/output direction of peripheral port 1 (P1) in bit units. Writing "0" to each bit sets it as input, and writing "1" sets it as output. Please access byte from SH-2.</P>
+<A NAME="_z1_41"></A><P><DT> <B>DDR2(W)：Data Direction Register 2</b><DD> This is a 7-bit register that sets the input/output direction of peripheral port 2 (P2) in bit units. Writing "0" to each bit sets it as input, and writing "1" sets it as output. Please access byte from SH-2.</P>
+<A NAME="t1_3"></A><P><DD> <B>Table 1.3 DDR function setting values</b><DD><TABLE BORDER=1>
+<TR><TH> Setting value</TH><TH> function</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> Set to input (default value)</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> set to output</TD></TR>
+</TABLE>
+</P>
+<A NAME="_z1_42"></A><P><DT> <B>PDR1(R or W)：Port Data Register 1</b><DD> PDR1 is a 7-bit register that stores peripheral port 1 (P1) data. Whether each bit of PDR1 is an input port or an output port is determined by the DDR1 settings. By writing data to this register, you can change the pin state of the port set as output. By reading this register, you can read the pin status of the port set as input. Also, for ports set as output, the value written to PDR1 is read, not the pin state. Please access byte from SH-2.</P>
+<A NAME="_z1_43"></A><P><DT> <B>PDR2(R or W)：Port Data Register 2</b><DD> PDR2 is a 7-bit register that stores peripheral port 2 (P2) data. Whether each bit of PDR2 is an input port or an output port is determined by the DDR2 settings. By writing data to this register, you can change the pin state of the port set as output. By reading this register, you can read the pin status of the port set as input. Also, for ports set as output, the value written to PDR2 is read, not the pin state. Please access byte from SH-2.</P>
+<A NAME="_z1_44"></A><P><DT> <B>IOSEL1(W)：I/O SELect 1</b><DD> Set peripheral port 1 (P1) to SMPC control mode or SH-2 direct mode. Writing "0" sets SMPC control mode, and writing "1" sets SH-2 direct mode. Please access byte from SH-2.</P>
+<A NAME="_z1_45"></A><P><DT> <B>IOSEL2(W): I/O SELect 2</b><DD> Set peripheral port 2 (P2) to SMPC control mode or SH-2 direct mode. Writing "0" sets SMPC control mode, and writing "1" sets SH-2 direct mode. Please access byte from SH-2.</P>
+<A NAME="t1_4"></A><P><DD> <B>Table 1.4 IOSEL functions</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> Setting value</TH><TH> function</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> Set to SMPC control mode (initial value)</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> Set to SH-2 direct mode</TD></TR>
+</TABLE>
+</P>
+<P><DD> For details on each mode, please refer to <A HREF="p03_10.htm">Chapter 3</a> .<P><DT><TABLE>
+<TR><TH><img srcset="../../../what/atto.png 5x"></TH><TD> <B>Use of SH-2 direct mode is prohibited.</b><BR>
+ <B>(Excluding <A HREF="../../../info/hon/stn41.htm">peripherals</a> using SH-2 direct mode)</b></TD></TR>
+</TABLE>
+<A NAME="_z1_46"></A><P><DT> <B>EXLE1(W): EXternal Latch Enable 1</b><DD> This bit sets whether to use bit 6 of peripheral port 1 (P1) as a PAD interrupt or VDP2 external latch input. Writing "0" disables it and sets bit 6 of peripheral port 1 as a normal I/O port. Writing "1" enables it, and bit 6 of peripheral port 1 can be used as a PAD interrupt input or an external latch input for VDP2. Please access byte from SH-2.</P>
+<A NAME="_z1_47"></A><P><DT> <B>EXLE2(W): EXternal Latch Enable 2</b><DD> This bit sets whether to use bit 6 of peripheral port 2 (P2) as a PAD interrupt or VDP2 external latch input. Writing "0" disables it and sets bit 6 of peripheral port 2 as a normal I/O port. Writing "1" enables it, and bit 6 of peripheral port 2 can be used as a PAD interrupt input or an external latch input for VDP2. Please access byte from SH-2.</P>
+<A NAME="t1_5"></A><P><DD> <B>Table 1.5 EXLE functions</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> Setting value</TH><TH> function</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> Disabled (default value)</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> enable</TD></TR>
+</TABLE>
+</P>
+<P><DD> EXLE is multiplexed to bit 6 of the I/O port. Therefore, when using EXLE, bit 6 of DDR1/DDR2 must be set to input.<DD> (See VDP2 external latch function and SCU PAD interrupt.)</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p02_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

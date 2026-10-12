@@ -1,0 +1,132 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/22&gt;CD builder script syntax/3.2 Definition of disk session structure</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD Builder Script Grammar Manual</b><H2 ALIGN=CENTER> 3.2 Defining the disk session structure</H2><HR NOSHADE>
+<DL>
+ Figure 3.1 shows an overview of the disk session structure definition.<PRE>
+↑     Disc  output file name
+｜          Session  { CDROM｜SEMIXA }                  ↑
+｜              LeadIn MODE1                   ←Lead In ｜
+｜                                                      ｜
+｜              EndLeadIn                               ｜
+｜                                                      ｜
+｜               SystemArea  System area file name      ｜
+｜                                                      ｜
+｜              Track  { MODE1 }               ←Track 1 ｜
+｜                :                                     S
+D              EndTrack                                 E
+I              Track  { MODE1 | MODE2|CDDA }  ←Track 2  S
+S                :                                      S
+K              EndTrack                                 I
+｜                                                      O
+｜              LeadOut { MODE1 | MODE2|CDDA } ←Leadout N        
+｜                  Empty 300                           ｜       
+｜              EndLeadOut                              ↓           
+｜          EndSession                                                     
+↓      EndDisc                                                              
+</PRE>Figure 3.1 Disk session definition</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.1"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Starting disk definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Disc</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Disc dskfile<DT> <B>parameters</b><DD> dskfile: Disk image file (extension is "DSK")<DT> <B>function</b><DD> Begins disk definition.<DT> <B>remarks</b><DD> none</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.2"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Finishing the disk definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndDisc</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndDisc<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the disk definition.<DT> <B>remarks</b><DD> none</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.3"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Specifying catalog number</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Catalog No.</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> CatalogNo digits<DT> <B>parameters</b><DD> digits: Numeric string of up to 13 digits.<DT> <B>function</b><DD> Define the catalog number.<DT> <B>remarks</b><DD> This command is retained for compatibility. No need to write.<BR>
+ Catalog numbers are not reflected in disk images.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.4"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Starting session definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Session</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Session disc type [filename]<DT> <B>parameters</b><DD> disctype: Disc type (CDROM or SEMIXA)<DD> filename: File name to output the disk image. Optional.<DT> <B>function</b><DD> Begins session definition.<DT> <B>remarks</b><DD> Parameter filename is kept for compatibility. No need to write.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.5"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Ending session definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndSession</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndSession<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the session definition.<DT> <B>remarks</b><DD></DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.6"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Starting lead-in area definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> LeadIn</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> LeadIn trktype<DT> <B>parameters</b><DD> trktype: Track type (only MODE1 can be specified)<DT> <B>function</b><DD> Begin defining the lead-in area.<DT> <B>remarks</b><DD> Currently, only MODE1 can be defined for the first track.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.7"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of lead-in area definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndLeadIn</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.7</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndLeadIn<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the lead-in area definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.8"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Defining the system area</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> System Area</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.8</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> SystemArea filename<DT> <B>parameters</b><DD> filename: Data file for system area.<DT> <B>function</b><DD> Writes the specified file to the system area (00:02:00 to 00:02:15) specified by ISO9660.<DT> <B>remarks</b><DD> Null data will be output for parts of the specified file that are less than 16 sectors (32768 bytes). If it exceeds 16 sectors, an error will occur.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.9"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Starting the readout area definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Lead Out</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.9</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> LeadOut trktype<DT> <B>parameters</b><DD> trktype : Track type (MODE1, MODE2 or CDDA)<DT> <B>function</b><DD> Begin defining the readout area.<DT> <B>remarks</b><DD> Specify the track type in the lead-out area to be the same as the last track in the session.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.10"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Finishing the readout area definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndLeadOut</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.10</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndLeadOut<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the leadout area definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="2.11"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_2">one</a><BR> <A HREF="p03_10.htm#t3_1_2">View</a><BR> <A HREF="p03_10.htm#t3_1_2">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Defining null data for readout</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Empty</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 2.11</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Empty nsect<DT> <B>parameters</b><DD> nsect: Number of output sectors of null data in the lead-out area.<DT> <B>function</b><DD> Outputs null data for the specified number of sectors.<DT> <B>remarks</b><DD> This command is left in place due to VCD emulator limitations. For reliable operation of the emulator, it is recommended to output 300 sectors or more.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

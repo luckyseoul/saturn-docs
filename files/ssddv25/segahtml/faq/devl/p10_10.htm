@@ -1,0 +1,113 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/10&gt;FAQ/Development environment/Others</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR>
+ <B>▲ <A HREF="p09_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>FAQ/Development environment</b><H2 ALIGN=CENTER> others</H2><!----------------------------------------------------------------------------->
+<A NAME="no10_01"><HR NOSHADE></a><DL>
+<H3> What are SBL and SGL?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Sega Saturn's development system has SBL and SGL, but how are they different?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There are two main types of environments for developing software for the Sega Saturn.</P>
+<P> <B>SBL (Software Library)</b> has been developed based on Hitachi's C compiler SH C, which has been used for a long time.<BR>
+ The feature is that it is a hardware-oriented library set, which allows the user to directly access various devices and achieve maximum speedup.<BR>
+ Also, since most of the library sources are open to the public, it is possible to freely customize them according to the user's requirements.<BR>
+ Currently, SBL is compatible with the gcc compiler and incorporates some of the SGL features described below.<BR>
+ (However, since the SGL bundled with SBL is an old one, functions added to future SGLs may not necessarily be usable with SBL.)<BR>
+ The original purpose of this library is to serve as a sample of how to handle the Sega Saturn at the hardware level.</P>
+<P> <B>SGL (Sega 3D Game Library)</b> is specialized for developing games that display 3D images, and has an OpenGL-like interface.<BR>
+ It is possible to use various powerful processes without having to be aware of detailed operations at the hardware level.<BR>
+ Along with this, we have migrated the processing system to a GNU-based one and are preparing a gcc cross compiler that outputs SH2 code.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no10_02"><HR></a><DL>
+<H3> About the bin←→S28 converter.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is there a converter for BIN->S28 or S28->BIN?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> A mutual converter for COFF, S28, and BIN is called objcopy (sh-objcopy in the SGI version), which is available here.<BR>
+ The format is</P>
+<P><DD> <B>objcopy(sh-objcopy) -O Output format Input file name Output file name</b></P>
+<P> It becomes.<BR>
+ The output formats that can be specified include <B>binary, srec, and sh-coff</b> .<BR>
+ (However, it is not possible to convert a binary file to an object file with symbols such as coff. In this case, SGI can output it using a tool called bin2coff provided by SGI.)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no10_03"><HR></a><DL>
+<H3> Please tell me the specifications of S format.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me the specifications of S format.<P><DT> <FONT SIZE=5>A)</font><DD> The S format specifications are written on page 90 of the H Series Linkage Editor Manual.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no10_04"><HR></a><DL>
+<H3> Which PC do you recommend for development equipment?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> We are considering both connecting a machine purchased by our company to an ICE and connecting it as a VCD machine.<BR>
+ It seems that some models may not be able to use it properly, so if you have confirmed that it works or have any reports, please let me know.</P>
+<P><DT> <FONT SIZE=5>A)</font><DL>
+<P><DT> <B>1) When using it as an ICE machine.</b><DD> Basically it works on all models.<BR>
+ (However, it is virtually impossible to test all compatible machines released so far, so we cannot guarantee that it will work on all models, but there are almost no reports of PC cases where ICE does not work. Not.)</P>
+<P><DT> <B>2) When used as a virtual CD machine</b><DD> Please do not use the virtual CD with any device other than the VCD compatible models sold by Ado Electronics.<BR>
+ This is because virtual CD machines require strict access timing, so even if the model number is slightly different from the machine recommended here, it may not work.<BR>
+ (However, we have not tested this on all compatible machines, so we cannot say with certainty that it will not work on any models other than those recommended, but at present, it is possible that you are using a model other than those recommended here.) If so, we will not be able to provide support.)</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no10_05"><HR></a><DL>
+<H3> addcdw doesn't work.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I'm trying to use <A HREF="../../prgg/cdtl/addc/hon/p05_10.htm">addcdw.exe</a> , but it doesn't work.<BR>
+ in particular,</P>
+<P><DD> <B><A HREF="../../prgg/cdtl/addc/hon/p06_10.htm#2.1">-master</a> =xxx</b></P>
+<P><DD> When you specify</P>
+<P><DD> <B>(0): An unknown error has occurred [fe81]</b></P>
+<P><DD> is displayed and I can't write. (However, I have only checked the operation with -t added)<BR>
+ -debug seems to work. (This is also only an operation check with -t added)<BR>
+ Since segacdw.exe is in a working environment, there seems to be no problem with the hardware.<BR>
+ If you have any idea what might be causing the malfunction, please let me know.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> When you start up your PC, the SCSI device is checked, and the model number and firmware version of the CD writer are displayed.<BR>
+ If the firmware version displayed at this time is older than 1.07, it will not work properly.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no10_06"><HR></a><DL>
+<H3> I want to make a copy of the Write Once CD.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is there a way to copy a write-once CD-R?<BR>
+ Please let me know if there is any software that can also copy CDDA data.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> <FONT SIZE=5>there is no.</font> The only option is to create a disc image and burn it again, or use a piece of hardware called a CD duplicator.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no10_07"><HR></a><DL>
+<H3> What should I be careful about when porting from NTSC to PAL?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me the settings of the tools necessary for PAL conversion, changes to the software, and points to note.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The biggest difference between NTSC and PAL is the vertical synchronization time of <FONT SIZE=5>1/60 seconds</font> (NTSC) and <FONT SIZE=5>1/50 seconds</font> (PAL).</P>
+ At this time, in game programs that operate based on V-BLANK (NTSC), the game progress speed will be 5/6 and slow.<BR>
+ Also, the aspect ratio of the dots changes as the vertical synchronization time changes. (The screen appears to be crushed in the vertical direction)<BR>
+ From these points, the precautions when converting <B>from NTSC to PAL</b> are as follows:</P>
+<P><DD><UL TYPE=DISC>
+<LI> Change the balance of the game<LI> Rewrite or modify graphic design for PAL.<LI> Changed the sound tempo to PAL.</UL>
+</P>
+<P><DD> Also, regarding movie playback such as Cinepak and TrueMotion, there is no need to make any corrections regarding the tempo since they also have time information.<BR>
+ However, since the aspect ratio changes, it is necessary to perform processing to prevent the image from being distorted (for example, playing it in VDP2 and using VDP2's scaling function).</P>
+<P> Of course, these things can also be said in the case of <B>PAL → NTSC</b> .<BR>
+ If possible, try to port from PAL, which requires more processing, to NTSC, and most of the burden on the programmer will be alleviated, but it may be better to be aware of both NTSC and PAL in advance. not.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no10_08"><HR></a><DL>
+<H3> When creating a CD with a Yamaha writer, noise appears between CDDA tracks.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I create a write-once disc using a Yamaha writer (CDW-100E), noise appears between the CDDA tracks.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There are reports that these symptoms occur with CDE-100 firmware versions older than 1.07.<BR>
+ You can check the version by reading the Inquiry from the SCSI adapter and displaying the vendor.<BR>
+ The manufacturer name, model name, revision, etc. appear, and the number that appears at the end is the version.</P>
+<P> If it is an older version, please contact Sophia Systems if you purchased it, or Yamaha directly if you purchased it from someone else.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p09_10.htm">Back</a> | ■</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

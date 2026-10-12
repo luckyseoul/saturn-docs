@@ -1,0 +1,69 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/54&gt;VDP1 User's Manual/4.6 Transfer End Status Register</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p04_15.htm">Back</a> ｜ <A HREF="p04_17.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 4 System Registers</b><HR NOSHADE>
+<DL>
+<A NAME="4_60"></A><P><DT><H2> ■4.6 Transfer end status register</H2><DD> The end status register (EDSR) indicates the end status of the previous frame processing. This is a read-only 16-bit register located at address 100010H. Set unused bits to 0.</P>
+<DT><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> EDSR<BR> 100010H<BR> (R)</TH><TH><PRE> bit15</TH><TH><PRE> bit14</TH><TH><PRE> bit13</TH><TH><PRE> bit12</TH><TH><PRE> bit11</TH><TH><PRE> bit10</TH><TH><PRE> bit9</TH><TH><PRE> bit8</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> CEF</TD><TD> BEF</TD></TR>
+</TABLE>
+</P>
+<A NAME="4_61"></A><P><DT> <B>End-bit fetch status in the current frame:</b> current end-bit fetch status(CEF), bit1<BR>
+<DD> Indicates whether the end bit (draw end command) was fetched from the command table in the currently drawing frame. A value of 0 indicates that the end bit has not been fetched, and a value of 1 indicates that the end bit has been fetched and drawing has finished.</P>
+<P><DD><TABLE BORDER>
+<TR><TD ALIGN="CENTER"><PRE> CEF</TD><TD ALIGN="LEFT"><PRE> End bit fetch state</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 0</TD><TD ALIGN="LEFT"><PRE> End bit not fetched in current frame</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="LEFT"><PRE> Fetch end bit in current frame, end drawing</TD></TR>
+</TABLE>
+</P>
+<P><DT><UL TYPE=DISC>
+<LI> VDP1 sequentially fetches command tables on VRAM and draws them to the frame buffer. When the drawing end command (end bit is 1) is fetched, the drawing process for one frame is finished. At this time, CEF is set to 1.</P>
+<P><LI> When data is transferred from the CPU to VRAM when drawing has finished (CEF=1), the CPU can access VRAM without having to wait without the overhead of stopping drawing.<BR>
+<P><LI> Fetching the drawing end command, VDP1 sets CEF to 1 and generates an interrupt signal.</P>
+<P><LI> There are two ways to determine when drawing has finished: checking the fetch status of the end bit each time using CEF (polling), and using this interrupt signal.</P>
+<P><LI> If there is no drawing end command in VRAM, or if it is defined so that it cannot be fetched in jump format, this bit remains 0.</P>
+<P><LI> This bit is initialized to 0 when switching frame buffers or starting drawing.</P>
+<P><LI> If the drawing end command fetch matches when switching frame buffers, CEF and BEF may not become 1.</UL>
+</P>
+<P><DT> <B>End-bit fetch status in previous frame:</b> before end-bit fetch status(BEF), bit 0<BR>
+<DD> Indicates whether the end bit (draw end command) was fetched from the command table in the previous frame. A value of 0 indicates that the end bit has not been fetched, and a value of 1 indicates that the end bit has been fetched and drawing has finished.</P>
+<P><DD><TABLE BORDER>
+<TR><TD ALIGN="CENTER"><PRE> BEF</TD><TD ALIGN="LEFT"><PRE> End bit fetch state</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 0</TD><TD ALIGN="LEFT"><PRE> End bit not fetched in previous frame</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="LEFT"><PRE> Fetch end bit in previous frame, end drawing</TD></TR>
+</TABLE>
+</P>
+<A NAME="4_61_0"></A><P><DT><UL TYPE="DISC">
+<LI> VDP1 sequentially fetches command tables on VRAM and draws them to the frame buffer. When the drawing end command (end bit is 1) is fetched, the drawing process for one frame is finished. If there are many commands or many pixels are drawn for enlargement, drawing may not be completed within one frame, and this is called "transfer overflow." This bit represents a transfer over condition.</P>
+<P><LI> If the transfer is overloaded, you need to take measures such as reducing the number of drawing commands or drawing pixels.</P>
+<P><LI> If there is no drawing end command in VRAM, or if it is defined so that it cannot be fetched in jump format, this bit remains 0.</P>
+<P><LI> The CEF value is written to this bit when switching frame buffers or when drawing starts, and is retained until the next frame buffer switching.</UL>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_15.htm">Back</a> ｜ <A HREF="p04_17.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

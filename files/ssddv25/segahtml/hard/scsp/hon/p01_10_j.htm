@@ -1,0 +1,146 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/29&gt;SCSPユーザーズマニュアル/1.サウンドシステム概要</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<B>■　　｜
+     <a href="p01_20_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCSPユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第１章　サウンドシステム構成</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_1"></A>
+	<P><DT><H2>1.1　イントロダクション</H2>
+
+<A NAME="no1_10"></A>
+	<P><DT><H3>■1.セガサターンのサウンドブロックについて</H3>
+	<DD><UL TYPE=DISC>
+	<P><LI>　セガサターンのサウンドブロックは、ＣＰＵ「ＭＣ６８０００」と、サウンド処理用音源ＩＣである「ＳＣＳＰ（Ｓaturn　Ｃustom　Ｓound　Ｐrocessor、以下ＳＣＳＰ）」、そして４ＭビットのＲＡＭによって構成されています。<BR>
+	（ＣＤもサウンドブロックと考えることもできますが、別のものとして説明をします。）</P>
+
+	<P><LI>　サウンドブロック自体にＣＰＵを持っていますので、メインシステム（ＳＨ２等）に対して独立に動作を行うことができます。<BR>
+	これによって、ＳＨ２を含むメインＣＰＵ側の処理の負担を減らすことができます。<BR>
+	サウンドＣＰＵは、ＳＣＳＰを含むサウンドブロック全体の制御を担当します。
+
+	<P><LI>　サターンにおいて音源といえるものとしては、ＣＤのＣＤ−ＤＡ音源とＳＣＳＰによるＰＣＭおよびＦＭ音源があります。<BR>
+	また、ＶＩＤＥＯ−ＣＤ用のオプション装置を接続している場合には、ＭＰＥＧオーディオも使用できます。<BR>
+	（ただし、ＣＤ−ＤＡとＭＰＥＧオーディオの同時使用はできませんので、注意をしてください）</P>
+
+	<P>　そのほかに、カートリッジコネクターからのデジタルオーディオ入力を利用して、例えば拡張サウンドＩＣの搭載等さまざまなオプション機器によるサウンド機能のグレードアップも可能になっています。<BR>
+	オプション機器ができましたら、そのマニュアルでお目にかかれればと思います。</P>
+
+	<P><LI>　ＳＣＳＰはＰＣＭおよびＦＭ音声合成、および音声の加工を行ないます。<BR>
+	３２基分のサウンドジェネレーターとエフェクト処理用のＤＳＰ、デジタルミキサーと、サウンドＣＰＵ用のタイマー、割り込みコントローラー等を内蔵しています。</P>
+
+	<P><LI>　サウンドＲＡＭは、４Ｍビット（５１２Ｋバイト）搭載しています。<BR>
+	　このメモリーはサウンドＣＰＵのプログラム、データおよび波形データ、エフェクト用の遅延（ディレイ）バッファ等に使用します。<BR>
+	　このＲＡＭには、サウンドＣＰＵ（ＭＣ６８ＥＣ０００）、ＳＣＳＰ、メインブロック（ＳＨ２、ＳＣＵ）がアクセス可能になっています。</P>
+	</UL>
+
+<A NAME="z1_0"></A>
+	<P ALIGN=CENTER><img srcset="../grp/i001_0_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>■2.サウンドブロック構成について</H3>
+	<DD>　セガサターンのサウンドブロックは図1.1のようになっています。</P>
+
+<A NAME="z1_1"></A>
+	<P ALIGN=CENTER><B>図1.1　サウンドブロック</B><BR><img srcset="../grp/i001_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no1_21"></A>
+	<P><DT><B>　●メインブロックとサウンドブロックとの関係</B>
+	<DD><UL TYPE=DISC>
+	<P><LI>　サウンドブロックは“<B>(1)</B>ＳＣＵ”を介してメインブロックに接続されています。<BR>
+	サウンドブロックの資産｛“<B>(5)</B>ＳＣＳＰ”のレジスタやサウンドの<B>(7)</B>ＲＡＭ（４Ｍビット）｝は、メインブロック側からアクセス可能で、リードライトが可能です。</P>
+	<P><B>※</B>レジスタには「リードのみ」や「ライトのみ」というように制限がつけられているものもありますので、注意してください。</P>
+
+	<P><LI>　逆にサウンドＣＰＵが、メインブロック側のメモリー等にアクセスすることはできませんので注意してください。</P>
+
+	<P><LI>　またサウンドブロックは、メインブロックとは独立に動作できるようにサウンドＣＰＵとして“<B>(4)</B>ＭＣ６８ＥＣ０００”を搭載しています。</P>
+	<P>　このＣＰＵを搭載していることにより、サウンドブロック制御負担をメインブロック側から取り除くことが可能です。</P>
+
+	<P><B>※</B>もちろんメインブロックによってサウンドブロックを制御することも可能です。</P>
+	</UL>
+
+<A NAME="no1_22"></A>
+	<P><DT><B>　●オーディオラインのつながりについて</B>
+	<DD><UL TYPE=DISC>
+	<P><LI>サウンドブロックは図１．１のようになっていて、基本的にすべてのオーディオ信号はサウンドブロック（ＳＣＳＰ）に集められます。<BR>
+	<P>　各音源からの出力ですが、サターンにおいて“ＳＣＳＰ”に対して入力可能な音源数はステレオ１系統となっていて、途中のＣＤブロック等においてＣＤ−ＤＡやＭＰＥＧ−ＡＵＤＩＯ、そしてカートリッジからの外部入力を選択するようになっています。</P>
+	<P>　選択されて入力される音に対して、“ＳＣＳＰ”内のＤＳＰでエフェクトをかけたりすることも可能になっています。</P>
+	</UL>
+
+<A NAME="no1_23"></A>
+	<P><DT><B>　●サウンドメモリーマップ</B>
+	<DD><UL TYPE=DISC>
+	<P><LI>サウンドブロックのメモリーおよびレジスタは図１．２のように配置されています。<BR>
+	　基本的にＳＨ２等のメインブロックからと、ＭＣ６８ＥＣ０００からの両方からアクセスすることができますがアドレスが異なりますので注意が必要です。</P>
+
+	<P><LI>　アクセスにおけるデータサイズ（バイト／ワード／ロングワード）ですが、ハードウェアの構成により、ワード／ロングワード単位での転送の方が効率が良いので、
+	連続するデータ群をリードまたはライトする場合には、ワードかロングワード単位にしてください。<BR>
+	　ＳＨ２を含むメイン側からのアクセスは、バイトアクセスは禁止ですので注意してください。</P>
+	</UL>
+
+<A NAME="t1_1"></A>
+	<P><DT><TABLE BORDER=1><B><CAPTION><B>表1.1　サウンドメモリーマッピング（概要）</B></CAPTION>
+	<TR ALIGN=CENTER><TD COLSPAN=2>　</TD>                         <TD><PRE>Ｄ１５〜Ｄ８</TD><TD><PRE>Ｄ７〜　Ｄ０</TD><TD COLSPAN=2>　</TD></TR>
+	<TR ALIGN=CENTER><TD>SH2-ADDRESS</TD> <TD>MC68EC000-ADDRESS</TD><TD>UPPER</TD>  <TD>LOWER</TD>  <TD>MC68EC000-ADDRESS</TD><TD>SH2-ADDRESS</TD></TR>
+	<TR ALIGN=CENTER><TD>0(2)5A00000H</TD><TD>000000H</TD>          <TD COLSPAN=2 ROWSPAN=3>サウンドRAM<BR>
+																		512Kバイト</TD><TD>000001H</TD><TD>0(2)5A00001H</TD></TR>
+	<TR ALIGN=CENTER><TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+	    <TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+	    <TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+	    <TD>:<BR>:<BR>:<BR>:<BR>:</TD></TR>
+
+	<TR ALIGN=CENTER><TD>0(2)5A7FFFEH</TD><TD>07FFFEH</TD><TD>07FFFFH</TD><TD>0(2)5A7FFFFH</TD></TR>
+
+	<TR ALIGN=CENTER><TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+	    <TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+		<TD COLSPAN=2>:<BR>:<BR>:<BR>:<BR>:</TD>
+		<TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+	    <TD>:<BR>:<BR>:<BR>:<BR>:</TD></TR>
+	
+	<TR ALIGN=CENTER><TD>0(2)5B00000H</TD><TD>100000H</TD><TD COLSPAN=2 ROWSPAN=3>コントロールレジスタ</TD><TD>100001H</TD><TD>0(2)5B00001H</TD></TR>
+	<TR ALIGN=CENTER><TD>:<BR>:<BR></TD>
+	    <TD>:<BR>:<BR></TD>
+	    <TD>:<BR>:<BR></TD>
+	    <TD>:<BR>:<BR></TD></TR>
+	<TR ALIGN=CENTER><TD>0(2)5B00EE2H</TD><TD>100EE2H</TD><TD>100EE3H</TD><TD>0(2)5B00EE3H</TD></TR></TABLE>
+
+	<P><DT><B>　注　釈:</B>
+	<DD>SH-2アドレスの<B>(2)</B>は、+20000000Hの略でキャッシュスルーアドレス(Cashe_through_address)を示します。</P>
+
+	<P><DT><B>　参　照:</B>
+	<DD>セガサターンのメモリマップついては、<BR>
+	『HARDWARE MANUAL／SCUユーザーズマニュアル』<a href="../../scu_/hon/p01_02_j.htm">SCUマッピング</A></P>
+</DL>
+<HR NOSHADE>
+<B>■　　｜
+     <a href="p01_20_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCSPユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

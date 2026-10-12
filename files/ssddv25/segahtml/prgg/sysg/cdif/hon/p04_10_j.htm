@@ -1,0 +1,330 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/19&gt;CD通信I/F(CDパート)/CDドライブ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>CDドライブ</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P>	<DT><H3>4.1　CDドライブの状態遷移</H3>
+
+<A NAME="no4_11"></A>
+	<P>	<DT><B>　(1)CDドライブ状態</B>
+		<DD>　CDドライブの状態を表4.1に示します。</P>
+
+<A NAME="t4_1"></A>
+	<P>	<DD><B>表4.1　CDドライブ状態</B>
+		<DD><TABLE border=1>
+	<TR><th width=150><PRE>状　態</TH><th width=350><PRE>説　明</TH></TR>
+	<TR><TD><PRE>〈BUSY〉</TD><TD><PRE>状態遷移中</TD></TR>
+	<TR><TD><PRE>〈PAUSE〉</TD><TD><PRE>ポーズ中（一時停止）</TD></TR>
+	<TR><TD><PRE>〈STANDBY〉</TD><TD><PRE>スタンバイ（ドライブ停止状態）</TD></TR>
+	<TR><TD><PRE>〈PLAY〉</TD><TD><PRE>CD再生中</TD></TR>
+	<TR><TD><PRE>〈SEEK〉</TD><TD><PRE>シーク中</TD></TR>
+	<TR><TD><PRE>〈SCAN〉</TD><TD><PRE>スキャン再生中</TD></TR>
+	<TR><TD><PRE>〈OPEN〉</TD><TD><PRE>トレイが開いている</TD></TR>
+	<TR><TD><PRE>〈NODISC〉</TD><TD><PRE>ディスクがない</TD></TR>
+	<TR><TD><PRE>〈RETRY〉</TD><TD><PRE>リードリトライ処理中</TD></TR>
+	<TR><TD><PRE>〈ERROR〉</TD><TD><PRE>リードデータエラーが発生した</TD></TR>
+	<TR><TD><PRE>〈FATAL〉</TD><TD><PRE>致命的エラーが発生した（ストップコマンドが必要）</TD></TR></TABLE></P>
+
+<A NAME="no4_12"></A>
+	<P>	<DT><B>　(2)ドライブコマンドの種類</B>
+		<DD>　CDドライブの状態を変化させるコマンド(ドライブコマンド)を表4.2に示します。</P>
+
+<A NAME="4_2"></A>
+	<P>	<DD><B>表4.2　ドライブコマンド</B>
+	<DD><TABLE border=1>
+	<TR><th width=150><PRE>ドライブコマンド</TH><th width=350><PRE>対応する関数</TH></TR>
+	<TR><TD><PRE>CDブロックの初期化</TD><TD><PRE>CDC_CdInit</TD></TR>
+	<TR><TD><PRE>トレイのオープン</TD><TD><PRE>CDC_CdOpen</TD></TR>
+	<TR><TD><PRE>プレイ</TD><TD><PRE>CDC_CdPlay</TD></TR>
+	<TR><TD><PRE>シーク</TD><TD><PRE>CDC_CdSeek</TD></TR>
+	<TR><TD><PRE>ポーズ</TD><TD><PRE>CDC_CdSeek</TD></TR>
+	<TR><TD><PRE>ストップ</TD><TD><PRE>CDC_CdSeek</TD></TR>
+	<TR><TD><PRE>スキャン</TD><TD><PRE>CDC_CdScan</TD></TR></TABLE></P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>ソフトリセット時、CDブロックの初期化はドライブコマンドとして動作しません。〈OPEN〉, 〈NODISC〉状態でソフトリセットを実行しても状態は遷移しません。<BR>ただし〈OPEN〉,〈NODISC〉状態以外では、現在位置でCDドライブをポーズさせます。</P>	<P>	<B><LI></B>トレイオープン以外のドライブコマンドは、トレイのクローズコマンドを兼ねます。</P>
+	</OL>
+
+<A NAME="no4_13"></A>
+	<P>	<DT><B>　(3)ドライブコマンドの発行</B>
+		<DD><OL TYPE=a>
+		<B><LI></B>ドライブコマンドのレスポンスは、REJECTでない限り、必ず〈BUSY〉が返ります。</P>
+	<P>	<B><LI></B>原則として、後から発行されたコマンドが優先して実行されます。連続的に発行すると、先に発行したコマンドが上書きされてしまう場合があります。<BR>確実に実行するには、〈BUSY〉以外の状態に遷移するまで発行しないでください。</P>
+	</OL>
+
+<A NAME="no4_1_10"></A>
+	<P>	<DT><H3>4.1.1　CDドライブの状態遷移図</H3>
+
+<A NAME="no4_1_11"></A>
+	<P>	<DT><B>　(1)正常系の状態遷移図</B>
+		<DD>　正常系におけるCDドライブの状態遷移図を図4.1に示します。<BR>
+
+<A NAME="z4_1"></A>
+	<P ALIGN=CENTER><B>図4.1　CDドライブの状態遷移図(正常系)</B><BR><img srcset="../grp/i064_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>TOCリード後は2秒0フレーム目(FAD＝150＝96H)で〈PAUSE〉状態になります。</P>
+	<P>	<B><LI></B>状態遷移中(矢印線上)では〈BUSY〉状態となります。</P>
+	<P>	<B><LI></B>トレイのクローズコマンドとは、トレイオープン以外のドライブコマンドを指します。<BR>トレイが閉まった後、各コマンドに対応する状態に遷移します。<BR>例：〈OPEN〉状態におけるプレイコマンドは、トレイが閉まった後で〈PLAY〉状態になります。</P>
+	</OL>
+
+<A NAME="no4_1_12"></A>
+	<P>	<DT><B>　(2)エラー系の状態遷移図</B>
+		<DD>　エラー系におけるCDドライブの状態遷移図を図4.2に、状態の説明を表4.3に示します。</P>
+
+<A NAME="z4_2"></A>
+	<P ALIGN=CENTER><B>図4.2　CDドライブの状態遷移図(エラー系)</B><BR><img srcset="../grp/i065_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="t4_3"></A>
+	<P>	<DD><B>表4.3　エラー関係の状態説明</B>
+		<DD><TABLE border=1>
+	<TR><TH><PRE>状　態</TH><TH><PRE>説　明</TH><TH><PRE>内部状態</TH></TR>
+	<TR><TD><PRE>〈RETRY></TD><TD><PRE>リトライが成功すれば〈PLAY〉に、失敗すれば〈ERROR〉になる。</TD><TD><PRE>〈SEEK〉</TD></TR>
+	<TR><TD><PRE>〈ERROR〉</TD><TD><PRE>次にドライブコマンドが発行されるまで状態は変わらない。</TD><TD><PRE>〈PAUSE〉</TD></TR>
+	<TR><TD><PRE>〈FATAL〉</TD><TD><PRE>ストップコマンドを発行して復帰を試みてください。<br>復帰できれば〈STANDBY〉に遷移します。</TD><TD><PRE>〈STANDBY〉</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　内部状態とは、CDブロックの内部的な動作として同等な状態を指します。</P>
+
+<A NAME="no4_1_20"></A>
+	<P>	<DT><H3>4.1.2　CDドライブの状態遷移表</H3>
+		<DD>　CDドライブの状態遷移表を表4.4に示します。例えば、〈PLAY〉状態でポーズコマンドを発行すると、〈PAUSE〉状態になることを示しています。</P>
+
+<A NAME="4_4"></A>
+	<P>	<DD><B>表4.4　CDドライブの状態遷移表</B>
+		<DD><TABLE BORDER=1>
+	<TR><th ROWSPAN=2><PRE>　　　　操作<br>　<br>状態　　　　</TH><th ROWSPAN=2><PRE>自動</TH><th COLSPAN=7><PRE>コマンド</TH></TR>
+	<TR><TH><PRE>初 期 化</TH><TH><PRE>ト レ イ<br>オープン</TH><TH><PRE>プ レ イ</TH><TH><PRE>シ ー ク</TH><TH><PRE>ポ ー ズ</TH><TH><PRE>ストップ</TH><TH><PRE>スキャン</TH></TR>
+	<TR><TD><PRE>〈BUSY〉</TD><TD><PRE>変化あり</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈PLAY〉</TD><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈SCAN〉  </TD></TR>
+	<TR><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈PLAY〉</TD><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈SCAN〉</TD></TR>
+	<TR><TD><PRE>〈STANDBY〉</TD><TD><PRE>−</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈PLAY〉</TD><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈SCAN〉</TD></TR>
+	<TR><TD><PRE>〈PLAY〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈PLAY〉</TD><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈SCAN〉</TD></TR>
+	<TR><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈PLAY〉</TD><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈SCAN〉</TD></TR>
+	<TR><TD><PRE>〈SCAN〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈PLAY〉</TD><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈SCAN〉</TD></TR>
+	<TR><TD><PRE>〈OPEN〉</TD><TD><PRE>−</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈PLAY〉</TD><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈SCAN〉</TD></TR>
+	<TR><TD><PRE>〈NODISC〉</TD><TD><PRE>−</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈OPEN〉</TD></TR>
+	<TR><TD><PRE>〈RETRY〉</TD><TD><PRE>変化あり</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈PLAY〉</TD><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈SCAN〉</TD></TR>
+	<TR><TD><PRE>〈ERROR〉</TD><TD><PRE>−</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈OPEN〉</TD><TD><PRE>〈PLAY〉</TD><TD><PRE>〈SEEK〉</TD><TD><PRE>〈PAUSE〉</TD><TD><PRE>〈STANDBY〉</TD><TD><PRE>〈SCAN〉</TD></TR>
+	<TR><TD><PRE>〈FATAL〉</TD><TD><PRE>−</TD><TD><PRE>不定</TD><TD><PRE>不定</TD><TD><PRE>不定</TD><TD><PRE>不定</TD><TD><PRE>不定</TD><TD><PRE>不定※</TD><TD><PRE>不定</TD></TR>
+	</TABLE>
+	<DD>「−」は変化なし。
+	<DD><B>※</B>〈FATAL〉状態でストップコマンドを発行すると、〈STANDBY〉状態に復帰できる可能性があります。</P>
+
+<A NAME="no4_1_21"></A>
+	<P>	<DT><B>　(1)〈BUSY〉状態におけるコマンドの発行</B>
+		<DD>　〈BUSY〉状態においてもコマンドは受け付けられますが、即座に実行されるとは限りません。例えば、トレイ開閉中の場合は、その動作が終了するまで実行されません。(ただし、トレイのオープンコマンドは即座に実行されます。)<P>
+
+<A NAME="no4_1_22"></A>
+	<P>	<DT><B>　(2)トレイの開閉</B>
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>原則として、どの状態でもトレイのオープンコマンドは即座に実行されます。</P>
+	<P>	<B><LI></B>自動開閉式でない場合のトレイ開閉コマンドは、手動で実行されるまで〈BUSY〉となります。</P>
+	<P>	<B><LI></B>〈OPEN〉状態でのコマンド(トレイオープンを除く)は、トレイのクローズ処理後、各状態に遷移します。</P>
+	<P>	<B><LI></B>トレイが閉まった時、TOCリードできないと〈NODISC〉になります。(ディスクが入っていても)</P>
+	</OL>
+
+<A NAME="no4_1_23"></A>
+	<P>	<DT><B>　(3)状態の経由</B>
+		<DD><OL TYPE=a>
+		<B><LI></B>コマンドによる場合、全て〈BUSY〉状態を経由します。</P>
+	<P>	<B><LI></B>〈PLAY〉,〈SCAN〉状態に遷移するときは、〈SEEK〉状態を経由する場合があります。</P>
+	</OL>
+
+<A NAME="no4_1_24"></A>
+	<P>	<DT><B>　(4)マルチセッションの場合</B>
+		<DD><OL TYPE=a>
+		<B><LI></B>最終セッションのTOCをリードします。</P>
+	<P>	<B><LI></B>TOCリード後、最終セッションの開始位置から2秒0フレーム目で〈PAUSE〉状態になります。</P>
+	</OL>
+
+<A NAME="no4_1_25"></A>
+	<P>	<DT><B>　(5)〈FATAL〉状態の復帰処理</B>
+		<DD>　復帰処理をするには、ストップコマンド発行後、SCDQフラグが2回更新されるまで待ってください。それまでは次のドライブコマンドを発行してはいけません。<BR>
+　また、トレイの開閉操作でも〈FATAL〉状態から復帰できる可能性があります。</P>
+
+<A NAME="no4_20"></A>
+<DT><H2>4.2　CDドライブの動作</H2>
+
+<A NAME="no4_21"></A>
+	<P>	<DT><B>　(1)〈PLAY〉状態のフレームアドレス</B>
+		<DD>　CD再生中に通知されるフレームアドレス(現在のFAD)は、リード処理中のセクタを指します。<BR>
+　現在のFADのセクタはCDバッファに格納されておらず、取り出すことはできません。<BR>
+　ホストは、現在のFADの1つ前のセクタまでアクセスできます。(CD-ROMの場合)</P>
+
+<A NAME="z4_3"></A>
+	<P ALIGN=CENTER><B>図4.3　現在のFADが指すセクタ</B><BR><img srcset="../grp/i067_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　再生を終了した場合、FAD＝再生終了位置＋1となります。<BR>
+　(再生終了位置がディスクエンドの場合にも成り立ち、FADはリードアウトエリアを指します。)</P>
+
+<A NAME="no4_22"></A>
+	<P>	<DT><B>　(2)〈PLAY〉状態からの遷移とセクタの格納</B>
+		<DD>　〈PLAY〉状態から別の状態に遷移する場合、リード処理中のセクタが格納されるかどうかは不定です。〈BUSY〉以外の状態に遷移すれば、格納されるべきセクタが確定します。<BR>
+　〈PLAY〉状態でポーズコマンドを発行して〈PAUSE〉状態に遷移した場合、(1)と同様に、格納セクタ＋1のFADが通知されます。</P>
+
+<A NAME="no4_23"></A>
+	<P>	<DT><B>　(3)CD再生のリピート処理</B>
+		<DD>　次のように、CD再生時に現在位置が再生範囲外へ出るとリピート処理がされます。</P>
+
+	<P>	<DD><UL TYPE="DISK">
+		<LI>終了位置のフレームを再生し終えた場合(FAD＝終了位置＋1)</P>
+
+	<P>	<LI>再生範囲の変更により、FADが再生範囲外になった場合</P>
+
+	<P>	<LI>再生範囲外でポーズ中に、ポーズ解除(再生の再開)を実行した場合</P>
+	</UL>
+
+	<P>	<DD>　リピートの通知回数(0H〜EH)、最大指定回数（0H〜FH）とも4ビットで表されます。<BR>
+　リピート処理の手順(リピートあり／なしの判断)を以下に示します。</P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>リピート回数＜最大リピート回数ならばリピートする。<BR>開始位置にシークして、〈PLAY〉状態になる。<BR>その時、リピート回数＜EH(14回)であればリピート回数を1つ増加させる。</P>
+	<P>	<B><LI></B>リピート回数≧最大リピート回数ならばリピートしない。<BR>現在位置で〈PAUSE〉状態になり、割り込み要因レジスタのPENDフラグが1になる。</P>
+	</OL>
+
+	<P>	<DD>　再生範囲か最大リピート回数が変更されたら、リピート回数は0クリアされます。<BR>
+リピート回数、再生範囲とも、トレイの開閉や再生途中でのシーク動作などには依存しません。</P>
+
+
+<A NAME="no4_24"></A>
+	<P>	<DT><B>　(4)再生範囲とフレームアドレス</B>
+		<DD>　ピックアップ位置を変更しない指定でCD再生を実行した場合、現在位置が新しい再生範囲内にあれば〈PLAY〉状態になります。〈PLAY〉中に実行すると、再生状態は中断されません。<P>
+
+<A NAME="z4_4"></A>
+	<P ALIGN=CENTER><B>図4.4　再生範囲と現在位置の関係</B><BR><img srcset="../grp/i068_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　次のような操作では、FADが再生範囲外(FAD＜開始位置、FAD＞終了位置)になります。</P>
+
+	<P>	<DD><UL TYPE="DISK">
+		<LI>再生終了、再生範囲の変更、シーク、スキャン再生により、再生範囲外に出る。</P>
+
+	<P>	<LI>再生範囲外でポーズ中に、ポーズ解除を実行する。</P>
+	</UL>
+
+	<P>	<DD>　再生範囲外での動作は、リピートあり／なしに依存します。<BR>
+　例えば、リピートなしで再生が終了すると、FAD＝終了位置＋1で〈PAUSE〉状態になり、PENDフラグが1になります。</P>
+
+<A NAME="t4_5"></A>
+	<P>	<DD><B>表4.5　再生範囲外での動作</B>
+		<DD><TABLE border=1>
+	<TR><TD ROWSPAN=2><PRE>操作（コマンド）</TD><td COLSPAN=2><PRE>リピートなし</TD><TD COLSPAN=2><PRE>リピートあり</TD></TR>
+	<TR><TD><PRE>状態</TD><TD><PRE>PEND</TD><TD><PRE>状態</TD><TD><PRE>PEND</TD></TR>
+	<TR><TD><PRE>CD再生が終了</TD><TD><PRE>FAD＝終了位置＋1で〈PAUSE〉</TD><TD ROWSPAN=2 ALIGN=CENTER><PRE>1</TD><td ROWSPAN=2><PRE>開始位置にシークして〈PLAY〉<br>（リピート動作）</TD><TD ROWSPAN=2 ALIGN=CENTER><PRE>0</TD></TR>
+	<TR><TD><PRE>CD再生→再生範囲の変更<br>　　　→ポーズ解除</TD><TD><PRE>現在位置で〈PAUSE〉</TD></TR>
+	<TR><TD><PRE>シーク</TD><TD><PRE>目標位置で〈PAUSE〉</TD><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>目標位置で〈PAUSE〉</TD><TD ALIGN=CENTER><PRE>0</TD></TR>
+	<TR><TD><PRE>スキャン再生</TD><TD><PRE>不定位置で〈PAUSE〉</TD><TD ALIGN=CENTER><PRE>1</TD><TD><PRE>不定位置で〈PAUSE〉</TD><TD ALIGN=CENTER><PRE>0</TD></TR>
+
+	</TABLE>
+PENDフラグの0は、変化なしを意味します。<P>
+　PENDフラグの0は、変化なしを意味します。<P>
+
+<A NAME="no4_"></A>
+	<P>	<DT><B>　(5)ホーム位置へのシーク（ストップ）</B>
+		<DD>　ホーム位置へシークすることにより、CDブロックは次の状態になります。</P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>ディスクモータは回転を停止し、ピックアップは内周待機位置へ移動する。</P>
+	<P>	<B><LI></B>CDドライブ状態は〈STANDBY〉に遷移し、レポートは無効値(FFHの並び)になる。</P>
+	<P>	<B><LI></B>ホーム位置で〈PAUSE〉状態に遷移すると、ピックアップはディスク先頭に移動する。</P>
+	<P>	<B><LI></B>保持している再生範囲、最大リピート回数、リピート通知回数は変更されません。</P>
+	</UL>
+
+<A NAME="no4_26"></A>
+	<P>	<DT><B>　(6)〈STANDBY〉状態におけるピックアップの位置</B>
+		<DD><UL TYPE="DISK">
+		<LI>〈PAUSE〉状態から遷移した場合：現在位置(レポートもそのまま)</P>
+
+	<P>	<LI>ホーム位置にシークした場合：内周待機位置(レポートは無効値)</P>
+	</UL>
+
+<A NAME="no4_27"></A>
+	<P>	<DT><B>　(7)CDバッファフルにおけるCDリード動作</B>
+		<DD>　CDバッファが満杯になると〈PAUSE〉状態になり、割り込み要因レジスタのBFULフラグが1になります。CDバッファに空きができると自動的に残りの再生を始めます。</P>
+
+<A NAME="no4_30"></A>
+	<P>	<DT><H3>4.3　サブコード</H3>
+
+<A NAME="no4_31"></A>
+	<P>	<DT><B>　(1)サブコードの更新とSCDQフラグ</B>
+		<DD>　サブコードQは1フレーム(1セクタ)ごとに更新されます。SCDQフラグは、サブコードQが更新されるごとに1となります。（定期レスポンスの更新タイミングと同じ）<BR>
+　サブコードR〜Wは1フレームで4パック(1パケット)が更新され、パックバッファに格納されていきます。CDブロックには、リングバッファ構造を持った24パック（6パケット）分のパックバッファがあります。</P>
+
+	<P>	<DD><B>《CD-DA再生時(標準速)の場合》</B>
+
+<A NAME="z4_5"></A>
+	<P ALIGN=CENTER><B>図4.5　サブコードの更新とSCDQフラグのタイミング</B><BR><img srcset="../grp/i069_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no4_32"></A>
+	<P>	<DT><B>　(2)サブコードの取り出しタイミング</B>
+		<DD>　ホストはSCDQフラグが1になるタイミングで取得コマンドを発行し、サブコードQとR〜Wのデータを取り出します。(コマンドの連続発行によるポーリングを防ぐため)</P>
+
+<A NAME="no4_33"></A>
+	<P>	<DT><B>　(3)サブコードQの取得（CDC_TgetScdQch）</B>
+		<DD>　取得コマンドは、CDドライブ状態によらず常に実行できます。ただし、〈OPEN〉時など、CDドライブ状態によっては無効な値を返す場合もあります。</P>
+
+<A NAME="no4_34"></A>
+	<P>	<DT><B>　(4)サブコードR〜Wの取得（CDC_TgetScdRwch）</B>
+		<DD>　パックデータは、パックバッファが空になるまで取得コマンドを繰り返し発行して取り出します。ただし、1フレーム時間中(13.3ms)に16パックを越えて取り出してはいけません。<BR>
+　ホストは取得コマンドを発行したら、1パックのデコード時間(3.2ms)以内にデータ転送を完了する必要があります。<BR>
+　パックバッファが空になり、パックデータがなくなればWAITを返します。</P>
+
+<A NAME="no4_45"></A>
+	<P>	<DT><B>　(5)サブコードR〜Wのデコード</B>
+		<DD><OL TYPE=a>
+	<P>	<B><LI></B>デコードの開始と終了<BR>デコードのON/OFFは、CDブロックの初期化コマンドで設定します。<BR>デコードを開始するには、デコードONを設定してから、CD-DAの再生を実行します。</P>
+	<P>	<B><LI></B>デコード開始タイミング<BR>〈PLAY〉時にデコードを開始します。<BR>実際には、〈PLAY〉状態になる2フレーム前からデータを取り込み始めます。</P>
+	<P>	<B><LI></B>パックバッファのクリアタイミング<BR>デコード開始時にクリアされます。<BR>ポーズ、シークをしてもパックバッファの内容は保持されます。</P>
+	<P>	<B><LI></B>デコード条件<BR>CD-DA再生時だけデコードされます。<BR>他の場合(スキャン再生時やCD-ROM領域の再生時)にはデコードされません。</P>
+	</OL>
+
+	<P>	<DD><B>注意:
+		<DD>　デコードONの設定だけではパックバッファはクリアされません。そのため、〈PLAY〉状態になる前に取得コマンドを発行すると、前の曲のパックデータが残っている場合があります。<BR>
+必ず〈PLAY〉状態になるのを確認してから、取得コマンドを発行してください。</B></P>
+
+<A NAME="no4_36"></A>
+	<P>	<DT><B>　(6)サブコードR〜Wのエラー</B>
+		<DD><OL TYPE=a>
+	<P>	<B><LI></B>オーバーランエラー<BR>パックの取得が間に合わないとパックバッファは上書きされ、オーバーランエラーになります。(実際にはパックデータを取得せずに23パックたまった時点で)データ転送終了後、取得ポインタはオーバーランエラーのないパックまで進みます。</P>
+	<P>	<B><LI></B>パックデータエラー<BR>CDブロックはパックデータのP系列・Q系列に対してCRCチェックをしており、エラーを検出した場合はデータを訂正します。<BR>訂正が不可能なときはパックデータエラーになります。</P>
+	</OL>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

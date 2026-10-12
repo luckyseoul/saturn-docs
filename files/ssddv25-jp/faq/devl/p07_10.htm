@@ -1,0 +1,158 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/10&gt;FAQ/開発環境/SNASM環境</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#devl">FAQ</A>
+★<A HREF="index.htm">開発環境</A>
+★<A HREF="index.htm#no7">SNASM環境</A>
+<HR>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+<A HREF="p08_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/開発環境</B>
+<H2 ALIGN=CENTER>SNASM環境</H2>
+<HR NOSHADE>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_01"><HR></A><DL>
+<H3>ハングアップした後メモリの内容を残した状態でsnbugsatを再起動したい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CartDev + Snbugsat を使用しています。<BR>
+通常使用では問題がないのですが、プログラムの暴走などが原因でデバッガモニタ側と通信不能状態になってしまった場合、
+モニターの再ロードをしなければならなくなり、暴走時のメモリの状態をチェックしたいのですが、モニタがロードされると
+アプリケーションが使用していたメモリがクリアされてしまいます。<BR>
+メモリをクリアしないで、デバッガ機能を復帰させる方法はないのでしょうか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD><FONT SIZE=5>ありません。</FONT></P><!--トホホ．．．．-->
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_02"><HR></A><DL>
+<H3>SNASMでREAD/WRITEサイクルの条件設定やヒストリ機能などを使用したい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SNBUGSATで、GUISHにある様な、"READ/WRITEサイクル"の条件設定や"データバスの値のサイズ"設定等の様なことは、可能でしょうか？<BR>
+また、ヒストリー機能追加等、バージョンアップのご予定等もあれば教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>GUI-SHの場合、使用しているCPUがEVAチップ(デバッグ機能付き)であるため、
+READ/WRITEサイクル条件などが可能でしたが、SNASM2の動作環境ではできません。<BR>
+単純な条件設定(ICEなどと比べて)であれば可能です。(何回目でブレークなど)<BR>
+ヒストリー機能などと同様でできません。<BR>
+もし、このようなデバッグが行いたい場合は、ProgrammingBoxとROM Debugger(ソフィアシステムズ製)の組み合わせで可能です。<BR>
+1セット<FONT SIZE=5>約80万円</FONT>弱かかりますが(ソフト込み)、SH-Cの出力フォーマット(SYSROFフォーマット)もGNU-Cの出力フォーマット(COFF形式)も読むことができます。<BR>
+ソフトの不具合も改善されているようです。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_03"><HR></A><DL>
+<H3>SNASMにRAMの中身をcoffファイル等に落すような機能はありますか?</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SNASM2のデバッガーを使用し、ワークRAM中に記録されているBG・MAP等のデータを、任意アドレス・バイト数を指定し、リンカーに使用できるファイル形式に出力する方法はあるでしょうか?　<BR>
+また、デバッガー使用方法についての詳細な翻訳資料はありますか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SNBUGSATの機能にはありません。(但しバイナリのロード/セーブだけであれば、可能です)<BR>
+マニュアルはSNASM2.09yの英語版の翻訳をテキストファイルとWindows用Microsoft Wordのファイルとして技術情報フォーラムのデータライブラリに提供しています。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_04"><HR></A><DL>
+<H3>SNASM環境でのSIMMアドレスの見方を教えて。</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SNASM2からみて、CartDevのSIMMアドレスがProgramming Boxと同じ番地(0x04000000)からには存在していないように見えます。<BR>
+snbugsat.exeのAlt+W(Window), M(Memory)にて当該番地をのぞいて見たところ、'**'が表示されてしまい、アクティブでは無いようです。<BR>
+実際の所簡易SIMMシステムはCartDev + DevSaturnの環境で使えるのでしょうか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>CartDev + DevSaturnの環境でも同様に0x04000000番地(キャッシュスルーアドレスだと0x24000000番地)にSIMMがアサインされます。<BR>
+具体的な方法としては、SNBUG.CFGファイルにメモリ空間のアクセス権を与えます。</P>
+
+<P><DD><PRE>
+[SAT_SH2_MAIN]
+Read      = 0x00000000, 0x0007FFFF, BYTE
+Write     = 0x00100000, 0x0010001F, BYTE
+Read      = 0x00100020, 0x0010005F, BYTE
+Write     = 0x00180000, 0x0018FFFF, BYTE
+ReadWrite = 0x00200000, 0x002FFFFF, BYTE
+ReadWrite = 0x01000000, 0x01000003, BYTE
+ReadWrite = 0x01800000, 0x01800003, BYTE
+ReadWrite = 0x04000000, 0x04FFFFFF, BYTE　←この２行
+ReadWrite = 0x24000000, 0x24FFFFFF, BYTE　←
+
+[SAT_SH2_SUB]
+Read      = 0x00000000, 0x0007FFFF, BYTE
+Write     = 0x00100000, 0x0010001F, BYTE
+Read      = 0x00100020, 0x0010005F, BYTE
+Read      = 0x00180000, 0x0018FFFF, BYTE
+ReadWrite = 0x00200000, 0x002FFFFF, BYTE
+ReadWrite = 0x01000000, 0x01000003, BYTE
+ReadWrite = 0x01800000, 0x01800003, BYTE
+ReadWrite = 0x04000000, 0x04FFFFFF, BYTE　←この２行
+ReadWrite = 0x24000000, 0x24FFFFFF, BYTE　←
+</PRE></P>
+
+<P><DD>の2行を加えます。</P>
+
+<P><DD>この領域がSIMMメモリにアサインされていますので、ここに必要なデータをバイナリロードすることで利用可能になります。<BR>
+CartDev環境での、SIMMからのブート及びメモリアドレスの変更はできません。<BR>
+又、モデム等の場合も同様でSNASMの禁止領域にアクセスするようなアプリケーションやデバイスのアドレスをこの設定ファイルで読み込み/書き込み許可をする事で可能になります。</P>
+</DL>
+
+<!----------------------------------------------------------------------------->
+<A NAME="no7_05"><HR></A><DL>
+<H3>SNASMでのデバッグの仕方は?</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SNASM2の環境で開発をしています。このデバッガを使って変数の内容を表示させるにはどうすればいいのでしょう?<BR>
+なお、ソースコードを表示してのデバッグ(ステップトレース等)は問題なく出来ています。<BR>
+コンパイル時のオプションは、</P>
+
+<P><DD><B>　-Wall -O2 -m2 -g  (と、include directory の指定)</B></P>
+
+<P>です。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>手順
+<OL>
+<P><B><LI></B>プログラムを実行します。</P>
+<P><B><LI></B>"Mixed"コマンドで変数を登録したソースファイルを開きます。</P>
+<P><B><LI></B>ブレークポイントを設定し、プログラムを停止させます。</P>
+<P><B><LI></B>グローバル変数を見たい時は"watch"コマンド、ローカル変数の時は、<BR>　"local var"コマンドを使用します。</P>
+<P><B><LI></B>"watch"の場合、"Edit"→"add"コマンドを使用して、変数の値を表示させます。<BR>(構造体の場合は"+"のついた項目をダブルクリックすることにより、詳しい情報が参照できます)</P>
+<P><B><LI></B>"local var"の場合、ローカル変数に設定したメモリの値が、自動的に表示されます。</P>
+</OL>
+
+<P><DD>なお両ウインドウとも変数の値は参照できますが直接書き換えはできません。<BR>
+"Memory"ウインドウにて書き換え下さるようお願いいたします。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_06"><HR></A><DL>
+<H3>SNASMで構造体の中が見えない。
+</H3>
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SNASMでwatch は使えるのですが、構造体の中身が表示されません。<BR>代わりでしょうか?</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>これは、SNASMがアセンブラでの開発を前提とした開発環境に依存するものなのですが、snasmldでは、リンク時に構造体の内部シンボルや、自動変数のシンボルをデバグ情報として取り込みません。<BR>
+従って、構造体の内部メンバのシンボルを参照したい場合や、Auto変数を表示するようなソースコードデバッグを行ないたい場合(それ以外の場合でもできるだけ)snasmldをリンカとしてお使いになるのはお止めください。<BR>
+これらのことは、GNU ldを使えば全て出来ることです。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+<A HREF="p08_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#devl">FAQ</A>
+★<A HREF="index.htm">開発環境</A>
+★<A HREF="index.htm#no7">SNASM環境</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

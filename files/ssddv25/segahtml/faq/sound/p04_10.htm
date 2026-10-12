@@ -1,0 +1,114 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/12&gt;FAQ/Sound related/Tone editor</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no4">Sound related</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Sound related</b><H2 ALIGN=CENTER> tone editor</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_01"><HR></a><DL>
+<H3> I would like information on header information other than PCM.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to know the details of the header information part other than the PCM waveform attached to the binary data output from the tone editor.<BR>
+ I am researching a method to store sound data as compressed data in on-memory.<P><DT> <FONT SIZE=5>A)</font><DD> There is no more detailed information than what is included in <A HREF="../../sndt/tool/tone/index.htm">the tone editor user's manual</a> of ``SOUND MANUAL''.<BR>
+ Please do some research based on this material. If there is anything you do not understand, please <B><A HREF="../../what/sega.htm">feel free</a></b> to ask questions. <!--あ1997-04-15「SEGA SATURN DEVEROPER'S MANUAL」→「SOUND MANUAL」-->
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_02"><HR></a><DL>
+<H3> Do not read loop points.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If you convert a Loop created with Infinity, SD2, WaveEditor, etc. to AIFF and read it with ToneEditor,</P>
+<P> <B>"Loop Point could not be obtained correctly"</b></P>
+<P> This message will appear and the Loop StartPoint and EndPoint will be ignored and the sound data will be looped from the beginning to the end.<BR>
+ Currently, only one piece of data has the correct loop point, and the others do not read the loop point as mentioned above.<P><DT> <FONT SIZE=5>A)</font><DD> First, in the tone editor, go to [Function] → [Initial Settings] and make sure that the checkbox "Check 3 or more markers" is turned on.</P>
+<P> If this is set to OFF, loop points may not be acquired properly when editing loop points between multiple waveform editing tools.</P>
+<P> Another possible cause of the error is that the start and end points of the loop are not in a one-to-one correspondence.<BR>
+ Also, the waveform editing tool used is "WaveEditor" provided by our company, but please do not use this tool as it has a bug regarding the generation of loop point ID information.<P> If you load an AIFF file created with a commercially available waveform editing tool into "WaveEditor" and output it, the loop points will not be set correctly due to the above bug.<!--あ1997-04-15「機能->
+初期設定」→「[機能]→[初期設定]」--></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_03"><HR></a><DL>
+<H3> In 2.07, I can't get the loop point of the data I received from the waveform editor.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it a bug or a specification that it is no longer possible to obtain loop points from data processed on the waveform editor in Tone Editor 2.07? (I was able to do it with Tone Editor 1.00)<BR>
+ If it is a specification, I would like the latest version to be able to handle data processed with a waveform editor.<P><DT> <FONT SIZE=5>A)</font><DD> Specifications.<BR>
+ To support this, it is necessary to modify the waveform editor, but this tool is not currently being updated.<BR>
+ Please use a commercially available waveform editing tool (SD, Infinity, etc.).</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_04"><HR></a><DL>
+<H3> How to check the waveform size accurately?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> There is a section on the tone editor that indicates the size, but this changes depending on whether the sampling rate is 16 bit or 8 bit.<BR>
+ What does it mean that when I take a 16-bit image on the wave editor and bring it to the tone editor, it doubles in size?<BR>
+ Where should I look to most accurately check the waveform size based on hex capacity?<P><DT> <FONT SIZE=5>A)</font><DD> All sizes are expressed in bytes on the tone editor.<BR>
+ In the wave editor, the size is expressed by the number of samples, so if it is 16 bits, it will be 2 bytes, and in the tone editor it will be twice the size.</P>
+<P> Currently, the waveform size can only be checked in units of voices using “Size” in the Voice window. This includes the waveform size + header size for each layer.<P> In the next release of Tone Editor (Ver3.0), it will be improved to display the size for each layer.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_05"><HR></a><DL>
+<H3> What is the AIFF waveform size that can be assigned?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If you assign an AIFF waveform with a size exceeding 10,000 on the tone editor, the Macintosh will freeze.<BR>
+ If you force quit an application while the Macintosh is stopped, the screen will collapse.<BR>
+ If you assign an AIFF waveform that does not exceed 10,000 in size, it will work properly, and the sample song for sound check will also play properly.<P><DT> <FONT SIZE=5>A)</font><DD> The upper limit of the waveform size that can be assigned in the tone editor is FFFFH samples in hexadecimal.<BR>
+ If the numbers above are in hexadecimal, the cause is likely to be simply exceeding the upper limit.<BR>
+ Also, when looking at the standard input/output dialog, the size is 131070 (=65536*2) for 16 bits and 65535 for 8 bits.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_06"><HR></a><DL>
+<H3> It seems strange only when the BendRange parameter change is 13.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The "BendRange" parameter in the Tone Editor's Voice window can be set from 0 to 13, but from 0 to 12 the pitch will go up in semitone steps, but at 13 it will go up two octaves all of a sudden.<BR>
+ Is this the specification?<P><DT> <FONT SIZE=5>A)</font><DD> Inside the driver, values from 0 to 12 and 24 are set, and there are no plans to change this method in the future.<BR>
+ Displaying 13 in the tone editor is a source of confusion, so we will correct it so that it displays 24 in the next release (Ver3.0).</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_07"><HR></a><DL>
+<H3> I am changing the rate of the AIFF waveform to be assigned, but is this a problem?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The sampling rate is normally 44kHz, 16bit, but if you change it to 22kHz, it will be one octave lower, so I changed the point from 60 to 72. Is there a problem?<BR>
+ Also, is there any problem if I change from 16bit to 8bit?<P><DT> <FONT SIZE=5>A)</font><DD> No problem.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_08"><HR></a><DL>
+<H3> Hangs when sending</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When sending with TONE editor, it hangs with a clock icon.<P><DT> <FONT SIZE=5>A)</font><DD> Please check the following items.</P>
+<UL TYPE=DISC>
+<P><LI> Turn off active sensing on your MIDI keyboard.<P><LI> TONE editor's VOICE parameter and PLAY MODE only support poly mode.<BR>
+ Please never use MONO, PORTA, LEGATO, L&P other than POLY.<P><LI> Do not set the PORTAMENT TIME of the voice window.<P><LI> By default, the Tone editor refers to the address and size of tone BANK0 in the current sound map in SndSimulator.<P> If the size of tone BANK 0 is set too small, a SCSI error may occur. Please increase the size of tone BANK0.<BR>
+ When editing tone data, we recommend that you create and use a map with a larger set tone BANK for creation purposes.</UL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_09"><HR></a><DL>
+<H3> Changes to MASTER VOLUME will be invalidated on next load.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Even if I change the MASTER VOLUME in the tone editor to adjust the overall volume balance of the song, it seems to be cleared to the maximum value the next time it is loaded.<BR>
+ How can I adjust the volume of the entire song?<P><DT> <FONT SIZE=5>A)</font><DD> The “MASTER VOLUME” setting in the tone editor is information that is not saved in the tone bank data.<BR>
+ The volume balance of the entire song is actually set on the program side, not on the data side.<BR>
+ Please note that the only thing that can be done on the sound production side is simulation.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_10"><HR></a><DL>
+<H3> How to set portamento parameters.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Setting portamento parameters in the tone editor has no effect. If you change the play mode from POLY to PORTA, that sound will no longer be produced. How do I set up portamento?<P><DT> <FONT SIZE=5>A)</font><DD> PORTAMENT TIME in the voice window is not working.<BR>
+ Setting this will cause trouble, so it is better not to set it.<BR>
+ Future responses are also undecided.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_11"><HR></a><DL>
+<H3> no sound</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When assigning the waveform in the tone editor, there were no specific instructions for the sampling rate, so I incorporated it with 18.9KHz Mono as described in the ADPCM converter documentation.<BR>
+ I tried setting the master volume and velocity, but there was no sound.<P><DT> <FONT SIZE=5>A)</font><DD> In the tone editor, there are no particular restrictions on the sampling rate of the waveform you assign.<BR>
+ The Sega Saturn's sound chip (SCSP) processes uncompressed PCM data, so it usually assigns a 44KHz, 16bit waveform with emphasis on sound quality, and only lowers it to 22KHz when it is necessary to save memory. Masu.<BR>
+ Also, if there is no sound, please check the following items.</P>
+<P><DD> <B>Check on sound simulator:</b><UL TYPE=DISC>
+<LI> Is there an " <FONT SIZE=5>x</font> " mark on the map window indicating that data has been sent to the target?<LI> If you need to change the mixer or effect, do you make sure to click the change button after making these changes in the simulator window?</UL>
+<P><DD> <B>Check on tone editor:</b><UL TYPE=DISC>
+<LI> Is "Direct Level" set to 0 (minimum) on the layer window? (If you want to check the pronunciation, set it to the maximum 7)<LI> If you are using effects (DSP), is the level of the channel specified for output on the mixer window set to 0 (minimum)?</UL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_12"><HR></a><DL>
+<H3> What is displayed in the finder</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Even if you use a tone editor to reduce the file size by removing tone layers, etc., the file size often becomes large.<P> (When using the finder) A file that is 96,456B in tone editor will be displayed as 117K in the finder.<P><DT> <FONT SIZE=5>A)</font><DD> The size display function in the viewfinder is simple and not accurate.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_13"><HR></a><DL>
+<H3> Parameters during Velocity Edit</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Regarding the tone editor's VELOCITY EDIT, there are various items such as V0, L0, V1, L1, V2, L2, and L3, but even after reading the manual, I have no idea what they mean.<P><DT> <FONT SIZE=5>A)</font><DD> V0,V1.. corresponds to the velocity level when receiving MIDI.<BR>
+ L0,L1.. corresponds to the actual output level.<BR>
+ You can set three curve change points with V0, V1, and V2, and control the actual output velocity by adjusting the output level with L0, L1, L2, and L3.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no4">Sound related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

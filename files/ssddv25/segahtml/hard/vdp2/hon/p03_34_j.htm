@@ -1,0 +1,105 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/86&gt;VDP2ユーザーズマニュアル/3.3表示期間中のVRAMアクセス方法-5</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<B>▲
+<a href="p03_33_j.htm">戻る</A>｜
+<a href="p03_35_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第３章　ＲＡＭ/■3.3　表示期間中のVRAMアクセス方法</B>
+</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_35"></A>
+	<P>	<DT><H3>　●VRAMサイクルパターンレジスタ指定手順</H3>
+		<DD>　VRAMサイクルパターンのレジスタへの指定手順は、次のようになります。</P>
+
+	<P>	<DD><OL>
+		<LI>TV画面モードを決めます。</P>
+	<P>	<LI>VRAMを2分割するかどうかを決めます。</P>
+	<P>	<LI>表示するスクロール画面のキャラクタ色数、縮小設定を決めます。<BR>また、縦セルスクロール機能を使用するかどうかも決めます。</P>
+	<P>	<LI>各スクロール画面に必要な画像データ（パターンネームデータ、キャラクタパターンデータ、ビットマップパターンデータ）を格納するVRAMのバンクを決めます。<BR>
+	縦セルスクロール機能を使用する場合には、縦セルスクロールテーブルデータを格納するVRAMのバンクも決めます。</P>
+	<P>	<LI>CPUによるリード／ライトアクセスを行うかどうかを決めます。</P>
+	<P>	<LI>それぞれのアクセスタイミングの指定制限を守るように、VRAMサイクルパターンレジスタにアクセスコマンドを指定します。</P>
+	</OL>
+
+	<P>	<DD>　VRAMサイクルパターンレジスタの指定例を図3.8に示します。</P>
+
+<A NAME="z3_8"></A>
+	<P>	<DD><B>図3.8　VRAMサイクルパターン指定例</B>
+		<DD><B>＜条件＞</B>
+		<UL TYPE=DISC>
+		<LI>TV画面モードはノーマルモードにする
+		<LI>VRAM-A，VRAM-Bどちらも分割する 
+		<LI>スクロール画面の設定は下表のようにする</P>
+
+	<P>	<TABLE BORDER=1>
+	<TR><TH>画面名</TH><TH>キャラクタ色数</TH><TH>縮小設定</TH><TH>縦セルスクロール機能</TH></TR>
+	<TR ALIGN=CENTER><TD>NBG0</TD><TD>256色</TD><TD>1/2倍</TD><TD>使用しない</TD></TR>
+	<TR ALIGN=CENTER><TD>NBG1</TD><TD>256色</TD><TD>1倍</TD><TD>使用する</TD></TR>
+	<TR ALIGN=CENTER><TD>NBG3</TD><TD>16色</TD><TD>1倍</TD><TD>-</TD></TR>
+	</TABLE></P>
+
+	<P>	<LI>スクロール画面の各データを格納するバンクは下表のようにする</P>
+
+	<P>	<TABLE BORDER=1>
+	<TR><TH>画面名</TH><TH>パターンネーム</TH><TH>キャラクタ<BR>パターン</TH><TH>縦セルスクロール<BR>テーブル</TH></TR>
+	<TR ALIGN=CENTER><TD>NBG0</TD><TD>A0</TD><TD>B0,B1</TD><TD>-</TD></TR>
+	<TR ALIGN=CENTER><TD>NBG1</TD><TD>A0,A1</TD><TD>B0,B1</TD><TD>A0</TD></TR>
+	<TR ALIGN=CENTER><TD>NBG3</TD><TD>A1</TD><TD>A1,B0</TD><TD>-</TD></TR>
+	</TABLE>
+	<DT><B>A0:</B>VRAM-A0　<B>A1:</B>VRAM-A1
+	<DT><B>B0:</B>VRAM-B0　<B>B1:</B>VRAM-B1</P>
+
+	<P>	<LI>VRAM-AへのCPUによるリード／ライトアクセスができるようにする</P>
+	</UL>
+
+	<P>	<DD><B>＜VRAMサイクルパターンレジスタ＞</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH>　</TH><TH><PRE>　T0　</TH><TH><PRE>　T1　</TH><TH><PRE>　T2　</TH><TH><PRE>　T3　</TH><TH><PRE>　T4　</TH><TH><PRE>　T5　</TH><TH><PRE>　T6　</TH><TH><PRE>　T7　</TH></TR>
+	<TR ALIGN=CENTER><TH>VRAM-A0用<BR>(またはVRAM-A用)</TH><TD>N1CE</TD><TD>N0PN</TD><TD>N1PN</TD><TD>N0PN</TD><TD>NA</TD><TD>CPU</TD><TD>CPU</TD><TD>NA</TD></TR>
+	<TR ALIGN=CENTER><TH>VRAM-A1用<BR>　</TH><TD>N3CE</TD><TD>NA</TD><TD>N1PN</TD><TD>NA</TD><TD>NA</TD><TD>CPU</TD><TD>CPU</TD><TD>N3CG</TD></TR>
+	<TR ALIGN=CENTER><TH>VRAM-B0用<BR>(またはVRAM-B用)</TH><TD>N0CG</TD><TD>N0CG</TD><TD>N1CG</TD><TD>N1CG</TD><TD>NA</TD><TD>N0CG</TD><TD>N0CG</TD><TD>N3CG</TD></TR>
+	<TR ALIGN=CENTER><TH>VRAM-B1用<BR>　</TH><TD>N0CG</TD><TD>N0CG</TD><TD>N1CG</TD><TD>N1CG</TD><TD>NA</TD><TD>N0CG</TD><TD>N0CG</TD><TD>NA</TD></TR>
+	</TABLE>
+	<DD>N1=NBG1　N2=NBG2　N3=NBG3
+	<DD>PN=パターンネームデータリード
+	<DD>CG=キャラクタパターンデータリード
+	<DD>CE=縦セルスクロールテーブルデータリード
+	<DD>CPU=CPUリード／ライト
+	<DD>NA=アクセスしない
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p03_33_j.htm">戻る</A>｜
+<a href="p03_35_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

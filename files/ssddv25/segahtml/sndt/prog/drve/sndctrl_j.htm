@@ -1,0 +1,175 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/17&gt;サウンドドライバVer2.10ガイド/２．サウンドコントロール</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no2">サウンドドライバプログラマーズガイド</A>
+<HR>
+<B>▲
+<a href="sndsys_j.htm">戻る</A>｜
+<a href="sndcmd0_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>サウンドドライバプログラマーズガイド</B>
+<H2 ALIGN=CENTER>２．サウンドコントロール</H2>
+<HR NOSHADE>
+<DL>
+
+<a name="colum1"></a>
+<h3>必要なデータファイル</h3>
+　サウンドドライバの起動に必要なものは、基本的にはサウンドドライバのプログラム本体だけです。ここでサウンドエリアマップも転送しているのは、サウンドエリアマップは最初に一度転送すると以後転送の必要がないからです。ゲーム中の全てのエリアマップを、ここでサウンドエリアマップ領域に格納してしまいます。本手順でサウンドドライバを起動する場合には、下記の2つのデータファイルを用意してください。<br>
+<ol>
+<li>サウンドドライバ（SDDRVS.TSK）<br>
+サウンドドライバは「sddrvs.tsk」というバイナリファイルで提供されます。ただし、Saturn Target Model M で開発するときのみ「sddrv.tsk」というファイルを使用します。これらのファイル名は変更してはなりません。<p>
+<li>サウンドエリアマップ（名称は任意）<br>
+ゲーム中の全てのエリアマップを結合したバイナリデータファイルです。ゲームによって違いますので、サウンドクリエータに作成してもらいます。<p>
+</ol>
+<a name="colum2"><hr></a>
+<h3>サウンドエリアマップ</h3>
+　サウンドエリアマップはゲーム中の全てのエリアマップをひとつに結合したもので、サウンド開発ツールのサウンドシミュレータで作成（出力）したものです。<br>
+　各エリアマップの終わりには1バイトのエンドコード(FFh)が入っており、サウンドエリアマップの一番最後にもオールエンドコード(FFh)が入っています。サウンドエリアマップのサイズは可変長で、そのサイズはエリアマップの数で決まりますが最大でも4096バイトまでです。<p>
+
+<P ALIGN=CENTER><B>サウンドエリアマップの構成</B><BR><img srcset="../image/sndmap0_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<a name="colum3"><hr></a>
+<h3>エリアマップとは</h3>
+　ゲームにはいくつかの場面がありますが、場面が変わると通常は音楽も変わります。音楽が変わるとサウンドデータの置き方（512KBのサウンドメモリをどう使うか）も変わってきますので、その場面でどういうデータの置き方をするかを決めたものがエリアマップです。置かれるデータは「音色データ」「シーケンスデータ」「DSPプログラム」の3種類しかありませんので、この3種類のデータをサウンドメモリ上のどこに、どれだけの大きさで配置するかを決めたものがエリアマップです。また、DSPを使用する場合には「DSPワークRAM」が必要になりますので、DSPワークRAMの場所とサイズも同様に指定します。<br>
+　通常は1つのエリアマップ内に、音色データとシーケンスデータの2つのマップ情報があればシーケンス再生が可能ですが、よく使う曲やSE等を別々の配置に分割にしておけばメモリ効率・開発効率の良いシステムを構築することができます。<br>
+　ゲームの場面が変わればサウンドも変わるという前提であれば、エリアマップはゲームの場面の数だけ必要になります。しかしここで言うエリアマップとは、あくまでもサウンドから見たエリアマップですので、ゲームの場面と一対一に対応するとは限りません。ゲームの場面が変わってもサウンドは同じでよければエリアマップはは変える必要はありませんし、一部のサウンドデータを入れ替えるだけで良いような場合もエリアマップは変える必要はありません。<p>
+
+<P ALIGN=CENTER><B>エリアマップとサウンドデータの関連</B><BR><img srcset="../image/sndmap2_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+　エリアマップはいくつかのマップ情報をひとつに結合したもので、サイズは可変長です。マップ情報は最大で32まで持つことができ、エリアマップのサイズはマップ情報の数で決まります。サイズが可変長ですので、エリアマップの最後には1バイトのエンドコードが入ります。<br>
+　マップ情報は、サウンドデータがメモリ上のどこに配置されるかを記述した8バイトのデータブロックで、下図ののような構造になっています。<p>
+
+<P ALIGN=CENTER><B>マップ情報のビットイメージ</B><BR><img srcset="../image/sndmap3_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+マップ情報のデータの説明<br>
+<table border>
+<tr><td>E</td><td>データ終了ビット</td><td>マップ情報の終了ビットです。実際にはFFhの1バイトとなります。</td>
+<tr><td>Data ID</td><td>データ種別</td><td>ここで定義するエリアに格納するデータの種別です。</td>
+<tr><td>ID number</td><td>データ種別内識別番号</td><td>同じ種別のデータが複数ある場合の識別番号です。</td>
+<tr><td>スタートアドレス</td><td>スタートアドレス</td><td>ここで定義するエリアの先頭アドレスです。</td>
+<tr><td>L</td><td>転送済みビット</td><td>本エリアにデータが転送されたことを示すフラグです。</td>
+<tr><td>エリアサイズ</td><td>エリアサイズ</td><td>ここで定義するエリアのエリアサイズです。</td>
+</table>
+<p>
+<a name="colum4"><hr></a>
+<h3>サウンドの種類</h3>
+
+　サウンドのならしかたには下記の3種類の方法があります。また、それぞれ下表のような長所・短所がありますので、ゲームの内容やそれぞれの場面に合った最適な再生方法を選択してください。
+<ol>
+<li>シーケンス再生
+<li>PCMストリーム再生
+<li>CD-DA再生
+</ol>
+シーケンス再生<br>
+<table border width="100%">
+<tr><td nowrap>発音方法</td><td>サウンドメモリ上の音色データ（波形データ）を音源として、シーケンスデータを解凍しながら演奏させる方法です。</td>
+<tr><td>特徴</td><td>波形データを音源（一つの楽器）として、サターン自体をマルチ音源の楽器として扱う方法です。</td>
+<tr><td>長所</td><td>
+<ul>
+<li>曲データが小さいため、たくさんの曲を持てます。
+<li>曲の変更・修正が容易です。
+<li>リアルタイムなテンポ変更が可能です。
+<li>CDアクセスの必要がありません。
+<li>メインはリクエストを出すだけです。<br>（サウンドドライバが全てをコントロールします）
+</ul></td>
+<tr><td>短所</td><td>
+<ul>
+<li>一度に持てる波形の容量に4Mbit(512KB)という制約があります。
+</ul></td>
+</table>
+<p>
+PCMストリーム再生<br>
+<table border width="100%">
+<tr><td nowrap>発音方法</td><td>波形データをループ再生させ、この中の発音が終わった部分に次の波形データを転送するということを繰り返して、長い波形データを連続再生させる方法です。</td>
+<tr><td>特徴</td><td>あらかじめ録音してある長い波形データをそのまま再生する方法です。<br>
+但し音がとぎれないように波形データを転送し続けなければなりません。</td>
+<tr><td>長所</td><td>
+<ul>
+<li>4Mビットを越えるような長い波形データが再生可能です。
+<li>転送の工夫でいろいろな再生パターンを編集できます。（編集合成が可能）
+<li>データ幅は 8ビット / 16ビット が選択でき、周波数も自由に変えられます。<br>
+（メモリ効率が良く、録音・再生時にピッチも変えられます）
+<li>同時に複数チャンネルを再生できます。
+</ul></td>
+<tr><td>短所</td><td>
+<ul>
+<li>波形データの転送で、メインシステムとサウンドCPUにかなりの負荷がかかります。
+</ul></td>
+</table>
+<p>
+CD-DA再生<br>
+<table border width="100%">
+<tr><td nowrap>発音方法</td><td>CDの音声トラックに録音してある音声を、ハード的に直接再生させる方法です。<br>
+市販の音楽CDをならすのと全く同じ方法です。</td>
+<tr><td>特徴</td><td>あらかじめ録音してある長い波形データをそのまま再生する方法です。<br>
+音声はハードウェアによって自動的に出力されます。</td>
+<tr><td>長所</td><td>
+<ul>
+<li>生録音ができるので、リアルで表現力の高い演奏が再生できます。
+<li>メインとサウンドCPUに一切負荷がかかりません。
+</ul></td>
+<tr><td>短所</td><td>
+<ul>
+<li>曲の変更、修正が容易でない。再度録音しなければなりません。
+<li>データ幅16ビット、周波数44.1KHz固定で、大量の波形データが必要です。
+<li>再生中は常にCDのアクセスが必要で、CDドライブを占有してしまいます。
+<li>リアルタイムにテンポを変えられません。
+</ul></td>
+</table>
+<p>
+<a name="colum5"><hr></a>
+<h3>3Dサウンドについて</h3>
+
+　本サウンドドライバでは下記の2種類の3Dサウンドをサポートしています。指定できる定位の種類とチャンネル数は下記の通りです。サウンドコントロールコマンドの「3D control (11h)」コマンドまたは「Qsound control (12h)」コマンドで任意の定位を指定してください。仮想音源が指定された定位に移動します。<br>
+　Qサウンド・YAMAHA3Dサウンドともに仮想音源の移動はランダムな場合が多く考えられますので、定位の移動コントロールはすべてメインシステムが行います。サウンドドライバは指定された定位に音像を移すだけです。但し、単純な直線移動で良い場合や、サウンドドライバにもう少しインテリジェントなコントロールをさせたいような場合には必要に応じてプロジェクトごとに対応します。
+　YAMAHAのDSP拡張モジュールとして、Qサウンド4ch・Qサウンド8ch・YAMAHA 3Dサウンド1ch の3種類のDSPプログラムが用意されていますので、3Dサウンドを使用する場合には上記4種類のDSPプログラムのうちから必要なDSPプログラムを「Effect Change (83h)」コマンドでダウンロードしてください。<p>
+
+<A NAME="no2_51"></A>
+<h4>Qサウンド</h4>
+　左右180度までの広角なPANを振ることができます。定位の種類はPANだけですが、最大8チャンネルまでを同時にコントロールすることができます。<br>
+<table border width="100%">
+<tr><td>チャンネル (0-7)</td><td>4チャンネル(0-3)、または8チャンネル(0-7)が指定できます。</td>
+<tr><td>PAN位置 (0-30)</td><td>値が0で左、15で中央、30で右の左右180度15段階までのPANを振ることができます。</td>
+</table>
+<p>
+<A NAME="no2_52"></A>
+<h4>YAMAHA 3Dサウンド</h4>
+　水平方位360度、垂直方位360度、距離128段階の自由な位置に仮想音源を移動させることができます。使用チャンネル数は１チャンネルですが、上下左右の任意の位置が指定できます。
+<table border width="100%">
+<tr><td>距離 (0-127)</td><td>値が0で距離は0で、値が大きくなるほど距離が離れます。</td>
+<tr><td>方位 (0-127)</td><td>方位360度を128段階で指定します。値が0で右0度、32で右90度、64で右180度、96で右270度です。</td>
+<tr><td>高さ (0-127)</td><td>高さを128段階で指定します。値が0で真上、32で目の高さ、64で真下、96で後方の目の高さです。</td>
+</table>
+<p>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="sndsys_j.htm">戻る</A>｜
+<a href="sndcmd0_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no2">サウンドドライバプログラマーズガイド</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

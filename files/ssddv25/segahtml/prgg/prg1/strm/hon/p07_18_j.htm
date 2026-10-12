@@ -1,0 +1,119 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/18&gt;ストリームシステムライブラリ/7.関数仕様-8</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<B>▲
+<a href="p07_17_j.htm">戻る</A>｜
+<a href="p07_19_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ストリームシステムライブラリ</B>
+<H2 ALIGN=CENTER>7.関数仕様-8</H2>
+<HR NOSHADE>
+
+
+<A NAME="no7_80"></A>
+<H3>7.8　CDブロックの操作</H3>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no8_1"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><a href="p07_10_j.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>絞りとCDバッファ区画の接続</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_ConnectCdbuf</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>8.1</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void　STM_ConnectCdbuf(StmHn keystm, StmHn bufstm)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>keystm</TD><TD><PRE>：接続元ストリームハンドル</TD></TR>
+<TR><TD><PRE>bufstm</TD><TD><PRE>：接続先ストリームハンドル(切断する場合、STM_CON_NULBUF)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>CDブロック内の絞りとバッファ区画を接続します。
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>接続元のストリームに割り当てられている絞りから、接続先のストリームに割り当てられているCDバッファ区画に読み込みを行います。</P>
+<P><B><LI></B>もとの設定に戻す場合は、接続元と同じストリームハンドルを指定します。</P>
+<P><B><LI></B>ストリームキーをOR条件に設定する場合の接続を示します。<BR><img srcset="../grp/i092_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><B><LI></B>CDストリームだけが指定できます。</P></OL>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no8_2"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><a href="p07_10_j.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>CDバッファ区画データの移動</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_MoveCdbuf</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>8.2</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void　STM_MoveCdbuf(StmHn src, Sint32 spos, Sint32 snum, StmHn dst)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>src</TD><TD><PRE>：移動元ストリームハンドル</TD></TR>
+<TR><TD><PRE>spos</TD><TD><PRE>：セクタ位置(先頭セクタはSTM_CDBUF_TOP)</TD></TR>
+<TR><TD><PRE>snum</TD><TD><PRE>：セクタ数(最後までの場合STM_CDBUF_END)</TD></TR>
+<TR><TD><PRE>dst </TD><TD><PRE>：移動先ストリームハンドル</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>CDブロック内のバッファ区画から絞りにセクタデータを移動します。
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>移動元のストリームに割り当てられたCDバッファ区画から、移動先のストリームに割り当てられている絞りにセクタデータを移動します。<BR><img srcset="../grp/i092_04_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><B><LI></B>CDストリームだけが指定できます。</P></OL>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no8_3"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><a href="p07_10_j.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>CDバッファ区画データの消去</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_EraseCdbuf</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>8.3</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void　STM_EraseCdbuf(StmHn stm, Sint32 spos, Sint32 snum)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>stm</TD><TD><PRE>：ストリームハンドル</TD></TR>
+<TR><TD><PRE>spos</TD><TD><PRE>：セクタ位置(先頭セクタはSTM_CDBUF_TOP)</TD></TR>
+<TR><TD><PRE>snum</TD><TD><PRE>：セクタ数(最後までの場合STM_CDBUF_END)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>ストリームに割り当てられたCDバッファ区画のセクタデータを消去します。
+</DL>
+
+
+<HR NOSHADE>
+<B>▲
+<a href="p07_17_j.htm">戻る</A>｜
+<a href="p07_19_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,105 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/29&gt;SCSP User's Manual/1. Sound System Overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>■ ｜ <A HREF="p01_20.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual</b><H2 ALIGN=CENTER> Chapter 1 Sound system configuration</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_1"></A><P><DT><H2> 1.1 Introduction</H2><A NAME="no1_10"></A><P><DT><H3> ■1.About Sega Saturn's sound block</H3><DD><UL TYPE=DISC>
+<P><LI> The Sega Saturn's sound block consists of a CPU ``MC68000,'' a sound processing sound source IC ``SCSP (Saturn Custom Sound Processor, hereinafter referred to as SCSP),'' and 4M bits of RAM.<BR>
+ (CDs can also be considered sound blocks, but I will explain them as separate.)</P>
+<P><LI> Since the sound block itself has a CPU, it can operate independently from the main system (SH2, etc.).<BR>
+ This reduces the processing load on the main CPU including SH2.<BR>
+ The sound CPU is responsible for controlling the entire sound block including SCSP.<P><LI> Sound sources for Saturn include CD-DA sound sources for CDs and PCM and FM sound sources for SCSP.<BR>
+ MPEG audio can also be used if an optional device for VIDEO-CD is connected.<BR>
+ (However, please note that CD-DA and MPEG audio cannot be used at the same time.)</P>
+<P> In addition, by using the digital audio input from the cartridge connector, it is also possible to upgrade the sound function with various optional equipment, such as installing an expansion sound IC.<BR>
+ When the optional equipment is available, I would like to see the manual for it.</P>
+<P><LI> SCSP performs PCM and FM voice synthesis and voice processing.<BR>
+ It has built-in sound generators for 32 units, a DSP for effect processing, a digital mixer, a timer for the sound CPU, an interrupt controller, etc.</P>
+<P><LI> The sound RAM is equipped with 4M bits (512K bytes).<BR>
+ This memory is used for sound CPU programs, data and waveform data, delay buffers for effects, etc.<BR>
+ This RAM can be accessed by the sound CPU (MC68EC000), SCSP, and main block (SH2, SCU). </P>
+</UL>
+<A NAME="z1_0"></A><P ALIGN=CENTER><img srcset="../grp/i001_0.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no1_20"></A><P><DT><H3>■2.About the sound block configuration</H3><DD> The Sega Saturn's sound block is shown in Figure 1.1.</P>
+<A NAME="z1_1"></A><P ALIGN=CENTER> <B>Figure 1.1 Sound block</b><BR>
+<img srcset="../grp/i001_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no1_21"></A><P><DT> <B>●Relationship between main block and sound block</b><DD><UL TYPE=DISC>
+<P><LI> The sound block is connected to the main block via “ <B>(1)</b> SCU”.<BR>
+ The sound block assets {“ <B>(5)</b> SCSP” register and sound <B>(7)</b> RAM (4M bits)} can be accessed from the main block side and can be read and written.</P>
+<P> <B>*</b> Please note that some registers have restrictions such as "read only" or "write only".</P>
+<P><LI> Conversely, please note that the sound CPU cannot access the memory, etc. on the main block side.</P>
+<P><LI> In addition, the sound block is equipped with a sound CPU <B>(4)</b> MC68EC000 so that it can operate independently from the main block.</P>
+<P> By installing this CPU, it is possible to remove the sound block control burden from the main block side.</P>
+<P> <B>*</b> Of course, it is also possible to control the sound block using the main block.</P>
+</UL>
+<A NAME="no1_22"></A><P><DT> <B>●About audio line connections</b><DD><UL TYPE=DISC>
+<P><LI> The sound block is shown in Figure 1.1, and basically all audio signals are collected in the sound block (SCSP).<BR>
+<P> Regarding the output from each sound source, the number of sound sources that can be input to "SCSP" on the Saturn is one stereo system, and external inputs from CD-DA, MPEG-AUDIO, and cartridge in the middle of the CD block etc. is now available for selection.</P>
+<P> It is also possible to apply effects to the selected input sound using the DSP in "SCSP".</P>
+</UL>
+<A NAME="no1_23"></A><P><DT> <B>●Sound memory map</b><DD><UL TYPE=DISC>
+<P><LI> The memory and registers of the sound block are arranged as shown in Figure 1.2.<BR>
+ Basically, it can be accessed both from the main block such as SH2 and from MC68EC000, but please note that the addresses are different.</P>
+<P><LI> Regarding the data size (byte/word/longword) for access, depending on the hardware configuration, it is more efficient to transfer in word/longword units, so when reading or writing a continuous data group, Please use words or longwords.<BR>
+ Please note that byte access is prohibited from the main side including SH2.</P>
+</UL>
+<A NAME="t1_1"></A>
+<P><DT><TABLE BORDER=1><B><CAPTION><B>Table 1.1 Sound memory mapping (overview)</B></CAPTION>
+<TR ALIGN=CENTER><TD COLSPAN=2>　</TD> <TD><PRE>D15~D8</TD><TD><PRE>D7~ D0</TD><TD COLSPAN=2>　</TD></TR>
+<TR ALIGN=CENTER><TD>SH2-ADDRESS</TD> <TD>MC68EC000-ADDRESS</TD><TD>UPPER</TD> <TD>LOWER</TD> <TD>MC68EC000-ADDRESS</TD><TD>SH2-ADDRESS</TD></TR>
+<TR ALIGN=CENTER><TD>0(2)5A00000H</TD><TD>000000H</TD> <TD COLSPAN=2 ROWSPAN=3>Sound RAM<BR>
+512K bytes</TD><TD>000001H</TD><TD>0(2)5A00001H</TD></TR>
+<TR ALIGN=CENTER><TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+<TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+<TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+<TD>:<BR>:<BR>:<BR>:<BR>:</TD></TR>
+
+<TR ALIGN=CENTER><TD>0(2)5A7FFFEH</TD><TD>07FFFEH</TD><TD>07FFFFH</TD><TD>0(2)5A7FFFFH</TD></TR>
+
+<TR ALIGN=CENTER><TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+<TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+<TD COLSPAN=2>:<BR>:<BR>:<BR>:<BR>:</TD>
+<TD>:<BR>:<BR>:<BR>:<BR>:</TD>
+<TD>:<BR>:<BR>:<BR>:<BR>:</TD></TR>
+	
+<TR ALIGN=CENTER><TD>0(2)5B00000H</TD><TD>100000H</TD><TD COLSPAN=2 ROWSPAN=3>Control register</TD><TD>100001H</TD><TD>0(2)5B00001H</TD></TR>
+<TR ALIGN=CENTER><TD>:<BR>:<BR></TD>
+<TD>:<BR>:<BR></TD>
+<TD>:<BR>:<BR></TD>
+<TD>:<BR>:<BR></TD></TR>
+<TR ALIGN=CENTER><TD>0(2)5B00EE2H</TD><TD>100EE2H</TD><TD>100EE3H</TD><TD>0(2)5B00EE3H</TD></TR> </TABLE>
+
+<P><DT><B>　Notes:</B>
+<DD><B>(2)</B> of the SH-2 address is an abbreviation of +20000000H and indicates the cache-through address (Cache_through_address). </P>
+
+<P><DT><B>　Reference:</B>
+<DD>For information on the Sega Saturn memory map, <BR>
+"HARDWARE MANUAL/SCU User's Manual" <a href="../../scu_/hon/p01_02.htm">SCU mapping</A></P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p01_20.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

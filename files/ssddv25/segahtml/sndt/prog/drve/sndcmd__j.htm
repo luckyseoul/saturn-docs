@@ -1,0 +1,707 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/17&gt;サウンドドライバVer2.10ガイド/サウンドコントロールコマンド詳細</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no3">サウンドドライバプログラマーズガイド</A>
+<HR>
+<B>▲
+<a href="sndcmd0_j.htm">戻る</A>｜
+<a href="sndrequ_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>サウンドドライバプログラマーズガイド</B>
+<H2 ALIGN=CENTER>サウンドコントロールコマンド詳細</H2>
+<HR NOSHADE>
+
+<A NAME="01"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A>■<A HREF="#02">▼</A>
+<HR>
+<dl><dt><b><font size=5>●01H SEQUENCE START</font>
+<dd>曲、効果音の演奏開始</b></dl>
+<dl compact>
+<dt>P1<dd>発音管理番号(0-7)<p>
+<dt>P2<dd>シーケンスデータバンク番号(0-15)　現在のエリアマップ内にシーケンスバンク（シーケンスデータの格納エリア）が複数個ある場合に、それらを区別するための番号です。1つのエリアマップには最大16シーケンスバンクまで持てますので、0から15のいずれかの値となります。<p>
+<dt>P3<dd>シーケンスデータ内 ソング番号(0-127)　ひとつのシーケンスデータ内には複数の曲データを格納することができますので、シーケンスデータ内の何番目の曲データであるかを指定します。1つのシーケンスデータ内には最大128曲まで格納できますので、0から127のいずれかの値となります。曲データが1つしかない場合には常に0です。<p>
+</dl>
+
+
+<A NAME="02"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#01">▲</A></A><A HREF="#03">▼</A>
+<HR>
+<dl><dt><b><font size=5>●02H SEQUENCE STOP</font>
+<dd>曲、効果音の演奏停止</b></dl>
+<dl compact>
+<dt>P1<dd>発音管理番号(0-7)<p>
+<dt>P2<dd>終了モード　bit7=H ---> with release off  （対応未定）<p>
+</dl>
+<dd>曲、効果音の一時停止</b></dl>
+<dl compact>
+<dt>P1<dd>発音管理番号(0-7)</dl>
+
+<A NAME="03"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#02">▲</A><A HREF="#04">▼</A>
+<HR>
+<dl><dt><b><font size=5>●03H PAUSE</font>
+<dd>曲、効果音の一時停止</b></dl>
+<dl compact>
+<dt>P1<dd>発音管理番号(0-7)</dl>
+
+<A NAME="04"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#03">▲</A><A HREF="#05">▼</A>
+<HR>
+<dl><dt><b><font size=5>●04H PAUSE OFF</font>
+<dd>曲、効果音の一時停止を解除</b></dl>
+<dl compact>
+<dt>P1<dd>発音管理番号(0-7)<p>
+</dl>
+
+<A NAME="05"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#04">▲</A><A HREF="#06">▼</A>
+<HR>
+<dl><dt><b><font size=5>●05H SEQUENCE VOLUME</font>
+<dd>音量調整またはフェードイン／アウト</b></dl>
+<dl compact>
+<dt>P1<dd>発音管理番号(0-7)<p>
+<dt>P2<dd>音量 (0-255) 128を中心に値が大きいほど音量が大きくなります。以前は127がデフォルトで、音量は小さくすることしかできませんでしたが、Ver-2.00以降ではサンプリングされたときの音量よりも大きくすることができます。ただし、極端に大きな値をセットすると歪むことがありますから、注意が必要です。<p>
+<dt>P3<dd>フェードレート(0-255)現在のシーケンスボリュームから指定のシーケンスボリュームまで達する時間をレート(0から255)で指定します。値が大きいほど変化が遅く255で最長、1で最短となります。（0の場合はフェードはせずにシーケンスボリュームの設定のみとなります）フェードは現在のシーケンスボリュームから、指定のシーケンスボリュームに向かって行われます。指定のシーケンスボリュームが現在のシーケンボリュームより大きいか小さいかでフェードインかフェードアウトかが決まります。<p>
+</dl>
+
+<A NAME="06"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#05">▲</A><A HREF="#07">▼</A>
+<HR>
+<dl><dt><b><font size=5>●06H  STOP ALL</font>
+<dd>すべての演奏停止</b></dl>
+<dl compact>
+<dt>  <dd>パラメータ無し<p>
+</dl>
+
+
+<A NAME="07"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#06">▲</A><A HREF="#08">▼</A>
+<HR>
+<dl><dt><b><font size=5>●07H TEMPO CHANGE</font>
+<dd>曲、効果音のテンポを変える</b></dl>
+<dl compact>
+<dt>P1<dd>発音管理番号(0-7)<p>
+<dt>P2<dd>dummy（P3,P4を偶数アドレスに配置するために存在）<p>
+<dt>P3-P4<dd>テンポ値(+32767 --> -32768)　基準テンポ値(0000h)に対する相対テンポ値です。1000h(4096)ごとに2倍のテンポ、マイナス時には2分の1のテンポになります。言い換えれば、テンポが2倍（または2分の1）になるまでの間を、4096段階の精度でコントロールできるということになります。0が基準テンポですので、0000hを指定することでいつでも元のテンポに戻ることができます。<p>
+</dl>
+
+<A NAME="08"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#07">▲</A><A HREF="#09">▼</A>
+<HR>
+<dl><dt><b><font size=5>●08H MAP CHANGE</font>
+<dd>マップチェンジを行なう</b></dl>
+<dl compact>
+<dt>P1<dd>エリアマップ番号(0-255)　サウンドエリアマップ内の、先頭から何番目のエリアマップかを指定するシーケンシャルなエリアマップ番号です。<p>
+</dl>
+　ゲーム中には数多くの場面があり、エリアマップも通常はそれぞれ異なります。従ってシーケンスを再生する前には、必ずエリアマップを指定しなければなりません。サウンドエリアマップの中から希望のエリアマップを選択して、マップチェンジを行ってください。マップチェンジが終わった後でそのマップに従ったサウンドデータの転送を行います。これでシーケンス再生の準備が完了です。<p>
+　マップチェンジは、まずサウンドドライバの起動後に必ず一度は行ってください。以後、エリアマップが変わるたびに毎回必ず行わなければなりません。マップチェンジは下記の1から6の手順で行ってください。<p>
+マップチェンジの方法
+<table border width="100%">
+<tr align="center"><th>順番</th><th>処理内容</th><th>説明</th></tr>
+<tr><td align="center">1</td><td>全ての発音を停止させる</td><td>「Sound Initial (10h)」コマンドを発行する。
+パラメータで、全ての発音停止、全ての初期化を指定します。</td></tr>
+<tr><td align="center">2</td><td>エリアマップを切り替える</td><td>「Map Change (08h)」コマンドを発行する。
+パラメータで、切り替えたいエリアマップの番号を指定します。</td></tr>
+<tr><td align="center">3</td><td>サウンドデータを転送する</td><td>サウンドデータをSHアドレスの 25A0B000 番地からへ転送する。
+サウンドデータを複数ファイルに分割して持っているような場合には、それぞれのデータをエリアマップに従って転送します。</td></tr>
+<tr><td align="center">4</td><td>転送完了を通知する</td><td>サウンドエリアマップ CRNT ワーク(SHアドレスの 25A00500hから) の転送済みビットを、転送が終わった分だけ全て"1"にする。</td></tr>
+<tr><td align="center">5</td><td>DSPをセットする</td><td>必要があれば「Effect Change (83h)」コマンドを発行する。</td></tr>
+<tr><td align="center">6</td><td>ミキサをセットする</td><td>「Mixer Change (87h)」コマンドを発行する。
+DSPを使用していなくても必ずミキサはセットしてください。</td></tr>
+</table><p>
+　マップチェンジが終わっていれば、いつでもシーケンスの再生を行うことができます。シーケンスの再生は、シーケンス再生をコントロールするサウンドコントロールコマンド（シーケンススタート、シーケンスストップ、等）を発行してください。<p>
+<note role="caution">
+注意１：まだ音が鳴っている途中でエリアマップを切り替えたり、使用中のサウンドデータを入れ替えたりするとシステムが暴走する場合があります。</note><p>
+<note role="caution">
+注意２：DSPワークRAMはDSPの内部処理に使われていますので、DSPが動作中はDSPによって本領域の内容は常に書き換えられています。DSPワークRAMのサイズやアドレスが変わるようなエリアマップの変更時には注意が必要です。DSPが動いていると、直前までDSPワークRAMとして使っていた場所に転送したサウンドデータは破壊されます。　</note><p>
+
+<A NAME="09"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#08">▲</A><A HREF="#10">▼</A>
+<HR>
+<dl><dt><b><font size=5>●09H DIRECT MIDI CONTROL</font>
+<dd>ＭＩＤＩイベントをコマンドとして送る</b></dl>
+<dl compact>
+<dt>P1<dd>MIDI command word  　(00h-FFh)<p>
+<dt>P2<dd>MIDI channel word    (00h-FFh)<p>
+<dt>P3<dd>MIDI data 1 　　   　(00h-7Fh)<p>
+<dt>P4<dd>MIDI data 2 　　　   (00h-7Fh)<p>
+</dl>
+　サウンドドライバはMIDIメッセージで発音する音源ですから、シーケンスデータを作成することなく直接MIDIメッセージを与えることで発音させることもできます。本コマンドはそのためのインターフェースで、サウンドドライバに与えるメッセージブロックをパラメータとして持ちます。<br>
+メッセージブロックは、MIDIメッセージに発音開始時のパラメータを付加した4バイトのデータブロックで下図のような構成になっています。<p>
+
+<P><TABLE BORDER=1>
+<TR><TH></TH><TH>７</TH><TH>６</TH><TH>５</TH><TH>４</TH><TH>３</TH><TH>２</TH><TH>１</TH><TH>０</TH></TR>
+<TR ALIGN=CENTER><TH>0</TH><TD COLSPAN=5>Priority level</TD><TD COLSPAN=3>CMD</TD></TR>
+<TR ALIGN=CENTER><TH>1</TH><TD COLSPAN=3>KNo</TD><TD COLSPAN=5>MIDI Ch</TD></TR>
+<TR ALIGN=CENTER><TH>2</TH><TD COLSPAN=8>MIDI Data #1</TD></TR>
+<TR ALIGN=CENTER><TH>3</TH><TD COLSPAN=8>MIDI Data #2</TD></TR>
+</TABLE>
+
+
+<table border>
+<tr><td>Priority level</td><td>0-31</td><td>Sequence Start時の発音優先順位</td></tr>
+<tr><td>CMD</td><td>0-7</td><td>MIDI command</td></tr>
+<tr><td>KNo</td><td>0-7</td><td>発音管理番号</td></tr>
+<tr><td>MIDII Ch</td><td>0-31</td><td>MIDI channel</td></tr>
+<tr><td>MIDI data #1</td><td>0-127</td><td>MIDI data byte #1</td></tr>
+<tr><td>MIDI data #2</td><td>0-127</td><td>MIDI data byte #2</td></tr>
+</table>
+<p>
+実際のMIDI Eventとの対応<br>
+<table border>
+<tr><td>CMDの値</td><td>対応するMIDI Event</td></tr>
+<tr><td>0</td><td>(80h-8Fh) Note Off Event</td></tr>
+<tr><td>1</td><td>(90h-9Fh) Note On Event</td></tr>
+<tr><td>2</td><td>(A0h-AFh) After Touch</td></tr>
+<tr><td>3</td><td>(B0h-BFh) Control Change</td></tr>
+<tr><td>4</td><td>(C0h-CFh) Program Change</td></tr>
+<tr><td>5</td><td>(D0h-DFh) Channel Pressure</td></tr>
+<tr><td>6</td><td>(E0h-EFh) Pitch Wheel</td></tr>
+<tr><td>7</td><td>(F0h-FFh) System Massage</td></tr>
+</table>
+<p>
+メッセージブロック4バイトをそのままパラメータの P1,P2,P3,P4 として「MIDIダイレクトコントロール(09h)」コマンドを発行します。但し下記のような長所・短所がありますので、サウンドクリエータと良く相談した上でよりよい方法を選択してください。<p>
+長所
+<ul>
+<li>シーケンスデータにあらかじめ持てないようなリアルタイムなコントロールが可能。
+<li>シーケンスの作成から圧縮等、データ作成の作業がいらない。
+<li>圧縮・解凍の処理を省けるので付加がかからない。
+</ul>
+短所
+<ul>
+<li>何でもできる代わりに、場合によってはかなりの内容を理解した上で高度なプログラムを組まなければなりません。（MIDIのチャンネルと対応する音色、DSPプログラムとミキサーの仕様等の関係がわかっていないと正しく利用できませんので、サウンドクリエータとのすりあわせが必要です）
+</ul>
+<p>
+
+<A NAME="10"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#09">▲</A><A HREF="#11">▼</A>
+<HR>
+<dl><dt><b><font size=5>●0AH START VOLUME ANALYZER</font>
+<dd>Digital Audio Inの入力レベル解析開始</b></dl>
+<dl compact>
+<dt><dd>パラメータなし<p>
+</dl>
+
+<A NAME="11"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#10">▲</A><A HREF="#12">▼</A>
+<HR>
+<dl><dt><b><font size=5>●0BH STOP VOLUME ANALYZER</font>
+<dd>Digital Audio Inの入力レベル解析終了</b></dl>
+<dl compact>
+<dt><dd>パラメータなし<p>
+</dl>
+
+<A NAME="12"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#11">▲</A><A HREF="#13">▼</A>
+<HR>
+<dl><dt><b><font size=5>●0CH DSP STOP</font>
+<dd>DSPの停止、初期化</b></dl>
+<dl compact>
+<dt><dd>パラメータなし<p>
+</dl>
+
+<A NAME="13"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#12">▲</A><A HREF="#14">▼</A>
+<HR>
+<dl><dt><b><font size=5>●0DH ALL NOTE OFF</font>
+<dd>全発音停止</b></dl>
+<dl compact>
+<dt><dd>パラメータなし<p>
+</dl>
+<note role="caution">註：緊急事態用ですので通常は使用しないでください。</note><p>
+
+<A NAME="14"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#13">▲</A><A HREF="#15">▼</A>
+<HR>
+<dl><dt><b><font size=5>●0EH SEQUENCE PAN</font>
+<dd>ゲーム上からPANPOTをコントロールする</b></dl>
+<dl compact>
+<dt>P1<dd>発音管理番号 (0-7)<p>
+<dt>P2<dd>第７ビットがスイッチとなっています。シーケンスPANのコントロールを行うか、行わないかを指示するビットです。0 でシーケンスPANのコントロールを行います。1 ならコントロールは行いません。ビット６から０はMIDIが取りうるPANデータの値です（0〜7FH）<p>
+</dl>
+MIDI PANデータの詳細（SCSPのPANとの対応）<br>
+<table border width="100%">
+<tr align="center"><td>MIDI PAN</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td></tr>
+<tr align="center"><td>00h - 0Fh</td><td>1Fh</td><td>1Fh</td><td>1Fh</td><td>1Fh</td><td>1Eh</td><td>1Eh</td><td>1Eh</td><td>1Eh</td><td>1Dh</td><td>1Dh</td><td>1Dh</td><td>1Dh</td><td>1Ch</td><td>1Ch</td><td>1Ch</td><td>1Ch</td></tr>
+<tr align="center"><td>10h - 1Fh</td><td>1Bh</td><td>1Bh</td><td>1Bh</td><td>1Bh</td><td>1Ah</td><td>1Ah</td><td>1Ah</td><td>1Ah</td><td>19h</td><td>19h</td><td>19h</td><td>19h</td><td>18h</td><td>18h</td><td>18h</td><td>18h</td></tr>
+<tr align="center"><td>20h - 2Fh</td><td>17h</td><td>17h</td><td>17h</td><td>17h</td><td>16h</td><td>16h</td><td>16h</td><td>16h</td><td>15h</td><td>15h</td><td>15h</td><td>15h</td><td>14h</td><td>14h</td><td>14h</td><td>14h</td></tr>
+<tr align="center"><td>30h - 3Fh</td><td>13h</td><td>13h</td><td>13h</td><td>13h</td><td>12h</td><td>12h</td><td>12h</td><td>12h</td><td>11h</td><td>11h</td><td>11h</td><td>11h</td><td>10h</td><td>10h</td><td>10h</td><td>10h</td></tr>
+<tr align="center"><td>40h - 4Fh</td><td>00h</td><td>00h</td><td>00h</td><td>00h</td><td>01h</td><td>01h</td><td>01h</td><td>01h</td><td>02h</td><td>02h</td><td>02h</td><td>02h</td><td>03h</td><td>03h</td><td>03h</td><td>03h</td></tr>
+<tr align="center"><td>50h - 5Fh</td><td>04h</td><td>04h</td><td>04h</td><td>04h</td><td>05h</td><td>05h</td><td>05h</td><td>05h</td><td>06h</td><td>06h</td><td>06h</td><td>06h</td><td>07h</td><td>07h</td><td>07h</td><td>07h</td></tr>
+<tr align="center"><td>60h - 6Fh</td><td>08h</td><td>08h</td><td>08h</td><td>08h</td><td>09h</td><td>09h</td><td>09h</td><td>09h</td><td>0Ah</td><td>0Ah</td><td>0Ah</td><td>0Ah</td><td>0Bh</td><td>0Bh</td><td>0Bh</td><td>0Bh</td></tr>
+<tr align="center"><td>70h - 7Fh</td><td>0Ch</td><td>0Ch</td><td>0Ch</td><td>0Ch</td><td>0Dh</td><td>0Dh</td><td>0Dh</td><td>0Dh</td><td>0Eh</td><td>0Eh</td><td>0Eh</td><td>0Eh</td><td>0Fh</td><td>0Fh</td><td>0Fh</td><td>0Fh</td></tr>
+</table>
+<p>
+○ 表内の値がSCSPのPANデータ（00h-1Fh:32段階）です。<br>
+○ MIDI PANデータは128段階ですので、SCSPのPANデータに変換する際に下位2ビットは無視されます。<p>
+<table border>
+<tr><td><pre>
+ Left　　　　　　　　　Center　　　　　　　　　 Right
+ 00h ←−−−−−−−→ 40h  ←−−−−−−−→ 7Fh
+</pre></td></tr>
+</table>
+<p>
+SCSP PANとMIDI PANの対応表<br>
+<table border>
+<tr arign="center"><td>PAN</td><td>L (db)</td><td>R (db)</td><td>定位</td><td> </td><td>PAN</td><td>L (db)</td><td>R (db)</td><td>定位</td></tr>
+<tr arign="center"><td>00h</td><td>-00.0</td><td>-00.0</td><td>C</td><td> </td><td>10h</td><td>-00.0</td><td>-00.0</td><td>C</td></tr>
+<tr arign="center"><td>01h</td><td>-03.0</td><td>-00.0</td><td>R1</td><td> </td><td>11h</td><td>-00.0</td><td>-03.0</td><td>L1</td></tr>
+<tr arign="center"><td>02h</td><td>-06.0</td><td>-00.0</td><td>R2</td><td> </td><td>12h</td><td>-00.0</td><td>-06.0</td><td>L2</td></tr>
+<tr arign="center"><td>03h</td><td>-09.0</td><td>-00.0</td><td>R3</td><td> </td><td>13h</td><td>-00.0</td><td>-09.0</td><td>L3</td></tr>
+<tr arign="center"><td>04h</td><td>-12.0</td><td>-00.0</td><td>R4</td><td> </td><td>14h</td><td>-00.0</td><td>-12.0</td><td>L4</td></tr>
+<tr arign="center"><td>05h</td><td>-15.0</td><td>-00.0</td><td>R5</td><td> </td><td>15h</td><td>-00.0</td><td>-15.0</td><td>L5</td></tr>
+<tr arign="center"><td>06h</td><td>-18.0</td><td>-00.0</td><td>R6</td><td> </td><td>16h</td><td>-00.0</td><td>-18.0</td><td>L6</td></tr>
+<tr arign="center"><td>07h</td><td>-21.0</td><td>-00.0</td><td>R7</td><td> </td><td>17h</td><td>-00.0</td><td>-21.0</td><td>L7</td></tr>
+<tr arign="center"><td>08h</td><td>-24.0</td><td>-00.0</td><td>R8</td><td> </td><td>18h</td><td>-00.0</td><td>-24.0</td><td>L8</td></tr>
+<tr arign="center"><td>09h</td><td>-27.0</td><td>-00.0</td><td>R9</td><td> </td><td>19h</td><td>-00.0</td><td>-27.0</td><td>L9</td></tr>
+<tr arign="center"><td>0Ah</td><td>-30.0</td><td>-00.0</td><td>R10</td><td> </td><td>1Ah</td><td>-00.0</td><td>-30.0</td><td>L10</td></tr>
+<tr arign="center"><td>0Bh</td><td>-33.0</td><td>-00.0</td><td>R11</td><td> </td><td>1Bh</td><td>-00.0</td><td>-33.0</td><td>L11</td></tr>
+<tr arign="center"><td>0Ch</td><td>-36.0</td><td>-00.0</td><td>R12</td><td> </td><td>1Ch</td><td>-00.0</td><td>-36.0</td><td>L12</td></tr>
+<tr arign="center"><td>0Dh</td><td>-39.0</td><td>-00.0</td><td>R13</td><td> </td><td>1Dh</td><td>-00.0</td><td>-39.0</td><td>L13</td></tr>
+<tr arign="center"><td>0Eh</td><td>-42.0</td><td>-00.0</td><td>R14</td><td> </td><td>1Eh</td><td>-00.0</td><td>-42.0</td><td>L14</td></tr>
+<tr arign="center"><td>0Fh</td><td>-  ∞</td><td>-00.0</td><td>R15</td><td> </td><td>1Fh</td><td>-00.0</td><td>-  ∞</td><td>L15</td></tr>
+</table>
+<p>
+
+<A NAME="15"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#14">▲</A><A HREF="#16">▼</A>
+<HR>
+<dl><dt><b><font size=5>●10H SOUND INITIALIZE</font>
+<dd>サウンドドライバの初期化を行なう</b></dl>
+<dl compact>
+<dt>P1<dd>全シーケンス再生の停止　　 (0-1)<p>
+<dt>P2<dd>全PCMストリーム再生の停止  (0-1)<p>
+<dt>P3<dd>CD-DA再生の停止            (0-1)<p>
+<dt>P4<dd>DSPの初期化          　    (0-1)<p>
+<dt>P5<dd>Mixerの初期化       　　   (0-1)<p>
+</dl>
+* P1からP5はすべて01hで実行指示です。00hの時は何もしません。<p>
+　サウンドイニシャル (10h) コマンドのＰ１からＰ５の値は、０１Ｈの時該当処理を実行、それ以外の値の時は無視されます。このコマンドは主にＭＡＰチェンジ発行の直前に設定することを目的としています。<p>
+Ｐ１からＰ５の詳細<p>
+<ul>
+<li type=square>　Ｐ１の実行指示(01h)により、現在発音中の全てのシーケンスに対してその停止を実行します。これによる他の音（ＰＣＭストリーム再生、ＣＤ−ＤＡ再生）への影響はありません。
+<li type=square>　Ｐ２の実行指示(01h)により、現在発音中の全てのＰＣＭストリーム再生に対してその停止を実行します。これによる他の音（シーケンス再生、ＣＤ−ＤＡ再生）への影響はありません。
+<li type=square>　Ｐ３の実行指示(01h)により、ＣＤ-ＤＡの入力成分[EXTS0],[EXTS1]に対してそのダイレクト成分である[EFSDL]と[EFPAN]を "00H" にすることによりその出力をＯＦＦします。したがってエフェクトによりＣＤ−ＤＡ入力を加工して出力させている場合はその音量がＯＦＦされることはありません。これによる他の音（シーケンス再生、ＰＣＭストリーム再生）への影響はありません。<p>
+<dl compact><dt><dd>
+<table>
+<tr><td>Sound address</td><td>100217H.b ← 00H</td></tr>
+<tr><td></td><td>100237H.b ← 00H</td></tr>
+</table>
+</dl>
+<p>
+<li type=square>　Ｐ４の実行指示(01h)により、音源内蔵のＤＳＰ部を初期化します。実際にはＤＳＰレジスタに下記のデータを設定し、エフェクト成分の出力をＯＦＦすると共に、ＤＳＰがＤ−ＲＡＭへアクセス（Ｒ／Ｗ）することを禁止させます。またこの時ミキサーの初期化も実行されますが復帰させます。これによる他の音（シーケンス再生、ＣＤ−ＤＡ再生、ＰＣＭストリームの各ダイレクト成分）への影響はありません。
+<dl compact><dt><dd>
+<table>
+<tr><td>[IMXL]</td><td>← 00H</td></tr>
+<tr><td>[EFSDL],[EFPAN]</td><td>← 00H</td></tr>
+<tr><td>[MPRO]</td><td>← 00000000H</td></tr>
+<tr><td>[COEF]</td><td>← 000H</td></tr>
+<tr><td>[TEMP]</td><td>← 000000H</td></tr>
+</table>
+</dl>
+<p>
+<li type=square>　Ｐ５の実行指示(01h)により、ミキサー部である全ての[EFREG]に対して[EFSDL]=[EFPAN]=0を書込み、エフェクト成分を出力しないようにします。これによる他の音（シーケンス再生、ＣＤ−ＤＡ再生、ＰＣＭストリームの各ダイレクト成分）への影響はありません。
+</ul>
+<p>
+
+<A NAME="16"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#15">▲</A><A HREF="#17">▼</A>
+<HR>
+<dl><dt><b><font size=5>●11H YAMAHA 3D CONTROL</font>
+<dd>YAMAHA  3D soundのコントロール</b></dl>
+<dl compact>
+<dt>P1<dd>距離(0-127)　YAMAHA3Dサウンドの、リスニングポイントから仮想音源までの距離です。<br>
+値が0で距離は0で、値が大きくなるほど距離が離れます。<p>
+<dt>P2<dd>方位 (0-127)　YAMAHA3Dサウンドの、リスニングポイントから見た仮想音源の方位です。<br>
+値が0で右0度、32で右90度、64で右180度、96で右270度です。<p>
+<dt>P3<dd>高さ (0-127)　YAMAHA3Dサウンドの、リスニングポイントから見た仮想音源の高さです。<br>
+値が0で真下、32で目の高さ、64で真上、96で後方の目の高さです。<p>
+</dl>
+
+<A NAME="17"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#16">▲</A><A HREF="#18">▼</A>
+<HR>
+<dl><dt><b><font size=5>●12H QSOUND CONTROL</font>
+<dd>Qsound　コントロール</b></dl>
+<dl compact>
+<dt>P1<dd>チャンネル番号(0-7)　Qサウンドのコントロールを行うチャンネルの番号です。<br>
+最大8チャンネルですので0から7を指定します。<p>
+<dt>P2<dd>PAN Position(0-30)　QサウンドのPAN位置の指定です。0で左90度、15で中央、30で右90度の左右15段階です。<p>
+</dl>
+
+<A NAME="18"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#17">▲</A><A HREF="#19">▼</A>
+<HR>
+<dl><dt><b><font size=5>●13H YAMAHA 3D INITIALIZE</font>
+<dd>YAMAHA 3D,Qsound　定位の初期化</b></dl>
+<dl compact>
+<dt><dd>パラメータなし<p>
+</dl>
+
+<A NAME="19"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#18">▲</A><A HREF="#20">▼</A>
+<hr>
+<dl><dt><b><font size=5>●14H TEMPO MODE</font>
+<dd>　</b></dl>
+<dl compact>
+<dt>P1<dd>テンポモード(0/plus/minus)　シーケンス再生中にテンポチェンジをおこなった場合，
+従来ではシーケンスループ時に元のテンポに戻されます．
+このバージョンでは，それを回避するためにいくつかのテンポモードを用意しました．<p>
+<dt>0：通常モード<dd>従来通りのテンポ処理を行います．<p>
+<dt>1 - 127：無視モード<dd>シーケンス中のテンポ変更を無視します．ホストコマンドのみで
+テンポコントロールが可能です．<p>
+<dt>128 - 255：相対テンポモード<dd>シーケンス中のテンポ変更はすべて効きます．ホスト側はそれに
+対する相対値をTEMPO RATIOコマンドにて設定します．ちょうどシーケンスによるテンポの変化を
+TEMPO RATIOコマンドによってシフトしたような状態になります．<p>
+</dl>
+
+<A NAME="20"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#19">▲</A><A HREF="#21">▼</A>
+<hr>
+<dl><dt><b><font size=5>●15H TEMPO RATIO</font>
+<dd>相対テンポ値の設定</b></dl>
+<dl compact>
+<dt>P1-P2<dd>相対テンポ値(+32767 --> -32768)　基準テンポ値(0000h)に対する相対テンポ値です。1000h(4096)ごとに2倍のテンポ、マイナス時には2分の1のテンポになります。言い換えれば、テンポが2倍（または2分の1）になるまでの間を、4096段階の精度でコントロールできるということになります。0が基準テンポですので、0000hを指定することでいつでも元のテンポに戻ることができます。<p>
+</dl>
+
+<A NAME="21"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#20">▲</A><A HREF="#22">▼</A>
+<HR>
+<dl><dt><b><font size=5>●80H CD-DA LEVEL</font>
+<dd>CD-DAのレベルを調整</b></dl>
+<dl compact>
+<dt>P1<dd>CD-DA Level Left 8段階 (00h-E0h)　 CD-DAの出力レベルの設定です。00hで最低音量(=Off)、E0hで最大音量の8段階です。<p>
+
+<P><CENTER><table border>
+<tr><td><pre> Off ←−−−−−−−−−→ Max 
+ 00h,20h,40h,60h,80h,A0h,C0h,E0h </pre></td></TR></table></CENTER></P>
+
+<p>
+<dt>P2<dd>CD-DA Level Right 8段階 (00h-E0h)　CD-DAの出力PANの設定です。<p>
+8段階の詳細： (off) 00h,20h,40h,60h,80h,A0h,C0h,E0h (MAX)<p>
+</dl>
+<p>
+　CD-DA再生は、CDの音声トラックの音声データをハード的に直接出力する方法です。これはテープレコーダーの原理と同じ事で、録音した音声をそのまま再生するものです。CDから読み出された音声データは自動的にSCSPへと流し込まれますので、あとはSCSPのCD-DAレベルを設定するだけで音声の出力が開始します。
+
+<P ALIGN=CENTER><B>CD-DAの流れ</B><BR><img srcset="../image/sdcdda_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+　CD-DAの再生は、CDドライブからの音声データ読み出しと、SCSPからの音声出力の設定で行います。<br>
+音声データ読み出しは、システムライブラリの「CDCライブラリ」を使用します。下記の2つの関数を呼び出すことで音声データの読み出しを行うことができます。CDCライブラリの詳細は、CDCライブラリのユーザーズマニュアルを参照してください。<p>
+　SCSPからの音声出力の設定は、サウンドコントロールコマンドの「CD-DA Level (80h)」コマンドと、「CD-DA Pan (81h)」コマンドで行ってください。音声データはCDインターフェースから直接SCSPに転送され、そのまま音声として出力されます。従ってメインシステムはCDインターフェースに対して再生のリクエストを出すだけで、データの読み込みやサウンドメモリへの転送等は一切必要ありません。メインシステムとサウンドシステムにとってもっとも負荷のかからない再生方法ですが、再生中は連続してCD を占有してしまいます。つまり音を出すこと以外にCDのアクセスができなくなってしまいます。但しそれが許されるような場合には、本サウンドシステムにおける最大のクオリティーを実現することが可能となります。<br>
+　周波数とデータ幅は44.1KHzの16bit固定でCD規格と同等のもので、再生時にピッチやテンポ等の変更をすることができません。同時に、このクオリティーを実現するためには非常に大量な音声データを必要としますので、通常の音楽CDがそうであるように1枚のCDには10曲から20曲程度しか入りません。実際にはゲームプログラムや画像データ等が入りますので、曲としては5-6曲程度しか入りません。<p>
+　CD-DAのデータはPCMの音声波形データそのものです。従ってCD-DAデータは、録音されたPCM波形データをそのままデータファイルとして持ちます。非常に大きなデータですが、加工や細工の必要がない最もシンプルな音声データです。<br>
+　CD-DAのデータはSEGAが提供しているサウンドツールの波形エディタや、市販の波形編集ツール等で作成することができます。44.1KHzで16bitステレオのPCMデータが出力できれば、ツールはなんでもかまいません。曲や効果音を直接デジタル録音する方法と、アナログ音声等をデジタルに変換する方法とがあります。モノラルの場合にはLchとRchに同じデータが入ります。<p>
+
+<P><CENTER><TABLE BORDER=1><CAPTION><B>CD-DAデータフォーマット</B></CAPTION>
+<TR><TH ROWSPAN=4>Data 1</TH>
+		<TD><PRE>Lch  low(8bit)</TD></TR>
+<TR>	<TD><PRE>Lch high(8bit)</TD></TR>
+<TR>	<TD><PRE>Rch  low(8bit)</TD></TR>
+<TR>	<TD><PRE>Rch high(8bit)</TD></TR>
+<TR><TH ROWSPAN=4>Data 2</TH>
+		<TD><PRE>Lch  low(8bit)</TD></TR>
+<TR>	<TD><PRE>Lch high(8bit)</TD></TR>
+<TR>	<TD><PRE>Rch  low(8bit)</TD></TR>
+<TR>	<TD><PRE>Rch high(8bit)</TD></TR>
+<TR><TH><PRE>:<BR>:<BR>:<BR>:<BR>:</TH>
+		<TH><PRE>:<BR>:<BR>:<BR>:<BR>:</TH></TR>
+<TR><TH ROWSPAN=4>Data n</TH>
+		<TD><PRE>Lch  low(8bit)</TD></TR>
+<TR>	<TD><PRE>Lch high(8bit)</TD></TR>
+<TR>	<TD><PRE>Rch  low(8bit)</TD></TR>
+<TR>	<TD><PRE>Rch high(8bit)</TD></TR>
+</TABLE></CENTER></P>
+
+注意１：各種ツールが出力するPCM波形データは、ツールによって16ビットの Low/High 関係が反対になっている場合があります。一般的にはインテル系CPUでは Low/High 、モトローラ系では High/Low となっていますので、モトローラ系フォーマットの場合にはインテル系フォーマットに変換してください。必要に応じてデータのLow/Highを反対にするようなツールを用意しておくと便利です。<p>
+注意２：CD-DAに対してDSP（エフェクト）を使用する場合には、ミキサの設定が必要です。DSPを使用する場合には必要なミキサデータを用意して、「Mixer Change (87h)」のコマンドを発行してください。シーケンス再生がないような場合でも、ミキサ設定のための音色データが必要になります。<p>
+
+<A NAME="22"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#21">▲</A><A HREF="#23">▼</A>
+<HR>
+<dl><dt><b><font size=5>●81H CD-DA PAN</font>
+<dd>CD-DA出力Panpotの設定</b></dl>
+<dl compact>
+<dt>P1<dd>CD-DA PAN Left  32段階 (0-31)<p>
+<dt>P2<dd>CD-DA PAN Right 32段階 (0-31)<p>
+</dl>
+
+<A NAME="23"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#22">▲</A><A HREF="#24">▼</A>
+<HR>
+<dl><dt><b><font size=5>●82H TOTAL VOLUME</font>
+<dd>トータルボリュームの設定</b></dl>
+<dl compact>
+<dt>P1<dd>トータルボリューム　16段階 (0-15)　SCSPのトータルボリューム（全ての再生に対する全体的な音量）の設定です。0で最低音量(=Off)、15で最大音量の16段階です。<p>
+</dl>
+
+<A NAME="24"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#23">▲</A><A HREF="#25">▼</A>
+<HR>
+<dl><dt><b><font size=5>●83H EFFECT CHANGE</font>
+<dd>エフェクトの切り換え</b></dl>
+<dl compact>
+<dt>P1<dd>エフェクトバンク番号(0-15)　現在のエリアマップ内にDSPバンク（DSPマイクロプログラムの格納エリア）が複数個ある場合に、先頭から何番目のDSPバンクであるかを指定します。1つのエリアマップには最大16のDSPバンクまでを持てますので、0から15のいずれかの値となります。DSPバンクが1つしかない場合には常に0です。<p>
+</dl><p>
+
+<A NAME="25"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#24">▲</A><A HREF="#26">▼</A>
+<HR>
+<dl><dt><b><font size=5>●85H START PCM STREAM</font>
+<dd>PCMストリーム再生開始</b></dl>
+<dl compact>
+<dt>P1<dd>bit7<br>
+0: mono  1:stereo<p>
+<dt><dd>bit6-5<br>
+未使用<p>
+<dt><dd>bit4<br>
+0: 16bitPCM  1: 8bitPCM<p>
+<dt><dd>bit3-0<br>
+再生開始 PCMストリーム再生番号(0-7)  PCMストリーム再生は同時に最大で8ストリームまでを再生できますので、PCMストリームの再生番号を0から7で指定します。ステレオ時には1つの再生番号で、Lch/Rchの２つのストリームを再生しますので注意が必要です。モノラルとステレオの合計として最大8ストリームまでですので、8ストリームを越えるような場合にはコマンドは無視されます。<p>
+<dt>P2<dd>bit7-5<br>
+ダイレクト音 出力レベル  8段階  (0-7)　ダイレクト音の出力レベル設定です。0で最低音量(=Off)、7で最大音量の8段階です。<p>
+<dt><dd>bit4-0<br>
+ダイレクト音 出力PAN  32段階 (0-31)　ダイレクト音の出力PAN設定です。詳細13ページのSEQUENC PANの項を参照してください。<p>
+<dt>P3-P4<dd>PCMストリームバッファスタートアドレス (0000h-FFFFh)　PCMストリームバッファ の先頭アドレスです。20ビットアドレスの上位16bitを指定します。<p>
+<dt>P5-P6<dd>PCMストリームバッファサイズ (0000h-FFFFh)　PCMストリームバッファ のサイズです。1ch分のサンプル数ですので、MONO時でもSTEREO時でも16bitでも8bitでも同じ値が入ります。<p>
+<dt>P7-P8<dd>pitch word (0000h-7FFFh)　　 SCSPのピッチレジスタの値(16ビット)をそのまま指定します。<p>
+
+<P><CENTER><TABLE BORDER=1>
+<CAPTION><B>Pitch Word(16bit)の構成</B></CAPTION>
+<TR><TH><PRE>15</TH><TH><PRE>14</TH><TH><PRE>13</TH><TH><PRE>12</TH><TH><PRE>11</TH><TH><PRE>10</TH><TH><PRE>９</TH><TH><PRE>８</TH><TH><PRE>７</TH><TH><PRE>６</TH><TH><PRE>５</TH><TH><PRE>４</TH><TH><PRE>３</TH><TH><PRE>２</TH><TH><PRE>１</TH><TH><PRE>０</TH>
+<TR ALIGN=CENTER><TD>0</TD><TD COLSPAN=4>OCT</TD><TD>0</TD><TD COLSPAN=10>FNS</TD></TR>
+</TABLE></CENTER></P>
+
+
+OCT : オクターブを2 の補数で指定します。-8オクターブから+7オクターブまでが指定できます。<br>
+FNS : 基準ピッチ（0）から1オクターブ上（1023）までの間を1024段階で指定します。<br>
+ビット15,ビット10は常に0です。<p>
+<dt>P9<dd>bit7-3<br>
+エフェクト 入力チャンネル(0-15)   【P9=Rch】　DSPの16ch Effect In の選択です。DSPのエフェクト入力は16チャンネルありますので0から15を指定します。「第６章　補足説明　６−７　DSPとミキサー」の項に詳細な説明がありますので参照してください。<p>
+<dt><dd>bit2-0<br>
+エフェクト 入力レベル  8段階(0-7)　エフェクト入力チャンネルへ送り込むダイレクト音のレベルを0から7で指定します。0で最低レベル(=Off)、7で最大レベルの8段階です。<p>
+<dt>P10<dd>bit7-3<br>
+エフェクト 入力チャンネル(0-15)   【P10=Lch】<p>
+<dt><dd>bit2-0<br>
+エフェクト 入力レベル  8段階(0-7)<p>
+<dt>P11<dd>トータルレベル 256段階 (max:00h-FFh:min)　ストリーム再生に使用しているスロットのトータルレベルです。ダイレクト音 出力レベルよりも細かい音量調節ができます。<p>
+</dl>
+　PCMストリーム再生は、PCM波形データをループ再生させながら再生が終わった部分に次の波形データを書き込むという処理を連続して行うことにより、長いPCM波形データを再生させる方法です。話し声や長い効果音、録音されたBGM等サウンドメモリに入り切らない長いPCM波形データを再生できます。
+　現在波形データのどの部分を再生中かを知ることができますので、再生が終わった部分に次の波形データを書き込みます。下図のような場合は、波形データAの再生が終わって波形データBを再生中に、波形データAの部分に次の波形データを書き込みます。この処理を繰り返すことでどんな長い波形データでも連続再生する事ができます。
+
+<P ALIGN=CENTER><img srcset="../image/sndstrm_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><BR><B>A,B,A,B,A,B.....と連続してループ再生されます</B></P>
+
+　PCMストリーム再生は下記の手順で行ってください。また、ステレオ時には下記の処理を左チャンネルと右チャンネルの２チャンネル分行う必要があります。<p>
+<table border>
+<tr><th>順番</th><th>処理</th>
+<tr><td>1</td><td>波形データA、波形データB の領域に最初の波形データを転送します。</td></tr>
+<tr><td>2</td><td>サウンドコントロールコマンドの「PCM start (85h)」コマンドを発行します。</td></tr>
+<tr><td>3</td><td>波形データAの再生が終わったら、波形データAの領域に次の波形データを転送します。</td></tr>
+<tr><td>4</td><td>波形データBの再生が終わったら、波形データBの領域に次の波形データを転送します。</td></tr>
+<tr><td>5</td><td>上記3,4の動作を繰り返します</td></tr>
+<tr><td>6</td><td>終了する場合にはサウンドコントロールコマンドの「PCM stop (86h)」コマンドを発行します。</td></tr>
+</table><p>
+注意：バッファのサイズ・転送の方法・転送のタイミング等はメインシステムの自由ですので、上記の手順にとらわれずに、場面に応じた最適な方法を選択してください。<p>
+<h4>データエリアの持ち方</h4>
+　PCMストリーム再生を行うためには、PCM波形データを再生させるためのデータエリア（PCMストリームバッファ）が必要です。PCMストリームバッファは、サウンドメモリ上の任意の場所を指定できます。通常は音色データ、曲データ等で使っていない部分を利用しますが、PCMストリーム再生と同時に使用しない音色バンク等があればその領域も使用可能です。<br>
+現在の再生位置は4Kサンプル単位で知ることができます。従って最低でも4Kサンプルのバッファを2面持つことでPCMストリーム再生を行うことができます。PCMストリームバッファのサイズは1チャンネルで最大64Kサンプルまで取れますので、この範囲内で自由に設定できます。<p>
+<h4>バッファ書き換えのタイミング</h4>
+　PCMストリーム再生が開始すると、ホストインターフェースワークに現在の波形再生位置が書き込まれます。再生位置は0から15までの数値で、再生開始時は値が0で、4Kサンプル再生が進むごとに1だけカウントアップします。バッファの最後まで再生が終わるとまたバッファの先頭から再生を繰り返しますので、この時点で再生位置の値は0に戻ります。<p>
+<table border>
+<tr align="center"><td>バッファの持ち方の例</td><td>再生位置の値</td></tr>
+<tr><td>4Kサンプルのバッファを2面もった場合</td><td>0, 1, 0, 1, 0, 1 ...</td></tr>
+<tr><td>4Kサンプルのバッファを3面もった場合</td><td>0, 1, 2, 0, 1, 2, 0, 1, 2 ...</td></tr>
+<tr><td>4Kサンプルのバッファを16面もった場合</td><td>0, 1, 2, 3 - - - - 12, 13, 14, 15, 0, 1, 2, 3 ...</td></tr>
+</table><p>
+　メインシステムはこの再生位置を監視して次の波形データを転送してください。PCMストリームバッファは最大64Kサンプルまで取れますから、最低2面から最大16面までの範囲で選択が可能です。<br>
+　また、再生位置が更新されたタイミングでメインシステムに対して割り込みを発生させることも可能ですので、必要な場合にはこれを利用してください。システムインターフェースワークに本割り込みのコントロール情報がありますので、設定内容は「７システムインターフェースワーク」の項を参照してください。<p>
+<h4>転送時の負荷</h4>
+　PCM再生スロットはハード的に44.1KHz固定ですので、再生開始から22.68usecごとに１サンプルを再生します。言い換えれば再生開始後は、1チャンネルにつき1秒間に44,100サンプル分の波形データを補給し続けなけなりません。8ビットPCMなら44,100バイト、16ビットPCMなら88,200バイトとなります。<br>
+　CDからの読み出しとサウンドメモリへの転送を含めて、この転送にかかる時間がメインシステムの負荷と言うことになります。転送時間はメインシステムのハードウェアに依存しますので、CDの回転待ち、シーク時間、SH（またはDMA）の転送クロックと転送バイト数で計算できます。<br>
+　但し、上記のバイト数は44.1KHz時のデータ量ですので、例えば半分の22KHzで良いような場合にはデータ量はその半分で済みますので、転送の負荷も半分になります。逆にステレオ再生や複数チャンネルを同時に再生する場合にはその分だけ負荷は重くなります。<p>
+<h4>ステレオ再生</h4>
+　PCMストリーム再生はステレオ再生を行うことができます。ステレオ再生の場合は下記のようにモノラル時の2倍のメモリを使いますので注意が必要です。再生開始のコマンドパラメータで指定するバッファサイズは1チャンネル分のサンプル数ですので、実際はその2倍のエリアを用意してください。<p>
+
+<P ALIGN=CENTER><img srcset="../image/sdstrmbf_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<h4>44.1KHz以外の再生周波数への対応</h4>
+　SCSPはいつでも44.1KHzの周波数で波形データを再生しますので、これ以外の周波数の波形データを再生する場合にはピッチのパラメータで対応します。例えば半分の22KHzのものを再生する場合はそのままでは2倍のピッチで再生されてしまいますので再生ピッチを半分にして再生するともとのピッチで再生されます。<p>
+　ピッチは±8オクターブ(OCT)までの範囲で、さらに1オクターブの中を1024段階(FNS)まで分割できますので、この精度の範囲内でどんな周波数にでも対応可能ですが、実際には、そう変則的な設定は行なわれませんので、対応表に記します。<p>
+<table border>
+<tr align="center"><td>サンプリングレート</td><td>OCT</td><td>FNS</td><td>設定値</td></tr>
+<tr align="center"><td>44.1kHz</td><td>00</td><td>0000</td><td>0000</td></tr>
+<tr align="center"><td>32kHz</td><td>0F</td><td>01CE</td><td>79CE</td></tr>
+<tr align="center"><td>22kHz</td><td>0F</td><td>0000</td><td>7800</td></tr>
+<tr align="center"><td>16kHz</td><td>0E</td><td>01CE</td><td>71CE</td></tr>
+<tr align="center"><td>11kHz</td><td>0E</td><td>0000</td><td>7000</td></tr>
+<tr align="center"><td>8kHz</td><td>0D</td><td>01CE</td><td>69CE</td></tr>
+<tr align="center"><td>5.5kHz</td><td>0D</td><td>0000</td><td>6800</td></tr>
+<tr align="center"><td>4kHz</td><td>0C</td><td>01CE</td><td>61CE</td></tr>
+</table><p>
+<ul>
+<li type=circle>連続転送時の注意<p>
+波形データの転送時は長時間の連続転送をさけてサウンドCPUが動作できるようにしてください。メインシステムがサウンドメモリをアクセスしている間はこちらが優先され、サウンドCPUは動作できませんので注意が必要です。連続転送が必要な場合には、最大でも1msec程度の転送に分割して行ってください。間をあけることによってサウンドCPUが動作可能となります。<p>
+<li type=circle>DSP使用時の注意<p>
+PCMストリーム再生にDSP（エフェクト）を使用する場合にはミキサの設定が必要です。DSPを使用する場合には必要なミキサデータを用意して、ミキサ設定のコマンドを発行してください。シーケンス再生がないような場合でも、ミキサ設定のための音色データが必要になります。<p>
+</ul>
+備考：1サンプルとはPCM波形データの最小単位データのことで、そのサイズはデータ幅に依存します。8ビットの場合は1バイトで、16ビットの場合は2バイトです。従って、4Kサンプルといった場合には8ビットPCMの場合には4096バイトで、16ビットPCMの場合には8192バイトとなります。<p>
+　PCMストリーム再生は機能的は８本まで可能となっていますが、現実的には処理能力の関係上、不可能といえます。ストリーム再生はサウンドCPU単体で稼働するものではありませんから、ゲームの処理スピードを考慮して、開発の初期段階から実験を重ねることをすすめます。ポリゴンによる演算にSH2を酷使しているようなゲームではフレームオーバーを引き起こす原因となる可能性がありますから特に注意してください。<p>
+
+<A NAME="26"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#25">▲</A><A HREF="#27">▼</A>
+<HR>
+<dl><dt><b><font size=5>●86H STOP PCM STREAM</font>
+<dd>PCMストリーム再生停止</b></dl>
+<dl compact>
+<dt>P1<dd>再生停止 PCMストリーム再生番号 (0-7)<p>
+</dl>
+
+<A NAME="27"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#26">▲</A><A HREF="#28">▼</A>
+<HR>
+<dl><dt><b><font size=5>●87H MIXER CHANGE</font>
+<dd>ミキサの切り換え</b></dl>
+<dl compact>
+<dt>P1<dd>音色データ   バンク番号 (0-15)　現在のエリアマップ内に音色バンク（音色データの格納エリア）が複数個ある場合に、それらを区別するための番号です。1つのエリアマップには最大16音色バンクまで持てますので、0から15のいずれかの値となります。（5-1-4 サウンドエリアマップCRNTワーク  マップ情報  参照）。<p>
+<dt>P2<dd>音色データ内 ミキサ番号 (0-127)　ひとつの音色データ内には複数のミキサデータを格納することができますので、音色データ内の先頭から何番目のミキサデータであるかを指定します。1つの音色データには最大で128ミキサまでを格納できますので、0から127のいずれかの値となります。ミキサデータが1つしかない場合には常に0です。<p>
+</dl>
+<h4>ミキサとは</h4>
+　ミキサは、SCSP音源の音量（ボリューム）と定位（左右への振り分け）のバランスをとるためのハードウェアです。音源自体は発音スロットとデジタルオーディオ入力の2種類だけですが、それぞれDSPを通すことができますので、ミキサは下記の4種類のミキサブロックに分けて考えることができます。<p>
+
+<P ALIGN=CENTER><B>ミキサーの構成</B><BR><img srcset="../image/sndmix_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+
+<dl compact>
+<dt>Slot Direct ミキサ<dd>： 発音スロットからのダイレクト（DSPを通さない）出力レベルとPAN
+<dt>CD-DA Direct ミキサ<dd>： CD-DAからのダイレクト（DSPを通さない）出力レベルとPAN
+<dt>Effect In ミキサ<dd>： DSPへの入力レベル
+<dt>Effect Out ミキサ<dd>： DSPからのエフェクト（DSPを通した）出力レベルとPAN
+</dl><p>
+　この中で「Slot Direct ミキサ」と「Effect In ミキサ」はすでに音色データ中で設定済みですので、特別にコントロールする必要はありません。また、「CD-DA Direct ミキサ」に関しては、専用の「CD-DA Level (80h)」・「CD-DA Pan (81h)」コマンドが用意してありますので、そちらでコントロールします。<p>
+　従って、本マニュアルで「ミキサ」と言えば、特別に上記の「Effect Out ミキサ」のことを意味します。本マニュアルで言うミキサとは、「DSPから出力される、16chのエフェクトレベルとPANの設定」のことです。<p>
+<h4>DSPとミキサ</h4>
+ミキサはDSPからの音の出口の設定です。従って、エフェクト処理が正常に動作してエフェクトが正しくかかっていても、正しいミキサを設定していないとエフェクト音は出力されません。ミキサはDSPの出力チャンネル16ch分の音量と定位を設定したデータで、音色データの一部としてサウンドクリエーターが作成します。<p>
+　また、DSPにはシーケンス再生・PCMストリーム再生・CD-DA再生の全ての音が入ってきますので、どの場面ではどのチャンネルに何の音が入ってきてどのチャンネルから出ていくかを正しく把握した上でコントロールしなければなりません。エフェクトの切り替えを行う場合には、対応するミキサはどれであるか、ミキサの仕様はどうなっているかを事前に確認しておきます。<p>
+　なお、MIDIのコントロールチェンジを使ってミキサの設定を行なう場合には、バンクセレクトができません。これはMIDIのフォーマットの都合上、バンク、ミキサ番号という２つの引数を一度に送信できないためです。したがって、ミキサ番号のみを送信することになりますが、そのときのバンクはバンクチェンジによってセレクトされているバンクに対して行なわれます。<p>
+
+<A NAME="28"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#27">▲</A><A HREF="#29">▼</A>
+<HR>
+<dl><dt><b><font size=5>●88H MIXER PARAMETER CHANGE</font>
+<dd>ミキサパラメータの切り換え</b></dl>
+<dl compact>
+<dt>P1<dd>エフェクト 出力チャンネル(0-17)　DSPの16ch Effect Out の選択です。DSPのエフェクト出力は16チャンネルありますので0から15を指定します。また、CD-DAを選択する場合には特別に、16(Lch)または17(Rch)を指定します。<p>
+<dt>P2<dd>bit7-5<br>
+エフェクト 出力レベル  8段階(0-7)　エフェクト出力チャンネルから出力されるエフェクト音のレベルを0から7で指定します。0で最低レベル(=Off)、7で最大レベルの8段階です。<p>
+<dt><dd>bit4-0<br>
+エフェクト 出力PAN   32段階(0-31)　エフェクト出力チャンネルから出力されるエフェクト音のPANを0から31で指定します。詳細は「第７章　付録　７−２　SCSP PAN（32段階）の詳細」の項を参照してください。<p>
+</dl>
+
+<A NAME="29"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#28">▲</A><A HREF="#30">▼</A>
+<HR>
+<dl><dt><b><font size=5>●89H HARDWARE CHECK</font>
+<dd>ハードウェアのチェック</b></dl>
+<dl compact>
+<dt>P1<dd>チェック項目<dl compact>
+<dt><dd>00h: DRAM 4Mbit read/write
+<dt><dd>01h: DRAM 8Mbit read/write
+<dt><dd>02h: SCSP MIDI
+<dt><dd>03h: 音源出力 (L/R)
+<dt><dd>04h: 音源出力 (L)
+<dt><dd>05h: 音源出力 (R)</dl>
+</dl>
+<p>
+　以下はハードチェック (89h) コマンドで行うチェック内容の詳細です。チェック時にはコマンドパラメータP1で0から5の値を指定をしますが、その値によって下記のチェックが行われます。チェックの結果はいずれも下記の値がシステムインターフェーステーブル（418h番地：word）に格納されます。<p>
+
+　7FFFH：Memory check Error<br>
+　8000H： Memory check Ok<p>
+<table border>
+<tr><td>00h</td><td>サウンド用Ｄ-ＲＡＭ（４Ｍビット）の read/write チェックを実行します。この時、内部でのメモリアクセスを禁止すべくＤＳＰは初期化されますので注意してください。<br>
+チェックは全ビットの low/high を write & read & compare し、その結果が システムインターフェーステーブル に格納されます。</td></tr>
+<tr><td>01h</td><td>サウンド用Ｄ-ＲＡＭ（８Ｍビット）の read/write チェックを実行します。他は上述の通り。
+<tr><td>02h</td><td>ＳＣＳＰ内蔵ＭＩＤＩの動作チェックを実行します。この時外部ＭＩＤＩ入出力端子を短絡させてください。チェックの結果は上述の通り。</td></tr>
+<tr><td>03h</td><td>矩形波がＬＲから出力されます。この時ＳＣＳＰのスロット０25B00000H が強制的に使用されますので注意してください。またこの音は数秒で自動的に off されます。またこのコマンドの発行に際してはMapデータ、曲データ、音色データは一切必要ありません。</td></tr>
+<tr><td>04h</td><td>矩形波がＬ側からのみ出力されます。他は上述の通り。</td></tr>
+<tr><td>05h</td><td>P1の値</td></tr>
+</table>
+<p>
+
+<A NAME="30"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#29">▲</A><A HREF="#31">▼</A>
+<HR>
+<dl><dt><b><font size=5>●8AH PCM PARAMETER CHANGE</font>
+<dd>再生中のPCMストリームに対してのパラメータ切り換え</b></dl>
+<dl compact>
+<dt>P1<dd>PCMストリーム再生番号(0-7)<p>
+<dt>P2<dd>bit7-5<br>
+ダイレクト音 出力レベル  8段階   (0-7)<p>
+<dt><dd>bit4-0<br>
+ダイレクト音 出力PAN  32段階　 (0-31) <p>
+<dt>P3-P4<dd>pitch word(0000h-FFFFh)<p>
+<dt>P5<dd>bit7-3<br>
+エフェクト 入力チャンネル(0-15)            【P5=Rch】<p>
+<dt><dd>bit2-0<br>
+エフェクト 入力レベル  8段階(0-7)<p>
+<dt>P6<dd>bit7-3<br>
+エフェクト 入力チャンネル(0-15)            【P6=Lch】<p>
+<dt><dd>bit2-0<br>
+エフェクト 入力レベル  8段階(0-7)<p>
+<dt>P7<dd>トータルレベル 256段階(max:00h-FFh:min)<p>
+</dl>
+
+<A NAME="31"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#30">▲</A><A HREF="#32">▼</A>
+<hr>
+<dl><dt><b><font size=5>●8BH PCM SLOT ALLOCATION</font>
+<dd>ＰＣＭストリーム用のスロットを確保する</b></dl>
+<dl compact>
+<dt>P1<dd>PCMストリーム再生番号(0-7)<p>
+</dl>
+<p>
+ＰＣＭストリームは固定スロットを使用しますが，
+シーケンス再生中，そのスロットを使用している場合があり，
+ＰＣＭストリームを開始させるとシーケンスの一部が強制的に
+ＯＦＦされることになります．
+このコマンドであらかじめＰＣＭスロットを確保しておけば，
+上記の問題は解決します。
+
+<A NAME="32"><HR></A>
+<a href="sndcmd0_j.htm#CommandList"><B>一覧</B></A><A HREF="#31">▲</A>■
+<hr>
+<dl><dt><b><font size=5>●8CH PCM SLOT RELEASE</font>
+<dd>ＰＣＭストリーム用スロットを解放する</b></dl>
+<dl compact>
+<dt>P1<dd>PCMストリーム再生番号(0-7)<p>
+</dl>
+確保しておいたスロットを解放し，シーケンス再生で使用できるようにします．
+
+<HR NOSHADE>
+<B>▲
+<a href="sndcmd0_j.htm">戻る</A>｜
+<a href="sndrequ_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no3">サウンドドライバプログラマーズガイド</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

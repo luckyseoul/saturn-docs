@@ -1,0 +1,215 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 5&gt;サウンド開発ノウハウ集/1.基本概要</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm#sndt"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#prog">SOUND Manual</A>
+★<A HREF="index.htm">サウンド開発ノウハウ集</A>
+<HR>
+<B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>サウンド開発ノウハウ集</B>
+<H2 ALIGN="CENTER">第1章　基本概要</H2>
+<HR NOSHADE>
+<UL TYPE=DISC>
+<P><LI>「<B><A HREF="../drve/index.htm">サウンドドライバVer.2.20プログラマーズガイド</A></B>」はプログラマ向けの技術資料です。ぜひ一度、目を通してください。サウンド処理上の重要な情報が、説明されています。</P>
+
+<P><LI>現在リリース直前というプロジェクト以外は、最新のサウンドドライバ（<B>Ver.2.04以降</B>）をかならず使用してください。データの互換性の問題から、それ以前のバージョンを使用せざるえない場合はバージョン1.33Bのみにかぎります。<br>
+データ制作時とゲームに組み込む時の、ドライバのバージョンも合わせてください。<BR>
+使用しているサウンドドライバのバージョンは、ドライバの先頭から1020h以降を16進数でダンプすると、ASCIIコードで記述されています。<BR>
+SndSimlator上から判別するには、アップルメニューの「このSndSimlatorについて」を開いてください。</P>
+
+<P><LI>思い通りにサウンドが動作しない、なにかトラブルが起こる場合に参照すべきものは、3つあります。
+<P><OL>
+	<LI>コマンド履歴
+	<LI>エラーステータスビット
+	<LI>モード、ステータス等の他のサウンドWORK RAMの情報</OL></P>
+これらについての詳細は「<B><A HREF="../drve/index.htm">サウンドドライバVer.2.20プログラマーズガイド</A></B>」を参照してください。</P>
+
+<P><LI>サウンドトラブル時の提出物についてトラブルを、
+<P><OL>
+	<LI>マックのツール上で再現できるトラブル
+	<LI>ツール上では正常だが、ゲームに組み込むと発生するトラブル</OL>
+に大別しますと、1の場合のトラブル時の提出物は<BR>
+マック上の開発時データ一式
+<P><OL TYPE=A>
+	<LI>サウンドシミュレータのマップファイル
+	<LI>TONEエディタの音色ファイル（.binファイルもあれば）
+	<LI>DSP Linkerの.YLIファイル（.EXBファイルもあれば）
+	<LI>シーケンサの出力した、STANDARD MIDI FILE（Type1）
+	<LI>説明のドキュメント</OL></P>
+
+2の場合はA、B、C、D、Eにくわえて</P>
+
+<P><OL START=6 TYPE=A>
+<P><LI>現象を再現できるCDーROMとその再現方法の説明</OL></P>
+
+をいただきたいと思います。</P>
+
+<P><LI>SH2からのサウンドコントロールの3つの方法
+<P><OL>
+	<LI>SBL（PCM、ADPCM再生ライブラリ含む）ライブラリの関数を使用
+	<LI>SGLライブラリの関数を使用
+	<LI>サウンドライブラリを使わないで直接コマンドエリアにコマンドを書く</OL></P>
+
+<P><LI>基本的にサウンドツールは、PowerMac, 68x00Macを問わず、Macintoshの機種の違いによって、動作に異常をきたすことはありません。サウンドツールのトラブルの最も大きな原因はSCSI関連によるものです。トラブルを極力回避するために、MacintoshとSound Box間は、最短で良質のSCSIケーブルで接続し、使用しないSCSI機器は接続しないようにしてください。また、CartDev.環境においてはMIDI信号とSCSI転送が同時に頻繁に行われるとフリーズしやすいので、なるべく避けてください。</P>
+
+<P><LI>SndSimulatorによってサウンドマップを転送し、サウンドドライバを起動した後でないとTONEエディタ、DSPリンカは動作しません。これは転送されたマップの音色BANK、DSPワークRAMの設定されたアドレスとサイズを参照してTONEエディタ、DSPリンカが機能しているためです。<BR>波形エディタはサウンドボックスのRAMをワークエリアとして使用しているだけですので、サウンドマップの転送や、サウンドドライバの起動は必要ありません。波形エディタ使用中はサウンドボックス背面の1から8までLEDのいくつかが点灯したままになりますが正常です。波形エディタはアドレス10000H以降をそのワークエリアとして使用し、破壊します。再度ToneエディタやDSPリンカを使用する場合は必要に応じてデータを転送し直してください。</P>
+
+<P><LI>サウンドシミュレータのPCMストリーム再生も、SCSIで転送してシミュレートしているため、実機と違う鳴り方をする可能性があります。この機能はあくまで簡易的なものと考えてください。</P>
+
+<P><LI>Sound Box(Sound Board System)においては Start upはサウンドドライバにGoをかけるだけで、サウンドドライバの転送はSndSimulator起動時に行われます。</P>
+
+<P><LI>SndSim2.0以降はDriverの1.29i以降でのみ動作します。それ以前のサウンドドライバの使用はできません。</P>
+         
+<P><LI>Sound Box(Sound Board System)の4組のLED(32K, 44.1K, 48K, PARITY, DE-EMPの表示）はどんな点灯状態でもサウンドツールの動作には影響ありません。32K, 44.1K, 48Kについては、サウンドボックスのオプティカル入力のサンプリングレイトに対応して点灯するものです。44.1kHz以外の入力は可能ですが動作は保証されませんので止めてください。</P>
+
+<P><LI>Sound Box(Sound Board System)背面のＬＥＤ仕様<BR>ブートＲＯＭ起動時にはＬＥＤ１から８に向かって光りながら移動点滅します。ＳＣＳＩを用いてデータを転送する期間、この動作が一瞬停止しますが転送終了後復活します。<BR>ターゲットにドライバを転送後、プログラムを実行させるとＬＥＤ１が点滅し、ＣＰＵが正常に動作していることを確認できます。</P>
+
+<P>ＬＥＤ１が点滅（ＣＰＵが正常に動作）している時における他のＬＥＤの点滅の意味を以下の通り。</p>
+<P><DL>
+<DD>ＬＥＤ２：ＣＰＵ処理能力ＭＡＸ
+<DD>ＬＥＤ３：ＢＧＭ解凍の割込み駆動中（通常点滅）。
+<DD>ＬＥＤ４：no care
+<DD>ＬＥＤ５：no care
+<DD>ＬＥＤ６：no care
+<DD>ＬＥＤ７：ボード上のＭＩＤＩ-ＩＮ２からのＭＩＤＩ入力。
+<DD>ＬＥＤ８：ボード上のＭＩＤＩ-ＩＮ１からのＭＩＤＩ入力。</DL></P>
+
+<P>またＬＥＤ１が消灯している時の他のＬＥＤの点滅は以下のようなエラーを意味します（点灯したままの場合はSCSI通信中かドライバがHALTした状態です）。</P>
+
+<P><TABLE BORDER CELLSPACING="1" CELLPADDING="4">
+<tr><th>ＬＥＤ番号<br><B>１２３４５６７８</B></th><th>意　味</th></tr>
+<!-- −−−−−−○○ -->
+<tr><td><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="on.gif">
+</td><td>YM3802(MIDI-1) IRQ vector error</td></tr>
+
+<!-- −−−−−○−− -->
+<tr><td><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif">
+</td><td>//  (MIDI-2)		//</td></tr>
+
+<!-- −−−−−○−○ -->
+<tr><td><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="on.gif">
+</td><td>MIDI data error</td></tr>
+
+<!-- −−−−−○○− -->
+<tr><td><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="on.gif"><IMG SRC="off.gif">
+</td><td>YM3802(MIDI-1) MIDI out error</td></tr>
+
+<!-- −−−−−○○○ -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="on.gif"><IMG SRC="on.gif">
+</td><td>//  (MIDI-2)		//</td></tr>
+
+<!-- −−−−○−−− -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif">
+</td><td>MIDI Control change $60〜$7F input</td></tr>
+
+<!-- −−−−○−−○ -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif">
+</td><td>HOST I/F Commnd execute error</td></tr>
+
+<!-- −−−−○−○− -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif">
+</td><td>...........</td></tr>
+
+<!-- −−−−○−○○ -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="on.gif">
+</td><td>...........</td></tr>
+
+<!-- −−−−○○○− -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="on.gif"><IMG SRC="on.gif"><IMG SRC="off.gif">
+</td><td>Map change error</td></tr>
+
+<!-- −−−−○○○○ -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="on.gif"><IMG SRC="on.gif"><IMG SRC="on.gif">
+</td><td>BANK change error</td></tr>
+
+<!-- −−−○−−−− -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif">
+</td><td>MIXER change error</td></tr>
+
+<!-- −−−○−−−○ -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif">
+</td><td>EFFECT change error</td></tr>
+
+<!-- −○−−−−−− -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif">
+</td><td>68k un-deffinition vector event</td></tr>
+
+<!-- −○−−−−−○ -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif">
+</td><td>...........</td></tr>
+
+<!-- −○−−−−○− -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif">
+</td><td>68k buss error</td></tr>
+
+<!-- −○−−−−○○ -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="on.gif">
+</td><td>68k address error</td></tr>
+
+<!-- −○−−−○−− -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif">
+</td><td>...........</td></tr>
+
+<!-- −○−−−○−○ -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="on.gif">
+</td><td>68k level-3 event</td></tr>
+
+<!-- −○−−−○○− -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="on.gif"><IMG SRC="off.gif">
+</td><td>68k level-4 event</td></tr>
+
+<!-- −○−−−○○○ -->
+<tr><td>
+<IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="off.gif"><IMG SRC="on.gif"><IMG SRC="on.gif"><IMG SRC="on.gif">
+</td><td>68k level-7 event</td></tr></table></p>
+
+
+<P><LI>16Bit、クロック11.3MHzの68EC000がサウンド制御専用CPUとしてSCSPをコントロールします。68EC000はSCSPとダイレクトに接続していて、SH2とは独立して動作します。また、SH2からもSCSPにアクセス可能です。アクセス時にSCSPも68000も停止することはありませんが、時分割処理のためSH2からのアクセス量が多いと68000の処理能力が低下します。</P>
+
+<P><LI>SCSPチップのクロックは22.58MHz、68000のクロックは11.3MHz。<br>またサウンドドライバのＣＰＵ実行単位時間については、</P>
+
+<P><DL>
+	<DD>ソフトウェア ＤＳＰ制御の実行単位時間は８msec。
+	<DD>ソフトウェア ＰＬＦＯ の実行単位時間は４msec。
+	<DD>その他のターゲットプログラムの実行単位時間は２msecです。</DL></P>
+
+<P><LI>PCMデータサイズまめ知識<BR>
+16bit44.1kHzで1秒88kbyte（サウンドRAMのほぼ最大である450kbyteで約5秒）。<br>
+8bit11kHzで1秒11kbyte（サウンドRAMのほぼ最大である450kbyteで約40秒）。<br>
+SCSPにおいて1波形は最大64ksampleまでですので、16bit8bitとも、44.1kHzで0.72秒、11kHzで2.9秒。</P>
+
+</UL>
+<HR NOSHADE>
+<B>■
+　　｜
+<A HREF="p02_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm#sndt"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#prog">SOUND Manual</A>
+★<A HREF="index.htm">サウンド開発ノウハウ集</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

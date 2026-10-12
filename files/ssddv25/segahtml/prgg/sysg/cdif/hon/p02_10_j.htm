@@ -1,0 +1,140 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/19&gt;CD通信I/F(CDパート)/基本事項</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>基本事項</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A>
+	<P>	<DT><H2>2.1　用語と記号</H2>
+
+<A NAME="no2_11"></A>
+	<P>	<DT><B>　(1)用語の定義</B>
+		<DD>　使用する用語の定義を表2.1に示します。</P>
+
+<A NAME="t2_1"></A>
+	<P>	<DD><B>表2.1　用語の定義</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH><PRE>用　語</TH><TH><PRE>意　味</TH></TR>
+	<TR><TD><PRE>セクタ</TD><TD><PRE>CDブロックで扱う基本的なデータの単位。（2352バイト固定）<BR>セクタのサイズや構造は、CD-ROMの形式に従います。</TD></TR>
+	<TR><TD><PRE>ストリーム</TD><TD><PRE>セクタのヘッダとサブヘッダで区別される、論理的に連続したデータの流れ。</TD></TR>
+	<TR><TD><PRE>CDバッファ</TD><TD><PRE>セクタデータを格納するCDブロック内のバッファ。</TD></TR>
+	<TR><TD><PRE>CDバッファサイズ</TD><TD><PRE>CDバッファのセクタ単位の大きさ。</TD></TR>
+	<TR><TD><PRE>バッファ区画</TD><TD><PRE>CDバッファを複数の論理的な区画に区分けしたもの。<BR>ストリームの格納・取り出しをする論理的な素子とみなすことができます。</TD></TR>
+	<TR><TD><PRE>バッファ区画サイズ</TD><TD><PRE>バッファ区画のセクタ単位の大きさ。</TD></TR>
+	<TR><TD><PRE>セクタ位置</TD><TD><PRE>バッファ区画内のセクタの位置。（セクタ単位の位置）<BR>0〜（バッファ区画サイズ−1）の値を取ります。<BR>バッファ区画のセクタは、セクタ位置をキーにしてアクセスします。</TD></TR>
+	<TR><TD><PRE>絞り</TD><TD><PRE>設定した条件によって、ストリームを分離する論理的な素子。</TD></TR>
+	<TR><TD><PRE>セレクタ</TD><TD><PRE>絞りとバッファ区画から構成され、ストリームを選択する論理的な素子。<BR>セレクタによりストリーム選択回路を構築できます。</TD></TR>
+	<TR><TD><PRE>デバイス</TD><TD><PRE>CD-ROMやMPEGなど、ストリームを発生・吸収する論理的な装置。上記回路<BR>にデバイスを接続することで、ストリーム選択処理が可能。</TD></TR>
+	<TR><TD><PRE>コネクタ</TD><TD><PRE>絞り、バッファ区画、デバイスを接続するための端子。</TD></TR>
+	<TR><TD><PRE>フレームアドレス（FAD）</TD><TD><PRE>CD上の絶対時間00:00:00を0として、フレーム単位に連続的に番号を付けたもの。<BR>絶対時間と1対1に対応します。<BR>CDブロックに対しては、絶対時間ではなく、フレームアドレスをキーとしてア<BR>クセスします。（CD-ROM、CD-DAとも）</TD></TR>
+	<TR><TD><PRE>論理セクタ番号（LSN）</TD><TD><PRE>CD上の絶対時間00:02:00を0として、セクタ（フレーム）単位に連続的に番号を<BR>付けたもの。論理セクタ番号＝フレームアドレス−150（2秒分）となります。<BR>ディレクトリレコード（ISO9660）内の情報に使われています。</TD></TR>
+	<TR><TD><PRE>ファイル情報</TD><TD><PRE>ファイルをアクセスするために保持している、ディレクトリレコード情報。<BR>ファイル先頭のFAD、ファイルサイズ、ユニットサイズ、ギャップサイズ、<BR>ファイル番号、アトリビュートがあります。</TD></TR>
+	<TR><TD><PRE>ファイル識別子</TD><TD><PRE>ファイルを識別するためのディレクトリ内の順序番号。<BR>0〜（ディレクトリレコード数−1）の値を取る。<BR>ただし、0:自分のディレクトリ、1:親ディレクトリを示します。</TD></TR>
+	</TABLE></P>
+
+<A NAME="no2_12"></A>
+	<P>	<DT><B>　(2)記号・略号の一覧</B>
+		<DD><B>表2.2　記号・略号の一覧</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH><PRE>記号・略号</TH><TH><PRE>意　　味</TH><TH><PRE>説　明</TH></TR>
+	<TR><TD><PRE>Adr</TD><TD><PRE>address</TD><TD><PRE>アドレス</TD></TR>
+	<TR><TD><PRE>BCD</TD><TD><PRE>binary coded decimal</TD><TD><PRE>2進化10進数</TD></TR>
+	<TR><TD><PRE>bn,bufno</TD><TD><PRE>buffer no.</TD><TD><PRE>バッファ区画番号</TD></TR>
+	<TR><TD><PRE>bufnum</TD><TD><PRE>buffer numbers</TD><TD><PRE>全バッファ区画数</TD></TR>
+	<TR><TD><PRE>CI</TD><TD><PRE>coding information</TD><TD><PRE>コーディング情報</TD></TR>
+	<TR><TD><PRE>CN</TD><TD><PRE>channel no.</TD><TD><PRE>チャンネル番号</TD></TR>
+	<TR><TD><PRE>Ctrl</TD><TD><PRE>control</TD><TD><PRE>コントロール</TD></TR>
+	<TR><TD><PRE>dst</TD><TD><PRE>destination</TD><TD><PRE>複写／移動先</TD></TR>
+	<TR><TD><PRE>fad</TD><TD><PRE>frame address </TD><TD><PRE>フレームアドレス</TD></TR>
+	<TR><TD><PRE>fasnum</TD><TD><PRE>fad sector numbers</TD><TD><PRE>フレームアドレスセクタ数</TD></TR>
+	<TR><TD><PRE>fid</TD><TD><PRE>file identifier</TD><TD><PRE>ファイル識別子</TD></TR>
+	<TR><TD><PRE>fln,filtno</TD><TD><PRE>filter no.</TD><TD><PRE>絞り番号</TD></TR>
+	<TR><TD><PRE>FN</TD><TD><PRE>file no.</TD><TD><PRE>ファイル番号</TD></TR>
+	<TR><TD><PRE>LSB</TD><TD><PRE>least significant bit</TD><TD><PRE>最下位ビット</TD></TR>
+	<TR><TD><PRE>MSB</TD><TD><PRE>most significant bit</TD><TD><PRE>最上位ビット</TD></TR>
+	<TR><TD><PRE>ply</TD><TD><PRE>play parameter</TD><TD><PRE>再生パラメータ</TD></TR>
+	<TR><TD><PRE>pos</TD><TD><PRE>position parameter</TD><TD><PRE>位置パラメータ</TD></TR>
+	<TR><TD><PRE>SM</TD><TD><PRE>submode</TD><TD><PRE>サブモード</TD></TR>
+	<TR><TD><PRE>sct</TD><TD><PRE>sector</TD><TD><PRE>セクタ</TD></TR>
+	<TR><TD><PRE>ses</TD><TD><PRE>session information</TD><TD><PRE>セッション情報</TD></TR>
+	<TR><TD><PRE>sesno</TD><TD><PRE>session no.</TD><TD><PRE>セッション番号</TD></TR>
+	<TR><TD><PRE>snum</TD><TD><PRE>sector numbers</TD><TD><PRE>セクタ数（区画のセクタ範囲指定時）</TD></TR>
+	<TR><TD><PRE>sp,spos</TD><TD><PRE>sector position</TD><TD><PRE>セクタ位置（区画のセクタ範囲指定時）</TD></TR>
+	<TR><TD><PRE>src</TD><TD><PRE>source</TD><TD><PRE>複写／移動先</TD></TR>
+	<TR><TD><PRE>stat</TD><TD><PRE>CD status information</TD><TD><PRE>CDステータス情報</TD></TR>
+	<TR><TD><PRE>subh</TD><TD><PRE>subheader condition</TD><TD><PRE>絞りに対するサブヘッダ条件</TD></TR>
+	<TR><TD><PRE>TNO</TD><TD><PRE>track no.</TD><TD><PRE>トラック番号（曲番）</TD></TR>
+	<TR><TD><PRE>toc</TD><TD><PRE>TOC information</TD><TD><PRE>TOC情報</TD></TR>
+	<TR><TD><PRE>txwnum</TD><TD><PRE>transfer word numbers</TD><TD><PRE>転送ワード数（ワード単位のデータ転送サイズ）</TD></TR>
+	<TR><TD><PRE>X,idx</TD><TD><PRE>index</TD><TD><PRE>インデックス番号</TD></TR>
+	<TR><TD><PRE>word</TD><TD><PRE>word</TD><TD><PRE>ワード。2バイト（16ビット）の長さの単位。</TD></TR>
+	</TABLE></P>
+
+<A NAME="no2_13"></A>
+	<P>	<DT><B>　(3)数値の表記</B>
+		<DD>　2進数は末尾に「B」を付ける。(例：10進数の5は、101Bと表記します。)<BR>
+　16進数は末尾に「H」を付ける。(例：10進数の255は、FFHと表記します。)<BR>
+　ただしC言語プログラム中の16進数は、C言語の仕様(0x)で表記します。</P>
+
+<A NAME="no2_14"></A>
+	<P>	<DT><B>　(4)BCDの扱い</B>
+		<DD>　パラメータ等には、原則としてBCDを使いません。トラック番号などCD上にBCDで記録されている数値も、全てバイナリ値に変換してやり取りします。</P>
+
+<A NAME="no2_15"></A>
+	<P>	<DT><B>　(5)C言語の識別子</B>
+		<DD>　CD通信インタフェースでは、CDまたはCdで始まる識別子を使用します。アプリケーションは、これらの識別子とぶつからないように注意が必要です。</P>
+
+<A NAME="no2_20"></A>
+	<P>	<DT><H3>2.2 ディスクレイアウト</H3>
+
+<A NAME="no2_21"></A>
+	<P>	<DT><B>　(1)トラックレイアウト</B>
+		<DD>　トラックの構造と、ディスク上の位置を指定するアクセスキーの関係を図2.1に示します。<BR>
+
+<A NAME="z2_1"></A>
+	<P ALIGN=CENTER><B>図2.1　トラックの構造とアクセスキーの関係</B><BR><img srcset="../grp/i054_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no2_22"></A>
+	<P>	<DT><B>　(2)マルチセッションのレイアウト</B>
+
+<A NAME="z2_2"></A>
+	<P ALIGN=CENTER><B>図2.2　マルチセッションのレイアウト</B><BR><img srcset="../grp/i054_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

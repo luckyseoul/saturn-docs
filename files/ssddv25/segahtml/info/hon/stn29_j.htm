@@ -1,0 +1,140 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE> SEGASATURN Developer's Information STN-29 </TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../index_j.htm">INDEX</A>
+▲
+|<a href="stn25_j.htm">STN-25</A>
+|<a href="stn27_j.htm">STN-27</A>
+|<a href="stn28_j.htm">STN-28</A>
+|<B>STN-29</B>
+|<a href="stn30_j.htm">STN-30</A>
+|<a href="stn31_j.htm">STN-31</A>
+|<a href="stn32_j.htm">STN-32</A>
+▼
+<HR NOSHADE>
+<H1 ALIGN=CENTER>STN-29</H1>
+<H2 ALIGN=CENTER>ＣＤ−ＤＡボリュームの設定について</H2>
+<HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発行番号：</TH><TD>STN-29</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発 行 日：</TH><TD>95/03/15</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>メディア：</TH><TD>○共　通</TD><TD>●CD-ROM</TH><TD>○カートリッジ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>関　　連：</TH><TD>●プログラム</TD><TD>○ハード</TD><TD>○マニュアル</TD><TD>○ツール</TD><TD>○ゲーム</TD><TD>○バグ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>情報区別：</TH><TD>●新　規</TD><TD>○変　更</TD><TD>○追　加</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>重 要 度：</TH><TD>●厳　守</TD><TD>○推　奨</TD><TD>○参　考</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>添付資料：</TH><TD>●無</TH><TD>○有</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>件名補足：</TH><TD COLSPAN=7>    </TD></TR>
+</TABLE>
+<A NAME="No0"><HR></A>
+<H3 ALIGN=CENTER>内　容</H3>
+<DL>
+  <P><DT><H3>■概要</H3>
+     <DD>　SEGASATURNアプリケーションでのCD-DAボリョームの設定は、マルチプレイヤー
+	画面での音楽CD再生ボリョームと大きく差が無いようにするため、CD-DAレベルを6dB 下げてください。</P>
+
+  <P><DT><H3>■対応方法</H3>
+     <DD>　以下に具体的な設定方法を記述します。</P>
+ 	<P><DD><OL>
+	<B><LI></B><A HREF="#NO1">ハードウェアに対して直接設定する場合</A>
+	<B><LI></B><A HREF="#NO2">SATURN Sound Driver を利用する場合</A>
+	<B><LI></B><A HREF="#NO3">サウンドI/Fライブラリを利用する場合</A>
+		</OL>
+
+  <P><DT><H3>■補足</H3>
+     <DD>　特殊な効果を演出したい場合等、積極的にCD-DAレベルを変化させたい時には、
+	マルチプレイヤーでの音楽CDレベルをリファレンスとし、著しく音量差が無いよ
+	バランスを調整してください。</P>
+</DL>
+
+<A NAME="NO1"><HR></A>
+<DL>
+  <P><DT><H3><A HREF="#No0">■</A>1. ハードウェアに対して直接設定する場合</H3>
+     <DD>　操作はスロット別制御レジスタの EFSDL[2:0]を111b(-0 dB)から110b(-6 dB)にしてください。
+	CD-DAに関してスロット番号は左右それぞれ 16番,17番です。</P>
+
+  <P><DD><B>左チャンネル</B>:スロット番号１６:アドレス 100200H+17H に FDH を書く。<BR>
+	FDHの内容は、EFSDL[2:0]=110b(送出レベル) EFPAN[4:0]=11111b(定位データ)</P>
+     
+  <P><DD><B>右チャンネル</B>:スロット番号１７:アドレス 100220H+17H に CFH を書く。<BR>
+	CFHの内容は、EFSDL[2:0]=110b(送出レベル) EFPAN[4:0]=01111b(定位データ)</P>
+
+  <P><DD>尚、メインCPUからのアドレスは、左右それぞれ</P>
+
+  <P><DD><B>左チャンネル</B>=25B00200H+16H
+     <DD><B>右チャンネル</B>=25B00200H+16H</P>
+
+  <P><DD>となります。</P>
+	<P><DT><B>注　意：</B>
+	<DD>メインCPUからは必ずワードアクセスしてください。</P>
+
+	<P><DT><B>参　照：</B>
+	<DD>『HARDWARE MANUAL／SCSPユーザーズマニュアル』<a href="../../hard/scsp/hon/p04_10_j.htm">■4.1　レジスタマップ</A></P>
+</DL>
+
+<A NAME="NO2"><HR></A>
+<DL>
+  <P><DT><H3><A HREF="#No0">■</A>2.「SATURN Sound Driver」を利用して設定する場合</H3>
+     <DD>　サウンドコントロールコマンドの CD-DA Level(コマンド番号80H)を使用します。
+   データは E0H (-0dB) から C0H (-6dB) に変更します。<BR>
+   　具体的には、Host interface work(700H) の Command Block 1 (+00H) へ以下のデータを書いてください。</P>
+
+  <CENTER><TABLE BORDER>
+  <TR><TH>データ</TH><TD>８０Ｈ</TD><TD>００Ｈ</TD><TD>Ｃ０Ｈ</TD><TD>Ｃ０Ｈ</TD></TR>
+  <TR><TH>意　味</TH><TD>ＣＯＭ</TD><TD>ダミー</TD><TD>左音量</TD><TD>右音量</TD></TR>
+  </TABLE></CENTER>
+
+	<P><DT><B>　参　照：</B>
+	<DD>『サウンドドライバプログラマーズガイド』<BR>３.サウンドコントロールコマンド／<a href="../../sndt/prog/drve/sndcmd__j.htm#19">●80H CD-DA LEVEL</A>
+</DL>
+
+<A NAME="NO3"><HR></A>
+<DL>
+  <P><DT><H3><A HREF="#No0">■</A>3.サウンドI/Fライブラリを利用して設定する場合</H3>
+     <DD>　Function CD-DA Level設定を使用します。<BR>
+	設定値は左右共に 0xE0 (-0dB)から 0xC0 (-6dB) に変更します。</P>
+
+  <P><DD><PRE>
+<H3>書　式：</H3>
+<H2>SND_SetCdLev(0xC0,0xC0)</H2>
+</PRE></P>
+
+
+	<P><DT><B>　参　照：</B>
+	<DD>『プログラマーズガイド／サウンドI/Fライブラリユーザーズマニュアル』<BR>
+	<a href="../../prgg/prg3/sund/hon/p02_13_j.htm#no28">CD-DA Level設定/SND_SetCdDaLev</A></P>
+</DL>
+
+以上
+<HR NOSHADE>
+  <a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../index_j.htm">INDEX</A>
+▲
+|<a href="stn25_j.htm">STN-25</A>
+|<a href="stn27_j.htm">STN-27</A>
+|<a href="stn28_j.htm">STN-28</A>
+|<B>STN-29</B>
+|<a href="stn30_j.htm">STN-30</A>
+|<a href="stn31_j.htm">STN-31</A>
+|<a href="stn32_j.htm">STN-32</A>
+▼
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

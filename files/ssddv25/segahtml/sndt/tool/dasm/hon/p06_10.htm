@@ -1,0 +1,187 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/ 7&gt;SCSP/DSP Assembler User's Manual/6.dAsms Programming Guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">SCSP/DSP Assembler User's Manual</a><HR>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP/DSP Assembler User's Manual</b><H2 ALIGN=CENTER> 6.dAsms Programming Guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no6_10"></A><P><DT><H2> ■Programming overview</H2><DD> When coding the dAsms source code, there is no need to be aware of pipeline processing, and all commands can be written with a sequential processing mindset. in particular,</P>
+<DD><OL>
+<LI> Preparing data required for calculation ( <B>LDI</b> / <B>LDY</b> / <B>LDA</b> )<LI> Description of multiplication-addition expression ( <B>@...</b> )<LI> Specifying the store destination (&gt; )</P>
+</OL>
+<P><DD> Consider the procedure as one unit process, extract an appropriate partial function from the signal flow diagram, apply it to this unit process, and write partial source code. We will write the source code by repeating this in the processing order.</P>
+<P> Below, we will explain how to code a DSP program in dAsms using a relatively simple example.</P>
+<P> In the example program below, external expansion inputs EXTS00 and EXTS01, which can input CD Audio, etc., are used as Lch and Rch inputs, respectively, and the results of delay (echo) processing performed on Lch and Rch independently are output to EFREG00 and EFREG01, respectively. That is.</P>
+<A NAME="no6_20"></A><P><DT><H3> ■Signal flow diagram</H3><img srcset="../grp/i018_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P><A NAME="no6_30"></A><P><DT><H3> ■Coding procedure</H3><A NAME="no6_31"></A><DT><H3> 1. Definition of coefficient symbol (#COEF)</H3><DT> <B>1-1 Definition of coefficients related to level attenuation</b></P>
+<P><DD> As a coefficient related to level attenuation,</P>
+<TABLE BORDER=1>
+<TR><TD> Send level to delay</TD><TD> :EffSendLevelL/R</TD></TR>
+<TR><TD> Direct signal level</TD><TD> :DrctLevelL/R</TD></TR>
+<TR><TD> Return level from delay</TD><TD> :EffRtnLevelL/R</TD></TR>
+<TR><TD> Delay signal feedback level</TD><TD> :FbL/R</TD></TR>
+</TABLE>
+</P>
+<P><DD> Define. Level attenuation is defined in percentage terms, assuming that a level resolution of about 1% is sufficient. For the definition format, see " <A HREF="p03_10.htm#no3_20">■Definition of coefficient/address symbol</a> ". The definition description on the dAsms source code is as follows. The initial value is an example.</P>
+<P><DD><PRE>
+-------------------------------------------------- ---
+     EffSendLevelL=%100
+     EffSendLevelR=%100
+     DrctLevelL=%50
+     DrctLevelR=%50
+     EffRtnLevelL=%75
+     EffRtnLevelR=%75
+     FbL=%50
+     FbR=%50
+-------------------------------------------------- ---
+</PRE></P>
+<P><DT><B>1-2 Definition of coefficients related to feedback filter</b><P><DD> As seen in the signal flow diagram, the coefficients of the first-order IIR filter, which is the feedback path of the delayed signal, are:</P>
+<P><DD><PRE>
+     C0L/R
+     C1L/R
+     C2L/R</PRE></P>
+<P><DD> Define. Assuming that the filter coefficient is given as a value normalized to 1, we will define it in decimal notation. Considering an appropriate cutoff frequency, the definition description on the dAsms source code is as follows.</P>
+<P><DD><PRE>
+     C0L=0.40893
+     C0R=0.40893
+     C1L=0.40893
+     C1R=0.40893
+     C2L=0.18164
+     C2R=0.18164</PRE></P>
+<A NAME="no6_32"></A><P><DT><H3> 2. Definition of address constant symbol (#ADRS)</H3><P><DT> <B>2-1 Definition of write and read addresses to delay ring buffer</b><DD> In the signal flow diagram, the rectangle in the center of each Lch/Rch section represents the delay. The delay is created by a ring buffer, and the delay time is proportional to the difference between the write address and the read address. One address corresponds to a delay of one sample. As an address constant,</P>
+<P><DD><PRE>
+     waL/R
+     raL/R</PRE></P>
+<P><DD> Define. Addresses on the ring buffer can be given as initial values to these address constant symbols as hexadecimal or decimal integers, but in dAsms, addresses can be converted to time (milliseconds). , considering an appropriate delay time, the definition description on the dAsms source code is as follows.</P>
+<P><DD><PRE>
+-------------------------------------------------- --------------
+     waL=ms0.0
+     raL=ms149.9
+     waR=ms150.0
+     raR=ms249.9
+-------------------------------------------------- --------------
+</PRE></P>
+<A NAME="no6_33"></A><P><DT><H3>3.Description of program part (#PROG)</H3><P><DT> <B>3-1 Preparation of Lch side data</b><DD> Looking at the signal flow diagram, you can see that memory access (reading from the ring buffer) is necessary to obtain the data necessary for the operation. The address on the ring buffer to be read is</P>
+<P><DD><PRE>
+     raL
+     raL+1</PRE></P>
+<P><DD> is. However, since these addresses are only relative positions on the ring buffer, add the address description element "DEC" to the "..." part of the external memory read parameter "MR[...]". "DEC" represents a counter that is decremented by 1 for each sample, and ring buffer operation is only realized by adding this to the address description element. The data read from positions raL and raL+1 on the ring buffer are respectively</P>
+<P><DD><PRE>
+     MEMS00
+     MEMS01</PRE></P>
+<P><DD> The above is expressed in the dAsms source code as shown below.</P>
+<P><DD><PRE>
+     LDI MEMS00,MR[raL+DEC]
+     LDI MEMS01,MR[raL+DEC+1]</PRE></P>
+<P><DD> For reference, the addresses on the ring buffer that are accessed by the above two "MR[...]" are kept 1 address apart from each other, and are accessed one address per sample by the action of "DEC". It will shift in the lower direction.</P>
+<P><DT> <B>3-2 Calculation of Lch side feedback filter part</b><DD> Once you have the necessary data ready, next you will write the instructions for performing calculations using that data. The calculation procedure for the first-order IIR filter, which is the feedback path for the delayed signal, is as follows.</P>
+<DD><OL>
+<P><LI> Multiply the value loaded into MEMS00 by the coefficient C0L.</P>
+<P><LI> Multiply the value loaded into MEMS01 by the coefficient C1L and add it to the result of (1).</P>
+<P><LI> Multiply the value of TEMP01 by the coefficient C2L and add it to the result of (2).</P>
+<P><LI> Store the result of (3) in TEMP00.</P>
+</OL>
+<P><DD> The important thing here is that TEMP is a ring buffer. The subscript xx of TEMPxx represents a relative address as a ring buffer, and the data stored in TEMP00 will appear in TEMP01 in the next sample. In (3) and (4) above, this is used to achieve a delay of one sample.</P>
+<P><DD> Due to the characteristics of the SCSP/DSP hardware that dAsms targets, the way to write calculation formulas is somewhat special. The contents of (1) to (4) above are expressed in the dAsms source code as follows.</P>
+<P><DD><PRE>
+-------------------------------------------------- ------------------------
+     @ TEMP01 * C2L + ( MEMS01 * C1L + ( MEMS00 * C0L + ) )&gt; TEMP00
+-------------------------------------------------- ------------------------
+</PRE></P>
+<P><DD>Note that in order to write consecutive multiplications and additions like (1) to (3) above, the actual order of each multiplication and the written order must be reversed.</P>
+<P><DT> <B>3-3 Writing to Lch side ring buffer</b><DD> From the signal flow diagram,</P>
+<P><DD><OL TYPE=a>
+<P><LI> The value of input EXTS00 multiplied by the coefficient EffSendLevelL</P>
+<P><LI> The value stored in TEMP00 in 3-2 (4) multiplied by the coefficient FbL</P>
+</OL>
+<P><DD> You can see that all you need to do is write the sum of these two to the ring buffer. The write address on the ring buffer is waL and uses the address description element "DEC" similar to MR[...] in 3-1. The above content is expressed in the dAsms source code as follows.</P>
+<P><DD><PRE>
+-------------------------------------------------- ------------------------
+     @TEMP00 * FbL + ( EXTS00 * EffSendLevelL + )&gt; MW[waL+DEC]
+-------------------------------------------------- ------------------------</PRE><P><DT> <B>3-4 Generating Lch output data and writing to EFREG</b><DD> From the signal flow diagram,</P>
+<DD><OL TYPE=a>
+<P><LI> Data read from address raL on the ring buffer multiplied by coefficient EffRtnLevelL<P><LI> The value of input EXTS00 multiplied by the coefficient DrctLevelL</P>
+</OL>
+<P><DD> You can see that all you need to do is add up the two and store it in EFREG00. Here, we will use the data (read from the ring buffer) required for the multiplication in (a), which was loaded into MEMS00 in 3-1. The above content is expressed in the dAsms source code as follows.</P>
+<P><DD><PRE>
+-------------------------------------------------- ------------------------
+     @EXTS00 * DrctLevelL + ( MEMS00 * EffRtnLevelL + )&gt; EFREG00
+-------------------------------------------------- ------------------------</PRE></P>
+<P><DD> This completes the writing of the Lch side source code.</P>
+<P><DT> <B>3-5 Writing the Rch side source code</b><DD> The function of this program example is a stereo (L/R independent) delay, but as you can see from the signal flow diagram, the processing content on the Rch side is the same as that on the Lch side. However, the coefficient/address constant symbol names, register names, etc. used are different. Therefore, if you copy and paste the Lch side source code written up to the previous section and rewrite only the changed parts, it will become the Rch side source code.</P>
+<P><DT> <B>3-6 Coding completed</b><DD> This completes the writing of the source code for this example program. The overall image of the source code according to " <A HREF="p03_10.htm">3. Source code structure</a> " is as follows.</P>
+<P><DD><PRE>
+-------------------------------------------------- ------------------------
+     'dAsms sample program.
+     'Function:L/R independent delay
+     'CD Lch Direct + Delayed -&gt; EFREG00
+     'CD Rch Direct + Delayed -&gt; EFREG01
+     #COEF
+
+     'Levels
+     EffSendLevelL=%100
+     EffSendLevelR=%100
+     DrctLevelL=%50
+     DrctLevelR=%50
+     EffRtnLevelL=%75
+     EffRtnLevelR=%75
+     FbL=%50
+     FbR=%50
+
+     'FilterCoefs
+     C0L=0.40893
+     C0R=0.40893
+     C1L=0.40893
+     C1R=0.40893
+     C2L=0.18164
+     C2R=0.18164
+
+     #ADRS
+     waL=ms0.0
+     raL=ms149.9
+     waR=ms150.0
+     raR=ms249.9
+
+     #PROG
+
+     'Lch
+     LDI MEMS00,MR[raL+DEC]
+     LDI MEMS01,MR[raL+DEC+1]
+     @ TEMP01 * C2L + ( MEMS01 * C1L + ( MEMS00 * C0L + ) )&gt; TEMP00
+     @ TEMP00 * FbL + ( EXTS00 * EffSendLevelL + )&gt; MW[waL+DEC]
+     @EXTS00 * DrctLevelL + ( MEMS00 * EffRtnLevelL + )&gt; EFREG00<P>
+     'Rch
+     LDI MEMS02,MR[raR+DEC]
+     LDI MEMS03,MR[raR+DEC+1]
+     @ TEMP03 * C2R + ( MEMS03 * C1R + ( MEMS02 * C0R + ) )&gt; TEMP02
+     @TEMP02 * FbR + ( EXTS01 * EffSendLevelR + )&gt; MW[waR+DEC]
+     @EXTS01 * DrctLevelR + ( MEMS02 * EffRtnLevelR + )&gt; EFREG01
+
+     #END
+-------------------------------------------------- ------------------------
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">SCSP/DSP Assembler User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

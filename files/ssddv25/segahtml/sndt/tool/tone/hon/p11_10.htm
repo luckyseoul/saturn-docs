@@ -1,0 +1,218 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/12&gt;Tone Editor User's Manual/1. overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">Tone Editor User's Manual/</a><HR>
+ <B>▲ <A HREF="p10_10.htm">Back</a> ｜ <A HREF="p12_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Tone Editor User's Manual</b><H2 ALIGN=CENTER> Appendix 2 </H2><HR NOSHADE>
+<DL>
+<!-------------------------------------------------------------------------------------------------------->
+<P> About the project file (bank file) format The project file format and bank file format are almost the same except for the header part.<BR>
+ The format can be roughly divided into two blocks.<BR>
+ It consists of the synthesizer parameter part in the first half and the waveform part in the second half.<A NAME="no11_11"></A><P><DT><H3> ●Synthesizer parameter part</H3><DD> This part is subjected to simple data compression.<BR>
+ An algorithm is set up to group 0x00 together.<P><DT> <B>example</b><DD> If "0x01,0x00,0x00,0x00,0xFF,0xFF,0x00,0x00,0x00,0x00,0x01"<BR>
+ <FONT SIZE=5>↓</font><BR>
+ Converted to "0x01,0x00,0x03,0xFF,0xFF,0x00,0x04,0x01".<A NAME="no11_11"></A><P><P><DT><H3> ●Protocol</H3><UL TYPE=DISC>
+<LI> <B>1st byte</b><BR>
+ Set the format version.<BR>
+ Currently (1/24/1997) "0xFF" is set in Ver1.00 format.<LI> <B>2nd, 3rd, 4th byte</b><BR>
+ Size of data when expanded.<LI> <B>After 5 bytes</b><BR>
+ compressed data<LI> <B>last 2 bytes</b><BR>
+ 0xFFFF Indicates the end of data.</UL>
+<P> The format of the uncompressed data part is as follows.<DL>
+<P><DT> <FONT SIZE=5>------- start file --------</font><P><DT> <B>Item</b> : File header<DT> <B>Size</b> : 100 bytes (for project files)<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD> 88</TD><TD><PRE> StandardFileReply</TD><TD><PRE> reply; </TD><TD<PRE> Project file location</TD></TR>
+<TR ALIGN=CENTER><TD> 2</TD><TD><PRE> short</TD><TD><PRE> posH; </TD><TD<PRE> Horizontal position of the window</TD></TR>
+<TR ALIGN=CENTER><TD> 2</TD><TD><PRE> short</TD><TD><PRE> posV; </TD><TD<PRE> window vertical position</TD></TR>
+<TR ALIGN=CENTER><TD> 2</TD><TD><PRE> short</TD><TD><PRE> bankNo; </TD><TD<PRE> Total number of banks</TD></TR>
+<TR ALIGN=CENTER><TD> 2</TD><TD><PRE> short</TD><TD><PRE> top; </TD><TD<PRE> Bank displayed at the top of the window</TD></TR>
+<TR ALIGN=CENTER><TD> 4</TD><TD><PRE> long</TD><TD><PRE> version; </TD><TD<PRE> File version</TD></TR>
+</TABLE>
+<P><DT> <B>Size</b> : 8 bytes (for bank files)<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD> 4</TD><TD><PRE> long</TD><TD><PRE> fileCode </TD><TD<PRE> 'Bank' (bank recognition code)</TD></TR>
+<TR ALIGN=CENTER><TD> 4</TD><TD><PRE> long</TD><TD><PRE> version; </TD><TD<PRE> File version</TD></TR>
+</TABLE>
+<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Item</b> : Bank data<DT> <B>Size</b> : 84 bytes * number of banks<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 64</TD><TD><PRE> Str63</TD><TD><PRE> name;</TD><TD><PRE> bank name</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Handle</TD><TD><PRE> voice;</TD><TD><PRE> Handle to voice & layer information</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> voiceNo;</TD><TD><PRE> number of voices</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> sendBank;</TD><TD><PRE> What bank should I send it to?</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> selVoice;</TD><TD><PRE> Position of currently selected voice</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> top;</TD><TD><PRE> Voice displayed at the top of the window</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> windowPv;</TD><TD><PRE> Voice window V position</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> windowPh;</TD><TD><PRE> Voice window H position</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> windowSize;</TD><TD><PRE> Voice window size</TD></TR>
+</TABLE>
+<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Item</b> : Voice data<DT> <B>Size</b> : 60 bytes *Total number of voices<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 34</TD><TD><PRE> Str31</TD><TD><PRE> voiceName;</TD><TD><PRE> voice name</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> bend range;</TD><TD><PRE> Bend range (0 -13)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> portament;</TD><TD><PRE> Portamento (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> volBias;</TD><TD><PRE> Volume bias (0 -127</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> checkFM;</TD><TD><PRE> Flag indicating whether this voice is an FM voice</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Handle</TD><TD><PRE> layer;</TD><TD><PRE> Layer information handle</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> layerNo;</TD><TD><PRE> Total number of layers</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> selLayer;</TD><TD><PRE> currently selected layer</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> top;</TD><TD><PRE> Layer displayed at the top of the window</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> windowPv;</TD><TD><PRE> V position of the last opened layer window</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> windowPh;</TD><TD><PRE> H position of the last opened layer window</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> windowSize;</TD><TD><PRE> Size of the last open window</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> upDate;</TD><TD><PRE> flag for recalculation</TD></TR>
+</TABLE>
+<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Item</b> : Layer data<DT> <B>Size</b> : 86 bytes * total number of layers<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 32</TD><TD><PRE> Str31</TD><TD><PRE> layerName;</TD><TD><PRE> layer name</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> short</TD><TD><PRE> waveNo;</TD><TD><PRE> Waveform number registered in the layer</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> unsigned char</TD><TD><PRE> start;</TD><TD><PRE> Start of key split (0-127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> unsigned char</TD><TD><PRE> end;</TD><TD><PRE> End of key split (0-127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> loopMode;</TD><TD><PRE> Loop mode (0-4)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> decayR1;</TD><TD><PRE> EG Decay Rate1 setting (0-31)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> decayR2;</TD><TD><PRE> EG Decay Rate2 setting (0-31)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> egHold;</TD><TD><PRE> EG Hold(0,1)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> attack;</TD><TD><PRE> EG Attack setting (0-31)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> loopSL;</TD><TD><PRE> Not used.</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> keyRS;</TD><TD><PRE> EG key rate scaling setting (0-15)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> decayL;</TD><TD><PRE> EG Decay Level setting (0-31)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> release;</TD><TD><PRE> EG Release Rate setting (0-31)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> stwinh;</TD><TD><PRE> not used</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> soundD;</TD><TD><PRE> not used</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> totalL;</TD><TD><PRE> Total level (0-127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> mdl;</TD><TD><PRE> FM modulation (0 -15)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> lfoRes;</TD><TD><PRE> LFO reset (0 -1)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> lfof;</TD><TD><PRE> LFO frequency (0 -31)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> mdxsl;</TD><TD><PRE> 1 for FM connection (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> mdysl;</TD><TD><PRE> 2 for FM connection (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> Boolean</TD><TD><PRE> pLFO;</TD><TD><PRE> PLFO switch (0 -1)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> Boolean</TD><TD><PRE> pLFOM;</TD><TD><PRE> PLFO modulation (0 -1)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> pLFOWS;</TD><TD><PRE> PLFO waveform selection (0 -3)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> pLFOS;</TD><TD><PRE> PLFO depth (0 -7)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> aLFOWS;</TD><TD><PRE> ALFO waveform selection (0 -3)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> aLFOS;</TD><TD><PRE> ALFO depth(0 -7)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> unsigned char</TD><TD><PRE> inSelect;</TD><TD><PRE> EffectSelect(0 -15)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> inMixLev;</TD><TD><PRE> EffectSend(0 -7)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> directL;</TD><TD><PRE> DirectLevel(0 -7)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> directP;</TD><TD><PRE> DirectPAN(0 -31) <B><A HREF="#_1">Note</a></b></TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> unsigned char</TD><TD><PRE> baseNote;</TD><TD><PRE> Base note (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> fineTune;</TD><TD><PRE> Fine tune (-63 - 63)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> unsigned char</TD><TD><PRE> vlNo;</TD><TD><PRE> Velocity number (0 -255)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> unsigned char</TD><TD><PRE> pegNo;</TD><TD><PRE> PEG number (0 -255)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> unsigned char</TD><TD><PRE> plfoNo;</TD><TD><PRE> PLFO number (0 -255)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> Boolean</TD><TD><PRE> pEG;</TD><TD><PRE> PEG switch (0 -1)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> Boolean</TD><TD><PRE> pEGM;</TD><TD><PRE> PEG modulation (0 -1)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> Boolean</TD><TD><PRE> lfoM;</TD><TD><PRE> LFO modulation (0 -1)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> Boolean</TD><TD><PRE> totalLM;</TD><TD><PRE> Total level modulation (0,1)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> size;</TD><TD><PRE> Current size of this layer</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> winH;</TD><TD><PRE> H position of layer window</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> winV;</TD><TD><PRE> Layer window V position</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> fmH;</TD><TD><PRE> H position of FM layer window</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> fmV;</TD><TD><PRE> V position of FM layer window</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> Boolean</TD><TD><PRE> upDate;</TD><TD><PRE> Check for size updates</TD></TR>
+</TABLE>
+<A NAME="_1"></A><P><DT> <B>Note</b><DD> DirectPAN supports the following "parameter/balance".<DD><TABLE BORDER=1>
+<TR><TH><PRE> parameters</TH><TH><PRE> 0</TH><TH><PRE> 1</TH><TH><PRE> 2</TH><TH><PRE> 3</TH><TH><PRE> 4</TH><TH><PRE> 5</TH><TH><PRE> ...</TH><TH><PRE> 15</TH><TH><PRE> 16</TH><TH><PRE> 17</TH><TH><PRE> 18</TH><TH><PRE> 19</TH><TH><PRE> ...</TH><TH><PRE> 31</TH></TR>
+<TR><TH><PRE> balance</TH><TH><PRE> C</TH><TH><PRE> R1</TH><TH><PRE> R2</TH><TH><PRE> R3</TH><TH><PRE> R4</TH><TH><PRE> R5</TH><TH><PRE> ...</TH><TH><PRE> R15</TH><TH><PRE> C</TH><TH><PRE> L1</TH><TH><PRE> L2</TH><TH><PRE> L3</TH><TH><PRE> ...</TH><TH><PRE> L15</TH></TR>
+</TABLE>
+<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>For separating data</b><DD> "0xFFFF"<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Item</b> : Data governing Mixer, Velocity, PEG, PLFO<DT> <B>Size</b> : 48 bytes<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> mixerNo;</TD><TD><PRE> Total number of mixers</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> veloNo;</TD><TD><PRE> Total number of velocities</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> pegNo;</TD><TD><PRE> Total number of PEGs</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> plfoNo;</TD><TD><PRE> Total number of PLFOs</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> selMixer;</TD><TD><PRE> currently selected mixer</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> selVelocity;</TD><TD><PRE> Currently selected velocity</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> selPEG;</TD><TD><PRE> Currently selected PEG</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> selPLFO;</TD><TD><PRE> Currently selected PLFO</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Point</TD><TD><PRE> posMixer;</TD><TD><PRE> Mixer window position</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Point</TD><TD><PRE> posVelocity;</TD><TD><PRE> Velocity window position</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Point</TD><TD><PRE> posPEG;</TD><TD><PRE> PEG window position</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Point</TD><TD><PRE> posPLFO;</TD><TD><PRE> PLFO window position</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Handle</TD><TD><PRE> mixer;</TD><TD><PRE> mixer data handle</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Handle</TD><TD><PRE> velocity;</TD><TD><PRE> velocity data handle</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Handle</TD><TD><PRE> peg;</TD><TD><PRE> PEG data handle</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> Handle</TD><TD><PRE> plfo;</TD><TD><PRE> PLFO data handle</TD></TR>
+</TABLE>
+<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Item</b> : Mixer data<DT> <B>Size</b> : 68 bytes *Total number of Mixers<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> Argument ( <B><A HREF="#_11">Note 1</a></b> )</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 32</TD><TD><PRE> Str31</TD><TD><PRE> name;</TD><TD><PRE> The name of the mixer.</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 18</TD><TD><PRE> unsigned char</TD><TD><PRE> pan[18];</TD><TD><PRE> Mixer PAN(0 -31)( <B><A HREF="#_12">Note 2</a></b> )</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 18</TD><TD><PRE> unsigned char</TD><TD><PRE> sendRet[18];</TD><TD><PRE> Mixer EffectLevel(0 -7)</TD></TR>
+</TABLE>
+<A NAME="_11"></A><P><DT> <B>Note 1</b><DD> Each argument in the array represents a channel for that mixer.<A NAME="_12"></A><P><DT> <B>Note 2</b><DD> PAN corresponds to the following "parameter/balance".<DD><TABLE BORDER=1>
+<TR><TH><PRE> parameters</TH><TH><PRE> 0</TH><TH><PRE> 1</TH><TH><PRE> 2</TH><TH><PRE> 3</TH><TH><PRE> 4</TH><TH><PRE> 5</TH><TH><PRE> ...</TH><TH><PRE> 15</TH><TH><PRE> 16</TH><TH><PRE> 17</TH><TH><PRE> 18</TH><TH><PRE> 19</TH><TH><PRE> ...</TH><TH><PRE> 31</TH></TR>
+<TR><TH><PRE> balance</TH><TH><PRE> C</TH><TH><PRE> R1</TH><TH><PRE> R2</TH><TH><PRE> R3</TH><TH><PRE> R4</TH><TH><PRE> R5</TH><TH><PRE> ...</TH><TH><PRE> R15</TH><TH><PRE> C</TH><TH><PRE> L1</TH><TH><PRE> L2</TH><TH><PRE> L3</TH><TH><PRE> ...</TH><TH><PRE> L15</TH></TR>
+</TABLE>
+<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Item</b> : Velocity data<DT> <B>Size</b> : 46 bytes *Total number of velocities<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 32</TD><TD><PRE> Str31</TD><TD><PRE> name;</TD><TD><PRE> velocity name</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> point0;</TD><TD><PRE> Position of velocity point 0 (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> level0;</TD><TD><PRE> Level of velocity point 0 (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> point1;</TD><TD><PRE> Velocity point 1 position (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> level1;</TD><TD><PRE> Level of velocity point 1 (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> point2;</TD><TD><PRE> Velocity point 2 position (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> level2;</TD><TD><PRE> Level of velocity point 2 (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> level3;</TD><TD><PRE> Level of velocity point 3 (0 -127)</TD></TR>
+</TABLE>
+<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Item</b> : PEG data<DT> <B>Size</b> : 60 bytes *Total number of PEGs<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 32</TD><TD><PRE> Str31</TD><TD><PRE> name;</TD><TD><PRE> PEG name</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> dly;</TD><TD><PRE> Delay time (0 -127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> ol;</TD><TD><PRE> Offset level (-127 - 127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> al;</TD><TD><PRE> Attack level (-127 - 127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> at;</TD><TD><PRE> Attack time (0 -2048)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> dl;</TD><TD><PRE> Decay level (-127 - 127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> dt;</TD><TD><PRE> Decay time (0 -2048)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> sl;</TD><TD><PRE> Sustain level (-127 - 127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> st;</TD><TD><PRE> Sustaun time (0 -2048)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> rl;</TD><TD><PRE> Release level (-127 - 127)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> rt;</TD><TD><PRE> Release time (0 -8192)</TD></TR>
+</TABLE>
+<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Item</b> : PLFO data<DT> <B>Size</b> : 40 bytes *Total number of PLFOs<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 32</TD><TD><PRE> Str31</TD><TD><PRE> name;</TD><TD><PRE> PLFO name</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> dly;</TD><TD><PRE> Delay time</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> freq;</TD><TD><PRE> PLFO frequency</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> amp;</TD><TD><PRE> Amplifier</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 2</TD><TD><PRE> short</TD><TD><PRE> fdTime;</TD><TD><PRE> fade time</TD></TR>
+</TABLE>
+<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Waveform data</b><DD> The waveform data in the latter half is not compressed at all.<DD> When saving a bank file, the used waveform is determined and saved.<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>For separating data</b><DD> "0xFFFF"<P><DT> <FONT SIZE=5>---------------------------</font><P><DT> <B>Item</b> : Save waveform<DT> <B>Size</b> : 92 bytes + waveform size<DD><TABLE BORDER=1>
+<TR><TH WIDTH="20"><PRE> size</TH><TH WIDTH="80"> mold</TH><TH WIDTH="150"><PRE> argument</TH><TH WIDTH="280"><PRE> explanation</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 32</TD><TD><PRE> Str63</TD><TD><PRE> name;</TD><TD><PRE> Waveform file name</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> dataSize;</TD><TD><PRE> Data size (including header)</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> numChannels;</TD><TD><PRE> Number of channels</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> numSampleFrames;</TD><TD><PRE> Number of sample frames</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 1</TD><TD><PRE> char</TD><TD><PRE> sampleSize;</TD><TD><PRE> sample size</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> sampleRate;</TD><TD><PRE> sample rate</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> start;</TD><TD><PRE> loop start</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4</TD><TD><PRE> long</TD><TD><PRE> end;</TD><TD><PRE> loop end</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> x</TD><TD><PRE> char</TD><TD><PRE> waveData[];</TD><TD><PRE> Actual waveform data</TD></TR>
+</TABLE>
+<P><DT><TABLE>
+<TR><TH><PRE> Note<BR><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>When converting data from a YAMAHA tone editor, the sample rate cannot be detected. However, since the playback rate is determined by the layer's base note and fine tune, the sample rate can be 0.</b></TD></TABLE>
+<P><DT> <FONT SIZE=5>-------End of file---------</font></DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p10_10.htm">Back</a> ｜ <A HREF="p12_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">Tone Editor User's Manual/</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

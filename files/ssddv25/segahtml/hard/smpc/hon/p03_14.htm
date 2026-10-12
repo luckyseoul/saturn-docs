@@ -1,0 +1,96 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/19&gt;SMPC User's Manual/3.1INTBACK command result parameters</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p03_13.htm">Back</a> ｜ <A HREF="p03_15.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/3.1 SMPC Control Mode</b><H2> ◆INTBACK command result parameters</H2><HR NOSHADE>
+<DL>
+<P><DD> This section explains the result parameters when acquiring peripheral data using the INTBACK command.</P>
+<A NAME="no3_14_1"></A><P><DT><H3> ●Basic structure of result parameters obtained by INTBACK command</H3><DD> When the INTBACK command is executed, the result parameters shown in Figure 3.10 are configured in the status register and OREG.<BR>
+ Peripheral control status shows various statuses in peripheral control mode. Port 1 status and Port 2 status indicate the peripheral connection status of each port. The connected peripheral ID and peripheral data are output to port 1 data and port 2 data. When a peripheral is directly connected to a peripheral port, it outputs peripheral data for one device. Also, when a multi-tap is connected, peripheral data for the number of taps is output.</P>
+<A NAME="z3_10"></A><P><DD> <B>Figure 3.10 Basic structure of result parameters obtained by INTBACK command</b><DD><PRE>
+
+    ┌──────────────┐   ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┐　
+ SR |  Peripheral  | = |  1  | PDL |RESB |P2MD1|P2MD0|P1MD1|P1MD0|　
+    │Control status│   └─────┴─────┴─────┴─────┴─────┴─────┴─────┘　
+    ├──────────────┤───┌──────────┐   ┌────────┬────────────┐　
+    │              │   │  Port 1  │   │ Multi- │ Number of  │　
+    │              │   │  status  │ = │ tap ID │ connectors │　
+    │              │   ├──────────┤   └────────┴────────────┘　
+    │              │   │Peripheral│　
+    │ Port 1 data  │   │  1 data  │　
+    │              │   ├──────────┤───┌────────────────┐ ┌───────────────┬─────────┐
+    │              │   │Peripheral│   │     Saturn     │ │  Sega Saturn  │         │
+    │              │   │  2 data  │   │  peripheral ID │=│Peripheral type│Data size│
+OREG├─  ─  ─  ─ ─ ─┤─┐ ├──────────┤─┐ ├────────────────┤ │               │         │
+    │              │ │ │          │ │ │    Extended    │ └───────────────┴─────────┘
+    │              │ │ │    :     │ │ │   data size    │
+    │              │ │ ├──────────┤ │ ├────────────────┤　
+    │ Port 2 data  │ │ │          │ │ │  Peripheral 2  │　
+    │              │ │ │    :     │ │ │    1st data    │　
+    │              │ │ ├──────────┤ │ ├────────────────┤　
+    │              │ │ │          │ │ │  Peripheral 2  │　
+    │              │ │ │    :     │ │ │    2nd data    │　
+    └──────────────┘ │ ├──────────┤ │ ├────────────────┤　
+                     │ │    :     │ │ │        :       │　
+                     │ ├──────────┤ │ ├────────────────┤　
+                     │ │Peripheral│ │ │                │　
+                     │ │  m data  │ │ │        :       │　
+                     └─└──────────┘ │ ├────────────────┤　
+                                    │ │        :       │　
+                                    │ ├────────────────┤　
+                                    │ │  Peripheral 2  │　
+                                    │ │    nth data    │　
+                                    └─└────────────────┘　
+</PRE><A NAME="no3_14_2"></A><P><DT><H3>●Result parameter configuration in 0 byte mode</H3><DD> If either port is set to 0-byte mode, the data from the port set to 0-byte mode is dropped, resulting in a packed structure.<BR>
+ Figure 3.11 shows the data structure when one side is in 0-byte mode.</P>
+<A NAME="z3_11"></A><P ALIGN=CENTER> <B>Figure 3.11 Result parameter configuration when one side is in 0-byte mode</b><BR>
+<img srcset="../grp/i063_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> As mentioned above, the composition of the result parameters differs depending on the setting conditions of the command parameters. Table 3.4 shows the relationship between command parameter setting conditions and generated result parameter configuration.</P>
+<A NAME="t3_4"></A><P><DD> <B>Table 3.4 Command parameter setting conditions and peripheral data structure</b><DD><TABLE BORDER=1>
+<TR><TH COLSPAN=4> Command parameter setting conditions</TH><TH COLSPAN=3> Result parameter configuration</TH></TR>
+<TR><TH><PRE> SMPC stator<BR> return</TH><TH><PRE> peripheral<BR> return data</TH><TH><PRE> port 1 con<BR> There are trolls</TH><TH><PRE> port 2 con<BR> There are trolls</TH><TH><PRE> SMPC status</TH><TH><PRE> port 1 data</TH><TH><PRE> port 2 data</TH></TR>
+<TR><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH></TR>
+<TR><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ○&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH></TR>
+<TR><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ○&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH></TR>
+<TR><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ○&#65310;</TH><TH>&#65308; ○&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH></TR>
+<TR><TH>&#65308; ×&#65310;</TH><TH>&#65308; ○&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH><TH>&#65308; ×&#65310;</TH></TR>
+<TR ALIGN=CENTER><TD> ×</TD><TD> ○</TD><TD> ×</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD> ×</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ○</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> ×</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ○</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ×</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ×</TD><TD> ○</TD><TD> ×</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ×</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD><TD> ○</TD><TD> ×</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ○</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD><TD> ○</TD><TD> ○</TD><TD> ×</TD></TR>
+<TR ALIGN=CENTER><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD><TD> ○</TD></TR>
+</TABLE>
+</P>
+<P><DD>&#65308; <B>?</b>&#65310; is prohibited to use</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_13.htm">Back</a> ｜ <A HREF="p03_15.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

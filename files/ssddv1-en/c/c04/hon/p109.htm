@@ -1,0 +1,58 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p108.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p110.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H3> 8.2.2 CD drive </H3>
+<DD> Refer to CD block initialization (CDC_CdInit) to open and close the tray in 〈OPEN〉, 〈NODISC〉 state. <P>
+<DT><table border cellpadding=5>
+<td width = 150> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220> <pre> <B> Function </B> <br> CD playback </td> <td width = 160> <pre> <B> Function Name </B> [SR] <br> CDC_CdPlay </td> <td width = 60> <pre> <B> No </B> <br >2.1</td>
+</table><P>
+<DD><PRE>
+<B> Format </B> Sint32 CDC_CdPlay (CdcPly * ply)
+<B> Input </B> ply: Playback parameter
+<B> Output </B> None
+<B> Function value </B> Returns an error code.
+<B> Function </B> Plays the CD according to the specified playback parameters.
+<B> </B> Music is played in the CD-DA area and sector data is read in the CD-ROM area.
+<B> Do not play back the gap / pause area at the boundary between CD-ROM and CD-DA.
+<B> Note SCSP settings are required to play CD-DA and actually output audio. For setting method
+Refer to the SCSP manual for details. </B>
+<B> Remarks </B> When playing CD-DA, the mute is canceled 4 frames before the start position to prevent the song from being cut off. <BR>
+<B> Example </B> <B> (1) Frame address specification </B>
+<B> </B> Sint32 ret;
+<B> C </P> CdcPly plywk, * ply = & plywk; / * Definition of playback parameter variable * /
+<B> </B> CDC_PLY_STYPE (ply) = CDC_PTYPE_FAD;
+<B> </B> CDC_PLY_SFAD (ply) = fad; / * Start frame address * /
+<B> </B> CDC_PLY_ETYPE (ply) = CDC_PTYPE_FAD;
+<B>: </B> CDC_PLY_EFAS (ply) = fasnum; / * number of frame address sectors * /
+<B>: </B> CDC_PLY_PMODE (ply) = pmode; / * Playback mode * /
+<B> </B> ret = CDC_CdPlay (ply); / * Start playback * / <P>
+<B> </B> <B> (2) Track / index specification </B>
+<B> </B> CdcPly plywk, * ply = & plywk;
+<B> </B> CDC_PLY_STYPE (ply) = CDC_PTYPE_TNO;
+<B> </B> CDC_PLY_STNO (ply) = tno1; / * Start track number * /
+<B>: </B> CDC_PLY_SIDX (ply) = x1; / * Start index number * /
+<B> </B> CDC_PLY_ETYPE (ply) = CDC_PTYPE_TNO;
+<B>: </B> CDC_PLY_ETNO (ply) = tno2; / * End track number * /
+<B>: </B> CDC_PLY_EIDX (ply) = x2; / * End index number * /
+<B> </B> CDC_PLY_PMODE (ply) = pmode; / * Playback mode * /
+<B> </B> ret = CDC_CdPlay (ply); <P>
+<B> </B> <B> (3) Specifying default values ​​</B>
+<B> </B> CdcPly plywk, * ply = & plywk;
+<B>: </B> CDC_PLY_STYPE (ply) = CDC_PTYPE_DFL; / * The start position is the top of the disc * /
+<B> </B> CDC_PLY_ETYPE (ply) = CDC_PTYPE_DFL; / * End position is the end of the disc * /
+<B>: </B> CDC_PLY_PMODE (ply) = CDC_PM_DFL; / * No repeat, move pickup * /
+<B> </B> ret = CDC_CdPlay (ply); <P>
+<B> </B> <B> (4) Resume CD playback (unchanged designation: playback from the current position) ... Pause cancellation </B>
+<B> </B> CdcPly plywk, * ply = & plywk;
+<B> </B> CDC_PLY_STYPE (ply) = CDC_PTYPE_NOCHG;
+<B> </B> CDC_PLY_ETYPE (ply) = CDC_PTYPE_NOCHG;
+<B> </B> CDC_PLY_PMODE (ply) = CDC_PM_NOCHG;
+<B> </B> ret = CDC_CdPlay (ply); </PRE> <BR>
+</DL><P><P><HR>
+<A HREF=p108.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p110.htm> Go to next page </A>
+</BODY>
+</HTML>

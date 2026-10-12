@@ -1,0 +1,68 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/ 7&gt;SGL Sound Tutorial/2. Create a song</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">SOUND TUTORIAL</a><HR>
+ <B>▲ <A HREF="p02_40.htm">Back</a> ｜ <A HREF="p02_60.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SOUND TUTORIAL/2. Create a song</b><HR NOSHADE>
+<DL>
+<A NAME="no2_50"></A><P><DT><H2> 2-5. Create a song</H2><DD> What I've created so far is just sounds, and I have to use those sounds to create songs.<BR>
+ However, Sega Sound Tool does not have software for creating musical scores or song data. The software used to create musical scores is mainly called sequence software, and when you play a MIDI instrument (keyboard, etc.), it records it and saves the song data.<BR>
+ There are also software that has a function called notation software, which allows you to display musical scores and insert notes like a word processor.<BR>
+ Sequence software can save song data in SMF (Standard MIDI Format) format.<BR>
+ To use it on the Saturn, please save the song data in this SMF type 1 format.<BR>
+ For details, please refer to the respective software manual.</P>
+<P><DD> Also, before creating a song, there are some things to keep in mind regarding the song itself, so be sure to check with your game programmer about the following points.</P>
+<P><DT><H3> A note about the song itself</H3><DD><P><LI> <B>When using fade out</b><DD> When using a long note, if the long note is played before the fade-out is applied, the volume of the note will not change while it is being played, so only the long note will not be faded out. may remain.</P>
+<P><LI> <B>When using loop</b><DD> If you change the tempo of a song that contains loop information, the tempo will return to the default at the beginning of the loop.</P>
+<P><DD> Now let's move on to creating the song.<BR>
+ When creating a song (including sound effects), each instrument part is handled in units called tracks.<BR>
+ When creating an SMF file, information called MIDI events must be entered in the following order, shifted by at least one clock, in the track that contains note information.</P>
+<A NAME="no2_51"></A><P><DT> <B>1) Insert control code 0 at the beginning of the track.</b><DD> For Saturn, there is no problem whether it is inserted or not, but the control numbers 32 to 63 that will be used from now on were originally prepared to improve the accuracy of 0 to 31, so it is better to include them. It means that it is good.</P>
+<A NAME="no2_52"></A><P><DT> <B>2) Next, enter control code 32.</b><DD> The parameter is <A NAME="TONEB">the tone bank number</a> (0 to 15) used in this song (sound effect). Set the tone bank number when creating the sound simulator map (see “ <A HREF="p02_60.htm#no2_64">4) Creating a map</a> ” in section 2-6).</P>
+<A NAME="no2_53"></A><P><DT> <B>3) Next, enter the program number.</b><DD> Enter the number (0 to 127) from the beginning of the tone bank set in step <B>2)</b> for the tone used in the track.</P>
+<P><DD> An example using VisionAV is shown below, but it is basically the same for other sequence software.</P>
+<A NAME="z2_31"></A><P ALIGN=CENTER> <B>Figure 2-31 Example of inserting control code using VisionAV</b><BR>
+<img srcset="../grp/p2_17.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> In the case of a control code, click the mouse at the position of the inserted control code and set it to 0 and 32 as shown below.</P>
+<A NAME="z2_32"></A><P ALIGN=CENTER> <B>Figure 2-32 Control code settings</b><BR>
+<img srcset="../grp/p2_18_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> This software is labeled "Number (0)", but some Japanese versions of the software are labeled "Control (0)".<BR>
+ There is also software that does not display a pop-up menu but moves the mouse over the parentheses () and clicks to move the numbers up and down.</P>
+<P><DD> In addition, to loop a song as BGM, etc., you can do so by inserting control code 31 number 0 at the beginning and end of the loop.</P>
+<P><DD> Loop information only needs to be placed in one track, so it will be easier to understand later if you create a track that only contains loop information.</P>
+<P><DD> Below is an example.</P>
+<A NAME="z2_33"></A><P ALIGN=CENTER> <B>Figure 2-33 Example of track for loop information</b><BR>
+<img srcset="../grp/p2_18_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The method of inserting a MIDI event is exactly the same as the example of inserting a control code.</P>
+<P><DD><LI> <B>keep</b><DD> Save as a multi-track SMF file. First, select Export from the File menu.</P>
+<A NAME="z2_34"></A><P ALIGN=CENTER> <B>Figure 2-34 Save file (export)</b><BR>
+<img srcset="../grp/p2_19_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Next, the following screen will be displayed, so specify SMF and Type 1 format.</P>
+<A NAME="z2_35"></A><P ALIGN=CENTER> <B>Figure 2-35 Settings when saving (exporting) a file</b><BR>
+<img srcset="../grp/p2_19_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_40.htm">Back</a> ｜ <A HREF="p02_60.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">SOUND TUTORIAL</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,174 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 3&gt;Debug support library/2.2 Function specifications</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Debug support library</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>Debug support library/2.Reference</b><HR NOSHADE>
+<H3> 2.2 Function specifications</H3><!-- ---------------------------------------------------------------------------- -->
+<A NAME="no1"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=150><PRE> <B>Title</b><BR> function specification</TD><TD WIDTH=220><PRE> <B>Function</b><BR> Initializing the debug environment</TD><TD WIDTH=160><PRE> <B>Function name</b><BR> DBG_Initial</TD><TD WIDTH=060><PRE> <B>No</b><BR> 1</TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DBG_Initial (Uint16 *PadData, Rgb16 charColor, Rgb16 backColor)<P><DT> <B>input</b><DD><DL>
+<P><DT> apPadData: Pointer to dedicated pad data<DD> Please specify the pad data area to set the pad data acquired using the peripheral library in the V-Blank user routine.<BR>
+ Also, please set the pad data by inverting 0 and 1.</P>
+<P><DT> charColor: Specify the display font color in 16-bit RGB.<DD> backColor: Specify the color of the display back screen in 16-bit RGB. If you specify 0, the color will be transparent.</P>
+</DL>
+<P><DT> <B>Setting Example</b><DD> === V blank interrupt routine (pad data acquisition) ===<PRE>
+    PerDgtInfo *pad;
+        Uint16 PadData1;
+
+    PadData1 = pad[0].data ^ 0xffff;
+</PRE><P><DD>=== DBG_Initial calling routine ===<PRE>
+        extern Uint16 PadData1;
+
+        DBG_Initial(&PadData1, ...);
+</PRE><DT><B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Initialize the debug support library and set the program error display routine entry in the program exception interrupt vector below.<DD><UL TYPE="DISK">
+<LI> General illegal instruction interrupt<LI> Illegal slot instruction interrupt<LI> CPU address error interrupt<LI> DMA address error interrupt</UL>
+<DD> When an error occurs, the program error display routine displays the cause of the error, current register contents, and stack area contents, and passes control to the simple monitor.<DT> <B>remarks</b><DD> Library users must run it first.</DL>
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no2"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Display debug screen ON</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> DBG_DisplayOn</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 2</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DBG_DisplayOn(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Display the debug screen.</DL>
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no3"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Debug screen display OFF</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> DBG_DisplayOff</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 3</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DBG_DisplayOff(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Does not display the debug screen.</DL>
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no4"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Clear debug screen</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> DBG_ClearScreen</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 4</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DBG_ClearScreen(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Erases the data written on the debug screen.</DL>
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no5"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Debug screen cursor set</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> DBG_SetCursol</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 5</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DBG_SetCursol(Uint16 x,Uint16 y)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> x</TD><TD><PRE> :X coordinate</TD></TR>
+<TR><TD><PRE> y</TD><TD><PRE> :Y coordinate</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Specifies the cursor position.</DL>
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no6"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Display string on debug screen</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> DBG_Printf</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 6</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DBG_Printf(const char *control, ...)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> control</TD><TD><PRE> : Pointer to a string indicating the format</TD></TR>
+<TR><TD><PRE> ...</TD><TD><PRE> : argument list</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Write a string to the debug screen. It is used in the same way as printf().<DT> <B>example</b><DD><PRE>
+sample()
+        {
+            DBG_Printf(“%s\n”,“SEGA”);
+        }
+</PRE></DL>
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no7"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> via software keyboard<BR> Key input processing</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> DBG_GetKeyStr</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 7</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> char *DBG_GetKeyStr(char *keyStr)<DT> <B>input</b><DD> keyStr: Pointer to input key string return area.<DT> <B>output</b><DD> keyStr: Input key string data.<DT> <B>function value</b><DD> Pointer to the specified input key string return area<DT> <B>function</b><DD> Display the software keyboard on the debug screen and import the string.<DT> <B>keypad operation</b><DD><TABLE>
+<TR><TD><PRE> R</TD><TD><PRE> : Move key selection cursor to the right</TD></TR>
+<TR><TD><PRE> L</TD><TD><PRE> : Move key selection cursor to the left</TD></TR>
+<TR><TD><PRE> U</TD><TD><PRE> :Move key selection cursor up</TD></TR>
+<TR><TD><PRE> D</TD><TD><PRE> :Move key selection cursor down</TD></TR>
+<TR><TD><PRE> B+R</TD><TD><PRE> :Key window right movement</TD></TR>
+<TR><TD><PRE> B+L</TD><TD><PRE> :Key window left movement</TD></TR>
+<TR><TD><PRE> B + U</TD><TD><PRE> :Move key window up</TD></TR>
+<TR><TD><PRE> B+D</TD><TD><PRE> :Move key window down</TD></TR>
+<TR><TD><PRE> A</TD><TD><PRE> : Enter the character at the key selection cursor position</TD></TR>
+<TR><TD><PRE> C</TD><TD><PRE> :Delete input characters (backspace)</TD></TR>
+<TR><TD><PRE> START</TD><TD><PRE> : End of input (return)</TD></TR>
+<TR><TD><PRE> X</TD><TD><PRE> :Hide/display sprite screen</TD></TR>
+<TR><TD><PRE> Y</TD><TD><PRE> :Hide/display scroll (other than normal 0) screen </TD></TR>
+</TABLE>
+</DL>
+<!-- ---------------------------------------------------------------------------- -->
+<A NAME="no8"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD> <A HREF="p02_10.htm#no2_10">one</a><BR>
+ <A HREF="p02_10.htm#no2_10">View</a><BR>
+ <A HREF="p02_10.htm#no2_10">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Simple debugging process</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> DBG_Monitor</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 8</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void DBG_Monitor(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Enter the following command to change the display of memory contents, etc.<P><DD> Items in brackets [] can be omitted, and please select one for /.</P>
+<DT><OL>
+<P> <B><LI>Displaying memory contents</li>
+</b><TABLE>
+<TR><TD COLSPAN=2> D fromAddr [toAddr/@size] [;B/W/L]&lt; RTN&gt;</TD></TR>
+<TR><TD><PRE> fromAddr</TD><TD><PRE> :Dump start address</TD></TR>
+<TR><TD><PRE> toAddr</TD><TD><PRE> :Dump end address</TD></TR>
+<TR><TD><PRE> @size</TD><TD><PRE> :Dump size (HEX)</TD></TR>
+<TR><TD><PRE> B</TD><TD><PRE> :Byte (8 bit) display specification</TD></TR>
+<TR><TD><PRE> W</TD><TD><PRE> : Word (16 bit) display specification</TD></TR>
+<TR><TD><PRE> L</TD><TD><PRE> : Long (32 bit) display specification</TD></TR>
+</TABLE>
+ In the command input after the D command,&lt; RTN&gt; If only the key is pressed in, the memory dump will continue.</P>
+<P> <B><LI>Changing memory contents</li>
+</b><BR>
+ D to Addr [data] [;B/W/L]&lt; RTN&gt;<TABLE>
+<TR><TD><PRE> toAddr</TD><TD><PRE> :Memory address</TD></TR>
+<TR><TD><PRE> data</TD><TD><PRE> : Change data (HEX)</TD></TR>
+<TR><TD><PRE> B</TD><TD><PRE> : Byte (8 bit) data specification</TD></TR>
+<TR><TD><PRE> W</TD><TD><PRE> : Word (16 bit) data specification</TD></TR>
+<TR><TD><PRE> L</TD><TD><PRE> :Long (32 bit) data specification</TD></TR>
+</TABLE>
+ If data is omitted, a prompt to change data will be displayed starting from the specified address, so enter the data one by one. At this time, if you enter ^, the changed address will be minus,&lt; RTN&gt; If you enter , the change address will be added. Also, enter . to finish changing the memory.</P>
+<P> <B><LI>Displaying register contents</li>
+</b><BR>
+ R<img srcset="../../../../what/retkey.png 5x"><BR>
+ Valid only when called from a program's exception handling routine.</P>
+<P> <B><LI>End of simple debugging process</li>
+</b><BR>
+ Q<img srcset="../../../../what/retkey.png 5x"><BR>
+ Returns to the calling source of this routine. However, it has no effect when called from a program's exception handling routine.</P>
+<P> <B><LI>Display command help</li>
+</b><BR>
+ H<img srcset="../../../../what/retkey.png 5x"></P>
+</OL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Debug support library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

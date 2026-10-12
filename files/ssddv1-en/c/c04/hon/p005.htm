@@ -1,0 +1,26 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p004.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p007.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD> As an example of creation, the SR value is always set to 0 and the priority (priority relationship) is described using only the SCU mask value. In this case, SH can always accept interrupts, and only the SCU mask controls enabling / disabling. <P>
+<TABLE><TD><PRE>
+Uint32 PRITab [32] = {<BR> 0x0000FFF9, / * During VBI processing, HBI and VBO are permitted <BR> 0x0000FFFB, / * Only during VBO processing, only HBI is permitted <BR> 0x0000FFFF, / * All during HBI processing is prohibited ( (Highest priority) <BR> ·························· <BR> 0x00000000 / * Allow all during the external 15 processing (lowest priority) <BR>}; > * / <BR> * / <BR> <BR> <BR> * / <BR> </TD> </TABLE> <P>
+<B> Contrary to the above example, it is prohibited to mask interrupts at the SR value level without changing the SCU mask value! ! ! (Only 0 or 15 are possible) </B> <P>
+In the above example, the interrupt enable / disable register for each built-in module must also be manipulated for interrupt enable / disable of the SH built-in module. <P>
+<PRE> <B> Note: When an interrupt for a factor in the SCU is enabled and that interrupt occurs, the interrupt
+SH SR mask is higher than Mi's unique level (value determined by SCU hardware), and divided by SH
+If the situation where the inclusion is rejected can never happen, it is OK.
+(However, all exceptions to SR mask 15 are possible in exceptional cases) </B> </PRE> <P>
+<DT> <H3> Start CD multiplayer </H3>
+<DD> A service that starts and executes the CD multiplayer when the application ends. When this service is called, the CD multiplayer screen is displayed and can be operated in exactly the same way as when the power-on sequence is started, regardless of the calling state. <BR>
+* It does not return to the caller. <P>
+<DT> <H3> Power-on-clear memory operation </H3>
+<DD> Provides 8-byte memory on SDRAM managed by BOOT ROM. <BR>
+∙ These 8 bytes are initialized to 0 when the power is turned on, but the contents are retained by the reset button (NMI). <BR>
+</DL><P><P><HR>
+<A HREF=p004.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p007.htm> Go to next page </A>
+</BODY>
+</HTML>

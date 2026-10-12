@@ -1,0 +1,101 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 8&gt;CD communication I/F (MPEG part)/1. Overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication I/F (MPEG part)</b><H2 ALIGN=CENTER> 1. overview</H2><HR NOSHADE>
+<DL>
+<P> This document summarizes the functions related to the MPEG part of the CD block and the external specifications related to the MPEG part of the CD communication interface.<BR>
+ The CD communication interface of the MPEG part is abbreviated as MPEG communication interface.</P>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 System configuration</H3><DD> Figure 1.1 shows the MPEG-related system configuration.</P>
+<A NAME="z1_1"></A><P ALIGN=CENTER><DD> <B>Figure 1.1 MPEG-related system configuration</b></P>
+<DT><PRE>
+ ┌──────────────────────────────────────────┬─┐
+ │┌────────────────────────────────────────┐│ │
+ ││         Host side program              ││ │
+ ││  (MPEG library, application, etc.)     ││ │
+ │└────────────────────────────────────────┘│h│
+ │     │CD comm   │MPEG comm   ↑            │o│
+ │     │functions │functions   │            │s│
+ │     ↓          ↓            │            │t│
+ │┌─────────────────────┐┌ ─ ─ ┴ ─ ─ ─ ─ ─ ┐│ │
+ ││  CD communication   │ (Data transfer    │ │
+ ││      interface      ││ module such as  ││ │
+ ││                     │      DMA)         │ │
+ │└─────────────────────┘└ ─ ─ ┬ ─ ─ ─ ─ ─ ┘│ │
+ └─────────────────────────────┼────────────┴─┘
+        │         │            │
+CD block│CD       │MPEG        │        
+ comms  │command  │command     │ Extracted data
+        ↓         ↓            │          
+ ┌─────────────────────────────┼────────────┬─┐
+ │                        ┌────┴───┐        │ │
+ │                        │MPEG    │        │C│
+ │                        │register│        │D│
+ │ CD part       MPEG part└────┬───┘        │ │
+ │functions      functions     │            │b│
+ │┌──────┐      ┌────────┐     │            │l│
+ ││  CD  │      │  MPEG  │     │video       │o│
+ ││buffer├─────→│ device ├─────┤data        │c│
+ │└──────┘MPEG  └────┬───┘     │            │k│
+ │        stream     │audio    │            │ │
+ │                   │data     │            │ │
+ └───────────────────┼─────────┼────────────┴─┘
+                     ↓         ↓     ┌──────┐
+                   ┌────┐    ┌────┐  │  TV  │
+                   │SCSP│    │VDP2├─→│screen│
+                   └────┘    └────┘  │      │
+                                     └──────┘
+To play MPEG and actually output video and audio, separate VDP2 and SCSP settings are required.
+Please refer to the VDP2 and SCSP manuals for configuration instructions.
+</PRE><P><DD>The CDC function and CD block command in the CD part and MPEG part are abbreviated as follows.</P>
+<DD><UL TYPE=DISC>
+<LI> CD communication function: CD communication interface function of the CD part<LI> CD command: CD block command for CD part<LI> MPEG communication function: CD communication interface function of MPEG part<LI> MPEG command: CD block command of MPEG part</UL>
+</P>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 Functions and features</H3><DD> (1) below is the function of the CD communication interface, and (2) to (8) are the functions of the CD block.</P>
+<P><DT> <B>(1) Communication function with MPEG part of CD block</b><P><DD><OL TYPE=a>
+<B><LI></b> A group of C language interface functions that communicate between the host and the MPEG part.<B><LI></b> Issue commands to the MPEG part and receive responses.<B><LI></b> There is almost a one-to-one correspondence with MPEG commands.</OL>
+</P>
+<P><DT> <B>(2) MPEG video playback function</b><DD> Decodes the MPEG stream (video/audio) stored in the buffer section and plays the video. Video and audio streams are stored in separate buffer sections.<BR>
+ The functions of the CD part are used to read and store the stream in the buffer section.</P>
+<P><DT> <B>(3) Output destination switching function</b><DD> Decoded image data can be output using the following method.</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> Output directly to TV monitor via VDP2. (16 million colors)<B><LI></b> Transfer to host area and output using VDP. (32000 colors)</OL>
+</P>
+<P><DT> <B>(4) Stream switching function</b><DD> Two streams are stored in separate buffer sections, and playback is smoothly switched from one to the other at a fixed timing.</P>
+<P><DT> <B>(5) Display screen control function</b><DD><OL TYPE=a>
+<P><B><LI></b> window function<BR>
+ You can set the display range of the decoded video as a window and further enlarge or reduce it.</P>
+<P><B><LI></b> video effects<BR>
+ Video effects such as ``mosaic'', ``blur'', and ``luminescence'' can be applied to the decoded video.</P>
+</OL>
+<P><DT> <B>(6) Still image playback function</b><DD> Still images are played back by sequentially decoding an MPEG stream consisting entirely of I pictures. (equivalent to JPEG)</P>
+<P><DT> <B>(7) MPEG frame buffer function</b><DD> Decoded image data in the MPEG frame buffer can be read into the buffer section, and conversely, image data in the buffer section can be written out to the MPEG frame buffer.</P>
+<P><DT> <B>(8) MPEG sector buffer function</b><DD> The MPEG decoder can be stopped and the MPEG buffer can be used as an MPEG sector buffer for data storage. The MPEG sector buffer reads and writes sectors to and from buffer partitions.<BR>
+ (1 sector 2048 bytes, total 256 sectors)</P>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

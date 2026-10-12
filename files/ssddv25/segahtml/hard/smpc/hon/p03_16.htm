@@ -1,0 +1,85 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;14/19&gt;SMPC User's Manual/3.1 Result Parameter Details</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p03_15.htm">Back</a> ｜ <A HREF="p03_17.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/3.1 SMPC Control Mode</b><H2> ◆Result parameter details</H2><HR NOSHADE>
+<DL>
+<A NAME="no3_16_1"></A><P><DT> <B>●Peripheral control status</b><DD> SMPC outputs peripheral control status to the status register (SR) when using SMPC control mode. The status register (SR) is a register that can be read regardless of the INTBACK command. However, even if this register is read while the INTBACK command is not in use, other than the RESB bit is undefined.</P>
+<A NAME="z3_13"></A><P><DD> <B>Figure 3.13 Peripheral control status</b><DD><TABLE BORDER=1 NOSHADE>
+<TR><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> PDL</TD><TD> NPE</TD><TD> RESB</TD><TD> P2MD1</TD><TD> P2MD0</TD><TD> P1MD1</TD><TD> P1MD0</TD></TR>
+</TABLE>
+<A NAME="_z3_13_0"></A><P><DT> <B>P1MD: Port 1 mode</b><DD> 00:15 byte mode (returns peripheral data up to 15 bytes)<DD> 01:255 byte mode (returns peripheral data up to 255 bytes)<DD> 10: Not used (setting prohibited)<!-- 常識 -->
+<DD> 11:0 byte mode (does not access ports)</P>
+<A NAME="_z3_13_1"></A><P><DT> <B>P2MD: Port 2 mode</b><DD> 00:15 byte mode (returns peripheral data up to 15 bytes)<DD> 01:255 byte mode (returns peripheral data up to 255 bytes)<DD> 10: Not used (setting prohibited)<!-- 常識だよね -->
+<DD> 11:0 byte mode (does not access ports)</P>
+<A NAME="_z3_13_2"></A><P><DT> <B>RESB: Reset button status bit</b><DD> 0: Reset button OFF<DD> 1: Reset button ON<DD> It can be read regardless of the INTBACK command. (Displays the status of each V-BLANK-IN)</P>
+<A NAME="_z3_13_3"></A><P><DT> <B>NPE: Remaining peripheral data presence/absence bit</b><DD> 0: No data remaining<DD> 1: Remaining data available</P>
+<A NAME="_z3_13_4"></A><P><DT> <B>PDL: Peripheral data position bit</b><DD> Peripheral data after 0:2nd<DD> 1:1st peripheral data</P>
+<A NAME="_z3_13_5"></A><P><DT> <B>bit7</b><DD> It is always 1.</P>
+<!-- よ -->
+<A NAME="no3_16_2"></A><P><DT> <B>●Port status</b><DD> Port status is 1 byte of data that indicates the status of peripherals connected to the port. By using the port status, you can determine whether a peripheral is directly connected to the corresponding port, how many multi-tap taps are connected, etc. Figure 3.14 shows the port status configuration.</P>
+<A NAME="z3_14"></A><P><DD> <B>Figure 3.14 Port status configuration</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD COLSPAN=4> Multi-tap ID</TD><TD COLSPAN=4> Number of connectors</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_16_3"></A><P><DD> <B>Number of connectors</b><DD> If a peripheral is directly connected to a peripheral port, the number of connectors will indicate 1H, indicating that one peripheral is connected to the corresponding port. If a multitap is connected, it shows the number of taps for that multitap. Indicates 0H when nothing is connected to the peripheral port or when a peripheral that cannot be recognized by SMPC is connected to the peripheral port.<BR>
+ Table 3.5 shows the relationship between the number of connectors and connected peripherals.</P>
+<A NAME="t3_5"></A><P><DD> <B>Table 3.5 Relationship between number of connectors and peripherals</b><TABLE BORDER=1>
+<TR><TD ALIGN="CENTER"><PRE> Number of connectors</TD><TD WIDTH=300 ALIGN="CENTER"><PRE> connected peripherals</TD></TR>
+<TR><TD><PRE> 0H</TD><TD WIDTH=300><PRE>・Not connected<BR>&#12539; SMPC UNKOWN peripherals are connected</TD></TR>
+<TR><TD><PRE> 1H</TD><TD WIDTH=300><PRE>・Directly connected peripherals</TD></TR>
+<TR><TD><PRE> 2H～FH</TD><TD WIDTH=300><PRE>・Number of multi-tap taps</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_16_4"></A><P><DD> <B>Multi tap ID</b><DD> Multi-tap IDs are classified as follows depending on the peripherals connected.</P>
+<P><DD><OL>
+<LI> The multitap ID indicates FH when the peripheral is directly connected to the peripheral port and when the peripheral is unconnected.</P>
+<P><LI> When a multi-tap is connected to the peripheral port, it indicates 0H to EH.</P>
+<P><LI> When a device that SMPC cannot recognize (UNKNOWN device) is connected to the peripheral port, the Mega Drive Peripheral ID (MD PID) is displayed.</OL>
+</P>
+<P><DD> SMPC UNKNOWN device connection is determined by receiving an MD PID that SMPC does not support during the initial phase between SMPC and the peripheral. When using Justifier (Lethal Enforcers' gun), etc., you can perform connection judgment in SMPC control mode, obtain the port status, and then use SH2 direct mode. Also, when a line error occurs during the initial phase between the SMPC and the peripheral, it may be determined as UNKNOWN.</P>
+<A NAME="t3_6"></A><P><DD> <B>Table 3.6 Relationship between connected peripherals and multitap ID</b><DD><TABLE BORDER=1>
+<TR><TD ALIGN="CENTER"><PRE> connected to peripheral port<BR> peripheral</TD><TD ALIGN="CENTER"><PRE> Data indicated by multi-tap ID</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> Peripherals directly connected, not connected</TD><TD ALIGN="CENTER"><PRE> FH</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> multi tap connection</TD><TD ALIGN="CENTER"><PRE> 0H～EH</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> UNKNOWN device connection</TD><TD ALIGN="CENTER"><PRE> MD-PID</TD></TR>
+</TABLE>
+</P>
+<P><DD> Multitap IDs are collected separately from Saturn Peripheral IDs. Multitap ID is provided as a multitap specification.<BR>
+ Table 3.7 shows the currently supported multi-tap IDs and number of connectors.</P>
+<A NAME="t3_7"></A><P><DD> <B>Table 3.7 Multi-tap ID and number of connectors</b><DD><TABLE BORDER=1>
+<TR><TD ALIGN="CENTER"><PRE> Multi tap name</TD><TD ALIGN="CENTER"><PRE> Multi tap ID</TD><TD ALIGN="CENTER"><PRE> Number of connectors</TD></TR>
+<TR><TD><PRE> sega tap</TD><TD ALIGN="CENTER"><PRE> 0H</TD><TD ALIGN="CENTER"><PRE> 4H</TD></TR>
+<TR><TD><PRE> Sega Saturn 6P Multitap</TD><TD ALIGN="CENTER"><PRE> 1H</TD><TD ALIGN="CENTER"><PRE> 6H</TD></TR>
+<TR><TD><PRE> sega reservation</TD><TD ALIGN="CENTER"><PRE> 2H～EH</TD><TD ALIGN="CENTER"><PRE> -</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_15.htm">Back</a> ｜ <A HREF="p03_17.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

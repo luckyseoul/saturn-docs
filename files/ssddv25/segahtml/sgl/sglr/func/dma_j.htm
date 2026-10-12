@@ -1,0 +1,320 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/22&gt;          <!-- 何ページ目／総ページ数 -->
+SGL関数リファレンス/dma関数  <!-- タイトルネーム　-->
+</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#dma">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slDMACopy"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slDMACopy</H1>
+<HR><H3>DMAを使ったメモリ転送</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void   *src_A;
+    void   *dest_A;
+    <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> size;
+
+    void slDMACopy( src_A, dest_A, size );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void   *src_A  - 元データのあるアドレス。<BR>
+    void   *dest_A - 転送先アドレス。<BR>
+    <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> size    - 転送するサイズ(バイト)。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    CPUに内蔵された DMAを使用してブロック転送を行います。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>( high_ram, vdp2, size );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は DMAを起動後、すぐに終了するため、転送が完了するのを知りたい
+    場合には「<a href="../func/dma_j.htm#slDMAWait"><I>slDMAWait</I></A>」関数を使用してください。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/dma_j.htm#slDMAWait">slDMAWait</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#dma">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slDMAXCopy"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slDMAXCopy</H1>
+<HR><H3>DMAを使ったメモリ転送</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void   *src_A;
+    void   *dest_A;
+    <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> size;
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode;
+
+    void slDMAXCopy( src_A, dest_A, size, mode );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void   *src_A  - 元データのあるアドレス。<BR>
+    void   *dest_A - 転送先アドレス。<BR>
+    <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> size    - 転送するサイズ(転送サイズ単位)。<BR>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> mode    - 転送モード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    CPUに内蔵された DMAを使用してブロック転送を行います。<BR>
+    引数は上記 <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>と同様ですが、 mode は 以下の様に指定します。<BR>
+    mode :
+      SourceMode_DestinationMode_Size の形式で、
+      SourceMode :
+        Sinc : 転送元アドレスを増やしながら転送します。<BR>
+        Sdec : 転送元アドレスを減らしながら転送します。<BR>
+        Sfix : 転送元アドレスを固定して転送します。<BR>
+      DestinationMode :
+        Dinc : 転送先アドレスを増やしながら転送します。<BR>
+        Ddec : 転送先アドレスを減らしながら転送します。<BR>
+        Dfix : 転送先アドレスを固定して転送します。<BR>
+      Size :
+        Byte : 1バイトごとに転送します。<BR>
+        Word : 2バイトごとに転送します。<BR>
+        Long : 4バイトごとに転送します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    ある領域を0で埋める。<BR>
+    <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> dest = 0;
+    <a href="../func/dma_j.htm#slDMAXCopy"><I>slDMAXCopy</I></A>( src, &dest, size, <a href="../struct/constdma_j.htm#Sfix_Dinc_Long"><I>Sfix_Dinc_Long</I></A> );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    アドレスの変更は転送単位が終るごとに実行されるため、減算を指定した場合、
+    まず指定先に転送し、アドレスを減らして、次の転送を行いますので、注意して
+    ください。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/dma_j.htm#slDMACopy">slDMACopy</A></TD>
+<TD><PRE><a href="../func/dma_j.htm#slDMAWait">slDMAWait</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMASt_CPU0">DMASt_CPU0</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#dma">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slDMAWait"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slDMAWait</H1>
+<HR><H3>DMAの転送待ち</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void slDMAWait();
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も渡しません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>, <a href="../func/dma_j.htm#slDMAXCopy"><I>slDMAXCopy</I></A>で起動されたDMAの終了を待ちます。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>( src0, dst0, cnt0 );  /* ひとつ目の転送リクエスト       */
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>( src1, dst1, cnt1 );  /* ふたつ目の転送リクエスト       */
+                                    /*   (ひとつ目終了後実行される)   */
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>( src2, dst2, cnt2);   /* みっつ目の転送リクエスト(同上) */
+
+    <a href="../func/dma_j.htm#slDMAWait"><I>slDMAWait</I></A>();                    /* みっつ目の転送終了待ち */
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>, <a href="../func/dma_j.htm#slDMAXCopy"><I>slDMAXCopy</I></A>は常に同じチャンネルを使用し、もし
+    実行中であれば、転送終了を待って新しい転送を起動しますので、続けて
+    実行することができます。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/dma_j.htm#slDMACopy">slDMACopy</A></TD>
+<TD><PRE><a href="../func/dma_j.htm#slDMAXCopy">slDMAXCopy</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#dma">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slDMAStatus"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slDMAStatus</H1>
+<HR><H3>DMAの起動状態</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slDMAStatus();
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も渡しません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    上記の <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>, <a href="../func/dma_j.htm#slDMAXCopy"><I>slDMAXCopy</I></A>が実行中であるか調べ状態を
+    返します。<BR>
+    動作中であれば<a href="../struct/constenm_j.htm#ON"><I>ON</I></A>、終了していれば<a href="../struct/constenm_j.htm#OFF"><I>OFF</I></A>を返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>( src, dest, size );
+    if ( <a href="../func/dma_j.htm#slDMAStatus"><I>slDMAStatus</I></A>() == <a href="../struct/constenm_j.htm#ON"><I>ON</I></A> ) {
+                    :
+    } else {
+                    :
+    }
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/dma_j.htm#slDMACopy">slDMACopy</A></TD>
+<TD><PRE><a href="../func/dma_j.htm#slDMAXCopy">slDMAXCopy</A></TD>
+<TD><PRE><a href="../func/dma_j.htm#slDMAWait">slDMAWait</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#dma">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slCashPurge"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slCashPurge</H1>
+<HR><H3>キャッシュの初期化</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void slCashPurge();
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も渡しません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    CPU内蔵のキャッシュをクリアします。DMA転送等によりキャッシュ領域
+    の変更があった場合等に使用します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    *( <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> * )( 0x26020000 ) = 0x25e09990;
+              :
+    <a href="../func/dma_j.htm#slCashPurge"><I>slCashPurge</I></A>();
+    test = *( <a href="../struct/types_j.htm#Uint32"><I>Uint32</I></A> * )( 0x6020000 );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    <a href="../func/dma_j.htm#slDMACopy"><I>slDMACopy</I></A>及び、<a href="../func/dma_j.htm#slDMAXCopy"><I>slDMAXCopy</I></A>では、転送先がキャッシュ領域であった
+    場合、キャッシュはクリアされます。<BR>
+    又、スレーブCPUからマスターCPUのメモリを見る場合、スレーブCPUで、
+                                                      ^^^^^^^^^^^^^
+    この関数を実行してから見るようにしてください。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/int_j.htm#slSynch">slSynch</A></TD>
+</TR>
+</TABLE>
+</DL>
+
+<HR NOSHADE>
+<A HREF="index_j.htm">戻る</A><ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

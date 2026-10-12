@@ -1,0 +1,135 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;51/86&gt;VDP2 User's Manual/7.1 Line Color Screen</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no7">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p06_43.htm">Back</a> ｜ <A HREF="p07_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual</b><H2 ALIGN=CENTER> Chapter 7 Line screen</H2><HR NOSHADE>
+<DL>
+<P><DD> The line screen has two sides, the line color screen (LNCL) and the back screen (BACK), and you can specify a color for each line or specify a single color for the entire screen. Unlike the scroll screen, characters cannot be displayed. To use a line color screen, data for each line is stored in VRAM as a line color screen table. If it is a single color, the data at the beginning of the table will be used for the entire screen. The line screen is shown in Figure 7.1.</P>
+<A NAME="z7_1"></A><CENTER>
+ <B>Figure 7.1 Line screen</b><PRE>
+Line screen table (VRAM)          Line screen
+┌──────────────┐      ┏━━━━━━━━━━━━━━───     
+│1AAAAAAAAAAAAA│────→ ┃              1st line
+├──────────────┤      ┣━━━━━━━━━━━━━━        
+│2AAAAAAAAAAAAA│────→ ┃              2nd line
+├──────────────┤      ┣━━━━━━━━━━━━━━        
+│3AAAAAAAAAAAAA│────→ ┃              3rd line
+├──────────────┤      ┣━━━━━━━━━━━━━━        
+│4AAAAAAAAAAAAA│      ┃              :       
+├──────────────┤      ┃                      
+│      :       │      ┃                      
+├──────────────┤      ┃                      
+                                             
+[Note] In the case of single color, the data of the first line is used for the entire screen. 
+</PRE></CENTER>
+<A NAME="no7_10"></A><P><DT><H2>■7.1 Line color screen</H2><DD> The line color screen (LNCL) is a screen used only for color calculations, and you can choose to specify a single color for the entire screen or specify a color for each line. Stores the color RAM address of the color used in that line in VRAM as line color screen data.</P>
+<P><DD> The number of lines specified by one line color screen data changes depending on the interlace setting. In non-interlaced and double-dense interlaced modes, you can specify a color for each line, but in single-dense interlaced mode, you can only specify every two lines.<BR>
+ The line color screen can also be rotated using the line color screen data in the coefficient data. For coefficient data, please refer to " <B>6.4 Coefficient table control</b> ".<BR>
+ Figure 7.2 shows the structure of the line color screen table for each interlace mode, and Figure 7.3 shows the data structure on the line color screen table.</P>
+<A NAME="z7_2"></A><P><DD> <B>Figure 7.2 Line color screen table configuration</b></P>
+<P><DD> ●Non-interlaced and double-dense interlaced modes<DD><TABLE BORDER=1>
+<TR><TD><PRE></TD><TH><PRE> Bit 15 ← Line color screen table (VRAM) → 0</TH></TR>
+<TR><TH> +00H</TH><TD ALIGN=CENTER> 1st line color RAM address</TD></TR>
+<TR><TH> +02H</TH><TD ALIGN=CENTER> 2nd line color RAM address</TD></TR>
+<TR><TH> +04H</TH><TD ALIGN=CENTER> 3rd line color RAM address</TD></TR>
+<TR><TH> +06H</TH><TD ALIGN=CENTER> 4th line color RAM address</TD></TR>
+<TR><TH> +08H</TH><TD ALIGN=CENTER> 5th line color RAM address</TD></TR>
+<TR><TH> +0AH</TH><TD ALIGN=CENTER> 6th line color RAM address</TD></TR>
+<TR><TH> :<BR>
+ :</TH><TD ALIGN=CENTER> :<BR>
+ :</TD></TR>
+</TABLE>
+<DD> <B>[note]</b><DD> In the case of a single color, the color RAM address of the first line is used for the entire line color.<BR>
+ For double-dense interlacing, store line color data for even and odd fields together</P>
+<P><DD> ●Single dense interlace mode<DD><TABLE BORDER=1>
+<TR><TD><PRE></TD><TH><PRE> Bit 15 ← Line color screen table (VRAM) → 0</TH></TR>
+<TR><TH> +00H</TH><TD ALIGN=CENTER> 1st and 2nd line color RAM address</TD></TR>
+<TR><TH> +02H</TH><TD ALIGN=CENTER> 3rd and 4th line color RAM address</TD></TR>
+<TR><TH> +04H</TH><TD ALIGN=CENTER> 5th and 6th line color RAM address</TD></TR>
+<TR><TH> +06H</TH><TD ALIGN=CENTER> 7th and 8th line color RAM address</TD></TR>
+<TR><TH> +08H</TH><TD ALIGN=CENTER> 9th and 10th line color RAM address</TD></TR>
+<TR><TH> +0AH</TH><TD ALIGN=CENTER> 11th and 12th line color RAM address</TD></TR>
+<TR><TH> :<BR>
+ :</TH><TD ALIGN=CENTER> :<BR>
+ :</TD></TR>
+</TABLE>
+<DD> <B>[note]</b><DD> In the case of a single color, the color RAM addresses of the 1st and 2nd lines are used for the entire line color.</P>
+<A NAME="z7_3"></A><P><DD> <B>Figure 7.3 Bit configuration of line color screen table data</b><P><TABLE BORDER>
+<TR><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR><TH COLSPAN=5><TH COLSPAN=11> Color RAM address 11 bits </TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE>
+<TR><TD><TABLE BORDER CELLSPACING=5>
+<TR><TD></TD></TR>
+</TABLE>
+</TD><TD> part is ignored.</TD></TR>
+</TABLE>
+<DD> Additionally, when the color RAM mode is mode 0 or mode 2, the most significant bit of the address is ignored.</P>
+<A NAME="no7_11"></A><P><DT><H3> ●Line color screen table address register</H3><DD> The line color screen table address register specifies the color mode of the line color screen and the start address of the table. This is a 32-bit write-only register located at addresses 1800A8H to 1800AAH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LCTAU_"></A><P><DD> <B><FONT SIZE=5>LCTAU</font> <FONT SIZE=4>1800A8</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#LCCLMD_">LCCLMD</a></TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#LCTA_">LCTA18</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA17</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA16</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="LCTAL_"></A><P><DD> <B><FONT SIZE=5>LCTAL</font> <FONT SIZE=4>1800AA</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#LCTA_">LCTA15</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA14</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA13</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA12</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA11</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA10</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA9</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#LCTA_">LCTA7</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA6</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA5</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA4</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA3</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA2</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA1</a></TH><TH><PRE> <A HREF="#LCTA_">LCTA0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="LCCLMD_">　</A><DT><B>Line color screen color mode bit</b> : LNCL color mode bit (LCCLMD), bit 15<DD> Specifies the color mode of the line color screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> LCCLMD</TD><TD> line color screen color</TD></TR>
+<TR><TH><PRE> 0</TH><TD> Make it monochrome</TD></TR>
+<TR><TH><PRE> 1</TH><TD> Specify for each line</TD></TR>
+</TABLE>
+</P>
+<A NAME="LCTA_">　</A><DT><B>Line color screen table address bit</b> : LNCL table address bit (LCTA18 to LCTA0)<DD> Specify the start address of the line color screen table on VRAM.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> LCTA18~LCTA16</TD><TD> 1800A8H</TD><TD> bits 2-0</TD><TD></TD></TR>
+<TR><TD> LCTA15~LCTA0</TD><TD> 1800AAH</TD><TD> bits 15-0</TD><TD></TD></TR>
+</TABLE>
+</P>
+<P><DD> The actual first VRAM address is calculated using the following formula. If the VRAM capacity is 4Mbits, the most significant bit of the address is ignored.</P>
+<P><DD><PRE>
+<B>
+(Line color screen table start address)
+           = (line color screen table address register value 19 bits) x 2H
+</b></PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p06_43.htm">Back</a> ｜ <A HREF="p07_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no7">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

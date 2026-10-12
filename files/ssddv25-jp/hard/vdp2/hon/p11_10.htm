@@ -1,0 +1,153 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;63/86&gt;VDP2ユーザーズマニュアル/11.1プライオリティ機能</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>★
+<A HREF="../index.htm#no11">VDP2ユーザーズマニュアル</A>
+<HR>
+<B>▲
+<A HREF="p10_30.htm">戻る</A>｜
+<A HREF="p11_20.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第11章　プライオリティ機能</H2>
+<HR NOSHADE>
+<DL>
+	<P><DD>　VDP2は、スプライトと各スクロール画面の、プライオリティナンバーの値を比較して、表示優先順位を上から3番目まで決定します。そのとき、スプライトのプライオリティナンバーは最大8個の値からキャラクタごとに選択することができ、各スクロール画面のプライオリティナンバーは特殊プライオリティ機能を使用することで、キャラクタごとやドットごとに値を変えることもできます。</P>
+
+	<P><DD>　ラインカラー画面は指定された画面のプライオリティが最も高くなったときに、その画面の一つ下である2番目の位置に挿入することができます。</P>
+
+<A NAME="no11_10"></A>
+	<P>	<DT><H2>■11.1　プライオリティ機能</H2>
+		<DD>　スプライトと各スクロール画面のプライオリティ(表示優先順位)は、同じTV画面座標に位置するドットが透明でない画面のプライオリティナンバーの値の大きさをドットごとに比較して決定します。画面のプライオリティは、プライオリティナンバーの値の大きい方が高くなり、最もプライオリティが高いドットで構成された画像をトップ画像061サード画像と呼びます。また、スプライトおよび各スクロール画面すべてのドットが透明な位置には、バック画面が表示されます。プライオリティ機能を図11.1に示します。</P>
+
+<A NAME="z11_1"></A>
+	<P ALIGN=CENTER><B>図11.1　プライオリティ機能</B><BR><IMG SRC="../../intr/grp/i034_02.gif"></P>
+
+<A NAME="no11_11"></A>
+	<P>	<DT><H3>　●プライオリティナンバー</H3>
+		<DD>　スクロール画面には、3ビットのプライオリティナンバーレジスタが画面ごとに1個ずつあります。このプライオリティナンバーは通常、面全体に使用されますが、特殊プライオリティモードによって最下位ビットの値をキャラクタごとやドットごとに変えることができます。スプライトのプライオリティナン</P>
+
+	<P>	<DD>バーは、8個ある3ビットのプライオリティナンバーレジスタの1個をキャラクタごとに選択することができます。スプライトのプライオリティナンバーレジスタの選択については、
+「<B><A HREF="p09_20.htm">9.2　プライオリティとカラー演算</A></B>」の「<B><A HREF="p09_20.htm#no9_21">プライオリティナンバー選択</A></B>」を参照してください。</P>
+
+	<P>	<DD>　プライオリティナンバーの値の大きい方が、画面のプライオリティは高くなりますが、等しい場合のプライオリティは表11.1に示す順番に従って決まります。プライオリティナンバーの値が0Hのときは、透明とみなされます。</P>
+
+<A NAME="t11_1"></A>
+	<P>	<DD><B>表11.1　プライオリティナンバーが等しい場合のプライオリティ</B>
+		<DD><TABLE BORDER>
+	<TR ALIGN=CENTER><TH><PRE>プライオリティ</TH><TH><PRE>通　常</TH><TH><PRE>外部画面データを<BR>入力する場合</TH><TH><PRE>回転スクロール画面<BR>を2面表示する場合</TH><TH><PRE>回転スクロール画面<BR>2面で外部画面を<BR>入力する場合</TH></TR>
+	<TR ALIGN=CENTER><TH ROWSPAN=6>高<BR>↑<BR>│<BR>│<BR>│<BR>│<BR>│<BR>│<BR>│<BR>│<BR>↓<BR>低</TH><TD>スプライト</TD><TD>スプライト</TD><TD>スプライト</TD><TD>スプライト</TD></TR>
+	<TR ALIGN=CENTER><TD>RBG0</TD><TD>RBG0</TD><TD>RBG0</TD><TD>RBG0</TD></TR>
+	<TR ALIGN=CENTER><TD>NBG0</TD><TD>NBG0</TD><TD>RBG1</TD><TD>RBG1</TD></TR>
+	<TR ALIGN=CENTER><TD>NBG1</TD><TD>EXBG</TD><TD>−</TD><TD>EXBG</TD></TR>
+	<TR ALIGN=CENTER><TD>NBG2</TD><TD>NBG2</TD><TD>−</TD><TD>−</TD></TR>
+	<TR ALIGN=CENTER><TD>NBG3</TD><TD>NBG3</TD><TD>−</TD><TD>−</TD></TR>
+	</TABLE></P>
+
+<A NAME="no11_12"></A>
+	<P>	<DT><H3>　●プライオリティナンバーレジスタ</H3>
+		<DD>　プライオリティナンバーレジスタは、プライオリティナンバーを指定します。書き込み専用の16ビットのレジスタで、1800F8H〜1800FCH番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRINA_"></A>
+<P>	<DD><B><FONT SIZE=5>PRINA</FONT>　<FONT SIZE=4>1800F8H</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxPRIN_">N1PRIN2</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">N1PRIN1</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">N1PRIN0</A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxPRIN_">N0PRIN2</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">N0PRIN1</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">N0PRIN0</A></TH>
+</TR></TABLE></P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRINB_"></A>
+<P>	<DD><B><FONT SIZE=5>PRINB</FONT>　<FONT SIZE=4>1800FAH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxPRIN_">N3PRIN2</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">N3PRIN1</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">N3PRIN0</A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxPRIN_">N2PRIN2</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">N2PRIN1</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">N2PRIN0</A></TH>
+</TR></TABLE></P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRIR_"></A>
+<P>	<DD><B><FONT SIZE=5>PRIR</FONT>　<FONT SIZE=4>1800FCH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE>   -   </TH>
+<TH><PRE><A HREF="#NxPRIN_">R0PRIN2</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">R0PRIN1</A></TH>
+<TH><PRE><A HREF="#NxPRIN_">R0PRIN0</A></TH>
+</TR></TABLE></P>
+
+<A NAME="NxPRIN_"></A>
+	<DT><B>プライオリティナンバービット(スクロール画面用)</B>：Priority number bit
+	<DD>(N0PRIN2〜N0PRIN0, N1PRIN2〜N1PRIN0, N2PRIN2〜N2PRIN0, N3PRIN2〜N3PRIN0, R0PRIN2〜R0PRIN0)<BR>
+　各スクロール画面のプライオリティナンバーを指定します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD>N0PRIN2〜N0PRIN0</TD><TD>1800F8H</TD><TD>ビット2〜0</TD><TD>NBG0用（またはRBG1用）</TD></TR>
+	<TR><TD>N1PRIN2〜N1PRIN0</TD><TD>1800F8H</TD><TD>ビット10〜8</TD><TD>NBG1用（またはEXBG用）</TD></TR>
+	<TR><TD>N2PRIN2〜N2PRIN0</TD><TD>1800FAH</TD><TD>ビット2〜0</TD><TD>NBG2用</TD></TR>
+	<TR><TD>N3PRIN2〜N3PRIN0</TD><TD>1800FAH</TD><TD>ビット10〜8</TD><TD>NBG3用</TD></TR>
+	<TR><TD>R0PRIN2〜R0PRIN0</TD><TD>1800FCH</TD><TD>ビット2〜0</TD><TD>RBG0用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　プライオリティナンバーの大きい方が、表示優先順位が高くなります。また、プライオリティナンバーの値が0のときには透明とみなされ表示されません。<BR>
+　スプライトのプライオリティナンバーレジスタについては、「<B><A HREF="p09_20.htm">9.2　プライオリティとカラー演算</A></B>」の「<B><A HREF="p09_21.htm#no9_25">●プライオリティナンバーレジスタ</A></B>」を参照してください。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p10_30.htm">戻る</A>｜
+<A HREF="p11_20.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>★
+<A HREF="../index.htm#no11">VDP2ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

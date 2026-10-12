@@ -1,0 +1,145 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 7&gt;FAQ/General program</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Program General</b><H2 ALIGN=CENTER> backup </H2><HR NOSHADE>
+<DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_01"><HR></a><DL>
+<H3> How to deal with unformatted and corrupted backup files?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Depending on how the user handles the cartridge RAM (power memory) (for example, when it is inserted or removed when the power is turned on), irregular characters may appear in the file name, comment, and usage value on the multiplayer "Saved Data Management" screen. or a numerical value may be displayed.</P>
+<P> At this time, the file is not unformatted (the application does not recognize it as unformatted), and there are corrupted files.</P>
+<P> If you record data to a cartridge RAM like the one above, it will stop within the BUP_Write() function.</P>
+<P> For comparison, I tried running the data recording process of another application (created by calling the SBL function with the same name using the same procedure), and it ran normally. Are there differences depending on the library in the internal processing of the BUP_Write() function?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> First, I think it depends on where the buffer prepared for the backup library is located.</P>
+<P> If the backup data is corrupted, the data size information included in the backup data may also have changed.<BR>
+ A situation may occur where the buffer is overflowed when reading/writing a backup.<BR>
+ If it is an important area used by the system, it may hang.</P>
+<P> In the first place, it is quite possible that a situation like this could occur depending on the user's usage, but if this happens, the application will no longer be able to intervene.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_02"><HR></a><DL>
+<H3> The size returned by the backup management screen and the application are different.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The built-in backup memory of the main unit is 32k bytes (512 blocks).<BR>
+ However, when I look at the backup data management screen, the free space is displayed as 461 blocks even though it is initialized.<BR>
+ Does this mean that the backup area available to the user is 461 blocks (approximately 29K bytes)? Also, why is that?</P>
+<P> In the case of 4096 bytes of continuous data, when calculated using the usage formula in the creation standards, the usage should be (4096+32)/64=65 blocks, but when it is actually written to backup RAM and "BUP_Dir" If you check with "BUP_Stat", the amount of blocks used is 72 blocks.<BR>
+ Also, on the backup data management screen, it is displayed as 65 blocks according to the calculation formula. Why does this difference occur?</P>
+<P> Is it okay to use the device's built-in backup RAM to its capacity limit for one backup data?<BR>
+ Or is it morally necessary to leave a certain amount of space free?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The difference between the number of free blocks obtained by the backup library function Bup_Stat and the number of blocks that can actually be used occurs because there is an area reserved as a reserve area for future expansion. For this reason, the actual usable capacity is slightly smaller.</P>
+<P> When accessing the backup RAM, check whether it is possible to write in the block unit shown in the structure BupStat obtained by Bup_Stat, and refer to it.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_03"><HR></a><DL>
+<H3> I don't really understand how to calculate "block" as a unit of capacity.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I don't quite understand the specifications of the "block" unit of capacity.<BR>
+ Developer's Information The value calculated from the contents of <A HREF="../../info/hon/stn09.htm">STN-9</a> and the value returned by the library do not match.<P><DT> <FONT SIZE=5>A)</font><DD> The reason why the two values do not match is because the purpose of use is different.<BR>
+ Please use the correct one for each purpose.</P>
+<P> " <B>Consumption amount [block]</b> " explained in Developer's Information STN-9 is<BR>
+ This is a convenient value to notify <FONT SIZE=5>the 'user'</font> of usage.</P>
+<P><DD> <B>(Amount used) = ( [Number of bytes used] + 32 ) / rounded up to 64</b></P>
+<P> The calculation formula is used.</P>
+<P> This calculation formula is the same as the consumption calculation formula displayed on the main unit's BOOT-ROM backup management screen, and is common to all main units, cartridges, and FDs. This is different from consumption in the strict sense of the word, so it cannot be used to check remaining capacity.</P>
+<P> In addition, the size of "block" in library functions differs depending on the device, and is as follows.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=180></TH><TH WIDTH=120> Total number of blocks<BR>
+ total block</TH><TH WIDTH=120> 1 block capacity<BR>
+ blocksize<BR>
+ (in bytes)</TH></TR>
+<TR><TD> Built-in RAM (current)</TD><TD ALIGN=CENTER> 512</TD><TD ALIGN=CENTER> 64</TD></TR>
+<TR><TD> Power memory (old model)</TD><TD ALIGN=CENTER> 1024</TD><TD ALIGN=CENTER> 512</TD></TR>
+<TR><TD> Power memory (new model)</TD><TD ALIGN=CENTER> 2048</TD><TD ALIGN=CENTER> 256</TD></TR>
+</TABLE>
+</P>
+ *Not all of the above values can be used as save data areas.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_04"><HR></a><DL>
+<H3> How should I check the remaining backup capacity?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How should I check the remaining backup capacity?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> First, check if save data already exists.<BR>
+ Please use the following directory information acquisition function <A HREF="../../prgg/sysg/bkup/hon/p02_11.htm#no2_8">BUP_dir()</a> .</P>
+<P><DL>
+<DT> <B>Format</b><DD> Sint32 BUP_Dir(device, filename, NUM, dir)<DT> <B>[input]</b><DD> Uint32 device:Device number (0:Built-in memory 1:Cartridge)<DD> Uint8 *filename: File name (ASCII string of up to 11 characters)<DD> Uint16 NUM: Number of directory information structures secured<DT> <B>[output]</b><DD> BupDir dir[NUM] :Status information<DT> <B>[Function value]</b><DD> Number of file name matches<BR>
+ (If the number of matches exceeds NUM, the value will be reversed)<DT> <B>[explanation]</b><DD> Searches the file name by prefix match and returns the number of matches as a function value.<BR>
+ In the case of an application that uses multiple save data, all files with the same file name other than the number at the end will be searched.<BR>
+ Also, if the number of matches is less than or equal to NUM, the directory information of each file will be obtained in dir[NUM].</DL>
+</P>
+<P><DD> If the number of matches is 0 for all devices, the save data does not exist.<BR>
+ In that case, check whether a new save is possible. Please use the following status acquisition function BUP_Stat().</P>
+<P><DL>
+<DT> <B>[Format]</b><DD> Sint32 BUP_Stat(device, datasize, stat)<DT> <B>[input]</b><DD> Uint32 device:Device number (0:Built-in memory 1:Cartridge)<DD> Uint32 datasize: Save data size (in bytes)<DT> <B>[Output]</b> BupStat *stat :Status information<DT> <B>[Function value]</b><DD> Device status<BR>
+ (0: Acquisition successful BUP_NON: Not connected BUP_UNFORMAT: Unformatted)<DT> <B>[explanation]</b><DD> You can check the number of files that can be saved.<BR>
+ Call the function by specifying the device number and data size.<BR>
+ If the function value is 0, the status information was successfully retrieved.<BR>
+ Refer to stat.datanum to get the number of files that can be saved.<BR>
+<DT> <B>[Notes]</b><DD> Among the acquired status information, please do not use the following information.<BR>
+ The reason is that the remaining capacity cannot be checked correctly.</P>
+<P><DD> stat.blocksize :Size of 1block (in bytes)<BR>
+<DD> stat.freeblock: Number of unused blocks<DD> stat.freesize: Unused capacity (in bytes)</P>
+<P><DD> However, there is no problem in using stat.freesize only when the number of files to be saved is one.<BR>
+ (Can be compared with the byte size of the data to be saved)</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_05"><HR></a><DL>
+<H3> What should I set as the 'language type' when saving?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What should I set as the 'language type' when saving?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The language type referred to here is the language of the comment information in the save file. Only ASCII codes can be used for save data file names, but katakana etc. can be used for comment information.</P>
+<P> If you want to write the comment in Japanese, please specify BUP_JAPANESE for 'Language type'.</P>
+<P> For other languages, use one of the following:</P>
+<P><DD><TABLE>
+<TR><TD> BUP_ENGLISH</TD><TD> :English</TD></TR>
+<TR><TD> BUP_FRANCAIS</TD><TD> :French</TD></TR>
+<TR><TD> BUP_DEUTSCH</TD><TD> :German</TD></TR>
+<TR><TD> BUP_ESPANOL</TD><TD> :Spanish</TD></TR>
+<TR><TD> BUP_ITALIANO</TD><TD> :Italian</TD></TR>
+</TABLE>
+</P>
+<P> <B>*</b> Please refer to "Backup Creation Standards" for characters that can be used in file names and comment information.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_06"><HR></a><DL>
+<H3> How do I check the connection of the backup cartridge?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How do I check the connection of the backup cartridge?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> You can check this when you initialize the backup library.</P>
+<P><DD><PRE>
+      BUP_Init( addr, workbuff, conf)
+        Uint32 *addr           :Library deployment area 
+        Uint32 workbuff[2078]  :Library work area
+        BupConfig conf[3]      :Connected device information
+                               conf[0] Built-in RAM
+                               conf[1] Cartridge RAM
+                               conf[2] FDD (currently unavailable)
+</PRE></P>
+<P><DD>After executing BUP_Init(), refer to the connected device information conf[1].<BR>
+ When the cartridge is not connected → conf[1].unit_id will be 0.<BR>
+ When the cartridge is connected → conf[1].unit_id becomes 2.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_07"><HR></a><DL>
+<H3> How should I do a bug check if the backup RAM is in an uninitialized state?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How can I do a bug check if the backup RAM is uninitialized?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> An easy way to initialize the main unit's RAM is to turn on the main unit with the battery removed.<BR>
+ We are currently preparing a dedicated tool to detect uninitialized cartridges and corrupted files.</p>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

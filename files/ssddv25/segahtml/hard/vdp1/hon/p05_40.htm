@@ -1,0 +1,63 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;24/54&gt;VDP1 User's Manual/5.4 Command Table</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p05_30.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 5 Table</b><HR NOSHADE>
+<DL>
+<A NAME="no5_40"></A><P><DT><H2> ■5.4 Command table</H2><DD> The command table consists of 1EH (30) Bytes. The command table is fetched every 20H (32) Bytes, so please define it with a 20H boundary. The 2 bytes following the command table are dummy and are skipped when fetching the command table.<BR>
+ The command table stored in VRAM is fetched from the start address (00000H) for each frame. Be sure to store the command table in addresses 00000H to 0001EH. If you place something other than a command table (color lookup table, Gouraud shading table, character pattern table), drawing behavior is not guaranteed. VRAM is up to address 7FFFFH. Do not define Gouraud shading tables beyond address 80000H.</P>
+<A NAME="z5_5"></A><DD> <B>Figure 5.5 Command table</b><BR>
+<DT><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD COLSPAN=2></TD><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> CMDCTRL</TD><TD> +00H</TD><TD> END</TD><TD COLSPAN=3> JP</TD><TD COLSPAN=4> ZP</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=2> Dir</TD><TD COLSPAN=4> Comm</TD></TR>
+<TR ALIGN=CENTER><TD> CMDLINK</TD><TD> +02H</TD><TD COLSPAN=14> LINK specification/8H</TD><TD> 0</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TD> CMDPMOD</TD><TD> +04H</TD><TD> MON</TD><TD> 0</TD><TD> 0</TD><TD> HSS</TD><TD> Pclp</TD><TD> Clip</TD><TD> Cmod</TD><TD> Mesh</TD><TD> ECD</TD><TD> SPD</TD><TD COLSPAN=3> color mode</TD><TD COLSPAN=3> color calculation bit</TD></TR>
+<TR ALIGN=CENTER><TD> CMDCOLP</TD><TD> +06H</TD><TD COLSPAN=16> Color bank, color lookup table/8H (LSB fixed at 00B), non-texture</TD><TR ALIGN=CENTER><TD> CMDSRCA</TD><TD> +08H</TD><TD COLSPAN=14> Character address/8H</TD><TD> 0</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TD> CMDSIZE</TD><TD> +0AH</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=6> Character size X/8</TD><TD COLSPAN=8> Character size Y/8</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXA</TD><TD> +0CH</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (A), X coordinate (XA) <B>*</b></TD></TR>
+<TR ALIGN=CENTER><TD> CMDYA</TD><TD> +0EH</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (A), Y coordinate (YA)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXB</TD><TD> +10H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (B), X coordinate (XB)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYB</TD><TD> +12H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (B), Y coordinate (YB)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXC</TD><TD> +14H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (C), X coordinate (XC)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYC</TD><TD> +16H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (C), Y coordinate (YC)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDXD</TD><TD> +18H</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (D), X coordinate (XD)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYD</TD><TD> +1AH</TD><TD COLSPAN=5> sign extension</TD><TD COLSPAN=11> Vertex (D), Y coordinate (YD)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDGRADA</TD><TD> +1CH</TD><TD COLSPAN=16> Gouro shading table/8H</TD></TR>
+<TR ALIGN=CENTER><TD></TD><TD> +1EH</TD><TD COLSPAN=16> Dummy (will be skipped when fetching the table)</TD></TR>
+<TR ALIGN=CENTER><TD></TD><TD> +20H</TD><TD COLSPAN=16> subsequent table<BR>
+</TD></TR>
+<TR ALIGN=CENTER><TD></TD><TD> +40H</TD><TD COLSPAN=16> subsequent table<BR>
+</TD></TR>
+<TR ALIGN=CENTER><TD></TD><TD> +60H</TD><TD COLSPAN=16> :<BR>
+ :</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>[Note] *</b> The first bit of the vertex coordinate is the sign bit. Negative values are expressed in two's complement. Extend the sign of the upper 6 bits.</P>
+<P><DD> The drawing order of each part, such as sprites, is determined by how this command table is placed in VRAM.<BR>
+ The drawn parts processed first are the ones furthest from the viewpoint, and the drawn parts processed last are the ones closest.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_30.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

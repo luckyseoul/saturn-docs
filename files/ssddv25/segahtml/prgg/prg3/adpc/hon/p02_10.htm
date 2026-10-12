@@ -1,0 +1,98 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 8&gt;PCM/ADPCM playback library/2.Specifications</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">PCM/ADPCM playback library</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>PCM/ADPCM playback library</b><H2 ALIGN=CENTER> 2.Specifications</H2><HR NOSHADE>
+<DL>
+<P><DD> The specifications of this library are shown in the table below.</P>
+<A NAME="t2_1"></A><P><DD> <B>Table 2.1 Library specifications</b><DT><TABLE BORDER>
+<TR><TH><PRE> Item</TH><TH><PRE> specification</TH><TH><PRE> remarks</TH></TR>
+<TR><TD><PRE> sampling frequency</TD><TD><PRE> up to 44.1kHz</TD><TD></TD></TR>
+<TR><TD><PRE> Quantization bit number</TD><TD><PRE> 8bit,16bit</TD><TD></TD></TR>
+<TR><TD><PRE> Number of channels</TD><TD><PRE> monaural, stereo</TD><TD></TD></TR>
+<TR><TD><PRE> file format</TD><TD><PRE> AIFF format<BR> Specified ADPCM format1 <B><A HREF="#_1">)</a></b><BR> CD-ROM XA Audio format2 <B><A HREF="#_2">)</a></b><BR> SaturnPCM format <B><A HREF="#_3">3)</a></b></TD><TD> PCM uncompressed<BR>
+ ADPCM compression<BR>
+ ADPCM compression<BR>
+ PCM uncompressed</TD></TR>
+<TR><TD><PRE> CD-ROM format</TD><TD><PRE> For CD-ROM XA Audio format<BR> Mode2Form2,<BR> Otherwise Model or<BR> Mode2Form1</TD><TD></TD></TR>
+<TR><TD><PRE> play mode</TD><TD><PRE> Memory playback mode (playback data on memory)<BR> File playback mode (read and play from CD)<BR> Stream playback mode (read and play from CD)</TD><TD> <B><A HREF="#_4">Four)</a></b><BR>
+ Use file system<BR>
+ Use stream system</TD></TR>
+<TR><TD WIDTH=170><PRE> function</TD><TD><PRE> Branch playback, continuous playback, loop playback5 <B><A HREF="#_5">)</a></b><BR> Multi playback (up to 4 videos can be played simultaneously)<BR> Specify pause, pause, volume/pan</TD><TD><PRE> Only one ADPCM</TD></TR>
+<TR><TD><PRE> Continuous playback time</TD><TD><PRE> up to 1 hour</TD><TD></TD></TR>
+<TR><TD><PRE> Library used</TD><TD><PRE> file system, stream system, DMA library,<BR> ADPCM decompression library</TD><TD> Specify to link these at the same time as this library <B><A HREF="#_6">6)</a></b></TD></TR>
+<TR><TD><PRE> CPU timer<BR> Use of (FRT)</TD><TD><PRE> This library uses the CPU timer (FRT) with a frequency division number of 128.<BR> is. Initialize it only once within the PCM_Init function. A user<BR> FRT initialization and settings on the side are prohibited.</TD><TD> It is possible to obtain the value using TIM_FRT_GET_16 etc.</TD></TR>
+<TR><TD><PRE> Using DMA</TD><TD><PRE> CPU-DMA (channel 1), or<BR> Uses SCU-DMA (channel 0).</TD><TD><PRE> <B><A HREF="#_7">7)</a></b></TD></TR>
+<TR><TD><PRE> sound driver</TD><TD> The user must perform initial settings (68000 reset, sound driver transfer, etc.) in advance. This library issues commands related to PCM playback (PCM start, stop, parameter change). All commands to the sound driver are issued using <A HREF="../../sund/index.htm">the sound I/F library</a> .</TD><TD> See " <A HREF="../../../../sndt/prog/drve/index.htm">SEGA Saturn Sound Driver 2.20 Programmer's Guide</a> ".</TD></TR>
+<TR><TD><PRE> Allocating a buffer</TD><TD><PRE> Work buffer: Work structure (approx. 530 bytes)<BR> Extended work buffer: 2048byte<BR> Ring buffer: Sector size *10 bytes ~<BR> PCM buffer: 4096*2~4096*4sample/1ch<BR> Pose processing work: 4096 samples ~ PCM buffer size</TD><TD><PRE> fixed size<BR> <B><A HREF="#_8">8)</a></b> Only for SaturnPCM format<BR> <B><A HREF="#_9">9)</a></b><BR> <B><A HREF="#_10">Ten)</a></b><BR> Required only when performing a pose</TD></TR>
+<TR><TD><PRE> CPU load<BR> |After playback starts|<BR> |Task function|<BR> |CPU occupancy|<BR> <B><A HREF="#_11">11)</a></b></TD><TD><PRE> PCM uncompressed 44kHz stereo 16bit: 10%<BR> PCM uncompressed 44kHz monaural 16bit: 6%<BR> ADPCM compression 44kHz stereo 16bit: 33%<BR> ADPCM compression 37.8kHz stereo 16bit: 29%<BR> ADPCM compression 22kHz stereo 16bit: 17%<BR> ADPCM compression 11kHz stereo 16bit: 8%<BR> ADPCM compression 11kHz monaural 16bit: 4%</TD><TD> This is the value measured for all processing times, including data transfer from CD to work memory to sound memory, including decompression processing in the case of ADPCM.</TD></TR>
+<TR><TD><PRE> PCM_Task(Task<BR> function) specifications</TD><TD> <B>-</b> Call at a frequency equal to or higher than the V blank interrupt frequency (1 time/16ms).<BR>
+<B>・</b>Maximum processing time for one task function<BR>
+ PCM uncompressed stereo 16bit: 15ms<BR>
+ PCM uncompressed monaural 16bit: 8ms<BR>
+ ADPCM compression stereo 16bit: 34ms<BR>
+ ADPCM compression monaural 16bit: 15ms</TD><TD> If you call it with appropriate frequency, the long processing time will only be once every few times.</TD></TR>
+</TABLE>
+</P>
+<!-- 注釈 -->
+<A NAME="_1"></A><P><DT> <B>1)</b><DD> The specified ADPCM format corresponds to data output by CRC Research Institute's Audio Starck tool (AIFF → ADPCM conversion tool).</P>
+<A NAME="_2"></A><P><DT> <B>2)</b><DD> CD-ROM XA Audio has 16bit PCM data compressed to 4bit ADPCM and has the following formats. For details, please refer to the CD-ROM XA standard document.<DD><UL TYPE=DISC>
+<LI> B mode (37.8kHz) stereo/monaural<LI> C mode (18.9kHz) stereo/monaural</UL>
+<DD> When playing CD-ROM XA Audio, only stream playback mode is available.</P>
+<A NAME="_3"></A><P><DT> <B>3)</b> SaturnPCM format<DD> SaturnPCM format files are created by converting AIFF files using the conversion tool AIF2SAP.<BR>
+ The characteristics of the SaturnPCM format are as follows.</P>
+<DD><UL TYPE=DISC>
+<LI> Data is transferred directly from the CD block to the sound memory using SCU-DMA, reducing the CPU load.<LI> Since no ring buffer is required, there is no pressure on main memory.</UL>
+</P>
+<P><DD> <B>*For</b> details on how to use the SaturnPCM format, please refer to " <A HREF="p04_10.htm#no4_80">4.Programming Notes/Section (8)</a> ".</P>
+<A NAME="_4"></A><P><DT> <B>Four)</b><DD> There are two ways to use memory playback mode.<DL>
+ <B>Resident playback:</b><DD> Play small files with the entire file preloaded into memory<DT> <B>Sequential supply regeneration:</b><DD> The data read by the user from the CD is sequentially supplied to the ring buffer and played back.</DL>
+<A NAME="_5"></A><P><DT> <B>Five)</b><DD> The loop playback function can only be used in memory playback mode (resident playback method) or file playback mode.</P>
+<A NAME="_6"></A><P><DT> <B>6)</b><DD> Some functions may not be linked depending on the functions you use.<BR>
+ The ADPCM decompression library will not be linked unless you declare PCM_DeclareUseAdpcm to use ADPCM.<BR>
+ In memory playback mode, file systems and stream systems are not linked.<BR>
+ In file playback mode, the stream system is not linked.<BR>
+ In stream playback mode, both the file system and stream system are linked.</P>
+<A NAME="_7"></A><P><DT> <B>7)</b><DD> The default setting is to transfer data from the CD block to the ring buffer using CPU-DMA (except for the SaturnPCM format. In the SaturnPCM format, the default setting is to use SCU-DMA to transfer data from the CD block to the sound memory. Masu).<BR>
+ The function PCM_SetTrModeCd allows you to specify program transfer, CPU-DMA, or SCU-DMA.</P>
+<A NAME="_8"></A><P><DT> <B>8)</b><DD> Extended work buffers are only required when using the SaturnPCM format.<BR>
+ The SaturnPCM format uses an extended work buffer but does not require a ring buffer.</P>
+<A NAME="_9"></A><P><DT> <B>9)</b><DD> When a user supplies data to the ring buffer during branch playback or memory playback, making the ring buffer large reduces the risk of interruptions.<BR>
+ The larger the value, the higher the safety for PCM playback, but the disadvantage is that the processing time for one task may be somewhat unstable.<BR>
+ If the entire file is prepared in memory for memory playback, specify its address and file size. In this case, it does not need to be an integral multiple of the sector size.</P>
+<A NAME="_10"></A><P><DT> <B>Ten)</b><DD> PCM buffer size of 4096*2 [sample/1ch] is sufficient unless there is a special reason.<BR>
+ By increasing this value, playback may not be disrupted even if the task function cannot be called at the specified frequency.</P>
+<A NAME="_11"></A><P><DT> <B>11)</b><DD> The definition of CPU load (CPU occupancy rate of the task function after playback starts) is shown below.<DD><PRE>
+<FONT SIZE=6>R＝(100×Ttask)/Tplay</font>
+┌                                                                                  ┐
+│ R    :CPU load[%]                                                                │
+│ Ttask:Total processing time of PCM_Task from start of playback to end of playback│
+│ Tplay:Playing time                                                               │
+└                                                                                  ┘
+</PRE></DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">PCM/ADPCM playback library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

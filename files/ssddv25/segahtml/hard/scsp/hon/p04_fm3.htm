@@ -1,0 +1,208 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/29&gt;SCSP User's Manual/How to use the FM sound source method/3</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+ <B>▲ <A HREF="p04_fm2.htm">Back</a> ｜ <A HREF="p04_24.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP User's Manual/4.3 Sound source register</b><HR NOSHADE>
+<DL>
+<P><DD> Until now, we have calculated "MDXSL" and "MDYSL", but from the slot numbers of the modulator side (modulator) and the modulated side (carrier), we can use the parameter correspondence table in Table 4.16 to find "MDXSL" " and "MDYSL" values can be derived.<BR>
+ Using the parameter table below, find "MDXSL" and "MDYSL" in Figure 4.33.</P>
+<P><DD> <B>(1) Parameters set in slot 0</b><DD> Slot 0 has a self-feedback configuration, so the carrier slot number and modulator slot number are "00". At this time, "MDXSL" and "MDYSL" are from the parameter table,<BR>
+<P><DD><PRE>
+Latest sample. ．． ．． ．． ．． 20H
+Past samples. ．． ．． ．． 00H
+</PRE></P>
+<P><DD>It becomes. As mentioned earlier, in the case of self-feedback, if the same generation is used as input, there is a possibility of oscillation, so avoid using this method.</P>
+<P><DD> <B>(2) Parameters set for slot 2</b><DD> Slot 2 has a multiple input configuration.<BR>
+ First, when slot 1 is input, the carrier slot number is "02" and the modulator slot number is "01". At this time, "MDXSL" and "MDYSL" are from the parameter table,</P>
+<P><DD><PRE>
+Latest sample. ．． ．． ．． ．． 1FH
+Past samples. ．． ．． ．． 3FH
+</PRE></P>
+<P><DD>It becomes.</P>
+<P><DD> Next, when inputting slot 0, the carrier slot number will be "02" and the modulator slot number will be "00". At this time, "MDXSL" and "MDYSL" are from the parameter table,</P>
+<P><DD><PRE>
+Latest sample. ．． ．． ．． ．． 1EH
+Past samples. ．． ．． ．． 3EH
+</PRE></P>
+<P><DD>It becomes.</P>
+<P><DD> <B>(3) Parameters set in slot 3</b><DD> Slot 3 takes the output of slot 2 as its input. Therefore, the carrier slot number will be "03" and the modulator slot number will be "02". At this time, "MDXSL" and "MDYSL" are from the parameter table,</P>
+<P><DD><PRE>
+Latest sample. ．． ．． ．． ．． 1FH
+Past samples. ．． ．． ．． 3FH
+</PRE></P>
+<P><DD>It becomes.</P>
+<A NAME="t4_9"></A><P><DD> <B>Table 4.16 Relationship between MDXSL/MDYSL and slots</b><DT><PRE>
+<HR NOSHADE>
+ MDXSL/MDYSL                    carrier slot number 
+ Parameter    00  01  02  03  04  05  06  07  08  09  10  11  12  13  14  15 
+   value
+  (SAMPLE)
+Latest Past                Modulation slot number SLOT 00~31
+ 20H    00H   00  01  02  03  04  05  06  07  08  09  10  11  12  13  14  15 
+ 21H    01H   01  02  03  04  05  06  07  08  09  10  11  12  13  14  15  16 
+ 22H    02H   02  03  04  05  06  07  08  09  10  11  12  13  14  15  16  17 
+ 23H    03H   03  04  05  06  07  08  09  10  11  12  13  14  15  16  17  18 
+
+ 24H    04H   04  05  06  07  08  09  10  11  12  13  14  15  16  17  18  19 
+ 25H    05H   05  06  07  08  09  10  11  12  13  14  15  16  17  18  19  20 
+ 26H    06H   06  07  08  09  10  11  12  13  14  15  16  17  18  19  20  21 
+ 27H    07H   07  08  09  10  11  12  13  14  15  16  17  18  19  20  21  22 
+
+ 28H    08H   08  09  10  11  12  13  14  15  16  17  18  19  20  21  22  23 
+ 29H    09H   09  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24 
+ 2AH    0AH   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25 
+ 2BH    0BH   11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26 
+
+ 2CH    0CH   12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27 
+ 2CH    0DH   13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28 
+ 2EH    0EH   14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29 
+ 2FH    0FH   15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30 
+
+ 30H    10H   16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31 
+ 31H    11H   17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  00 
+ 32H    12H   18  19  20  21  22  23  24  25  26  27  28  29  30  31  00  01 
+ 33H    13H   19  20  21  22  23  24  25  26  27  28  29  30  31  00  01  02 
+
+ 34H    14H   20  21  22  23  24  25  26  27  28  29  30  31  00  01  02  03 
+ 35H    15H   21  22  23  24  25  26  27  28  29  30  31  00  01  02  03  04 
+ 36H    16H   22  23  24  25  26  27  28  29  30  31  00  01  02  03  04  05 
+ 37H    17H   23  24  25  26  27  28  29  30  31  00  01  02  03  04  05  06 
+
+ 38H    18H   24  25  26  27  28  29  30  31  00  01  02  03  04  05  06  07 
+ 39H    19H   25  26  27  28  29  30  31  00  01  02  03  04  05  06  07  08 
+ 3AH    1AH   26  27  28  29  30  31  00  01  02  03  04  05  06  07  08  09 
+ 3BH    1BH   27  28  29  30  31  00  01  02  03  04  05  06  07  08  09  10 
+
+ 1CH    3CH   28  29  30  31  00  01  02  03  04  05  06  07  08  09  10  11 
+ 1DH    3DH   29  30  31  00  01  02  03  04  05  06  07  08  09  10  11  12 
+ 1EH    3EH   30  31  00  01  02  03  04  05  06  07  08  09  10  11  12  13 
+ 1FH    3FH   31  00  01  02  03  04  05  06  07  08  09  10  11  12  13  14 
+<HR NOSHADE>
+ MDXSL/MDYSL                     carrier slot number 
+ Parameter    16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31 
+   value
+  (SAMPLE)
+Latest Past                Modulation slot number SLOT 00~31
+ 20H    00H   16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31 
+ 21H    01H   17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  00 
+ 22H    02H   18  19  20  21  22  23  24  25  26  27  28  29  30  31  00  01 
+ 23H    03H   19  20  21  22  23  24  25  26  27  28  29  30  31  00  01  02 
+
+ 24H    04H   20  21  22  23  24  25  26  27  28  29  30  31  00  01  02  03 
+ 25H    05H   21  22  23  24  25  26  27  28  29  30  31  00  01  02  03  04 
+ 26H    06H   22  23  24  25  26  27  28  29  30  31  00  01  02  03  04  05 
+ 27H    07H   23  24  25  26  27  28  29  30  31  00  01  02  03  04  05  06 
+
+ 28H    08H   24  25  26  27  28  29  30  31  00  01  02  03  04  05  06  07 
+ 29H    09H   25  26  27  28  29  30  31  00  01  02  03  04  05  06  07  08 
+ 2AH    0AH   26  27  28  29  30  31  00  01  02  03  04  05  06  07  08  09 
+ 2BH    0BH   27  28  29  30  31  00  01  02  03  04  05  06  07  08  09  10 
+
+ 2CH    0CH   28  29  30  31  00  01  02  03  04  05  06  07  08  09  10  11 
+ 2DH    0DH   29  30  31  00  01  02  03  04  05  06  07  08  09  10  11  12 
+ 2EH    0EH   30  31  00  01  02  03  04  05  06  07  08  09  10  11  12  13 
+ 2FH    0FH   31  00  01  02  03  04  05  06  07  08  09  10  11  12  13  14 
+
+ 30H    10H   00  01  02  03  04  05  06  07  08  09  10  11  12  13  14  15 
+ 31H    11H   01  02  03  04  05  06  07  08  09  10  11  12  13  14  15  16 
+ 32H    12H   02  03  04  05  06  07  08  09  10  11  12  13  14  15  16  17 
+ 33H    13H   03  04  05  06  07  08  09  10  11  12  13  14  15  16  17  18 
+
+ 34H    14H   04  05  06  07  08  09  10  11  12  13  14  15  16  17  18  19 
+ 35H    15H   05  06  07  08  09  10  11  12  13  14  15  16  17  18  19  20 
+ 36H    16H   06  07  08  09  10  11  12  13  14  15  16  17  18  19  20  21 
+ 37H    17H   07  08  09  10  11  12  13  14  15  16  17  18  19  20  21  22 
+
+ 38H    18H   08  09  10  11  12  13  14  15  16  17  18  19  20  21  22  23 
+ 39H    19H   09  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24 
+ 3AH    1AH   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25 
+ 3BH    1BH   11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26 
+
+ 1CH    3CH   12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27 
+ 1DH    3DH   13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28 
+ 1EH    3EH   14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29 
+ 1FH    3FH   15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30 
+</PRE></P>
+<P><DD><B>*How to read the table</b><DD> First find the slot number on the carrier side, then find the slot number of the modulator that will be entered into it. Find the corresponding number of samples in the horizontal column.</P>
+<P><DD> Next, we will explain "MDL" (Modulation Level).<BR>
+ "MDL" is a parameter that sets the modulation depth (degree of modulation) by the modulation signal applied to modulation inputs X and Y. Increasing this value will deepen the frequency modulation, and decreasing this value will make the frequency modulation shallower (Figure 4.32).</P>
+<A NAME="z4_32"></A><P ALIGN=CENTER> <B>Figure 4.32 MDL modulation depth</b><BR>
+<img srcset="../grp/i066_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> This section explains the modulation degree based on the "MDL" setting value. Table 4.15 shows that the modulation depth is ±nπ depending on the "MDL" setting value.<BR>
+ Each sound slot data input to modulation inputs X and Y is averaged by the averaging calculation section. If the data input to X is XD, the data input to Y is YD, and the output of the averaging operation section is ZD, it can be expressed as the following formula.</P>
+<P><DD><PRE><B>
+ZD = (XD + YD) ÷ 2
+</b></PRE></P>
+<P><DD>This ZD undergoes level adjustment by "MDL" and is sent to the slot address pointer (phase adder).<A NAME="z4_33"></A><P ALIGN=CENTER> <B>Figure 4.33 Maximum displacement by waveform read address</b><BR>
+<img srcset="../grp/i067_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> In FM voice synthesis, if no modulation waveform is added, the time-phase function is linear. However, when a modulated waveform is added, the displacement corresponding to the modulated waveform is added, so the linear time-phase waveform becomes nonlinear. This displacement is maximum when ZD takes the ±maximum value. The modulation degree of MDL represents the displacement (maximum displacement) of the waveform address when ZD takes the ±maximum value, with one cycle of waveform data (sine wave) = 1K words.</P>
+<A NAME="t4_10"></A><P><DD> <B>Table 4.10 Maximum address displacement by register setting value</b><DD><TABLE BORDER>
+<TR ALIGN=CENTER><TD> MDL[3:0]</TD><TD><PRE> 0-4</TD><TD><PRE> 5</TD><TD><PRE> 6</TD><TD><PRE> 7</TD><TD><PRE> 8</TD><TD><PRE> 9</TD><TD><PRE> A</TD><TD><PRE> B</TD><TD><PRE> C</TD><TD><PRE> D</TD><TD><PRE> E</TD><TD><PRE> F</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Maximum address displacement ±</TD><TD> 0</TD><TD> 32</TD><TD> 64</TD><TD> 128</TD><TD> 256</TD><TD> 512</TD><TD> 1024</TD><TD> 2048</TD><TD> 4096</TD><TD> 8192</TD><TD> 16384</TD><TD> 32768</TD></TR>
+</TABLE>
+</P>
+<P><DD> Comparing Table 4.16 and Table 4.10, we obtain the relationship π = 512 (when MDL = AH). In Table 4.16, one cycle of waveform data (sine wave) is considered to be 1K words (1024 words), but mathematically, the length of one cycle of the waveform is defined as 2π. Therefore, in this FM voice synthesis, we are using a sine wave with 1 cycle = 1K words, so the maximum address displacement of 512 can be expressed as π. The expression method using π is valid only when one period of waveform data is 1K words. In other cases, use the expression method using address displacement in Table 4.10.</P>
+<P><DD> When performing FM voice synthesis, please have three cycles of waveform data. The reason is that address displacement occurs. With SCSP hardware, it is necessary to store waveform data in memory up to 1K word address displacement (MDL="AH"), but the hardware automatically performs clipping processing for data exceeding 1K words. Therefore, there is no need to store more than 1K words of extra waveform data.</P>
+<A NAME="z4_34"></A><P ALIGN=CENTER> <B>Figure 4.34 Address displacement during FM synthesis</b><BR>
+<img srcset="../grp/i068_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> When performing FM voice synthesis, place extra data for the address displacement. Basically, if it is ±π, there will be no operational problem by setting the waveform data for π before "SA" and after "LEA" (if PLFO is not used). However, it is better to set data for three cycles as shown in Figure 4.34.</P>
+<A NAME="4_34_0"></A><P><DD> <B>*About clipping processing</b><DD> This is related to the address displacement described earlier. The range of address displacement varies by a maximum of ±32768 addresses depending on "MDL", so 32 cycles (32K words) of waveform data are required before and after one cycle (1K words) of the basic waveform, for a total of 65K words. Requires a large amount of memory.<BR>
+ Therefore, in SCSP, if the displacement exceeds 1K words, clipping (processing to prevent it from exceeding) is performed and the displacement is returned to 0. As a result, no matter how much displacement there is, a total of 3K words of waveform data is enough to handle it.<BR>
+ Also, since the effective address bits prepared for displacement are 10 bits, we decided to perform clipping processing.</P>
+<A NAME="z4_35"></A><P ALIGN=CENTER> <B>Figure 4.35 Wave data during clipping processing</b><BR>
+<img srcset="../grp/i068_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> As shown in Figure 4.35, even if it exceeds the preliminary waveform after displacement, it returns to 0 when the phase exceeds 2π.</P>
+<P><DD> Next, I will explain how to assemble the FM configuration (algorithm) in SCSP. SCSP slots basically have a structure of 2 inputs and 1 output, so the maximum number of slots that can be connected (and modulated) to one slot is 2. .</P>
+<A NAME="z4_36"></A><P ALIGN=CENTER> <B>Figure 4.36 Number of slot connections</b><BR>
+<img srcset="../grp/i069_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> As shown in Figure 4.36, modulation is possible with up to two. Also, considering that modulation data (source) is brought from the sound stack, SCSP allows FM configurations such as those shown in Figure 4.37, Figure 4.38, Figure 4.39, and Figure 4.40 to be constructed.<BR>
+ (Figure 4.37 shows a configuration in which a slot subjected to self-feedback is modulated using other slots, Figure 4.38 shows multistage feedback including multiple slots, Figure 4.39 shows a composite feedback system that combines multistage feedback and self-feedback, and Figure 4.40 represents a composite modulation type in which each slot is modulated with a different slot with multi-stage feedback.)</P>
+<A NAME="z4_37"></A><P ALIGN=CENTER> <B>Figure 4.37 Self-feedback modulation</b> <BR>
+<img srcset="../grp/i069_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z4_38"></A><P><CENTER>
+<TABLE BORDER=0>
+<TR ALIGN=CENTER><TD> <B>Figure 4.38 Multi-stage feedback</b><BR>
+<img srcset="../grp/i069_03.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD><A NAME="z4_39"></A><TD> <B>Figure 4.39 Composite feedback</b> <BR>
+<img srcset="../grp/i069_04.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><BR>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<A NAME="z4_40"></A><P ALIGN=CENTER> <B>Figure 4.40 Complex modulation</b><BR>
+<img srcset="../grp/i070_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Figures 4.41 and 4.42 show specific examples of basic FM configurations. Please use this as a reference when performing FM voice synthesis. The upper two lines of each slot represent the modulation input, and the lower line represents the slot output.<BR>
+ Also, in Figures 4.41 and 4.42, it appears that only one connection is made between the slots, so in reality, make sure to also connect the part shown by the broken line.</P>
+<A NAME="z4_41"></A><P ALIGN=CENTER> <B>Figure 4.41 FM configuration algorithm pattern 1</b><BR>
+<img srcset="../grp/i070_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z4_42"></A><P ALIGN=CENTER> <B>Figure 4.42 FM configuration algorithm pattern 2</b><BR>
+<img srcset="../grp/i071_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> In FM speech synthesis, the top slot has nothing connected to it unless there is self-feedback. In this case, set "MDL" to a value between 0B" and "4B" and set the modulation depth to "0". This allows you to set the modulation input to "0". .</P>
+<A NAME="4_42_0"></A><P><DD> <B>*Definition of top slot</b><DD> Top slot refers to the top slot of each tower in the algorithm. In Figure 4.43, there are three towers: S0, S1, S2, and S3, S4, S5, and S6. These top slots are S0, S1, and S6.</P>
+<A NAME="z4_43"></A><P ALIGN=CENTER> <B>Figure 4.43 7-slot FM configuration</b><img srcset="../grp/i071_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_fm2.htm">Back</a> ｜ <A HREF="p04_24.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCSP User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

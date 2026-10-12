@@ -1,0 +1,270 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/13&gt;Virtual CD System/Setup Edition</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Virtual CD System</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Virtual CD System User's Manual</b><H2 ALIGN=CENTER> 2.Setup version</H2><HR NOSHADE>
+<A NAME="no2_10"><HR></a><DL>
+<P><DT><H2> 1.Main functions of VCD I/F board</H2><DD> The VCD I/F board (RT-V1A) is used to communicate commands and messages between the PC compatible machine and the CD block (RT-V1B) in the target box, and to transfer CD-ROM data from the PC compatible machine to the CD block. This is an ISA expansion board for PC compatible machines that sends out CD-DA data, etc.</P>
+<DD><OL>
+<P> <B><LI>Communication with CD block</li>
+</b><BR>
+ It receives commands from the CD block, performs the specified processing according to the contents, and returns the status to the CD block.</P>
+<P> <B><LI>Communication with PC compatible machine body</li>
+</b><BR>
+ Among the commands from the CD block, necessary commands are extracted and sent to PC compatible machines. In contrast, the PC compatible machine itself returns data as necessary.<P><P> <B><LI>Receive data from PC compatible device</li>
+</b><BR>
+ When a PLAY command is sent to a PC compatible device, the PC compatible device prepares CD-ROM data, CD-DA data, or R to W subcode data as necessary, but the VCDI/F board These data are received by the DMA controller.</P>
+<P> <B><LI>Send data to CD block</li>
+</b><BR>
+ Scramble the data imported in <B>step 3</b> , convert it to serial data format, and send it out.</P>
+</OL>
+</DL>
+<!-------------------------------------------------------------------------------->
+<A NAME="no2_20"><HR></a><DL>
+<P><DT><H2> 2.Data transfer speed</H2><DD> Only when transferring CD-ROM data, two transfer speeds, standard speed and double speed, are set according to the command sent from the CD block.</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<A NAME="no2_30"><HR></a><DL>
+<P><DT><H2> 3. Jumper pin settings</H2><P><DT> <B>[important]</b><DD> VCD I/F board has</P>
+<DD><OL>
+<P> <B><LI><A HREF="#no2_31">ISA-IRQ settings (J3)</a></li>
+</b></P>
+<P> <B><LI><A HREF="#no2_32">ISA-DMA settings (J4)</a></li>
+</b></P>
+<P> <B><LI><A HREF="#no2_33">I/O address setting (J5)</a></li>
+</b></P>
+<P> <B><LI><A HREF="#no2_34">Diag settings (J6)</a></li>
+</b></P>
+</OL>
+<P><DD> There are 4 jumper pins.</P>
+<P> If the three function settings <B>(J3)</b> , <B>(J4)</b> , and <B>(J5)</b> overlap with those already set on the PC compatible machine you are using, the virtual CD may not start up or the PC compatible machine may hang. Doing so may cause problems such as</P>
+<P> After understanding the settings of each PC compatible device, change the settings below only when it is absolutely necessary to change the settings of the VCD I/F board from the default state, such as when it overlaps with the DMA channel of a SCSI board. to hold. In this case, you will also need to change the values of the environment variables. If you install with the factory default settings, there is no need to set any environment variables after starting the PC compatible machine. Please refer to section 5.1 Preparation for startup for the procedure.</P>
+<A NAME="no2_31"></A><P><DT> <B>(1) ISA-IRQ settings (J3)</b><DD> Select the interrupt request number for the PC by shorting it with a jumper. <B>Default is set to IRQ10</b> .</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD WIDTH=180 ALIGN=RIGHT><PRE> 1-2 pin</TD><TD><PRE> IRQ4(00)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 3-4 pin</TD><TD><PRE> IRQ3(01)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 5-6 pin</TD><TD><PRE> IRQ10(02)</TD><TH> Default</TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 7-8 pin</TD><TD><PRE> IRQ11(03)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 9-10 pin</TD><TD><PRE> IRQ12(04)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 11-12 pin</TD><TD><PRE> IRQ15(05)</TD><TH></TH></TR>
+</TABLE>
+</P>
+<A NAME="no2_32"></A><P><DT> <B>(2) ISA-DMA settings (J4)</b><DD> Select the DREQ and DACK signal numbers for DMA transfer with the PC by shorting with jumpers. <B>Default is set to DREQ5/DACK5</b> .</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD WIDTH=180 ALIGN=RIGHT><PRE> 1-2 pin & 3-4 pin</TD><TD><PRE> DREQ5/DACK5(00)</TD><TH> Default</TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 5-6 pin & 7-8 pin</TD><TD><PRE> DREQ6/DACK6(01)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 9-10 pin & 11-12 pin</TD><TD><PRE> DREQ7/DACK7(02)</TD><TH></TH></TR>
+</TABLE>
+</P>
+<A NAME="no2_33"></A><P><DT> <B>(3) Setting I/O address (J5)</b><DD> By shorting with a jumper, select the I/O address of the I/F board as seen from a PC compatible machine. <B>Default is set to 340H</b> .</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD WIDTH=180 ALIGN=RIGHT><PRE> 1-2 pin & 3-4 pin & 5-6 pin</TD><TD><PRE> 340H(00)</TD><TH> Default</TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 3-4 pin & 5-6 pin</TD><TD><PRE> 350H(01)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 1-2 pin & 5-6 pin</TD><TD><PRE> 3E0H(02)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 5-6 pin</TD><TD><PRE> 300H(03)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 1-2 pin & 3-4 pin</TD><TD><PRE> 310H(04)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 3-4 pin</TD><TD><PRE> 320H(05)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> 1-2 pin</TD><TD><PRE> 330H(06)</TD><TH></TH></TR>
+<TR><TD ALIGN=RIGHT><PRE> open</TD><TD><PRE> 370H(07)</TD><TH></TH></TR>
+</TABLE>
+</P>
+<A NAME="no2_34"></A><P><DT> <B>(4) Diag settings (J6)</b><DD> The Diag setting function (J6) is used when manufacturing the board. You can leave it open.</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<A NAME="no2_40"><HR></a><DL>
+<P><DT><H2> 4.Installation and connection to PC compatible machine</H2><P><DT> <B>(1) Things to prepare</b><DT><UL TYPE=DISC>
+<P><LI> PC compatible machine for virtual CD: 1 unit<BR>
+ --Recommended specs--<BR>
+ 486/33MHz or more, Memory: 8MB or more, Expansion slot: 3 or more ISA bus slots, Video memory: 512KB or more, FDD: 3.5" x 1, SCSI board: Adaptec AHA-154xCF, HDD (1.2GB or more): Dec DSP3210/DSP3107L etc.</P>
+<TABLE>
+<TR><TH><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>In order to process large numbers of files, you need to use XMS memory.</b><BR>
+ <B>Be sure to specify HIMEM.SYS in CONFIG.SYS.</b></TD></TR>
+</TABLE>
+<P><LI> VCD I/F card (RT-V1A)</P>
+<P><LI> VCD I/F cable</P>
+<P><LI> SEGASATURN programming box</P>
+<P><LI> SH-2 ICE<P></P>
+</UL>
+<P><DT> <B>(2) Setup</b><DD> Unpack the VCD I/F card (RT-V1A) and insert it securely into the expansion slot of the PC compatible machine you provided.</P>
+<DD> Connect the VCD I/F board's connection connector and the SEGASATURN programming box's virtual CD I/F connector using the included virtual CD I/F cable. Please set up the programming box and ICE according to the instructions in their respective manuals.</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<A NAME="no2_50"><HR></a><DL>
+<P><DT><H2> 5. Execution with sample data</H2><DD> Check the operation of the virtual CD emulator that you have set up.<BR>
+ In the following explanation, [ENTER] on the command line you enter means to press the carriage return key. Also, <B>△ means to separate with a space</b> . Other parts enclosed in brackets [ ] indicate keys on the keyboard.</P>
+<P><DT> <B>[Step 0-a]</b><DD> <B>Install the VCD I/F board on your PC. At this time, check the value of the next jumper number and make a note of it.</b></P>
+<P><DD><UL TYPE=DISC>
+<P><LI> Jumper number to select interrupt number ( <B><A HREF="#no2_31">J3</a></b> )</P>
+<P><LI> Jumper number to select channel number for DMA transfer ( <B><A HREF="#no2_32">J4</a></b> )</P>
+<P><LI> Jumper number ( <B><A HREF="#no2_33">J5</a></b> ) that selects the input/output address of the VCD I/F board</P>
+</UL>
+<P><DD> If the VCD I/F board is already installed, perform [Step 0-b]. Also, at this time, you may not need to set up the environment [Step 1]. Please read the instructions in [Step 1].</P>
+<P><DT> <B>[Step 0-b]</b><DD> <B>Next, turn on the PC compatible computer and wait for MS-DOS to start up.</b><BR>
+ [Result] When MS-DOS starts up, the MS-DOS prompt will appear.</P>
+<P><DD> Once MS-DOS has started, proceed to the next step.</P>
+<A NAME="no2_51"></A><P><DT><H2> 5.1 Preparation for startup</H2><DD> It does not work in Japanese mode, so change DOS to English mode. Please type the command as below.</P>
+<P><DT> <B>[step 1]</b><P><DD><PRE><B>
+C:\</b>&gt; <B>CHEV△US[ENTER]
+    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+</b></PRE></P>
+<P>If you are in Japanese mode, the screen will flash and a prompt will appear at the top of the screen.</P>
+<P> Next, set the environment variable VCDIO.<BR>
+ However, if you are already using a virtual CD emulator on a compatible PC, this setting may be set automatically when MS-DOS starts up, so please check with someone who has used it before. please do.<BR>
+ If it is already set, please skip this step and proceed from <B>step 3</b> .</P>
+<P> The value of the environment variable VCDIO must reflect the VCD I/F board settings, as mentioned in <A HREF="#no2_30">3. Jumper pin</a> settings.<BR>
+ In the example, we will set the default values for the VCD I/F board.</P>
+<P> Type the following MS-DOS command.</P>
+<P><DT> <B>[Step 2]</b><P><DD><PRE><B>
+C:\</b>&gt; <B>SET△VCDIO=020000[ENTER]
+    ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾
+</b></PRE></P>
+<P><DD>The virtual CD emulator will not work properly if it is not compatible with the VCD I/F board. Also, please note that in some cases, PC compatible machines may hang up.</P>
+<P> If the jumper setting is set to a value other than the default due to PC compatibility, the value of the environment variable will be different.<BR>
+ For example, if you set the interrupt number to 01, the channel number for DMA transfer to 02, and the input/output address of the VCD I/F board to 03, set the environment variables as follows.</P>
+<P><DD><PRE><B>
+C:\</b>&gt; <B>SET△VCDIO=010203[ENTER]
+    ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾
+</b></PRE></P>
+<P><DD>Install the sample program attached to the virtual CD emulator on a PC compatible machine.</P>
+<P> Create a directory.</P>
+<P><DT> <B>[Step 3]</b><P><DD><PRE><B>
+C:\</b>&gt; <B>MD△MYDIR[ENTER]
+    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+C:\</b>&gt; <B>CD△MYDIR[ENTER]
+    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+</b></PRE></P>
+<P>Copy the files from Disk.1 to that directory.</P>
+<P><DD><PRE><B>
+C:MYDIR</b>&gt; <B>COPY △A:*.*[ENTER]
+        ‾‾‾^‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+</b></PRE></P>
+<P>Create sound data using the sample data generation utility VCDMKDAT.</P>
+<P><DD><PRE><B>
+C:MYDIR</b>&gt; <B>VCDMKDAT[ENTER]
+        ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+</b></PRE></P>
+<P>Two sound data files will be created in the MYDIR directory that will be used for the following checks.</P>
+<A NAME="no2_52"></A><P><DT><H2> 5.2 Startup and Shutdown</H2><DD> Start the virtual CD emulator. Please type the command as below.</P>
+<P><DT> <B>[Step 4]</b><DD><PRE><B>
+C:MYDIR</b>&gt; <B>VCDEMU△JVC[ENTER]
+        ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+</b></PRE></P>
+<P>The virtual CD emulator will start and the screen will be displayed.<BR>
+ The names of the specified disk image file, CD configuration information file, script file, and log information file are displayed on the screen.<BR>
+ If no log information file is specified, "No Log File" will be displayed.<P> The virtual CD emulator is waiting for a keystroke to confirm the message. When pressed, proceed.</P>
+<P><DT> <B>[Step 5]</b><P><DD> <B>Press [ENTER] or [ESC].</b><BR>
+ The program begins loading the files it needs to run.</P>
+<P> If loaded correctly,<BR>
+<P><DD> [result]<BR>
+<P><PRE>
+===========Open New File =****.dat===============
+===========All Data has been Read================
+===========PAUSE2================================
+</PRE></P>
+<P>It will be displayed like this.</P>
+<P> The operating mode in the dialog box at the top right of the screen should be Direct. The operating mode is "Direct DOS File Access".<BR>
+ After this state, operations will be centered on the target box.</P>
+<P><DT> <B>[Step 6]</b><DD> <B>Start the Sega Saturn program from ICE.</b></P>
+<DD><UL TYPE=DISC>
+<P><LI> Insert Disk 1 into drive A of the PC controlling the ICE.</P>
+<P><LI> Stop ICE with ctrl-C and reset it with the following command.</P>
+<P><PRE><B>
+:rs[ENTER]
+:g[ENTER]
+</b></PRE></P>
+<P>After a while (after the logo mark display is completed)</P>
+<P><PRE><B>
+:ctrl-C
+</b></PRE></P>
+<P><LI>Load the program.<BR>
+<P><PRE><B>
+:</b>&lt; <B>A:JVC1.INI[ENTER]
+</b></PRE></P>
+<P><LI>Run the program.</P>
+<P><PRE><B>
+:g△6002000
+</b></PRE></P>
+</UL>
+<P><DT><B>[Step 7]</b><DD> Confirm that <B>"VIRTUAL CD CHECK PRGRAM"</b> is displayed on the Sega Saturn screen to confirm that the program has started successfully.</P>
+<P><DT> <B>[Step 8]</b><DD> Follow the instructions displayed on the screen to operate the pads and confirm that the CD-DA playback demo has finished.</P>
+<P><DT><H4> ■How to exit</H4><P><DT> <B>[Step 9]</b><DD> <B>Press [SPACE] on the PC compatible machine running Virtual CD.</b></P>
+<P> [Result] "Menu" on the top bar will be highlighted.</P>
+<P> Pressing the cursor's [LEFT] and [RIGHT] keys will alternately highlight "Menu" or "Help", so make sure that Menu is highlighted.</P>
+<P><DT> <B>[Step 10]</b><DD> <B>Press [ENTER] or the cursor [DOWN] key.</b></P>
+<P><DT> <B>[Step 11]</b><DD> <B>Use the [DOWN] key to highlight the last menu item, Exit.</b></P>
+<P><DT> <B>[Step 12]</b><DD> <B>Press the [ENTER] key.</b></P>
+<P><DD> This will exit the Virtual CD emulator.</P>
+<A NAME="no2_53"></A><P><DT><H2> 5.3 Sample data specifications</H2><P><H4> ■File structure</H4><DD><TABLE BORDER=0>
+<TR><TD><PRE> JVC.SCR</TD><TD> sample script</TD></TR>
+<TR><TD><PRE> JVC.PRM</TD><TD> PRE/BUILD boot parameter file</TD></TR>
+<TR><TD><PRE> PAT_1.DAT</TD><TD> 10KBYTE increment data</TD></TR>
+<TR><TD><PRE> PAT_10.DAT</TD><TD> 130KBYTE increment data</TD></TR>
+<TR><TD><PRE> JVC.RTI</TD><TD> PRE / BUILD output information file</TD></TR>
+<TR><TD><PRE> JVC.PVD</TD><TD> PRE output information file</TD></TR>
+<TR><TD><PRE> JVC1.ABS</TD><TD> Ver. 1.02 Small sample program</TD></TR>
+<TR><TD><PRE> JVC1.INI</TD><TD> Sample execution command file</TD></TR>
+<TR><TD><PRE> SYSTBL.TSK</TD><TD></TD></TR>
+<TR><TD><PRE> SDDRV.TSK</TD><TD> sound initialization file</TD></TR>
+<TR><TD><PRE> NEWMAP.BIN</TD><TD></TD></TR>
+<TR><TD><PRE> VCDMKDAT.EXE</TD><TD> Create two sound data files in the current directory.<BR>
+ The amount of data is approximately 1.4MByte each. </TD></TR>
+</TABLE>
+<!-- ＊インストールと実行については「セットアップ編」を参照してください。<P>
+ --><P><DT><H4> ■Check items</H4><DD> Check items are</P>
+<P><DD><UL TYPE=DISC>
+<LI> CD-ROM file name check<LI> CD-ROM data read check<LI> CD-DA output check</UL>
+</P>
+<P> There are three items.<BR>
+ The CD-ROM test is normal if the COMPLETE message is displayed for each item.<BR>
+ The CD-DA is normal if the sine wave (approximately 440Hz, -10dB) and square wave (approximately 440Hz, -10dB) sounds are played according to the message.</P>
+<P><DT><H4> ■Basic operation method</H4><DD> Operations are performed using only the A and B buttons on the pad. The A button executes that test item. Press the A button to move to the next item. If you do not want to execute that item, press the B button. Always return to the opening with the S button.</P>
+<P ALIGN=CENTER><img srcset="../grp/i067_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>[Opening screen]</b><DD> Press the A button to move to the first test item.</P>
+<P><DT> <B>[1.CD-ROM directory read]</b><DD> Displays the ISO9660 format directory. Only the first 8 entries of the root directory (including yourself and the parent, so effectively 6 entries) are displayed. Also displays directory attributes.<BR>
+ An OK message will be displayed when the file name and size are specified.<BR>
+ When the check is complete, COMPLETE will be displayed on the bottom line. If it is incorrect or unreadable, an error message will be displayed.</P>
+<P ALIGN=CENTER><img srcset="../grp/i067_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>[2.CD-ROM data read]</b><DD> Since we know the contents of ABCDEFG1.DAT and D10, we will check by reading the data and comparing them. When finished, COMPLETE will be displayed on the bottom line and you will be waiting for the A button to be pressed.</P>
+<P><DT> <B>[3.CD-DA playback]</b><DD> Play the sound using the data of tracks 2 and 3. Auto does some playback.</P>
+<P><DD><UL TYPE=DISC>
+<LI> Track 3 playback<LI> Track 4 playback<LI> Tracks 3 and 4 Repeat play 3 times<LI> Track 4 Pause in the middle<LI> Track 4 Play after pause</UL>
+</P>
+<P> TNO, ATIME, and status are always displayed on the screen.<BR>
+ When finished, COMPLETE will be displayed on the bottom line and you will be waiting for the A button to be pressed.</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<A NAME="no2_60"><HR></a><DL>
+<P><DT><H2> 6. Switching between virtual CD and CD drive</H2><DD> To switch between the virtual CD and the CD drive, there is a switch as shown in Figure 1 between the CD block and the CD drive. Both the virtual CD and the CD trays in the CD drive must be open when you operate this switch. To open a virtual CD, use the VCD emulator's menu selection.</P>
+<DD><UL TYPE=DISC>
+<P><LI> Press the [SPACE] key.</P>
+<P><LI> Make sure that "MENU" on the top bar is highlighted in white text, then press [ENTER] or the cursor key [DOWN] to display the menu contents.</P>
+<P><LI> Select [Open CD Tray] in [DOWN] and press [ENTER] or [SPACE] to open the virtual CD.</P>
+</UL>
+<P><DD> If you operate the changeover switch without performing this operation, there will be an inconsistency between the track information held on the target machine and the CD drive (VCD).</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Virtual CD System</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

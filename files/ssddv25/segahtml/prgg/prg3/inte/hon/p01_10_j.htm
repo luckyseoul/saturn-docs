@@ -1,0 +1,128 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 3&gt;割込み管理ライブラリ/1．ガイド</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">割込み管理ライブラリ</A>
+<HR>
+<B>■
+　　｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>割込み管理ライブラリ</B>
+<H2 ALIGN=CENTER>1．ガイド</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A>
+	<P><DT><H3>1.1　目的</H3>
+	<DD>割り込みを管理することです。</P>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>1.2　概要</H3>
+	<DD>　割り込みレジスタアクセス管理、割り込み処理ルーチンの登録、参照を行います。</P>
+
+<A NAME="no1_30"></A>
+	<P><DT><H3>1.3　機能概要</H3>
+
+	<P><DT><B>　[割り込みレジスタアクセス管理]</B>
+	<DD>　割り込みマスクレジスタはライトオンリであるため、その値を読むことができません。そのため、割り込みマスクレジスタに書き込んだ値は、ライブラリで保持しています。具体的には以下のような方式です。</P>
+
+	<DT><OL>
+	<P><B><LI></B>割り込みマスクレジスタといつも同じ内容を持つメモリ(以下、マスク保存用メモリ)を用意する。</P>
+	<P><B><LI></B>割り込みマスクレジスタへの書き込みがある場合は、必ずマスク保存用メモリにも同じ内容を書き込む。</P>
+	<P><B><LI></B>割り込みマスクレジスタを読み込むときには、マスク保存用メモリの内容を読み込むようにする。</P>
+	</OL>
+
+	<P><DT><B>　[割り込み処理ルーチンの登録、参照]</B>
+	<DD>　割り込み関数やSCU関数を割り込みベクタテーブルへ登録したり、現在の割り込みベクタの登録内容を参照したりすることができます。<BR>　SCU割り込みベクタテーブルには、初期値としてSCU割り込み関数を登録しています。SCU割り込み関数には、登録されたSCU関数をサブルーチンコールする機能があります。登録されたSCU関数は、SCU割り込み関数が実行されるたびに実行されます。<BR>　初期値として割り込み関数には、ダミー関数(リターン処理のみ実行)、SCU割り込み関数にはSCUダミー関数（リターン処理のみ実行）を登録しています。</P>
+
+<A NAME="no1_40"></A>
+	<P><DT><H3>1.4　使用条件</H3>
+	<P><DT><B>　[割り込みレジスタアクセス管理]</B>
+	<DD>　ライブラリでは割り込みマスクレジスタの値を保持しているため、割り込みマスクレジスタへの書き込みは、ライブラリの提供する関数を使用してください。直接書き込みを行うと、マスク保存メモリと割り込みマスクレジスタの整合が取れなくなり、正しい処理ができなくなります。</P>
+
+<A NAME="no1_50"></A>
+	<P><DT><H3>1.5　コーリングシーケンス</H3>
+	<P><DT><B>　[割り込みレジスタアクセス管理]</B>
+	<DD><PRE>
+void sysInit()
+{
+     INT_SetMsk((INT_MSK_HBLK_IN | INT_MSK_VBLK_OUT),
+                                         (INT_MSK_SPR | INT_MSK_DMA1));
+               /* "H-ブランク-IN"と"V-ブランク-OUT"をイネーブル設定　　　　　　　*/
+               /* "スプライト描画終了"と"レベル0-DMA"をディセーブル設定          */
+     ...
+}
+void anyPrg()
+{
+     Uint32 status_bit;
+     status_bit = INT_GET_STAT();          /* ステータスの取得　　　　　　　　　 */
+     if(INT_JudgeStat(status_bit,INT_ST_VBLK_OUT,INT_ST_VBLK_IN) == TRUE){
+                                   /* V-ブランク-OUTの割り込みが発生し、         */
+                                   /*     V-ブランク-INの割り込みが未発生の時    */
+     ...
+     }
+}
+</PRE><P>
+
+	<P><DT><B>　[割り込み処理ルーチンの登録、参照]</B>
+	<DT><B>　ファイルA</B>
+<!------------------------------------------------------------------------------------>
+	<DD><PRE>
+#pragma interrupt (vblkIn)     /* vblkIn関数を割り込み関数とします     */
+
+void vblkIn(void)
+{
+     ...
+}
+</PRE>
+<!------------------------------------------------------------------------------------>
+	<P><DT><B>　ファイルB</B>
+<!------------------------------------------------------------------------------------>
+	<DD><PRE>
+void systemInit(void)
+{
+     INT_SetFunc(INT_SCU_VBLK_IN, vblkIn);
+                              /* vblkIn割り込み関数をV-ブランク-IN割込みベク     */
+                              /*     タテーブルに登録します。　　　　　　　　　 　*/
+     INT_SetScuFunc(INT_SCU_VBLK_OUT, vblkOut);
+                              /* vblkOut関数をV-ブランク-OUT割り込みベクタの     */
+                              /*     SCU割り込み関数に登録します。               */
+     ...
+}
+
+void vblkOut(void)
+{
+     ...
+}
+</PRE></P>
+
+</DL>
+<HR NOSHADE>
+<B>■
+　　｜
+<a href="p02_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">割込み管理ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

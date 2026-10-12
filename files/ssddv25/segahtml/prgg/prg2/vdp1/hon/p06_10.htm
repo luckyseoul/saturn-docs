@@ -1,0 +1,166 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/11&gt;VDP1 Library/6.VDP1 3D Reference</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no6">VDP1 library</a><HR>
+ <B>▲ <A HREF="p05_11.htm">Back</a> ｜ <A HREF="p06_11.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 library</b><H2 ALIGN=CENTER> 6.VDP1 3D Reference</H2><HR NOSHADE>
+<A NAME="no6_10"></A><H3> 6.1 Data specifications</H3><!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no1"><HR></a><DL>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> cluster definition</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> SprCluster</H3></TD><TD WIDTH=060><PRE> No<BR><H4></H4></TD></TR>
+</TABLE>
+<DD><PRE> typedef struct SprCluster {
+     Uint16 no; /* Cluster number */
+     Uint16 angleSeq; /* Rotation order */
+     MthXyz angle; /* Rotation in the parent cluster's coordinate system */
+     MthXyz point; /* Coordinates of the origin in the parent cluster's coordinate system */
+     SprObject3D *object /* 3D object */
+     SprCluster *next; /* Next cluster */
+     SprCluster *child; /* Child cluster */
+     SprInbetInf *inbetInf; /* Connection polygon information between objects */
+     void (*transStart)(SprCluster*);
+                                   /* User callback routine before starting coordinate transformation */
+     void (transEnd)(SprCluster*, SprObject3D*, MthMatrix*, MthXyz*);
+                                   /* User callback routine after coordinate transformation */
+     void *context; /* User context area */
+} SprCluster;</PRE><P> no is used by the user callback routine to identify the cluster table, and is optional.<P><PRE> angleSeq = ROT_SEQ_ZYX: Rotate the object in the order of Z→Y→X = ROT_SEQ_ZXY: ” Z→X→Y ”
+           = ROT_SEQ_YZX : ”Y→Z→X”
+           = ROT_SEQ_YXZ : ”Y→X→Z”
+           = ROT_SEQ_XYZ : ”X→Y→Z”
+           = ROT_SEQ_XZY : ”X→Z→Y”</PRE><P><PRE> If the 3D object, next cluster, and child cluster are not connected, set object, next, and child to 0, respectively.<P>
+If there is no connection polygon information between objects, set inbetInf to 0.<P>
+transStart specifies a user callback routine that is called before starting the coordinate transformation for this cluster. The routine moves clusters, changes object data, etc. Set to 0 if there is no callback routine.<P>
+[TransStart routine calling sequence]
+void transStart(SprCluster *cluster);<BR>
+     cluster: Local cluster table<BR></PRE><DD><PRE> transEnd specifies a user callback routine that is called after the coordinate transformation for this cluster is complete. This callback routine uses 3D data connected to the cluster.
+Called for each object. Set to 0 if there is no callback routine.<P>
+[TransStart routine calling sequence]
+void transEnd(SprCluster *cluster, SprObject3D *object,<BR>
+                            MthMatrix *worldMatrix, MthXyz *worldVertPoint);<BR>
+     cluster: Own cluster table object: 3D object table worldMatrix: Transformation matrix to world coordinate system (3 rows and 4 columns)
+     worldVertPoint: Vertex coordinate value table in the world coordinate system (Returned when #define SPR_3NEED_WORLD_VERT is defined in the 3D sprite work area definition macro.)<P>
+context specifies the context area used by the user callback routine for each cluster. If not, set it to 0. </PRE></DL>
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no2"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> object definition</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> SprObject3D</H3></TD><TD WIDTH=060><PRE> No<BR><H4></H4></TD></TR>
+</TABLE>
+<DD><PRE> typedef struct SprObject3D {
+     Uint16 no; /* Object number */
+     Uint16 dispFlag /* Display flag */
+     Uint16 vertCount; /* Number of vertices */
+     Uint16 surfaceCount; /* Number of surfaces */
+     MthXyz *vertPoint; /* Vertex coordinate table */
+     MthXyz *vertNormal; /* Vertex normal vector table */
+     SprSurface *surface; /* Surface definition table */
+     MthXyz *surfaceNormal; /* Surface normal vector table */
+     MthXyz *surfaceVert; /* Surface representative point coordinate table */
+     Uint16 **shdIdxTbl; /* Shading index table */
+     Fixed32 surfNormK; /* Calculation correction value of surface normal vector */
+     SprObject3D *next; /* Next 3D object */
+} SprObject3D;</PRE><P> no is used by the user callback routine to identify the object table, and is optional.<BR>
+<PRE> dispFlag b15,b14 = 00: Polygon display = 10: Polyline display<P>
+             b12 = 1: double-sided polygon<P>
+           b9,b8 = 00: No shading 01: Flat shading 10: Gouraud shading<P>
+              b4 = 1: Connection polygon object between objects</PRE><P><PRE> vertNormal: Set when performing Gouraud shading.
+surface: Pointer to the table that defines the vertices that make up the surface and color information for each surface surfaceNormal: Pointer to the table that defines the normal for each surface surfaceVert: Representative point of the surface that is referenced when calculating the brightness of the surface (Center point) Sets the coordinate table pointer. If set to 0, the first vertex of the surface definition will be used as the representative point.
+shdIdxTbl: When performing flat shading using a shading table, set the index table of the shading table. When Gouraud shading is specified,
+              If this parameter is specified, shdIdxTbl[0] will be the Gouraud shading Gray code table. If flat shading is used and the surface definition drawing mode is texture specification, if this parameter is specified, shdIdxTbl[0] will be used as the flat shading Gray code table.
+surfNormK: Specify this when calculating the surface normal vector for this object using the SPR_3SetNormVect() routine, or when this object is an inter-object connection polygon object. For details, see the MTH_ComputeNormVect() routine in the mathematical calculation library.
+              See fNormK parameter.
+              For object-to-object connection polygon objects, specify a negative value.</PRE><BR>
+<DD> If the vertex normal vector table, shading index table, and next object are not connected, set vertNormal, shdIdxTbl, and next to 0, respectively.<P> The shading table is specified in the following format using 32 levels of RGB code.<P> Uint16 shadingTbl[32]; 0←Dark Light→31<P> If double-sided polygon specification is set to 1, single-sided polygon data will be displayed on both sides.<P></DL>
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no3"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> surface definition</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> SprSurface</H3></TD><TD WIDTH=060><PRE> No<BR><H4></H4></TD></TR>
+</TABLE>
+<DD><PRE> typedef struct SprSurface {
+     Uint16 vertNo[4]; /* Vertex number composing the surface */
+     Uint16 drawMode; /* draw mode */
+     Uint16 color; /* Color data */
+} SprSurface;</PRE><P><PRE>
+drawMode b15,b14 = 00: color is the color code 01: color is the texture character number 10: color is the shading table index number 11: color is the original RGB code for automatic shading<P>
+            b13,b12 = 00: Set the minimum value among the 4 vertices after coordinate transformation as the target point for Z sorting.
+                      01: The maximum value among the 4 vertices after coordinate transformation is the target point for Z sorting.
+                      10: Set the center value of the 4 vertices after coordinate transformation as the target point for Z sorting.<P>
+            b11-b0: Same as sprite drawing mode word.
+If you specify a texture in drawMode, the color bits will be as follows:
+color b15,b14 specifies the texture inversion mode.
+      b15,b14 =00: No reversal =01: Horizontal reversal =10: Vertical reversal =11: Vertical, horizontal reversal<P>
+      b13-b0: Texture character number </PRE><P></DL>
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no4"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> Connection polygon information between objects</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> SprInbetInf</H3></TD><TD WIDTH=060><PRE> No<BR><H4></H4></TD></TR>
+</TABLE>
+<DD><PRE> typedef struct SprInbetInf {
+     Sint32 vertCount; /* Number of vertices to extract */
+     SprObject3D *fromObj; /* Connection vertex data extraction object */
+     Uint16 *fromVertNo; /* Extract vertex number array */
+     SprObject3D *toObj; /* Connection vertex data setting object */
+     Uint16 *toVertNo; /* Setting vertex number array */
+     SprInbetInf *next; /* Connection polygon information between next objects */
+} SprTexture;<P>
+If there is no connection polygon information between the next objects, set next to 0. </PRE><P></DL>
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no5"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> texture table</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> SprTexture</H3></TD><TD WIDTH=060><PRE> No<BR><H4></H4></TD></TR>
+</TABLE>
+<DD><PRE> typedef struct SprTexture {
+     Uint16 charNo; /* Character number */
+     Uint16 colorMode; /* Color mode */
+     Uint16 color; /* Color data */
+     Uint16 width; /* Character width */
+     Uint16 height; /* Character height */
+     Uint8 *charData; /* Character data pointer */
+     SprLookupTbl *lookupTbl; /* Lookup table pointer */
+} SprTexture;<P>
+SprTexture texture[n]; The charNo of the final entry should be 0xffff (stopper).<P>
+colorMode : b5 - b3 is the same as the sprite drawing mode word.
+color: Color data Lookup table number when color mode = 1 Color bank code when color mode = 0, 2, 3, 4 Ignored when color mode = 5 </PRE><P></DL>
+<!-- ----------------------------------------------------------------------------------- -->
+<A NAME="no6"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> 3D environment data table</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> Spr3dStatus</H3></TD><TD WIDTH=060><PRE> No<BR><H4></H4></TD></TR>
+</TABLE>
+<DD><PRE> typedef struct Spr3dStatus {
+     MthXyz lightAngle; /* Light source angle */
+     MthXyz viewCoordPoint; /* View position in the view coordinate system */
+     MthXyz viewPoint; /* Viewpoint coordinates */
+     MthXyz viewAngle; /* View angle */
+     Sint32 viewAngleSeq; /* View angle rotation operation */
+     Sint32 zSortMode; /* Z sort Z coordinate value adoption mode */
+     Fixed32 zSortZMin; /* Z sort current point coordinate system Z minimum value */
+     Fixed32 zSortZMax; /* Z sort current coordinate system Z maximum value */
+     Fixed32 clipZMin; /* Viewpoint coordinate system clip Z minimum value */
+     Fixed32 clipZMax; /* View coordinate system clip Z maximum value */
+     Sint32 clipLevel; /* Clipping level */
+     MthXy unitPixel; /* Number of screen pixels for x,y1.0*/
+} Spr3dStatus;</PRE><P></DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_11.htm">Back</a> ｜ <A HREF="p06_11.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no6">VDP1 library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

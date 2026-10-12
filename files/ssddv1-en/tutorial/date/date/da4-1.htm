@@ -1,0 +1,161 @@
+﻿<HTML>
+<HEAD> <TITLE> Data structure </TITLE> </HEAD> <BODY>
+
+<P> <A HREF="../cd-rom/da3-4.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> ｜ <A HREF="da4-2.htm"> Go to next page </A> </BR> </P> <HR>
+
+<IMG SRC="logo.gif">
+
+<H1 ALIGN = CENTER> Data transfer </H1>
+
+<H2 ALIGN = CENTER> Data structure </H2>
+
+<P> <B> This chapter explains the model data, material name specifications, and texture data structure handled by Sega Saturn. </B></P>
+
+<H2> 4-1. Model data specifications </H2>
+
+<P> Model data here refers to three types of data: point data of three-dimensional coordinates (x, y, z), polygon data formed by four of them, and attribute data representing attributes of the polygon. This is a set. <BR>
+The general format when the model name is “label” is shown below. </P>
+
+<H3> <A NAME="NO1"> Point data </A> </H3>
+
+<IMG SRC="p2-1.gif">
+
+<PRE>
+POINT: Point data
+x, y, z: Float type coordinate values
+</PRE>
+
+<P> 0, 1, 2, and 3 point data indexes in order from the top. </P>
+
+<H3> <A NAME="NO2"> Polygon data </A> </H3>
+
+<IMG SRC="p2-2.gif">
+
+<PRE>
+NORMAL: Normal vector
+x, y, z: Float type coordinate values
+VERTICES: Point data of 4 points forming a polygon
+</PRE>
+
+<P> In the case of a triangular polygon, the last one point is repeated to obtain four points of polygon data. </P>
+
+<DL>
+<DT> Example) For a quadrilateral polygon
+<DD>VERTICES(0,1,2,3)
+
+<DT> Example) Triangular polygon
+<DD>VERTICES(0,1,2,2)
+</DL>
+
+<H3> <A NAME="DATE"> Attribute data </A> </H3>
+
+<IMG SRC="p3.gif">
+
+<PRE>
+ATTR: attribute
+Plane: Attribute with or without backside judgment
+Sort: Representative point of Z sort
+Texture: Texture name (No.)
+Color: Color data
+Gouraud: Gouraud shading attribute
+Mode: Drawing mode
+Dir: Polygon or texture status
+Option: Option, other functions
+</PRE>
+
+The <P> attribute has the above eight parameters. Here are the symbols that should actually be output for each parameter and their contents. </P>
+
+<DL><DT>[Plane] 
+<DD>
+<PRE>
+Single_Plane: With back side judgment
+Dual_Plane: No back side judgment
+</PRE>
+
+<DT>[Sort]
+<DD>
+<PRE>          
+SORT_MIN: Recent points
+SORT_CEN: Center point
+SORT_MAX: Farthest point
+SORT_BFR: Display in front of the most recently registered polygon
+</PRE>
+
+<DT>[Texture] 
+<DD>
+<PRE>
+No_Texture: For polygons
+Texture name: For texture (macro indicating texture data)
+For details, refer to “Section 4-3: Specification of texture data”.
+</PRE>
+
+<DT>[Color]
+<DD>
+<PRE>
+No_Palet: For textures
+C_RGB (r, g, b: Color data for polygon
+R, g, and b represent the three primary colors, and enter a decimal value from 0 to 31.
+</PRE>
+
+<DT>[Gouraud]
+<DD>
+<PRE>
+No_Gouraud: No goo
+Address: Relative address of Gouraud shading table
+</PRE>
+</DL>
+
+<P><B>[Mode]</B></P>
+*
+<IMG SRC = "p07-19.gif">
+
+<P><B>[Dir]</P></B>
+
+<IMG SRC="p07-21.gif">
+
+<P><B>[Option]</B></P>
+
+<IMG SRC="p07-22.gif">
+
+<P> Plane, Sort, Mode among the above parameters can be obtained by specifying the material name in the next section. </P>
+
+<H3> <A NAME="PDATA"> PDATA structure </A> </H3>
+
+<IMG SRC="p4-1.gif">
+
+<PRE>
+pdata_label: Indicates the PDATA type address passed to SGL.
+*
+point_labe: Indicates a POINT type address.
+*
+nl: Indicates the number of points.
+*
+polygon_label: Indicates a POLYGON type address.
+*
+n2: Indicates the number of polygons.
+
+attribute_label: Indicates an ATTR type address.
+</PRE>
+
+<H3> <A NAME="OBJECT"> OBJECT structure </A> </H3>
+
+<IMG SRC="p4-2.gif">
+
+<PRE>
+pdata_label: Indicates a PDATA type address.
+*
+TRANSLATION: Indicates the movement amount.
+
+ROTATION: Indicates the rotation amount.
+
+SCALING: Indicates the enlargement amount.
+*
+object_child: Indicates the child OBJECT type address.
+*
+object_sibling: Indicates the sibling OBJECT type address.
+</PRE>
+
+<P> Please refer to the “design 3” sample source for how to use this structure. </P>
+
+<HR>
+<P> <A HREF="../cd-rom/da3-4.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> ｜ <A HREF="da4-2.htm"> Go to next page </A> </BR> </P> </BODY> </HTML>

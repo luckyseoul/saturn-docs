@@ -1,0 +1,386 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGA3Dファイル仕様  （1995.08.08現在）</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm">Graphic Tools Guide</A>
+★<a href="../index_j.htm#frm">フォーマット一覧</A>
+<HR NOSHADE>
+<CENTER>
+<H1>SEGA3Dファイル仕様</H1>
+<H5>1995.08.08現在</H5>
+</CENTER>
+<HR>
+<DL>
+<A NAME="top"></A>
+<P><DT><H3>■データ構成／ファイルレイアウト</H3>
+<UL TYPE=DISC>
+	<LI><A HREF="#no1">ヘッダ</A>
+	<LI><A HREF="#no2">モデル</A>
+	<LI><A HREF="#no3">スリップ</A>
+	<LI><A HREF="#no4">マテリアル</A>
+	<LI><A HREF="#no5">オブジェクト</A>
+	<LI><A HREF="#no6">光源</A>
+	<LI><A HREF="#no7">アトリビュート</A>
+	</UL>
+</DL>
+<HR>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no1"></A>
+<DL>
+<P><DT><H3>■ヘッダ</H3>
+<DD><PRE>
+「
+    SEGA 3D
+」
+</PRE>
+
+<DL>
+<P><DT><B>◆目的</B>
+<DD>ファイル種類の識別。
+
+<P><DT><B>◆規約</B>
+<DD>ファイルの先頭に必ず存在しなければならない。
+</DL>
+</DL>
+<HR>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no2"></A>
+<DL>
+<P><DT><H3>■モデル</H3>
+<DD>　1モデルに1ペアの頂点構造(vertices)・面構造(polygons)が存在する。<BR>
+　同一モデル名の混在は認められない。
+<DD>
+<PRE>
+「
+    model        modelname
+    {
+        vertices    ;number of verticies
+        {    
+            (x0,y0,z0),(nx0,ny0,nz0)        ;0
+            (x1,y1,z1),(nx1,ny1,nz1)        ;1
+            .............                    ;2
+        }
+        polygons    ;number of polygons
+        {
+            (v0,v1,v2,v3),(Nx,Ny,Nz),(Zpos)        ;0
+            .............                        ;1
+        }
+    }
+」
+</PRE>
+<DL>
+<P><DT><B>◆目的</B>
+<DD>4点ポリゴンモデルの頂点及びポリゴン構造等を設定する。
+
+<P><DT><B>◆予約語</B>
+<DD><TABLE>
+<TR><TD><PRE>model           </TD><TD><PRE>：　制御構造</TD></TR>
+<TR><TD><PRE>vertices        </TD><TD><PRE>：　制御構造</TD></TR>
+<TR><TD><PRE>polygons        </TD><TD><PRE>：　制御構造</TD></TR>
+</TABLE>
+
+<P><DT><B>◆データ</B>
+<DD><TABLE>
+<TR><TD><PRE>modelname       </TD><TD><PRE>：　モデル名</TD></TR>
+<TR><TD><PRE>(Xn,Yn,Zn)      </TD><TD><PRE>：　各頂点座標</TD></TR>
+<TR><TD><PRE>(nx0,ny0,nz0)   </TD><TD><PRE>：　各頂点法線ベクトル（単位ベクトル）</TD></TR>
+<TR><TD><PRE>(v0,v1,v2,v3)   </TD><TD><PRE>：　面を構成する頂点番号</TD></TR>
+<TR><TD><PRE>(Nx,Ny,Nz)      </TD><TD><PRE>：　面法線ベクトル</TD></TR>
+<TR><TD><PRE>(Zpos)          </TD><TD><PRE>：　Ｚソートの基準（AVE=中心/MIN=最近/MAX=最遠）</TD></TR>
+</TABLE>
+
+<P><DT><B>◆規約</B>
+<DD>面を構成する頂点の順番は「時計回り」とする。
+<PRE>
+０　　　　　　　　　１
+　┌───────┐　
+　│　　　→　　　│　
+　│　　　　　　　│　
+　│↑　　　　　↓│　
+　│　　　　　　　│　
+　│　　　←　　　│　
+　└───────┘　
+３　　　　　　　　　２
+</PRE>
+<DD>3角形を表現する場合は、v2とv3が同一番号とする。
+</DL>
+</DL>
+<HR>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no3"></A>
+<DL>
+<P><DT><H3>■スリップ</H3>
+<DD>サターン旧ツール互換用データ構造。<BR>
+モデルに何らかのマテリアルデータが存在する場合、スリップが構成される。
+<DD>
+<PRE>
+「
+    slips        modelname
+    {
+        materialname_0
+        materialname_1
+        .........
+    }
+」
+</PRE>
+<DL>
+<P><DT><B>◆目的</B>
+<DD>マテリアルと各モデルの面構造を対応させる。
+
+<P><DT><B>◆予約語</B>
+<DD><TABLE>
+<TR><TD><PRE>slips           </TD><TD><PRE>：　制御構造</TD></TR>
+</TABLE>
+
+<P><DT><B>◆データ</B>
+<DD><TABLE>
+<TR><TD><PRE>modelname       </TD><TD><PRE>：　対応モデル名</TD></TR>
+<TR><TD><PRE>materialname_n  </TD><TD><PRE>：　対応マテリアル名</TD></TR>
+</TABLE>
+
+<P><DT><B>◆規約</B>
+<DD>マテリアル名は、それぞれ対応モデルに含まれる面番号に対応する。
+</DL>
+</DL>
+<HR>
+<!-------------------------------------------------------------------------------->
+<A NAME="no4"></A>
+<DL>
+<P><DT><H3>■マテリアル</H3>
+<DD>サターン旧ツール互換用データ構造。<BR>
+各データは、必要に応じ構成される。
+<DD>
+<PRE>
+「
+    material    materialname
+    {
+        type        (TYPE0|TYPE1|...)
+        texture      "textureName"
+        color        ColorCode
+        gouraud      offset
+        direction    0,1,2,3
+    }
+」
+</PRE>
+<DL>
+<P><DT><B>◆目的</B>
+<DD>各面に割り当てる面属性を設定する。
+
+<P><DT><B>◆予約語</B>
+<DD><TABLE>
+<TR><TD><PRE>material      </TD><TD><PRE>：　制御構造</TD></TR>
+<TR><TD><PRE>type          </TD><TD><PRE>：　予約語</TD></TR>
+<TR><TD><PRE>texture       </TD><TD><PRE>：　予約語</TD></TR>
+<TR><TD><PRE>color         </TD><TD><PRE>：　予約語</TD></TR>
+<TR><TD><PRE>gouraud       </TD><TD><PRE>：　予約語</TD></TR>
+<TR><TD><PRE>direction     </TD><TD><PRE>：　予約語</TD></TR>
+</TABLE>
+
+<P><DT><B>◆データ</B>
+<DD><TABLE>
+<TR><TD><PRE>materialname  </TD><TD><PRE>：　マテリアル名</TD></TR>
+<TR><TD><PRE>(TYPEn)       </TD><TD><PRE>：  マテリアルタイプ。シェーディング・マッピング等の方法を指定する。</TD></TR>
+	<TR><TD></TD><TD><PRE>　→　NULL=なし</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　FLAT=フラットシェーディング</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　TEXT=テクスチャマッピング</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　GOUR=グーローシェーディング</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　MESH=メッシュ表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　TRAN=半透明</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　SHAD=半輝度</TD></TR>
+	<TR><TD></TD><TD><PRE><B>　※複数指定は'|'で接続する。</B></TD></TR>
+
+<TR><TD><PRE>"textureName" </TD><TD><PRE>：　テクスチャマップファイル名</TD></TR>
+<TR><TD><PRE>ColorCode     </TD><TD><PRE>：  ノンテクスチャカラーコード(RGB各5bit=1b.B5.G5.R5)</TD></TR>
+<TR><TD><PRE>offset        </TD><TD><PRE>：  グーローカラーオフセット=0x10。未使用データ。</TD></TR>
+<TR><TD><PRE>0,1,2,3       </TD><TD><PRE>：　テクスチャマップの各頂点への対応。表示方向。<BR>
+	<TR><TD></TD><TD><PRE>　→　[0,1,2,3]=通常表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　[1,0,3,2]=H反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　[3,2,1,0]=V反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　[2,3,0,1]=HV反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　 　 [1,2,3,0]=90度回転通常表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　[2,1,0,3]=90度回転H反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　[0,3,2,1]=90度回転V反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　[3,0,1,2]=90度回転HV反転表示</TD></TR>
+</TABLE>
+</DL>
+</DL>
+<HR>
+<!-------------------------------------------------------------------------------->
+<A NAME="no5"></A>
+<DL>
+<P><DT><H3>■オブジェクト</H3>
+<DD>複数モデルが存在する場合、オブジェクト構造が構成される。
+<PRE>
+「
+    object    objectname
+    {
+        modelname_0,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+        {
+        }
+        modelname_1,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+        {
+            modelname_2,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+            {
+                modelname_4,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+                {
+                }
+            }
+            modelname_3,(xs,ys,zs),(xd,yd,zd),(xt,yt,zt),(xi,yi,zi)
+            {
+            }
+        }
+        ..................................
+        ..................................
+    }
+」
+</PRE>
+<DL>
+<P><DT><B>◆目的</B>
+<DD>各モデルの階層マトリクス構造を設定する。
+
+<P><DT><B>◆予約語</B>
+<DD><TABLE>
+<TR><TD><PRE>object        </TD><TD><PRE>：　制御構造</TD></TR>
+</TABLE>
+
+<P><DT><B>◆データ</B>
+<DD><TABLE>
+<TR><TD><PRE>objectname    </TD><TD><PRE>：　オブジェクト名(=ファイル名)</TD></TR>
+<TR><TD><PRE>modelname_n   </TD><TD><PRE>：　モデル名</TD></TR>
+<TR><TD><PRE>(xs,ys,zs)    </TD><TD><PRE>：　スケール(比)</TD></TR>
+<TR><TD><PRE>(xd,yd,zd)    </TD><TD><PRE>：　ローテート(角度:-180.0〜+179.0)</TD></TR>
+<TR><TD><PRE>(xt,yt,zt)    </TD><TD><PRE>：　トランスレーション(座標)</TD></TR>
+<TR><TD><PRE>(xi,yi,zi)    </TD><TD><PRE>：　現在未使用=(0,0,0)</TD></TR>
+</TABLE>
+</DL>
+</DL>
+<HR>
+<!-------------------------------------------------------------------------------->
+<A NAME="no6"></A>
+<DL>
+<P><DT><B>■光源</B>
+<DD><PRE>
+「
+    light
+    {
+        vector    n    ;number of light
+        {
+            (X0, Y0, Z0)    ;0
+            (X1, Y1, Z1)    ;1
+            ............
+        }
+    }
+」
+</PRE>
+<DL>
+<P><DT><B>◆目的</B>
+<DD>光源ベクトルを設定する。
+
+<P><DT><B>◆予約語</B>
+<DD><TABLE>
+<TR><TD><PRE>light         </TD><TD><PRE>：　制御構造</TD></TR>
+<TR><TD><PRE>vector        </TD><TD><PRE>：　制御構造</TD></TR>
+</TABLE>
+
+<P><DT><B>◆データ</B>
+<DD><TABLE>
+<TR><TD><PRE>(Xn,Yn,Zn)    </TD><TD><PRE>：　光源の単位ベクトル</TD></TR>
+</TABLE>
+</DL>
+</DL>
+<HR>
+<!-------------------------------------------------------------------------------->
+<A NAME="no7"></A>
+<DL>
+<P><DT><H3>■アトリビュート</H3>
+<DD>アトリビュートは、ターゲットに依存したデータ構造である。
+<PRE>
+「
+    attribute    modelname
+    {
+        {
+            type        (TYPE0|TYPE1|...)
+            texture        "textureName"
+            color        ColorCode1, ColorCode2
+            gour_color    (R1,G1,B1),(R2,G2,B2),(R3,G3,B3),(R4,G4,B4)
+            direction    0,1,2,3
+            zsort        (Zpos)
+        }
+        {
+            .....
+        }
+        ..........
+        ..........
+    }
+」
+</PRE>
+<DL>
+<P><DT><B>◆目的</B>
+<DD>モデル各面に割り当てる属性を設定する。
+
+<P><DT><B>◆予約語</B>
+<DD><TABLE>
+<TR><TD><PRE>attribute    </TD><TD><PRE>：　制御構造</TD></TR>
+<TR><TD><PRE>type         </TD><TD><PRE>：　予約語</TD></TR>
+<TR><TD><PRE>texture      </TD><TD><PRE>：　予約語</TD></TR>
+<TR><TD><PRE>color        </TD><TD><PRE>：　予約語</TD></TR>
+<TR><TD><PRE>gour_color   </TD><TD><PRE>：　予約語</TD></TR>
+<TR><TD><PRE>direction    </TD><TD><PRE>：　予約語</TD></TR>
+</TABLE>
+
+<P><DT><B>◆データ</B>
+<DD><TABLE>
+<TR><TD><PRE>modelname    </TD><TD><PRE>：　モデル名</TD></TR>
+<TR><TD><PRE>(TYPEn)      </TD><TD><PRE>：　マテリアルタイプ(マテリアルデータと同様)。</TD></TR>
+	<TR><TD></TD><TD><PRE>　　シェーディング・マッピング等の方法を指定する。</TD></TR>
+	<TR><TD></TD><TD><PRE>　　→　NULL=なし    </TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　FLAT=フラットシェーディング</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　TEXT=テクスチャマッピング</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　GOUR=グーローシェーディング</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　MESH=メッシュ表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　TRAN=半透明</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　SHAD=半輝度</TD></TR>
+	<TR><TD></TD><TD><PRE>　　<B>※　複数指定は'|'で接続する。</B></TD></TR>
+<TR><TD><PRE>"textureName" </TD><TD><PRE>：　テクスチャマップファイル名</TD></TR>
+<TR><TD><PRE>ColorCode1    </TD><TD><PRE>：　マテリアルに設定されたノンテクスチャカラーコード</TD></TR>
+	<TR><TD></TD><TD><PRE>　　(RGB各5bit=1b.B5.G5.R5)</TD></TR>
+<TR><TD><PRE>ColorCode2    </TD><TD><PRE>：　現在の光源によって計算されたノンテクスチャカラーコード</TD></TR>
+	<TR><TD></TD><TD><PRE>　　(RGB各5bit=1b.B5.G5.R5)</TD></TR>
+<TR><TD><PRE>(Rn,Gn,Bn)    </TD><TD><PRE>：　現在の光源によって計算された4頂点のグーローテーブル</TD></TR>
+<TR><TD><PRE>0,1,2,3       </TD><TD><PRE>：　テクスチャマップの各頂点への対応。表示方向。</TD></TR>
+	<TR><TD></TD><TD><PRE>　　→　[0,1,2,3]=通常表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　[1,0,3,2]=H反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　[3,2,1,0]=V反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　[2,3,0,1]=HV反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　 　 [1,2,3,0]=90度回転通常表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　[2,1,0,3]=90度回転H反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　[0,3,2,1]=90度回転V反転表示</TD></TR>
+	<TR><TD></TD><TD><PRE>　　　　[3,0,1,2]=90度回転HV反転表示</TD></TR>
+<TR><TD><PRE>(Zpos)        </TD><TD><PRE>：　Ｚソートの基準（AVE=中心/MIN=最近/MAX=最遠</TD></TR>
+</TABLE>
+</DL>
+</DL>
+<HR NOSHADE>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm">Graphic Tools Guide</A>
+★<a href="../index_j.htm#frm">フォーマット一覧</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

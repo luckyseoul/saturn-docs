@@ -1,0 +1,128 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/11&gt;追記ライトワンス付録A.関連ツール「ADDGEN」</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">追記ライトワンス</A>
+<HR>
+<B>▲
+<a href="p08_10_j.htm">戻る</A>｜
+<a href="p10_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>追記ライトワンスシステムユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>付録Ａ．関連ツール「ADDGEN」</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="noa_1"></A>
+	<P><DT><H3>A.1　概要</H3>
+	<DD>　ADDGENはADDCDWのサブコマンドファイルを自動生成するツールです。<BR>
+　CD-Rディスクのファイルを更新するために、VCDBUILD用スクリプトファイル（以下、スクリプトファイルと省略）とADDCDW用サブコマンドファイルの両方を修正すると、手間がかかり不整合も生じやすい。<BR>
+　この問題を解決するため、スクリプトファイルを修正するだけで、それに対応するADDCDWサブコマンドファイルを自動生成します。</P>
+
+<A NAME="noa_2"></A>
+	<P><DT><H3>A.2　機能</H3>
+	<DD>　スクリプトファイルとCD-Rディスクを比較し、変更があったファイルを追加／削除／置換するためのADDCDW用サブコマンドファイルを出力する。即ち、CDに対しADDCDWを使ってどのような更新処理をすれば、スクリプトファイルに記述されたファイル構造と同一になるかを調べます。<BR>
+　DOS上のファイルとCD-Rディスク上のファイルの日付・時間を比較し、DOS上のファイルの方が新しい場合にファイルが変更されたと判断します。</P>
+
+<A NAME="za_1"></A>
+	<P ALIGN=CENTER><B>図A.１　ADDGENのデータフロー</B><BR><img srcset="../grp/i023_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+                     
+<A NAME="noa_3"></A>
+	<P><DT><H3>A.3　起動方法</H3>
+	<DD>　DOSのプロンプトから以下の形式のコマンドを入力してください。</P>
+
+	<P><DL><DD><B>C:&gt;addgen  スクリプトファイル名  [サブコマンドファイル名]  [オプション]</B></DL></P>
+
+	<P><DT><B>　（１）スクリプトファイル名</B>
+	<DD>　更新後のCD-ROMの内容を記述したスクリプトファイルの名称。<BR>　拡張子を省略した場合は、「.scr」が省略されたものとみなされます。</P>
+
+	<P><DT><B>　（２）サブコマンドファイル名</B>
+	<DD>　出力するADDCDW用サブコマンドファイルの名称。<BR>　省略された場合は、スクリプトファイル名の拡張子を「.cdw」としたサブコマンドファイルを出力します。</P>
+
+	<P><DT><B>　（３）オプション</B>
+	<DL>
+	<P><DT><B>-c</B>：
+	<DD>DOS上のファイルとCD-Rディスク上のファイルの内容を比較し、変更があった場合にファイルを置換する。日付・時間が古いファイルに更新したい場合に必要です。<BR>
+ただし、インタリーブされたファイル、MPEGストリーム、CDDAファイルは、日付・時間が比較されます。</P>
+
+	<P><DT><B>-e</B>：
+	<DD>メッセージを英語で表示します。省略した場合、DOSの言語モードを判別して、日本語か英語のどちらかのメッセージを表示します。</P>
+	</DL>
+
+<A NAME="noa_4"></A>
+	<P><DT><H3>A.4　動作内容</H3>
+	<DD>  スクリプトファイルとCD-Rディスク上の最終セッションを比較し、サブコマンドファイルを出力します。以下の場合に、各サブコマンドを出力します。</P>
+
+	<P><DT><B>　（１）全面追記サブコマンド</B>
+	<DD><OL TYPE=a>
+	<B><LI></B>CD-RドライブにセットされたCD-Rディスクが新品の場合。
+	<B><LI></B>ディレクトリ構造を更新する場合。
+	<B><LI></B>インタリーブされているファイルを更新する場合。
+	</OL>
+
+	<P><DT><B>　（２）ファイル追加サブコマンド</B>
+	<DD><OL TYPE=a>
+	<B><LI></B>CD-Rディスク上に無いファイルがスクリプトファイルにあった場合。
+	</OL>
+
+	<P><DT><B>　（３）ファイル削除サブコマンド</B>
+	<DD><OL TYPE=a>
+	<B><LI></B>CD-Rディスク上にあるファイルがスクリプトファイルに無い場合。
+	</OL>
+
+	<P><DT><B>　（４）ファイル置換サブコマンド</B>
+	<DD><OL TYPE=a>
+	<B><LI></B>オプションで指定された方法でファイルを比較し、ファイルが変更されている場合。
+	</OL>
+
+<A NAME="noa_5"></A>
+	<P><DT><H3>A.5　エラーレベル</H3>
+	<DD>　実行した結果に従い、以下のエラーレベルをDOSに返します。</P>
+
+	<P><DT><B>　（１）エラーレベル：0</B>
+	<DD>　正常終了しました。サブコマンドファイルが出力され、ADDCDWを実行することができます。</P>
+
+	<P><DT><B>　（２）エラーレベル：1</B>
+	<DD>　全面追記する必要がありますが、ディスクイメージファイル、TOCファイルが作成されていません。<BR>サブコマンドファイルが出力され、VCDBUILD, VCDMKTOCを実行すれば、ADDCDWを実行することができます。</P>
+
+	<P><DT><B>　（３）エラーレベル：2</B>
+	<DD>　処理を継続することができません。詳細は<a href="p07_10_j.htm#t7_1">エラーメッセージ</A>を参照してください。</P>
+
+<A NAME="noa_6"></A>
+	<P><DT><H3>A.6　制限事項</H3>
+	<DT><OL TYPE=a>
+	<P><B><LI></B>スクリプトファイルに記述できるファイル数は、起動時に「MAX FILE」で表示される個数以下とします。</P>
+
+
+	</OL>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p08_10_j.htm">戻る</A>｜
+<a href="p10_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">追記ライトワンス</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,135 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/19&gt;SMPC User's Manual/3.4</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p03_30.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>SMPC User's Manual/Chapter 3 Peripheral Control</b><HR NOSHADE>
+<H2> ■3.4 Peripheral access protocol</H2><DL>
+<P><DD> This section shows the peripheral access protocol in <B>SH-2 direct mode</b> .</P>
+<A NAME="no3_41"></A><P><DT><H3> ●About peripheral port bit names</H3><DD> The configuration of the SMPC peripheral port is inherited from the Mega Drive peripheral port in order to maintain compatibility with the Mega Drive. Therefore, we have decided to inherit the port bit names from the Mega Drive. Table 3.22 shows the correspondence between port bit numbers and port bit names. From now on, this manual uses port bit names for explanations.</P>
+<A NAME="t3_22"></A><P><DD> <B>Table 3.22 Correspondence between port bit number and port bit name</b><DD><TABLE BORDER=1>
+<TR><TD><PRE> port bit number</TD><TD><PRE> bit6</TD><TD><PRE> bit5</TD><TD><PRE> bit4</TD><TD><PRE> bit3</TD><TD><PRE> bit2</TD><TD><PRE> bit1</TD><TD><PRE> bit0</TD></TR>
+<TR><TD><PRE> port bit name</TD><TD><PRE> T.H.</TD><TD><PRE> T.R.</TD><TD><PRE> T.L.</TD><TD><PRE> R</TD><TD><PRE> L</TD><TD><PRE> D</TD><TD><PRE> U</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_42"></A><P><DT><H3> ●Megadrive peripheral ID calculation method in SH-2 direct mode</H3><DD> The Mega Drive peripheral ID calculation formula is shown below.<DD> Megadrive peripheral ID is represented by 4 bits: ID3 ID2 ID1 ID0.</P>
+<P><DD><PRE>
+<H2>
+ID3=R# L (TH=1)
+ID2=D# U (TH=1)
+ID1=R# L (TH=0)
+ID0=D# U (TH=0)
+</H2>
+<H3>
+# indicates logical sum (OR).
+</H3>
+</PRE></P>
+<A NAME="no3_43"></A><P><DT><H3>●Port settings when acquiring Mega Drive peripheral ID</H3><DD> Table 3.23 shows the port direction register settings when acquiring the Mega Drive peripheral ID. You can set the port direction as shown below, read the RLDU when TH=1 and the RLDU when TH=0, and calculate the Mega Drive peripheral ID using the above formula.<BR>
+ Please read R, L, D, and U after 2μs after TH changes.</P>
+<A NAME="t3_23"></A><P><DD> <B>Table 3.23 Port direction register setting value when acquiring Mega Drive peripheral ID</b><DD><TABLE BORDER=1>
+<TR><TD><PRE> port bit name</TD><TD><PRE> T.H.</TD><TD WIDTH=60><PRE> T.R.</TD><TD WIDTH=60><PRE> T.L.</TD><TD WIDTH=60><PRE> R</TD><TD WIDTH=60><PRE> L</TD><TD WIDTH=60><PRE> D</TD><TD WIDTH=60><PRE> U</TD></TR>
+<TR><TD><PRE> port direction</TD><TD><PRE> set to output</TD><TD COLSPAN=6><PRE> set to input </TD></TR>
+</TABLE>
+</P>
+<!-- 社内用限定情報 -------------------
+<A NAME="no3_44"></A>
+	<P>	<DT><H3>　●ペリフェラルインタフェースプロトコルについて</H3>
+		<DD>　ペリフェラルインタフェースプロトコルには、3種類のプロトコルがあります。以下、各インタフェースプロトコルの概要、および対応ペリフェラルについて示します。<BR>
+
+
+<A NAME="no3_44_0"></A>
+	<P>	<DT><H4>　TH制御方式</H4>
+		<DD>　TH制御方式インタフェースプロトコルは、TH＝1のときのTR、TL、R、L、D、U、およびTH＝0のときのTR、TL、R、L、D、U、のデータを取得する方式です。本プロトコル対応ペリフェラルには、メガドライブ3ボタンPAD、
+			およびメガドライブ6ボタンPADがあります。<P>
+
+<A NAME="no3_44_1"></A>
+	<P>	<DT><H4>　TH、TR制御方式</H4>
+		<DD>　TH、TR制御方式インタフェースプロトコルは、TH、TRの4通りのビットパターンでR、L、D、U、のデータを取得する方式です。本プロトコル対応ペリフェラルには、サターン標準PADがあります。<P>
+
+<A NAME="no3_44_2"></A>
+	<P>	<DT><H4>　3線ハンドシェイク方式</H4>
+		<DD>　3線ハンドシェイク方式はTH＝0によりペリフェラルをSEL(セレクト)、TRからREQ(データリクエスト)を送信し、R、L、D、U、のデータが確定すると、TLにACK(応答信号)を返してきます。
+			3線ハンドシェイク方式は、このように3線の制御信号で状態を確認しながらデータを取得する方式です。
+			本プロトコル対応ペリフェラルには、セガタップ、セガマウス、サターンアナログジョイスティック、サターンキーボード、サターン6Pマルチタップがあります。<P>
+---------------------ここまで----------------><A NAME="no3_45"></A><P><DT><H3> ●Megadrive peripheral ID of each peripheral</H3><DD> Table 3.24 shows the MegaDrive peripheral ID for each peripheral.</P>
+<A NAME="t3_24"></A><P><DD> <B>Table 3.24 MegaDrive Peripheral ID for each peripheral</b><DD><TABLE BORDER=1>
+<TR><TD><PRE> Peripheral name</TD><TD><PRE> mega drive<BR> Peripheral ID</TD></TR>
+<TR><TD><PRE> Megadrive 3 button PAD</TD><TD><PRE> DH</TD></TR>
+<TR><TD><PRE> Megadrive 6 button PAD</TD><TD><PRE> DH&CH</TD></TR>
+<TR><TD><PRE> sega mouse</TD><TD><PRE> 3H</TD></TR>
+<TR><TD><PRE> sega tap</TD><TD><PRE> 7H</TD></TR>
+<TR><TD><PRE> saturn standard pad</TD><TD><PRE> BH</TD></TR>
+<TR><TD><PRE> saturn analog joystick</TD><TD><PRE> 5H</TD></TR>
+<TR><TD><PRE> saturn keyboard</TD><TD><PRE> 5H</TD></TR>
+<TR><TD><PRE> saturn multitap</TD><TD><PRE> 5H</TD></TR>
+</TABLE>
+</P>
+<DD> Note: "Saturn Standard Pad", "Saturn Analog Joystick", "Saturn Keyboard", and "Saturn Multi-Tap" are development names. </P>
+<!-- 社内用限定情報 -------------------
+<A NAME="no3_46"></A>
+	<P>	<DT><H3>　●5H以外のメガドライブペリフェラルIDをもつペリフェラルへのSH-2ダイレクトモードでのアクセス手順</H3>
+		<DD>　5H以外のメガドライブペリフェラルIDをもつペリフェラルへのSH2ダイレクトモードでのアクセス手順を以下に示します。</P>
+
+
+	<P>	<DD><OL>
+
+		<LI>メガドライブペリフェラルIDを取得する。</P>
+
+
+	<P>	<LI>メガドライブペリフェラルIDによりペリフェラルを判定。それに応じたシーケンスを実行しデータ取得を行います。また、5H以外のメガドライブペリフェラルIDをもつペリフェラルは、サターンペリフェラルIDを返しません。</OL>
+</P>
+
+
+<A NAME="no3_47"></A>
+	<P>	<DT><H3>　●5HのメガドライブペリフェラルIDをもつペリフェラルへのSH-2ダイレクトモードでのアクセス手順</H3>
+		<DD>　5HのメガドライブペリフェラルIDをもつペリフェラルへのSH2ダイレクトモードでのアクセス手順を以下に示します。</P>
+
+
+	<P>	<DD><OL>
+
+		<LI>メガドライブペリフェラルIDを取得する。</P>
+
+
+	<P>	<LI>メガドライブペリフェラルIDに応じたプロトコルを実行しサターンペリフェラルIDを取得します。</P>
+
+
+	<P>　メガドライブペリフェラルIDを構成するD、Uによりプロトコルを決定できます。その他の組み合わせは、<B>SEGA RESERVED</B>です。</P>
+
+
+	<P><PRE>
+<B>3線ハンドシェイク方式のペリフェラル</B>
+<H2>
+D、U ＝0、1  (TH=1)
+D、U ＝0、1  (TH=0)
+</H2></PRE></P>
+
+
+	<P>	<LI>サターンペリフェラルIDを取得し、データサイズに応じた回数のアクセスを行い全ペリフェラルデータを受信します。</OL>
+</P>
+
+---------------------ここまで----------------></DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_30.htm">Back</a> | ■</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

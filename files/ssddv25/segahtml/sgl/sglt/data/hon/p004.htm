@@ -1,0 +1,233 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 4&gt;SGL Tutorial DATA/4.Data Format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">Data exchange</a><HR>
+ <B>▲ <A HREF="p003.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>Passing data</b><H2 ALIGN=CENTER> 4.Data structure</H2><HR NOSHADE>
+<P> This chapter explains the structure of model data, material name specifications, and texture data handled by Sega Saturn.</P>
+<DL>
+<A NAME="no4_10"></A><P><DT><H2> 4-1. Model data specifications</H2><DD> The model data here refers to a set of three data: point data of three-dimensional coordinates (x, y, x), polygon data formed by four of the points, and attribute data representing the attributes of the polygon. Masu.<BR>
+ Below is the general format when the model name is assumed to be "label".</P>
+<A NAME="no4_11"></A><P><DT><H3> point data</H3><P><CENTER>
+<HR NOSHADE WIDTH=40%>
+<PRE>
+POINT point_label[]={   
+      POStoFIXED(x,y,z),
+      POStoFIXED(x,y,z),
+      POStoFIXED(x,y,z),
+      POStoFIXED(x,y,z),
+           .............
+      };                
+	<HR NOSHADE WIDTH=40%>
+POINT:Point data　
+x,y,z:Float type coordinate values</PRE></CENTER>
+</P>
+<P><DD> This is the index of point data 0, 1, 2, 3 in order from the top.</P>
+<A NAME="no4_12"></A><P><DT><H3> polygon data</H3><P><CENTER>
+<HR NOSHADE WIDTH=40%>
+<PRE>
+POLYGON polygon_label[]={
+     NORMAL(x,y,z),      
+     VERTICES(0,1,2,3),  
+                         
+     NORMAL(x,y,z),      
+     VERTICES(0,1,2,3),  
+          .............  
+    };                   
+	<HR NOSHADE WIDTH=40%>
+NORMAL: Normal vector　
+x,y,z:Float type coordinate values　
+VERTICES: Point data of 4 points forming a polygon</PRE></CENTER>
+</P>
+<P><DD> For triangular polygons, repeat the last point to create 4 points of polygon data.</P>
+<P><DT> Example) For quadrilateral polygons<DD> <B>VERTICES(0,1,2,3)</b><P><DT> Example) For triangular polygons<DD> <B>VERTICES(0,1,2,2)</b><A NAME="no4_13"></A><P><DT><H3> attribute data</H3><A NAME="db4_1"></A><P><CENTER>
+<HR NOSHADE WIDTH=60%>
+<PRE>
+ATTR attribute_label=[]={                                           
+        ATTRIBUTE(Plane,Sort,Texture,Color,Gouraud,Mode,Dir,Option),
+         ....... .... ..... ... ... ..... ... .....          
+                                                                    
+        };                                                          
+	<HR NOSHADE WIDTH=60%>
+ATTR: Attribute　
+Plane: Attribute to determine whether back side is present or not Sort: Representative point of Z sort　
+Texture: Texture name (No.)　
+Color: Color data　
+Gouraud: Attribute of Gouraud shading Mode: Drawing mode　
+Dir: State of polygons and textures Option: Options and other functions　
+</PRE></CENTER>
+</P>
+<P><DD>Attributes have the following eight parameters. Here we will describe the symbols that should actually be output for each parameter and their contents.</P>
+<P><DT> <B>[Plane]</b><DD> Single_Plane: Back side judgment available<DD> Dual_Plane: No back side detection</P>
+<P><DT> <B>[Sort]</b><DD> SORT_MIN: Nearest point<DD> SORT_CEN: center point<DD> SORT_MAX: farthest point<DD> SORT_BFR: Display in front of the polygon registered just before</P>
+<A NAME="db4_2"></A><P><DT> <B>[Texture]</b><DD> No_Texture: For polygons<DD> Texture name: For texture (macro indicating texture data)</P>
+<P><DD> For details, see “ <A HREF="#no4_30">Section 4-3</a> : Texture data specifications”.</P>
+<P><DT> <B>[Color]</b><DD> No_Palet: For textures<DD> C_RGB( r, g, b: Color data for polygons<BR>
+ r, g, b represent the three primary colors, and each has a decimal value from 0 to 31.</P>
+<P><DT> <B>[Gouraud]</b><DD> No_Gouraud: No Gouraud<DD> Address: relative address of Gouraud shading table<A NAME="db4_4"></A><P><DT> <B>[Mode]</b><DD><TABLE BORDER=1>
+<TR><TH> group</TH><TH> macro</TH><TH> Contents</TH></TR>
+<TR></TR>
+<TR><TH ROWSPAN=3> <B>[1]</b></TH><TD> No_Window</TD><TD> Not subject to restrictions within the window <B>(default)</b></TD></TR>
+<TD> Window_In</TD><TD> Display inside Window</TD></TR>
+<TD> Window_Out</TD><TD> Display outside the window</TD></TR>
+<TR></TR>
+<TR><TH ROWSPAN=2> <B>[2]</b></TH><TD> MESHoff</TD><TD> Normal display <B>(default)</b></TD></TR>
+<TD> MESHon</TD><TD> Display as mesh</TD></TR>
+<TR></TR>
+<TR><TH ROWSPAN=2> <B>[3]</b></TH><TD> ECdis</TD><TD> Disable EndCode</TD></TR>
+<TD> ECenb</TD><TD> Enable EndCode <B>(default)</b></TD></TR>
+<TR></TR>
+<TR><TH ROWSPAN=2> <B>[4]</b></TH><TD> SPdis</TD><TD> Also display transparent pixels <B>(default)</b></TD></TR>
+<TD> SPenb</TD><TD> Do not display transparent pixels</TD></TR>
+<TR></TR>
+<TR><TH ROWSPAN=6> <B>[5]</b></TH><TD> CL16Bnk</TD><TD> 16 colors Color bank mode <B>(default)</b></TD></TR>
+<TD> CL16Look</TD><TD> 16 colors lookup table mode</TD></TR>
+<TD> CL64Bnk</TD><TD> 64 colors color bank mode</TD></TR>
+<TD> CL128Bnk</TD><TD> 128 colors color bank mode</TD></TR>
+<TD> CL256Bnk</TD><TD> 256 colors color bank mode</TD></TR>
+<TD> CL32KRGB</TD><TD> 32768 colors RGB mode</TD></TR>
+<TR></TR>
+<TR><TH ROWSPAN=5> <B>[6]</b></TH><TD> CL_Replace</TD><TD> Overwrite (standard) mode <B>(default)</b></TD></TR>
+<TD> CL_Shadow</TD><TD> shadow mode</TD></TR>
+<TD> CL_Half</TD><TD> half brightness mode</TD></TR>
+<TD> CL_Trans</TD><TD> Translucent mode</TD></TR>
+<TD> CL_Gouraud</TD><TD> gouraud shading mode</TD></TR>
+</TABLE>
+</P>
+<A NAME="db4_3"></A><P><DT> <B>[Dir]</b><DD><TABLE BORDER=1>
+<TR><TH> macro</TH><TH> Contents</TH></TR>
+<TR></TR>
+<TR><TD> sprNoflip</TD><TD> Display texture normally</TD></TR>
+<TR><TD> sprHflip</TD><TD> Flip the texture horizontally</TD></TR>
+<TR><TD> sprVflip</TD><TD> Flip the texture vertically</TD></TR>
+<TR><TD> sprHVflip</TD><TD> Flip the texture vertically and horizontally</TD></TR>
+<TR><TD> sprPorygon</TD><TD> display polygons</TD></TR>
+<TR><TD> sprPolyLine</TD><TD> display polyline</TD></TR>
+<TR><TD> sprLine</TD><TD> Displays a straight line using the first two points</TD></TR>
+</TABLE>
+</P>
+<A NAME="db4_5"></A><P><DT> <B>[Option]</b><DD><TABLE BORDER=1>
+<TR><TH> macro</TH><TH> Contents</TH></TR>
+<TR></TR>
+<TR><TD> UseLight</TD><TD> Perform light source calculations</TD></TR>
+<TR><TD> UseClip</TD><TD> Do not display if a vertex goes off the screen</TD></TR>
+<TR><TD> Use Palette</TD><TD> Indicates that polygon colors are in palette format</TD></TR>
+</TABLE>
+</P>
+<P><DD> Among the above parameters, <B>Plane</b> , <B>Sort</b> , and <B>Mode</b> can be obtained by specifying them in the material name in the next section.</P>
+<A NAME="no4_14"></A><P><DT><H3> PDATA structure</H3><P><CENTER>
+<HR NOSHADE WIDTH=60%>
+<PRE>
+PDATA pdata_label[]={   
+       point_label,n1,  
+       polygon_label,n2,
+       attribute_label  
+      };                
+	<HR NOSHADE WIDTH=60%>
+pdata_label: Indicates the PDATA type address to be passed to SGL.
+point_label: Indicates the address of the POINT type.　
+nl: Indicates the number of points.　
+polygon_label: Indicates the address of POLYGON type.　
+n2: Indicates the number of polygons.　
+attribute_label: Indicates the ATTR type address.　
+</PRE><HR NOSHADE WIDTH=60%>
+</CENTER>
+</P>
+<A NAME="no4_15"></A><P><DT><H3>OBJECT structure</H3><P><CENTER>
+<HR NOSHADE WIDTH=60%>
+<PRE>
+OBJECT object_label[]={   
+       pdata_label,       
+       TRANSLATION(x,y,z),
+       ROTATION(x,y,z),   
+       SCALING(x,y,z),    
+       object_child,      
+       object_sibling,    
+<HR NOSHADE WIDTH=60%>
+pdata_label: Indicates the PDATA type address.　
+TRANSLATION: Indicates the amount of movement.　
+ROTATION: Indicates the amount of rotation.　
+SCALING: Indicates the amount of expansion.　
+object_child: Indicates the address of the child's OBJECT type.
+object_sibling: Indicates the address of the sibling OBJECT type.
+</PRE></CENTER>
+</P>
+<P><DD>Please refer to the “design 3” sample source for information on how to use this structure.</P>
+<A NAME="no4_20"></A><P><DT><H2> 4-2. Material name specifications</H2><DD> Each character in the material name has a meaning. The contents will be reflected in the attribute data as is. Its specifications are shown below.</P>
+<P><DD> Generally, it is as follows.<DD> <B>[Plane][Sort][Mesh]</b> ([] contains one character, and the material name is represented by three characters, for example “SSN”.)</P>
+<P><DD> The attributes of each character are</P>
+<P><DT> <B>[Plane]</b><DD> S:Single_Plane<DD> D:Dual_Plane</P>
+<P><DT> <B>[Sort]</b><DD> N:SORT_MIN<DD> C:SORT_CEN<DD> F：SORT_MAX<DD> B:SORT_BFR</P>
+<P><DT> <B>[Mesh]</b><DD> O：MESHon<DD> N：MESHoff</P>
+<P><DD> Example) If the material name is “SCN”, the attribute data is</P>
+<P><DD> <B>ATTRIBUTE( Single_Plane, SORT_CEN, No_Texture, C_RGB( r, g, b ), No_Gouraud, MESHoff, sprNoflip, NoOption )</b></P>
+<P> It becomes.</P>
+<A NAME="no4_30"></A><P><DT><H2> 4-3. Texture data specifications</H2><DD> This data is only required for textures. The texture name in the attribute data “Texture” is based on this data.</P>
+<P><DD> If the DGT file used as a texture is “sample.dgt”,</P>
+<P><CENTER>
+<HR NOSHADE WIDTH=50%>
+<PRE>
+TEXDAT sample[]={                      
+        rgb,rgb,rgb,rgb,rgb,rgb,rgb,rgb
+        rgb,rgb,rgb,rgb,rgb,rgb,rgb,rgb
+        ......................................  
+        };                             
+<HR NOSHADE WIDTH=50%>
+TEXTB: Texture table　
+sample: Indicates a label with texture data (file name as is)
+hsize,vsize: Texture size (hsize is always a multiple of 8)　
+bgr: 1 pixel of texture data　
+</PRE></CENTER>
+</P>
+<P><DD>In addition, each of the three primary colors is expressed using 5 bits with a value between 0 and 31.<BR>
+ The data format is as follows.</P>
+<P><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD></TD><TD COLSPAN=5> B</TD><TD COLSPAN=5> G</TD><TD COLSPAN=5> R</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 4</TD><TD> 3</TD><TD> 2</TD><TD> 1</TD><TD> 0</TD><TD> 4</TD><TD> 3</TD><TD> 2</TD><TD> 1</TD><TD> 0</TD><TD> 4</TD><TD> 3</TD><TD> 2</TD><TD> 1</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<P><DD> Example) Let's assume that the graphic data file sample.dgt is an 8x2 white and black checker texture as shown below.</P>
+<A NAME="z4_1"></A><P ALIGN=CENTER> <B>Figure 4-1 Checkered texture</b><BR>
+<img srcset="../grp/p6_3.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Then the texture data for this texture will be as follows.</P>
+<P><CENTER>
+<HR NOSHADE WIDTH=65%>
+<PRE>
+TEXDAT sample[]={                                               
+        0xffff,0x8000,0xffff,0x8000,0xffff,0x8000,0xffff,0x8000,
+        0x8000,0xffff,0x8000,0xffff,0x8000,0xffff,0x8000,0xffff 
+        };                                                      
+	</PRE><HR NOSHADE WIDTH=65%>
+</CENTER>
+</P>
+<P><DD>The attribute data of the polygon with the material name “SCN” to which this texture is attached is as follows:</P>
+<P><DD> <B>ATTRIBUTE(Single_Plane, SORT_CEN, SAMPLE, No_Palet, No_Gouraud, MESHoff, SprNoflip, NoOption)</b></P>
+<P><DD> It becomes.</P>
+<P><DD> <B>Note</b><BR>
+<DD> For textures, the H size must be a multiple of 8. This is a limitation due to Saturn's hardware specifications.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p003.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">Data exchange</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

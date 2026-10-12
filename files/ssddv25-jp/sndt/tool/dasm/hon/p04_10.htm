@@ -1,0 +1,166 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 7&gt;SCSP/DSPアセンブラユーザーズマニュアル/4.プログラムの記述</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#no2">SOUND Manual</A>
+★<A HREF="../index.htm">SCSP/DSPアセンブラユーザーズマニュアル</A>
+<HR>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCSP/DSPアセンブラユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>4.プログラムの記述</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P><DT><H2>■コマンドリスト</H2>
+	<DD><TABLE BORDER>
+	<TR><TH><PRE>　コマンド　</TH><TH><PRE>機　　能</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>＠</TD> <TD><PRE>乗加算記述の開始</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>＊</TD> <TD><PRE>乗算</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>＋</TD> <TD><PRE>加算</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>−</TD> <TD><PRE>減算</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>＞</TD> <TD><PRE>ストア（乗加算記述の終了）</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>（</TD> <TD><PRE>左カッコ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>）</TD> <TD><PRE>右カッコ</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>LDI</TD><TD><PRE>メモリアクセスおよびMEMSへのロード</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>LDY</TD><TD><PRE>INPUTSからYレジスタへのロード</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>LDA</TD><TD><PRE>INPUTSからAレジスタへのロード</TD></TR></TABLE></P>
+
+<A NAME="no4_20"></A>
+	<P><DT><H2>■パラメータ</H2>
+<A NAME="no4_21"></A>
+	<P><DT><H3>　●内部レジスタ</H3>
+	<DD><TABLE BORDER>
+	<TR><TH><PRE>　シンボル　</TH><TH><PRE>解　　説</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>REG</TD><TD><PRE>直前の乗加算結果を表す</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>YREGH</TD><TD><PRE>YREGの一部（乗加算の文法解説を参照）を表す</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>YREGL</TD><TD><PRE>YREGの一部（乗加算の文法解説を参照）を表す</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>FREG</TD><TD><PRE>(ストアの文法解説参照)</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>ADREG</TD><TD><PRE>アドレス変調分（ストアの文法解説参照）</TD></TR></TABLE></P>
+
+<A NAME="no4_22"></A>
+	<P><DT><H3>　●内部RAM</H3>
+	<DD><TABLE BORDER>
+	<TR><TH><PRE>　シンボル　</TH><TH><PRE>解　　説</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>MEMS00〜1F </TD><TD><PRE>外部メモリから読み込んだデータをここに置く</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>MIXS00〜0F </TD><TD><PRE>音源部からのデータがここに現れる</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>TEMP00〜7F </TD><TD><PRE>乗加算結果をここに一時置くことができる</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>EFREG00〜0F</TD><TD><PRE>処理後のデータをここに置く</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>EXTS00〜01 </TD><TD><PRE>外部拡張入力からのデータがここに現れる</TD></TR></TABLE></P>
+
+<A NAME="no4_23"></A>
+	<P><DT><H3>　●メモリアクセス用パラメータ</H3>
+	<DD><TABLE BORDER>
+	<TR><TH><PRE>　シンボル　</TH><TH><PRE>解　　説</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>MR［…］</TD><TD><PRE>メモリからの読み込みを行う</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>MW［…］</TD><TD><PRE>メモリへの書き込みを行う</TD></TR></TABLE></P>
+
+	<P><DD><B>※注</B>
+	<DD>[...]内には以下に示すメモリアクセス記述要素を、別途規定する規則に従って記述します。</P>
+	<DD><UL TYPE=DISK>
+	<LI>ユーザ定義アドレスシンボル
+	<LI>DEC
+	<LI>ADREG
+	<LI>1
+	<LI>NF
+	</UL></P>
+
+<A NAME="no4_30"></A>
+	<P><DT><H2>■プログラム文法</H2>
+	<DD>全てのニモニック、パラメータは、定められた区切り記号、すなわち、「空白文字」、「カンマ(,)」、「タブ」、「改行」のいずれか１つ以上によって区切られなければなりません。</P>
+
+<A NAME="no4_31"></A>
+	<DT><H3>　●外部メモリの読み出しおよびロード先MEMSの指定(LDI)</H3>
+	<DD>LDI  MEMSxx, MR[AddressElement(s)/NF]</P>
+	<DT><UL TYPE=DISK>
+	<P><LI>外部メモリ読み出し用パラメータ「MR[...]」の記述中には区切り文字を入れてはなりません。</P>
+	<P><LI>「AddressElement(s) 」は、別途示す「アドレス記述要素」を記号「+」で連結したものを表します。</P>
+	<P><LI>「AddressElement(s) 」のアドレス記述要素の中に、必ず１個のアドレス定数シンボル(ユーザが定義したアドレス用シンボル名)が含まれていなければなりません。</P>
+	</UL>
+
+<A NAME="no4_32"></A>
+	<P><DT><H3>　●YREGへのロード(LDY)</H3>
+	<DD>LDY INPUTS</P>
+
+<A NAME="no4_33"></A>
+	<P><DT><H3>　●ADREGへのロード(LDA)</H3>
+	<DD>LDA INPUTS</P>
+
+<A NAME="no4_34"></A>
+	<P><DT><H3>　●乗加算</H3>
+	<DD>@ pM * pC ± ( pM * pC ± ( ... ( pM * pC ± ( pM * pC + pA ) ) ... ) )</P>
+
+	<P><DD>pM：被乗算数<BR>
+	pC：乗算係数<BR>
+	pA：披加算数</P>
+
+	<P><DT><UL TYPE=DISC>
+	<P><LI>左カッコ「(」と「)」の個数は一致していなければなりません。</P>
+	<P><LI>最も右側の「(」は、最も左側の「)」よりも左側になければなりません。</P>
+	<P><LI>pMとpAの組み合わせには次表のような制限があります。</P>
+	<P><TABLE BORDER>
+	<TR><TH><PRE>　pM　</TH><TH><PRE>　pA　</TH></TR>
+	<TR><TD><PRE>INPUTS</TD><TD><PRE>[PEG, TEMP00-TEMP7F]</TD></TR>
+	<TR><TD><PRE>TEMP00-TEMP7F</TD><TD><PRE>[REG,T]※</TD></TR></TABLE></P>
+	<P>pMで{TEMP00-TEMP7F}を指定し、なおかつpAにもTEMPを指定する場合には、同一の添字を持つTEMPしか使用できません。このためpAの方には“T”と指定します。</P>
+
+	<P><LI>乗算係数としてYREGの値を引数に使用する場合、{YREGH, YREGL｝のいずれかの表記とします。この２通りの表記による違いは次表を参照してください。<P>
+	<TABLE BORDER>
+	<TR><TH><PRE>　表　記　</TH><TH><PRE>乗算機に渡されるデータ（13bits）</TH></TR>
+	<TR ALIGN=CENTER><TD><PRE>YREGH</TD><TD><PRE><table border cellpadding=2><td>YREG bit23-bit11</td></table></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>YREGL</TD><TD><PRE><table border cellpadding=2><td>0</td><td>YREG bit15-bit4</td></table></TD></TR></TABLE></P>
+	</UL>
+	
+<A NAME="no4_35"></A>
+	<P><DT><H3>　●ストア</H3>
+	<DD><B>&gt; opt Destination(s)</B></P>
+	<P><DD><TABLE BORDER=0>
+	<TR><TD ALIGN=CENTER><PRE>opt</TD><TD>：ストアオプション。<BR>　｛ S1 / S2 / S3 ｝の内のいずれか１つ、または省略。</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>Destination(s)</TD><TD>：ストア先の指定。<BR>　以下に示す「a群〜d群」から合計１個以上を選択します。省略は不可。</TD></TR></TABLE></P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TD ALIGN=CENTER><PRE>a群</TD><TD><PRE>｛TEMP00〜7F｝のうちいずれか1個</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>b群</TD><TD><PRE>FREG</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>c群</TD><TD><PRE>ADREG</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>d群</TD><TD><PRE>｛EFREG00〜0F｝のうちいずれか1個</TD></TR></TABLE></P>
+
+	<P><DD><TABLE><TR>
+	<TH>注　意<BR><IMG SRC="../../../../what/atto.gif"></TH>
+	<TD><B>Destination(s)にADREGを指定する場合には、<BR>optにはS3を指定しなければなりません。</TD></TR></TABLE></P>
+
+	<DT><UL TYPE="DISK">
+	<P><LI>optにより、ストアしようとするデータのビットシフト、オーバーフロープロテクト、ストアモードの指定を行います。その組み合わせは下表のとおりです。</P>
+	<TABLE BORDER>
+	<TR><TH><PRE>第1パラメータ設定</TH><TH><PRE>シフト</TH><TH><PRE>オーバーフロープロテクト</TH><TH><PRE>ストアモード</TH></TR>
+	<TR ALIGN=CENTER><TD><PRE>省略</TD><TD><PRE>×1</TD><TD><PRE>プロテクト有</TD><TD><PRE>A</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>S1</TD><TD><PRE>×2</TD><TD><PRE>プロテクト有</TD><TD><PRE>A</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>S2</TD><TD><PRE>×2</TD><TD><PRE>プロテクト無</TD><TD><PRE>A</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>S3</TD><TD><PRE>×1</TD><TD><PRE>プロテクト無</TD><TD><PRE>B</TD></TR></TABLE></P>
+
+	<P><LI>ストアモードA／Bの違いにより、ADREGおよびFREGにストアされるデータは下表のように異なります。</P>
+	<TABLE BORDER>
+	<TR><TH><PRE>モード／レジスタ名</TH><TH><PRE>ADREG（12bits）</TH><TH><PRE>FREG（13bits）</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>A</TD><TD><PRE><table border cellpadding=2><td width=35>ssss</td><td>INPUTS bit23-bit16</TD></table></td><TD><PRE><table border cellpdding=2><td width=150>  シフタbit23-bit11</TD></table></td></TR>
+	<TR><TD ALIGN=CENTER><PRE>B</TD><TD><PRE><table border cellpadding=2><td width=170>シフタ bit23-bit12</TD></table></td><TD><PRE><table border cellpadding=2><td width=20> 0</td><td>シフタ bit11-bit0</TD></table></td></TR></TABLE></P>
+
+	<P><TABLE><TD><PRE>※ADREG/ストアモードAの上位4bit(上表の</TD><TD><table border cellpadding=2><TD><PRE>ssss</TD></TABLE></TD><TD>)は、INPUTSのbit23に等しい</TD><TR>
+	<TD COLSPAN=3>　値（符号ビット）で満たされ（符号拡張され）ます。</TD></TABLE>
+	</UL>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#no2">SOUND Manual</A>
+★<A HREF="../index.htm">SCSP/DSPアセンブラユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

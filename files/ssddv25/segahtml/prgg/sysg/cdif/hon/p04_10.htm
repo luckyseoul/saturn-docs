@@ -1,0 +1,212 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/19&gt;CD communication I/F (CD part)/CD drive</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual</b><H2 ALIGN=CENTER> CD drive</H2><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H3> 4.1 CD drive state transition</H3><A NAME="no4_11"></A><P><DT> <B>(1)CD drive status</b><DD> Table 4.1 shows the status of the CD drive.</P>
+<A NAME="t4_1"></A><P><DD> <B>Table 4.1 CD drive status</b><DD><TABLE border=1>
+<TR><th width=150><PRE> situation</TH><th width=350><PRE> explanation</TH></TR>
+<TR><TD><PRE>&#12296; BUSY&#12297;</TD><TD><PRE> State transition in progress</TD></TR>
+<TR><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE> Pausing (pause)</TD></TR>
+<TR><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE> Standby (drive stopped)</TD></TR>
+<TR><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE> CD playing</TD></TR>
+<TR><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE> Seeking in progress</TD></TR>
+<TR><TD><PRE>&#12296; SCAN&#12297;</TD><TD><PRE> Scan playback in progress</TD></TR>
+<TR><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE> tray is open</TD></TR>
+<TR><TD><PRE>&#12296; NODISC&#12297;</TD><TD><PRE> no disc</TD></TR>
+<TR><TD><PRE>&#12296; RETRY&#12297;</TD><TD><PRE> Read retry processing in progress</TD></TR>
+<TR><TD><PRE>&#12296; ERROR&#12297;</TD><TD><PRE> A read data error occurred</TD></TR>
+<TR><TD><PRE>&#12296; FATAL&#12297;</TD><TD><PRE> A fatal error has occurred (stop command required)</TD></TR>
+</TABLE>
+</P>
+<A NAME="no4_12"></A><P><DT> <B>(2) Types of drive commands</b><DD> Table 4.2 shows the commands (drive commands) that change the status of the CD drive.</P>
+<A NAME="4_2"></A><P><DD> <B>Table 4.2 Drive commands</b><DD><TABLE border=1>
+<TR><th width=150><PRE> drive command</TH><th width=350><PRE> Corresponding function</TH></TR>
+<TR><TD><PRE> CD block initialization</TD><TD><PRE> CDC_CdInit</TD></TR>
+<TR><TD><PRE> opening the tray</TD><TD><PRE> CDC_CdOpen</TD></TR>
+<TR><TD><PRE> play</TD><TD><PRE> CDC_CdPlay</TD></TR>
+<TR><TD><PRE> seek</TD><TD><PRE> CDC_CdSeek</TD></TR>
+<TR><TD><PRE> Pause</TD><TD><PRE> CDC_CdSeek</TD></TR>
+<TR><TD><PRE> stop</TD><TD><PRE> CDC_CdSeek</TD></TR>
+<TR><TD><PRE> scan</TD><TD><PRE> CDC_CdScan</TD></TR>
+</TABLE>
+</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> During a soft reset, CD block initialization does not work as a drive command.&#12296; OPEN&#12297; ,&#12296; NODISC&#12297; Even if a soft reset is executed in the state, the state will not change.<BR>
+ however&#12296; OPEN&#12297; ,&#12296; NODISC&#12297; Other than status, pauses the CD drive at the current position.</P>
+<P><B><LI></b> Drive commands other than tray open also serve as tray close commands.</P>
+</OL>
+<A NAME="no4_13"></A><P><DT> <B>(3)Issuing drive commands</b><DD><OL TYPE=a>
+<B><LI></b> The drive command response is always&#12296; BUSY&#12297; is returned.</P>
+<P><B><LI></b> As a general rule, commands issued later are executed first. If issued consecutively, the previously issued command may be overwritten.<BR>
+ To ensure that&#12296; BUSY&#12297; Please do not issue until the state transitions to a state other than</P>
+</OL>
+<A NAME="no4_1_10"></A><P><DT><H3> 4.1.1 CD drive state transition diagram</H3><A NAME="no4_1_11"></A><P><DT> <B>(1) State transition diagram of normal system</b><DD> Figure 4.1 shows the state transition diagram of the CD drive in a normal system.<BR>
+<A NAME="z4_1"></A><P ALIGN=CENTER> <B>Figure 4.1 CD drive state transition diagram (normal system)</b><BR>
+<img srcset="../grp/i064_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD><OL TYPE=a>
+<B><LI></b> After TOC lead, at 2 seconds 0 frame (FAD=150=96H)&#12296; PAUSE&#12297; state.</P>
+<P><B><LI></b> During state transition (on the arrow line)&#12296; BUSY&#12297; The condition will be.</P>
+<P><B><LI></b> Tray close commands refer to drive commands other than tray open.<BR>
+ After the tray is closed, it transitions to the state corresponding to each command.<BR>
+ example:&#12296; OPEN&#12297; The play command in the state is after the tray is closed.&#12296; PLAY&#12297; state.</P>
+</OL>
+<A NAME="no4_1_12"></A><P><DT> <B>(2) State transition diagram of error system</b><DD> Figure 4.2 shows the state transition diagram of the CD drive in error mode, and Table 4.3 shows the state explanations.</P>
+<A NAME="z4_2"></A><P ALIGN=CENTER> <B>Figure 4.2 CD drive state transition diagram (error type)</b><BR>
+<img srcset="../grp/i065_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="t4_3"></A><P><DD> <B>Table 4.3 Error-related status description</b><DD><TABLE border=1>
+<TR><TH><PRE> situation</TH><TH><PRE> explanation</TH><TH><PRE> internal state</TH></TR>
+<TR><TD><PRE>&#12296; RETRY></TD><TD><PRE> If the retry is successful&#12296; PLAY&#12297; If you fail,&#12296; ERROR&#12297; become.</TD><TD><PRE>&#12296; SEEK&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; ERROR&#12297;</TD><TD><PRE> The state remains unchanged until the next drive command is issued.</TD><TD><PRE>&#12296; PAUSE&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; FATAL&#12297;</TD><TD><PRE> Please issue a stop command and try to return.<BR> If I can come back&#12296; STANDBY&#12297; Transition to.</TD><TD><PRE>&#12296; STANDBY&#12297;</TD></TR>
+</TABLE>
+</P>
+<P><DD> Internal state refers to the state equivalent to the internal operation of the CD block.</P>
+<A NAME="no4_1_20"></A><P><DT><H3> 4.1.2 CD drive state transition table</H3><DD> Table 4.4 shows the CD drive state transition table. for example,&#12296; PLAY&#12297; If you issue a pause command in the state,&#12296; PAUSE&#12297; It indicates that the condition will be reached.</P>
+<A NAME="4_4"></A><P><DD> <B>Table 4.4 CD drive state transition table</b><DD><TABLE BORDER=1>
+<TR><th ROWSPAN=2><PRE> operation<BR><BR> situation</TH><th ROWSPAN=2><PRE> automatic</TH><th COLSPAN=7><PRE> command</TH></TR>
+<TR><TH><PRE> Initialization</TH><TH><PRE> tray<BR> open</TH><TH><PRE> play</TH><TH><PRE> Seek</TH><TH><PRE> Pause</TH><TH><PRE> stop</TH><TH><PRE> scan</TH></TR>
+<TR><TD><PRE>&#12296; BUSY&#12297;</TD><TD><PRE> There are changes</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; SCAN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; SCAN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE> −</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; SCAN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; SCAN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; SCAN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; SCAN&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; SCAN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE> −</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; SCAN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; NODISC&#12297;</TD><TD><PRE> −</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; RETRY&#12297;</TD><TD><PRE> There are changes</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; SCAN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; ERROR&#12297;</TD><TD><PRE> −</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; OPEN&#12297;</TD><TD><PRE>&#12296; PLAY&#12297;</TD><TD><PRE>&#12296; SEEK&#12297;</TD><TD><PRE>&#12296; PAUSE&#12297;</TD><TD><PRE>&#12296; STANDBY&#12297;</TD><TD><PRE>&#12296; SCAN&#12297;</TD></TR>
+<TR><TD><PRE>&#12296; FATAL&#12297;</TD><TD><PRE> −</TD><TD><PRE> Indeterminate</TD><TD><PRE> Indeterminate</TD><TD><PRE> Indeterminate</TD><TD><PRE> Indeterminate</TD><TD><PRE> Indeterminate</TD><TD><PRE> Undefined*</TD><TD><PRE> Indeterminate</TD></TR>
+</TABLE>
+<DD> "-" means no change.<DD> <B>*</b>&#12296; FATAL&#12297; If you issue a stop command in the state,&#12296; STANDBY&#12297; There is a possibility that the condition can be restored.</P>
+<A NAME="no4_1_21"></A><P><DT> <B>(1)</b>&#12296; <B>BUSY</b>&#12297; <B>Issuing a command in a state</b><DD>&#12296; BUSY&#12297; Commands are accepted even in this state, but they are not necessarily executed immediately. For example, if a tray is being opened or closed, it will not be executed until that operation is finished. (However, the tray open command is executed immediately.)<P><A NAME="no4_1_22"></A><P><DT> <B>(2) Opening and closing the tray</b><P><DD><OL TYPE=a>
+<B><LI></b> As a general rule, the tray open command is executed immediately in any state.</P>
+<P><B><LI></b> If the tray is not automatically opened/closed, the tray open/close command will not be executed until manually executed.&#12296; BUSY&#12297; It becomes.</P>
+<P><B><LI></b>&#12296; OPEN&#12297; Commands in the state (excluding tray open) transition to each state after the tray is closed.</P>
+<P><B><LI></b> If the TOC cannot be read when the tray is closed&#12296; NODISC&#12297; It will be. (Even if there is a disc included)</P>
+</OL>
+<A NAME="no4_1_23"></A><P><DT> <B>(3) Via the state</b><DD><OL TYPE=a>
+<B><LI></b> By command, all&#12296; BUSY&#12297; Via the state.</P>
+<P><B><LI></b>&#12296; PLAY&#12297; ,&#12296; SCAN&#12297; When transitioning to the state,&#12296; SEEK&#12297; It may go through the state.</P>
+</OL>
+<A NAME="no4_1_24"></A><P><DT> <B>(4) For multi-session</b><DD><OL TYPE=a>
+<B><LI></b> Lead the TOC for the final session.</P>
+<P><B><LI></b> After TOC lead, at 2 seconds 0 frame from the start position of the final session&#12296; PAUSE&#12297; state.</P>
+</OL>
+<A NAME="no4_1_25"></A><P><DT> <B>(Five)</b>&#12296; <B>FATAL</b>&#12297; <B>Status recovery process</b><DD> To perform recovery processing, wait until the SCDQ flag is updated twice after issuing the stop command. Until then, do not issue the next drive command.<BR>
+ Also, when opening and closing the tray,&#12296; FATAL&#12297; It is possible to recover from the condition.</P>
+<A NAME="no4_20"></A><DT><H2> 4.2 CD drive operation</H2><A NAME="no4_21"></A><P><DT> <B>(1)</b>&#12296; <B>PLAY</b>&#12297; <B>state frame address</b><DD> The frame address (current FAD) notified during CD playback refers to the sector being read.<BR>
+ The current FAD sector is not stored in the CD buffer and cannot be retrieved.<BR>
+ The host can access up to one sector before the current FAD. (For CD-ROM)</P>
+<A NAME="z4_3"></A><P ALIGN=CENTER> <B>Figure 4.3 Sector pointed to by current FAD</b><BR>
+<img srcset="../grp/i067_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> When playback ends, FAD = playback end position + 1.<BR>
+ (This also applies when the playback end position is the end of the disc, and FAD refers to the lead-out area.)</P>
+<A NAME="no4_22"></A><P><DT> <B>(2)</b>&#12296; <B>PLAY</b>&#12297; <B>Transition from state and storage of sectors</b><DD>&#12296; PLAY&#12297; When transitioning from one state to another, it is undefined whether the sector being read is stored or not.&#12296; BUSY&#12297; If you transition to a state other than , the sector to be stored is determined.<BR>
+&#12296; PLAY&#12297; Issue a pause command in the state&#12296; PAUSE&#12297; If the state changes, the FAD of the storage sector + 1 will be notified, similar to (1).</P>
+<A NAME="no4_23"></A><P><DT> <B>(3) Repeat processing for CD playback</b><DD> As shown below, when the current position goes outside the playback range during CD playback, repeat processing is performed.</P>
+<P><DD><UL TYPE="DISK">
+<LI> When the frame at the end position has finished playing (FAD = end position + 1)</P>
+<P><LI> If the FAD goes outside the playback range due to a change in the playback range</P>
+<P><LI> When canceling the pause (resuming playback) while pausing outside the playback range</P>
+</UL>
+<P><DD> Both the number of repeat notifications (0H to EH) and the maximum specified number of times (0H to FH) are expressed in 4 bits.<BR>
+ The procedure for repeat processing (determining whether or not to repeat) is shown below.</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> Repeat count&#65308; Repeat if it is the maximum number of repeats.<BR>
+ Seek to the starting position and&#12296; PLAY&#12297; become a state.<BR>
+ At that time, the number of repeats&#65308; If EH (14 times), increase the repeat count by 1.</P>
+<P><B><LI></b> If the number of repeats ≧ the maximum number of repeats, it will not be repeated.<BR>
+ at current location&#12296; PAUSE&#12297; state, and the PEND flag in the interrupt factor register becomes 1.</P>
+</OL>
+<P><DD> If the playback range or maximum repeat count is changed, the repeat count will be cleared to 0.<BR>
+ Neither the number of repeats nor the playback range depends on opening/closing the tray or seek operations during playback.</P>
+<A NAME="no4_24"></A><P><DT> <B>(4) Playback range and frame address</b><DD> When playing a CD with the pickup position not changed, if the current position is within the new playback range,&#12296; PLAY&#12297; state.&#12296; PLAY&#12297; If you run it while it is running, the playback state will not be interrupted.<P><A NAME="z4_4"></A><P ALIGN=CENTER> <B>Figure 4.4 Relationship between playback range and current position</b><BR>
+<img srcset="../grp/i068_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> In the following operations, the FAD is outside the playback range (FAD&#65308; Starting position, FAD&#65310; end position).</P>
+<P><DD><UL TYPE="DISK">
+<LI> Exiting the playback range due to end of playback, change of playback range, seek, or scan playback.</P>
+<P><LI> Executes pause release while paused outside the playback range.</P>
+</UL>
+<P><DD> Operation outside the playback range depends on whether repeat is present or not.<BR>
+ For example, if playback ends without repeat, FAD = end position + 1.&#12296; PAUSE&#12297; state and the PEND flag becomes 1.</P>
+<A NAME="t4_5"></A><P><DD> <B>Table 4.5 Operation outside the playback range</b><DD><TABLE border=1>
+<TR><TD ROWSPAN=2><PRE> Operation (command)</TD><td COLSPAN=2><PRE> No repeat</TD><TD COLSPAN=2><PRE> With repeat</TD></TR>
+<TR><TD><PRE> situation</TD><TD><PRE> PEND</TD><TD><PRE> situation</TD><TD><PRE> PEND</TD></TR>
+<TR><TD><PRE> CD playback ends</TD><TD><PRE> FAD=end position+1&#12296; PAUSE&#12297;</TD><TD ROWSPAN=2 ALIGN=CENTER><PRE> 1</TD><td ROWSPAN=2><PRE> seek to start position&#12296; PLAY&#12297;<BR> (Repeat operation)</TD><TD ROWSPAN=2 ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD><PRE> CD playback → Change playback range<BR> →Cancel pause</TD><TD><PRE> at current location&#12296; PAUSE&#12297;</TD></TR>
+<TR><TD><PRE> seek</TD><TD><PRE> at the target position&#12296; PAUSE&#12297;</TD><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> at the target position&#12296; PAUSE&#12297;</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+<TR><TD><PRE> scan playback</TD><TD><PRE> in an undefined position&#12296; PAUSE&#12297;</TD><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> in an undefined position&#12296; PAUSE&#12297;</TD><TD ALIGN=CENTER><PRE> 0</TD></TR>
+</TABLE>
+ A PEND flag of 0 means no change.<P> A PEND flag of 0 means no change.<P><A NAME="no4_"></A><P><DT> <B>(5) Seek to home position (stop)</b><DD> By seeking to the home position, the CD block will be in the following state.</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> The disk motor stops rotating and the pickup moves to the inner standby position.</P>
+<P><B><LI></b> CD drive status&#12296; STANDBY&#12297; , and the report becomes an invalid value (a sequence of FFH).</P>
+<P><B><LI></b> at home position&#12296; PAUSE&#12297; When the state changes, the pickup moves to the beginning of the disc.</P>
+<P><B><LI></b> The retained playback range, maximum repeat count, and repeat notification count will not be changed.</P>
+</UL>
+<A NAME="no4_26"></A><P><DT> <B>(6)</b>&#12296; <B>STANDBY</b>&#12297; <B>Pickup position in condition</b><DD><UL TYPE="DISK">
+<LI>&#12296; PAUSE&#12297; When transitioning from the state: Current position (report remains unchanged)</P>
+<P><LI> When seeking to home position: Inner radius standby position (report is invalid value)</P>
+</UL>
+<A NAME="no4_27"></A><P><DT> <B>(7)CD read operation when CD buffer is full</b><DD> When the CD buffer is full&#12296; PAUSE&#12297; The BFUL flag in the interrupt factor register becomes 1. When there is space in the CD buffer, the remaining playback will begin automatically.</P>
+<A NAME="no4_30"></A><P><DT><H3> 4.3 Subcode</H3><A NAME="no4_31"></A><P><DT> <B>(1) Subcode update and SCDQ flag</b><DD> Subcode Q is updated every frame (1 sector). The SCDQ flag becomes 1 each time subcode Q is updated. (Same as update timing of regular response)<BR>
+ Four packs (one packet) of subcodes R to W are updated in one frame and stored in the pack buffer. The CD block has a pack buffer for 24 packs (6 packets) with a ring buffer structure.</P>
+<P><DD> <B>《When playing CD-DA (standard speed)》</b><A NAME="z4_5"></A><P ALIGN=CENTER> <B>Figure 4.5 Subcode update and SCDQ flag timing</b><BR>
+<img srcset="../grp/i069_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no4_32"></A><P><DT> <B>(2) Subcode extraction timing</b><DD> The host issues an acquisition command when the SCDQ flag becomes 1 and retrieves subcode Q and data from R to W. (To prevent polling due to continuous command issuing)</P>
+<A NAME="no4_33"></A><P><DT> <B>(3) Obtaining subcode Q (CDC_TgetScdQch)</b><DD> The acquisition command can be executed at any time regardless of the CD drive status. however,&#12296; OPEN&#12297; An invalid value may be returned depending on the CD drive status.</P>
+<A NAME="no4_34"></A><P><DT> <B>(4) Obtaining subcodes R to W (CDC_TgetScdRwch)</b><DD> Packed data is retrieved by repeatedly issuing retrieval commands until the pack buffer is empty. However, do not remove more than 16 packs during one frame time (13.3ms).<BR>
+ After the host issues the acquisition command, it must complete the data transfer within the decoding time of one pack (3.2ms).<BR>
+ Returns WAIT when the pack buffer is empty and there is no more packed data.</P>
+<A NAME="no4_45"></A><P><DT> <B>(5) Decoding of subcodes R to W</b><DD><OL TYPE=a>
+<P><B><LI></b> Start and end decoding<BR>
+ Decoding ON/OFF is set using the CD block initialization command.<BR>
+ To start decoding, set decode ON and then play the CD-DA.</P>
+<P><B><LI></b> Decoding start timing<BR>
+&#12296; PLAY&#12297; Start decoding at the same time.<BR>
+ in fact,&#12296; PLAY&#12297; Data begins to be captured two frames before the state is reached.</P>
+<P><B><LI></b> Pack buffer clear timing<BR>
+ Cleared when decoding starts.<BR>
+ The contents of the pack buffer are retained even if you pause or seek.</P>
+<P><B><LI></b> Decoding conditions<BR>
+ It is decoded only when playing CD-DA.<BR>
+ It is not decoded in other cases (during scan playback or CD-ROM area playback).</P>
+</OL>
+<P><DD> <B>Note:</b> Just setting decode ON will not clear the pack buffer. Therefore,&#12296; PLAY&#12297; If you issue a retrieval command before the state is reached, pack data for the previous song may remain.<BR>
+ surely&#12296; PLAY&#12297; Please issue the acquisition command after confirming the status.</P>
+<A NAME="no4_36"></A><P><DT> <B>(6) Errors in subcodes R to W</b><DD><OL TYPE=a>
+<P><B><LI></b> overrun error<BR>
+ If the pack is not acquired in time, the pack buffer will be overwritten and an overrun error will occur. After data transfer is completed (when 23 packs have been accumulated without actually acquiring pack data), the acquisition pointer advances to the pack with no overrun error.</P>
+<P><B><LI></b> pack data error<BR>
+ The CD block performs a CRC check on the P and Q sequences of the packed data, and if an error is detected, the data is corrected.<BR>
+ If correction is not possible, a pack data error will occur.</P>
+</OL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

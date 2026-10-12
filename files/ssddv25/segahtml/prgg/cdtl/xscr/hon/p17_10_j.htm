@@ -1,0 +1,132 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;22/22&gt;CDビルダスクリプト文法</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CDビルダスクリプト文法</A>
+<HR>
+<B>▲
+<a href="p16_10_j.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>CDビルダスクリプト文法マニュアル</B>
+<H3 ALIGN=CENTER>付録Ａ</H3>
+<H2 ALIGN=CENTER> ＣＤビルダスクリプト文法クイックリファレンス</H2>
+<HR NOSHADE>
+<PRE>
+
+　Disc  出力ファイル.DSK
+　　Session { CDROM｜SEMIXA }[出力ファイル名]
+　　　LeadIn  MODE1
+　　　EndLeadIn
+　　［SystemArea  MSDOSファイル名］
+　　　Track  { CDDA｜MODE1｜MODE2 }
+　　　　Volume ISO9660  出力ファイル.PVD
+　　　　　PrimaryVolume 0:2:16
+　　　　　　［SystemIdentifier "識別子" ... ］
+　　　　　EndPrimaryVolume
+　　　　EndVolume
+　　　┏File ISOファイル名
+　　　┃　┌BeginTimeS   相対時間　　；分：秒：フレームまたはＦＡＤ値│Trigger        ファイル内位置；相対時間
+　　　┃　│EndTimeS     相対時間　　　　　　　　　　　　　　　　　　｜Eors           ファイル内位置
+　　　┃　│BeginTimeE   相対時間　　　　　　　　　　　　　　　　　　│
+　　　┃　│EndTimeE     相対時間　　　　　　　　　　　　　　　　　　│
+　　　┃　│FileNo       ファイル番号；１〜２５５　　　　　　　　　　│MinLength      ｛バイト数｜セクタ数｝　　　　　　　　　　　　　　　　│
+　　　┃　｜Pack         　　　　　　　　　　　　　　　　　　　　　　│RecordingDate  日付；日／月／年　時：分：秒：１／１００秒：グリニッチ│
+　　　┃　└SectorRate   ０〜６５５３５；０の時は自動計算　　　　　　│
+　　　┃　┏FileSource  入力ファイル名
+　　　┃　┃　┌SubHeader   　　　　　　　　　　　　　　│　BeginTimeF         相対時間
+　　　┃　┃　│Offset      入力位置　入力長　　　　　　│　EndTimeF           相対時間
+　　　┃　┃　│BitRate     ビットレート［順序番号］　　│　DataType           ｛FORM1 ｜ FORM2 }
+　　　┃　┃　│UnitSize    ユニットサイズ　　　　　　　│　AutoEOR
+　　　┃　┃　│GapSize     ギャップサイズ　　　　　　　│　CodingInformation  コーディング情報 ；数字列
+　　　┃　┃　│RealTime    　　　　　　　　　　　　　　│　SubSource          サブソースファイル名
+　　　┃　┃　│            　　　　　　　　　　　　　　│　SubEmpty           ブロック数
+　　　┃　┃　└SourceType { MONO_A｜MONO_B｜MONO_C｜STEREO_A｜STEREO_B｜STEREO_C｜CDDA｜ISO11172｜VIDEO｜DATA｜MPEG_VIDEO }┘
+　　　┃　┃EndFileSource
+　　　┃　┃FileSource
+　　　┃　┃EndFileSource
+　　　┃　┗　　　　　：
+　　　┃　┏MpegMultiplex　［出力ファイル名］
+　　　┃　┃　┌BeginTimeF   相対時間          │ RealTime
+　　　┃　┃　└EndTimeF     相対時間          │ AutoEOR
+　　　┃　┃　　MpegStream  ソースファイル名  { AUDIO ｜ VIDEO ｜ DATA }
+　　　┃　┃　　　┌BitRate   ビットレート [ 順序番号 ]
+　　　┃　┃　　　│DataType    { FORM1 ｜ FORM2 }
+　　　┃　┃　　　└MpegFlush
+　　　┃　┃　　EndMpegStream
+　　　┃　┃　　MpegStream
+　　　┃　┃　　EndMpegStream
+　　　┃　┃　　　　　：
+　　　┃　┗EndMpegMultiplex
+　　　┃　┏Channel チャネル番号
+　　　┃　┃　［Reallocation］
+　　　┃　┃　　FileSource
+　　　┃　┃　　　┌BitRate   ビットレート
+　　　┃　┃　　　│UnitSize  ユニットサイズ
+　　　┃　┃　　　└GapSize   ギャップサイズ
+　　　┃　┃　　EndFileSource
+　　　┃　┃　　　　　：
+　　　┃　┃　　MpegMultiplex
+　　　┃　┃　　EndMpegMultiplex
+　　　┃　┗EndChannel
+　　　┗EndFile
+　　　┏Extent　相対時間
+　　　┃　FileInterLeave   ユニットサイズ ギャップサイズ
+　　　┃　　File ISO9660ファイル名
+　　　┃　　　　　　　：
+　　　┃　　EndFile
+　　　┃　EndFileInterLeave
+　　　┃　FileInterLeave  ユニットサイズ ギャップサイズ
+　　　┃　　File ISO9660ファイル名
+　　　┃　　　　　　　：
+　　　┃　　EndFile
+　　　┃　EndFileInterLeave
+　　　┗EndExtent
+　　　┏Directory  ディレクトリ名
+　　　┃　File ISO9660ファイル名
+　　　┃　EndFile
+　　　┗EndDirectory
+　　　EndTrack                                                                                                                    
+　　　Track CDDA                 ; CDDAトラック
+　　　　Pause 150                ; ポーズ２秒
+　　　　FileSource INDEX1.DAT    ; インデックス１ (X=01)
+　　　　EndFileSource
+　　　　FileSource INDEX2.DAT    ; インデックス２ (X=02)
+　　　　EndFileSource
+　　　EndTrack
+　　　LeadOut  { CDDA｜MODE1｜MODE2 }                                                                                     
+　　　［Empty ブロック数］
+　　　EndLeadOut
+　　EndSession
+　EndDisc
+
+</PRE>
+<HR NOSHADE>
+<B>▲
+<a href="p16_10_j.htm">戻る</A>｜
+　　■</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CDビルダスクリプト文法</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

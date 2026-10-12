@@ -1,0 +1,198 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/19&gt;CD通信I/F(CDパート)/関数詳細-6</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(CDパート)</A>
+<HR>
+<B>▲
+<A HREF="p08_15.htm">戻る</A>｜
+<A HREF="p08_17.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル(CDパート)</B>
+<H2 ALIGN=CENTER>関数詳細-6</H2>
+<HR NOSHADE>
+<H3>8.2.6　バッファ情報</H3>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_1"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_6">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>CDバッファサイズの取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［S-］<BR><H3>CDC_GetBufSiz</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6.1</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_GetBufSiz(Sint32 *totalsiz, Sint32 *bufnum, Sint32 *freesiz)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD><TABLE>
+<TR><TD><PRE>totalsiz</TD><TD><PRE>：全バッファサイズ(セクタ単位、200セクタ＝C8H)</TD></TR>
+<TR><TD><PRE>bufnum</TD><TD><PRE>：全バッファ区画数(24区画＝18H)</TD></TR>
+<TR><TD><PRE>freesiz</TD><TD><PRE>：空きバッファサイズ(セクタ単位)</TD></TR></TABLE>
+
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　機　能</B><DD>CDバッファ全体のサイズとバッファ区画数(いずれも固定値)、および現在の空きサイズを取得します。<BR>
+セレクタの数(または絞りの数)は、全バッファ区画数に等しくなります。
+<DT><B>　備　考</B><DD>空きサイズが０であっても、システムで使用しているセクタがあるため、バッファフルになるとは限りません。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_2"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_6">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>CDバッファ区画のセクタ数の取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［S-］<BR><H3>CDC_GetSctNum</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6.2</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_GetSctNum(Sint32 bufno, Sint32 *snum)
+<DT><B>　入　力</B><DD>bufno：バッファ区画番号
+<DT><B>　出　力</B><DD>snum ：バッファ区画内のセクタ数(バッファ区画サイズ)
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　機　能</B><DD>バッファ区画の現在のセクタ数(バッファ区画サイズ)を取得します。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_3"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_6">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>実データサイズの計算</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_CalActSiz</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6.3</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_CalActSiz(Sint32 bufno, Sint32 spos, Sint32 snum)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>bufno</TD><TD><PRE>：バッファ区画番号</TD></TR>
+<TR><TD><PRE>spos</TD><TD><PRE>：セクタ位置(<B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</A></B>：区画最後のセクタを示す)</TD></TR>
+<TR><TD><PRE>snum</TD><TD><PRE>：セクタ数(CDC_SNUM_END：sposから区画最後までのセクタ数を示す)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>ESELフラグ
+<DT><B>　機　能</B><DD>バッファ区画の指定セクタ範囲から、実データサイズ(ホストに取り出す場合のワード数)を計算します。計算結果を得るには、実データサイズの取得(CDC_GetActSiz)を実行します。<BR>エラーの場合、実データサイズは以下の値になります。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE>定数名</TH><TH WIDTH=420><PRE>説　明</TH></TR>
+<TR><TD><PRE>CDC_ACTSIZ_ERR</TD><TD><PRE>計算を実行できなかった。</TD></TR></TABLE>
+<DD>１セクタの長さは、セクタ長の設定(<B><A HREF="p08_17.htm#no7_1">CDC_SetSctLen</A></B>)で変更できます。
+<DT><B>　備　考</B><DD>区画出力コネクタに接続済みのコネクタは切断されます。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_4"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_6">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>実データサイズの取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［S-］<BR><H3>CDC_GetActSiz</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6.4</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_GetActSiz(Sint32 *actwnum)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>actwnum：実データサイズ(ワード数)
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>ESELフラグ(チェックだけしている)
+<DT><B>　機　能</B><DD>実データサイズの計算結果(初期値0)を取得します。<BR>
+前回の計算結果は、次に計算(<B><A HREF="#no6_3">CDC_CalActSiz</A></B>)を実行するまで保持されます。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_5"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_6">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>セクタ情報の取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［S-］<BR><H3>CDC_GetSctInfo</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6.5</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 CDC_GetSctInfo(Sint32 bufno, Sint32 spos, CdcSct *sct)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>bufno</TD><TD><PRE>：バッファ区画番号</TD></TR>
+<TR><TD><PRE>spos</TD><TD><PRE>：セクタ位置(<B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</A></B>：区画最後のセクタを示す)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>sct  ：セクタ情報
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　機　能</B><DD>バッファ区画の指定セクタのヘッダ情報(FAD)、サブヘッダ情報を取得します。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_6"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_6">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>フレームアドレス検索の実行</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_ExeFadSearch</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6.6</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 CDC_ExeFadSearch(Sint32 bufno, Sint32 spos, Sint32 fad)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>bufno</TD><TD><PRE>：バッファ区画番号</TD></TR>
+<TR><TD><PRE>spos</TD><TD><PRE>：セクタ位置(<B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</A></B>：区画最後のセクタを示す)</TD></TR>
+<TR><TD><PRE>fad</TD><TD><PRE>：フレームアドレス</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>ESELフラグ
+<DT><B>　機　能</B><DD>バッファ区画の指定セクタ位置から、フレームアドレスをキーにしてセクタを検索します。検索結果を得るには、フレームアドレス検索結果の取得(CDC_GetFadSearch)を実行します。
+
+<P><DT><B>　(1)検索方向</B>
+<DD>バッファ区画の後方に向かって検索します。(セクタ位置の小さい方から大きい方へ)</P>
+
+<P><DT><B>　(2)検索結果</B>
+<DD>検索結果として保持する内容は、バッファ区画番号、検索して得られたセクタ位置、そのセクタのフレームアドレスです。</P>
+
+<P><DT><B>　(3)検索条件</B>
+<DD>一致するFADが存在しない場合、指定されたFADを越えない最も近いセクタを検索します。つまり検索結果のFADは、FAD≦指定FADを満たす最大のFADとなります。<BR>エラーの場合、検索結果のセクタ位置とFADは以下の値になります。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE>セクタ位置</TH><TH><PRE>フレームアドレス</TH><TH WIDTH=300><PRE>説　明</TH></TR>
+<TR><td rowspan=2><PRE>CDC_SPOS_ERR</TD><TD><PRE>0</TD><TD><PRE>検索条件を満たすセクタが存在しない。</TD></TR>
+<TR><TD><PRE>CDC_FAD_ERR</TD><TD><PRE>検索を実行できなかった。</TD></TR></TABLE>
+<DT><B>　備　考</B><DD>区画出力コネクタに接続済みのコネクタは切断されます。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_7"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_6">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>フレームアドレス検索結果の取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［S-］<BR><H3>CDC_GetFadSearch</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6.7</H4></TD>
+</TR></TABLE></P>
+<DT><B>　書　式</B><DD>Sint32　CDC_GetFadSearch(Sint32 *bufno, Sint32 *spos, Sint32 *fad)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD><TABLE>
+<TR><TD><PRE>bufno</TD><TD><PRE>：バッファ区画番号</TD></TR>
+<TR><TD><PRE>spos</TD><TD><PRE>：セクタ位置</TD></TR>
+<TR><TD><PRE>fad</TD><TD><PRE>：フレームアドレス</TD></TR></TABLE>
+
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>ESELフラグ(チェックだけしている)
+<DT><B>　機　能</B><DD>フレームアドレス検索の実行結果(初期値は全て0)を取得します。<BR>
+前回の検索結果は、次に検索(<B><A HREF="#no6_6">CDC_ExeFadSearch</A></B>)を実行するまで保持されます。
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p08_15.htm">戻る</A>｜
+<A HREF="p08_17.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

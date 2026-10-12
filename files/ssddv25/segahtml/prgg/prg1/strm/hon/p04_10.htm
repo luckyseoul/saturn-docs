@@ -1,0 +1,84 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/18&gt;Stream System Library/4.Stream Access Overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">Stream system library</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>stream system library</b><H2 ALIGN=CENTER> 4. Overview of stream access</H2><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H3> 4.1 Streams and stream groups</H3><P><DT> <B>(1) Stream</b><DD> A group of sectors that have the same subheader (FN, CN, SM, CI) and are basically processed in the same way is called a stream. They do not need to be physically contiguous sectors.</P>
+<P><DT> <B>(2)Stream group</b><DD> By interleaving and recording multiple streams, like audio and video, you can synchronize and access related streams. A collection of related streams like this is called a stream group.</P>
+<A NAME="no4_20"></A><P><DT><H3> 4.2 Stream range</H3><DD> The range of a stream is specified in two ways:</P>
+<P><DT> <B>(1) Stream open by file</b><DD> You can open a stream by specifying a file identifier (STM_OpenFid). In this case, the stream range is from the start frame address of the file to the end frame address.<BR>
+ The ending frame address is actually calculated from the starting frame address and the total number of sectors in the file. In the case of interleaved files, calculations are made assuming that they are recorded with a constant interleaving factor (fixed interleaving).</P>
+<P><DT> <B>(2) Open stream by directly specifying frame address range</b><DD> Users can open a stream by directly specifying the frame address range of the stream (STM_OpenFrange). In this case, the specified range becomes the stream range.<BR>
+ The frame address range specifies the first frame address and the number of physical sectors.</P>
+<A NAME="no4_30"></A><P><DT><H3> 4.3 Stream access procedure</H3><DD> Follow the steps below to access the stream.</P>
+<A NAME="z4_1"></A><P ALIGN=CENTER> <B>Figure 4.1 Stream access procedure</b><BR>
+<img srcset="../grp/i057_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> An image of stream access is shown below.</P>
+<A NAME="z4_2"></A><P ALIGN=CENTER> <B>Figure 4.2 Overview of stream access</b><BR>
+<img srcset="../grp/i058_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(a) Start playing</b><DD> Among the streams belonging to the stream group, playback starts from stream A whose start FAD is furthest forward.</P>
+<P><DT> <B>(b) Seek</b><DD> When there are no more streams to play, move the pickup to the start position of the next stream (stream B) and play it.</P>
+<P><DT> <B>(c) loop</b><DD> When you finish playing the last stream (stream C), move the pickup to the start position of the loop start stream (default is the forwardmost stream) and start playing. The number of times the pickup is moved to the loop start stream in this way is called the loop number.</P>
+<P><DT> <B>(d) Aperture, buffer section</b><DD> Buffer partitions are allocated one-to-one with streams.<BR>
+ Sector data that meets the stream key conditions is stored in the buffer section. Sector data that does not meet the conditions is sent to the next aperture.</P>
+<P><DT> <B>(e) Data transfer</b><DD> When the server function is called, it compares the transfer start position set for each stream with the current playback position, and if there is a stream that has reached the transfer start position, it attempts to transfer data to the specified transfer area once. .<BR>
+ If the transfer register or DMA is in use during a transfer, the server function will end at that point and the next time it will try to transfer data from the next stream.</P>
+<P><DT> <B>(f) User registration transfer function</b><DD> By registering a transfer function, you can transfer data while processing it, such as decompressing compressed data.</P>
+<P><DT> <B>(g) User-specific buffer management</b><DD> If you do not set a transfer area or transfer function, the CD buffer data can be managed by the application program itself.</P>
+<P><DT> <B>(h) Transfer gate</b><DD> Stream flow can be temporarily stopped and restarted by opening and closing transfer gates. If the transfer gate is closed, the stream data is stored in the CD buffer.</P>
+<A NAME="no4_40"></A><P><DT><H3> 4.4 Branch playback</H3><DD> A playback method that allows you to know which stream to play next while playing a stream is called branch playback. Branch playback can be achieved by setting the loop stream as the first stream (STM_SetLoop) and specifying that it will not be reloaded during loop playback (STM_OpenFid, STM_OpenFrange).</P>
+<A NAME="z4_3"></A><P ALIGN=CENTER> <B>Figure 4.3 Branch playback</b><BR>
+<img srcset="../grp/i060_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> In this case as well, the stream is read in order starting from the previous stream, but after reading the last stream, it starts reading the most forward stream that has not been read yet. In Figure 4.3, if you open B while loading A, C while loading B, and D while loading C, you can read in the order ABCD. Even if the playback ranges of B and D overlap, the data of B will not be read.<BR>
+ In Figure 4.3, the time required for the pickup to move from stream B to stream C is required. To minimize this kind of wasted time, the streams should be played from the front to the back of the disc.</P>
+<A NAME="no4_50"></A><P><DT><H3> 4.5 Resident Stream</H3><DD> If you want to retrieve a relatively short stream repeatedly as needed, you can open it as a resident stream (STM_OpenResi). By using resident streams, you can make the same data resident in the CD buffer in advance, instead of reading it from the CD over and over again.</P>
+<P><DT> <B>(1) Reading resident stream</b><DD> Files specified as resident streams are read into the CD buffer only once. It will not be read if you return to the loop start stream and repeat the access. Therefore, the first time the stream is accessed, playback must begin before the file range of the resident stream.<BR>
+ When opening a resident stream in the middle of accessing a stream, be careful because if the playback position exceeds the range of the resident stream, it will not be read into the CD buffer.</P>
+<A NAME="z4_4"></A><P ALIGN=CENTER> <B>Figure 4.4 Loading a resident stream</b><BR>
+<img srcset="../grp/i061_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(2) Transfer start frame address of resident stream</b><DD> Once stored in the CD buffer as a resident stream, it can be transferred at any time. This timing is done by setting the transfer start frame address for the resident stream (STM_SetTrFad).<BR>
+ The playback position advances according to normal stream access, and when it exceeds the set transfer start frame address, the resident stream data is transferred. Also, for resident streams, the stream data is not removed from the CD buffer after being transferred to the host area.</P>
+<P><DT> <B>(3)Using SIMM files and SCSI files (when debugging)</b><DD> For SIMM files and SCSI files, they can only be used as resident streams.<BR>
+ If the specified file is a SIMM file or a SCSI file, it will not be resident in the CD buffer and will be read each time it is accessed.</P>
+<A NAME="no4_60"></A><P><DT><H3> 4.6 Precautions when adding or changing settings while playing a CD</H3><DD> The stream system allows you to dynamically change settings such as the stream key while playing a CD. However, after requesting processing to CD Block, there will be a certain delay before the settings become effective.<BR>
+ Therefore, the following function must be issued at least 10 sectors before the target position.</P>
+<A NAME="z4_5"></A><P ALIGN=CENTER> <B>Figure 4.5 Timing of function issuance</b><BR>
+<img srcset="../grp/i062_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(1) Functions that require a delay before the settings become effective</b><A NAME="t4_2"></A><DD> <B>Table 4.2 Functions with delays</b><DD><TABLE BORDER>
+<TR><TH width=300><PRE> function</TH><TH width=220><PRE> function name</TH></TR>
+<TR><TD><PRE> Opening a stream by file identifier</TD><TD><PRE> STM_OpenFid</TD></TR>
+<TR><TD><PRE> Opening a stream by playback range</TD><TD><PRE> STM_OpenFrange</TD></TR>
+<TR><TD><PRE> Opening a resident stream</TD><TD><PRE> STM_OpenResi</TD></TR>
+<TR><TD><PRE> Closing the stream</TD><TD><PRE> STM_Close</TD></TR>
+<TR><TD><PRE> Stream key settings</TD><TD><PRE> STM_SetKey</TD></TR>
+<TR><TD><PRE> Connection of aperture and CD buffer compartment</TD><TD><PRE> STM_ConnectCdbuf</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">Stream system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

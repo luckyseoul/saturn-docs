@@ -1,0 +1,701 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 22/22&gt; <!-- Number of pages/total number of pages -->
+ SGL function reference/sprite function <!-- Title name -->
+ </TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><!-------------------------------------------------------------------------------->
+<HR>
+<H1> ★Perspective</H1><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slSetScreenDist"><HR NOSHADE></a><H4> function</H4><H1> slSetScreenDist</H1><HR>
+<H3> Setting distance constant to screen</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> dist;
+
+    void slSetScreenDist( dist );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> dist - Distance constant to screen.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.    
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Set the distance constant to the screen used when performing perspective transformation.<BR>
+    Also sets the rotation center Z position of the rotating scroll.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/sprite.htm#slSetScreenDist"><I>slSetScreenDist</i></a> ( <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 40.0 ) );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slZdspLevel">slZdspLevel</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slPerspective">slPerspective</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenDist">MsScreenDist</a></TD><TD><PRE> <A HREF="../mem/system03.htm#Resolution">Resolution</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParA">RotScrParA</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system08.htm#RotScrParB">RotScrParB</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slGetFrameData"><HR NOSHADE></a><H4> function</H4><H1> slGetFrameData</H1><HR>
+<H3> Get framebuffer data</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void *dist;
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> size_x;
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> size_y;
+
+    void slGetFrameData( dist, size_x, size_y );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void *dist - 
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> size_x - X size after being read.<BR>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> size_y - Y size after being read.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Reads the contents of the frame buffer (one screen worth), scales it to the specified size, and sets it.<BR>
+    Since processing is done in units of 4 dots, the X size should be a multiple of 4.<BR>
+    Buffer contains 2 bytes/dot for low resolution, 1 byte/dot for high resolution
+    So, I'll write.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    If you want to display the read data as a sprite,
+    Low resolution:
+      <A HREF="../func/scroll.htm#slSpriteColMode"><I>slSpriteColMode</i></a> ( <A HREF="../struct/constscl.htm#SPR_PAL_RGB"><I>SPR_PAL_RGB</i></a> ); /* default */
+    year,
+      <A HREF="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</i></a> ( PN_???, <A HREF="../struct/constspr.htm#No_Palet"><I>No_Palet</i></a> , <A HREF="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</i></a> , <A HREF="../struct/constspr.htm#SPdis"><I>SPdis</i></a> | <A HREF="../struct/constspr.htm#ECdis"><I>ECdis</i></a> | <A HREF="../struct/constspr.htm#CL32KRGB"><I>CL32KRGB</i></a> ,
+        <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> );
+    Executes a sprite display function with an attribute such as<BR>
+    <A HREF="../func/scroll.htm#slSpriteColMode"><I>slSpriteColMode</i></a> ( <A HREF="../struct/constscl.htm#SPR_PAL"><I>SPR_PAL</i></a> ) for high resolution;
+      <A HREF="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</i></a> ( PN_???, <A HREF="../struct/constspr.htm#No_Palet"><I>No_Palet</i></a> , <A HREF="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</i></a> , <A HREF="../struct/constspr.htm#SPdis"><I>SPdis</i></a> | <A HREF="../struct/constspr.htm#ECdis"><I>ECdis</i></a> | <A HREF="../struct/constspr.htm#CL256Bnk"><I>CL256Bnk</i></a> ,
+        <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> );
+    Display it with the attributes.<BR>
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function waits for VDP1 to finish drawing, skips the frame buffer, and
+    It is set in the buffer. Reading the frame buffer takes a considerable amount of time, so it takes about 5msec. for 32x24 (=768) dots.
+    Please pay attention to the processing time when using it.</i></b><BR><B><I>
+    It is better to take the buffer to be read on the workpiece and transfer it to VRAM with blanking.
+    It seems to have less weight than deploying directly to VRAM.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeX">MsScreenSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeY">MsScreenSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#Resolution">Resolution</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slPerspective"><HR NOSHADE></a><H4> function</H4><H1> slPerspective</H1><HR>
+<H3> Viewing volume settings</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> pers;
+
+    void slPerspective( pers );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> pers - Viewing volume angle.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Set the distance constant to the screen used when performing perspective transformation.<BR>
+    Also sets the rotation center Z position of the rotating scroll.<BR>
+    The angle of view is used as the angle at which the field of view covers the width of the screen (not the size of the window).<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/sprite.htm#slPerspective"><I>slPerspective</i></a> ( <A HREF="../struct/macro.htm#DEGtoANG"><I>DEGtoANG</i></a> ( 60.0 ) );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slZdspLevel">slZdspLevel</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slSetScreenDist">slSetScreenDist</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenDist">MsScreenDist</a></TD><TD><PRE> <A HREF="../mem/system02.htm#SlScreenDist">SlScreenDist</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeX">MsScreenSizeX</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsScreenSizeY">MsScreenSizeY</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParA">RotScrParA</a></TD><TD><PRE> <A HREF="../mem/system08.htm#RotScrParB">RotScrParB</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<HR>
+<H1>★Display limit</H1><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slZdspLevel"><HR NOSHADE></a><H4> function</H4><H1> slZdspLevel</H1><HR>
+<H3> Setting the display level</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> level;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slZdspLevel( level );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> level - Display level.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> if the argument contains a value other than the default value, otherwise <A HREF="../struct/constenm.htm#TRUE"><I>TRUE</i></a> .<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Changes how far polygons (or sprite data) in front of the screen are displayed.<BR>
+    level is between 1 and 7; anything else will result in an error.<BR>
+    1: Display range up to 1/2 of the distance to the screen (default).<BR>
+    2: Display range up to 1/4 of the distance to the screen.<BR>
+    3: Display range up to 1/8 of the distance to the screen.<BR>
+    4: Display range up to 1/16 of the distance to the screen.<BR>
+    5: Display range up to 1/32 of the distance to the screen.<BR>
+    6: Display range up to 1/64 of the distance to the screen.<BR>
+    7: Display range up to 1/128 of the distance to the screen.<BR>
+    Please note that when you switch the level, the reference position of zlim specified in <A HREF="../func/sprite.htm#slWindow"><I>slWindow</i></a> will also change for polygons (or sprites) displayed after that.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Set the display level to 7 (1/128 of the screen distance).<BR>
+    <A HREF="../func/sprite.htm#slZdspLevel"><I>slZdspLevel</i></a> ( 7 );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/polygon.htm#slPutPolygon">slPutPolygon</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slPutPolygonS">slPutPolygonS</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slPutPolygonX">slPutPolygonX</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slDispPolygon">slDispPolygon</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slPutSprite">slPutSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slSetSprite">slSetSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite">slDispSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteHV">slDispSpriteHV</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteSZ">slDispSpriteSZ</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite4P">slDispSprite4P</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slPutObject">slPutObject</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlZlimit">SlZlimit</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<HR>
+<H1>★Sprite drawing function</H1><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDispSprite"><HR NOSHADE></a><H4> function</H4><H1> slDispSprite</H1><HR>
+<H3> drawing sprites</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZS"><I>XYZS</i></a> ];
+    <A HREF="../struct/types.htm#ATTR"><I>ATTR</i></a> *attr;
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> z_ang;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slDispSprite( pos, atrb, z_ang );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZS"><I>XYZS</i></a> ] - sprite position.<BR>
+    <A HREF="../struct/types.htm#ATTR"><I>ATTR</i></a> *attr - Sprite attributes.<BR>
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> z_ang - Sprite rotation angle.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Display the sprite by specifying its position, scale, and rotation angle.<BR>
+    Similar to <A HREF="../func/polygon.htm#slPutPolygon"><I>slPutPolygon</i></a> (), it also sorts by Z value.<BR>
+    If you specify a negative value for the scale, the scale will be calculated based on the Z position,
+    Multiply by the complement of the scale to create the display scale.<BR>
+    For example, if you specify -2.0 for the scale, if it is at a position (Z position) that would be displayed at 0.5 times, it will be displayed at 1.0 times.<BR>
+    If the scale is zero, the sprite's display coordinate (Z) is too far away, or you try to display a sprite that exceeds the maximum display number, an error code of <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> will be returned.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZS"><I>XYZS</i></a> ] = {
+      <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 110.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( <A HREF="../struct/constspr.htm#ORIGINAL"><I>ORIGINAL</i></a> )
+    };
+    <A HREF="../struct/types.htm#SPR_ATTR"><I>SPR_ATTR</i></a> attr = <A HREF="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</i></a> ( 0, 0, <A HREF="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</i></a> , <A HREF="../struct/constspr.htm#CL16Bnk"><I>CL16Bnk</i></a> , <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> | <A HREF="../struct/constspr.htm#_ZmCC"><I>_ZmCC</i></a> );
+
+    <A HREF="../func/sprite.htm#slDispSprite"><I>slDispSprite</i></a> ( pos, attr, <A HREF="../struct/macro.htm#DEGtoANG"><I>DEGtoANG</i></a> ( 0.0 ) );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function uses the slave CPU to obtain coordinate values and determine sorting.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slZdspLevel">slZdspLevel</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slPutSprite">slPutSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slSetSprite">slSetSprite</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteHV">slDispSpriteHV</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteSZ">slDispSpriteSZ</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite4P">slDispSprite4P</a></TD><TD><PRE> <A HREF="../mem/system01.htm#SpritePtr">SpritePtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenDist">MsScreenDist</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsZlimit">MsZlimit</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#WinUseFlag">WinUseFlag</a></TD><TD><PRE> <A HREF="../mem/system02.htm#TotalPolygons">TotalPolygons</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MXPolygons">MXPolygons</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DispPolygons">DispPolygons</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#DMAEndFlag">DMAEndFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMASetFlag">DMASetFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#PutCount">Put Count</a></TD><TD><PRE> <A HREF="../struct/types.htm#SPR_ATTR">SPR_ATTR</a></TD></TR>
+<TR><TD><PRE> <A HREF="../struct/macro.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDispSpriteHV"><HR NOSHADE></a><H4> function</H4><H1> slDispSpriteHV</H1><HR>
+<H3> drawing sprites</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZSS"><I>XYZSS</i></a> ];
+    <A HREF="../struct/types.htm#ATTR"><I>ATTR</i></a> *attr;
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> z_ang;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slDispSpriteHV( pos, attr, z_ang );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZSS"><I>XYZSS</i></a> ] - sprite position.<BR>
+    <A HREF="../struct/types.htm#ATTR"><I>ATTR</i></a> *attr - Sprite attributes.<BR>
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> z_ang - Sprite rotation angle.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Displays the deformed sprite by specifying the vertical and horizontal display scales.<BR>
+    Unlike <A HREF="../func/sprite.htm#slDispSprite"><I>the slDispSprite</i></a> () function above, if you specify a negative value for the scale, the character will be displayed inverted.<BR>
+    If the scale is zero, the sprite display coordinate (Z) is too far away, or you try to display sprites that exceed the number of displays, an error <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> will be returned.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    #define FX0 <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 )
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZSS"><I>XYZSS</i></a> ] = {
+      FX0, FX0, <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 110.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( <A HREF="../struct/constspr.htm#ORIGINAL"><I>ORIGINAL</i></a> ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 2.0 )
+    };
+    <A HREF="../struct/types.htm#SPR_ATTR"><I>SPR_ATTR</i></a> attr = <A HREF="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</i></a> ( 0, 0, <A HREF="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</i></a> , <A HREF="../struct/constspr.htm#CL16Bnk"><I>CL16Bnk</i></a> , <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> | <A HREF="../struct/constspr.htm#_ZmCC"><I>_ZmCC</i></a> );
+
+    <A HREF="../func/sprite.htm#slDispSpriteHV"><I>slDispSpriteHV</i></a> ( pos, attr, <A HREF="../struct/macro.htm#DEGtoANG"><I>DEGtoANG</i></a> ( 0.0 ) );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function uses the master CPU to obtain coordinate values and determine sorting.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slZdspLevel">slZdspLevel</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slPutSprite">slPutSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slSetSprite">slSetSprite</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite">slDispSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteSZ">slDispSpriteSZ</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite4P">slDispSprite4P</a></TD><TD><PRE> <A HREF="../mem/system01.htm#SpritePtr">SpritePtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#DispPolygons">DispPolygons</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMAEndFlag">DMAEndFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMASetFlag">DMASetFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#PutCount">Put Count</a></TD></TR>
+<TR><TD><PRE> <A HREF="../struct/types.htm#SPR_ATTR">SPR_ATTR</a></TD><TD><PRE> <A HREF="../struct/macro.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDispSpriteSZ"><HR NOSHADE></a><H4> function</H4><H1> slDispSpriteSZ</H1><HR>
+<H3> drawing sprites</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZSS"><I>XYZSS</i></a> ];
+    <A HREF="../struct/types.htm#ATTR"><I>ATTR</i></a> *attr;
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> z_ang;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slDispSpriteSZ( pos, attr, ang_z );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZSS"><I>XYZSS</i></a> ] - sprite position.<BR>
+    <A HREF="../struct/types.htm#ATTR"><I>ATTR</i></a> *attr - Sprite attributes.<BR>
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> z_ang - Sprite rotation angle.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Displays the transformed sprite by specifying the vertical and horizontal display sizes.<BR>
+    If a negative size is specified, it will be displayed in reverse.<BR>
+    If you try to display a sprite whose size is zero, the display coordinate (Z) of the sprite is too far, or the number of sprites exceeds the display limit, an error <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> will be returned.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    #define FX0 <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 )
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZSS"><I>XYZSS</i></a> ] = {
+      <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 30.0 ), FX0, <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 110.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.5 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 2.0 )
+    };
+    <A HREF="../struct/types.htm#SPR_ATTR"><I>SPR_ATTR</i></a> attr = <A HREF="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</i></a> ( 0, 0, <A HREF="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</i></a> , CL16Bnk[a], <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> | <A HREF="../struct/constspr.htm#_ZmCC"><I>_ZmCC</i></a> );
+
+    <A HREF="../func/sprite.htm#slDispSpriteSZ"><I>slDispSpriteSZ</i></a> ( pos, attr, <A HREF="../struct/macro.htm#DEGtoANG"><I>DEGtoANG</i></a> ( 0.0 ) );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function uses the master CPU to obtain coordinate values and determine sorting.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slZdspLevel">slZdspLevel</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slPutSprite">slPutSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slSetSprite">slSetSprite</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite">slDispSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteHV">slDispSpriteHV</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite4P">slDispSprite4P</a></TD><TD><PRE> <A HREF="../mem/system01.htm#SpritePtr">SpritePtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeX">FrameSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeY">FrameSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipXAdder">MsClipXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipYAdder">MsClipYAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#DispPolygons">DispPolygons</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMAEndFlag">DMAEndFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMASetFlag">DMASetFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#PutCount">Put Count</a></TD></TR>
+<TR><TD><PRE> <A HREF="../struct/types.htm#SPR_ATTR">SPR_ATTR</a></TD><TD><PRE> <A HREF="../struct/macro.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDispSprite4P"><HR NOSHADE></a><H4> function</H4><H1> slDispSprite4P</H1><HR>
+<H3> drawing sprites</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ 4 ][ <A HREF="../struct/constenm.htm#XY"><I>XY</i></a> ];
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos_z;
+    <A HREF="../struct/types.htm#SPR_ATTR"><I>SPR_ATTR</i></a> *attr;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slDispSprite4P( pos, pos_z, attr );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ 4 ][ <A HREF="../struct/constenm.htm#XY"><I>XY</i></a> ] - Coordinates of 4 vertices.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos_z; - sorting criteria.<BR>
+    <A HREF="../struct/types.htm#SPR_ATTR"><I>SPR_ATTR</i></a> *attr; - Attribute.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Specify 4 points on the screen to display the transformed sprite.<BR>
+    Specify the four points as offset positions from the window center, and separately specify the Z position that represents the whole.<BR>
+    Specify the four points in the order of top left, top right, bottom right, and bottom left (clockwise).<BR>
+    If any of the four points exceeds the clip range, an error code <A HREF="../struct/constenm.htm#FALSE"><I>of FALSE</i></a> will be returned.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ 4 ][ <A HREF="../struct/constenm.htm#XY"><I>XY</i></a> ] = {
+      { <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 ) },
+      { <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 40.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 10.0 ) },
+      { <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 70.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 60.0 ) },
+      { <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 10.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 50.0 ) }
+    };
+    <A HREF="../struct/types.htm#SPR_ATTR"><I>SPR_ATTR</i></a> attr = <A HREF="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</i></a> ( 2, 0x100, <A HREF="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</i></a> , <A HREF="../struct/constspr.htm#CL16Bnk"><I>CL16Bnk</i></a> , 
+                                  <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> | <A HREF="../struct/constspr.htm#_ZmCC"><I>_ZmCC</i></a> );
+
+    <A HREF="../func/sprite.htm#slDispSprite4P"><I>slDispSprite4P</i></a> ( pos, <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 150.0 ), attr );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function uses the master CPU to obtain coordinate values and determine sorting.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slZdspLevel">slZdspLevel</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slPutSprite">slPutSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slSetSprite">slSetSprite</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite">slDispSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteSZ">slDispSpriteSZ</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteHV">slDispSpriteHV</a></TD><TD><PRE> <A HREF="../mem/system01.htm#SpritePtr">SpritePtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeX">FrameSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeY">FrameSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipXAdder">MsClipXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipYAdder">MsClipYAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#DispPolygons">DispPolygons</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMAEndFlag">DMAEndFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMASetFlag">DMASetFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#PutCount">Put Count</a></TD></TR>
+<TR><TD><PRE> <A HREF="../struct/types.htm#SPR_ATTR">SPR_ATTR</a></TD><TD><PRE> <A HREF="../struct/macro.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slPutSprite"><HR NOSHADE></a><H4> function</H4><H1> slPutSprite</H1><HR>
+<H3> drawing sprites</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZS"><I>XYZS</i></a> ];
+    <A HREF="../struct/types.htm#ATTR"><I>ATTR</i></a> *attr;
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> ang_z;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slPutSprite( pos, attr, ang_z );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZS"><I>XYZS</i></a> ];
+    <A HREF="../struct/types.htm#ATTR"><I>ATTR</i></a> *attr;
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> ang_z;
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Calculates the position using the current matrix and displays the sprite scaled to match the perspective transformation.<BR>
+    Same as <A HREF="../func/sprite.htm#slDispSprite"><I>slDispSprite</i></a> () above, it will be multiplied by the specified scale, but if you specify a negative value, it will be scaled with the sign reversed.<BR>
+    If the maximum number of polygons or vertices is exceeded, an error code ' <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> ' will be returned.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZS"><I>XYZS</i></a> ] = {
+      <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 110.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( <A HREF="../struct/constspr.htm#ORIGINAL"><I>ORIGINAL</i></a> )
+    };
+    <A HREF="../struct/types.htm#SPR_ATTR"><I>SPR_ATTR</i></a> attr = <A HREF="../struct/macro.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</i></a> ( 0, 0, <A HREF="../struct/constspr.htm#No_Gouraud"><I>No_Gouraud</i></a> , <A HREF="../struct/constspr.htm#CL16Bnk"><I>CL16Bnk</i></a> , <A HREF="../struct/constspr.htm#sprNoflip"><I>sprNoflip</i></a> | <A HREF="../struct/constspr.htm#_ZmCC"><I>_ZmCC</i></a> );
+
+    <A HREF="../func/sprite.htm#slPutSprite"><I>slPutSprite</i></a> ( pos, attr, <A HREF="../struct/macro.htm#DEGtoANG"><I>DEGtoANG</i></a> ( 0.0 ) );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function uses the slave CPU to obtain coordinate values and determine sorting.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slZdspLevel">slZdspLevel</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slSetSprite">slSetSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite">slDispSprite</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteSZ">slDispSpriteSZ</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite4P">slDispSprite4P</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteHV">slDispSpriteHV</a></TD><TD><PRE> <A HREF="../mem/system01.htm#SpritePtr">SpritePtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenDist">MsScreenDist</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsZlimit">MsZlimit</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MXPolygons">MXPolygons</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DispPolygons">DispPolygons</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMAEndFlag">DMAEndFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMASetFlag">DMASetFlag</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#PutCount">Put Count</a></TD><TD><PRE> <A HREF="../struct/types.htm#SPR_ATTR">SPR_ATTR</a></TD><TD><PRE> <A HREF="../struct/macro.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slSetSprite"><HR NOSHADE></a><H4> function</H4><H1> slSetSprite</H1><HR>
+<H3> drawing sprites</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#SPRITE"><I>SPRITE</i></a> *spr;
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos_z;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slSetSprite( spr, pos_z );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#SPRITE"><I>SPRITE</i></a> *spr - VDP1 command data to display.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos_z - criteria for sorting.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Set the sprite control command data to be passed to the hardware in the transfer list.<BR>
+    Use this when you want to create deformed sprites that cannot be created using library functions, or when you want to set a window that only affects a specific sprite.<BR>
+    If the maximum number of polygons is exceeded or the Z clipping boundary is exceeded, an error code <A HREF="../struct/constenm.htm#FALSE"><I>of FALSE</i></a> will be returned.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <a href="../struct/types.htm#SPRITE"><I>SPRITE</I></A> attr = {
+      <a href="../struct/constspr.htm#FUNC_Sprite"><I>FUNC_Sprite</I></A>,                         /* Drawing Sprite              */
+      0,                                   /* Link ( Ignore )             */
+      <a href="../struct/constspr.htm#ECdis"><I>ECdis</I></A> | <a href="../struct/constspr.htm#SPenb"><I>SPenb</I></A> | <a href="../struct/constspr.htm#CL16Look"><I>CL16Look</I></A> | <a href="../struct/constspr.htm#CL_Trans"><I>CL_Trans</I></A>, /* Color mode.                 */
+      ( 0x1b000 >> 3 ),                    /* Color bank number.          */
+      ( 0x12400 >> 3 ),                    /* Character address.          */
+      ( ( 64 / 8 ) << 8 | 96 ),            /* Character size ((x/8)<<8|y) */
+      0,                                   /* A(x)                        */
+      0,                                   /* A(y)                        */
+      64,                                  /* B(x)                        */
+      0,                                   /* B(y)                        */
+      64,                                  /* C(x)                        */
+      96,                                  /* C(y)                        */
+      0,                                   /* D(x)                        */
+      96,                                  /* D(y)                        */
+      0,                                   /* Gouraud table address       */
+      0                                    /* Dummy.                      */
+    };
+
+    <A HREF="../func/sprite.htm#slSetSprite"><I>slSetSprite</i></a> ( attr, <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 145.0 ) );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function uses the slave CPU for sorting decisions.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slZdspLevel">slZdspLevel</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slPutSprite">slPutSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite">slDispSprite</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteSZ">slDispSpriteSZ</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite4P">slDispSprite4P</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteHV">slDispSpriteHV</a></TD><TD><PRE> <A HREF="../mem/system01.htm#SpritePtr">SpritePtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenDist">MsScreenDist</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsZlimit">MsZlimit</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#WinUseFlag">WinUseFlag</a></TD><TD><PRE> <A HREF="../mem/system02.htm#TotalPolygons">TotalPolygons</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MXPolygons">MXPolygons</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DispPolygons">DispPolygons</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#DMAEndFlag">DMAEndFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#DMASetFlag">DMASetFlag</a></TD><TD><PRE> <A HREF="../mem/system03.htm#PutCount">Put Count</a></TD><TD><PRE> <A HREF="../struct/types.htm#SPRITE">SPRITE</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<HR>
+<H1>★Window</H1><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slWindow"><HR NOSHADE></a><H4> function</H4><H1> slWindow</H1><HR>
+<H3> Sprite window settings</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> left, top, right, bottom;
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> zlim;
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> cen_x, cen_y;
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slWindow( left, top, right, bottom, zlim, cen_x, cen_y );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> left - right edge of the window.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> top - top edge of the window.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> right - left edge of the window.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> bottom - Bottom edge of the window.<BR>
+    <A HREF="../struct/types.htm#Uint16"><I>Uint16</i></a> zlim - Z limit.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> cen_x - X coordinate of the vanishing point (coordinate origin).<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> cen_y - Y coordinate of the vanishing point (coordinate origin).<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Error code (described below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Set the range to limit the display of sprites and polygons.<BR>
+    The display range is the position on the TV screen and can be specified up to two times during display.<BR>
+    zlim will no longer be displayed beyond this point.<BR>
+    cen_x, cen_y are the vanishing point position for polygons, and the coordinate origin for sprites.<BR>
+    The position on the screen is (0, 0) at the top left and (319, 223) at the bottom right <normal screen size>
+    is.<BR>
+    When the total number of windows is 3 or more, the function returns <A HREF="../struct/constenm.htm#FALSE"><I>FALSE</i></a> . Returns <A HREF="../struct/constenm.htm#TRUE"><I>TRUE</i></a> if successful.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Window with upper left coordinates (10,15), lower right coordinates (300,195), vanishing point is in the center of this window, and Z limit value is 5000h.<BR>
+    <A HREF="../func/sprite.htm#slWindow"><I>slWindow</i></a> ( 10, 15, 300, 195, 0x5000, 145, 75 );
+    See also the note below.<BR>
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    <A HREF="../func/polygon.htm#slPutPolygon"><I>slPutPolygon</i></a> () before calling <A HREF="../func/sprite.htm#slWindow"><I>slWindow</i></a> (),
+    When you use functions that set sprites, such as <A HREF="../func/sprite.htm#slPutSprite"><I>slPutSprite</i></a> (), they use a full-screen window, and a second window is set with a new call to <A HREF="../func/sprite.htm#slWindow"><I>slWindow</i></a> ().</i></b><BR><B><I>
+    Usually <A HREF="../func/sprite.htm#slWindow"><I>slWindow</i></a> (...) ; /* Window 1 */
+           ...
+        <A HREF="../func/polygon.htm#slPutPolygon"><I>slPutPolygon</i></a> (...);
+        <A HREF="../func/sprite.htm#slPutSprite"><I>slPutSprite</i></a> (...);
+           ...
+      <A HREF="../func/sprite.htm#slWindow"><I>slWindow</i></a> (...) ; /* Window 2 */
+           ...
+         <A HREF="../func/sprite.htm#slPutSprite"><I>slPutSprite</i></a> (...);
+         <A HREF="../func/polygon.htm#slPutPolygon"><I>slPutPolygon</i></a> (...);
+
+    Set a window at the beginning of the process, and then set another window again at the point where you want to switch.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/polygon.htm#slPutPolygon">slPutPolygon</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slPutPolygonS">slPutPolygonS</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slPutPolygonX">slPutPolygonX</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slDispPolygon">slDispPolygon</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slPutSprite">slPutSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slSetSprite">slSetSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite">slDispSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteHV">slDispSpriteHV</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteSZ">slDispSpriteSZ</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite4P">slDispSprite4P</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slZdspLevel">slZdspLevel</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slCurWindow">slCurWindow</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slSprWinNum">slSprWinNum</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsZlimit">MsZlimit</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#WindowNumber">Window Number</a></TD><TD><PRE> <A HREF="../mem/system02.htm#WinUseFlag">WinUseFlag</a></TD><TD><PRE> <A HREF="../mem/system02.htm#TotalPolygons">TotalPolygons</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenLeft">MsScreenLeft</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#MsScreenTop">MsScreenTop</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenRight">MsScreenRight</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenBottom">MsScreenBottom</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeX">MsWindowSizeX</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeY">MsWindowSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeX">FrameSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeY">FrameSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWinXAdder">MsWinXAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsWinYAdder">MsWinYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlWinXAdder">SlWinXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlWinYAdder">SlWinYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipXAdder">MsClipXAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsClipYAdder">MsClipYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlClipXAdder">SlClipXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlClipYAdder">SlClipYAdder</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slCurWindow"><HR NOSHADE></a><H4> function</H4><H1> slCurWindow</H1><HR>
+<H3> Switching windows</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> win;
+
+    void slCurWindow( win );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> win - The type of window to switch to (see below).<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Switch the displayed window.<BR>
+    For win, specify either <A HREF="../struct/constenm.htm#winFar"><I>winFar</i></a> (back side) or <A HREF="../struct/constenm.htm#winNear"><I>winNear</i></a> (front side).<BR>
+    When you execute this function, the screen position and display area are set, but
+    Please note that the light vector will not change.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Move the displayed window to the back.<BR>
+    <A HREF="../func/sprite.htm#slCurWindow"><I>slCurWindow</i></a> ( <A HREF="../struct/constenm.htm#winFar"><I>winFar</i></a> );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slSprWinNum">slSprWinNum</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComWrPtr">ComWrPtr</a></TD><TD><PRE> <A HREF="../mem/system02.htm#ComRdPtr">ComRdPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#MsScreenDist">MsScreenDist</a></TD><TD><PRE> <A HREF="../mem/system02.htm#WindowNumber">Window Number</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenLeft">MsScreenLeft</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenTop">MsScreenTop</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system02.htm#MsScreenRight">MsScreenRight</a></TD><TD><PRE> <A HREF="../mem/system02.htm#MsScreenBottom">MsScreenBottom</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeX">MsWindowSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeY">MsWindowSizeY</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsWinXAdder">MsWinXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWinYAdder">MsWinYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlWinXAdder">SlWinXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlWinYAdder">SlWinYAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsClipXAdder">MsClipXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsClipYAdder">MsClipYAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlClipXAdder">SlClipXAdder</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlClipYAdder">SlClipYAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#SlZlimit">SlZlimit</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slSprWinNum"><HR NOSHADE></a><H4> function</H4><H1> slSprWinNum</H1><HR>
+<H3> Get window number</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> slSprWinNum( void );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> - Window number used for display.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Returns the window number used for display.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> winno;
+
+    winno = <A HREF="../func/sprite.htm#slSprWinNum"><I>slSprWinNum</i></a> ();
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slCurWindow">slCurWindow</a></TD><TD><PRE> <A HREF="../mem/system02.htm#WindowNumber">Window Number</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slFrameClipSize"><HR NOSHADE></a><H4> function</H4><H1> slFrameClipSize</H1><HR>
+<H3> Specifying clipping size</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> size_x, size_y;
+
+    void slFrameClipSize( size_x, size_y );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> size_x - X size of the clip.<BR>
+    <A HREF="../struct/types.htm#Sint16"><I>Sint16</i></a> size_y - Y size of the clip.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Sprite display functions <A HREF="../func/sprite.htm#slDispSprite"><I>slDispSprite</i></a> , <A HREF="../func/sprite.htm#slDispSpriteHV"><I>slDispSpriteHV</i></a> ,
+    <A HREF="../func/sprite.htm#slDispSpriteSZ"><I>slDispSpriteSZ</i></a> , <A HREF="../func/sprite.htm#slDispSprite4P"><I>slDispSprite4P</i></a> , <A HREF="../func/sprite.htm#slPutSprite"><I>slPutSprite</i></a> and
+    Sets the range to display polygons with the <A HREF="../struct/constspr.htm#UseClip"><I>UseClip</i></a> option specified.<BR>
+    Points outside the window size plus the specified widths on the top, bottom, left, and right will be hidden.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/sprite.htm#slFrameClipSize"><I>slFrameClipSize</i></a> ( 10, 5, 190, 200 );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/init.htm#slInitSystem">slInitSystem</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slWindow">slWindow</a></TD><TD><PRE> <A HREF="../mem/system02.htm#WindowNumber">Window Number</a></TD><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeX">MsWindowSizeX</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#MsWindowSizeY">MsWindowSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeX">FrameSizeX</a></TD><TD><PRE> <A HREF="../mem/system03.htm#FrameSizeY">FrameSizeY</a></TD><TD><PRE> <A HREF="../mem/system03.htm#SlClipXAdder">SlClipXAdder</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system03.htm#SlClipYAdder">SlClipYAdder</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<HR>
+<H1>★Slave activity status</H1><BR><BR>
+ <A HREF="index.htm#sprite">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slCheckSlave"><HR NOSHADE></a><H4> function</H4><H1> slCheckSlave</H1><HR>
+<H3> Check slave activity status</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slCheckSlave( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Slave status (see below).<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Check the operating status of the slave.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Wait for the slave's task (geometry calculation) to finish, then
+    Call <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> .<BR>
+      while ( <A HREF="../func/sprite.htm#slCheckSlave"><I>slCheckSlave</i></a> () != <A HREF="../struct/constenm.htm#TRUE"><I>TRUE</i></a> );
+      <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> ();
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function is used to check whether the calculations of sprite/polygon drawing functions that require perspective transformation and geometry calculations have been completed, and are not used to check the behavior of the functions set by the user with <A HREF="../func/math.htm#slSlaveFunc"><I>slSlaveFunc</i></a> . 
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/polygon.htm#slPutPolygon">slPutPolygon</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slPutPolygonS">slPutPolygonS</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slDispPolygon">slDispPolygon</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slPutObject">slPutObject</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slPutSprite">slPutSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite">slDispSprite</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteSZ">slDispSpriteSZ</a></TD><TD><PRE> <A HREF="../func/sprite.htm#slDispSprite4P">slDispSprite4P</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sprite.htm#slDispSpriteHV">slDispSpriteHV</a></TD><TD><PRE> <A HREF="../func/polygon.htm#slPutPolygonX">slPutPolygonX</a></TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+ <A HREF="index.htm">return</a><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

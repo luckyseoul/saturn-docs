@@ -1,0 +1,120 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;22/22&gt;CD Builder Script Grammar</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+ <B>▲ <A HREF="p16_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>CD Builder Script Grammar Manual</b><H3 ALIGN=CENTER> Appendix A</H3><H2 ALIGN=CENTER> CD Builder Script Grammar Quick Reference</H2><HR NOSHADE>
+<PRE>
+
+
+ Disc  OutputFile.DSK
+  Session { CDROM｜SEMIXA }[OutputFileName]
+   LeadIn  MODE1
+   EndLeadIn
+  ［SystemArea  MSDOSFileName］
+   Track  { CDDA｜MODE1｜MODE2 }
+    Volume ISO9660  OutputFile.PVD
+     PrimaryVolume 0:2:16
+      ［SystemIdentifier "identifier" ... ］
+     EndPrimaryVolume
+    EndVolume
+   ┏File ISOFileName
+   ┃ ┌BeginTimeS   RelativeTime  ;Minutes:Seconds:Frame or FAD value│Trigger        Position in file; relative time
+   ┃ │EndTimeS     RelativeTime                                     │Eors           Position in file
+   ┃ │BeginTimeE   RelativeTime                                     │
+   ┃ │EndTimeE     RelativeTime                                     │
+   ┃ │FileNo       File number; 1-255                               │MinLength      {Number of bytes | Number of sectors}    │
+   ┃ │Pack                                                          │RecordingDate  Date;DD/MM/YY HH:MM:SS:1/100Second: GMT  │
+   ┃ └SectorRate   0~65535; Automatically calculated when 0         │
+   ┃ ┏FileSource   InputFileName
+   ┃ ┃ ┌SubHeader                                     │ BeginTimeF         RelativeTime
+   ┃ ┃ │Offset      Input position  Input length      │ EndTimeF           RelativeTime
+   ┃ ┃ │BitRate     Bitrate [sequence number]         │ DataType           {FORM1 | FORM2}
+   ┃ ┃ │UnitSize    unit size                         │ AutoEOR
+   ┃ ┃ │GapSize     gap size                          │ CodingInformation  Coding information; number string
+   ┃ ┃ │RealTime                                      │ SubSource          Sub source file name
+   ┃ ┃ │                                              │ SubEmpty           Number of blocks
+   ┃ ┃ └SourceType { MONO_A｜MONO_B｜MONO_C｜STEREO_A｜STEREO_B｜STEREO_C｜CDDA｜ISO11172｜VIDEO｜DATA｜MPEG_VIDEO }┘
+   ┃ ┃EndFileSource
+   ┃ ┃FileSource
+   ┃ ┃EndFileSource
+   ┃ ┗     :
+   ┃ ┏MpegMultiplex ［OutputFileName］
+   ┃ ┃ ┌BeginTimeF   RelativeTime          │ RealTime
+   ┃ ┃ └EndTimeF     RelativeTime          │ AutoEOR
+   ┃ ┃  MpegStream  SourceFileName  { AUDIO ｜ VIDEO ｜ DATA }
+   ┃ ┃   ┌BitRate   Bitrate [sequence number]
+   ┃ ┃   │DataType    { FORM1 ｜ FORM2 }
+   ┃ ┃   └MpegFlush
+   ┃ ┃  EndMpegStream
+   ┃ ┃  MpegStream
+   ┃ ┃  EndMpegStream
+   ┃ ┃     :
+   ┃ ┗EndMpegMultiplex
+   ┃ ┏Channel channel number
+   ┃ ┃ ［Reallocation］
+   ┃ ┃  FileSource
+   ┃ ┃   ┌BitRate   bit rate
+   ┃ ┃   │UnitSize  unit size
+   ┃ ┃   └GapSize   gap size
+   ┃ ┃  EndFileSource
+   ┃ ┃     :
+   ┃ ┃  MpegMultiplex
+   ┃ ┃  EndMpegMultiplex
+   ┃ ┗EndChannel
+   ┗EndFile
+   ┏Extent RelativeTime
+   ┃ FileInterLeave   UnitSize GapSize
+   ┃  File ISO9660FileName
+   ┃       :
+   ┃  EndFile
+   ┃ EndFileInterLeave
+   ┃ FileInterLeave  UnitSize GapSize
+   ┃  File ISO9660FileName
+   ┃       :
+   ┃  EndFile
+   ┃ EndFileInterLeave
+   ┗EndExtent
+   ┏Directory  DirectoryName
+   ┃ File ISO9660FileName
+   ┃ EndFile
+   ┗EndDirectory
+   EndTrack                                                                                                                    
+   Track CDDA                 ; CDDA track
+    Pause 150                ; pause 2 seconds
+    FileSource INDEX1.DAT    ; Index 1 (X=01)
+    EndFileSource
+    FileSource INDEX2.DAT    ; Index 2 (X=02)
+    EndFileSource
+   EndTrack
+   LeadOut  { CDDA｜MODE1｜MODE2 }                                                                                     
+   ［Empty block count］
+   EndLeadOut
+  EndSession
+ EndDisc
+
+</PRE><HR NOSHADE>
+<B>▲ <A HREF="p16_10.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

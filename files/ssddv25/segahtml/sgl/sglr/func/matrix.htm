@@ -1,0 +1,1156 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/22&gt; <!-- Number of pages/total number of pages -->
+ SGL function reference/matrix function <!-- Title name -->
+ </TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><!-------------------------------------------------------------------------------->
+<HR>
+<H1> ★Matrix operation</H1><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slInitMatrix"><HR NOSHADE></a><H4> function</H4><H1> slInitMatrix</H1><HR>
+<H3> Matrix initialization</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void slInitMatrix( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Initializing variables and buffers used in matrix operations</PRE></P>
+<P><DT><H3> example</H3><DD><PRE>
+    Initialize the matrix buffer.<BR>
+    <A HREF="../func/matrix.htm#slInitMatrix"><I>slInitMatrix</i></a> ();
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slPushMatrix"><HR NOSHADE></a><H4> function</H4><H1> slPushMatrix</H1><HR>
+<H3> Evacuation of the matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slPushMatrix( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Returns <A HREF="../struct/constenm.htm#NG"><I>NG</i></a> if an error occurs, <A HREF="../struct/constenm.htm#OK"><I>OK</i></a> if successful.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Advances the matrix stack pointer and copies the current matrix to it.<BR>
+    Up to 20 matrices can be nested, but an error will be returned if this is exceeded.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Save the current matrix in the matrix stack and use the contents of that matrix for the next process.<BR>
+    <A HREF="../func/matrix.htm#slPushMatrix"><I>slPushMatrix</i></a> ();
+    {
+      <A HREF="../func/matrix.htm#slScale"><I>slScale</i></a> (...);
+          :
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This function is used when building a model that stores past current matrix information, such as a hierarchical model.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a></TD><TD><PRE> <A HREF="../mem/system01.htm#MatrixCount">MatrixCount</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slPushUnitMatrix"><HR NOSHADE></a><H4> function</H4><H1> slPushUnitMatrix</H1><HR>
+<H3> Evacuation of the matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slPushUnitMatrix( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Returns <A HREF="../struct/constenm.htm#NG"><I>NG</i></a> if an error occurs, <A HREF="../struct/constenm.htm#OK"><I>OK</i></a> if successful.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Advances the matrix stack pointer and sets the identity matrix there.<BR>
+    Returns an error if nested too much.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Save the unit matrix to the matrix buffer.<BR>
+    <A HREF="../func/matrix.htm#slPushUnitMatrix"><I>slPushUnitMatrix</i></a> ();
+    {
+       <A HREF="../func/matrix.htm#slTranslate"><I>slTranslate</i></a> ( ... );
+              :
+       <A HREF="../func/polygon.htm#slPutPolygonX"><I>slPutPolygonX</i></a> ( ... );
+    }
+    <A HREF="../func/matrix.htm#slPopMatrix"><I>slPopMatrix</i></a> ();
+    At this point, the current matrix becomes an identity matrix.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a></TD><TD><PRE> <A HREF="../mem/system01.htm#MatrixCount">MatrixCount</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slIncMatrixPtr"><HR NOSHADE></a><H4> function</H4><H1> slIncMatrixPtr</H1><HR>
+<H3> Advance the matrix one stack</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slIncMatrixPtr( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Returns <A HREF="../struct/constenm.htm#NG"><I>NG</i></a> if an error occurs, <A HREF="../struct/constenm.htm#OK"><I>OK</i></a> if successful.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Advances the matrix stack pointer.<BR>
+    You can nest up to 20 matrices, but if you exceed this limit, an error will be returned.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Advance the matrix stack pointer by one and check whether a stack overflow has occurred.<BR>
+    if ( <A HREF="../func/matrix.htm#slIncMatrixPtr"><I>slIncMatrixPtr</i></a> () == <A HREF="../struct/constenm.htm#NG"><I>NG</i></a> ) {
+      /* Stack Overflow. */
+    } else {
+      /* Stack safety. */
+    }
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a></TD><TD><PRE> <A HREF="../mem/system01.htm#MatrixCount">MatrixCount</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slPopMatrix"><HR NOSHADE></a><H4> function</H4><H1> slPopMatrix</H1><HR>
+<H3> Restoring the matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slPopMatrix( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Returns <A HREF="../struct/constenm.htm#NG"><I>NG</i></a> if an error occurs, <A HREF="../struct/constenm.htm#OK"><I>OK</i></a> if successful.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Returns one pointer to the matrix stack.<BR>
+    If it goes back too much, it returns an error.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    The matrix evacuated to the current matrix is restored and reused.<BR>
+    <A HREF="../func/matrix.htm#slPushMatrix"><I>slPushMatrix</i></a> (); <-- (A)
+    {
+       <A HREF="../func/matrix.htm#slTranslate"><I>slTranslate</i></a> ( .. );
+            :
+    }
+    <A HREF="../func/matrix.htm#slPopMatrix"><I>slPopMatrix</i></a> (); <-- (B)
+    At time (B), the current matrix is in the same state as in (A).<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a></TD><TD><PRE> <A HREF="../mem/system01.htm#MatrixCount">Matrix Count</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slDecMatrixPtr"><HR NOSHADE></a><H4> function</H4><H1> slDecMatrixPtr</H1><HR>
+<H3> Matrix restoration</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slDecMatrixPtr( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Returns <A HREF="../struct/constenm.htm#NG"><I>NG</i></a> if an error occurs, <A HREF="../struct/constenm.htm#OK"><I>OK</i></a> if successful.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Returns one pointer to the matrix stack.<BR>
+    If it goes back too much, it returns an error.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Return one pointer to the matrix stack and check whether a stack underflow has occurred.<BR>
+    if ( <A HREF="../func/matrix.htm#slDecMatrixPtr"><I>slDecMatrixPtr</i></a> () == <A HREF="../struct/constenm.htm#NG"><I>NG</i></a> ) {
+      /* Stack underflow. */
+    } else {
+      /* Stack safety. */
+    }
+    <A HREF="../func/matrix.htm#slPushMatrix"><I>slPushMatrix</i></a> ();
+    {
+          :
+    }
+    <A HREF="../func/matrix.htm#slDecMatrixPtr"><I>slDecMatrixPtr</i></a> ();
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This is a function with the same functionality as <A HREF="../func/matrix.htm#slPopMatrix"><I>slPopMatrix</i></a> .</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a></TD><TD><PRE> <A HREF="../mem/system01.htm#MatrixCount">Matrix Count</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slUnitMatrix"><HR NOSHADE></a><H4> function</H4><H1> slUnitMatrix</H1><HR>
+<H3> Make a matrix an identity matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr;
+
+    void slUnitMatrix( mtptr )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr - pointer to the <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> data type representing the matrix you want to be the identity matrix</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Makes the specified matrix an identity matrix. If <A HREF="../struct/constspr.htm#CURRENT"><I>CURRENT</i></a> is specified for the matrix, the current matrix of the matrix stack is targeted.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slUnitAngle"><HR NOSHADE></a><H4> function</H4><H1> slUnitAngle</H1><HR>
+<H3> Unitize the rotational components of the matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr;
+
+    void slUnitAngle( mtptr )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr - pointer to the <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> data type representing the matrix you want to unitize</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Make the rotated part (3×3) of the matrix into a unit matrix. The parallel movement part will not be changed.<BR>
+    If <A HREF="../struct/constspr.htm#CURRENT"><I>CURRENT</i></a> is specified for the matrix, the current matrix will be changed.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slUnitTranslate"><HR NOSHADE></a><H4> function</H4><H1> slUnitTranslate</H1><HR>
+<H3> Set the parallel component of the matrix to 0</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr;
+
+    void slUnitTranslate( mtptr )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr - Pointer to <A HREF="../struct/types.htm#MATRIX"><I>the MATRIX</i></a> data type representing the matrix whose parallel components you want to zero out.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Set the parallel translation part of the matrix to 0. The rotating part remains unchanged.<BR>
+    If <A HREF="../struct/constspr.htm#CURRENT"><I>CURRENT</i></a> is specified for the matrix, the current matrix will be changed.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Set the parallel component of the matrix to 0.<BR>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> matr
+                  :
+    slUnitTranslate( &matr );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slLoadMatrix"><HR NOSHADE></a><H4> function</H4><H1> slLoadMatrix</H1><HR>
+<H3> Copy to current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr;
+
+    void slLoadMatrix( mtptr )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr - Pointer to <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> data type indicating the matrix you want to copy to the current matrix.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Copies the specified matrix to the current matrix.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Copies the contents of the specified matrix to the current matrix.<BR>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> matr = {
+                   :
+    };
+    <A HREF="../func/matrix.htm#slPushMatrix"><I>slPushMatrix</i></a> ();
+    {
+       <A HREF="../func/matrix.htm#slLoadMatrix"><I>slLoadMatrix</i></a> ( &matr );
+       <A HREF="../func/matrix.htm#slRotX"><I>slRotX</i></a> ( ... );
+             :
+    }
+    <A HREF="../func/matrix.htm#slPopMatrix"><I>slPopMatrix</i></a> ();
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slCopyMatrix"><HR NOSHADE></a><H4> function</H4><H1> slCopyMatrix</H1><HR>
+<H3> Copy to current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> slCopyMatrix( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#Bool"><I>Bool</i></a> - Returns <A HREF="../struct/constenm.htm#NG"><I>NG</i></a> if an error occurs, <A HREF="../struct/constenm.htm#OK"><I>OK</i></a> if successful.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Copies the previous matrix to the current matrix.<BR>
+    Returns an error if the matrix is not nested.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Puts the contents of the matrix stack into the current matrix and decrements the matrix stack pointer by one.<BR>
+            : <-- (A)
+    <A HREF="../func/matrix.htm#slPushMatrix"><I>slPushMatrix</i></a> ();         
+    { <-- (B)
+       <A HREF="../func/matrix.htm#slTranslate"><I>slTranslate</i></a> ( .. );
+            :
+       <A HREF="../func/matrix.htm#slCopyMatrix"><I>slCopyMatrix</i></a> (); <-- (C)
+    }
+    <A HREF="../func/matrix.htm#slPopMatrix"><I>slPopMatrix</i></a> ();          
+            : <-- (D)
+    At point (C), the current matrix is in the same state as (A).<BR>
+    However, since the matrix stack pointer is not manipulated, the state of the matrix stack at the time of (C)
+    is the same as that of (B), but not the same as that of (A). Starting at point (D),
+    The situation will be the same as in (A).<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRegistMatrix"><HR NOSHADE></a><H4> function</H4><H1> slRegistMatrix</H1><HR>
+<H3> Register new matrix buffer</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr;
+
+    void slRegistMatrix( mtptr )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr - Pointer to <A HREF="../struct/types.htm#MATRIX"><I>the MATRIX</i></a> data type representing the matrix you want to register on the matrix stack.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Copies the specified matrix into the matrix buffer.<BR>
+    If <A HREF="../struct/constspr.htm#CURRENT"><I>CURRENT</i></a> is specified for the matrix, the current matrix of the matrix stack is targeted.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Registers the specified matrix to the matrix stack.<BR>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> matr;
+              :
+    <A HREF="../func/matrix.htm#slRegistMatrix"><I>slRegistMatrix</i></a> ( &matr );
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a></TD><TD><PRE> <A HREF="../mem/system01.htm#MatrixCount">MatrixCount</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slGetMatrix"><HR NOSHADE></a><H4> function</H4><H1> slGetMatrix</H1><HR>
+<H3> Copying the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr;
+
+    void slGetMatrix( mtptr )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *mtptr - Pointer to <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> type data to copy the contents of the current matrix.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing. (However, the processing results are reflected in the <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> data indicated by the argument mtptr.)
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Copies the current matrix to the specified matrix.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    Copy the contents of the current matrix to another location.<BR>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> *matr;
+    <A HREF="../func/matrix.htm#slGetMatrix"><I>slGetMatrix</i></a> ( matr );
+    The contents of the current matrix are copied to matr.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD></TR>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a></TD><TD><PRE> <A HREF="../mem/system01.htm#MatrixCount">Matrix Count</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slGetTranslate"><HR NOSHADE></a><H4> function</H4><H1> slGetTranslate</H1><HR>
+<H3> Extracting the parallel component from the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ]
+
+    void slGetTranslate( pos )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ] - Pointer to <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> type array to store retrieved parallel components.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing. (However, the processing result is reflected in the <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> type data indicated by the argument pos.)
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Extracts the translation component from the current matrix and copies it to the specified buffer.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTranslate">slTranslate</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slLoadTranslate"><HR NOSHADE></a><H4> function</H4><H1> slLoadTranslate</H1><HR>
+<H3> Update translation component</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> x_dif, y_dif, z_dif;
+
+    void slLoadTranslate( x_dif, y_dif, z_dif )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> x_dif - X value of the translation component.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> y_dif - Y value of the translation component.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> z_dif - Z value of the translation component.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Updates only the parallel portion of the current matrix.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTranslate">slTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slMultiMatrix">slMultiMatrix</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slInversMatrix"><HR NOSHADE></a><H4> function</H4><H1> slInversMatrix</H1><HR>
+<H3> Invert the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void slInversMatrix( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Inverse the current matrix.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slTransposeMatrix">slTransposeMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slTransposeMatrix"><HR NOSHADE></a><H4> function</H4><H1> slTransposeMatrix</H1><HR>
+<H3> Make the current matrix a transposed matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void slTransposeMatrix( void )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Makes the current matrix a transposed matrix.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<HR>
+<H1>★Affine transformation</H1><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRotX"><HR NOSHADE></a><H4> function</H4><H1> slRotX</H1><HR>
+<H3> Apply rotational transformation on the X axis to the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> angx;
+
+    void slRotX( angx )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> angx - rotation angle</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Multiplies the current matrix by the rotation matrix around the X axis.<BR>
+    The rotation matrix is
+<PRE>         1.0      0.0      0.0      0.0
+         0.0     cosΘ     sinΘ      0.0
+         0.0    -sinΘ     cosΘ      0.0
+         0.0      0.0      0.0      1.0
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotXSC">slRotXSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotY">slRotY</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotYSC">slRotYSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotZ">slRotZ</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotZSC">slRotZSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotAX">slRotAX</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slZrotR">slZrotR</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRotXSC"><HR NOSHADE></a><H4> function</H4><H1> slRotXSC</H1><HR>
+<H3> Apply rotational transformation on the X axis to the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> sin;
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> cos;
+
+    void slRotXSC( sin, cos )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> sin - value of sin to give during rotation transformation.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> cos - Cos value given during rotation transformation.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Rotate around the X axis by specifying sine and cosine.<BR>
+<PRE>         1.0      0.0      0.0      0.0
+         0.0      cos      sin      0.0
+         0.0     -sin      cos      0.0
+         0.0      0.0      0.0      1.0
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotX">slRotX</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotY">slRotY</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotYSC">slRotYSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotZ">slRotZ</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotZSC">slRotZSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotAX">slRotAX</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slZrotR">slZrotR</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRotY"><HR NOSHADE></a><H4> function</H4><H1> slRotY</H1><HR>
+<H3> Apply rotational transformation on the X axis to the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> Angy;
+
+    void slRotY(angy)
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> angy - rotation angle</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Multiplies the current matrix by the rotation matrix around the Y axis.<BR>
+<PRE>        cosΘ      0.0    -sinΘ     0.0
+         0.0      1.0      0.0     0.0
+        sinΘ      0.0     cosΘ     0.0
+         0.0      0.0      0.0     1.0
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotX">slRotX</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotXSC">slRotXSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotYSC">slRotYSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotZ">slRotZ</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotZSC">slRotZSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotAX">slRotAX</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slZrotR">slZrotR</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRotYSC"><HR NOSHADE></a><H4> function</H4><H1> slRotYSC</H1><HR>
+<H3> Apply rotational transformation on the X axis to the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> sin;
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> cos;
+
+    void slRotYSC( sin, cos )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> sin - value of sin to give during rotation transformation.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> cos - Cos value given during rotation transformation.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Specify sine and cosine to rotate around the Y axis.<BR>
+<PRE>         cos      0.0     -sin      0.0
+         0.0      1.0      0.0      0.0
+         sin      0.0      cos      0.0
+         0.0      0.0      0.0      1.0      
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotX">slRotX</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotXSC">slRotXSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotY">slRotY</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotZ">slRotZ</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotZSC">slRotZSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotAX">slRotAX</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slZrotR">slZrotR</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRotZ"><HR NOSHADE></a><H4> function</H4><H1> slRotZ</H1><HR>
+<H3> Apply Z-axis rotation transformation to the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> angz;
+
+    void slRotZ( angz )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> angz - rotation angle</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Multiplies the current matrix by the rotation matrix around the Z axis.<BR>
+<PRE>        cosΘ     sinΘ      0.0      0.0
+       -sinΘ     cosΘ      0.0      0.0
+         0.0      0.0      1.0      0.0
+         0.0      0.0      0.0      1.0
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotX">slRotX</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotXSC">slRotXSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotY">slRotY</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotYSC">slRotYSC</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotZSC">slRotZSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotAX">slRotAX</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slZrotR">slZrotR</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRotZSC"><HR NOSHADE></a><H4> function</H4><H1> slRotZSC</H1><HR>
+<H3> Apply Z-axis rotation transformation to the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> sin;
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> cos;
+
+    void slRotZSC( <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> sin , <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> cos )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> sin - value of sin to give during rotation transformation.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> cos - Cos value given during rotation transformation.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Specify sine and cosine to rotate around the Z axis.<BR>
+<PRE>         cos      sin      0.0      0.0
+        -sin      cos      0.0      0.0
+         0.0      0.0      1.0      0.0
+         0.0      0.0      0.0      1.0
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotX">slRotX</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotXSC">slRotXSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotY">slRotY</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotYSC">slRotYSC</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotZ">slRotZ</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotAX">slRotAX</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slZrotR">slZrotR</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRotAX"><HR NOSHADE></a><H4> function</H4><H1> slRotAX</H1><HR>
+<H3> Apply rotational transformation around an arbitrary axis to the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> vecx, vecy, vecz;
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> ang;
+
+    void slRotAX( vecx, vecy, vecz, ang )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> vecx - X component of the vector representing the rotation axis<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> vecy - Y component of the vector representing the rotation axis<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> vecz - Z component of the vector representing the rotation axis<BR>
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> ang - Rotation angle</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Rotate around an arbitrary axis passing through the origin. Axes are specified as unit vectors.<BR>
+<PRE>        NxNx(1-C)+C     NxNy(1-C)+NzS  NxNz(1-C)-NyS  0.0
+        NyNx(1-C)-NzS   NyNy(1-C)+C    NyNz(1-C)+NxS  0.0
+        NzNx(1-C)+NyS   NzNy(1-C)-NxS  NzNz(1-C)+C    0.0
+        0.0             0.0            0.0            1.0</PRE>
+    Nx, Ny, Nz are the components of the unit vector representing the axis.<BR>
+    C stands for cosine and S stands for sine.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotX">slRotX</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotXSC">slRotXSC</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotY">slRotY</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotYSC">slRotYSC</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRotZ">slRotZ</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRotZSC">slRotZSC</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slZrotR">slZrotR</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slTranslate"><HR NOSHADE></a><H4> function</H4><H1> slTranslate</H1><HR>
+<H3> Apply a translation transformation to the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> x_dif, y_dif, z_di;f
+
+    void slTranslate( x_dif, y_dif, z_dif )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> x_dif - X component of translation<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> y_dif - Y component of translation<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> z_dif - Z component of translation</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Performs parallel movement on the current matrix.<BR>
+<PRE>         0.0      0.0      0.0      0.0
+         0.0      0.0      0.0      0.0
+         0.0      0.0      0.0      0.0
+         tx       ty       tz       1.0
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slRegistTranslate"><HR NOSHADE></a><H4> function</H4><H1> slRegistTranslate</H1><HR>
+<H3> Take out the matrix from the matrix buffer and move it in parallel</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> x_dif, y_dif, z_di;f
+
+    void slRegistTranslate( x_dif, y_dif, z_dif )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> x_dif - X component of translation<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> y_dif - Y component of translation<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> z_dif - Z component of translation</PRE></P>
+<P><DT><H3> Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Copies the parallel movement of the matrix buffer to the current matrix. However, the matrix buffer remains unchanged.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slScale"><HR NOSHADE></a><H4> function</H4><H1> slScale</H1><HR>
+<H3> Apply scale transformation to current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> scl_x, scl_y, scl_z;
+
+    void slScale( <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> scl_x, <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> scl_y, <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> scl_z )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> scl_x - Scale value in the X direction.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> scl_y - Scale value in Y direction.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> scl_z - Scale value in Z direction.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Scales against the current matrix.<BR>
+<PRE>        scl_x    0.0      0.0      0.0
+         0.0    scl_y     0.0      0.0
+         0.0     0.0     scl_z     0.0
+         0.0     0.0      0.0      1.0
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slMultiMatrix"><HR NOSHADE></a><H4> function</H4><H1> slMultiMatrix</H1><HR>
+<H3> Multiply current matrix by matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> mtrx
+
+    void slMultiMatrix( mtrx )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#MATRIX"><I>MATRIX</i></a> mtrx - Matrix to be applied to the current matrix.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Multiplies the current matrix by the specified matrix.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slInitMatrix">slInitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushMatrix">slPushMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slPushUnitMatrix">slPushUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slIncMatrixPtr">slIncMatrixPtr</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slPopMatrix">slPopMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slDecMatrixPtr">slDecMatrixPtr</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitMatrix">slUnitMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slUnitAngle">slUnitAngle</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slUnitTranslate">slUnitTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadMatrix">slLoadMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCopyMatrix">slCopyMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slRegistMatrix">slRegistMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slGetMatrix">slGetMatrix</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slGetTranslate">slGetTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slLoadTranslate">slLoadTranslate</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slInversMatrix">slInversMatrix</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slRegistTranslate">slRegistTranslate</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatConv">slScrMatConv</a></TD><TD><PRE> <A HREF="../func/sclnorm.htm#slScrMatSet">slScrMatSet</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<HR>
+<H1>★Viewpoint operation</H1><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slLookAt"><HR NOSHADE></a><H4> function</H4><H1> slLookAt</H1><HR>
+<H3> Viewpoint transformation for current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> camera[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ];
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> target[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ];
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> angz;
+
+    void slLookAt( camera, target, angz )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> camera[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ] - Camera (view position)
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> target[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ] - A vector representing the viewing direction.<BR>
+    <A HREF="../struct/types.htm#ANGLE"><I>ANGLE</i></a> angz - Rotational component relative to viewing direction.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Multiply the current matrix by the matrix that looks at the target direction from the camera position.<BR>
+    At that time, it also rotates around the Z axis.<BR>
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    In a direction along the Y-axis, the vector on the XZ plane becomes small and may not be calculated correctly.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<HR>
+<H1>★Vector calculation</H1><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slCheckOnScreen"><HR NOSHADE></a><H4> function</H4><H1> slCheckOnScreen</H1><HR>
+<H3> Determine whether the specified ball is displayed on the screen</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> obj[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ];
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> size;
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> slCheckOnScreen( obj, size )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> obj[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ] - Object position. 
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> size - radius of the object.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> Z position of object. Returns a negative number when off-screen.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Transforms the position of the specified object through the current matrix,
+    Tests whether an object of the specified size is visible on the screen at that location and returns the result.<BR>
+    Returns -1 (FFFFFFFF) if it is in front of the screen, -2 (FFFFFFFE) if it is above, below, left or right, and returns the Z position if it is within the screen.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    if ( <A HREF="../func/matrix.htm#slCheckOnScreen"><I>slCheckOnScreen</i></a> ( obj, obj_size ) < <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 0.0 ) ) {
+      /* It is not displayed on the screen, so it is not drawn. */
+    } else {
+      <A HREF="../func/polygon.htm#slPutPolygonX"><I>slPutPolygonX</i></a> ( ... );
+    }
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slCheckOnScreen0">slCheckOnScreen0</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slConvert3Dto2DFX">slConvert3Dto2DFX</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slConvert3Dto2D">slConvert3Dto2D</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slCheckOnScreen0"><HR NOSHADE></a><H4> function</H4><H1> slCheckOnScreen0</H1><HR>
+<H3> Determine whether the sphere at the origin is displayed at that size</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> size[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ];
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> slCheckOnScreen0( size )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> size - radius of the object.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> Z position of object. Returns a negative number when off-screen.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Tests whether the object at position (0,0,0) is displayed on the screen at the specified size and returns the result.<BR>
+    Returns -1 (FFFFFFFF) if it is in front of the screen, -2 (FFFFFFFE) if it is above, below, left or right, and returns the Z position if it is within the screen.<BR>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/matrix.htm#slCheckOnScreen">slCheckOnScreen</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slConvert3Dto2DFX">slConvert3Dto2DFX</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slConvert3Dto2D">slConvert3Dto2D</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slCalcPoint"><HR NOSHADE></a><H4> function</H4><H1> slCalcPoint</H1><HR>
+<H3> Transform the coordinates of the specified point using the current matrix</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos_x, pos_y, pos_z;
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> ans[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ];
+
+    void slCalcPoint( pos_x, pos_y, pos_z, ans )
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos_x, pos_y, pos_z - Points you want to transform in the current matrix.<BR>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> ans[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ] - FIXED type array for storing operation results.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing. (However, the result of the operation is stored in ans given as an argument.)
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Returns the result of coordinate transformation of the specified point using the current matrix to the buffer.<BR>
+<PRE>    →
+    a = (pos_x, pos_y, pos_z)
+    →
+    b = ans
+    When the current matrix is M,
+    → →
+    b = M・a
+    Calculations will be made.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/matrix.htm#slPushMatrix"><I>slPushMatrix</i></a> ();
+    {
+       <A HREF="../func/matrix.htm#slScale"><I>slScale</i></a> ( ... );
+             :
+       <A HREF="../func/polygon.htm#slPutPolygonX"><I>slPutPolygonX</i></a> ( ... );
+       <A HREF="../func/matrix.htm#slCalcPoint"><I>slCalcPoint</i></a> ( ... );
+    }
+    <A HREF="../func/matrix.htm#slPopMatrix"><I>slPopMatrix</i></a> ();
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slConvert3Dto2DFX"><HR NOSHADE></a><H4> function</H4><H1> slConvert3Dto2DFX </H1></PRE></P><!--------------------------------------------------------------------------------><BR><BR> <A HREF="index.htm#matrix">List</a> ｜ <A HREF="../index.htm">Reference</a><BR><A NAME="slConvert3Dto2D"><HR NOSHADE></a><H4> function</H4><H1> slConvert3Dto2D</H1><HR><H3> Conversion from 3D coordinates to screen coordinates</H3><DL><P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ];
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> ans_fx[ <A HREF="../struct/constenm.htm#XY"><I>XY</i></a> ];
+    <A HREF="../struct/types.htm#Sint32"><I>Sint32</i></a> ans_si[ <A HREF="../struct/constenm.htm#XY"><I>XY</i></a> ];
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> slConvert3Dto2DFX( pos, ans_fx );
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> slConvert3Dto2D( pos, ans_si );
+</PRE></P><P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ] - Coordinates to be converted to screen coordinates (However, the coordinate values in the coordinate space given by the current matrix are relative coordinates.)
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> ans_si[ <A HREF="../struct/constenm.htm#XY"><I>XY</i></a> ] - <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> type array containing the result of the operation.<BR>
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> ans_fx[ <A HREF="../struct/constenm.htm#XY"><I>XY</i></a> ] - <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> type array containing the result of the operation.<BR>
+
+</PRE></P><P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> Z position of given coordinates. (The operation result is returned to ans given as the argument.)
+</PRE></P><P><DT><H3>function</H3><DD>
+    Using the current matrix, returns the screen coordinate values ans_fx/ans_si when actually displayed on the screen from the 3D relative coordinate pos. Returns the Z value as the function value.<BR>
+
+</PRE></P><P><DT><H3>example</H3><DD><PRE>
+    Find the screen coordinates of the center position of a model.<BR>
+
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> pos[ <A HREF="../struct/constenm.htm#XYZ"><I>XYZ</i></a> ] = { <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 1.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 2.0 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 3.0 ) };
+    <A HREF="../struct/types.htm#FIXED"><I>FIXED</i></a> ans[ <A HREF="../struct/constenm.htm#XY"><I>XY</i></a> ];
+              :
+    <A HREF="../func/matrix.htm#slPushMatrix"><I>slPushMatrix</i></a> ();
+    {
+      <A HREF="../func/matrix.htm#slTranslate"><I>slTranslate</i></a> ( <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 3.5 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 6.2 ), <A HREF="../struct/macro.htm#toFIXED"><I>toFIXED</i></a> ( 2.1 ) );
+      <A HREF="../func/matrix.htm#slRotX"><I>slRotX</i></a> ( <A HREF="../struct/macro.htm#DEGtoANG"><I>DEGtoANG</i></a> ( 20.0 ) );
+      <A HREF="../func/matrix.htm#slRotY"><I>slRotY</i></a> ( ang_para_y );
+      <A HREF="../func/matrix.htm#slRotZ"><I>slRotZ</i></a> ( ang_para_z );
+      <A HREF="../func/polygon.htm#slPutPolygon"><I>slPutPolygon</i></a> ( ... );
+      <A HREF="../func/matrix.htm#slConvert3Dto2D"><I>slConvert3Dto2D</i></a> ( pos, ans );
+    }
+    <A HREF="../func/matrix.htm#slPopMatrix"><I>slPopMatrix</i></a> ();
+</PRE></P><P><DT><H3>reference</H3><DD><TABLE BORDER><TR><TD><PRE> <A HREF="../func/matrix.htm#slCheckOnScreen">slCheckOnScreen</a></TD><TD><PRE> <A HREF="../func/matrix.htm#slCheckOnScreen0">slCheckOnScreen0</a></TD><TD><PRE> <A HREF="../mem/system01.htm#mtptr">mtptr</a></TD></TR></TABLE></DL><HR NOSHADE> <A HREF="index.htm">return</a><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

@@ -1,0 +1,408 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;26/31&gt;SCU User's Manual/5.DSP Instruction Details</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p04_55.htm">Back</a> ｜ <A HREF="p04_57.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 4 DSP Control</b><H2 ALIGN=CENTER> DMA instructions</H2><HR NOSHADE>
+<!-- --------------------------------------------------------- -->
+<A NAME="dma_d0_ram_simm"><HR></a><!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">List</a> | ▲ <A HREF="p04_55.htm#mvi_imm_d_nzs">Back</a> | <A HREF="#dma_ram_d0_simm">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> DMA D0,[RAM],SImm</H1><DD><H3> DMA transfer (D0[31-0]→RAM)</H3><P><DT> <B>Operation details</b><DD> Transfer D0[31-0] data to RAM. The external address register and transfer word count register are updated (added) according to the number of address additions. The transfer word count register is a register that stores the number of transfer words in longword units. Transfer ends when this word count becomes 0 or when the transfer is forcibly terminated.</P>
+<P><DT> <B>descriptive formula</b><DD> label: DMA D0,[Destination],Counter<DD> Source=M0～M3 <A HREF="#c1"><B>*</b></a><P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER>
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> x</TD><TD> x</TD><TD> x</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> x</TD><TD> x</TD><TD COLSPAN=8> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>bit data</TH><TH ROWSPAN=2> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TH> bit17</TH><TH> bit16</TH><TH> bit15</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 4</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 8</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 16</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 32</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 64</TD></TR>
+</TABLE>
+</TD><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2> bit data</TH><TH ROWSPAN=2> choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit9</TH><TH> bit8</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> It will be T0;1. <B>**</b><A NAME="c1"></A><P><DT> <B>remarks</b><DD> <B>*</b> [Mx(x=0~3)] selects DATA RAMx(x=0~3).<DD> <B>**</b> When the END signal indicating the end of transfer from the outside is received, it becomes T0;0.<DD> To specify address addition, add the addition number after the instruction, and specify DMA0 to DMA64.<DD> If address addition number specification is omitted, the addition number will be 1.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="dma_ram_d0_simm"><HR></a><!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">List</a> | ▲ <A HREF="#dma_d0_ram_simm">Back</a> | <A HREF="#dma_d0_ram_s">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> DMA [RAM],D0,SImm</H1><DD><H3> DMA transfer (RAM→D0[31-0])</H3><P><DT> <B>Operation details</b><DD> Transfer RAM data to D0[31-0]. The external address register and transfer word count register are updated (added) according to the number of address additions. However, only addition numbers 0 and 1 are valid for A-Bus, and the writing unit is 32 bits. For B-Bus, all (addition numbers 0-64) are valid. The export unit will be 16 bits, and the 32 bit data will be divided into two and exported at intervals of 16 bits x (0-64). The transfer word count register is a register that stores the number of transfer words in longword units. Transfer ends when this word count becomes 0 or when the transfer is forcibly terminated.</P>
+<P><DT> <B>descriptive formula</b><DD> label: DMA [Source],D0,Counter<DD> Source=M0～M3 <A HREF="#c1"><B>*</b></a><P><DT> <B>instruction code</b><P><DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER>
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>０</TD><TD>０</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD>
+<TD COLSPAN=8> imm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>bit data</TH><TH ROWSPAN=2> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TH> bit17</TH><TH> bit16</TH><TH> bit15</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 4</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 8</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 16</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 32</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 64</TD></TR>
+</TABLE>
+</TD><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2> bit data</TH><TH ROWSPAN=2> choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit9</TH><TH> bit8</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> It will be T0;1. <B>**</b><A NAME="c1"></A><P><DT> <B>remarks</b><DD> <B>*</b> [Mx(x=0~3)] selects DATA RAMx(x=0~3).<DD> <B>**</b> When the END signal indicating the end of transfer from the outside is received, it becomes T0;0.<DD> To specify address addition, add the addition number after the instruction, and specify DMA0 to DMA64.<DD> If address addition number specification is omitted, the addition number will be 1.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="dma_d0_ram_s"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#dma">List</a> | ▲ <A HREF="#dma_ram_d0_simm">Back</a> | <A HREF="#dma_ram_d0_s">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> DMA D0,[RAM],[s]</H1><DD><H3> DMA transfer (D0[31-0]→RAM)</H3><P><DT> <B>Operation details</b><DD> The [s] data specified by bits 0 to 2 is used as the transfer counter, and the indicated number of D0[31-0] data are transferred to the RAM. The external address register and transfer word count register are updated (added) according to the number of address additions. The transfer word count register is a register that stores the number of transfer words in longword units. Transfer ends when this word count becomes 0 or when the transfer is forcibly terminated.</P>
+<P><DT> <B>descriptive formula</b><DD> label: DMA D0,[Destination],[Counter]<DD> Counter = M0~M3 <A HREF="#c3"><B>*</b></a> , MC0~MC3 <A HREF="#c3"><B>*</b></a> ,<DD> Destination = M0~M3 <A HREF="#c3"><B>*</b></a> ,PR <A HREF="#c3"><B>*</b></a><P><DT> <B>instruction code</b><CENTER>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> bit15</TH><TH> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> Address addition 0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> Address addition 1 </TD></TR>
+</TABLE>
+</CENTER>
+<P><DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>10</TH><TH>９</TH><TH>８</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>２</TH><TH>１</TH><TH>０</TH></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>０</TD><TD>０</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>０</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>bit data</TH><TH ROWSPAN=2> choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit10</TH><TH> bit9</TH><TH> bit8</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> PROGARM RAM</TD></TR>
+</TABLE>
+</TD><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3> bit data</TH><TH ROWSPAN=2> [s] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> It will be T0;1. <B>**</b><DD> CTx(x=0~3);Incremented only when b2=1. There is no change when b2=0.</P>
+<A NAME="c3"></A><P><DT> <B>remarks</b><DD> <B>*</b> [Mx(x=0~3)] selects DATA RAMx(x=0~3). MCx (x=0~3) selects DATA RAMx (x=0~3) and increments CTx (x=0~3) after transfer.<DD> PR selects PROGRAM RAM.<DD> <B>**</b> When the END signal indicating the end of transfer from the outside is received, it becomes T0;0.<DD> To specify address addition, add the number of additions after the instruction, and specify DMA0 to DMA1.<DD> If address addition number specification is omitted, the addition number will be 1.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="dma_ram_d0_s"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#dma">List</a> | ▲ <A HREF="#dma_d0_ram_s">Back</a> | <A HREF="#dmah_d0_ram_simm">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> DMA [RAM],D0,[s]</H1><DD><H3> DMA transfer (RAM→D0[31-0])</H3><P><DT> <B>Operation details</b><DD> The [s] data specified by bits 0 to 2 is used as the transfer counter, and the indicated number of RAM data is transferred to D0[31-0] data. The external address register and transfer word count register are updated (added) according to the number of address additions. However, only addition numbers 0 and 1 are valid for A-Bus, and the writing unit is 32 bits. For B-Bus, all (addition numbers 0-64) are valid. The export unit will be 16 bits, and the 32 bit data will be divided into two and exported at intervals of 16 bits x (0-64). The transfer word count register is a register that stores the number of transfer words in longword units. Transfer ends when this word count becomes 0 or when the transfer is forcibly terminated.</P>
+<P><DT> <B>descriptive formula</b><DD> label: DMA [Source],D0,[Counter]<DD> Counter = M0~M3 <A HREF="#c4"><B>*</b></a> , MC0~MC3 <A HREF="#c4"><B>*</b></a> ,<DD> Source = M0~M3 <A HREF="#c4"><B>*</b></a><P><DT> <B>instruction code</b><P><DD><TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3> bit data</TH><TH ROWSPAN=2> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TH> bit17</TH><TH> bit16</TH><TH> bit15</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 4</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 8</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 16</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 32</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 64</TD></TR>
+</TABLE>
+</TD><TD></TD><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3> bit data</TH><TH ROWSPAN=2> [s] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++ </TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<P><DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>２</TH><TH>１</TH><TH>０</TH></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>０</TD><TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TABLE>
+</P>
+<CENTER>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2> bit data</TH><TH ROWSPAN=2> [RAM] Choice</TH></TR>
+<TR ALIGN=CENTER><TH> bit9</TH><TH> bit8</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+</TABLE>
+</CENTER>
+<P><DT> <B>flag</b><DD> It will be T0;1. <B>**</b><DD> CTx(x=0~3);Incremented only when b2=1. There is no change when b2=0.</P>
+<A NAME="c4"></A><P><DT> <B>remarks</b><DD> <B>*</b> [Mx(x=0~3)] selects DATA RAMx(x=0~3). MCx (x=0~3) selects DATA RAMx (x=0~3) and increments CTx (x=0~3) after transfer.<DD> <B>**</b> When the END signal indicating the end of transfer from the outside is received, it becomes T0;0.<DD> To specify address addition, add the number of additions after the instruction, and specify DMA0 to DMA1.<DD> If address addition number specification is omitted, the addition number will be 1.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="dmah_d0_ram_simm"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#dma">List</a> | ▲ <A HREF="#dma_ram_d0_s">Back</a> | <A HREF="#dmah_ram_d0_simm">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> DMAH D0,[RAM],SImm</H1><DD><H3> DMA transfer in HOLD state (D0[31-0]→RAM)</H3><P><DT> <B>Operation details</b><DD> Transfer D0[31-0] data to RAM. The external address register and transfer word count register retain the value at the start of transfer in the address addition number. The transfer word count register is a register that stores the number of transfer words in longword units. Transfer ends when this word count becomes 0 or when the transfer is forcibly terminated.</P>
+<P><DT> <B>descriptive formula</b><DD> label: DMAH DO,[Destination],Counter<DD> Destination = M0~M3 <A HREF="#c4"><B>*</b></a> ,PR <A HREF="#c4"><B>*</b></a></P>
+<P><DT> <B>instruction code</b> <P><DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>17</TD><TD>　</DH>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>10</TH><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>０</TD><TD>０</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+<TD COLSPAN=8> SImm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> bit15</TH><TH> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> Address addition 0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> Address addition 1</TD></TR>
+</TABLE>
+</TD><TD></TD><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3> bit data</TH><TH ROWSPAN=2> choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit10</TH><TH> bit9</TH><TH> bit8</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> PROGRAM RAM</TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> It will be T0;1. <B>**</b></P>
+<A NAME="c4"></A><P><DT> <B>remarks</b><DD> <B>*</b> Mx(x=0~3) selects DATA RAMx(x=0~3).<DD> PR selects PROGRAM RAM.<DD> <B>**</b> When the END signal indicating the end of transfer from the outside is received, it becomes T0;0.<DD> To specify address addition, add the number to add after the instruction, and specify DMAH0 to DMAH1.<DD> If address addition number specification is omitted, the addition number will be 1.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="dmah_ram_d0_simm"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#dma">List</a> | ▲ <A HREF="#dmah_d0_ram_simm">Back</a> | <A HREF="#dmah_d0_ram_s">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> DMAH [RAM],D0,SImm</H1><DD><H3> DMA transfer in HOLD state (RAM→D0[31-0])</H3><P><DT> <B>Operation details</b><DD> Transfer RAM data to D0[31-0]. The external address register and transfer word count register retain the value at the start of transfer in the address addition number. The transfer word count register is a register that stores the number of transfer words in longword units. Transfer ends when this word count becomes 0 or when the transfer is forcibly terminated.</P>
+<P><DT> <B>descriptive formula</b><DD> label: DMAH [Source],DO,Counter<DD> Source = M0~M3 <A HREF="#c4"><B>*</b></a><P><DT> <B>instruction code</b> <P><DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>１</TD><TD>０</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD COLSPAN=8> SImm data</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>bit data</TH><TH ROWSPAN=2> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TH> bit17</TH><TH> bit16</TH><TH> bit15</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 4</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 8</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 16</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 32</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 64</TD></TR>
+</TABLE>
+</TD><TD></TD><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2> bit data</TH><TH ROWSPAN=2> choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit9</TH><TH> bit8</TH></TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> It will be T0;1. <B>**</b></P>
+<A NAME="c4"></A><P><DT> <B>remarks</b><DD> <B>*</b> Mx(x=0~3) selects DATA RAMx(x=0~3).<DD> <B>**</b> When the END signal indicating the end of transfer from the outside is received, it becomes T0;0.<DD> To specify address addition, add the addition number after the instruction, and specify DMAH0 to DMAH64.<DD> If address addition number specification is omitted, the addition number will be 1.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="dmah_d0_ram_s"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#dma">List</a> | ▲ <A HREF="#dmah_ram_d0_simm">Back</a> | <A HREF="#dmah_ram_d0_s">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> DMAH D0,[RAM],[s]</H1><DD><H3> DMA transfer in HOLD state (D0[31-0]→RAM)</H3><P><DT> <B>Operation details</b><DD> The [s] data specified by bits 0 to 2 is used as the transfer counter, and the indicated number of D0[31-0] data are transferred to the RAM. The external address register and transfer word count register retain the value at the start of transfer in the address addition number. The transfer word count register is a register that stores the number of transfer words in longword units. Transfer ends when this word count becomes 0 or when the transfer is forcibly terminated.</P>
+<P><DT> <B>descriptive formula</b><DD> label: DMAH D0,[Destination],[Counter]<DD> Counter = M0~M3 <A HREF="#c4"><B>*</b></a> ,MC0~MC3 <A HREF="#c4"><B>*</b></a><DD> Destination = M0~M3 <A HREF="#c4"><B>*</b></a> ,PR <A HREF="#c4"><B>*</b></a><P><DT> <B>instruction code</b><CENTER>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> bit15</TH><TH> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> Address addition 0</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> Address addition 1 </TD></TR>
+</TABLE>
+</CENTER>
+<P><DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>10</TH><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>２</TH><TH>１</TH><TH>０</TH></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>０</TD><TD>０</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>Ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>bit data</TH><TH ROWSPAN=2> [RAM] Choice</TH></TR>
+<TR ALIGN=CENTER><TH> bit10</TH><TH> bit9</TH><TH> bit8</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> PROGRAM RAM</TD></TR>
+</TABLE>
+</TD><TD></TD><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3> bit data</TH><TH ROWSPAN=2> [s] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++</TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<P><DT> <B>flag</b><DD> It will be T0;1. <B>**</b><DD> CTx(x=0~3);Incremented only when b2=1. There is no change when b2=0.</P>
+<A NAME="c4"></A><P><DT> <B>remarks</b><DD> <B>*</b> [Mx(x=0~3)] selects DATA RAMx(x=0~3). MCx (x=0~3) selects DATA RAMx (x=0~3) and increments CTx (x=0~3) after transfer.<DD> <B>**</b> When the END signal indicating the end of transfer from the outside is received, it becomes T0;0.<DD> To specify address addition, add the number of additions after the instruction, and specify DMA0 to DMA1.<DD> If address addition number specification is omitted, the addition number will be 1.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="dmah_ram_d0_s"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#dma">List</a> | ▲ <A HREF="#dmah_d0_ram_s">Back</a> | <A HREF="p04_57.htm#jmp_imm">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> DMAH [RAM],d0,[s]</H1><DD><H3> DMA transfer in HOLD state (RAM→D0[31-0])</H3><P><DT> <B>Operation details</b><DD> The [s] data specified by bits 0 to 2 is used as the transfer counter, and the indicated number of RAM data is transferred to D0[31-0] data. The external address register and transfer word count register retain the value at the start of transfer in the address addition number. The transfer word count register is a register that stores the number of transfer words in longword units. Transfer ends when this word count becomes 0 or when the transfer is forcibly terminated.</P>
+<P><DT> <B>descriptive formula</b><DD> label: DMAH [Source],D0,[Counter]<DD> Counter = M0~M3 <A HREF="#c4"><B>*</b></a> ,MC0~MC3 <A HREF="#c4"><B>*</b></a><DD> Source = M0~M3 <A HREF="#c4"><B>*</b></a><P><DT> <B>instruction code</b><P><DD><TABLE BORDER=0>
+<TR><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3> bit data</TH><TH ROWSPAN=2> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TH> bit17</TH><TH> bit16</TH><TH> bit15</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 4</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> Address addition 8</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> Address addition 16</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> Address addition 32</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> Address addition 64</TD></TR>
+</TABLE>
+</TD><TD></TD><TD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3> bit data</TH><TH ROWSPAN=2> [s] Choices</TH></TR>
+<TR ALIGN=CENTER><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3,CT3++ </TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<P><DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>２</TH><TH>１</TH><TH>０</TH></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>１</TD><TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TABLE>
+</P>
+<CENTER>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2> bit data</TH><TH ROWSPAN=2> [RAM] Choice</TH></TR>
+<TR ALIGN=CENTER><TH> bit9</TH><TH> bit8</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> DATA RAM3</TD></TR>
+</TABLE>
+</CENTER>
+<P><DT> <B>flag</b><DD> It will be T0;1. <B>**</b><DD> CTx(x=0~3);Incremented only when b2=1. There is no change when b2=0.</P>
+<A NAME="c4"></A><P><DT> <B>remarks</b><DD> <B>*</b> [Mx(x=0~3)] selects DATA RAMx(x=0~3). MCx (x=0~3) selects DATA RAMx (x=0~3) and increments CTx (x=0~3) after transfer.<DD> <B>**</b> When the END signal indicating the end of transfer from the outside is received, it becomes T0;0.<DD> To specify address addition, add the number of additions after the instruction, and specify DMA0 to DMA1.<DD> If address addition number specification is omitted, the addition number will be 1.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_55.htm">Back</a> ｜ <A HREF="p04_57.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

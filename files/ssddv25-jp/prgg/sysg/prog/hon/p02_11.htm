@@ -1,0 +1,387 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 3&gt;システムプログラムユーザーズマニュアル/リファレンス/詳細</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no2">システムプログラムユーザーズマニュアル</A>
+<HR>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>SMPCインタフェースユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>関数仕様</H2>
+<HR NOSHADE>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no1_1"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>割り込みベクタへ、<BR>割込み処理ルーチンを登録する</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_SETSINT</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>1.1</TD>
+</TR></TABLE>
+<DT><B>　書　式</B>
+<DD>void　SYS_SETSINT(Uint32　Num, void*　Hdr);
+<DT><B>　入　力</B>
+<DD>Num：ベクタ番号(0..7FH)
+<DD>Hdr：割り込み処理ルーチンアドレス
+<DD>(0の場合、ダミールーチンまたはNumがSCU割り込みベクタの場合その割り込み処理ルーチンとなる)</P>
+<DT><B>　出　力</B>
+<DD>なし
+<DT><B>　関数値</B>
+<DD>なし
+<DT><B>　機　能</B>
+<DD>Hdrは、必ずレジスタ保存、復帰、RTE命令で終わる処理ルーチンでなければなりません（C言語ならば ＃pragma interrupt 宣言付のもの)。
+<DD>Hdrが０の場合、NumがSCU割り込み（40H..4DH,50H..5FH）内では、SCU割り込みルーチンを再登録し、それ以外では、ダミールーチンを登録します。<BR>
+範囲チェックは行っていません。制限外の値は指定してはいけません。
+
+<DT><B>　備　考</B>
+<DD>本ルーチンはマスタ・スレーブSH２とも使用可能で、各々のVBRをベースにしたベクタアドレスへ登録します。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no1_2"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>SCU割り込みルーチンへ、<BR>処理関数を登録する</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_SETUINT</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>1.2</TD>
+</TR></TABLE>
+
+	<DT><B>　書　式</B>
+		<DD>void　SYS_SETUINT(Uint32　Num,void*　Hdr);
+	<DT><B>　入　力</B>
+		<DD>Num：ベクタ番号(SCUベクタ番号)
+		<DD>Hdr：関数ルーチンアドレス(0の場合、ダミールーチンになる)
+	<DT><B>　出　力</B>
+		<DD>なし
+	<DT><B>　関数値</B>
+		<DD>なし
+	<DT><B>　機　能</B>
+		<DD>Hdrは、SHCによる関数でなければいけません。アセンブラで作成したルーチンならば、SHCのレジスタ保存規則に従っていなければなりません。
+		<DD>NumはSCU割り込みベクタ(40H..4DH,50H..5FH)に限ります。
+		<DD>Hdrが０の場合、ダミールーチンを登録します。
+		<DD>範囲チェックは行っていません。制限外の値は指定してはいけません。
+	<DT><B>　備　考</B>
+		<DD>SYS_SETSINTでベクタにルーチンを登録した場合、そのベクタのSCU割り込み処理ルーチンは無効となり、登録関数は呼び出されません。
+		<DD>本ルーチンをスレーブSH2で呼び出した場合、結果は保証されません。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no1_3"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>割り込みベクタの登録内容を得る</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_GETSINT</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>1.3</TD>
+</TR></TABLE>
+
+	<DT><B>　書　式　　</B>
+		<DD>void(＊)()　SYS_GETSINT(Uint32 Num)；
+	<DT><B>　入　力　　</B>
+		<DD>Num：ベクタ番号(0..7FH)
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関数値　</B>
+		<DD>ベクタ登録内容(割り込み処理ルーチンアドレス)
+	<DT><B>　機　能　　</B>
+		<DD>Numのベクタの内容を関数値として返します。
+		<DD>範囲チェックは行っていません。範囲外の値は指定してはいけません。
+	<DT><B>　備　考　　</B>
+		<DD>本ルーチンはマスタ・スレーブSH2とも使用可能で、各々のVBRをベースにしたベクタアドレスを参照します。</P>
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no1_4"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=260><PRE><B>Function</B><BR>SCU割り込みルーチンの登録内容を得る</TD>
+<TD WIDTH=140><PRE><B>Function Name</B><BR>SYS_GETUINT</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>1.4</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>void(＊)()　SYS_GETUINT(Uint32 Num)；
+	<DT><B>　入　力　　</B>
+		<DD>Num：ベクタ番号(SCUベクタ番号)
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関　数値　</B>
+		<DD>登録内容(関数ルーチンアドレス)
+	<DT><B>　機　能　　</B>
+		<DD>Num該当するSCU割り込みルーチンの登録内容を関数値に返します。
+		<DD>範囲チェックは行っていません。範囲外の値は指定してはいけません。
+	<DT><B>　備　考　　</B>
+		<DD>本ルーチンをスレーブSH2で呼び出した場合、結果は保証されません。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_1"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>SCU割り込みマスクのセット</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_SETSCUIM</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>2.1</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>void　SYS_SETSCUIM(Uint32　MaskPat);
+	<DT><B>　入　力　　</B>
+		<DD>MaskPat：SCU割り込みマスク値
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関数値　</B>
+		<DD>なし
+	<DT><B>　機　能　　</B>
+		<DD>マスク保存メモリ、SCU割り込みマスクレジスタにMaskPatの値を書き込み、次に同じ値をSCU割り込みステータスレジスタに書き込みます。ただし、A-Bus割り込みマスクビットが許可になる場合、ステータスレジスタの上位ワードをクリアし、さらにA-Bus割り込みアクノリッジレジスタをクリアします。
+	<DT><B>　備　考　　</B>
+		<DD>本ルーチンを（SCU割り込みの）割り込み処理から使用してはいけません（SCU割り込み処理中は、<A HREF="#no2_3"><B>SYS_GETSCUIM</B></A>の値が不定になっています）。
+		<DD>処理中にSCU割り込みが発生した場合、その割り込みは消える場合があります（SCU仕様)。その可能性を避けるか、関知しない状況で使用してください。
+		<DD>本ルーチンをスレーブSH2で呼び出した場合、結果は保証されません。</P>
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_2"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>SCU割り込みマスクの変更</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_CHGSCUIM</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>2.2</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>void　SYS_CHGSCUIM(Uint32　AndMask,Uint32　OrMask);
+	<DT><B>　入　力　　</B>
+		<DD>AndMask：許可用マスク値
+		<DD>OrMask：拒否用マスク値
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関数値　</B>
+		<DD>なし
+	<DT><B>　機　能　　</B>
+		<DD>マスク保存メモリ内容を、AndMaskと論理積をとり、それにOr-Maskと論理和をとった結果を、マスク保存用メモリとSCU割り込みマスクレジスタに書き込みます。
+		<DD>次に、AndMaskとOrMaskの論理</B>和を、SCUステータスレジスタに書き込みます。ただしA-Bus割り込みマスクビットが許可になる場合、ステータスレジスタの上位ワードをクリアし、さらにA−Bus割り込みアクノリッジレジスタをクリアします。これらの操作を不可分に実行します。
+	<DT><B>　備　考　　</B>
+		<DD>本ルーチンを（SCU割り込みの）割り込み処理から使用してはいけません(SCU割り込み処理中は、<A HREF="#no2_3"><B>SYS_GETSCUIM</B></A>の値が不定になっています）。
+		<DD>処理中にSCU割り込みが発生した場合、その割り込みは消える場合があります（SCU仕様)。その可能性を避けるか、関知しない状況で使用してください。
+		<DD>本ルーチンをスレーブSH2で呼び出した場合、結果は保証されません。</PRE><P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no2_3"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>SCU割り込みマスク値の参照</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_GETSCUIM</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>2.3</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>Uint32　SYS_GETSCUIM;
+	<DT><B>　入　力　　</B>
+		<DD>なし
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関数値　</B>
+		<DD>マスク保存メモリの値
+	<DT><B>　機　能　　</B>
+		<DD>マスク保存用メモリの値を読み出します。この値は、SCU割り込みマスクレジスタのセット・変更を前述の関数で行っていれば、実際にSCU割り込みマスクレジスタに設定されている値と同一です。
+	<DT><B>　備　考　　</B>
+		<DD>SCU割り込み処理中は、アプリケーションがSYS_SETSCUIM()、SYS_CHGSCUIM()を使用してセットした値に、割り込み要因別のマスク値(アプリケーションが、SYS_CHGUIPR()を使用した場合、そのテーブル内の該当値)の論理和に変化します。ただし、割り込みが多重になると、さらにその論理和というように変化します。<BR>　したがって、SCU割り込み処理中でこの値は不定になります。処理中、参照した値に依存する処理は行わないでください。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no3_1"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>セマフォを獲得する</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_TASSEM</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>3.1</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>Uint32　SYS_TASSEM(Uint32 Num);
+	<DT><B>　入　力　　</B>
+		<DD>Num：セマフォ番号(0〜FFH)
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関数値　</B>
+		<DD>結果(1：獲得、0：すでに他が獲得中)
+	<DT><B>　機　能　　</B>
+		<DD>Numの番号と関連付けられるメモリ(1バイト)に対してTAS命令を実行し、その結果を関数値に返します。
+		<DD>範囲チェックは行っていません。範囲外の値は指定してはいけません。
+		<DD>本ルーチンはマスタ・スレーブSH2とも使用可能です。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no3_2"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>セマフォを解放する</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_CLRSEM</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>3.2</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>void　SYS_CLRSEM(Uint32 Num);
+	<DT><B>　入　力　　</B>
+		<DD>Num：セマフォ番号(0〜FFH)
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関数値　</B>
+		<DD>なし
+	<DT><B>　機　能　　</B>
+		<DD>Numの番号と関連付けられるメモリ(1バイト)をクリアします。
+		<DD>範囲チェックは行っていません。範囲外の値は指定してはいけません。
+		<DD>本ルーチンはマスタ・スレーブSH2とも使用可能です。</P>
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no4_1"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>システムクロックを切り替える</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_CHGSYSCK</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>4.1</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>void　SYS_CHGSYSCK(Uint32 CkMode);
+	<DT><B>　入　力　　</B>
+		<DD>CkMode：
+		<DD>0：CPU 26MHz、320/640モード
+		<DD>1：CPU 28MHz、352/704モード
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関数値　</B>
+		<DD>なし
+	<DT><B>　機　能　　</B>
+		<DD>CkModeで指定された値にシステムクロックを切り替えます。
+	<DT><B>　備　考　　</B>
+		<DD>リセットされるデバイスや処理時間に関して、概要やSMPCマニュアルを参照してください。
+		<DD>本ルーチンをスレーブSH２で呼び出した場合、システムはハングアップします。必ずマスタSH2で呼び出してください。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no4_2"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>システムクロック値を参照する</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_GETSYSCK</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>4.2</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>Uint32　SYS_GETSYSCK;
+	<DT><B>　入　力　　</B>
+		<DD>なし
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関数値　</B>
+		<DD>0または1：最後のSYS_CHGSYSCK()のパラメータ値
+	<DT><B>　機　能　　</B>
+		<DD>システムクロック値を読み出します。最後にSYS_CHGSYSCK()が呼ばれた時のパラメータ値です。
+	<DT><B>　備　考　　</B>
+		<DD>この値はマスタSH2で参照してください。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no5_1"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>SCU割り込みルーチン優先度を変更する</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_CHGUIPR</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>5.1</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>void　SYS_CHGUIPR(Uint32 *IprTab);
+	<DT><B>　入　力　　</B>
+		<DD>IprTab：32ロングワードのデータ配列
+	<DT><B>　出　力　　</B>
+		<DD>なし
+	<DT><B>　関数値　</B>
+		<DD>なし
+	<DT><B>　機　能　　</B>
+		<DD>BOOTROMが持つSCU割り込みルーチン用の優先度テーブルを、IprTabに指定されたテーブルの値で書き換えます。<BR>　<BR>
+		<DD>一度書き換えを行うと、ＳＣＵ割り込みルーチンによる割り込み処理は、要因ごとに該当するそのテーブル値の優先度で実行されるようになります。
+
+	<P><DT><TABLE><TR>
+	<TD><IMG SRC="../../../../what/danger.gif"></TD>
+	<TD><B>テーブル内容をチェックしていません。テーブル内容に優先度関係の矛盾があれば、システムがハングアップする可能性があります。</B></TD></TR></TABLE><P>
+
+	<DT><B>　備　考　　</B>
+		<DD>次に書き換えるまで、テーブルの設定は有効です。その間、パラメータに指定したテーブルをアプリケーションで保持する必要はありません。なお、リセット時にはBOOT ROMの初期設定値に戻ります。
+		<DD>本ルーチンをスレーブSH2で呼び出した場合、結果は保証されません。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no6_1"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>CDマルチプレーヤを起動実行する</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_EXECDMP</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>6.1</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>void　SYS_EXECDMP(void);
+	<DT><B>　入　力　　</B>
+		<DD>なし
+	<DT><B>　出　力　　</B>
+		<DD>呼び出し側には戻りません
+	<DT><B>　関数値　</B>
+		<DD>なし
+	<DT><B>　機　能　　</B>
+		<DD>CDマルチプレーヤを起動実行します。
+	<DT><B>　備　考　　</B>
+		<DD>本ルーチンをスレーブSH2で呼び出した場合、システムはハングアップします。必ずマスタSH2で呼び出してください。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<HR><DL><P><A NAME="no7_1"></A>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p02_10.htm#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE><B>Title</B><BR>関数仕様</TD>
+<TD WIDTH=220><PRE><B>Function</B><BR>パワーオンクリアメモリを操作する</TD>
+<TD WIDTH=180><PRE><B>Function Name</B><BR>SYS_PCLRMEM</TD>
+<TD WIDTH=060><PRE><B>No</B><BR>7.1</TD>
+</TR></TABLE>
+	<DT><B>　書　式　　</B>
+		<DD>Uint8 *SYS_PCLRMEM
+	<DT><B>　入　力　　</B>
+		<DD>通常のメモリアクセスを行ってください。
+	<DT><B>　出　力　　</B>
+		<DD>通常のメモリアクセスを行ってください。
+	<DT><B>　関　数値　</B>
+		<DD>なし
+	<DT><B>　機　能　　</B>
+		<DD>BOOT ROMが管理する8バイトのメモリのアドレスです。このメモリはパワーオン起動時のみ０に初期化されますが、リセットボタン(NMI)では内容は保持されます。
+	<DT><B>　備　考　　</B>
+		<DD>範囲のチェックは行っていません。範囲外のアクセスをしないよう注意してください。</P>
+
+
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+　　■</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no2">システムプログラムユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

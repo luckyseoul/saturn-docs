@@ -1,0 +1,260 @@
+<HTML>
+<HEAD>
+<TITLE> SCU DSP Alambra Instruction Manual </TITLE>
+</HEAD>
+<BODY bgcolor="FFFFFF">
+<A HREF=p166.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=dspsim.htm> Go to next page </A>
+ <HR>
+ <H1> SCU DSP Alambra Instruction Manual </H1>
+'94/07/08
+<HR>
+<H2> Contents </H2>
+<DIR>
+<DT> <A HREF="#1"> 1. Assembler functions </A>
+<DT> <A HREF="#2"> 2. Run the assembler </A>
+<DT> <A HREF="#3"> 3. Program description format </A>
+<DT> <A HREF="#4"> 4. Instruction list </A>
+<DT> <A HREF="#5"> 5. Sample program </A>
+</DIR>
+
+<H2> <A NAME="1"> 1. Outline of assembler functions </A> </H2>
+This assembler is for generating instruction codes for DSP, and is intended to run on MS-DOS and UNIX. The output code is Motorola's S format and the code is output directly, so no link is required. <BR>
+The DSP assembler requires a lot of hardware knowledge, so please familiarize yourself with the DSP hardware before using the assembler.
+
+<H2> <A NAME="2"> 2. Run the assembler </A> </H2>
+dspasm [option] &lt;source file name&gt;
+<OL>
+The following can be specified for the <LI> option. (File creation is only successful)
+<DD> -l [file name]: List output specification
+<DD> -a [file name]: Data format output specification for SH assembler
+<DD> -c [file name]: C data format output specification
+<DD> -m: Specify when using the MODEL M development environment
+<LI> The source file name has no default extension.
+The <LI> error is displayed only for the first detected one. Repeat correction and assembly until no error occurs.
+</OL>
+
+<H2> <A NAME="3"> 3. Program description format </A> </H2>
+<B> [Label] [△ Operation [△ Operand]] ... [Comment] </B> <BR>
+Example: LABEL: MOV MC0, X; comment
+
+<H3> (1) Label </H3>
+<UL>
+<LI> Defined by the programmer and can be used as a jump destination name for JMP instructions.
+When writing a <LI> label, start writing from the first column or add ":" at the end like "LABEL:".
+The maximum length of the <LI> label is 32 characters. Uppercase letters, lowercase letters, numbers, and underscores (_) can be used. Uppercase and lowercase letters are considered the same.
+</UL>
+
+<H3> (2) Operation </H3>
+<UL>
+<LI> Describes the DSP execution instruction.
+When you start writing from the <LI> operation, put a space character in front.
+<LI> operations may be arranged up to a maximum of 6 for arithmetic instructions only.
+</UL>
+
+<H3> (3) Operand </H3>
+<UL>
+<LI> Describe what is to be executed.
+Use a space character to separate the <LI> operand.
+</UL>
+
+<H3> (4) Comments </H3>
+<UL>
+<LI> Comments can be written to make the program easier to understand.
+<LI> Comments are from the position with ";" to the end of the line.
+</UL>
+
+<B> * Notes on writing </B>
+<UL>
+<LI> Basically, operations and operands are written to fit on one line. If they do not fit on one line, "\" is added before the line feed code to connect to the next line. I can do it. However, when connecting an operation after a line with a comment, add "\" before the ";". Do not exceed the maximum length of 255 bytes per line.
+The <LI> operation and operand can be either uppercase or lowercase.
+<LI> Use hexadecimal, $ xx, decimal, xxx, binary,% xxxxxxxx for the numerical notation.
+<LI> The address where the output code is placed can be specified by the ORG pseudo-instruction.
+<LI> The program area in the DSP has only 256 instructions. However, Warning can be output and code for 2048 instructions can be output so that the process of division and optimization can be performed smoothly. . Since this code can only be used by a simulator, it must be assembled within 256 instructions when used in an actual DSP. Also, when using labels with addresses exceeding 256 instructions, note that 8-bit values ​​cannot be substituted.
+</UL>
+
+<B> * About reserved words </B>
+<UL>
+The following names used for the <LI> operand cannot be used for labels: <BR>
+{ALH, ALL, ALU, M0, M1, M2, M3, MC0, MC1, MC2, MC3, MUL}
+</UL>
+
+<B> * About numerical calculation </B>
+<UL>
+The following operators can be used when setting a value for the <LI> label or using a numeric value for the operand. (However, please note that white space characters cannot be used when used as operands. Example: ○ JMP $ + 2, × JMP $ + 2)
+</UL>
+
+<H3> Operational relation </H3>
+<DT>+  … addition
+<DT>-  … Subtraction
+<DT>*  … Multiplication
+<DT>/  … division
+<DT>%  … Exclusion
+<DT>‾  … Bit negation
+<DT>&  … Bit product
+<DT>|  … bit sum
+<DT>^  … Exclusive bit sum
+<DT>&lt;&lt;… Shift left
+<DT>&gt;&gt;… Shift right
+
+<H3> Priority </H3>
+<DT>1. + - ~ (unary operator)
+<DT>2. * / %
+<DT>3. + -
+<DT>4. &lt;&lt;&gt;&gt;
+<DT>5. &
+<DT>6. | ^
+
+<H2> <A NAME="4"> 4. Instruction list </A> </H2>
+<OL>
+<LI> Operation instruction
+<DD>NOP AND OR XOR ADD SUB AD2 SR RR SL RL RL8 CLR MOV
+<LI> Load immediate instruction
+<DD>MVI
+<LI> DMA instruction
+<DD>DMA DMAH
+<LI> JUMP instruction
+<DD>JMP
+<LI> LOOP BOTTOM instruction
+<DD>BTM LPS
+<LI> END instruction
+<DD>END ENDI
+</OL>
+
+<H3> Pseudo-instruction </H3>
+<UL>
+<LI> EQU (=) ……………… Used to define labels.
+<LI> ORG ……………… Specifies the start address where the instruction is placed.
+<LI> ENDS ……………… If you put it at the end of the program, it will be ignored.
+<LI> IF &lt;Numeric / Label&gt;… If the numerical value or label calculation result is other than 0, assemble up to ELSE or ENDIF.
+<LI> IFDEF &lt;Label&gt; ……… If the label is defined in front, then assemble up to ELSE or ENDIF. <BR>
+IF and IFDEF nesting levels are up to 16. )
+</UL>
+
+<H2> <A NAME="5"> 5. Sample program </A> </H2>
+
+<H3> (1) When copying the contents of DSP internal RAM0 to internal RAM1. </H3>
+<PRE>
+; ------- sample (1) start -------
+
+COPY_SIZE = 12; Copy size
+RAM0_ADR = $ 00; Copy source address
+RAM1_ADR = $ 00; Copy destination address
+
+MOV RAM0_ADR, CT0; Set the RAM0 copy source address
+MOV RAM1_ADR, CT1; Set the copy destination address of RAM1
+MOV COPY_SIZE-1, LOP; Set transfer size -1 in LOP register
+LPS; 1 instruction loop execution
+MOV MC0, MC1; Transfer from RAM0 to RAM1
+ENDI
+
+; ------- sample (1) end -------
+</PRE>
+
+<H3> (2) When calculating 2 × 3 + 4 × 5. (RAM0 x RAM1 + RAM0 x RAM1 = RAM2) (sample 2b is an optimized version of 2a) </H3>
+<PRE>
+; ------- sample (2a) start -------
+
+RAM0_ADR = $ 00; 2, 4 First storage address
+RAM1_ADR = $ 00; 3, 5 Storage address head
+RAM2_ADR = $ 00; Result storage address
+
+MOV RAM0_ADR, CT0; Set RAM0 address
+MOV RAM1_ADR, CT1; Set the address of RAM1
+MVI # 2, MC0; Set “2” to RAM0
+MVI # 3, MC1; Set “3” to RAM1
+MVI # 4, MC0; Set “4” to RAM0
+MVI # 5, MC1; Set “5” to RAM1
+MOV RAM0_ADR, CT0; Set RAM0 address
+MOV RAM1_ADR, CT1; Set the address of RAM1
+MOV RAM2_ADR, CT2; Set the address of RAM2
+MOV MC0, X; Data transfer from RAM0 to RX
+MOV MC1, Y; Data transfer from RAM1 to RY
+MOV MUL, P; Stores RX and RY integration results in PH and PL
+MOV MC0, X; Data transfer from RAM0 to RX
+MOV MC1, Y; Data transfer from RAM1 to RY
+CLR A; Set “0” to ACH and ACL
+AD2 MOV ALU, A; Addition result of PH, PL and ACH, ACL is stored in ACH, ACL
+MOV MUL, P; Stores RX and RY integration results in PH and PL
+AD2 MOV ALL, MC2; Addition result of PH, PL and ACH, ACL is stored in RAM2.
+ENDI
+
+; ------- sample (2a) end -------
+; ------- sample (2b) start -------
+
+RAM0_ADR = $ 00; 2, 4 First storage address
+RAM1_ADR = $ 00; 3, 5 Storage address head
+RAM2_ADR = $ 00; Result storage address
+
+MOV RAM0_ADR, CT0
+MOV RAM1_ADR, CT1
+MVI # 2, MC0
+MVI # 3, MC1
+MVI # 4, MC0
+MVI # 5, MC1
+MOV RAM0_ADR, CT0
+MOV RAM1_ADR, CT1
+MOV MC0, X MOV MC1, Y MOV RAM2_ADR, CT2
+MOV MC0, X MOV MUL, P MOV MC1, Y CLR A
+AD2 MOV MUL, P MOV ALU, A
+AD2 MOV ALL, MC2
+ENDI
+
+; ------- sample (2b) end -------
+</PRE>
+
+<H3> (3) When calculating movement processing for a matrix. (RAM0 × RAM1 = RAM2) </H3>
+<PRE>
+ / M00 M01 M02 M03 \ / 100x \ / M00 M01M02 M03 \
+| M10 M11 M12 M13 || 010y | → | M10 M11 M12 M13 |
+ \ M20 M21 M22 M23 / | 001z | \ M20 M21M22 M23 /
+ , \ 0001 /
+
+; ------- sample (3) start -------
+
+DATA_TOP = $ 10000 >> 2; The address of the external memory is in 4-byte units
+MAT_SIZE = $ 0C; array size
+RAM0_ADR = $ 00; Start address for storing the movement amount of X, Y, Z
+RAM1_ADR = $ 00; Work address for array
+RAM2_ADR = $ 00; Original array address
+
+; (Transfer array with movement amount set from external memory to RAM0)
+;
+MVI DATA_TOP, RA0
+MOV RAM0_ADR, CT0
+DMA D0, MC0, # $ 02
+;
+; (Copy of array to operate from RAM2 to RAM1)
+MOV RAM2_ADR, CT2
+MOV RAM1_ADR, CT1
+MOV MAT_SIZE-1, LOP
+LPS
+MOV MC2, MC1
+WAITING:
+JMP T0, WAITING
+;
+; (Array calculation execution)
+MOV RAM0_ADR, CT0
+MOV RAM1_ADR, CT1
+MOV MC0, X MOV MC1, Y
+MOV MC0, X MOV MUL, P MOV MC1, Y CLR A
+AD2 MOV MC0, X MOV MUL, P MOV MC1, Y MOV ALU, A MOV RAM0_ADR, CT0
+AD2 MOV MUL, P MOV MC1, Y MOV ALU, A MOV # 1, RX
+AD2 MOV MC0, X MOV MUL, P MOV MC1, Y MOV ALU, A MOV RAM2_ADR + 3, CT2
+AD2 MOV MC0, X MOV MUL, P MOV MC1, Y CLR A MOV ALL, MC2
+AD2 MOV MC0, X MOV MUL, P MOV MC1, Y MOV ALU, A MOV RAM0_ADR, CT0
+AD2 MOV MUL, P MOV MC1, Y MOV ALU, A MOV # 1, RX
+AD2 MOV MC0, X MOV MUL, P MOV MC1, Y MOV ALU, A MOV RAM2_ADR + 7, CT2
+AD2 MOV MC0, X MOV MUL, P MOV MC1, Y CLR A MOV ALL, MC2
+AD2 MOV MC0, X MOV MUL, P MOV MC1, Y MOV ALU, A MOV RAM0_ADR, CT0
+AD2 MOV MUL, P MOV MC1, Y MOV ALU, A MOV # 1, RX
+AD2 MOV MUL, P MOV ALU, A MOV RAM2_ADR + 11, CT2
+AD2 MOV ALL, MC2
+ENDI
+
+; ------- sample (3) end -------
+</PRE>
+that's all
+<HR>
+<A HREF=p166.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=dspsim.htm> Go to next page </A>
+  </BODY>
+</HTML>

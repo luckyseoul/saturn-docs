@@ -1,0 +1,91 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 3&gt;Interrupt management library/1. guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Interrupt management library</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>interrupt management library</b><H2 ALIGN=CENTER> 1. guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Purpose</H3><DD> It's about managing interrupts.</P>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 Overview</H3><DD> Manage interrupt register access, register and reference interrupt processing routines.</P>
+<A NAME="no1_30"></A><P><DT><H3> 1.3 Functional overview</H3><P><DT> <B>[Interrupt register access management]</b><DD> The interrupt mask register is write-only, so its value cannot be read. Therefore, the value written to the interrupt mask register is held in the library. Specifically, the method is as follows.</P>
+<DT><OL>
+<P><B><LI></b> Prepare a memory (hereinafter referred to as mask storage memory) that always has the same contents as the interrupt mask register.</P>
+<P><B><LI></b> When writing to the interrupt mask register, be sure to write the same contents to the mask storage memory.</P>
+<P><B><LI></b> When reading the interrupt mask register, read the contents of the mask storage memory.</P>
+</OL>
+<P><DT> <B>[Register and reference interrupt handling routine]</b><DD> You can register interrupt functions and SCU functions in the interrupt vector table, and view the current interrupt vector registration contents.<BR>
+ SCU interrupt functions are registered as initial values in the SCU interrupt vector table. The SCU interrupt function has the ability to call a registered SCU function as a subroutine. Registered SCU functions are executed every time the SCU interrupt function is executed.<BR>
+ As an initial value, a dummy function (executes only return processing) is registered for the interrupt function, and an SCU dummy function (executes only return processing) is registered for the SCU interrupt function.</P>
+<A NAME="no1_40"></A><P><DT><H3> 1.4 Terms of Use</H3><P><DT> <B>[Interrupt register access management]</b><DD> Since the library holds the value of the interrupt mask register, use the function provided by the library to write to the interrupt mask register. If a direct write is performed, the mask storage memory and interrupt mask register will not match, and correct processing will not be possible.</P>
+<A NAME="no1_50"></A><P><DT><H3> 1.5 Calling Sequence</H3><P><DT> <B>[Interrupt register access management]</b><DD><PRE>
+void sysInit()
+{
+     INT_SetMsk((INT_MSK_HBLK_IN | INT_MSK_VBLK_OUT),
+                                         (INT_MSK_SPR | INT_MSK_DMA1));
+               /* Enable "H-Blank-IN" and "V-Blank-OUT" */
+               /* Disable "End sprite drawing" and "Level 0-DMA" */
+     ...
+}
+void anyPrg()
+{
+     Uint32 status_bit;
+     status_bit = INT_GET_STAT(); /* Get status */
+     if(INT_JudgeStat(status_bit,INT_ST_VBLK_OUT,INT_ST_VBLK_IN) == TRUE){
+                                   /* V-blank-OUT interrupt occurs, */
+                                   /* When V-Blank-IN interrupt has not occurred */
+     ...
+     }
+}
+</PRE><P><P><DT><B>[Register and reference interrupt handling routine]</b><DT> <B>File A</b><!------------------------------------------------------------------------------------>
+<DD><PRE>
+#pragma interrupt (vblkIn) /* Make the vblkIn function the interrupt function */
+
+void vblkIn(void)
+{
+     ...
+}
+</PRE><!------------------------------------------------------------------------------------>
+<P><DT><B>File B</b><!------------------------------------------------------------------------------------>
+<DD><PRE>
+void systemInit(void)
+{
+     INT_SetFunc(INT_SCU_VBLK_IN, vblkIn);
+                              /* vblkIn interrupt function V-blank-IN interrupt vector */
+                              /* Register in the table. */
+     INT_SetScuFunc(INT_SCU_VBLK_OUT, vblkOut);
+                              /* vblkOut function of V-blank-OUT interrupt vector */
+                              /* Register to SCU interrupt function. */
+     ...
+}
+
+void vblkOut(void)
+{
+     ...
+}
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Interrupt management library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

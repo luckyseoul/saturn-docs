@@ -1,0 +1,98 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/22&gt;CD builder script syntax/3.5 Definition of logical file structure</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD Builder Script Grammar Manual</b><H2 ALIGN=CENTER> 3.5 Defining the logical file structure</H2><HR NOSHADE>
+<DL>
+<P><DT> An overview of the logical file structure definition is shown below.</P>
+<DD><PRE>
+Directory DIR1                        
+    Directory SUBDIR1                 
+        File FILE1                    
+            FileSource SRCFILE1    hierarchy
+            EndFileSource          ↓
+        EndFile                    1    2       3
+        File FILE2                 \─┬─DIR1─┬─SUBDIR─┬─FILE1
+            FileSource SRCFILE2      │      │        ├─FILE2
+            EndFileSource            │      │        │
+        EndFile                      │      │        │
+        :                            :      :        :
+        :                            :      :        :
+    EndDirectory 
+    :
+    :
+EndDirectory
+</PRE></P>
+</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.1"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_5">one</a><BR> <A HREF="p03_10.htm#t3_1_5">View</a><BR> <A HREF="p03_10.htm#t3_1_5">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Begin directory definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Directory</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 5.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Directory dirname<DT> <B>parameters</b><DD> dirname: Directory name<DT> <B>function</b><DD> Begins directory definition.<DT> <B>remarks</b><DD> According to the ISO9660 standard, a directory hierarchy can be defined up to a maximum of 8 levels, counting the root directory as 1. However, for Sega Saturn, we recommend a level of 7 or less.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.2"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_5">one</a><BR> <A HREF="p03_10.htm#t3_1_5">View</a><BR> <A HREF="p03_10.htm#t3_1_5">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of directory definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndDirectory</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 5.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndDirectory<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the directory definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.3"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_5">one</a><BR> <A HREF="p03_10.htm#t3_1_5">View</a><BR> <A HREF="p03_10.htm#t3_1_5">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Start file definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> File</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 5.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> File isofile [outfile]<DT> <B>parameters</b><DD> isofile: File name on disk (ISO9660 standard)<DD> outfile: File name to output file definition build results (optional)<DT> <B>function</b><DD> Begins file definition.<DT> <B>remarks</b><DT><UL TYPE=DISC>
+<P><LI> If the part after ";" is omitted in the file name format "filename.extension;version number", the version number ";1" is added by default.</P>
+<P><LI> If ";0" is specified in the version number, ";0" will be omitted and the file name will be set without a version number.</P>
+</UL>
+</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.4"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_5">one</a><BR> <A HREF="p03_10.htm#t3_1_5">View</a><BR> <A HREF="p03_10.htm#t3_1_5">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of file definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndFile</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 5.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndFile<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the file definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.5"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_5">one</a><BR> <A HREF="p03_10.htm#t3_1_5">View</a><BR> <A HREF="p03_10.htm#t3_1_5">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Starting a file source definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> FileSource</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 5.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> FileSource srcfile<DT> <B>parameters</b><DD> srcfile: File name used as input for file definition<DT> <B>function</b><DD> Specifies the file that is the input for the file definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.6"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_5">one</a><BR> <A HREF="p03_10.htm#t3_1_5">View</a><BR> <A HREF="p03_10.htm#t3_1_5">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of file source definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndFileSource</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 5.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndFileSource<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the file source definition.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

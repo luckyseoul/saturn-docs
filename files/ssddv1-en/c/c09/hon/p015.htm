@@ -1,0 +1,66 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p014.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p016.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H3> Action control usage example </H3>
+<DD> Actual usage example of action. <P>
+<PRE>
+/*
+ *    Variable definition
+ */
+Uint8  Mainlevel;
+Uint8  Gameover;
+SMTA_DefActWk(GAMEACT,
+    SPRITE sprite; / * SPRITE DISPLAY * /
+    Sint16 wreg [4]; / ​​* General-purpose register * /
+    Sint16 wcnt [4]; / ​​* General-purpose counter * /
+    Uit8 colino; / * collision table index * /
+    Uint8 coliatr; / * collision attribute * /
+    Uint8 coliflg; / * collision flag * /
+    Uint8 atp; / * kougeki ryoku * /
+    Sint16 hp; / * hit point * /
+); / * Declare dedicated action structure GAMEACT * /
+/*
+ * Function prototype
+ */
+void GameMain(void);
+void PlayerAct(GAMEACT *);
+void EnemyAct(GAMEACT *);
+void ScrollAct(GAMEACT *);
+/ * #### [Example of action main part] #### * /
+void GameMain(void)
+{
+    enum {
+        INIT, MAIN,
+    };
+    Mainlevel = INIT;
+    Gameover = 0; / * Game end flag * /
+    for(;;) {
+        intWait (); / * Waiting for V blank * /
+        switch(Mainlevel) {
+        case INIT:
+            InitVdp (); / * VDP initialization * /
+            SMTA_ActWkInit (); / * Action work initialization * /
+            SMTA_MakeAction(PlayerAct);
+                                       / * Player action set * /
+            SMTA_MakeAction(EnemyAct);
+                                       / * Enemy action set * /
+            SMTA_MakeAction(ScrollAct);
+                                       / * Background action set * /
+            Mainlevel++;
+        case MAIN:
+            SMTA_ActionLoop();
+            if (Gameover) Mainlevel++;
+            break;
+        case EXIT:
+            return; / * End of game * /
+        }
+    }
+} </PRE> <P>
+</DL><P><P><HR>
+<A HREF=p014.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p016.htm> Go to next page </A>
+</BODY>
+</HTML>

@@ -1,0 +1,202 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/13&gt;バーチャルCDシステム/4.CDイメージ部分更新ツール</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">バーチャルCDシステム</A>
+<HR>
+<B>▲
+<a href="p09_10_j.htm">戻る</A>｜
+<a href="p11_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>バーチャルCDシステムユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第４章　ＣＤイメージ部分更新ツール VCDUTL</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P><DT><H3>4.1　コマンド仕様</H3>
+	<P><DT><B>コマンド:</B><DD>VCDUTL</P>
+	<P><DT><B>コマンド名:</B><DD>CDイメージ部分更新</P>
+	<P><DT><B>書　式:</B><DD>VCDUTL　プロジェクトファイル名　ISOファイル名　旧DOSファイル名 新DOSファイル名　[-f 更新情報ファイル名]</P>
+	<P><DT><B>引　数:</B><DL>
+		<DT>プロジェクトファイル名：
+			<DD>CDイメージ作成時に使用したプロジェクトファイル
+		<DT>ISOファイル名：
+			<DD>更新されるCDイメージ内のファイル名
+		<DT>旧DOSファ
+			<DD>更新されるISOファイル内のファイル名
+		<DT>新DOSファイル名：
+			<DD>置き換えられるDOSファイル
+		<DT>更新情報ファイル名：
+			<DD>CDイメージは更新せず、更新情報ファイルのみを生成する。
+			<DD>更新した情報を記録したファイル。バーチャルCDエミュレータで使用する。
+	</DL>
+	<P><DT><B>機　能:</B>
+	<DD>　VCDBUILDで生成されたCDイメージ中のファイルの更新を行うツールです。</P>
+	<DD><OL>
+	<P><B><LI></B>CDイメージの一部のISOファイルを指定されたDOSファイルに置き換え、CDイメージを更新します。ISOファイルは、ファイルインタリーブ、チャネルインターリーブされていても構いません。ディスク全体を生成し直すよりは短時間でエミュレーションを行えます。</P>
+	<P><B><LI></B>CDイメージの一部のISOファイルを指定されたDOSファイルに置き換え、CDイメージはそのままの状態で、その変更された情報を作成します。ISOファイルは、ファイルインタリーブされていても構いませんが、チャネルインタリーブは変更の対象としません。更新部分だけをダイレクトDOSファイルアクセスでエミュレーションします。</P></OL>
+
+	<P><DT><B>注　意:</B>
+	<DD>　(1.)の場合は、置き換えるDOSファイルは、置き換えられるDOSファイルの大きさと同じか、もしくは小さくなければなりません。新しいファイルの容量が古いファイルよりも大きい場合は、エラーを表示しイメージの更新は行われません。<BR>
+　また現行では、変更対象となるDOSファイルはMPEG,CD-DA以外のファイルです。<BR>
+(2.)の場合は、特に制限はありません。</P>
+
+	<P><DT><B>使用例:</B>
+	<DD>VCDUTL△TSTGAME△ISO1FILE.DDD△DOSFILE.D01△DOSFILE.D02△[-f△TSTGAME.PAT][ENTER]</P>
+
+	<P><DD><TABLE>
+	<TR><TD><PRE>VCDUTL</TD>      <TD><PRE>実行ファイル名</TD></TR>
+	<TR><TD><PRE>TSTGAME</TD>     <TD><PRE>変更の対象となるCDイメージを作成したプロジェクト名</TD></TR>
+	<TR><TD><PRE>ISO1FILE.DDD</TD><TD><PRE>変更対象のDOSファイルを含むISOファイル名</TD></TR>
+	<TR><TD><PRE>DOSFILE.D01</TD> <TD><PRE>変更対象のDOSファイル名</TD></TR>
+	<TR><TD><PRE>DOSFILE.D02</TD> <TD><PRE>置き換えるDOSファイル名</TD></TR></TABLE></P>
+
+	<P><DT><B>オプション指定:</B>
+	<DD><DL>
+	<P><DT><B>-f:</B>
+		<DD>　TSTGAME.PATはDOSファイル置き換えに伴う更新情報ファイル名(任意)。<BR>
+このオプションを指定するとCDイメージ自身は更新されません。エミュレーション時に更新情報ファイルを基に再生されます。<BR>
+このオプションを指定しない場合は、更新情報ファイルは出力されずCDイメージを書き換えて更新します。</P></DL>
+
+	<P><DD>　一つのCDイメージのデータに対して複数のDOSファイルを変更したい場合には、次の二つの方法があります。</P>
+	<DD><OL>
+	<P><B><LI></B>「-f」オプションなしでコマンドを複数回実行する。</P>
+	<P><B><LI></B>「-f」オプション付きで更新情報ファイル名を変えずにコマンドを複数回実行する。</P>
+	</OL></P>
+
+	<P><DD>　(2.)の方法ではCDイメージはそのままの状態で残っているので注意が必要です。</P>
+
+	<P><DT><B>備　考:</B>
+	<DD>　「-f」オプション付きの場合において、指定された変更対象のDOSファイルを含むISOファイルが、チャネルインタリーブで構成されている場合にはコマンドの実行は行わず、エラーとなります。<BR>
+「-f」オプションがない場合において、DOSファイルのサイズがそぐわない場合はエラーとなります。</P>
+
+	<P><DT><B>VCDUTLのエラーメッセージ</B>
+	<DD><DL>
+	<P><DT><B>Cannot open CD image file.</B>
+	<DD>　更新するCDイメージファイルが存在しないか、ファイルのオープンに失敗した。<BR>
+　更新するCDイメージファイルの存在を確認する。</P>
+
+	<P><DT><B>Cannot found iso file [ test ].</B>
+	<DD>　"test"というISOファイルがCDイメージファイル中から見つけられなかった。スクリプトファイルを参照して存在するISOファイル名を入力する。</P>
+
+	<P><DT><B>Cannot found dos file [ test ].</B>
+	<DD>　これから更新しようとするファイル"test"をRTIファイル中から見つけられなかった。スクリプトファイルを参照して存在するDOSファイル名を入力する。</P>
+
+	<P><DT><B>Cannot found Project file [ test ].</B>
+	<DD>　"test"というプロジェクトファイルが存在しないか、ファイルのオープンに失敗した。正しいプロジェクト名を指定する。</P>
+
+	<P><DT><B>Cannot found RTI file [ test ].</B>
+	<DD>　"test"というRTIファイルが存在しないか、ファイルのオープンに失敗した。プロジェクトファイル中に記述しているRTIファイルの存在を確認する。</P>
+
+	<P><DT><B>DOS file [ test ] is channel interleaved.</B>
+	<DD>　[-f]オプションで更新情報ファイルを作成するときに、ファイル"test"がチャネルインタリーブされている。チャネルインタリーブされているファイルはダイレクトDOSモードでエミュレーションできないため、このファイルは指定できない。</P>
+
+	<P><DT><B>New DOS file [ test ] open error.</B>
+	<DD>　新しく置き換えようとするDOSファイルが存在しないか、ファイルのオープンに失敗した。存在するDOSファイルを指定する。</P>
+
+	<P><DT><B>New DOS file size [ a byte ] is larger than old DOS [ b byte ].</B>
+	<DD>　新しく置き換えようとするDOSファイルの大きさが、置き換えられるDOSファイルの大きさより大きい。置き換えられるDOSファイルの大きさと同じか、小さいサイズのDOSファイルを指定する。</P>
+	</DL>
+
+<A NAME="no4_20"></A>
+	<P><DT><H3>4.2　部分更新の実行例</H3>
+	<DT><B>　(1)サンプルスクリプト</B>
+	<DD><PRE>
+;             test1.scr
+;
+Disc          ".¥test1.dsk"
+Session          SEMIXA
+LeadIn           MODE1
+EndLeadIn
+    Track          MODE1
+                   Volume     ISO9660      <B><I>test1.pvd</I></B>    ；ISOファイル名ではない
+                              PrimaryVolume          0:02:16
+                              EndPrimaryVolume
+                   EndVolume
+                   PostGap    75
+    EndTrack
+    Track          MODE1
+                   PreGap     150
+                   File       <B><I>ISOF_1.DAT;1</I></B>                ；ISOファイル名
+                              FileSource    <B><I>"pat_7.dat"</I></B>
+                              EndFileSource     ↓
+                   EndFile                    このDOSファイルをpat_1.datと
+                   PostGap    75              置き換える。
+    EndTrack
+    Track          CDDA
+                   Pause      150
+                   File       <B><I>CDDA1.DAT;1</I></B>                  ；ISOファイル名
+                              FileSource    <B><I>"sound1.dat"</I></B>
+                              EndFileSource    ↓
+                    EndFile                  このDOSファイルはCDDAなので現行の
+    EndTrack                                 VCDUTL.EXE Ver. 1.0では更新できま
+LeadOut    CDDA                              せん。
+    Empty          300
+EndLeadOut
+EndSession
+EndDisc
+</PRE></P>
+
+
+	<P><DT><B>　(2).部分更新の実行</B>
+	<DT><UL TYPE="DISK">
+	<P><LI>プロジェクトファイル名test1のディスクイメージ(test1.dsk)を構成するISOファイル（ISOF1_1.DAT;1）中のDOSファイル（pat_7.dat）を、DOSファイル（pat_1.dat）で置き換え、ディスクイメージの更新を行う場合、つぎの様に入力します。なお、指定するISOファイル名は英大文字で入力する必要があります。</P>
+
+	<P><PRE>
+正：VCDUTL    test1    ISOF1_1.DAT;1    pat_7.dat    pat_1.dat
+誤：VCDUTL    test1    TEST1.PVD        pat_7.dat    pat_1.dat
+</PRE>
+<P><B>＊</B>VCDUTL.EXEは、ボリュームディスクリプタセット(test1.pvd)を直接更新するものではありません。</P>
+
+	<P>　この結果、pat_1.datのファイルサイズがpat_7.datと同じか小さい場合、ディスクイメージのpat_7.datの部分がpat_1.datに置き換えられます。<BR>
+ひきつづきエミュレーションを実行する場合</P>
+
+	<P><B>　VCDEMU△test1</B></P>
+
+	<P>と入力し、リアルタイムモードのエミュレーションを行います。</P>
+
+	<P><LI>また、−fオプションを付けるとディスクイメージを更新せず、更新情報ファイルを作成します。</P>
+
+	<P><B>　VCDUTL△test1△ISOF1_1.DAT;1△pat_7.dat△pat_1.dat△-f△test1.pat</B></P>
+
+	<P>この結果、更新情報ファイル(test1.pat)が作成されます。<BR>
+ひきつづきエミュレーションを実行する場合、- uオプションを付けてVCDエミュレータを起動します。</p>
+
+	<P><B>　VCDEMU△test1△-u△test1.pat</B></P>
+
+	<P>と入力すると、ダイレクトDOSアクセスモードのエミュレーションを行います。<BR>
+単に</P>
+
+	<P><B>　VCDEMU△test1</B></P>
+
+	<P>と入力すると、既作成のディスクイメージtest1.dskを使用するリアルタイムモードのエミュレーションを実行してしまいますのでご注意ください。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p09_10_j.htm">戻る</A>｜
+<a href="p11_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">バーチャルCDシステム</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

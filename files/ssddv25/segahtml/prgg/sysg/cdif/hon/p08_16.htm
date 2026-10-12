@@ -1,0 +1,120 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/19&gt;CD communication I/F (CD part)/Function details-6</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>▲ <A HREF="p08_15.htm">Back</a> ｜ <A HREF="p08_17.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual (CD part)</b><H2 ALIGN=CENTER> Function details-6</H2><HR NOSHADE>
+<H3> 8.2.6 Buffer information</H3><!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_1"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_6">one</a><BR> <A HREF="p08_10.htm#t8_1_6">View</a><BR> <A HREF="p08_10.htm#t8_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Get CD buffer size</H4></TD><TD WIDTH=160><PRE> Function Name［S-］<BR><H3> CDC_GetBufSiz</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_GetBufSiz(Sint32 *totalsiz, Sint32 *bufnum, Sint32 *freesiz)<DT> <B>input</b><DD> none<DT> <B>output</b><DD><TABLE>
+<TR><TD><PRE> total size</TD><TD><PRE> : Total buffer size (in sector units, 200 sectors = C8H)</TD></TR>
+<TR><TD><PRE> bufnum</TD><TD><PRE> : Total number of buffer sections (24 sections = 18H)</TD></TR>
+<TR><TD><PRE> free size</TD><TD><PRE> :Free buffer size (in sectors)</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Obtains the entire CD buffer size, the number of buffer partitions (both fixed values), and the current free size.<BR>
+ The number of selectors (or number of apertures) is equal to the total number of buffer compartments.<DT> <B>remarks</b><DD> Even if the free size is 0, there are sectors in use by the system, so the buffer does not necessarily become full.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_2"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_6">one</a><BR> <A HREF="p08_10.htm#t8_1_6">View</a><BR> <A HREF="p08_10.htm#t8_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Obtaining the number of sectors in the CD buffer partition</H4></TD><TD WIDTH=160><PRE> Function Name［S-］<BR><H3> CDC_GetSctNum</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_GetSctNum(Sint32 bufno, Sint32 *snum)<DT> <B>input</b><DD> bufno: Buffer partition number<DT> <B>output</b><DD> snum: Number of sectors in the buffer partition (buffer partition size)<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Gets the current number of sectors in the buffer partition (buffer partition size).</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_3"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_6">one</a><BR> <A HREF="p08_10.htm#t8_1_6">View</a><BR> <A HREF="p08_10.htm#t8_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Calculating actual data size</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_CalActSiz</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_CalActSiz(Sint32 bufno, Sint32 spos, Sint32 snum)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> bufno</TD><TD><PRE> :Buffer section number</TD></TR>
+<TR><TD><PRE> spos</TD><TD><PRE> : Sector position ( <B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</a></b> : Indicates the last sector of the partition)</TD></TR>
+<TR><TD><PRE> snum</TD><TD><PRE> : Number of sectors (CDC_SNUM_END: Indicates the number of sectors from spos to the end of the partition)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> ESEL flag<DT> <B>function</b><DD> Calculates the actual data size (number of words when fetching to the host) from the specified sector range of the buffer partition. To obtain the calculation result, execute Get Actual Data Size (CDC_GetActSiz).<BR>
+ In case of an error, the actual data size will be the following value.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> constant name</TH><TH WIDTH=420><PRE> explanation</TH></TR>
+<TR><TD><PRE> CDC_ACTSIZ_ERR</TD><TD><PRE> Could not perform calculation.</TD></TR>
+</TABLE>
+<DD> The length of one sector can be changed by setting the sector length ( <B><A HREF="p08_17.htm#no7_1">CDC_SetSctLen</a></b> ).<DT> <B>remarks</b><DD> Any connectors already connected to the partition output connector will be disconnected.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_4"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_6">one</a><BR> <A HREF="p08_10.htm#t8_1_6">View</a><BR> <A HREF="p08_10.htm#t8_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Obtaining actual data size</H4></TD><TD WIDTH=160><PRE> Function Name［S-］<BR><H3> CDC_GetActSiz</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_GetActSiz(Sint32 *actwnum)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> actwnum: Actual data size (number of words)<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> ESEL flag (only checked)<DT> <B>function</b><DD> Get the calculation result of the actual data size (initial value 0).<BR>
+ The previous calculation result is retained until the next calculation ( <B><A HREF="#no6_3">CDC_CalActSiz</a></b> ) is performed.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_5"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_6">one</a><BR> <A HREF="p08_10.htm#t8_1_6">View</a><BR> <A HREF="p08_10.htm#t8_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Get sector information</H4></TD><TD WIDTH=160><PRE> Function Name［S-］<BR><H3> CDC_GetSctInfo</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_GetSctInfo(Sint32 bufno, Sint32 spos, CdcSct *sct)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> bufno</TD><TD><PRE> :Buffer section number</TD></TR>
+<TR><TD><PRE> spos</TD><TD><PRE> : Sector position ( <B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</a></b> : Indicates the last sector of the partition)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> sct: Sector information<DT> <B>function value</b><DD> Returns an error code.<DT> <B>function</b><DD> Gets the header information (FAD) and subheader information of the specified sector of the buffer partition.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_6"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_6">one</a><BR> <A HREF="p08_10.htm#t8_1_6">View</a><BR> <A HREF="p08_10.htm#t8_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Executing frame address search</H4></TD><TD WIDTH=160><PRE> Function Name［SR］<BR><H3> CDC_ExeFadSearch</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_ExeFadSearch(Sint32 bufno, Sint32 spos, Sint32 fad)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> bufno</TD><TD><PRE> :Buffer section number</TD></TR>
+<TR><TD><PRE> spos</TD><TD><PRE> : Sector position ( <B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</a></b> : Indicates the last sector of the partition)</TD></TR>
+<TR><TD><PRE> fad</TD><TD><PRE> :Frame address</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> ESEL flag<DT> <B>function</b><DD> Searches for a sector from the specified sector position in the buffer partition using the frame address as a key. To obtain the search results, execute Get Frame Address Search Results (CDC_GetFadSearch).<P><DT> <B>(1)Search direction</b><DD> Search towards the back of the buffer compartment. (from the smallest sector position to the largest sector position)</P>
+<P><DT> <B>(2)Search results</b><DD> The contents retained as search results are the buffer partition number, the sector position obtained by the search, and the frame address of that sector.</P>
+<P><DT> <B>(3)Search conditions</b><DD> If no matching FAD exists, searches for the closest sector that does not exceed the specified FAD. In other words, the FAD of the search result is the largest FAD that satisfies FAD≦specified FAD.<BR>
+ In case of an error, the sector position and FAD of the search result will have the following values.<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE> sector position</TH><TH><PRE> frame address</TH><TH WIDTH=300><PRE> explanation</TH></TR>
+<TR><td rowspan=2><PRE> CDC_SPOS_ERR</TD><TD><PRE> 0</TD><TD><PRE> There are no sectors that meet the search conditions.</TD></TR>
+<TR><TD><PRE> CDC_FAD_ERR</TD><TD><PRE> Search could not be performed.</TD></TR>
+</TABLE>
+<DT> <B>remarks</b><DD> Any connectors already connected to the partition output connector will be disconnected.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no6_7"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_6">one</a><BR> <A HREF="p08_10.htm#t8_1_6">View</a><BR> <A HREF="p08_10.htm#t8_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Obtain frame address search results</H4></TD><TD WIDTH=160><PRE> Function Name［S-］<BR><H3> CDC_GetFadSearch</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6.7</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_GetFadSearch(Sint32 *bufno, Sint32 *spos, Sint32 *fad)<DT> <B>input</b><DD> none<DT> <B>output</b><DD><TABLE>
+<TR><TD><PRE> bufno</TD><TD><PRE> :Buffer section number</TD></TR>
+<TR><TD><PRE> spos</TD><TD><PRE> : Sector position</TD></TR>
+<TR><TD><PRE> fad</TD><TD><PRE> :Frame address</TD></TR>
+</TABLE>
+<DT> <B>function value</b><DD> Returns an error code.<DT> <B>end flag</b><DD> ESEL flag (only checked)<DT> <B>function</b><DD> Gets the frame address search execution result (initial value is all 0).<BR>
+ The previous search results are retained until the next search ( <B><A HREF="#no6_6">CDC_ExeFadSearch</a></b> ).</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_15.htm">Back</a> ｜ <A HREF="p08_17.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

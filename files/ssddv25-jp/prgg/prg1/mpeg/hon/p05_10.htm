@@ -1,0 +1,99 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/17&gt;MPEGライブラリ/5.MPEGウィンドウ</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no5">MPEGライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p06_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>MPEGライブラリ</B>
+<H2 ALIGN=CENTER>5.MPEGウィンドウ</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A>
+	<P><DT><H3>5.1　MPEG ウィンドウの制御</H3>
+	<DD>　フレームバッファ内の領域に出力するためのウィンドウを開くことができます。このウィンドウの制御インタフェースにより、ビジュアルエフェクトを簡単に行えます。</P>
+
+	<P><DT><B>　(1)ディスプレイウィンドウ</B>
+	<DD>　TVモニタ上に実際に表示される矩形領域としてディスプレイウィンドウを設定しす。<BR>　VDP2直接出力方式の場合は、TVモニタに対する位置と大きさを指定します。ホスト転送方式の場合は、TVモニタに直接表示されないので大きさのみを指定します。</P>
+
+	<P><DT><B>　(2)フレームバッファウィンドウ</B>
+	<DD>　ディスプレイウィンドウは、フレームバッファ内の任意の矩形領域のデータを出力します。このフレームバッファ内の矩形領域をフレームバッファウィンドウと呼びます。フレームバッファウィンドウは、1つのフレームバンクの領域内に開くことができます。</P>
+
+	<P><DT><B>　(3)ウィンドウの制御パラメータ</B>
+	<DD>　ディスプレイウィンドウとフレームバッファウィンドウの制御パラメータは以下のとおりです。</P>
+
+	<DT><OL TYPE=a>
+	<P><LI>ディスプレイウィンドウ
+		<UL TYPE="DISK">
+		<LI>表示基準位置(DZX, DZY)：TVモニタ上の表示の基準位置
+		<LI>表示相対位置(DLX, DLY)：表示基準位置からの相対座標
+		<LI>表示サイズ  (DSX, DSY)：TVモニタ上の大きさ</UL></P>
+
+	<P><LI>フレームバッファウィンドウ
+		<UL TYPE="DISK">
+		<LI>ズームポイント(FZX, FZY)：フレームバッファ内の表示の基準となる位置
+		<LI>倍率          (FRX, FRY)：Ｘ方向、Ｙ方向の拡大率</UL></P>
+	</OL>
+
+	<P><DD>　表示基準位置(Pz')とズームポイント(Pz)が重なるように、フレームバッファウィンドウの位置・サイズ・拡大率を設定します。また、倍率 (FRX, FRY) は任意の値が指定可能で、LSIの設定可能な拡大率に変換され設定されます。<BR>　以下に概念図を示します。</P>
+
+<A NAME="z5_1"></A>
+	<P ALIGN=CENTER><B>図5.1　ディスプレイウィンドウとフレームバッファウィンドウ</B><BR><IMG SRC="../grp/i111_01.gif"></P>
+
+	<P><DD>　MPEGウィンドウの制御インタフェースは、以下のビジュアルエフェクトを少ないパラメータで実現できます。ビジュアルエフェクト実行時に、操作するパラメータを以下に示します。</P>
+
+<A NAME="t5_1"></A>
+	<P><DD><B>表5.1　ビジュアルエフェクトと制御パラメータ</B>
+	<DD><table border>
+	<TR><TH><pre>ビジュアルエフェクト</TH><TH><pre>制御するパラメータ</TH><TH><pre>効　　果</TH></tr>
+	<TR><td><pre>ズーム</td><td><pre>FRX，FRY</td><td><pre>ディスプレイウインドウを固定し、表示されている映像をズームします。</td></tr>
+	<TR><td><pre>スクロール</td><td><pre>FZX，FZY</td><td><pre>映像を拡大率を変えずに左右上下に移動します。</td></tr>
+	<TR><td><pre>ムーブ</td><td><pre>DZX，DZY</td><td><pre>ズームポイントを変えずに表示基準位置を移動させます。</td></tr>
+	<TR><td><pre>ピーピング</td><td><pre>DLX，DLY</td><td><pre>映像の表示相対位置を変えながら、フレームバッファの映像をのぞき見ることができます。</td></tr>
+	<TR><td><pre>ワイプ</td><td><pre>DLX，DLY，DSX，DSY</td><td><pre>映像の倍率は変わらずに、ディスプレイウィンドウの大きさが変化します。</td></tr>
+	<TR><td><pre>エクスパンド</td><td><pre>DLX，DLY，DSX，DSY<br>FRX，FRY</td><td><pre>映像の大きさの変化に合わせて、ディスプレイウィンドウの大きさも変化します。</td></TR></table></p>
+
+<A NAME="no5_20"></A>
+	<P><DT><H3>5.2　MPEGウィンドウ使用上の注意</H3>
+
+	<P><DT><B>　(1)MPEGウィンドウの表示スイッチ</B>
+	<DD>　MPEGウィンドウの表示スイッチに関して、以下の制限事項があります。</P>
+
+	<DD><OL TYPE=a>
+	<P><LI>２つ以上のVDP2出力ウィンドウの表示スイッチを同時にONにしてはいけません。<BR>下図のように接続して使用してください。</OL></P>
+
+	<P ALIGN=CENTER><IMG SRC="../grp/i112_01.gif"></P>
+
+	<P><DT><B>　(2)ホスト転送出力</B>
+	<DD>　画像をホスト転送出力する際、MPEGシステムの仕様上X方向はフレームバッファウィンドウサイズの２倍の数の画素が出力されます。これを回避するには、以下の例のようにX方向は表示サイズを半分に、倍率を２倍に設定する必要があります。</P>
+
+	<P><DD><PRE>
+/* 352×240画素の画像を等倍でホスト転送出力する */
+/* 表示サイズの変更 */
+MPG_WnSetSize(mpgwn, (352/2), 240);
+
+/* 倍率の設定 */
+MPG_WnSetDispRatio(mpgwn, 2000, 1000);
+
+/* ホスト転送出力実行 */
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p06_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no5">MPEGライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

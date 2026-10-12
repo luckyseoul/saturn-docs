@@ -1,0 +1,101 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/11&gt; Addendum Write Once/5. System Execution</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">P.S. Write Once</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>P.S. Write Once System User's Manual</b><H2 ALIGN=CENTER> 5. Running the system</H2><HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A><P><DT><H3> 5.1 How to start</H3><DD> Enter the command in the following format from the DOS prompt. Options must be preceded by a hyphen '-' or a slash '/'.</P>
+<P><DL>
+<DD> <B>C:</b>&gt; <B>addcdw [-option...]</b></DL>
+</P>
+<P><DD> The option can be a subcommand or a subcommand file.<BR>
+ Subcommands are instructions for editing the contents of a CD-R disc. For details, see " <A HREF="p06_10.htm">6. Subcommands</a> ."</P>
+<P><DT> <B>(1) Command line specification</b><DD> Subcommands are specified directly on the command line and are interpreted sequentially from the beginning.</P>
+<P><DL>
+<DD> <B>C:</b>&gt; <B>addcdw - subcommand 1=argument 1, argument 2 - subcommand 2=argument 1, argument 2 ...</b></DL>
+</P>
+<P><DT> <B>(2) Subcommand file specification</b><DD> This is a way to specify subcommands in a file instead of on the command line.<BR>
+ Each line is interpreted from the beginning of the file.</P>
+<P><DL>
+<DD> <B>C:</b>&gt; <B>addcdw -sub=path name of subcommand file</b></DL>
+</P>
+<P><DD> A file that describes a group of subcommands is called a subcommand file.<BR>
+ Use ";" to write comments in the subcommand file. The string from ";" to the end of the line is ignored.</P>
+<A NAME="no5_20"></A><P><DT><H3> 5.2 Command examples</H3><P><DT> <B>《Example 1》</b><P><DL>
+<DD> <B>C:</b>&gt; <B>addcdw newdisc -s=2</b></DL>
+</P>
+<DD><OL TYPE=a>
+<P><B><LI></b> Create a master disk based on newdisc.dsk and newdisc.toc in the current directory.</P>
+<P><B><LI></b> You cannot use a disc that has already been written.</P>
+<P><B><LI></b> Write at double speed.</P>
+<P><B><LI></b> The command that performs the same process is shown below. (-master can be omitted as in the example above)</P>
+</OL>
+<P><DL>
+<DD> <B>C:</b>&gt; <B>addcdw -master=newdisc -s=2</b></DL>
+</P>
+<P><DT> <B>《Example 2》</b><P><DL>
+<DD> <B>C:</b>&gt; <B>addcdw -debug=newdisc -s=4</b></DL>
+</P>
+<DD><OL TYPE=a>
+<P><B><LI></b> Create a debugging disk by adding newdisc.dsk and newdisc.toc in the current directory.</P>
+<P><B><LI></b> Discs can be reused.</P>
+<P><B><LI></b> Write at 4x speed. (default value)</P>
+</OL>
+<P><DT> <B>《Example 3》</b><P><DL>
+<DD> <B>C:</b>&gt; <B>addcdw -replace=\dir1\file1.dat,file1_1.dat</b></DL>
+</P>
+<DD><OL TYPE=a>
+<P><B><LI></b> Replace \DIR1\FILE1.DAT on the disk with file1_1.dat in the current directory.<BR>
+ Do not change the file name.</P>
+</OL>
+<P><DT> <B>《Example 4》</b><P><DL>
+<DD> <B>C:</b>&gt; <B>addcdw -sub=discedit.cdw -t</b></DL>
+</P>
+<P><DD> <B>discedit.cdw</b><HR WIDTH=60% ALIGN=LEFT>
+<DD><PRE>
+;comment delete = \file1.dat
+add = \file1_1.dat, subdir\file1.dat
+s = 2
+</PRE><HR WIDTH=60% ALIGN=LEFT>
+<DD><OL TYPE=a>
+<P><B><LI></b>Delete FILE1.DAT in the root directory of newdisc.dsk.</P>
+<P><B><LI></b> Add subdir\file1.dat on DOS to the root directory of the disk with the name FILE1_1.DAT.</P>
+<P><B><LI></b> Write at 2x speed in test mode. (-t on the command line also works)</P>
+</OL>
+<P><DT> <B>《Example 5》</b><P><DL>
+<DD> <B>C:</b>&gt; <B>addcdw -otf=newdisc -s=2</b></DL>
+</P>
+<DD><OL TYPE=a>
+<P><B><LI></b> Based on newdisc.sct, newdisc.toc, newdisc.pvd in the current directory,<BR>
+ Create discs on the fly.<BR>
+ The disk created on the fly is a debug disk.</P>
+<P><B><LI></b> Discs can be reused.</P>
+<P><B><LI></b> Write at double speed.</P>
+</OL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">P.S. Write Once</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

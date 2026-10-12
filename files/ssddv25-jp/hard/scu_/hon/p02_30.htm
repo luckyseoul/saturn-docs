@@ -1,0 +1,115 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/31&gt;SCUユーザーズマニュアル/2.動作説明</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p02_20.htm">戻る</A>｜
+     <A HREF="p03_01.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCUユーザーズマニュアル／第２章　動作説明</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_30"></A>
+  <P><DT><H2>■2.3 ＤＳＰ</H2>
+
+<A NAME="no2_31"></A>
+  <DT><H3>　◆メインCPUからのDSP制御</H3>
+  <DD>　メインCPUからDSPの制御をすることができます。CPUから可能なDSP制御項目は
+      以下の通りです。
+  <OL>
+    <LI>DSPプログラムのロード
+    <LI>DSPのデータのアクセス
+    <LI>DSPプログラムの実行開始
+    <LI>DSPプログラムの強制停止
+  </OL>
+
+  <DD><H4>●DSPプログラムのロード</H4>
+  <DD>　DSPのプログラムをロードするためには、DSPのDMA命令を使用するやり方もあ
+      りますが、メインCPUからDSPのプログラムRAMエリアに直接書き込む方法もあり
+      ます。次に示す順序でメインCPUから制御すると、プログラムデータのロードが
+      できます。
+  <OL>
+    <LI>プログラム制御ポートのbit16およびbit17を0にします。
+    <LI>同ポートのプログラムRAMアドレスに転送開始アドレスを書き出します。
+　　    DSPが停止していないと、セットできません。
+    <LI>プログラムRAMデータポートにロングワード単位で順次プログラムデータを書き
+        出します。
+  </OL>
+  
+  <DD>　図2.15から図2.17にCPUからの制御方法をステップごとに示します。
+  
+<A NAME="z2_15"></A>
+  <P ALIGN="CENTER"><B>図2.15　DSPプログラムのロードStep1</B><BR>
+  <IMG SRC="../grp/i034_01.gif"></P>
+  
+<A NAME="z2_16"></A>
+  <P ALIGN="CENTER"><B>図2.16　DSPプログラムのロードStep2</B><BR>
+  <IMG SRC="../grp/i035_01.gif"></P>
+
+<A NAME="z2_17"></A>
+  <P ALIGN="CENTER"><B>図2.17　DSPプログラムのロードStep3</B><BR>
+  <IMG SRC="../grp/i035_02.gif"></P>
+  
+  <DD><H4>●DSPのデータのアクセス</H4>
+  <DD>　DSPのデータをアクセスするためには、DSPのDMA命令を使用するやり方もありま
+      すが、メインCPUからDSPのデータRAMエリアをアクセスする方法もあります。次に
+      示す順序でメインCPUから制御すると、データのアクセスができます。
+
+  <OL>
+    <LI>プログラム制御ポートのbit16およびbit17を0にします。
+    <LI>データRAMアドレスポートにアクセス開始アドレスを書き出します。
+    　　DSPが停止していないと、セットできません。
+    <LI>データRAMデータポートを介して、ロングワード単位で順次データをアクセス
+        します。
+  </OL>
+  
+  <DD>　図2.18から図2.20にCPUからの制御方法をステップごとに示します。
+
+<A NAME="z2_18"></A>
+  <P ALIGN="CENTER"><B>図2.18　DSPデータのアクセスstep1</B><BR>
+  <IMG SRC="../grp/i034_01.gif"></P>
+
+<A NAME="z2_19"></A>
+  <P ALIGN="CENTER"><B>図2.19　DSPデータのアクセスstep2</B><BR>
+  <IMG SRC="../grp/i037_01.gif"></P>
+
+<A NAME="z2_20"></A>
+  <P ALIGN="CENTER"><B>図2.20　DSPデータのアクセスstep3</B><BR>
+  <IMG SRC="../grp/i037_02.gif"></P>
+
+  <DD><H4>●DSPプログラムの実行開始</H4>
+  <DD>　DSPプログラムの実行を開始するには、プログラム制御ポートのbit16に1を書
+      き込むことで実行します(図2.21を参照)。DSPは、書き込まれたことを認識する
+      と、プログラム制御ポートのプログラムRAMアドレスに格納されている番地より
+      実行を開始します。よって、実行開始アドレスのセットは、プログラム制御
+      ポートのbit16に1を書き込むより以前に行わなければなりません。
+
+<A NAME="z2_21"></A>
+  <P ALIGN="CENTER"><B>図2.21　CPUからDSPプログラムの実行開始制御</B><BR>
+  <IMG SRC="../grp/i038_01.gif"></P>
+
+  <DD><H4>●DSPプログラムの強制停止</H4>
+  <DD>　DSPプログラムの実行を強制的に停止させるには、実行開始とは逆に、
+      プログラム制御ポートのbit16に0を書き込むことで実行します。図2.22に、
+      強制停止制御を示します。
+      
+<A NAME="z2_22"></A>
+  <P ALIGN="CENTER"><B>図2.22　CPUからDSPプログラムの強制停止制御</B><BR>
+  <IMG SRC="../grp/i038_02.gif"></P>
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p02_20.htm">戻る</A>｜
+     <A HREF="p03_01.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

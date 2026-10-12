@@ -1,0 +1,88 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/17&gt; Sound driver Ver2.10 guide/6. debugging techniques</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no">Sound Driver Programmer's Guide</a><HR>
+ <B>▲ <A HREF="snderr.htm">Back</a> ｜ <A HREF="sndintf.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound Driver Programmer's Guide</b><H2 ALIGN=CENTER> 6. debugging techniques</H2><HR NOSHADE>
+ When a sound control command is executed, the running status and necessary information are returned to the main system as a return status. The return status is stored in the status area of the system area, so refer to it as necessary.<p><P ALIGN=CENTER> <B>status area</b><BR>
+<img srcset="../image/sndstat.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<a name="colum1"><hr></a><h3> Sequence playback mode and status</h3><table border cellpadding="4">
+<tr><td> +0</td><td> Sequence playback mode (0-4)</td></tr>
+<tr><td> +1</td><td> Sequence playback status (0-FFh)</td></tr>
+</table>
+<p> While the sequence is playing, the current status is written to the mode/status area at any time. To find out the current status of sequence playback, please refer to the mode/status area.<BR>
+ The mode/status area has a total of 16 bytes, 2 bytes x 8 sequences, corresponding to pronunciation control numbers 0 to 7. For details on area addresses, please refer to the host interface work section in the system area.<p> [Sequence playback mode]<BR>
+<table border width="100%" cellpadding="4">
+<tr><td> 0x00</td><td> initial state</td></tr>
+<tr><td> 0x01</td><td> Now playing</td></tr>
+<tr><td> 0x03</td><td> Pause during playback</td></tr>
+<tr><td> 0x05</td><td> Fade in progress</td></tr>
+</table>
+<p> [Sequence playback status]<BR>
+<table border width="100%" cellpadding="4">
+<tr><td> 0x00</td><td> normal</td></tr>
+<tr><td> 0x80</td><td> Resolution exceeds SEGASATURN's capabilities.</td></tr>
+<tr><td> 0x81</td><td> There is no tempo data.</td></tr>
+<tr><td> 0x82</td><td> No event data.</td></tr>
+<tr><td> 0x83</td><td> Tempo data is set outside the range.</td></tr>
+<tr><td> 0x84</td><td> There is no control in the sequence data.</td></tr>
+<tr><td> 0x85</td><td> A bank that does not exist was specified.</td></tr>
+<tr><td> 0x86</td><td> You specified a program that does not exist.</td></tr>
+<tr><td> 0x87</td><td> A program change was performed without a bank set. When the 0X85 error occurs, this error often occurs in succession.</td></tr>
+<tr><td> 0x88</td><td> Volume bias value is too large for Total level.</td></tr>
+<tr><td> 0x89</td><td> A mixer change was performed on a bank that does not exist.</td></tr>
+<tr><td> 0x8A</td><td> Using MONO MODE</td></tr>
+<tr><td> 0x8B</td><td> Layer is not set on the Tone editor.</td></tr>
+<tr><td> 0x8C</td><td> Because the number of simultaneous pronunciations exceeded 32, the oldest key-on was forcibly destroyed.</td></tr>
+<tr><td> 0x8D</td><td> A layer that does not exist was specified.</td></tr>
+<tr><td> 0x8E</td><td> Trouble occurred in DSP</td></tr>
+<tr><td> 0x8F</td><td> An unsupported MIDI event was issued.</td></tr>
+<tr><td> 0x92</td><td> There were some notes that could not be played because there were too many FM sound source channels.</td></tr>
+<tr><td> 0x93</td><td> Double assignment of slot (program error)</td></tr>
+<tr><td> 0x94</td><td> An attempt was made to play on a MIDI channel other than 1-16.</td></tr>
+<tr><td> 0x99</td><td> NOTE ON was canceled because all slots were filled with FM.</td></tr>
+</table>
+<p><a name="colum2"><hr></a><h3> CD-DA input level</h3> Stores the digital audio input signal level. When the control command "Digital Audio In input level analysis start (0Ah)" is issued, input signal detection starts and this area is set. The value is 0 to 7FFFh, where 0 is no input signal and 7FFFh is the input signal at maximum level. Also, since this input signal level is an instantaneous value, it constantly changes as the input signal level changes.<BR>
+ Normally, only the Lch/Rch of the total level is stored, but using a dedicated DSP program (DSP - 3 Band Ana.EXB), it is also possible to detect levels divided into high temperature, midrange, and low temperature ranges. However, what can be detected here is the level of the input signal, so even if you change the output volume using the control command "CD-DA Level (80h)", the signal level set in this area will not change.<p><note role="caution">
+ Note: This process places a load on the sound driver, so if level detection is no longer required, issue the "Digital Audio In input level analysis end (0Bh)" command to end level detection.</note>
+<p><table border cellpadding="4">
+<tr><td> +0</td><td> PCM stream playback position (0-15)</td></tr>
+<tr><td> +1</td><td> unused</td></tr>
+</table>
+<p> This is the data position currently being played. Relative number of samples from the beginning of the PCM stream playback buffer, values from 0 to 15 are stored. You can monitor in units of 4K samples (4KB for 8-bit playback, 8KB for 16-bit playback), so when the value advances by 1, it means that the playback position advances by 4K samples. Also, even in stereo playback, Rch and Lch have the same playback address.<BR>
+ The PCM stream playback position area corresponds to stream playback numbers 0 to 7, and has a total of 16 bytes (2 bytes x 8 streams). For details on area addresses, please refer to the host interface work section in the system area.<p><table border cellpadding="4">
+<tr><td> +0</td><td> Sequence playback position (H)</td></tr>
+<tr><td> +1</td><td> Sequence playback position (L)</td></tr>
+</table>
+<p> While a sequence is being played, the playback position of the sequence is stored in this area. Values from 0 to FFFFh are stored sequentially. This indicates the time since the start of playback, and can be used as a guide to roughly know where the playback is currently being played. The value advances by 1 every 100msec.<BR>
+ The sequence playback position area corresponds to pronunciation management numbers 0 to 7, and has a total of 16 bytes (2 bytes x 8 sequences). For details on area addresses, please refer to the host interface work section in the system area.<p> Note: The sequence playback position is absolute time, so if the tempo changes, the position shown will change even if the value is the same. In order to accurately synchronize with the sequence being played, please take measures such as storing a synchronization message in the sequence data.<p><dl>
+<dt> □ Now, I will introduce how to debug and check.<p><dd> If a sound-related problem occurs, please check the areas below as data may be saved that can be helpful in investigating the cause.<p><dt> ○ Bitmap of error status<p><dd> If an error occurs while the sound driver is operating, an error bit corresponding to the error is set in the system interface table (4 bytes starting from 420h). For details, please refer to "5 Error Status Bitmap".<p><dt> ○ Sound control command history<p><dd> The history of sound control commands is stored in the reserved area of the system area (2048 bytes from 800h to FFFh). Control commands (16 bytes) that the sound driver receives from the main system and executes are written in this area at any time in the order in which they were executed.<BR>
+ Writing is done in a ring buffer format, and when the area is full, it is rewritten starting with the oldest command, so that the latest 128 commands are always recorded. (If the number of commands processed exceeds 128, the area will be overwritten from the beginning again.) Even in such a case, the next data write position will be FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF. Therefore, you can find the location of the most recently written data.<BR>
+ The 15th and 16th bytes (words) of the command history (16 bytes) store the elapsed time since the previous command processing, so you can also verify the temporal timing of command issuance. One count is approximately 2msec.<p></dl>
+ By referring to this area, you can check items like the example below.<p><ul>
+<li> If there is no sound, are the correct commands being issued from the main system?<li> Is the same command issued multiple times?<li> In processes where the order of commands is determined, whether the commands are issued in the correct order.<li> Are many commands being issued in unusually short intervals?</ul>
+<HR NOSHADE>
+ <B>▲ <A HREF="snderr.htm">Back</a> ｜ <A HREF="sndintf.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no">Sound Driver Programmer's Guide</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

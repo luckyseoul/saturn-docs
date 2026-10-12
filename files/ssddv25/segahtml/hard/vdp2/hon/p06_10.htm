@@ -1,0 +1,144 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;39/86&gt;VDP2 User's Manual/6.1 Rotating scroll coordinate calculation</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no6">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p05_30.htm">Back</a> ｜ <A HREF="p06_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual</b><H2 ALIGN=CENTER> Chapter 6 Rotating scroll screen</H2><HR NOSHADE>
+<DL>
+<P><DD> The rotary scroll screen has two sets of parameter tables called "rotation parameter A" and "rotation parameter B", and screens based on each parameter table can be displayed simultaneously. In addition to storing these two sets of parameters in VRAM as rotation parameter tables, they can also be stored in VRAM as corresponding coefficient tables.</P>
+<P><DD> There are two sets of rotation parameters: rotation parameter A and rotation parameter B, and each is stored in a table. RBG0 can simultaneously display one screen specified by rotation parameter A or rotation parameter B, or two screens specified by rotation parameter A and rotation parameter B, and RBG1 can display the screen specified by rotation parameter B. can only be displayed. Table 6.1 shows the relationship between the rotation scroll screen and rotation parameters.</P>
+<A NAME="t6_1"></A><P><DD> <B>Table 6.1 Rotating scroll screen</b><DD><TABLE BORDER CELLPADDING=5>
+</TR>
+<TH> screen</TH><TH> Single display</TH><TH> Relationship with rotation parameters</TH></TR>
+</TR>
+<TD> RBG0</TD><TD> Possible</TD><TD> 1 screen specified by either rotation parameter A or B,<BR>
+ Or two screens specified by rotation parameters A and B can be displayed simultaneously.</TD></TR>
+</TR>
+<TD> RBG1</TD><TD> Not possible (RBG0 is also displayed)<BR>
+ Must)</TD><TD> Display the screen specified by rotation parameter B</TD></TR>
+</TABLE>
+</P>
+<P><DD> Rotation parameter A and rotation parameter B can each have their own coefficient tables, and various displays can be made by reading the coefficient data line by line or dot by dot. You can also use rotation parameter A to scale or rotate the sprite frame buffer.</P>
+<A NAME="no6_10"></A><P><DT><H2> ■6.1 Rotating scroll coordinate calculation</H2><DD> The display screen of the rotating scroll screen rotates (including parallel translation) the viewpoint and the screen (TV screen) based on the center point, and the line of sight from the transformed viewpoint through the transformed screen is fixed. It is a collection of points that intersect with the scroll map. Figure 6.1 shows how to display the rotating scroll screen.</P>
+<A NAME="z6_1"></A><P ALIGN=CENTER> <B>Figure 6.1 How to display the rotating scroll screen</b><BR>
+<img srcset="../grp/i145_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> From the rotation transformation formula, the viewpoint coordinates after transformation and the screen screen coordinates after transformation are expressed by the following formula.</P>
+<P><DD><PRE><B>
+┌  ┐   ┌     ┐   ┌       ┐   ┌  ┐   ┌  ┐
+│Xp│   │A B C│   │Px - Cx│   │Cx│   │Mx│
+│Yp│ = │D E F│ x │Py - Cy│ + │Cy│ + │My│
+│Zp│   │G H I│   │Pz - Cz│   │Cz│   │Mz│
+└  ┘   └     ┘   └       ┘   └  ┘   └  ┘
+┌  ┐   ┌     ┐   ┌       ┐   ┌  ┐   ┌  ┐
+│Xs│   │A B C│   │Sx - Cx│   │Cx│   │Mx│
+│Ys│ = │D E F│ x │Sy - Cy│ + │Cy│ + │My│
+│Zs│   │G H I│   │Sz - Cz│   │Cz│   │Mz│
+└  ┘   └     ┘   └       ┘   └  ┘   └  ┘
+</b>
+A, B, C, D, E, F, G, H, I: Rotation matrix parameters
+               Px, Py, Pz: Viewpoint coordinates before rotation transformation
+               Sx, Sy, Sz: Screen screen coordinates before rotation transformation
+               Cx, Cy, Cz: Rotation center coordinates
+               Mx, My, Mz: Parallel movement amount
+               Xp, Yp, Zp: Viewpoint coordinates after rotation transformation
+               Xs, Ys, Zs: Screen screen coordinates after rotation transformation</PRE></P>
+<P><DD> In addition, the line of sight that passes through the screen after rotation conversion from the viewpoint after rotation conversion is expressed by the following formula.</P>
+<P><PRE><B>
+X − Xp   Y − Yp   Z − Zp
+―――――― = ―――――― = ――――――
+Xs− Xp   Ys− Yp   Zs− Zp
+</b></PRE></P>
+<P><DD>Here, since the scroll map is fixed on the XY plane (Z = 0), the display coordinates (X, Y) on the scroll map can be calculated using the following formula.</P>
+<P><DD><PRE><B>
+X = k (Xs−Xp)＋Xp
+Y = k (Ys−Yp)＋Yp
+</b></PRE></P>
+<P><DD>however,</P>
+<P><DD><PRE><B>
+     −Zp
+k = ――――――
+    Zs− Zp
+</b></PRE></P>
+<P><DD>This k is called the perspective transformation coefficient, and with X-axis rotation, it changes only in the vertical direction of the screen and remains constant in the horizontal direction. Additionally, Y-axis rotation changes only in the horizontal direction of the screen and remains constant in the vertical direction. It is always constant in Z-axis rotation.<BR>
+ Normally, the screen screen before rotation conversion is the same as the TV screen, so Sx is the horizontal coordinate value (H counter value) on the TV screen, Sy is the vertical coordinate value (V counter value) on the TV screen, and Sz is 0. It will be. The coordinate values of the screen when rotated around the perpendicular line (SZ axis) of this screen are calculated using the following formula.</P>
+<P><DD><PRE><B>
+┌  ┐   ┌     ┐   ┌          ┐   ┌   ┐   ┌   ┐
+│Sx│   │a b 0│   │Hcnt - Csx│   │Csx│   │Msx│
+│Sy│ = │c d 0│ x │Vcnt - Csy│ + │Csy│ + │Msy│
+│Sz│   │0 0 1│   │     0    │   │ 0 │   │Msz│
+└  ┘   └     ┘   └          ┘   └   ┘   └   ┘
+</b>
+   a, b, c, d: Screen rotation matrix parameters
+   Hcnt, Vcnt: HV counter value
+     Csx, Csy: Screen rotation center coordinates
+Msx, Msy, Msz: Amount of parallel movement of the screen</PRE></P>
+<P><DD> The above formula is expressed as:</P>
+<P><DD><PRE><B>
+Sx = Xst＋DX・Hcnt＋DXst・Vcnt
+Sy = Yst＋DY・Hcnt＋DYst・Vcnt
+Sz = Zst
+</b></PRE></P>
+<P><DD>however,</P>
+<P><DD><PRE><B>
+Xst = −a・Csx−b・Csy＋Csx＋Msx
+Yst = −c・Csx−d・Csy＋Csy＋Msy
+Zst = Msz
+
+△X = a
+△Y = c
+△Xst = b
+△Yst = d
+</b>
+Xst, Yst, Zst: Screen screen start coordinates
+      △X, △Y: Screen screen horizontal direction coordinate increment
+  △Xst, △Yst: Screen screen vertical direction coordinate increment</PRE></P>
+<P><DD> From the above formula, the formula for calculating the display coordinates (X, Y) when performing both 3-axis rotation of the scroll screen and rotation of the screen screen is as follows.</P>
+<P><PRE><B>
+X = kx (Xsp+dX・Hcnt)+Xp
+Y = ky (Ysp+dY・Hcnt)+Yp
+</b></PRE></P>
+<P><DD>however,</P>
+<P><PRE><B>
+Xsp = A{(Xst＋△Xst・Vcnt)−Px}＋B{(Yst＋△Yst・Vcnt)−Py}＋C(Zst−Pz)
+Ysp = D{(Xst＋△Xst・Vcnt)−Px}＋E{(Yst＋△Yst・Vcnt)−Py}＋F(Zst−Pz)
+Xp  = A(Px−Cx)＋B(Py−Cy)＋C(Pz−Cz)＋Cx＋Mx
+Yp  = D(Px−Cx)＋E(Py−Cy)＋F(Pz−Cz)＋Cy＋My
+dX  = A・DX＋B・DY
+dY  = D・DX＋E・DY
+</b>
+   Xst, Yst, Zst: Screen screen start coordinates
+     △Xst, △Yst: Screen screen vertical direction coordinate increment
+         △X, △Y: Screen screen horizontal direction coordinate increment
+A, B, C, D, E, F: Rotation matrix parameter
+      Px, Py, Pz: Viewpoint coordinates
+      Cx, Cy, Cz: Center coordinates
+          Mx, My: Amount of parallel movement
+          kx, ky: Enlargement/contraction coefficient
+      Hcnt, Vcnt: HV counter value</PRE></P>
+<P><DD> VDP2 reads each parameter line by line from the rotation parameter table stored in VRAM, calculates Xsp, Ysp, Xp, Yp, dX, and dY using the above formula, and uses the results to Find the display coordinates (X, Y) of . The scaling factors kx and ky are normally read from the rotation parameter table, but you can also change the values for each line or dot by using the coefficient table.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_30.htm">Back</a> ｜ <A HREF="p06_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no6">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

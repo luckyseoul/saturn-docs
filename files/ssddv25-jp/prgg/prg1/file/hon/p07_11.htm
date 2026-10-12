@@ -1,0 +1,409 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/17&gt;プログラマーズガイド/ファイルシステムライブラリ/データ詳細</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no7">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p07_10.htm">戻る</A>｜
+<A HREF="p08_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>7.データ仕様</H2>
+<HR NOSHADE>
+<A NAME="no7_10"></A>
+<H3>7.1　基本的なデータ</H3>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_0"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>基本的なデータ</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>　</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.0</H4></TD>
+</TR></TABLE></P>
+
+	<P><DT><B>　(1)基本データ型</B>
+		<DD>　基本的データ構造の一覧表を次に示します。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH WIDTH=80><PRE>型　名</TH><TH WIDTH=290><PRE>説　明</TH></TR>
+	<TR><TD><PRE>Uint8</TD><TD><PRE>符号なし1バイト整数</TD></TR>
+	<TR><TD><PRE>Sint8</TD><TD><PRE>符号あり1バイト整数</TD></TR>
+	<TR><TD><PRE>Uint16</TD><TD><PRE>符号なし2バイト整数</TD></TR>
+	<TR><TD><PRE>Sint16</TD><TD><PRE>符号あり2バイト整数</TD></TR>
+	<TR><TD><PRE>Uint32</TD><TD><PRE>符号なし4バイト整数</TD></TR>
+	<TR><TD><PRE>Sint32</TD><TD><PRE>符号あり4バイト整数</TD></TR>
+	<TR><TD><PRE>Bool</TD><TD><PRE>論理型4バイト整数</TD></TR></TABLE></P>
+
+	<P><DT><B>　(2)論理型定数</B>
+		<DD>　論理型(Bool)の値として使用します。</P>
+		<DD><TABLE BORDER=1>
+	<TR><TH width=80><PRE>定数名</TH><TH width=70><PRE>値</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>FALSE</TD><TD ALIGN=CENTER><PRE>0</TD><TD><PRE>論理値の偽</TD></TR>
+	<TR><TD><PRE>TRUE</TD> <TD ALIGN=CENTER><PRE>1</TD><TD><PRE>論理値の真</TD></TR></TABLE></P>
+
+	<P><DT><B>　(3)ヌルポインタ</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH width=80><PRE>定数名</TH><TH width=70><PRE>値</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>NULL</TD><TD><PRE>(void*)0</TD><TD><PRE>ヌルポインタ</TD></TR></TABLE></P>
+</DL>
+
+<A NAME="no7_20"></A>
+<H3>7.2　定数</H3>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_1"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD width=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>ファイルの属性</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GFS_ATR_〜</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.1</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　以下に示す定数は、それぞれの属性の有無を表します。これらの定数は、GFS_Init、GFS_LoadDirで読み込まれたディレクトリ情報中の属性、およびGFS_GetFileInfoで出力される属性に対して使用できます。<BR>ここに示さなかったビットの内容は不定です。</P>
+
+<!-- +++ Update by CRI ：1.3 -->
+	<P><DD><PRE>
+bit 7   6   5   4   3   2   1   0
+   [ ] [ ] [ ] [ ] [ ] [-] [-] [ ] 
+    |   |   |   |   |           |
+    |   |   |   |   |           |
+    |   |   |   |   |           +---- GFS_ATR_END_TBL  1:ディレクトリ情報テーブルの最後 
+    |   |   |   |   |
+    |   |   |   |   +---------------- GFS_ATR_FORM1    1:Form1セクタを含む
+    |   |   |   +-------------------- GFS_ATR_FORM2    1:Form2セクタを含む
+    |   |   +------------------------ GFS_ATR_INTLV    1:インタリ−ブセクタを含む
+    |   +---------------------------- GFS_ATR_CDDA     1:CDDAファイル
+    +-------------------------------- GFS_ATR_DIR      1:ディレクトリファイル
+</PRE></P>
+<!-- --- Update by CRI ：1.3 -->
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_2"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD width=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>アクセス状態</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GFS_NWSTAT_〜</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.2</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　以下に示す定数は、サーバのアクセス状態を表します。GFS_NwGetStatで出力されます。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH width=150><PRE>定数名</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_NWSTAT_NOACT</TD> <TD><PRE>何もしていない</TD></TR>
+	<TR><TD><PRE>GFS_NWSTAT_FREAD</TD> <TD><PRE>GFS_NwFread実行中</TD></TR>
+	<TR><TD><PRE>GFS_NWSTAT_CDREAD</TD><TD><PRE>GFS_NwCdRead実行中</TD></TR></TABLE></P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_3"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>アクセスサーバ状態</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GFS_SVR_〜</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.3</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　以下に示す定数はGFS_NwExecOneとGFS_NwExecServerの関数値である。その実行状態を表す。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH width=150><PRE>定数名</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_SVR_COMPLETED</TD><TD><PRE>処理終了</TD></TR>
+	<TR><TD><PRE>GFS_SVR_BUSY</TD><TD><PRE>処理中</TD></TR>
+	<TR><TD><PRE>GFS_SVR_CDPAUSE</TD><TD><PRE>CDバッファフルの為一時停止</TD></TR>
+	<TR><TD><PRE>GFS_SVR_ERROR</TD><TD><PRE>アクセス中にエラーが発生した</TD></TR></TABLE></P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_4"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>シークモード</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GFS_SEEK_〜</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.4</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　以下に示す定数は、アクセスポインタを移動する際の基準を表します。GFS_Seekの引数として使用されます。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH width=150><PRE>定数名</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_SEEK_SET</TD><TD><PRE>ファイルの先頭</TD></TR>
+	<TR><TD><PRE>GFS_SEEK_CUR</TD><TD><PRE>現在の位置</TD></TR>
+	<TR><TD><PRE>GFS_SEEK_END</TD><TD><PRE>ファイルの終端</TD></TR></TABLE></P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_5"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>取り出しモード</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GFS_GMODE_〜</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.5</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　以下の定数はCDバッファからの取り出し方式を表します。GFS_SetGmodeの引数として使用されます。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH width=150><PRE>定数名</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_GMODE_ERASE</TD>   <TD><PRE>転送後、バッファから削除</TD></TR>
+	<TR><TD><PRE>GFS_GMODE_RESIDENT</TD><TD><PRE>転送後もCDバッファに残す</TD></TR></TABLE></P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_6"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR><!-- *** Update by CRI ：5.3 -->
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>転送モード</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GFS_TMODE_〜</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.6</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　以下の定数はCDバッファからの転送を実行するデバイスを表します。GFS_SetTmodeの引数として使用されます。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH width=150><PRE>定数名</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_TMODE_SCU</TD><TD><PRE>SCUによりDMA転送(レベル0)<BR>　※転送先がWORKRAM-Lの場合、<BR>　　ソフトウェア転送になります。</TD></TR><!-- *** Update by CRI ：5.4 -->
+	<TR><TD><PRE>GFS_TMODE_SDMA0</TD><TD><PRE>DMAサイクルスチール転送チャンネル0</TD></TR>
+	<TR><TD><PRE>GFS_TMODE_SDMA1</TD><TD><PRE>DMAサイクルスチール転送チャンネル1</TD></TR>
+	<TR><TD><PRE>GFS_TMODE_CPU</TD>  <TD><PRE>ソフトウェア転送</TD></TR></TABLE></P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_7"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>エラーコード</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GFS_ERR_〜</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.7</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　GFS_ERR_OKの値は0です。その他のエラーコードは、負の値を持ちます。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH width=150><PRE>定数名</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_ERR_OK</TD>      <TD><PRE>正常終了</TD></TR>
+	<TR><TD><PRE>GFS_ERR_CDRD</TD>    <TD><PRE>CDリードエラー</TD></TR>
+	<TR><TD><PRE>GFS_ERR_CDNODISC</TD><TD><PRE>CDがセットされていない</TD></TR>
+	<TR><TD><PRE>GFS_ERR_CDROM</TD>   <TD><PRE>CD-ROMでないディスクが設定されている</TD></TR>
+	<TR><TD><PRE>GFS_ERR_DIRTBL</TD>  <TD><PRE>ディレクトリ管理テーブルの内容が不正</TD></TR>
+	<TR><TD><PRE>GFS_ERR_OPENMAX</TD> <TD><PRE>最大オープン数の値が不正</TD></TR>
+	<TR><TD><PRE>GFS_ERR_DIR</TD>     <TD><PRE>指定されたファイルはディレクトリでない</TD></TR>
+	<TR><TD><PRE>GFS_ERR_CDBFS</TD>   <TD><PRE>CDブロックファイルシステムのエラー</TD></TR>
+	<TR><TD><PRE>GFS_ERR_NONAME</TD>  <TD><PRE>現在のディレクトリではファイル名を扱えない</TD></TR>
+	<TR><TD><PRE>GFS_ERR_NEXIST</TD>  <TD><PRE>存在しないファイル名</TD></TR>
+	<TR><TD><PRE>GFS_ERR_FID</TD>     <TD><PRE>不正なファイル識別子</TD></TR>
+	<TR><TD><PRE>GFS_ERR_HNDL</TD>    <TD><PRE>ファイルハンドルが不正</TD></TR>
+	<TR><TD><PRE>GFS_ERR_SEEK</TD>    <TD><PRE>シーク位置が不正</TD></TR>
+	<TR><TD><PRE>GFS_ERR_ORG</TD>     <TD><PRE>基準位置が不正</TD></TR>
+	<TR><TD><PRE>GFS_ERR_NUM</TD>     <TD><PRE>バイト数が負</TD></TR>
+	<TR><TD><PRE>GFS_ERR_OFS</TD>     <TD><PRE>オフセット不正</TD></TR>
+	<TR><TD><PRE>GFS_ERR_FBUSY</TD>   <TD><PRE>指定ファイルハンドルに対する処理が残っている</TD></TR>
+	<TR><TD><PRE>GFS_ERR_PARA</TD>    <TD><PRE>パラメータが不正</TD></TR>
+	<TR><TD><PRE>GFS_ERR_BUSY</TD>    <TD><PRE>ライブラリ関数実行中</TD></TR>
+	<TR><TD><PRE>GFS_ERR_NOHNDL</TD>  <TD><PRE>ファイルハンドルに空きがない</TD></TR>
+	<TR><TD><PRE>GFS_ERR_PUINUSE</TD> <TD><PRE>ピックアップ動作中</TD></TR>
+	<TR><TD><PRE>GFS_ERR_ALIGN</TD>   <TD><PRE>データ読込み量域が4バイト境界にない</TD></TR>
+	<TR><TD><PRE>GFS_ERR_TMOUT</TD>   <TD><PRE>内部処理でタイムアウトが発生した</TD></TR>
+	<TR><TD><PRE>GFS_ERR_CDOPEN</TD>  <TD><PRE>トレイが開いている</TD></TR>
+	<TR><TD><PRE>GFS_ERR_BFUL</TD>    <TD><PRE>バッファフルで読み込み中止</TD></TR>
+	<TR><TD><PRE>GFS_ERR_FATAL</TD>   <TD><PRE>CDドライブが〈FATAL〉状態</TD></TR></TABLE></P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_8"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>その他</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>　</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.8</H4></TD>
+</TR></TABLE></P>
+	<P><DD>　本ライブラリで使用されるその他の定数を次に示します。</P>
+	<P><DD><TABLE BORDER=1>
+	<TR><TH width=150><PRE>定数名</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_RPARA_DFL</TD><TD><PRE>読み込みパラメータの初期値</TD></TR>
+	<TR><TD><PRE>GFS_BUFSIZ_INF</TD><TD><PRE>GFS_Loadで読み込み領域の大きさに関わらず読み込むことを指定</TD></TR></TABLE></P>
+</DL>
+
+<A NAME="no7_30"></A>
+<H3>7.3　データ型</H3>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_1"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>ファイルハンドル</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GfsHn</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3.1</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　ファイルのアクセスに関する、ファイルごとの情報を保持します。GFS_Openによって生成されます。ファイルをアクセスするほとんどの関数はこのデータを参照します。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_2"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>ディレクトリ情報管理</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GfsDirTbl</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3.2</H4></TD>
+</TR></TABLE></P>
+
+	<P><DT><B>(1)　ディレクトリ情報テーブル種別</B>
+	<DD>　ディレクトリ情報管理構造体はファイル名なしディレクトリ情報、またはファイル名つきディレクトリ情報を管理できる。どちらを管理するかを次の定数で指定します。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH width=150><PRE>定数名</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_DIR_ID</TD><TD><PRE>ファイル名情報を持たない</TD></TR>
+	<TR><TD><PRE>GFS_DIR_NAME</TD><TD><PRE>ファイル名情報を持つ</TD></TR></TABLE></P>
+
+	<P><DT><B>(2)　ディレクトリ情報管理</B>
+	<DD>　ディレクトリ情報を管理するためのデータ型です。ディレクトリ情報テーブルの種別と、その大きさ、その実体を保持します。</P>
+
+	<P><DD>GfsDirTbl　*dirtbl
+		<DD><TABLE BORDER=1>
+	<TR><TH width=180><PRE>アクセスマクロ</TH><TH width=100><PRE>型</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_DIRTBL_TYPE(dirtbl)</TD><TD><PRE>Sint32</TD><TD><PRE>ディレクトリ情報テーブルの種別</TD></TR>
+	<TR><TD><PRE>GFS_DIRTBL_NDIR(dirtbl)</TD><TD><PRE>Sint32</TD><TD><PRE>ディレクトリ情報テーブルの最大要素数</TD></TR>
+	<TR><TD><PRE>GFS_DIRTBL_DIRID(dirtbl)</TD><TD><PRE>GfsDirId*</TD><TD><PRE>ファイル名なしディレクトリ情報テーブル<BR>へのポインタ</TD></TR>
+	<TR><TD><PRE>GFS_DIR_NAME(dirtbl)</TD><TD><PRE>GfsDirName*</TD><TD><PRE>ファイル名つきディレクトリ情報テーブル<BR>へのポインタ</TD></TR></TABLE></P>
+
+	<P><DT><B>(3)　設定方法</B>
+	<P><DT><B>　(a)ファイル名なしディレクトリ情報使用時</B>
+		<DD><PRE>
+GfsDirTbl dirtbl;
+GfsDirId dir_id[MAX_DIR_ID]<P>
+GFS_DIRTBL_TYPE (&amp;dirtbl) = GFS_DIR_ID;     /* ファイル名なしディレクトリ情報指定　　 */
+GFS_DIRTBL_NDIR (&amp;dirtbl) = MAX_DIR_ID;     /* 最大要素数　　　　　　　　　　　　　　 */
+GFS_DIRTBL_DIRID(&amp;dirtbl) = dir_id;         /* ファイル名なしディレクトリ情報テーブル */
+</PRE></P>
+
+	<P><DT><B>　(b)ファイル名つきディレクトリ情報使用時</B>
+		<DD><PRE>
+GfsDirTbl dirtbl;
+GfsDirName dir_name[MAX_DIR_NAME];<P>
+GFS_DIRTBL_TYPE(&amp;dirtbl) = GFS_DIR_NAME;    /* ファイル名つきディレクトリ情報指定　　 */
+GFS_DIRTBL_NDIR(&amp;dirtbl) = MAX_DIR_NAME;    /* 最大要素数　　　　　　　　　　　　　　 */
+GFS_DIRTBL_DIRNAME(&amp;dirtbl) = dir_name;     /* ファイル名つきディレクトリ情報テーブル */
+</PRE></P>
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_3"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>ファイル名なしディレクトリ情報</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GfsDirId</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3.3</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　ファイル名を含まないディレクトリ情報構造体です。<BR>　ディレクトリ情報テーブルの種別(GFS_DIRTBL_TYPE)には、GFS_DIR_IDを指定します。</P>
+
+	<P><DD>GfsDirId *dir
+		<DD><TABLE BORDER=1>
+	<TR><TH width=180><PRE>アクセスマクロ</TH><TH width=100><PRE>型</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_DIR_FAD(dir)</TD>  <TD><PRE>Sint32</TD><TD><PRE>ファイルの先頭FAD</TD></TR>
+	<TR><TD><PRE>GFS_DIR_SIZE(dir)</TD> <TD><PRE>Sint32</TD><TD><PRE>ファイルの大きさ(単位はバイト)</TD></TR>
+	<TR><TD><PRE>GFS_DIR_FN(dir)</TD>   <TD><PRE>Uint8</TD> <TD><PRE>ファイル番号</TD></TR>
+	<TR><TD><PRE>GFS_DIR_ATR(dir)</TD>  <TD><PRE>Uint8</TD> <TD><PRE>ファイルの属性</TD></TR>
+	<TR><TD><PRE>GFS_DIR_UNIT(dir)</TD> <TD><PRE>Uint8</TD> <TD><PRE>ファイルのユニットサイズ(単位はセクタ)</TD></TR>
+	<TR><TD><PRE>GFS_DIR_GAP(dir)</TD>  <TD><PRE>Uint8</TD> <TD><PRE>ファイルのギャップサイズ(単位はセクタ)</TD></TR></TABLE></P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_4"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>ファイル名つきディレクトリ情報</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GfsDirName</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3.4</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　ファイル名を含むディレクトリ情報構造体です。<BR>　ディレクトリ情報テーブルの種別(GFS_DIRTBL_TYPE)には、GFS_DIR_NAMEを指定します。</P>
+
+	<P><DD>GfsDirName *dir
+		<DD><TABLE BORDER=1>
+	<TR><TH width=180><PRE>アクセスマクロ</TH><TH width=100><PRE>型</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_DIR_FAD(dir)</TD>  <TD><PRE>Sint32</TD> <TD><PRE>ファイルの先頭FAD</TD></TR>
+	<TR><TD><PRE>GFS_DIR_SIZE(dir)</TD> <TD><PRE>Sint32</TD> <TD><PRE>ファイルの大きさ(単位はバイト)</TD></TR>
+	<TR><TD><PRE>GFS_DIR_FN(dir)</TD>   <TD><PRE>Uint8</TD>  <TD><PRE>ファイル番号</TD></TR>
+	<TR><TD><PRE>GFS_DIR_ATR(dir)</TD>  <TD><PRE>Uint8</TD>  <TD><PRE>ファイルの属性</TD></TR>
+	<TR><TD><PRE>GFS_DIR_UNIT(dir)</TD> <TD><PRE>Uint8</TD>  <TD><PRE>ファイルのユニットサイズ(単位はセクタ)</TD></TR>
+	<TR><TD><PRE>GFS_DIR_GAP(dir)</TD>  <TD><PRE>Uint8</TD>  <TD><PRE>ファイルのギャップサイズ(単位はセクタ)</TD></TR>
+	<TR><TD><PRE>GFS_DIR_FNAME(dir)</TD><TD><PRE>Sint8[]</TD><TD><PRE>ファイル名*1</TD></TR><!-- *** Update by CRI ：5.5 -->
+	</TABLE>
+	<DD><B>＊１：</B>領域の大きさは12バイトです。ファイル名の長さが12バイトの時、文字列は'¥0'では終わりません。</P>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_5"><HR></A><DL>
+<P><DT><TABLE BORDER=1><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>エラー処理関数</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GfsErrFunc</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3.5</H4></TD>
+</TR></TABLE></P>
+	<DT><B>　書　式</B>
+		<DD>void (*GFsErrFunc) (void *obj, Sint32 ec)
+	<DT><B>　入　力</B>
+	<DD><TABLE>
+	<TR><TD><PRE>obj</TR><TD><PRE>：エラー処理を行うために必要なオブジェクト</TD></TR>
+	<TR><TD><PRE>ec</TD><TD><PRE>：エラーコード</TD></TR></TABLE>
+
+	<DT><B>　出　力</B>
+	<DD>なし
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_6"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p07_10.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=270><PRE>Data<BR><H4>エラー状態</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>GfsErrStat</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3.6</H4></TD>
+</TR></TABLE></P>
+
+	<P><DD>　GFS_GetErrStatで出力されるデータです。</P>
+
+	<P><DD>GfsErrStat　*stat
+		<DD><TABLE BORDER=1>
+	<TR><TH width=180><PRE>アクセスマクロ</TH><TH width=100><PRE>型</TH><TH width=220><PRE>説　明</TH></TR>
+	<TR><TD><PRE>GFS_ERR_FUNC(err)</TD><TD><PRE>GfsErrFunc</TD><TD><PRE>エラー処理関数へのポインタ。</TD></TR>
+	<TR><TD><PRE>GFS_ERR_OBJ(err)</TD><TD><PRE>void*</TD><TD><PRE>エラー処理関数の第１引数。</TD></TR>
+	<TR><TD><PRE>GFS_ERR_CODE(err)</TD><TD><PRE>Sint32</TD><TD><PRE>エラーコード。</TD></TR></TABLE></P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p07_10.htm">戻る</A>｜
+<A HREF="p08_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no7">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

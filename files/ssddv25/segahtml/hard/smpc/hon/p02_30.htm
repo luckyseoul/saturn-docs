@@ -1,0 +1,323 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/19&gt;SMPC User's Manual/2.3 Reset system management commands</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p02_20.htm">Back</a> ｜ <A HREF="p02_40.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/Chapter 2 SMPC Commands</b><HR NOSHADE>
+<DL>
+<A NAME="no2_30"></A><P><DT><H2> ■2.3 Reset system management commands</H2><DD> Details of reset system management commands are shown in table format. The table of each command and notes are as follows. In addition, by using status flags in all commands, you can manage double issuing of commands.</P>
+<A NAME="no2_31"></A><P><DT> <B>●SMPC interrupt</b><DD> Items marked as "occurrence" generate an SMPC interrupt to the SH-2 via the SCU at the end of the command. Additionally, interrupts can be enabled/disabled by setting the SCU.</P>
+<A NAME="no2_32"></A><P><DT> <B>●IREG, OREG</b><DD><UL TYPE=DISC>
+<LI> Details of IREG and OREG used in the command are shown.<LI> Command parameters are parameters that are set in IREG before issuing the command.<LI> Result parameters are parameters set in OREG by command execution.<LI> Result parameter OREG31 is set by SMPC when command processing begins. The command code is output to OREG31.</UL>
+<P><DD> By using it together with status flag (SF),</P>
+<UL TYPE=DISC>
+<LI> Which command is being executed ( <B>SF=1</b> )<LI> Which command finished ( <B>SF=0</b> )</UL>
+<P><DD> can be judged.</P>
+<A NAME="no2_33"></A><P><DT> <B>●Execution time</b><DD> The execution time is calculated from the number of steps in the SMPC internal firmware. If there is a conflict with an internal task such as RTC increment, the command execution time will change, so it is described in the range of minimum and maximum values.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_01"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> |■ | <A HREF="#c1_02">Next</a> ▼</b><DL>
+<P><DT> No.1<DT><H1> MSHON</H1><DD><H2> Master SH-2 ON</H2><P><DT><PRE>
+<B>Command code</b> 00H
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=30μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Turn on master SH-2.</P>
+<DT> <B>command parameters</b><DD> none</P>
+<DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> User use is prohibited.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_02"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_01">Back</a> | <A HREF="#c1_03">Next</a> ▼</b><DL>
+<P><DT> No.2<DT><H1> SSHON</H1><DD><H2> Slave SH-2 ON</H2><P><DT><PRE>
+<B>Command code</b> 02H
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=30μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Turn on slave SH-2.</P>
+<DT> <B>command parameters</b><DD> none</P>
+<DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> none</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_03"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_02">Back</a> | <A HREF="#c1_04">Next</a> ▼</b><DL>
+<P><DT> No.3<DT><H1> SSHOFF</H1><DD><H2> Slave SH-2 OFF</H2><P><DT><PRE>
+<B>Command code</b> 03H
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=30μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Turn off slave SH-2.</P>
+<DT> <B>command parameters</b><DD> none</P>
+<DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> Issuance of this command is prohibited under the following conditions.<P> <B>When slave SH-2 is accessing external bus (A-Bus, B-Bus, CPU-Bus).</b></P>
+<P> In other words, it cannot be used unless the slave SH-2 is accessing the cache inside the CPU.</P>
+<P> If the above management is difficult on the application side, please use the system library's clock change ( <A HREF="../../../prgg/sysg/prog/hon/p02_11.htm#no4_1">SYS_CHGSYSCK</a> ).</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_04"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_03">Back</a> | <A HREF="#c1_05">Next</a> ▼</b><DL>
+<P><DT> No.4<DT><H1> SNDON</H1><DD><H2> sound on</H2><P><DT><PRE>
+<B>Command code</b> 06H
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=30μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Turn on the sound CPU (MC68EC000).</P>
+<DT> <B>command parameters</b><DD> none</P>
+<DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> See " <A HREF="#c1_05">Sound OFF</a> " command.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_05"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_04">Back</a> | <A HREF="#c1_06">Next</a> ▼</b><DL>
+<P><DT> No.5<DT><H1> SNDOFF</H1><DD><H2> Sound OFF</H2><P><DT><PRE>
+<B>Command code</b> 07H
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=30μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Turn off the sound CPU (MC68EC000).</P>
+<DT> <B>command parameters</b><DD> none</P>
+<DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> When stopping the sound CPU, be sure to strictly observe the following restrictions.</P>
+<P><DD>&#65308;&#65308; <B>Limitations on stopping and starting sound blocks</b>&#65310;&#65310;</P>
+<P><DD> When the sound block is stopped, there must not be a non-access period of 0.5 seconds or more from the main system (SH2 side) to the sound RAM.<BR>
+ If you want to stop Sound Block, please stop it only for the minimum necessary period such as loading the sound driver, and then restart it immediately.<BR>
+ If you do not need to use the sound CPU (MC68EC000), you need to take measures such as running a dummy program (just an infinite loop).<BR>
+ If these restrictions are not observed, the operation of the sound RAM and sound block cannot be guaranteed.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_06"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_05">Back</a> | <A HREF="#c1_07">Next</a> ▼</b><DL>
+<P><DT> No.6<DT><H1> CDON</H1><DD><H2> CD ON</H2><P><DT><PRE>
+<B>Command code</b> 08H
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=40μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Turn on the CD.</P>
+<DT> <B>command parameters</b><DD> none</P>
+<DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> User use is prohibited.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_07"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_06">Back</a> | <A HREF="#c1_08">Next</a> ▼</b><DL>
+<P><DT> No.7<DT><H1> CDOFF</H1><DD><H2> CD OFF</H2><P><DT><PRE>
+<B>Command code</b> 09H
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=40μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Turn off the CD.</P>
+<DT> <B>command parameters</b><DD> none</P>
+<DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> By executing this command, the contents of the CD buffer (DRAM) will not be retained.</P>
+<P><DD> User use is prohibited.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_08"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_07">Back</a> | <A HREF="#c1_09">Next</a> ▼</b><DL>
+<P><DT> No.8<DT><H1> SYSRES</H1><DD><H2> Whole system reset</H2><P><DT><PRE>
+<B>Command code</b> 0DH
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> 100msec+α
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Reset the entire Sega Saturn system.</P>
+<DT> <B>command parameters</b><DD> none</P>
+<DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD></TR>
+</TABLE>
+</P>
+<DT> <B>remarks</b><DD> By executing this command, all functions are reset (initialized), the master SH-2 operates from the power ON vector, and the boot ROM is started. All memory contents are not retained except for the 256K-bit battery-backed RAM.</P>
+<P><DD> User use is prohibited.</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_09"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_08">Back</a> | <A HREF="#c1_10">Next</a> ▼</b><DL>
+<P><DT> No.9<DT><H1> CKCHG352</H1><DD><H2> Clock change 352 mode</H2><P><DT><PRE>
+<B>Command code</b> 0EH
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> 100msec+α
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Switch the Sega Saturn's system clock from 320 mode to 352 mode.</P>
+<P><DT> <B>command parameters</b><DD> none</P>
+<P><DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DT><TABLE>
+<TR><TD><img srcset="../../../what/atto.png 5x"></TD><TD> <B>Issuance of this command from applications is prohibited. Call <A HREF="../../../prgg/sysg/prog/hon/p002.htm">the clock change routine</a> in the Sega Saturn boot ROM.</b></TD></TR>
+</TABLE>
+</P>
+<P><DD> When a clock change is executed, each LSI becomes as follows.</P>
+<P><DD> <B>VDP1, VDP2, SCU, SCSP:</b> Default value at power ON<DD> <B>Master SH-2:</b> Return from boot ROM clock change routine<DD> <B>Slave SH-2:</b> OFF<DD> <B>CD block:</b> hold<DD> <B>Work RAM:</b> Retention<DD> <B>VRAM:</b> Not retained</P>
+<P><DD> User use is prohibited.<BR>
+ If you use it, please use the system library clock change ( <A HREF="../../../prgg/sysg/prog/hon/p02_11.htm#no4_1">SYS_CHGSYSCK</a> ).</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_10"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_09">Back</a> | <A HREF="#c1_11">Next</a> ▼</b><DL>
+<P><DT> No.10<DT><H1> CKCHG320</H1><DD><H2> Clock change 320 mode</H2><P><DT><PRE>
+<B>Command code</b> 0FH
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> 100msec+α
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Switch the Sega Saturn's system clock from 352 mode to 320 mode.</P>
+<P><DT> <B>command parameters</b><DD> none</P>
+<P><DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DT><TABLE>
+<TR><TD><img srcset="../../../what/atto.png 5x"></TD><TD> <B>Issuance of this command from applications is prohibited. Call <A HREF="../../../prgg/sysg/prog/hon/p002.htm">the clock change routine</a> in the Sega Saturn boot ROM.</b></TD></TR>
+</TABLE>
+</P>
+<P><DD> When a clock change is executed, each LSI becomes as follows.</P>
+<P><DD> <B>VDP1, VDP2, SCU, SCSP:</b> Default value at power ON<DD> <B>Master SH-2:</b> Return from boot ROM clock change routine<DD> <B>Slave SH-2:</b> OFF<DD> <B>CD block:</b> hold<DD> <B>Work RAM:</b> Retention<DD> <B>VRAM:</b> Not retained</P>
+<P><DD> User use is prohibited.<BR>
+ If you use it, please use the system library clock change ( <A HREF="../../../prgg/sysg/prog/hon/p02_11.htm#no4_1">SYS_CHGSYSCK</a> ).</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_11"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_10">Back</a> | <A HREF="#c1_12">Next</a> ▼</b><DL>
+<P><DT> No.11<DT><H1> NMIREQ</H1><DD><H2> NMI request</H2><P><DT><PRE>
+<B>Command code</b> 18H
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=30μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> Request NMI from master SH-2.</P>
+<P><DT> <B>command parameters</b><DD> none</P>
+<P><DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DD> Requests NMI unconditionally even if disabled by <A HREF="#c1_13"><B>the RESDISA command</b></a> .</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_12"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_11">Back</a> | <A HREF="#c1_13">Next</a> ▼</b><DL>
+<P><DT> No.12<DT><H1> RESENAB</H1><DD><H2> reset enable</H2><P><DT><PRE>
+<B>Command code</b> 19H
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=30μsec
+</PRE></P>
+<A NAME="c1_no12_0"></A><P><DT><B>Functional details</b><DD> On Sega Saturn, an NMI is generated when the reset button on the main body panel is pressed. This command enables NMI generation.<BR>
+ The default value when booting with BOOR ROM is enable.<P><DT> <B>command parameters</b><DD> none</P>
+<P><DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DD> To prevent chattering, an NMI is generated when the reset button is pressed for 3VINT (3/60sec).</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c1_13"><HR></a><!-- --------------------------------------------------------------------------------- -->
+ <B><A HREF="p02_10.htm#t2_1">List</a> | ▲ <A HREF="#c1_12">Back</a> | <A HREF="p02_40.htm#c2_01">Next</a> ▼</b><DL>
+<P><DT> No.13<DT><H1> RESDISA</H1><DD><H2> reset disable</H2><P><DT><PRE>
+<B>Command code</b> 1AH
+<B>SMPC interrupt</b> cannot be generated
+<B>IREG</b> unused
+<B>OREG</b> 31
+<B>Execution time</b> max=xxx
+<B>　　　　　　　　</B>min=30μsec
+</PRE></P>
+<P><DT><B>Functional details</b><DD> On the Sega Saturn, an NMI is generated when the reset button on the main body panel is pressed. This command disables NMI generation.<BR>
+ The default value when booting with BOOR ROM is enable.</P>
+<P><DT> <B>command parameters</b><DD> none</P>
+<P><DT> <B>Result parameters</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH> OREG31</TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> 2010005FH</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>remarks</b><DD> The state of the reset switch is only indicated by the RESB bit (bit4) of the SR (status register), and no NMI output is performed to the master SH-2. The RESB bit indicates the state of the button at V-BLANK-IN.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_20.htm">Back</a> ｜ <A HREF="p02_40.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

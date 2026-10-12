@@ -1,0 +1,231 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/11&gt;Cinepak for SEGASaturnユーザーズマニュアル/2．Cinepakムービの制作</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">MOVIE TOOLS GUIDE</A>
+★<a href="../index_j.htm">Cinepak for SEGASaturn</A>
+<HR>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>Cinepak for SEGASaturn</B>
+<H2 ALIGN=CENTER>2．Cinepakムービの制作</H2>
+<HR NOSHADE>
+<DL>
+	<P>　オリジナルの音声、映像、グラフィック素材をSEGASATURNフォーマットに取込むプロセスは、オリジナルソース素材や最終的な形式によって異なります。プロセスの開始位置、ステップ数、必要なツールなどはすべて持っている機材ややりたいことによって変わってきます。本章では、どの方法が一番いいのかを決めるのに役立つ情報について説明します。</P>
+
+<A NAME="no2_10"></A>
+	<P><DT><H2>2.1　プロセスの概要</H2>
+	<DD>　一般的プロセスの手順を次図に示します。実際の手順は、作業の内容によって異なります。</P>
+
+<A NAME="z2_1"></A>
+	<P><DD><B>図2.1　Cinepakムービの制作手順</B>
+
+	<TABLE BORDER=0>
+	<TR><TD ROWSPAN=9><img srcset="../grp/i006_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD>
+<TD HEIGHT=30><PRE>
+・フレームサイズ、フレームレート、サウンドの決定
+・CDからの転送レート<BR> <BR> </TD></TR>
+
+<TR><TD HEIGHT=30><PRE>
+・ビデオデッキ、レーザーディスク、カメラ
+・QuickTimeアニメーション、PICTファイル
+・CG、アニメーションファイル等から
+・映像、サウンドを取り込みQuickTimeムービに変換する</TD></TR>
+
+<TR><TD HEIGHT=30><PRE>
+・QuickTimeツールを使う
+・シーケンス、長さを編集する
+・必要ならばムービにエフェクトをかける
+・サウンドトラックを追加編集する
+・サウンドのレートを変える場合は、編集後サウンドをカット保存する</TD></TR>
+
+<TR><TD HEIGHT=30><PRE>
+・Quality、Key Frameその他必要項目を設定する
+・Cinepakで圧縮する</TD></TR>
+
+<TR><TD HEIGHT=30><PRE>
+・必要ならばサウンドを追加する</TD></TR>
+
+<TR><TD HEIGHT=30><PRE>
+・MovieToSaturn_Jを使ってCinepak圧縮してQuickTimeムービを<BR>SEGASaturn用ムービに変換する</TD></TR>
+
+<TR><TD HEIGHT=30><PRE>
+・使用できるならば、LANでバーチャルCDマシンへ転送する
+・必要に応じて、Mac-PC間のファイル変換する</TD></TR>
+
+<TR><TD HEIGHT=30><PRE>
+・Cinepakライブラリを使ってCinepakプレーやを追加する
+・必要に応じて、サンプルプログラムを追加する</TD></TR>
+
+<TR><TD HEIGHT=30><PRE>
+・バーチャルCDでCDイメージファイルを作成する</TD></TR>
+</TABLE>
+
+<A NAME="no2_20"></A>
+	<P><DT><H2>2.2　ムービの制作計画</H2>
+	<DD>　Cinepakムービを制作しゲームアプリケーションで使用するには、予めどのようなムービを制作するのか計画を立てておくことが必要です。<BR>
+SEGASATURNのCD-ROMは、倍速モードで300KB/Sでデータを転送します。従って、作成するムービはその転送レートを下回っていなければなりません。</P>
+
+	<P><DD>　図2.2はフレームサイズ320×224pixel、図2.3は256×160pixelでサウンドのない自然画ムービをCinepak圧縮したときのグラフです。これらの図から判るように、圧縮率は画質を上げることによって悪くなり、データ転送レートが大きくなってしまいます。実際のムービはこれにサウンドが加わるため次式を満足するようにします。</P>
+
+	<P><DD><PRE>
+サンプリング周波数×A×B＋画像の転送レート &lt;300KB/S……(式2.1)<BR>
+　Ａ：8bitPCMならば    A=1
+　　　16bitPCMならば   A=2
+　Ｂ：モノラルならば   B=1
+　　　ステレオならば   B=2
+</PRE></P>
+
+	<P><DD>　画像の転送レートは図を参考にしてください。但し、実際の圧縮率はムービの内容によって異なってきますので、これらの図を参考にフレームサイズ、フレームレート、サウンドを大枠決定しておき、使用するムービを圧縮してみて画質設定で転送レートを調整する方が良いでしょう。</P>
+
+	<P ALIGN=CENTER><B>図2.2　画質設定に対する転送レート(320×224)</B><BR><img srcset="../grp/i008_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P ALIGN=CENTER><B>図2.3　画質設定に対する転送レート(256×160)</B><BR><img srcset="../grp/i008_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>　●表示色によるフレームレート</B>
+	<DD>　Cinepakで圧縮したムービは、16M色(24ビットカラー)で作成されています。このムービはデコードするときに、32K色で再生する場合は16ビット/ピクセル（MSBは透明ビット、RGBは各5ビット）に変換して展開し、16M色で再生する場合は32ビット/ピクセル（上位1バイトは透明ビット用、RGBは各8ビット）で展開します。すなわち、どちらで再生しようとムービの圧縮率は同じ（ムービデータが同じ）であり、画像の転送レートは前述したとおり（式2.1）を満足していれば問題ありません。<BR>
+しかし、16M色で再生する場合は32K色の時に比べて2倍のデータがあり、またVRAMへの転送も工夫が必要なため32K色の場合よりフレームレートを落とす必要があります。<BR>
+表示色によるフレームレートは、ムービの内容によっても異なってきますが大体次の値を参考にしてください。</P>
+
+	<P><DD><OL>
+	<P><B><LI></B>32K色、320×224サイズ　24〜30fps<BR>　画質を確保するためには24fps以下が適当<P>
+	<P><B><LI></B>16M色、320×224サイズ　15〜18fps</P>
+	</OL>
+
+	<P><DT><B>　〈参考〉</B>
+	<DD>　16Ｍ色再生について<BR>
+VDP2のスクロール面を使って16Ｍ色で再生する場合は、一旦ワークRAMに1フレームデータを展開後SCUのDMAを使ってVRAMへ転送します。VRAMへの転送は図2.4に示すように、TVの走査線が下半分の領域にある間に上半分のデータを転送します。次に、走査線が上半分の領域にある間に下半分のデータを転送します。すなわち、TVの走査線に追っかけられながらVRAMを書き換えていきます。これらの処理は1Ｖsync期間に終える必要があり、走査線に追いつかれないようにSUCのDMAを使って高速に転送します。VRAMへのデータ転送タイミングを図2.5に示します。</P>
+
+<A NAME="z2_4"></A>
+	<P ALIGN=CENTER><B>図2.4　VRAMへのデータ転送イメージ</B><BR><img srcset="../grp/i009_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z2_5"></A>
+	<P ALIGN=CENTER><B>図2.5　VRAMへのデータ転送イメージ</B><BR><img srcset="../grp/i010_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no2_30"></A>
+	<P><DT><H2>2.3　映像、サウンドの取込</H2>
+	<DD>　Cinepak用ムービを作成するためには、ソース素材のQuickTimeムービファイルが必要です。
+ソース素材をQuickTimeに転送するには、手順・機器構成など無数の組み合わせ考えられますが一例として次の方法を参考にしてください。</P>
+
+	<P><DT><B>　●映像ソースからの取込</B>
+	<DD>　映像をQuickTimeファイルの中に取込む場合、Macintoshのビデオキャプチャーボードを経由して、素材(ビデオデッキ、カメラ、レーザディスク等)をQuickTimeアプリケーションに入力します。<BR>
+最高の画質を得るためには、できるだけ非圧縮で映像を取込みます。非圧縮で取込むには、ビデオデッキのコントロールボードを使用して1フレーム単位で取込みます。リアルタイムに非圧縮で取込むには、高速なハードディスク(DiskArrayタイプ)を使うか、一旦RAMに取込んだ後でハードディスクに書き込む方法があります。操作方法については、使用する機器のマニュアルを参照してください。</P>
+
+	<P><DT><B>　●Macintoshのグラフィックソースからの取込</B>
+	<DD>　Macintoshファイルフォーマットの静止画像(PICT形式)がある場合、<BR>
+MovieConverterユーテリティを使ってQuickTimeファイルを作成します。</P>
+
+	<P><DT><B>　●Macintosh以外のデジタル素材からの取込</B>
+	<DD>　DeBabelizerユーティリティプログラムを使って、Macintosh以外(ワークステーションや他のPCマシンのグラフィックデータ)のファイルをQuickTimeフォーマットに変換します。</P>
+
+	<P><DT><B>　●サウンドの取込</B>
+	<DD>　Macintoshのサウンドボードを経由して、AIFF形式で録音します。また、DAT等のデジタルサウンドの場合は、市販の波形エディタを使ってハードディスクレコーディング後、目的とするサンプリング周波数に再サンプルしてください。</P>
+
+<A NAME="no2_40"></A>
+	<P><DT><H2>2.4　QuickTimeムービの編集</H2>
+	<DD>　この時点で、ストーリー、シーケンス、サウンドトラックの編集を行い、必要であればエフェクトやフィルタ処理を行います。QuickTimeムービの編集ツールには、AdobeSystem社の「AdobePremiere」等を使用します。また、フィルタは同じくAdobeSystem社の「Adobe PhotoShop」のPlug-insの中のフイルタをPremiereでも利用することができますので試してみてください。詳細は、各ソフトのマニュアルを参照してください。</P>
+
+	<P><DT><B>　●ムービの分割について</B>
+	<DD>　SEGASATURNフォーマットのCinepakムービは図2.6に示すとおりムービのヘッダとムービのデータ(映像＋サウンド、サンプルデータと呼ぶ)で構成されています。このヘッダはムービ全体の情報とサンプル情報が含まれています。サンプル情報は、映像1フレーム毎の情報とインタリーブした各サウンドの情報であり、1サンプルに対して16バイト必要とします。ムービのヘッダサイズは次式によって求めることができます。</P>
+
+	<P><DD><PRE>
+Ｈ＝(Ｌ×Ｆ＋4Ｌ−1)×16＋80……（式2.2）
+　Ｈ：ヘッダサイズ［バイト］
+　Ｌ：ムービの長さ［秒］
+　Ｆ：フレームレート［fps］
+</PRE></P>
+
+	<P><DD>　例えば、30fps、サウンド付きで10分のムービを作成した場合、ヘッダサイズは約320KBとなります。<BR>
+ヘッダはムービ再生中常にメモリ上に存在していなければならないため、長いムービを作成した場合はムービのヘッダが大きくなり、SEGASATURNのワークRAM領域を圧迫することになります。また、ヘッダが大きければCD-ROMからの読み込みに時間がかかり、ムービの再生開始が遅くなってしまいます。これらの問題を回避するためには、ムービを分割し連続再生を行います。Cinepakライブラリは、次に再生するムービを登録することによって、分割したムービをシームレスに連続再生することができます。</P>
+
+	<P ALIGN=CENTER><B>図2.6　Cinepak for SEGASATURNムービファイルフォーマット</B>
+	<TABLE BORDER=0>
+	<TR><TD ROWSPAN=7><img srcset="../grp/i012_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD>
+		<TD><PRE>ムービについての全体的な情報と<BR>サンプルテープおよび各サンプルの詳細</TD></TR>
+	<TR><TD><PRE>各サンプルデータのオフセット、<BR>サンプルデータサイズ、表示時間情報</TD></TR>
+	<TR><TD><PRE>サンプルデータ０には必ずサウンドデータが<BR>1/2秒分入っている</TD></TR>
+	<TR><TD>　</TD></TR>
+	<TR><TD>　</TD></TR>
+	<TR><TD>　</TD></TR>
+	<TR><TD>　</TD></TR>
+		</TABLE>
+
+	<P><DT><B>　●サウンドのサンプリング周波数を変更する場合</B>
+	<DD>　通常、QuickTime編集ツールで取り扱うサウンドは、44.1KHz、22.254KHz、11.127KHzです。一方、SEGASATURNは44.1KHz以下のサンプリング周波数を再生することができます。もし、44.1KHz、22.254KHz、11.127KHz以外のサウンドを使用したい場合は、Adobe Premiere のような QuickTime編集ツールを使って、元のサウンドトラックをカットし、AIFFファイルに保存し、サウンドユーティリティを使ってそのAIFFファイルをダウンサンプルします。次に、Cinepakでムービを圧縮した後で、ムービにダウンサンプルしたサウンドを追加します。</P>
+
+<A NAME="no2_50"></A>
+	<P><DT><H2>2.5　Cinepak圧縮</H2>
+	<DD>　Apple社のMovieConverterなどの圧縮ユーティリティを使って、コンプレッサのポップアップメニューにあるCinepakでムービを圧縮します。色深度はColor(圧縮ユーティリティによっては、千数百万色となっているものもあります)を選びます。Grayscaleは使用できませんので注意してください。後は、品質やフレームレートなど必要とする値に設定してCinepak圧縮します。<BR>
+オーディオのブロックは何が設定されていてもかまいません。</P>
+
+<A NAME="no2_60"></A>
+	<P><DT><H2>2.6　サウンドの追加</H2>
+	<DD>　映像だけのCinepakムービを作成したあとサウンドを追加する場合は、MoviePlayerを使います。AIFFフォーマットのサウンドファイルをMoviePlayerで開きます(映像がないムービとなります)。同様に、映像だけのCinepakムービを開き、サウンドだけのムービをペーストします。ペーストする場合は、必ずOptionキーを押したままにします。</P>
+
+	<P><DD><B>操作</B>
+	<DD><OL>
+		<LI>映像だけのCinepakムービと追加するサウンドファイルをMoviePlayerで開く
+		<LI>サウンドだけのムービをSelect All後、Copyする<BR>
+		<LI>映像だけのCinepakムービを選択後、Optionキーを押しながらPasteする
+		<LI>再生確認後、保存する</OL></P>
+
+<A NAME="no2_70"></A>
+	<P><DT><H2>2.7　SEGASATURNフォーマットへの変換</H2>
+	<DD>　MovieToSEGASATURN_Jを使用して、編集済みのCinepak圧縮ファイルをSEGASATURNフォーマットのムービファイルに変換します。</P>
+
+	<P><DD><B>操作</B>
+	<DD><OL>
+		<LI>Macintoshの適当なフォルダーにMovieToSaturn_Jをコピーします。
+		<LI>MovieToSaturn_Jを起動し、変換したいファイルを選び「Open」ボタンをクリックします(図2.7)。
+		<LI>保存用のダイアログが開くので、保存するときのファイル名を入力します(図2.8)。デフォルトでは変換元のファイル名の最後に「.CPK」が追加されています。
+		<LI>「保存」ボタンをクリックすると変換を開始します。
+		<LI>変換が終了すると自動的に終了します。</OL><P>
+
+	<P ALIGN=CENTER><B>図2.7　MovieToSaturn_J ムービ選択ダイアログ</B><BR><img srcset="../grp/i013_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P ALIGN=CENTER><B>図2.8　MovieToSaturn_J ムービ保存ダイアログ</B><BR><img srcset="../grp/i014_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DD>　また、ドラッグ＆ドロップでも変換できます。変換したいCinepakファイルを、MovieToSaturn_Jのアイコンへドロップすると変換を開始します。この場合のファイル名は、拡張子が「.MOV」ならば「.CPK」に書き換え、そうでなければ最後に「.CPK」を元のファイル名に追加します。</P>
+
+<A NAME="no2_80"></A>
+	<P><DT><H2>2.8　CinepakムービをDOSに転送する</H2>
+	<DD>　Apple File Exchangeを使って、ムービをDOSファイルに変換します。また、LANサービスが使えるならばネットワーク経由でバーチャルCD用のPC/AT互換機へ転送します。</P>
+
+<A NAME="no2_90"></A>
+	<P><DT><H2>2.9　Cinepakドライバ用コードの追加</H2>
+	<DD>　Cinepakライブラリを使用して、アプリケーションを作成します。Cinepakライブラリについては「第4章 Cinepakライブラリ」を参照してください。また、必要ならばCinepakライブラリとあわせて提供しているサンプルプログラムのソースコードを参考にしてください。<P>
+
+<A NAME="no2_a0"></A>
+	<P><DT><H2>2.10　CD-ROM用ファイルの作成</H2>
+	<DD>　バーチャルCDでCDイメージを作成し、再生内容を確認します。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">MOVIE TOOLS GUIDE</A>
+★<a href="../index_j.htm">Cinepak for SEGASaturn</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

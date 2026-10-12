@@ -1,0 +1,464 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/11&gt;Cinepak for SEGASaturnユーザーズマニュアル</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">MOVIE TOOLS GUIDE</A>
+★<a href="../index_j.htm">Cinepak for SEGASaturn</A>
+<HR>
+<B>▲
+<a href="p04_14_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>Cinepak for SEGASaturn</B>
+<H2 ALIGN=CENTER></H2>
+<HR NOSHADE>
+<DL>
+
+<DT><H2>4.6　関数詳細</H2>
+<TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>初期化</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_Init</TD><TD WIDTH=60><PRE>No<BR>1.1</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　Bool　CPK_Init(void)
+<B>入力</B>　　なし
+<B>出力</B>　　なし
+<B>関数値</B>　正常に初期化できた場合TRUE
+<B>　　　</B>　正常に初期化できない場合FALSE
+<B>機能</B>　　プログラム起動直後、本ライブラリを使用するための初期化を行います。
+<B>備考</B>　　本ライブラリを使うときは、必ずプログラムの先頭で本関数を呼んでください。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>終了処理</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_Finish</TD><TD WIDTH=60><PRE>No<BR>1.2</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_Finish(void)
+<B>入力</B>　　なし
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　ムービの再生をそれ以降行わない場合には、本関数を呼び出してください。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>ハンドルの作成（メモリ）</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_CreateMemMovie</TD><TD WIDTH=60><PRE>No<BR>2.1</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　CpkHn　CPK_CreateMemMovie(CpkCreatePara *para)
+<B>入力</B>　　para：作成パラメータ
+<B>出力</B>　　なし
+<B>関数値</B>　ムービハンドル(作成できない場合はNULL)
+<B>機能</B>　　メモリにあるムービファイルを再生するためのムービハンドルを作成します。
+<B>備考</B><UL><UL TYPE="DISK"><LI>同時に作成できるムービは、32個です。
+<LI>ムービファイルはアプリケーションプログラムでメモリにロードしてください。
+<LI>CPK_CreateMemMovie で生成したムービハンドルは、必ずCPK_NotifyWriteSizeで
+ムービファイルのサイズを通知してください。</UL></UL></PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>ハンドルの消去（メモリ）</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_DestroyMemMovi</TD><TD WIDTH=60><PRE>No<BR>2.2</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_DestroyMemMovie(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　ムービハンドルを消去します。
+<B>　　</B>　　ハンドルを消去すると、そのムービハンドルはそれ以降使用できません。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>ハンドルの作成（ファイルシステム）</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_CreateGfsMovie</TD><TD WIDTH=60><PRE>No<BR>2.3</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　CpkHn　CPK_CreateGfsMovie(CpkCreatePara *para, GfsHn gfs)
+<B>入力</B>　　para：作成パラメータ
+<B>　　</B>　　gfs：ファイルハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　ムービハンドル(作成できない場合はNULL)
+<B>機能</B>　　ファイルシステムでムービファイルを再生するためのムービハンドルを作成します。
+<B>備考</B><UL><UL TYPE="DISK"><LI>同時に作成できるムービは、32個です。
+<LI>ファイルハンドルは、あらかじめアプリケーションプログラムで取得してください。</UL></UL></PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>ハンドルの消去（ファイルシステム）</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_DestroyGfsMovi</TD><TD WIDTH=60><PRE>No<BR>2.4</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_DestroyGfsMovie(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B><UL><UL TYPE="DISK"><LI>ムービハンドルを消去します。
+<LI>ハンドルを消去すると、そのムービハンドルはそれ以降使用できません。
+<LI>ファイルハンドルをクローズする前に、ムービハンドルを消去してください。</UL></UL></PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD><PRE>Data<BR>ハンドルの作成（ストリームシステム）</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_CreateStmMovie</TD><TD WIDTH=60><PRE>No<BR>2.5</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　CpkHn　CPK_CreateStmMovie(CpkCreatePara *para, StmHn stm)
+<B>入力</B>　　para：作成パラメータ
+<B>　　</B>　　stm：ファイルハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　ムービハンドル(作成できない場合はNULL)
+<B>機能</B>　　ストリームシステムでムービファイルを再生するためのムービハンドルを作成します。
+<B>備考</B><UL><UL TYPE="DISK"><LI>同時に作成できるムービは、32個です。
+<LI>ストリームハンドルは、あらかじめアプリケーションプログラムで取得してください。</UL></UL></PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD><PRE>Data<BR>ハンドルの消去（ストリームシステム）</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_DestroyStmMovi</TD><TD WIDTH=60><PRE>No<BR>2.6</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_DestroyStmMovie(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B><UL><UL TYPE="DISK"><LI>ムービハンドルを消去します。
+<LI>ハンドルを消去すると、そのムービハンドルはそれ以降使用できません。
+<LI>ストリームハンドルをクローズする前に、ムービハンドルを消去してください。</UL></UL></PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>再生タスク</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_Task</TD><TD WIDTH=60><PRE>No<BR>2.7</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_Task(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　CDからのファイル読み込み及び画像の展開処理を行います。
+<B>備考</B>　　ムービ再生中は定期的に本関数を呼んでください。
+<B>　　</B>　　呼ぶ間隔は、再生コマ数よりも多くしてください。コマ数以下だとなめらかに
+<B>　　</B>　　再生できません。
+<B>　　</B>　　本関数を読んだ後は、必ずCPK_IsDispTimeで表示タイミングになっているか調
+<B>　　</B>　　べてください。CPK_IsDispTimeが TRUE を返した場合は、画像を表示するタイ
+<B>　　</B>　　ミングなのでスプライトVRAMに展開していた場合はフレームチェンジをしてく
+<B>　　</B>　　ださい。メモリに展開していた場合は、VRAMに転送してください。
+<B>　　</B>　　その後、必ず CPK_CompleteDisp を呼んでください。
+<B>　　</B>　　展開先のアドレスをVRAMに指定した場合は、表示タイミングの前に展開します
+<B>　　</B>　　ので、注意してください。</PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>表示タイミングの判定</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_IsDispTime</TD><TD WIDTH=60><PRE>No<BR>2.8</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　Bool　CPK_IsDispTime(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　ムービのフレーム画像の展開が終了し、表示するとき刻のときはTRUE
+<B>　　　</B>　まだ表示するタイミングでないときはFALSE
+<B>機能</B>　　本関数がTRUEに返した場合は、１フレームの画像を表示するタイミングになった
+<B>　　</B>　　ので、スプライトVRAMに展開していた場合はフレームチェンジをします。メモリ
+<B>　　</B>　　に展開していた場合は、展開内容をVRAMに転送します。
+<B>　　</B>　　その後に、必ず CPK_CompleteDisp を呼んでください。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>表示完了の通知</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_CompleteDisp</TD><TD WIDTH=60><PRE>No<BR>2.9</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_CompleteDisp(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　画像表示が終了したことをライブラリに通知します。
+<B>備考</B>　　CPK_IsDispFrame が TRUE になったら本関数を呼んでください。
+<B>　　</B>　　呼ばないと、ムービは再生されません。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>VブランクIN処理関数</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_VblIn</TD><TD WIDTH=60><PRE>No<BR>2.10</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_VblIn(void)
+<B>入力</B>　　なし
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　ムービの再生時刻の管理を行います。
+<B>備考</B>　　本ライブラリを使う場合は、必ず本関数をVブランクIN割り込みで呼んでください。</PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>再生開始</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_Start</TD><TD WIDTH=60><PRE>No<BR>3.1</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_Start(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　ムービの再生を開始します。
+<B>備考</B><UL><UL TYPE="DISK"><LI>ムービの再生は、生成されたムービハンドルに対して1回だけできます。
+同じムービを何度も繰り返し再生したい場合は、その都度ムービハンドルを生成
+してください。</UL></UL></PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>再生停止</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_Stop</TD><TD WIDTH=60><PRE>No<BR>3.2</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_Stop(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　ムービの再生を停止します。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>一時停止（ポーズ）</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_Pause</TD><TD WIDTH=60><PRE>No<BR>3.3</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_Pause(CpkHn cpk, CpkPauseCmd cmd)
+<B>入力</B>　　cpk：ムービハンドル
+<B>　　</B>　　cmd：一時停止の制御コマンド
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　ムービの再生を一時停止、解除します。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>次に再生するムービの登録</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_EntryNext</TD><TD WIDTH=60><PRE>No<BR>3.4</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_EntryNext(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　次に再生するムービハンドルを登録します。この関数でムービを登録しておくと、
+<B>　　</B>　　現在再生しているムービが終了した時点で自動的に次のムービに切り替わります。
+<B>　　</B>　　NULLを指定すると登録の解除となります。
+<B>　　</B>　　CPK_Changeで強制切り替えをするときも、この関数で登録されたムービが次に再生
+<B>　　</B>　　されます。</PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>ムービの強制切り替え</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_Change</TD><TD WIDTH=60><PRE>No<BR>3.5</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_Change(void)
+<B>入力</B>　　なし
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　現在再生しているムービを中断して、CPK_EntryNextで登録されているムービの再生
+<B>　　</B>　　を開始します。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>ムービの切り替え状態の取得</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_CheckChange</TD><TD WIDTH=60><PRE>No<BR>3.6</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　CpkChangeStatus　CPK_CheckChange(void)
+<B>入力</B>　　なし
+<B>出力</B>　　なし
+<B>関数値</B>　強制切り替え可能性チェック値
+<B>機能</B>　　CPK_Changeで強制切り替えをするときの切り替えの可能性を返します。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>指定フレームの展開</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_DecodeFrame</TD><TD WIDTH=60><PRE>No<BR>3.7</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_DecodeFrame(CpkHn cpk, Sint32 frame_no)
+<B>入力</B>　　cpk     ：ムービハンドル
+<B>　　</B>　　frame_no：展開するフレームの番号
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　指定フレームの画像を展開します。
+<B>備考</B>　　本関数は、メモリに読み込まれたムービに対してのみ使用可能です。
+<B>　　</B>　　アプリケーションプログラム内で、ムービファイルを読み込み、
+<B>　　</B>　　CPK_CreateMemMovieでムービハンドルを作成してから、本関数をコールして
+<B>　　</B>　　ください。
+<B>　　</B>　　CPK_CreateGfsMovie、CPK_CreateStmMovieで作成したムービハンドルでは、
+<B>　　</B>　　本関数を使用できません。
+<B>　　</B>　　音なしのキーフレームのみのムービファイルを使ってください。</PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>展開先アドレスの設定</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_SetDecodeAddr</TD><TD WIDTH=60><PRE>No<BR>4.1</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_SetDecodeAddr(CpkHn cpk, void *dec_addr, Sint32 dec_line_size)
+<B>入力</B>　　cpk          ：ムービハンドル
+<B>　　</B>　　dec_addr     ：画像展開先のアドレス
+<B>　　</B>　　dec_line_size：画像展開先バッファの1行のバイト数
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　展開した画像イメージを転送するアドレスを指定します。
+<B>　　</B>　　画像展開先のアドレスが NULL の場合は画像展開を行いません。
+<B>　　</B>　　デフォルトは NULL です。
+<B>　　</B>　　本関数はムービを再生する前にコールしてください。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>表示色数の設定</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_SetColor</TD><TD WIDTH=60><PRE>No<BR>4.2</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_SetColor(CpkHn cpk, CpkColorType color)
+<B>入力</B>　　cpk  ：ムービハンドル
+<B>　　</B>　　color：表示色数
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　画像の表示色数を指定します。
+<B>　　</B>　　デフォルトは1600万色です。
+<B>　　</B>　　本関数はムービを再生する前にコールしてください。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>最大転送セクタ数の設定</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_SetLoadNum</TD><TD WIDTH=60><PRE>No<BR>4.3</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_SetLoadNum(CpkHn cpk, Sint32 load_sct)
+<B>入力</B>　　cpk     ：ムービハンドル
+<B>　　</B>　　load_sct：最大転送セクタ数
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　CDバッファからライブラリの内部バッファへ転送するときの、最大転送セクタ数を
+<B>　　</B>　　設定します。
+<B>　　</B>　　デフォルトは20セクタです。
+<B>　　</B>　　本関数はムービを再生する前にコールしてください。</PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>再生PANの設定</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_SetPan</TD><TD WIDTH=60><PRE>No<BR>4.4</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_SetPan(CpkHn cpk, Sint32 pan)
+<B>入力</B>　　cpk：ムービハンドル
+<B>　　</B>　　pan：PANの値(0〜31)
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　音のPANを指定します。
+<B>　　</B>　　デフォルトは0です。</PRE>
+<UL><TABLE BORDER CELLPADDING=5>
+<TD><pre> </td><td WIDTH=30><PRE>0</TD><TD WIDTH=30><PRE>1</TD><TD WIDTH=30><PRE>2</TD><TD WIDTH=30><PRE>→</TD><TD WIDTH=30><PRE>15</TD><TD WIDTH=30><PRE>16</TD><TD WIDTH=30><PRE>17</TD><TD WIDTH=30><PRE>18</TD><TD WIDTH=30><PRE>→</TD><TD WIDTH=30><PRE>31</TD><TR>
+<TD><PRE>Left<BR>Right</TD><TD><PRE>Max<BR>Max</TD><TD><PRE>&gt;&gt;<BR>Max</TD><TD><PRE>&gt;&gt;<BR>Max</TD><TD><PRE>&gt;&gt;<BR>Max</TD><TD><PRE>Off<BR>Max</TD><TD><PRE>Max<BR>Max</TD><TD><PRE>Max<BR>&gt;&gt;</TD><TD><PRE>Max<BR>&gt;&gt;</TD><TD><PRE>Max<BR>&gt;&gt;</TD><TD><PRE>Max<BR>Off</TD>
+</TABLE></UL><p>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>再生ボリュームの設定</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_SetVolume</TD><TD WIDTH=60><PRE>No<BR>4.5</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_SetVolume(CpkHn cpk, Sint32 volume)
+<B>入力</B>　　cpk   ：ムービハンドル
+<B>　　</B>　　volume：ボリューム(0〜7)
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　音量を指定します。(0で何も出力されない、7で最大音量)
+<B>　　</B>　　デフォルトは7です。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>PCMコマンドブロック番号の設定</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_SetPcmCmdBlock</TD><TD WIDTH=60><PRE>No<BR>4.6</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　voidC　PK_SetPcmCmdBlockNo(CpkHn cpk, Sint32 blk_no)
+<B>入力</B>　　cpk   ：ムービハンドル
+<B>　　</B>　　blk_no：PCMコマンドブロック番号(0〜7)
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　サウンドドライバに設定するPCMコマンドブロック番号を設定します。
+<B>　　</B>　　デフォルトは0です。
+<B>　　</B>　　PCMコマンドブロック番号の詳細については、「SEGASATURN Sound Driverシ
+<B>　　</B>　　ステムインタフェース」を参照してください。
+<B>　　</B>　　本関数はムービを再生する前にコールしてください。</PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>PCMストリーム再生番号の設定</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_SetPcmStreamNo</TD><TD WIDTH=60><PRE>No<BR>4.7</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_SetPcmStreamNo(CpkHn cpk, Sint32 stream_no)
+<B>入力</B>　　cpk      ：ムービハンドル
+<B>　　</B>　　stream_no：PCMストリーム再生番号(0〜7)
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　サウンドドライバに設定するPCMストリーム再生番号を設定します。
+<B>　　</B>　　デフォルトは0です。
+<B>　　</B>　　PCMストリーム再生番号の詳細については、「SEGASATURN Sound Driverシステムインタフ
+<B>　　</B>　　ェース」を参照してください。
+<B>備考</B>　　マルチムービ再生をするときは、それぞれ違うストリーム再生番号にしてください。
+<B>　　</B>　　本関数はムービを再生する前にコールしてください。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>キーアウト範囲の設定</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_SetKeyOutRange</TD><TD WIDTH=60><PRE>No<BR>4.8</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_SetKeyOutRange(CpkHn cpk, Sint32 range)
+<B>入力</B>　　cpk  ：ムービハンドル
+<B>　　</B>　　range：キーアウト(透明にする色)の範囲
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　クロマキー処理で透明色にする範囲を設定します。
+<B>備考</B><UL><UL TYPE="DISK"><LI>クロマキー処理では、展開した点のRGB値とクロマキー指定したRGB値を次の式
+で比較し、その値がキーアウトの範囲よりも小さい場合に透明色にします。
+ABS(ckey.b - decode.b) + ABS(ckey.g - decode.g) + ABS(ckey.r - decode.r)
+ckey はクロマキー指定したRGB値
+decode は展開した点のRGB値<BR>
+<LI>32000色の場合は、0〜96の範囲が指定できます。
+<LI>1600万色の場合は、0〜768の範囲が指定できます。
+<LI>デフォルトは21です。</UL></UL></PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>タイムスケールの取得</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_GetTimeScale</TD><TD WIDTH=60><PRE>No<BR>5.1</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　Sint32　CPK_GetTimeScale(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　タイムスケール
+<B>機能</B>　　タイムスケール値を取得します。
+<B>　　</B>　　リングバッファへフィルムヘッダ部分のデータ供給が終わるまでは、タイムスケー
+<B>　　</B>　　ルの値は無効です。</PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>再生時刻の取得</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_GetTime</TD><TD WIDTH=60><PRE>No<BR>5.2</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　Sint32　CPK_GetTime(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　カレント時刻
+<B>機能</B>　　ムービのカレント時刻を取得します。カレント時刻は、タイムスケール単位のカウ
+<B>　　</B>　　ント値です。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>再生ステータスの取得</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_GetPlayStatus</TD><TD WIDTH=60><PRE>No<BR>5.3</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　CpkPlayStatus　CPK_GetPlayStatus(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　再生ステータス
+<B>機能</B>　　ムービの現在の再生ステータスを返します。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>フィルムヘッダの取得</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_GetHeader</TD><TD WIDTH=60><PRE>No<BR>5.4</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　CpkHeader　*CPK_GetHeader(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　フィルムヘッダ
+<B>機能</B>　　ムービファイルのフィルムヘッダ部分のアドレスを返えします。
+<B>　　</B>　　バッファへフィルムヘッダ部分のデータ供給が終わるまでは、構造体の内容は
+<B>　　</B>　　無効です。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>書き込みバッファの取得</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_GetWriteBuf</TD><TD WIDTH=60><PRE>No<BR>6.1</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　Uint32　*CPK_GetWriteBuf(CpkHn cpk, Sint32 *free_size, Sint32 *free_total)
+<B>入力</B>　　cpk       ：ムービハンドル
+<B>出力</B>　　free_size ：連続書き込み可能な領域のバイト数
+<B>　　</B>　　free_total：不連続領域も合わせた書き込み可能な領域の総バイト数
+<B>関数値</B>　連続書き込み可能な領域の先頭アドレス(書き込みできない場合はNULL)
+<B>機能</B>　　書き込み先のバッファアドレスと書き込み可能なバイト数を取得します。
+<B>備考</B>　　リングバッファへのデータ供給を独自に行いたい場合に使用します。</PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>書き込みサイズの通知</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_NotifyWriteBuf</TD><TD WIDTH=60><PRE>No<BR>6.2</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_NotifyWriteSize(CpkHn cpk, Sint32 write_size)
+<B>入力</B>　　cpk       ：ムービハンドル
+<B>　　</B>　　write_size：書き込んだバイト数
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　バッファに実際に書き込んだバイト数をライブラリに通知します。
+<B>備考</B>　　リングバッファへのデータ供給を独自に行いたい場合に使用します。
+<B>　　</B>　　メモリ上にあるムービファイルを再生するときに使用します。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>バッファにムービを読み込む</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_PreloadMovie</TD><TD WIDTH=60><PRE>No<BR>7.1</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_PreloadMovie(CpkHn cpk, Uint32 size)
+<B>入力</B>　　cpk ：ムービハンドル
+<B>　　</B>　　size：読み込むバイト数
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　ムービファイルをメモリに読み込みます。
+<B>備考</B>　　読み込みバイト数がライブラリが管理しているバッファよりも小さい場合は、
+<B>　　</B>　　バッファサイズまで読み込みます。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>バッファにフィルムヘッダを読み込む</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_PreloadHeader</TD><TD WIDTH=60><PRE>No<BR>7.2</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_PreloadHeader(CpkHn cpk)
+<B>入力</B>　　cpk：ムービハンドル
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　ムービファイルのフィルムヘッダ部分をメモリに読み込みます。
+<B>備考</B>　　本関数をコールする前に、ピックアップの位置をムービファイルの先頭に移動
+<B>　　</B>　　してください。</PRE>
+
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>エラー情報の取得</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_GetErr</TD><TD WIDTH=60><PRE>No<BR>8.1</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　CpkErrCode　CPK_GetErr(void)
+<B>入力</B>　　なし
+<B>出力</B>　　なし
+<B>関数値</B>　エラーコード
+<B>機能</B>　　一番最近に発生したエラーコードを返します。</PRE>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH=150><PRE>Title<BR>関数仕様</TD><TD WIDTH=220><PRE>Data<BR>エラー関数の登録</TD><TD WIDTH=160><PRE>Data Name<BR>CPK_SetErrFunc</TD><TD WIDTH=60><PRE>No<BR>8.2</TD>
+</TABLE><p>
+<DD><PRE><B>書式</B>　　void　CPK_SetErrFunc(CpkErrFunc func, void *obj)
+<B>入力</B>　　func：エラー発生時に呼び出す関数
+<B>　　</B>　　obj ：登録オブジェクト
+<B>出力</B>　　なし
+<B>関数値</B>　なし
+<B>機能</B>　　エラー発生時に呼び出す関数を設定します。登録オブジェクトが登録関数の
+<B>　　</B>　　第一引き数に渡されます。</PRE>
+
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p04_14_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">MOVIE TOOLS GUIDE</A>
+★<a href="../index_j.htm">Cinepak for SEGASaturn</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

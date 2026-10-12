@@ -1,0 +1,52 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p009.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p011.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD ALIGN = "LEFT" WIDTH = 150> <PRE> <B> Title </B> <BR> Function specifications </TD>
+<TD ALIGN = "LEFT" WIDTH = 220> <PRE> <B> Function </B> <BR> Change SCU interrupt mask </TD>
+<TD ALIGN="LEFT" WIDTH=180><PRE><B>Function Name</B><BR>SYS_CHGSCUIM</TD>
+<TD ALIGN="LEFT" WIDTH=60><PRE><B>No</B><BR>2.2</TD>
+</TABLE><P>
+<DD><PRE>
+<B> format </B> void SYS_CHGSCUIM (Uint32 AndMask, Uint32 OrMask);
+<B> Input </B> AndMask: Mask value for permission
+<B>: </B> OrMask: Mask value for rejection
+<B> Output </B> None
+<B> No function value </B>
+<B> Function </B> Mask storage memory contents are ANDed with AndMask and ORed with Or-Mask.
+<B> </B> Writes to the disk storage memory and SCU interrupt mask register. Next, the logic of AndMask and OrMask
+Write <B> sum </B> to the SCU status register. However, the A-Bus interrupt mask bit is enabled
+In case of <B> </B>, the upper word of the status register is cleared, and the A-Bus interrupt acknowledge register
+<B> Clear </B>. Perform these operations atomically.
+<B> Remarks </B> This routine must not be used from interrupt processing (for SCU interrupts)
+<B> </B> SYS_GETSCUIM value is undefined.)
+<B> </B> If an SCU interrupt occurs during processing, the interrupt may disappear (SCU specification). Its possible
+<B> </B> Use it in a situation where you avoid the ability or do not know.
+<B> </B> If this routine is called on slave SH2, the results are not guaranteed. </PRE><P>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD ALIGN = "LEFT" WIDTH = 150> <PRE> <B> Title </B> <BR> Function specifications </TD>
+<TD ALIGN = "LEFT" WIDTH = 220> <PRE> <B> Function </B> <BR> Reference SCU interrupt mask value </TD>
+<TD ALIGN="LEFT" WIDTH=180><PRE><B>Function Name</B><BR>SYS_GETSCUIM</TD>
+<TD ALIGN="LEFT" WIDTH=60><PRE><B>No</B><BR>2.3</TD>
+</TABLE><P>
+<DD><PRE>
+<B> format </B> Uint32 SYS_GETSCUIM;
+<B> Input </B> None
+<B> Output </B> None
+<B> Function value </B> Mask save memory value
+<B> Function </B> Reads the value of the mask storage memory. This value is set / changed in the SCU interrupt mask register.
+If <B> </B> is performed with the above function, it is the same as the value actually set in the SCU interrupt mask register.
+<B> Remarks </B> During SCU interrupt processing, the application uses SYS_SETSCUIM () and SYS_CHGSCUIM () to set
+The mask value for each interrupt factor (if the application uses SYS_CHGUIPR () as the value of <B>. </B>
+<B> The corresponding value in the table of </B> changes to a logical sum. However, when interrupts are multiplexed, the argument is further increased.
+<B> Changes </B> Riwa.
+<B> </B> Therefore, this value is undefined during SCU interrupt processing. Processing that depends on the referenced value during processing
+Do not <B> </B>. </PRE><BR>
+</DL><P><P><HR>
+<A HREF=p009.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p011.htm> Go to next page </A>
+</BODY>
+</HTML>

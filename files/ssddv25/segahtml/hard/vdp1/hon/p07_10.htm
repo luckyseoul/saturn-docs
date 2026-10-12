@@ -1,0 +1,95 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;42/54&gt;VDP1 User's Manual/7.Command</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a> ★ <A HREF="p07_00.htm">Chapter 7 Command</a><HR>
+ <B>▲ <A HREF="p07_00.htm">Back</a> ｜ <A HREF="p07_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 7 Commands</b><HR NOSHADE>
+<DL>
+<A NAME="no7_10"></A><P><DT><H2> ■7.1 System clipping coordinate setting command</H2><DD> Clipping means cutting out (clipping) so that it does not draw in areas other than the set display area. There are two types of clipping: system clipping, which sets the system drawing area, and user clipping, which can be set freely using software.<BR>
+ When the command selection bits (bits 3 to 0) are 1001B, it is a system clipping coordinate setting command, and when it is 1000B, it is a user clipping coordinate setting command.<BR>
+ The contents of the table of system clipping coordinate setting commands are as follows:</P>
+<!-- -------------------------------------------------------------------------------- -->
+<P><DT><TABLE BORDER=0<TR>
+<TD><TABLE BORDER=1>
+<TR><TH><PRE> bit</TH><TH><PRE> 15</TH><TH><PRE> 14</TH><TH><PRE> 13</TH><TH><PRE> 12</TH><TH><PRE> 11</TH><TH><PRE> 10</TH><TH><PRE> 9</TH><TH><PRE> 8</TH><TH><PRE> 7</TH><TH><PRE> 6</TH><TH><PRE> 5</TH><TH><PRE> 4</TH><TH><PRE> 3</TH><TH><PRE> 2</TH><TH><PRE> 1</TH><TH><PRE> 0</TH></TR>
+<TR ALIGN=CENTER><TD> CMDCTRL<BR>
+ +00</TD><TH> 0</TH><TD COLSPAN=3> JP</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH></TR>
+<TR ALIGN=CENTER><TD> CMDLINK<BR>
+ +02</TD><TD COLSPAN=14> LINK specification/8H</TD><TD> 0</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TD> +04</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +06</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +08</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +0A</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +0C</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +0E</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +10</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +12</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> CMDXC<BR>
+ +14</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=10> Lower right X coordinate (XC)</TD></TR>
+<TR ALIGN=CENTER><TD> CMDYC<BR>
+ +16</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=9> Lower right Y coordinate (YC)</TD></TR>
+<TR ALIGN=CENTER><TD> +18</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +1A</TD><TD COLSPAN=16></TD></TR>
+<TR ALIGN=CENTER><TD> +1C </TD><TD COLSPAN=16></TD></TR>
+</TABLE>
+</TD><TD><img srcset="../grp/i110.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD></TR>
+</TABLE>
+<TABLE>
+<TR><TD> 【note】</TD><TD><TABLE BORDER cellspacing=10>
+<TR><TD></TD></TR>
+</TABLE>
+</TD><TD> is ignored (don't care) </TD></TR>
+</TABLE>
+</P>
+<!-- -------------------------------------------------------------------------------- -->
+<P><DD>The system clipping coordinate setting command is defined as follows.</P>
+<P><DT><UL TYPE=DISC>
+<LI> Setting the end bit (bit 15) to 0B and the command selection bit to 1001B becomes the system clipping coordinate setting command.</P>
+<P><LI> Specify the jump format. When the jump format is Assign or Call, divide the address of the next command table to be processed by 8H and set it to CMDLINK.</P>
+<P><LI> Define the lower right coordinates of the clipping area to CMDXC and CMDYC. The upper left coordinate is fixed at (0,0). The drawing area is on and inside the rectangle (square) represented by the upper left coordinates (0,0) and the lower right coordinates (XC, YC).</UL>
+</P>
+<A NAME="no7_11"></A><P><DT><H3> ●System clipping</H3><DD> System clipping coordinates are always valid when drawing, and the area outside the set area is clipped. In other words, the inside is drawn.</P>
+<P><DD> The clipping process is done rectangularly. The specification method is that the upper left coordinates are fixed at (0,0), so define the values for the lower right coordinates (XC, YC) in the command table.<BR>
+<P><DD> Since the clipping coordinates are not checked, please set them so that XC≧0 and YC≧0 in advance. XC&#65308; 0, or YC&#65308; If set to 0, operation is not guaranteed.<BR>
+<P><DD> Points on the clipping line are treated as inside the clipping area and drawn.<BR>
+<P><DD> The clipping coordinate set command rewrites the internal clipping coordinate register. Subsequent parts that have been rewritten will be drawn referring to that value.<BR>
+<P><DD> This command can be defined as many times as you want within one frame, so each group of parts can have different clipping coordinates.<BR>
+<P><DD> The system clipping coordinates must be set before drawing starts, as their values are undefined after power is turned on or reset.</P>
+<A NAME="z7_1"></A><CENTER>
+<P><DT> <B>Figure 7.1 System clipping</b><DT><TABLE BORDER=0>
+<TR><TD> <B>(a) System clipping settings</b></TD></TR>
+<TR><TD ALIGN=CENTER><img srcset="../grp/i111_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><BR>
+ The interior of the area is shown</TD></TR>
+<TR><TD> <B>(b) Incorrect system clipping settings</b></TD></TR>
+<TR><TD ALIGN=CENTER><img srcset="../grp/i111_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><BR>
+ Operation is not guaranteed if XC<0 or YC<0 is set.</TD>
+</TR>
+</TABLE>
+</P>
+</CENTER>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_00.htm">Back</a> ｜ <A HREF="p07_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a> ★ <A HREF="p07_00.htm">Chapter 7 Command</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

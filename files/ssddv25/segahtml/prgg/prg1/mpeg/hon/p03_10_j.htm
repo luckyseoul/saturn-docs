@@ -1,0 +1,97 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/17&gt;MPEGライブラリ/3.動作概要</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no3">MPEGライブラリ</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>MPEGライブラリ</B>
+<H2 ALIGN=CENTER>3.動作概要</H2>
+<HR NOSHADE>
+<DL>
+	<P><DD>　MPEGライブラリは、ビデオの再生に対して以下の2つの動作モードを持っています。</P>
+
+	<P><DT><B>　(1)動画再生モード</B>
+	<DD>　動画を再生するモードです。通常再生状態、フリーズ状態、ポーズ状態、ポーズ＆フリーズ状態があります。</P>
+
+	<P><DT><B>　(2)静止画再生モード</B>
+	<DD>　静止画を再生するモードです。通常の解像度で4バンク、高精細の解像度で1バンク分の画像が表示できます。<BR>　オーディオは常に再生することができます。また、ビデオとオーディオの同期を取ることもできます。</P>
+
+<A NAME="z3_1"></A>
+	<P ALIGN=CENTER><B>図3.1　動作モード</B><BR><img srcset="../grp/i102_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no3_10"></A>
+	<P><DT><H3>3.1　動画再生</H3>
+	<DD>　MPEGビデオのデータは、CDからCDバッファに読み込まれ、デコーダによってフレームバンクに展開されます。このフレームバンクに展開されたイメージデータを、順次表示することによって動画となります。フレームバンクのデータ表示方法は、VDP2に直接出力する方法とホストによってVRAMに転送し表示する方法があります。以下にデータの流れを示します。</P>
+
+<A NAME="z3_2"></A>
+	<P ALIGN=CENTER><B>図3.2　動画再生時のデータの流れ</B><BR><img srcset="../grp/i103_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P>
+
+<A NAME="no3_20"></A>
+	<P><DT><H3>3.2　静止画再生</H3>
+	<DD>　静止画再生モードでは、CDバッファ中のビデオストリームデータをフレームバンク番号を指定してデコードすることができます。出力するフレームバンク番号を指定して、VDP2に直接出力したり、ホストによってVRAMに転送し表示したりできます。</P>
+
+<A NAME="z3_3"></A>
+	<P ALIGN=CENTER><B>図3.3　静止画再生時のデータの流れ</B><BR><img srcset="../grp/i104_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no3_30"></A>
+	<P><DT><H3>3.3　画像データの出力方法</H3>
+	<DD>　出力フレームバンク内のイメージデータ領域に出力ウィンドウを作成し、データを出力することができます。データの出力方法には、以下の2通りの方式があります。</P>
+
+	<DD><OL TYPE=a>
+	<P><LI>VDP2直接出力方式</P>
+	<P><LI>ホスト転送方式</P></OL>
+
+	<P><DD>　ホスト領域に転送するときには複数の出力ウィンドウを、VDP2に直接出力するときにはただ1つの出力ウィンドウを作成することができます。<BR>　また、これらのウィンドウに様々な映像効果を与えることができます。</P>
+
+<A NAME="z3_4"></A>
+	<P ALIGN=CENTER><B>図3.4　出力ウィンドウ</B><BR><img srcset="../grp/i105_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>　映像効果</B>
+	<DD><UL TYPE="DISK">
+	<LI>トリミング(画像の切り出し)
+	<LI>拡大・縮小
+	<LI>フェード
+	<LI>モザイク・ぼかし
+	<LI>ルミネッセンスキー</UL></P>
+
+<A NAME="no3_40"></A>
+	<P><DT><H3>3.4　MPEGオーディオの再生</H3>
+	<DD>　MPEGオーディオの再生は、CDバッファから読み出されたストリームデータをデコードし、サウンドブロックへ出力することによって行われます。</P>
+
+<A NAME="z3_5"></A>
+	<P ALIGN=CENTER><B>図3.5　オーディオの再生</B><BR><img srcset="../grp/i105_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no3">MPEGライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

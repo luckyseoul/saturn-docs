@@ -1,0 +1,26 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p048.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p050.htm> Go to next page </A>
+<HR><P><P>
+<H3> 6.10 Sound initial command </H3>
+<UL> Sound Initial (10h) The value of P1 to P5 of the command is executed when 01H, otherwise it is ignored. This command is mainly intended to be set immediately before issuing a MAP change. <P></UL>
+<B> P1 to P5 details </B> <BR>
+<UL> <UL TYPE = circle> <LI> By executing the P1 execution instruction (01h), stop all sequences that are currently sounding. This has no effect on other sounds (PCM stream playback, CD-DA playback). <P>
+<LI> P2 execution instruction (01h) will stop all PCM stream playbacks that are currently sounding. This has no effect on other sounds (sequence playback, CD-DA playback). <P>
+<LI> In response to the P3 execution instruction (01h), set the direct components [EFSDL] and [EFPAN] to "00H" for the CD-DA input components [EXTS0] and [EXTS1] to output them. Is turned off. Therefore, if the CD-DA input is processed and output by an effect, the volume will not be turned off. This has no effect on other sounds (sequence playback, PCM stream playback). <P>
+<PRE>    Sound address 100217H.b <--- 00H
+                  100237H.b <--- 00H</PRE><P>
+<LI> P4 execution instruction (01h) initializes the DSP unit with a built-in sound source. In practice, the following data is set in the DSP register to turn off the effect component output and prohibit the DSP from accessing (R / W) the D-RAM. At this time, initialization of the mixer is also executed, but it is restored. This has no effect on other sounds (sequence playback, CD-DA playback, PCM stream direct components). <P>
+<PRE>    [IMXL] <--- 00H
+    [EFSDL],[EFPAN] <--- 00H
+    [MPRO] <--- 00000000H
+    [COEF] <--- 000H
+    [TEMP] <--- 000000H</PRE><P>
+<LI> P5 execution instruction (01h) writes [EFSDL] = [EFPAN] = 0 to all the [EFREG] in the mixer section, and does not output the effect component. This has no effect on other sounds (sequence playback, CD-DA playback, PCM stream direct components). <BR></UL></UL>
+<P><P><HR>
+<A HREF=p048.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p050.htm> Go to next page </A>
+</BODY>
+</HTML>

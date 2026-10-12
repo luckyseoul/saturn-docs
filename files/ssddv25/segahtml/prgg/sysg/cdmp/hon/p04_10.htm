@@ -1,0 +1,187 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 8&gt;CD communication I/F (MPEG part)/4.MPEG decoder</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication I/F (MPEG part)</b><H2 ALIGN=CENTER> 4. MPEG decoder</H2><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H3> 4.1 MPEG/Video decoder</H4><DD> The structure of the MPEG/Video decoder is shown in Figure 4.1.</P>
+<A NAME="z4_1"></A><P><DD> <B>Figure 4.1 Structure of MPEG/Video decoder</b><DD><TABLE BORDER=0>
+<TR><TD></TD><TH> Controllable items</TH></TR>
+<TR><TD><img srcset="../grp/i013_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD><TD> <B>《Transfer block》</b><BR>
+
+&#12539; Registering a stream to play<BR>
+
+&#12539; Registering the next stream to play<BR>
+
+&#12539; Stream data transfer<BR>
+
+&#12539; Force video switching</TD></TR>
+<TR><TD><img srcset="../grp/i013_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD><TD> <B>《Decode block》</b><BR>
+
+&#12539; Start decoding<BR>
+
+&#12539; Stop decoding<BR>
+
+&#12539; Clearing data in decoder buffer</TD></TR>
+<TR><TD><img srcset="../grp/i013_03.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD><TD> <B>《Display block》</b><BR>
+
+&#12539; Switching decoding timing<BR>
+
+&#12539; Setting and canceling video pauses<BR>
+
+&#12539; Setting and unfreezing videos<BR>
+
+&#12539; Switching output destination</TD></TR>
+</TABLE>
+</P>
+<A NAME="no4_111"></A><P><DT> <B>4.1.1 Overview of MPEG/Video decoder operation</b><DD> Figure 4.2 shows an overview of the operation of the MPEG/Video decoder.</P>
+<A NAME="z4_2"></A><DT> <B>Figure 4.2 Overview of MPEG/Video decoder operation</b><BR>
+<img srcset="../grp/i014_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no4_112"></A><P><DT> <B>4.1.2 MPEG/Video decoding block</b><DD> The decode block controls start/stop of decoding and erasure of the decoder buffer (VBV buffer and MPEG frame buffer).</P>
+<P><DT> <B>(1) Start/stop decoding</b><DD> You can directly control the decode switch of the MPEG/Video decoder.<BR>
+ If you instruct to stop decoding while decoding a certain video stream, decoding of the picture being processed is completed, and decoding is stopped when the decoder detects the next picture start code.</P>
+<DD><OL TYPE=a>
+<P> <B><LI>Stream A decoding in progress</li>
+</b><BR>
+<PRE>
+ VBV buffer         MPEG frame buffer
+┌─────┬─┬──┐ ┌───────┐ ┌─┬──┬───┬───┐
+│     │ │  │→│Decoder│→│ │  │   │   │
+└─────┴─┴──┘ └───────┘ └─┴──┴───┴───┘
+Not    ↑ ↑
+decoded│ Decoded
+       │
+       Start next picture
+</PRE>
+	<P><B><LI>Decoding stop instruction</B><BR>
+<PRE>
+  VBV buffer        MPEG frame buffer
+┌────┬────┐ ┌───────┐ ┌─┬──┬───┬───┐
+│    │    │→│Decoder│→│ │  │   │   │
+└────┴────┘ └───────┘ └─┴──┴───┴───┘
+           ↑         ↑
+           Start     Decoding of the picture 
+           next      being processed is completed
+           picture
+</PRE></OL>
+<P><DT> <B>(2) Stream switching and decoder buffer clearing</b><DD> When switching streams, the data of the previously decoded stream remains in the decoder buffer below. This data needs to be erased.</P>
+<DL>
+<P><DT> <B>VBV buffer</b><DD> The undecoded portion of the picture currently being processed and the subsequent data that has been prefetched remain.</P>
+<P><DT> <B>MPEG frame buffer</b><DD> The decoded portion of the picture currently being processed and the already decoded picture data remain.</P>
+</DL>
+<P><DT> <B>(3) Clearing VBV buffer</b><DD> Wait for the picture start code, clear the VBV buffer, and switch to another stream.<BR>
+ Continuing from the decoded picture in the MPEG frame buffer, pictures in the subsequent stream can be smoothly played back.<BR>
+ If the VBV buffer is immediately erased without waiting for the picture start code, there is a risk that the picture being decoded in the MPEG frame buffer will not be able to complete its processing, resulting in a decoding error.</P>
+<P><DT> <B>(4) Clearing MPEG frame buffer</b><DD> If you simply erase the VBV buffer and switch to another stream, the decoded picture in the MPEG frame buffer will be displayed first. As a result, a three-frame delay occurs in stream switching.<BR>
+ To avoid this delay, the decoded data in the MPEG frame buffer can be cleared at the same time as the VBV buffer.</P>
+<A NAME="no4_413"></A><P><DT> <B>4.1.3 MPEG/Video display block</b><DD> The display block controls the output of image data decoded in the decode block.<BR>
+ In the following explanation, re-pause is an operation in which the pause switch is open, waits for a certain decoding timing, closes the switch, and opens the switch at the next decoding timing. The same goes for refreeze and freeze switch.</P>
+<P><DT> <B>(1) Function of display block</b><DD> The display block has the following functions.<DD><OL TYPE=a>
+<P> <B><LI>Switching decoding timing</li>
+</b><BR>
+ Specifies the timing of the decode synchronization signal. You can specify whether decoding is performed using VSYNC synchronization or host synchronization.</P>
+<P> <B><LI>Setting and canceling video pauses</li>
+</b><BR>
+ Set the pose of the video by opening the pause switch. During pause, image data does not flow beyond the pause switch, so the image is not updated. Unpause the video by closing the pause switch.<BR>
+ Additionally, slow playback is possible by specifying the re-pause interval.</P>
+<P> <B><LI>Setting and unfreezing videos</li>
+</b><BR>
+ Set the video to freeze by opening the freeze switch. During freezing, the image data is discarded from the freeze switch, so the image is not updated. Unfreeze the video by closing the freeze switch.<BR>
+ You can also perform strobe playback by specifying the refreeze interval.</P>
+<P> <B><LI>Switching output destination</li>
+</b><BR>
+ Switch the output destination of image data. VDP2 and host can be set as output destinations.</P>
+</OL>
+<P><DT> <B>(2) Display block state transition</b><DD> The display block has the following states.</P>
+<A NAME="t4_1"></A><P><DD> <B>Table 4.1 Display block status</b><DD><TABLE BORDER=1>
+<TR><TH ROWSPAN=2></TH><TH ROWSPAN=2> situation</TH><TH COLSPAN=2><PRE> switch status</TH><TH ROWSPAN=2> explanation</TH></TR>
+<TR><TH> Pause</TH><TH> Freeze</TH></TR>
+<TR><TH> 1</TH><TD ALIGN=CENTER><PRE> Normal playback</TD><TD ALIGN=CENTER> closed</TD><TD ALIGN=CENTER> closed</TD><TD> Playing normally.</TD></TR>
+<TR><TH> 2</TH><TD ALIGN=CENTER><PRE> Pause</TD><TD ALIGN=CENTER> Open</TD><TD ALIGN=CENTER> closed</TD><TD> The video has stopped.<BR>
+ The image data stops at the pause switch.</TD></TR>
+<TR><TH> 3</TH><TD ALIGN=CENTER><PRE> Freeze</TD><TD ALIGN=CENTER> closed</TD><TD ALIGN=CENTER> Open</TD><TD> The video has stopped.<BR>
+ Image data is discarded from the freeze switch.</TD></TR>
+<TR><TH> 4</TH><TD ALIGN=CENTER><PRE> Pause<BR> &<BR> Freeze</TD><TD ALIGN=CENTER> Open</TD><TD ALIGN=CENTER> Open</TD><TD> The video has stopped.<BR>
+ The image data stops at the pause switch.<BR>
+ Even after canceling the pause, the video freezes and does not resume playing.</TD></TR>
+</TABLE>
+</P>
+<P><DD> Figure 4.3 shows the state transition diagram of the display block of the MPEG/Video decoder.</P>
+<A NAME="z4_3"></A><P ALIGN=CENTER> <B>Figure 4.3 State transition diagram of MPEG/Video display block</b><BR>
+<img srcset="../grp/i017_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no4_20"></A><P><DT><H3> 4.2 MPEG/Audio decoder</H3><DD> The MPEG/Audio decoder takes sectors from the specified buffer partition and decodes them. The decoded data is sent to the sound block (SCSP) via a serial line.<BR>
+ Figure 4.4 shows the structure of the MPEG/Audio decoder.</P>
+<A NAME="z4_4"></A><P><DD> <B>Figure 4.4 Structure of MPEG/Audio decoder</b><DD><TABLE BORDER=0>
+<TR><TD></TD><TH> Controllable items</TH></TR>
+<TR><TD><img srcset="../grp/i018_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD><TD> <B>《Transfer block》</b><BR>
+
+&#12539; Registering a stream to play<BR>
+
+&#12539; Registering the next stream to play<BR>
+
+&#12539; Stream data transfer<BR>
+
+&#12539; Switching streams<BR>
+
+&#12539; Setting stream number and channel number</TD></TR>
+<TR><TD><img srcset="../grp/i018_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></TD><TD> <B>《Decode block》</b><BR>
+
+&#12539; Start decoding<BR>
+
+&#12539; Stop decoding<BR>
+
+&#12539; mute audio</TD></TR>
+</TABLE>
+<DD> <B>Note 1</b> : The processing target sector area within the CD buffer section is used for the decoder buffer.</P>
+<A NAME="no4_421"></A><P><DT> <B>4.2.1 MPEG/Audio decoding block functions</b><DD> The audio decoding block has the following functions.</P>
+<DD><UL TYPE=DISC>
+<LI> Start decoding/Stop decoding<LI> mute audio<LI> Get audio timestamp</UL>
+</P>
+<P><DT> <B>(1) Mute audio</b><DD> The following settings can be made for the MPEG audio decoder.</P>
+<DD><OL TYPE=a>
+<P> <B><LI>Mute LR channel</li>
+</b><BR>
+ Mute left and right independently.</P>
+<P> <B><LI>Automatic mute when stream input starts</li>
+</b><BR>
+ When a stream is input to the audio decoder, the data of the first three audio frames (approximately 100 msec) is muted.</P>
+</OL>
+<A NAME="no4_422"></A><P><DT> <B>4.2.2 Playing multiple channels</b><DD> When performing multilingual playback, allocate MPEG audio data to each channel number.<BR>
+ Once a channel is set for playback, only the data for that channel is sent to the decoder. Data from other channels is discarded as the playback channel is transferred, so even if you switch to another channel, you can instantly play audio in sync with the video.<BR>
+ Figure 4.5 shows an example of multilingual playback.</P>
+<P ALIGN=CENTER> <B>Figure 4.5 Multilingual playback</b></P>
+<DD><PRE>
+Buffer section
+┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐        ┌────────┐
+|  CN=3  |  CN=2  |  CN=1  |  CN=3  |  CN=2  |  CN=1  |  CN=3  |  CN=1  |Decoder |
+│ French │English │Japanese│ French │English │Japanese│ French │   →    │        │
+└────────┴────────┴────────┴────────┴────────┴────────┴────────┘        └────────┘
+An example of playing Japanese on channel number 1 (CN=1) is shown.
+French and English audio data are discarded as Japanese data is played back.
+</PRE></DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

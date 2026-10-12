@@ -1,0 +1,27 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p031.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p033.htm> Go to next page </A>
+<HR><P><P>
+<H2> Chapter 6 Supplementary explanation </H2>
+<H3> 6.1 How to issue a command </H3>
+There are two methods for issuing <UL> commands: “timing flag handshake” and “command code handshake”. However, since the command code handshake is for compatibility with the sound driver Ver1.00 to Ver1.29, use the timing flag handshake for the sound driver Ver1.30 or later. <BR>
+Either selection is possible, but command code handshake is selected if nothing is specified for upward compatibility. Therefore, when selecting timing flag handshake, the command sequence control word (4E1h ) ”Should be set to the timing flag handshake side. Refer to “Chapter 5 System area 5.1.3 System interface work” for the setting contents. <P></UL>
+<H4> 6.1.1 Timing flag handshake </H4>
+This is a command issuance method that uses the <UL> timing flag to ensure that the order of commands written by the main system is reproduced. Use the following method to issue commands using timing flags. “Timing Flag (4E0h)” is in the system interface work. Refer to “Chapter 5 System Area 5.1.3 System Interface Work”. <P>
+<B> Main system processing (command issuance) </B> <BR>
+<OL> <LI> If the timing flag is "0", write as many commands as you want in the command block. <BR>
+(Up to 8 commands, command blocks may be used with a gap between them.) <BR>
+<LI> Set the timing flag to “1”. <P></OL>
+<B> Sound driver processing (command collection and execution) </B> <BR>
+<OL> <LI> If the timing flag is “1”, command execution is started in order from the command block 1. <BR>
+(The command blocks are executed in order from 1 to 8, and the block with the command code "00h" goes to the next block without doing anything) <BR>
+<LI> The command block that has finished executing the command returns the command code to “00h”. <BR>
+<LI> When all processing up to command block 8 is completed, the timing flag is returned to “0”. <P>
+<IMG SRC="hyou/i032-01.gif"><BR></OL></UL>
+<P><P><HR>
+<A HREF=p031.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p033.htm> Go to next page </A>
+</BODY>
+</HTML>

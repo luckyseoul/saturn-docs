@@ -1,0 +1,104 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 5&gt; Sound I/F library</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#">Sound I/F library</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>Sound I/F library</b><H2 ALIGN=CENTER> 1. guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Purpose</H3><DD> The purpose is to interface the sound system with the main (including CD system) system and control the sound.</P>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 Overview</H3><DD> The sound system allows you to control sequence, PCM, and CD sound.<BR>
+ To control sound, you must first start your sound system. Next, for sequences and PCM, the sound data must be transferred to sound memory in preparation for performance. Also, the result of sound control is obtained by getting the status. The details will be explained in the following order.<BR>
+ See also Sound Driver System Interface in the Sound Development Manual.</P>
+<DD><UL TYPE="DISK">
+<LI> Starting the sound system<LI> Preparation for performance<LI> control of sound<LI> Get status</UL>
+<A NAME="no1_30"></A><P><DT><H3> 1.3 Starting the sound system</H3><DD> The sound system must be started at power-on. The calling sequence is shown below.</P>
+<DD><PRE>
+void sndStart()
+{
+     SndIniDt sys_ini; /* Data storage area for system startup */
+
+     SND_INI_PRG_ADR(sys_ini) = (Uint16 *)0x22002400;
+                              /* 68K program storage start address setting */
+     SND_INI_PRG_SZ(sys_ini) = (Uint16 *)0x4fc8;
+                              /* 68K program size setting */
+     SND_INI_ARA_ADR(sys_ini) = (Uint16 *)0x22004400;     
+                              /* Sound area map storage start address setting */
+     SND_INI_ARA_SZ(sys_ini) = 0x0550;
+                              /* Sound area map size (word specification) settings */
+     SND_Init(&sys_ini); /* Start sound system */
+     ...
+}
+</PRE><P><A NAME="no1_40"></A><P><DT><H3>1.4 Preparing for performance</H3><P><DT> <B>[sequence]</b><DD> It is necessary to transfer the sequence data (song data, sound effect data) to be executed by the sound control function to the sound memory. Please transfer according to the current sound area map. Please see the Sound Development Manual for the sound area map. The calling sequence is shown in `` <A HREF="#no1_50">Controlling Sound</a> ''.</P>
+<P><DT> <B>[PCM]</b><DD> For information on preparing PCM for performance, see Sound Driver System Interface in the Sound Development Manual.</P>
+<A NAME="no1_50"></A><P><DT><H3> 1.5 Sound Control</H3><P><DT> <B>[Functional overview]</b><DD> Sound control functions write commands to sound memory. There are 8 command buffers. The sound control functions can be used without having to be aware of the command buffer.</P>
+<DD><UL TYPE=DISC>
+<P><LI> <B>sequence</b><BR>
+ You can start and stop playback of sequence data, set the volume, etc.</P>
+<P><LI> <B>P.C.M.</b><BR>
+ You can start and stop playing PCM data.</P>
+<P><LI> <B>CD</b><BR>
+ You can set the volume of CD data, PAN settings, volume analysis, effect changes, etc.</P>
+</UL>
+<P><DT> <B>[Calling sequence]</b><DD> The calling sequence below is the processing up to the start of the sequence.</P>
+<P><DD><PRE>
+void sndCnt()
+{
+     sndStart(); /* Start the sound system (see above) */
+     SND_ChgMap(2); /* Change sound area map */
+     SND_MoveData((Uint16 *)0x22005000, 0xffff, SND_KD_SEQ, 2);
+                                        /* Sound data transfer (sequence) */
+     SND_MoveData((Uint16 *)0x22005500, 0xffff, SND_KD_TONE, 2);
+                                        /* Sound data transfer (tone) */
+     SND_SetTlVl(15); /* Overall volume setting */
+     SND_StartSeq(0, 2, 5, 0); /* Start sequence */
+     ...
+}
+</PRE></P>
+<A NAME="no1_60"></A><P><DT><H3>1.6 Get status</H3><P><DT> <B>[Functional overview]</b><DD> Below is an overview of the functions for each sound data.</P>
+<DD><UL TYPE="DISK">
+<P><LI> <B>sequence</b><BR>
+ You can get the current execution status (playing, interrupted, etc.).</P>
+<P><LI> <B>P.C.M.</b><BR>
+ You can get the current running PCM data address.</P>
+<P><LI> <B>CD</b><BR>
+ You can obtain the volume analysis results.</P>
+</UL>
+<P><DT> <B>[Calling sequence]</b><DD> The calling sequence below starts a different sequence at pronunciation control number 0 if the sequence with pronunciation control number 0 is stopped.</P>
+<DD><PRE>
+void sndHantei()
+{
+     SndSeqStat status; /* Sequence status storage area definition */
+     ...
+     SND_GetSeqStat(&status, 0); /* Get sequence status */
+     if(SND_SEQ_STAT_MODE(stauts) == SND_MD_STOP){
+                                        /* Is the sequence with pronunciation control number 0 stop? */
+          SND_StartSeq(0, 2, 6, 0); /* Start sequence */
+     }
+}
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#">Sound I/F Library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

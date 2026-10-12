@@ -1,0 +1,50 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/31&gt;SCU User's Manual/4.DSP Control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p03_07.htm">Back</a> ｜ <A HREF="p04_02.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual</b><H1 ALIGN=CENTER> Chapter 4 DSP control</H1><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H2> ■4.1 DSP internal block diagram</H2><DD> Figure 4.1 shows the internal block diagram of the DSP.</P>
+<A NAME="z4_1"></A><P><DD> <B>Figure 4.1 DSP internal block diagram</b><DT><img srcset="../grp/i077_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>●ALU</b><DD> This is an arithmetic unit that can output up to 48 bits. Normal calculations are executed in 32 bits. Only the product-sum operation is a 48-bit operation.</P>
+<P><DT> <B>●MULTIPLIER</b><DD> This is a multiplier that obtains a 64-bit result using 32 bits x 32 bits, and outputs the lower 48 bits. The calculation result is 48 bits of data, the upper 16 bits are stored in PH (see below) and the lower 32 bits are stored in PL (see below).</P>
+<P><DT> <B>●TOP(W)</b><DD> This is an 8-bit register that stores the start address. For JUMP instructions, subroutine execution, etc., the start address is stored in this register and the process is executed.</P>
+<P><DT> <B>●LOP(W)</b><DD> This is a 12-bit register that stores the loop counter. Set the number of loops in the process of repeatedly executing one instruction.</P>
+<P><DT> <B>●CT0-3(W)</b><DD> This is a 6-bit register that stores the access address of data RAM0-3.</P>
+<P><DT> <B>●MD0-3(R/W)</b><DD> This is a 32-bit data port that stores data in data RAM0-3. Each data RAM has 64 data ports.</P>
+<P><DT> <B>●RA(W)</b><DD> This is an address storage register for accessing data RAM. This register is 8bit. The upper 2 bits store the RAM specification number (0-3), and the lower 6 bits store the RAM access address.</P>
+<P><DT> <B>●RX(W)</b><DD> This is a 32-bit X bus connection register that stores multiplier input data.</P>
+<P><DT> <B>●RY(W)</b><DD> This is a 32-bit Y bus connection register that stores multiplier input data.</P>
+<P><DT> <B>●PH(W)</b><DD> This register stores the upper 16 bits of the 48-bit multiplier output data. It is also an input data storage register that stores the upper 16 bits of input data B (48 bits) of the ALU arithmetic unit.</P>
+<P><DT> <B>●PL(W)</b><DD> This register stores the lower 32 bits of the 48-bit multiplier output data. It is also an input data storage register that stores the lower 32 bits of the input data B (48 bits) of the ALU arithmetic unit.<DT> <B>●ACH(W)</b><DD> This register stores the upper 16 bits of the 48 bit data representing the ALU operation results. It is also an input data storage register that stores the upper 16 bits of the input data A (48 bits) of the ALU arithmetic unit.</P>
+<P><DT> <B>●ACL(W)</b><DD> This register stores the lower 32 bits of the 48 bit data representing the ALU operation results. It is also an input data storage register that stores the lower 32 bits of the input data A (48 bits) of the ALU arithmetic unit.</P>
+<P><DT> <B>●D0 bus</b><DD> A 32-bit data bus for external access. Operates at 28MHz. Used for accessing the main CPU.</P>
+<P><DT> <B>●X bus, Y bus</b><DD> This is a 32-bit data bus for obtaining computing unit input data. Operates at 14MHz.</P>
+<P><DT> <B>●RA0(W)</b><DD> This is a 32-bit external address register used for external → DSP DMA transfer. Since the value is in 4-byte units, please set the external address by shifting it to the right by 2 bits.</P>
+<P><DT> <B>●WA0(W)</b><DD> This is a 32-bit external address register used for DSP → external DMA transfer. Since the value is in 4-byte units, please set the external address by shifting it to the right by 2 bits. <B/R>
+<HR NOSHADE>
+<B>▲ <A HREF="p03_07.htm">Back</a> ｜ <A HREF="p04_02.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+</b> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

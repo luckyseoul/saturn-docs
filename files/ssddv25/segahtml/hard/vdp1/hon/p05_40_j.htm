@@ -1,0 +1,129 @@
+﻿<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;24/54&gt;VDP1ユーザーズマニュアル/5.4　コマンドテーブル</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p05_30_j.htm">戻る</A>｜
+     <a href="p06_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第５章　テーブル</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no5_40"></A>
+	<P>	<DT><H2>■5.4　コマンドテーブル</H2>
+		<DD>　コマンドテーブルは1EH(30)Byteで構成されています。コマンドテーブルは20H(32)Byteごとにフェッチされますので、20Hのバウンダリで定義してください。
+		コマンドテーブルに続く2Byteはダミーとなり、コマンドテーブルのフェッチ時は読み飛ばされます。<BR>
+		　VRAMに格納されたコマンドテーブルは、1フレームごとに先頭アドレス(00000H)からフェッチされます。00000H〜0001EH番地には必ずコマンドテーブルを格納してください。
+		コマンドテーブル以外(カラールックアップテーブル、グーローシェーディングテーブル、キャラクタパターンテーブル)を置いた場合の描画の動作は保証されません。VRAMは7FFFFH番地までです。
+		80000H番地を越えてグーローシェーディングテーブルを定義しないでください。</P>
+
+<A NAME="z5_5"></A>
+	<DD><B>図5.5　コマンドテーブル</B><BR>
+	<DT><TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<TD COLSPAN=2></TD>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> ９ </TD><TD><PRE> ８ </TD>
+<TD><PRE> ７ </TD><TD><PRE> ６ </TD><TD><PRE> ５ </TD><TD><PRE> ４ </TD><TD><PRE> ３ </TD><TD><PRE> ２ </TD><TD><PRE> １ </TD><TD><PRE> ０ </TD></TR>
+<TR ALIGN=CENTER>
+<TD>CMDCTRL</TD><TD>+00H</TD>
+	<TD>END</TD><TD COLSPAN=3>JP</TD><TD COLSPAN=4>ZP</TD><TD>0</TD><TD>0</TD><TD COLSPAN=2>Dir</TD><TD COLSPAN=4>Comm</TD></TR>
+
+<TR ALIGN=CENTER>
+<TD>CMDLINK</TD><TD>+02H</TD>
+	<TD COLSPAN=14>LINK指定/8H</TD><TD>0</TD><TD>0</TD></TR>
+
+<TR ALIGN=CENTER>
+<TD>CMDPMOD</TD><TD>+04H</TD>
+	<TD>MON</TD><TD>0</TD><TD>0</TD><TD>HSS</TD><TD>Pclp</TD><TD>Clip</TD><TD>Cmod</TD><TD>Mesh</TD><TD>ECD</TD><TD>SPD</TD><TD COLSPAN=3>カラーモード</TD><TD COLSPAN=3>色演算ビット</TD></TR>
+
+<TR ALIGN=CENTER>
+<TD>CMDCOLP</TD><TD>+06H</TD>
+	<TD COLSPAN=16>カラーバンク、カラールックアップテーブル/8H(LSBは00B固定)、ノンテクスチャ</TD>
+
+<TR ALIGN=CENTER>
+<TD>CMDSRCA</TD><TD>+08H</TD>
+	<TD COLSPAN=14>キャラクタアドレス/8H</TD><TD>0</TD><TD>0</TD></TR>
+
+<TR ALIGN=CENTER>
+<TD>CMDSIZE</TD><TD>+0AH</TD>
+	<TD>0</TD><TD>0</TD><TD COLSPAN=6>キャラクタサイズX/8</TD><TD COLSPAN=8>キャラクタサイズY/8</TD></TR>
+
+<TR ALIGN=CENTER>
+<TD>CMDXA</TD><TD>+0CH</TD>
+	<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(A),X座標(XA)<B>*</B></TD></TR>
+<TR ALIGN=CENTER>
+<TD>CMDYA</TD><TD>+0EH</TD>
+	<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(A),Y座標(YA)</TD></TR>
+<TR ALIGN=CENTER>
+<TD>CMDXB</TD><TD>+10H</TD>
+	<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(B),X座標(XB)</TD></TR>
+<TR ALIGN=CENTER>
+<TD>CMDYB</TD><TD>+12H</TD>
+	<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(B),Y座標(YB)</TD></TR>
+<TR ALIGN=CENTER>
+<TD>CMDXC</TD><TD>+14H</TD>
+	<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(C),X座標(XC)</TD></TR>
+<TR ALIGN=CENTER>
+<TD>CMDYC</TD><TD>+16H</TD>
+	<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(C),Y座標(YC)</TD></TR>
+<TR ALIGN=CENTER>
+<TD>CMDXD</TD><TD>+18H</TD>
+	<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(D),X座標(XD)</TD></TR>
+<TR ALIGN=CENTER>
+<TD>CMDYD</TD><TD>+1AH</TD>
+	<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(D),Y座標(YD)</TD></TR>
+
+<TR ALIGN=CENTER>
+<TD>CMDGRADA</TD><TD>+1CH</TD>
+	<TD COLSPAN=16>グーロシェーディングテーブル/8H</TD></TR>
+
+<TR ALIGN=CENTER>
+<TD>　</TD><TD>+1EH</TD>
+	<TD COLSPAN=16>ダミー(テーブルフェッチ時は読み飛ばされる)</TD></TR>
+
+
+<TR ALIGN=CENTER>
+<TD>　</TD><TD>+20H</TD>
+	<TD COLSPAN=16>後続のテーブル<BR>　</TD></TR>
+
+<TR ALIGN=CENTER>
+<TD>　</TD><TD>+40H</TD>
+	<TD COLSPAN=16>後続のテーブル<BR>　</TD></TR>
+
+<TR ALIGN=CENTER>
+<TD>　</TD><TD>+60H</TD>
+	<TD COLSPAN=16>：<BR>：</TD></TR>
+</TABLE></P>
+	<P>	<DD><B>[注]*</B>頂点座標の先頭ビットは符号ビットです。負の値は2の補数で表します。上位6bitは符号を拡張してください。</P>
+
+	<P>	<DD>　スプライト等、各パーツの描画の順序は、このコマンドテーブルのVRAM内での置き方により決定されます。<BR>
+		　先に処理された描画パーツは、視点より一番遠いものとなり、最後に処理されたものは、一番近いものとなります。</P>
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p05_30_j.htm">戻る</A>｜
+     <a href="p06_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

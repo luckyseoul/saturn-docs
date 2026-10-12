@@ -1,0 +1,56 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p010.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p012.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD> <PRE> extern void vbStart (void); / * V-BLANK IN interrupt routine * /
+extern void vbEnd (void); / * V-BLANK OUT interrupt routine * /
+main()
+{
+     set_imask (0); / * Enable interrupt * / <P>
+     SCL_Vdp2Init (); / * Scroll and priority initialization * /
+     SCL_SetPriority(SCL_SP0|SCL_SP1|SCL_SP2|SCL_SP3|SCL_SP4|
+                              SCL_SP5|SCL_SP6|SCL_SP7,7);
+     SCL_SetSpriteMode(SCL_TYPE1,SCL_MIX,SCL_SP_WINDOW);<P>
+     SPR_2Initial (& work2d); / * 2D sprite display initialization * / <P>
+     SPR_3Initial (& work3d); / * 3D sprite display initialization * / <P>
+     INT_ChgMsk(INT_MSK_NULL, INT_MSK_VBL_IN | INT_MSK_VBL_OUT);
+                                       / * Disable V-BLANK interrupt * /
+     INT_SetFunc(INT_SCU_VBLK_IN, &vbStart);
+                                       / * Register V-BLANK IN interrupt routine * /
+     INT_SetFunc(INT_SCU_VBLK_OUT, &vbEnd);
+                                       / * Register V-BLANK OUT interrupt routine * /
+     INT_ChgMsk( INT_MSK_VBL_IN | INT_MSK_VBL_OUT, INT_MSK_NULL);
+                                       / * Enable V-BLANK interrupt * / <P>
+     SPR_2FrameChgIntr (0xffff); / * Frame change interval is undefined * /
+                                       / * Set to mode * / <P>
+     SPR_3SetTexture (texture); / * 3D texture data set * / <P>
+     for(;;) {
+           --------------- / * Scroll data set * / <P>
+          SPR_3SetLight (...); / * 3D light source set * /
+          SPR_3SetView (...); / * 3D viewpoint set * / <P>
+          SPR_2OpenCommand(SPR_2DRAW_PRTY_ON); 
+                                       / * Open sprite command write * /
+          SPR_2SysClip(SPR_2MOST_FAR,&xy);
+                                       / * System clip area command * /
+          SPR_2LocalCoord(SPR_2MOST_FAR,&xy); 
+                                       / * Local coordinate command * / <P>
+          SPR_3moveCluster (model0, ...); / * Move the root cluster of 3D model 0 * /
+          SPR_3DrawModel (model0, ...); / * 3D model 0 registration * / <P>
+          SPR_3moveCluster (model1, ...); / * Move the root cluster of 3D model 1 * /
+          SPR_3DrawModel (model1, ...); / * 3D model 1 registration * /
+                            .
+                            .
+                            .
+          SPR_3Flush (); / * 3D sprite command set * /
+          SPR_2CloseCommand (); / * Close sprite command writing * /
+          SCL_DisplayFrame (); / * Wait for V-BLANK interrupt, * /
+                                       / * Display sprite and scroll * /
+      }
+}</PRE>
+</DL><P><P><HR>
+<A HREF=p010.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p012.htm> Go to next page </A>
+</BODY>
+</HTML>

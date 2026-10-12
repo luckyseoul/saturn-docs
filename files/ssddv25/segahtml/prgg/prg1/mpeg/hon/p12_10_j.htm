@@ -1,0 +1,302 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/17&gt;MPEGライブラリ/12.関数詳細-1</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no12">MPEGライブラリ</A>
+<HR>
+<B>▲
+<a href="p11_10_j.htm">戻る</A>｜
+<a href="p12_11_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>MPEGライブラリ/12.関数詳細-1</B>
+<H3 ALIGN=CENTER>12.1　MPEGシステム制御</H3>
+<HR NOSHADE>
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_1"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>MPEGシステムの初期化</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_Init</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.1</H4></TD>
+</TR></table></P>
+
+<DT><B>　書　式</B><DD>Sint32  MPG_Init(Sint32 dscn)
+<DT><B>　入　力</B><DD>dscn：表示の走査方法
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコード
+<DT><B>　機　能</B><DD>MPEGシステムを初期化する。MPEGオーディオはこの初期化が行われると、常に再生可能となります。<BR>MPEGライブラリを使用する場合、必ず最初に１回だけ本関数を呼ばなければならなりません。
+
+<DD>(1) 表示の走査方法
+<DD><TABLE>
+	<TR><TD><PRE>・MPG_DSCN_NITL</TD><TD><PRE>：NTSCノンインタレースモード</TD></TR>
+	<TR><TD><PRE>・MPG_DSCN_ITL</TD><TD><PRE>：NTSCインタレースモード</TD></TR>
+	<TR><TD><PRE>・MPG_DSCN_PLNITL</TD><TD><PRE>：PALノンインタレースモード</TD></TR>
+	<TR><TD><PRE>・MPG_DSCN_PLITL</TD><TD><PRE>：PALインタレースモード</TD></TR></TABLE>
+
+<DT><B>　備　考</B>
+<DD><B>(a)</B>本関数内で以下の手順を実行し、エラーコードを返します。
+<DD><TABLE BORDER>
+	<TR><TD></TD><TH ALIGN=CENTER><PRE>手　　順</TH><TH ALIGN=CENTER><PRE>エラーコード</TH></TR>
+	<TR><TD><PRE>１</TD><TD><PRE>CDブロックのソフトリセット（CDC_CdInit関数）行う。</TD><TD><PRE>エラーが発生した場合、<BR>MPG_ERR_CDINITを返す</TD></TR>
+	<TR><TD><PRE>２</TD><TD><PRE>CDC_GetHwInfo関数を用いて、MPEGカートリッジが装着されているか<BR>チェックする。</TD><TD><PRE>装着されていない場合、<BR>MPG_ERR_NOMCを返す。</TD></TR>
+	<TR><TD><PRE>３</TD><TD><PRE>MPEG使用不可の場合、BOOT ROM内サービスルーチンの<BR>MPEGチェック（SYS_CHKMPEG）を実行する。</TD><TD><PRE>チェックに失敗した場合、<BR>MPG_ERR_MPNGを返す。</TD></TR>
+	<TR><TD><PRE>４</TD><TD><PRE>MPEGデコーダの初期化 （CDC_MpInit関数）を実行する。</TD><TD><PRE>エラーが発生した場合、<BR>MPG_ERR_MPINITを返す。</TD></TR>
+	<TR><TD><PRE>５</TD><TD><PRE>MPEG割り込みマスクの設定 (CDC_MpSetIntMsk関数)を実行し、<BR>ピクチャスタート検出とシーケンスエンド検出割り込みを許可する。</TD><TD><PRE>エラーが発生した場合、<BR>MPG_ERR_NGを返す。</TD></TR>
+	<TR><TD><PRE>６</TD><TD><PRE>表示の走査方法にPAL用の定数が指定された場合、<BR>CDC_MpSetWinDofs関数を用いてディスプレイウィンドウオフセット<BR>を(150,45)に設定する。</TD><TD><PRE>エラーが発生した場合、<BR>MPG_ERR_NGを返す。</TD></TR></TABLE>
+
+<DD><B>(b)</B>GFS_Init関数とSTM_Init関数は、本関数の実行後に呼んでください。
+<!-- +++ Add by CRI ：4.1 -->
+
+	<P><DD><B>(c)</B>GFS_Init関数の実行後、本関数を実行するとECC/リトライ回数がクリアされます。<BR>以下のように、本関数の実行後に再設定してください。
+
+	<P ALIGN=CENTER><FONT SIZE=5>CDC_CdInit(0,0,0x05,0x0f);</FONT></P>
+
+<!-- +++ Add by CRI ：4.1 -->
+</DL>
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_2"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>MPEGシステムの状態の取り込み</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_CaptStat</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.2</H4></TD>
+</TR></table></P>
+
+<DT><B>　書　式</B><DD>void  MPG_CaptStat(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>CDブロック内の現在の状態を取り込みます。MPEGライブラリの各関数は、この関数によって得られた情報によって動作します。ユーザは表示区間の最初にこの関数を呼ばなければなりません。
+</DL>
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_3"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>MPEGビデオの動作モードの設定</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_SetVideoMode</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.3</H4></TD>
+</TR></table></P>
+
+<!-- *** Update by CRI ：2.3(4) --> <DT><B>　書　式</B><DD>Sint32  MPG_SetVideoMode(Sint32 vmode)
+<DT><B>　入　力</B><DD>vmode：MPEGビデオ動作モード
+<DT><B>　出　力</B><DD>なし
+<!-- *** Update by CRI ：2.3(4) --> <DT><B>　関数値</B><DD>エラーコード
+<DT><B>　機　能</B><DD>MPEGビデオの動作モードを設定します。
+<DD>(1)MPEGビデオ動作モード
+<DD><TABLE>
+	<TR><TD><PRE>・MPG_VMODE_MOVIE    </TD><TD><PRE>：動画</TD></TR>
+	<TR><TD><PRE>・MPG_VMODE_SPIC     </TD><TD><PRE>：静止画</TD></TR>
+	<TR><TD><PRE>・MPG_VMODE_SPIC_H   </TD><TD><PRE>：高精細静止画</TD></TR></TABLE>
+</DL>
+
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_4"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>MPEGビデオの動作モードの取得</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_GetVideoMode</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.4</H4></TD>
+</TR></table></P>
+
+<DT><B>　書　式</B><DD>Sint32  MPG_GetVideoMode(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>MPEGビデオ動作モード
+<DT><B>　機　能</B><DD>現在のMPEGビデオの動作モードを返します。
+</DL>
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_5"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>デコード準備の完了確認</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_IsDecReady</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.5</H4></TD>
+</TR></table></P>
+
+<DT><B>　書　式</B><DD>Bool　MPG_IsDecReady(Sint32 decpic)
+<DT><B>　入　力</B><DD>decpic：デコードの開始待ちパラメータ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD><TABLE>
+	<TR><TD><PRE>TRUE </TD><TD><PRE>：デコード準備が完了した</TD></TR>
+	<TR><TD><PRE>FALSE</TD><TD><PRE>：デコード準備が完了していない</TD></TR></TABLE>
+
+<DT><B>　機　能</B><DD>画像データのデコード準備が完了したことをチェックします。MPG_MvDecNext関数またはMPG_SpDecNext関数を呼ぶ前には、本関数でデコードが終了したことを確認してください。<BR>デコードの開始待ちパラメータは以下のとおりです。再生開始前に一回、MPG_HDEC_PREを指定して呼んでください。
+
+<P><DD>(1) デコードの開始待ちパラメータ
+<DD><TABLE>
+	<TR><TD><PRE>・MPG_HDEC_PRE</TD><TD><PRE>：デコード開始前処理</TD></TR>
+	<TR><TD><PRE>・MPG_HDEC_EXE</TD><TD><PRE>：デコード開始待ち</TD></TR></TABLE></P>
+
+<DT><B>　備　考</B><DD>(a)デコードタイミングはMPG_DECTMG_HOSTになっていなければなりません。
+
+<!-- +++ Add by CRI ：4.5 -->
+<P><DT><TABLE BORDER=0><TR>
+<TH><img srcset="../../../../what/atto_j.png 5x"></TH>
+<TD><B>原則として本関数は最初のピクチャのデコード時だけ使用することができます。<BR>
+それ以降のデコードについては、ピクチャ周期Ｍ≦３のストリーム（ストリーム最後の３フレームを除く）では使用可能ですが、一般には<FONT SIZE=5>使用禁止</FONT>とします。</B></TD></TR></TABLE>
+<!-- --- Add by CRI ：4.5 -->
+
+</DL>
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_6"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>ハングアップのリセット</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_ResetHng</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.6</H4></TD>
+</TR></table></P>
+
+<DT><B>　書　式</B><DD>void　MPG_ResetHng(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>ハングアップ検出関数をリセットします。ハングアップ検出を始める前に、この関数によって内部状態をリセットしておかなければなりません。
+</DL>
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_7"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>ハングアップの検出</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_CheckHng</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.7</H4></TD>
+</TR></table></P>
+
+<DT><B>　書　式</B><DD>Bool　MPG_CheckHng(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD><TABLE>
+	<TR><TD><PRE>TRUE </TD><TD><PRE>：ハングアップした</TD></TR>
+	<TR><TD><PRE>FALSE</TD><TD><PRE>：ハングアップしていない</TD></TR></TABLE>
+
+<DT><B>　機　能</B><DD>MPEGビデオがハングアップしたか否かを検査します。ハングアップを検出した場合は、TRUEを返します。正常に動作している場合はFALSEを返します。
+</DL>
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_8"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>MPEGレポートの取得</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_GetReport</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.8</H4></TD>
+</TR></table></P>
+
+<DT><B>　書　式</B><DD>Sint32　MPG_GetReport(Sint32 *actst, Sint32 *vcnt, Sint32 *pict,
+                                     Sint32 *stat_a, Sint32 *stat_v)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD><TABLE>
+	<TR><TD><PRE>actst </TD><TD><PRE>：MPEG動作ステータス        (下位１バイトが有効)</TD></TR>
+	<TR><TD><PRE>vcnt  </TD><TD><PRE>：動作区間(VSYNC)カウンタ   (下位２バイトが有効)</TD></TR>
+	<TR><TD><PRE>pict  </TD><TD><PRE>：ピクチャ情報          　　(下位１バイトが有効)</TD></TR>
+	<TR><TD><PRE>stat_a</TD><TD><PRE>：MPEG/Audioステータス　　　(下位１バイトが有効)</TD></TR>
+	<TR><TD><PRE>stat_v</TD><TD><PRE>：MPEG/Videoステータス　　　(下位２バイトが有効)</TD></TR></TABLE>
+
+<DT><B>　関数値</B><DD>エラーコード
+<DT><B>　機　能</B><DD>MPEGシステムに対して情報取得コマンドを発行し、MPEGレポートを取得します。<BR>失敗した場合の出力値は不定です。<BR>
+<DT><B>　備　考</B>
+<DD>(ａ)出力値の詳細は、CD通信インタフェースマニュアルのMPEGステータス情報の説明を参照してください。
+</DL>
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_9"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>MPEG割り込み要因の取得</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_GetInt</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.9</H4></TD>
+</TR></table></P>
+
+<DT><B>　書　式</B><DD>Sint32　MPG_GetInt(Sint32 *mpint)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>mpint：MPEG割り込み要因(下位３バイトが有効)
+<DT><B>　関数値</B><DD>エラーコード
+<DT><B>　機　能</B><DD>MPEG割り込み要因を取得します。失敗した場合の出力値は不定です。
+<DT><B>　備　考</B><DD>(ａ)出力値の詳細は、CD通信インタフェースマニュアルのMPEG割り込み要因の説明を参照してください。
+</DL>
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_10"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>MPEGのリセット</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_ResetMp</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.10</H4></TD>
+</TR></table></P>
+
+<DT><B>　書　式</B><DD>Sint32 MPG_ResetMp(Bool mpsw)
+<DT><B>　入　力</B><DD>mpsw：MPEGスイッチ(ON/OFF)
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコード
+<DT><B>　機　能</B><DD>MPEGデコーダを初期化します。MPEGスイッチによって、MPEGのON/OFFを指定できます。
+</DL>
+
+<!-- +++ Update by CRI ：2.3(1) --> 
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_11"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>エラー状態の取得</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_GetErrStat</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.11</H4></TD>
+</TR></table></P>
+<DT><B>　書　式</B><DD>Sint32 MPG_GetErrStat(MpgErrStat *stat)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>stat    ：エラー状態
+<DT><B>　関数値</B><DD>エラーコード
+<DT><B>　機　能</B><DD>最後に実行したライブラリ関数のエラー状態を取得します。
+</DL>
+
+<!-- ----------------------------------------------------------------------------- -->
+<A NAME="no1_12"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><a href="p11_10_j.htm#t11_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=250><PRE>Function<BR><H4>エラー関数の登録</H4></TD>
+<TD WIDTH=180><PRE>Function Name<BR><H3>MPG_SetErrFunc</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.12</H4></TD>
+</TR></table></P>
+<DT><B>　書　式</B><DD>void MPG_SetErrFunc(MpgErrFunc func, void *obj)
+<DT><B>　入　力</B><DD>func    ：エラー発生時に呼び出す関数
+<DT><B>　出　力</B><DD>obj     ：登録オブジェクト
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>エラー発生時に呼び出す関数を設定します。登録オブジェクトがエラー関数の第１引数に渡されます。
+</DL>
+<!-- --- Update by CRI ：2.3(1) --> 
+
+
+<HR NOSHADE>
+<B>▲
+<a href="p11_10_j.htm">戻る</A>｜
+<a href="p12_11_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no12">MPEGライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

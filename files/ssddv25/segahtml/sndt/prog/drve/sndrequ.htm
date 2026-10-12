@@ -1,0 +1,101 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/17&gt; Sound driver Ver2.10 guide/4. Specific method of requesting sound</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no4">Sound Driver Programmer's Guide</a><HR>
+ <B>▲ <A HREF="sndcmd_.htm">Back</a> ｜ <A HREF="snderr.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound Driver Programmer's Guide</b><H2 ALIGN=CENTER> 4. Specific method of requesting sound</H2><HR NOSHADE>
+<DL>
+ Basically, to start the sound driver, simply transfer the sound driver to the sound memory and cancel the reset signal. However, the contents of the memory when the power is turned on are not guaranteed, so initialization such as zero clearing is required.<BR>
+ Follow steps 1 to 6 below to start the sound driver. This will start the sound driver and start running from the beginning of the program. For details on hardware such as SCSP and reset, please refer to the SCSP and SMPC user's manuals.<p><a name="colum1"></a><h3> Start-up steps</h3><table border>
+<tr><th> order</th><th> Processing content</th><th> explanation</th></tr>
+<tr><td> 1</td><td> stop 68000<BR>
+ (Resets the sound CPU)</td><td> Execute "Sound OFF" in the software library "SMPC Interface Library".</td></tr>
+<tr><td> 2</td><td> Initialize SCSP registers</td><td> Write 02h as a byte to SH address 25B00400.<BR>
+ (DAC18B=0, MEM4MB=1 settings)</td></tr>
+<tr><td> 3</td><td> Clear the system area to zero</td><td> Clear all SH addresses from 25A00000 to 25A0AFFF to zero.</td></tr>
+<tr><td> 4</td><td> Transfer sound programs to sound memory</td><td> Transfer the sound program (SDDRVS.TSK) from SH address 25A00000.</td></tr>
+<tr><td> 5</td><td> Transfer sound area map to sound memory</td><td> Transfer the sound area map from SH address 25A0A000 to.</td></tr>
+<tr><td> 6</td><td> Start 68000<BR>
+ (Cancels sound CPU reset)</td><td> Execute "Sound ON" in the software library "SMPC Interface Library".</td></tr>
+</table>
+<p> remarks)<BR>
+ The maximum size of a sound area map is 0x1000 bytes, so if the size is larger than this, please divide it into multiple sound area maps and have them created. However, in that case, if necessary, please replace the sound area map before changing the map (as explained in the section on how to play sound).<p> Even if you know the details of the request command, it often happens that you don't know how to actually issue the command. Although the general request procedure is shown here, it is recommended that you decide on the request command buffer allocation before proceeding. The command buffer allocation recommended by SEGA is as follows (regardless of the order, the roles are divided).<p><table border>
+<tr><td> 0x25A00700</td><td> Dedicated for important commands such as sound initials and map changes</td></tr>
+<tr><td> 0x25A00710</td><td> Only for pose on/off</td></tr>
+<tr><td> 0x25A00720</td><td> Dedicated for on/off of PCM stream playback</td></tr>
+<tr><td> 0x25A00730</td><td> CD-DA control only</td></tr>
+<tr><td> 0x25A00740</td><td> For normal sound effect volume requests only</td></tr>
+<tr><td> 0x25A00750</td><td> For regular sound effect performance on/off requests only</td></tr>
+<tr><td> 0x25A00760</td><td> BGM volume request only</td></tr>
+<tr><td> 0x25A00770</td><td> BGM performance on/off request only</td></tr>
+</table>
+<p> Although this is not necessarily a good idea, we strongly recommend that you at least separate buffers between sound effects and other requests. This is because most of the troubles related to sound requests are related to sound effects. This is due to the fact that the number of requests for sound effects is extremely high compared to others, and because requests are made in real time using the control pad, there are many unpredictable cases. This distinction also saves time spent debugging, in addition to ensuring that other requests are not affected.<p> Now, I will explain the request procedure from the start of the game.<p><ol>
+<li> After loading the sound program, set bit 7 of 0x25A004E1 to enable the timing flag.<p><li> Start 68000.<p><li> Performs sound initialization.<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0700</td><td> 10</td><td> --</td><td> 01</td><td> 01</td><td> 01</td><td> 01</td><td> 01</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above and set the timing flag.<p><li> Load the map data and sound data to address 0x25A0A000 and beyond, and set the transferred flag.<p><li> Perform a map change.<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0700</td><td> 08</td><td> --</td><td> nn</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above and set the timing flag.<p><li> Perform effect changes (no need to do this if you are not using DSP).<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0700</td><td> 83</td><td> --</td><td> nn</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above and set the timing flag.<p><li> Perform mixer change.<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0700</td><td> 87</td><td> --</td><td> nn</td><td> nn</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above and set the timing flag.<p> Once you complete the above steps, you will be able to request songs and sound effects. Next, let's request song number 2 in bank 1 with pronunciation control number 3. In this example, it is assumed that no volume was specified by the sound creator.<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0760</td><td> 05</td><td> --</td><td> 03</td><td> 80</td><td> 00</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+<tr><td> 0x0770</td><td> 01</td><td> --</td><td> 03</td><td> 01</td><td> 02</td><td> 00</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above and set the timing flag.<p> In this way, there is usually no error when issuing a sequence volume command and a sequence volume command to the same INT. Now, let's request the sound effect of song number 3 in bank 2 using pronunciation control number 7. Since the sound effect is produced without stopping the song, the pronunciation control numbers for the song and sound effect must be different.<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0740</td><td> 05</td><td> --</td><td> 04</td><td> 80</td><td> 00</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+<tr><td> 0x0750</td><td> 01</td><td> --</td><td> 04</td><td> 02</td><td> 03</td><td> 00</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above and set the timing flag.<p> Next, stop the song currently being played with pronunciation control number 3. Please specify 0 for the end mode.<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0770</td><td> 02</td><td> --</td><td> 03</td><td> 00</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above and set the timing flag.<p> You can stop playing with just one click. Looking at the command reference, there are other commands that seem to stop the sound, but this is the only one that stops the performance. Now let's fade out and end the song. Let's set the fade-out speed to 0x0A. Most games are about this.<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0760</td><td> 05</td><td> --</td><td> 03</td><td> 00</td><td> 0A</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above and set the timing flag. Usually, you cannot wait until the song fades out completely, so issue the end play command at an appropriate point.<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0770</td><td> 02</td><td> --</td><td> 03</td><td> 00</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above and set the timing flag.<p> You have just finished the song, but after that you want to replace the sound data using overlay processing. In this case, just to be safe (because sequences such as sound effects may be playing with other pronunciation management numbers), stop all sequences.<p><table border>
+<tr><td></td><td> +0</td><td> +1</td><td> +2</td><td> +3</td><td> +4</td><td> +5</td><td> +6</td><td> +7</td><td> +8</td><td> +9</td><td> +A</td><td> +B</td></tr>
+<tr><td> 0x0700</td><td> 06</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td><td> --</td></tr>
+</table>
+<p> Write the above, set the timing flag, wait for the timing flag to turn off, return to the beginning, and issue a sound initial, data load, map change, effect change, and mixer change.<p></ol>
+ In rare cases, it seems that a program is created in SH2 that absorbs requests issued by the main side, treats the request command buffer as a ring buffer of 0x10 bytes, and writes the requests in the order in which they are issued. This can be very dangerous depending on the game, so please never do this. Please share the roles of command buffers!<p></DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="sndcmd_.htm">Back</a> ｜ <A HREF="snderr.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no4">Sound Driver Programmer's Guide</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

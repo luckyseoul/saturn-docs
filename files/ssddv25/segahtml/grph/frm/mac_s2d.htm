@@ -1,0 +1,322 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGA2D Format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR NOSHADE>
+<CENTER>
+<H1> for sega saturn<BR>
+ Scroll (VDP2)<BR>
+ data format</H1><H3> SEGA2D</H3></CENTER>
+<HR>
+<DL>
+<P><DT><H2> ■File layout</H2><DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> function</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> $000</TD><TD ALIGN=CENTER><PRE> $100</TD><TD><PRE> <A HREF="#no1">header</a></TD></TR>
+<TR><TD ALIGN=CENTER><PRE> variable</TD><TD ALIGN=CENTER><PRE> variable</TD><TD><PRE> <A HREF="#no2">map data</a></TD></TR>
+<TR><TD ALIGN=CENTER><PRE> variable</TD><TD ALIGN=CENTER><PRE> variable</TD><TD><PRE> <A HREF="#no3">pattern name data</a></TD></TR>
+<TR><TD ALIGN=CENTER><PRE> variable</TD><TD ALIGN=CENTER><PRE> variable</TD><TD><PRE> <A HREF="#no4">character data</a></TD></TR>
+<TR><TD ALIGN=CENTER><PRE> variable</TD><TD ALIGN=CENTER><PRE> variable</TD><TD><PRE> <A HREF="#no5">pallet data</a></TD></TR>
+<TR><TD ALIGN=CENTER><PRE> variable</TD><TD ALIGN=CENTER><PRE> variable</TD><TD><PRE> <A HREF="#no6">attribute data</a></TD></TR>
+</TABLE>
+<A NAME="no1"></A><P><DT><H3> ◆Header</H3><DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><Th><PRE> size</Th><Th><PRE> function</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> $00</TD><TD ALIGN=CENTER><PRE> $10</TD><TD><PRE> Identifier="SEGA_SATURN_SCR"+? ("_" is a space = $20)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $10</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> Map data offset address</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $14</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> Map data size (bytes)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $20</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> pattern name data offset address</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $24</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> Pattern name data size (bytes)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $30</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> Character data offset address</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $34</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> Character data size (bytes)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $40</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> Palette data offset address</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $44</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> Palette data size (bytes)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $50</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> Attribute data offset address</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $54</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> Attribute data size (bytes)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $60</TD><TD ALIGN=CENTER><PRE> $A0</TD><TD><PRE> All vacant addresses $00</TD></TR>
+</TABLE>
+<DD> If no data exists, offset address/data size = 0<BR>
+ The last byte of the identifier is optional.<A NAME="no2"></A><P><DT><H3> ◆Map data</H3><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</Th></TR>
+<TR><TD ALIGN=CENTER><PRE> $00</TD><TD ALIGN=CENTER><PRE> word</TD><TD><PRE> Horizontal page size</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $02</TD><TD ALIGN=CENTER><PRE> word</TD><TD><PRE> Vertical page size</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $04</TD><TD ALIGN=CENTER><PRE> $0C</TD><TD><PRE> Dummy data all $FF</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $10</TD><TD ALIGN=CENTER><PRE> variable</TD><TD><PRE> Page (number) table</TD></TR>
+</TABLE>
+<DD> One page is an area of 512 dots x 512 dots. The page number is an index of <A HREF="#no3">the pattern name table</a> in the order in which it is stored on a page basis.<P> A page table is constructed by storing an array of page numbers that make up a map contiguously in memory with horizontal priority.<P> Please note that the map data in the SEGA2D file has a slightly different interpretation than the map data in the Sega Saturn. (It will be equivalent if 1 plane = 1 page.)<A NAME="no3"></A><P><DT><H3> ◆Pattern name data</H3><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</Th></tr>
+<TR><TD ALIGN=CENTER><PRE> $00</TD><TD ALIGN=CENTER><PRE> long</TD><TD><PRE> character control data</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $04</TD><TD ALIGN=CENTER><PRE> word</TD><TD><PRE> Pattern name auxiliary data</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $06</TD><TD ALIGN=CENTER><PRE> $0A</TD><TD><PRE> Dummy data all $FF</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> $10</TD><TD ALIGN=CENTER><PRE> variable</TD><TD><PRE> pattern name table</TD></TR>
+</TABLE>
+<DD> The pattern name table consists of a sequence of characters laid out on one page that is stored consecutively in memory for the total number of pages.<P> The size and arrangement of the pattern name table changes depending on the "pattern name data size" and "character size" set by the "character control data" and "pattern name auxiliary data".<P> The pattern name data is based on the Sega Saturn pattern name data.<P><DT> <B>detail</b><DD> Please refer to "HARDWARE MANUAL/VDP2 User's Manual/ <A HREF="../../hard/vdp2/hon/p04_60.htm">■4.6 Pattern Name Table</a> ".<A NAME="no3_1"></A><P><DT>&#65308; <B>character control data</b>&#65310;<DD><PRE>
+MSB              Number     size
+│               │  of │     │ │
+│    Unused    │colors│Unused││
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│−│−│−│−│−│−│−│−│2│1│0│−│−│−│S│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+                 │ │ │       └─ SZ :  0=1 cell x 1 cell
+                 │ │ │                1=2 cells x 2 cells
+                 │ │ │         
+                 └─┴─┴───────── CN :000=16 colors
+                                    001=256 colors
+                                    011=32768 colors
+                            LSB
+              Unused          │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│−│−│−│−│−│−│−│−│−│−│−│−│−│−│−│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><A NAME="no3_2"></A><P><DT>&#65308;<B>Pattern name auxiliary data</b>&#65310;<DD><PRE>
+MSB                         LSB
+│   │       │ Pattern name    │
+│   │Unused │ auxiliary data  │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│P│N│−│−│−│−│0│0│0│0│0│0│0│0│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+ │ │ 
+ │ └─ NSM: Character number auxiliary mode
+ │         0=10bit
+ │         1=12bit
+ │ 
+ └─── PNB: Pattern name data size
+           0=1 word
+           1=2 words
+</PRE><DD> *All pattern name auxiliary data are reserved as 0.<A NAME="no3_3"></A><P><DT>&#65308; <B>pattern name data</b>&#65310;<DD> Each bit that makes up the pattern name data is expressed as follows.<UL TYPE=DISC>
+<LI> <B>VF</b> = Vertical flip flag<LI> <B>HF</b> = Upside down flag<LI> <B>PR</b> = special priority bit<LI> <B>CC</b> = special color calculation bit</UL>
+<P> Palette numbers are expressed as 1 unit of 16 colors.<P> For the character number, specify the offset address of the character pattern table (see the character data section) in units of $20. Therefore, the number of occupancies per character changes as shown below, depending on the character size and number of character colors.<P><DD><TABLE BORDER=1>
+<TR><Th><PRE> Number of character colors</Th><Th><PRE> 1 cell x 1 cell</Th><Th><PRE> 2 cells x 2 cells</Th></TR>
+<TR ALIGN=CENTER><TD><PRE> 16 colors</TD><TD><PRE> 1</TD><TD><PRE> 4</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 256 colors</TD><TD><PRE> 2</TD><TD><PRE> 8</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 32768 colors</TD><TD><PRE> 4</TD><TD><PRE> 16</TD></TR>
+</TABLE>
+<P><DD> In Sega Saturn, if the pattern name data size is 1 word, the missing pattern name data is usually supplemented with pattern name auxiliary data.<P> In the SEGA2D file, all bits that make up the pattern name auxiliary data are fixed to 0. Therefore, there are restrictions on the number of characters and palettes that can be used, so please be careful.<P><DD> <B>◇When pattern name data size = 2 words</b><PRE>
+MSB
+ │Reverse function
+ │      │Special function
+ │          |   Unused     │   Pallete number   │
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│HF│VF│Pr│CC│−−│−−│−−│−−│−−│6 │5 │4 │3 │2 │1 │0 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+                                              LSB
+│  │ Character number                           │
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│−−│14│13│12│11│10│9 │8 │7 │6 │5 │4 │3 │2 │1 │0 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><P><DD><B>◇Pattern name data size = 1 word</b><DD> Character size = 1 cell x 1 cell<BR>
+ Number of character colors = 16 colors<BR>
+ When character number auxiliary mode=10bit<PRE>
+MSB                                           LSB
+│           │Reverse  │
+│Palette    │function│
+│number     │     |       Character number
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│3 │2 │1 │0 │VF│HF│9 │8 │7 │6 │5 │4 │3 │2 │1 │0 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><P><DD><B>◇Pattern name data size = 1 word</b> Character size = 1 cell x 1 cell<BR>
+ Number of character colors = 16 colors<BR>
+ When character number auxiliary mode=12bit<PRE>
+MSB                                           LSB
+│Palette    │                                   │
+│number     │Character number                   │
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│3 │2 │1 │0 │11│10│9 │8 │7 │6 │5 │4 │3 │2 │1 │0 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><P><DD><B>◇Pattern name data size = 1 word</b> Character size = 1 cell x 1 cell<BR>
+ Number of character colors = other than 16 colors<BR>
+ When character number auxiliary mode=10bit<PRE>
+MSB                                           LSB
+   │        │Reverse  │
+   │Palette │function│
+   │number  │     |       Character number
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│−−│6 │5 │4 │VF│HF│9 │8 │7 │6 │5 │4 │3 │2 │1 │0 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><P><DD><B>◇Pattern name data size = 1 word</b> Character size = 1 cell x 1 cell<BR>
+ Number of character colors = other than 16 colors<BR>
+ When character number auxiliary mode=12bit<PRE>
+MSB                                           LSB
+   │Palette │                                   │
+   │number  │Character number                   │
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│−−│6 │5 │4 │11│10│9 │8 │7 │6 │5 │4 │3 │2 │1 │0 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><P><DD><B>◇Pattern name data size = 1 word</b> Character size = 2 cells x 2 cells<BR>
+ Number of character colors = 16 colors<BR>
+ When character number auxiliary mode=10bit<PRE>
+MSB                                           LSB
+│           │Reverse  │
+│Palette    │function│
+│number     │     |       Character number
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│3 │2 │1 │0 │VF│HF│11│10│9 │8 │7 │6 │5 │4 │3 │2 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><P><DD><B>◇Pattern name data size = 1 word</b> Character size = 2 cells x 2 cells<BR>
+ Number of character colors = 16 colors<BR>
+ When character number auxiliary mode=12bit<PRE>
+MSB                                           LSB
+│Palette    │                                   │
+│number     │Character number                   │
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│3 │2 │1 │0 │13│12│11│10│9 │8 │7 │6 │5 │4 │3 │2 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><P><DD><B>◇Pattern name data size = 1 word</b> Character size = 2 cells x 2 cells<BR>
+ Number of character colors = other than 16 colors<BR>
+ When character number auxiliary mode=10bit<PRE>
+MSB                                           LSB
+   │        │Reverse  │
+   │Palette │function│
+   │number  │     |       Character number
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│−−│6 │5 │4 │VF│HF│11│10│9 │8 │7 │6 │5 │4 │3 │2 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><P><DD><B>◇Pattern name data size = 1 word</b> Character size = 2 cells x 2 cells<BR>
+ Number of character colors = other than 16 colors<BR>
+ When character number auxiliary mode=12bit<PRE>
+MSB                                           LSB
+   │Palette │                                   │
+   │number  │Character number                   │
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│−−│6 │5 │4 │13│12│11│10│9 │8 │7 │6 │5 │4 │3 │2 │
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE><A NAME="no4"></A><P><DT><H3>◆Character data</H3><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</Th></tr>
+<TR><TD><PRE> $00</TD><TD><PRE> $10</TD><TD><PRE> Dummy data all $FF</TD></TR>
+<TR><TD><PRE> $10</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no4_1">character pattern table</a></TD></TR>
+</TABLE>
+<DD> The total number and arrangement of character pattern tables vary depending on the character size and number of character colors.<P><DT> <B>detail</b><DD> "HARDWARE MANUAL/VDP2 User's Manual/ <A HREF="../../hard/vdp2/hon/p04_30.htm">■4.3 Cell</a> / <A HREF="../../hard/vdp2/hon/p04_40.htm">■4.4 Character Pattern</a> "<A NAME="no4_1"></A><P><DT>&#65308; <B>Character pattern data</b>&#65310;<DD> A character pattern table is constructed by storing the "cell data" that make up a character consecutively in memory.<P> Cell data is arranged as shown below depending on the character size.<P><DD> <B>◇When character size = 1 cell x 1 cell</b><PRE>
+┌─────┬─────┬─────┬─────┬─────┬
+│Cell0│Cell1│Cell2│Cell3│Cell4│
+├─────┼─────┼─────┼─────┼─────┼
+│.....│.....│.....│.....│.....│
+├─────┼─────┼─────┼─────┼─────┼
+│.....│.....│.....│.....│.....│
+├─────┼─────┼─────┼─────┼─────┼
+
+ |cell 0=character 0|
+ |cell 1=character 1|
+ |cell 2=character 2|
+ |cell 3=character 3|
+ |cell 4=character 4|
+ |cell 5=character 5|
+ |cell 6=character 6|
+ | ･････････････････････････････････････････････････････････
+</PRE><P><DD><B>◇When character size = 2 cells x 2 cells</b><PRE>
+┌─────┬─────┬─────┬─────┬─────┬
+│Cell0│Cell1│Cell4│Cell5│Cell8│
+├─────┼─────┼─────┼─────┼─────┼
+│Cell2│Cell3│Cell6│Cell7│.....│
+├─────┼─────┼─────┼─────┼─────┼
+│.....│.....│.....│.....│.....│
+├─────┼─────┼─────┼─────┼─────┼
+
+ --------------------
+ |Cell 0|            |
+ |Cell 1|Character 0 |
+ |Cell 2|            |
+ |Cell 3|            |
+ --------------------
+ |Cell 4|            |
+ |Cell 5|Character 1 |
+ |Cell 6|            |
+ |Cell 7|            |
+ --------------------
+ | ...  |........... |
+</PRE><P><DT><H3>◆Cell data</H3><DD> Cell data is structured as follows depending on the number of character colors.<BR>
+ The numbers in the frame are the offset addresses from the beginning of each cell data.<P><DD> <B>◇When number of character colors = 16 colors</b><PRE>
+  0 1 2 3 4 5 6 7 
+ ┌───┬───┬───┬───┐
+0│+00│+01│+02│+03│
+ ├───┼───┼───┼───┤
+1│+04│+05│+06│+07│
+ ├───┼───┼───┼───┤
+2│+08│+09│+0a│+0b│
+ ├───┼───┼───┼───┤
+3│+0c│+0d│+0e│+0f│
+ ├───┼───┼───┼───┤
+4│+10│+11│+12│+13│
+ ├───┼───┼───┼───┤
+5│+14│+15│+16│+17│
+ ├───┼───┼───┼───┤
+6│+18│+19│+1a│+1b│
+ ├───┼───┼───┼───┤
+7│+1c│+1d│+1e│+1f│
+ └───┴───┴───┴───┘
+</PRE><P><DT><B>◇When number of character colors = 256 colors</b><DD><PRE>
+   0   1   2   3   4   5   6   7 
+ ┌───┬───┬───┬───┬───┬───┬───┬───┐
+0│+00│+01│+02│+03│+04│+05│+06│+07│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+1│+08│+09│+0a│+0b│+0c│+0d│+0e│+0f│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+2│+10│+11│+12│+13│+14│+15│+16│+17│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+3│+18│+19│+1a│+1b│+1c│+1d│+1e│+1f│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+4│+20│+21│+22│+23│+24│+25│+26│+27│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+5│+28│+29│+2a│+2b│+2c│+2d│+2e│+2f│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+6│+30│+31│+32│+33│+34│+35│+36│+37│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+7│+38│+39│+3a│+3b│+3c│+3d│+3e│+3f│
+ └───┴───┴───┴───┴───┴───┴───┴───┘
+</PRE><P><DD><B>◇When number of character colors = 32768 colors</b><DD><PRE>
+  0   1   2   3   4   5   6   7 
+ ┌───┬───┬───┬───┬───┬───┬───┬───┐
+0│+00│+02│+04│+06│+08│+0a│+0c│+0e│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+1│+10│+12│+14│+16│+18│+1a│+1c│+1e│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+2│+20│+22│+24│+26│+28│+2a│+2c│+2e│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+3│+30│+32│+34│+36│+38│+3a│+3c│+3e│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+4│+40│+42│+44│+46│+48│+4a│+4c│+4e│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+5│+50│+52│+54│+56│+58│+5a│+5c│+5e│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+6│+60│+62│+64│+66│+68│+6a│+6c│+6e│
+ ├───┼───┼───┼───┼───┼───┼───┼───┤
+7│+70│+72│+74│+76│+78│+7a│+7c│+7e│
+ └───┴───┴───┴───┴───┴───┴───┴───┘
+</PRE><A NAME="no5"></A><P><DT><H3>◆Palette data</H3><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</Th></tr>
+<TR><TD><PRE> $00</TD><TD><PRE> word</TD><TD><PRE> Starting (offset) pallet number</TD></TR>
+<TR><TD><PRE> $02</TD><TD><PRE> word</TD><TD><PRE> Number of color tables</TD></TR>
+<TR><TD><PRE> $04</TD><TD><PRE> $0C</TD><TD><PRE> Dummy data all $FF</TD></TR>
+<TR><TD><PRE> $10</TD><TD><PRE> variable</TD><TD><PRE> color table</TD></TR>
+</TABLE>
+<DD> If the number of character colors is 32768 colors (RGB mode), palette data does not exist.<P> A color table is constructed by storing the "color data" that make up a palette in memory consecutively.<P> The starting palette number is specified in units of 1 color (1 color data).<P><DT><H3> ◆Color data</H3><DD><PRE>
+MSB                           LSB
+│ │    B    │    G    │    R    │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│−│4│3│2│1│0│4│3│2│1│0│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><DD>Color data follows the data structure of color RAM in the case of 5 bits each for RGB.<P><DT> <B>detail</b><DD> "HARDWARE MANUAL/VDP2 User's Manual/ <A HREF="../../hard/vdp2/hon/p03_40.htm">■3.4 Color RAM Mode</a> "<A NAME="no6"></A><P><DT><H3> ◆Attribute data</H3><DD><TABLE BORDER=1>
+<TR><Th><PRE> offset</Th><Th><PRE> size</Th><Th><PRE> function</Th></tr>
+<TR><TD><PRE> $00</TD><TD><PRE> Word x number of characters</TD><TD><PRE> attribute data</TD></TR>
+</TABLE>
+<DD> Attribute data consists of one unit of word size, which is the same number of characters as the number of characters, and is stored contiguously in memory.<P> There are no specific Sega Saturn hardware functions that correspond to attribute data. Use this field if your application software requires some information that corresponds one-to-one with the character table.</DL>
+<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#frm">Format list</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

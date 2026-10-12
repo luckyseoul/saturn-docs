@@ -1,0 +1,291 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 5&gt;FAQ/Movie related/Cinepak</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#movi">FAQ</a> ★ <A HREF="index.htm#cine">Movie related</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Movie related</b><H2 ALIGN=CENTER> Cinepak</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_01"><HR></a><DL>
+<H3> I want to play an audio-only Cinepak from the middle.</H3><P><DT> <FONT SIZE=5>Q)</font><DD><OL>
+<P><B><LI></b> Is it possible to play Cinepack data from any position?<BR>
+ If possible, how can I do it?</P>
+<P><B><LI></b> Is it possible to do this with Cinepack data that only has sound (no image data)?</P>
+</OL>
+<P> Please tell me about these two points.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD><OL>
+<P><B><LI></b> Playing Cinepack data from any position is possible as long as it is in memory, there is no sound, and all keyframes are present.</P>
+<P><B><LI></b> <FONT SIZE=5>you can't.</font></P>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_02"><HR></a><DL>
+<H3> In Cinepak, when you pause at the joint of a movie, the sound of the next movie is played.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If <A HREF="../../movi/cine/hon/p04_14.htm#no3_3">you use the CPK_Pause function</a> to pause between Cinepack's split movies (just before the next movie starts), the audio of the next movie registered with <A HREF="../../movi/cine/hon/p04_14.htm#no3_4">CPK_EntryNext</a> will play during the pause. (Looping) When you release the pause, the audio will be out of sync for a while.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> There are <FONT SIZE=5>two</font> problems.</P>
+<P> <FONT SIZE=5>First</font> , since Ver1.10, the CPK_Pause function returns a return value, and if it cannot be paused correctly, it will output an error code.</P>
+<P><DD>&#65308; <B>Specification change of pause function CPK_Pause</b>&#65310;<DD> Old specification: No return value.<DD> New specification: Returns a Bool type return value.<DD><TABLE>
+<TR><TD> TRUE</TD><TD> :Command was accepted</TD></TR>
+<TR><TD> FALSE</TD><TD> :Command was not accepted</TD></TR>
+</TABLE>
+<P><DD> Returns FALSE if:<UL TYPE=DISC>
+<LI> Abnormal handle.<LI> An attempt was made to pause with a playback status other than CPK_STAT_PLAY_TIME.<LI> An attempt was made to release the pause with a playback status other than CPK_STAT_PLAY_PAUSE.<LI> Tried to pause while moving on to the next movie.</UL>
+</P>
+<P> Be sure to check the error codes above.</P>
+<P> <FONT SIZE=5>Second</font> , if you execute this CPK_Pause function at a change in the movie, the change cannot be determined within the function, so the same phenomenon may occur even if you perform the first check.<BR>
+ For details on the processing to be performed before executing the CPK_Pause function, please refer to " <A HREF="../../movi/cine/hon/p04_101.htm#4_3_11">(11) About changing the next handle registration</a> " in the Cinepak User's Manual.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_03"><HR></a><DL>
+<H3> About the pose during seamless brunch.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The currently playing movie is Movie1, and the next movie registered with CPK_EntryNext is Movie2.</P>
+<P> When I pause with Movie2 registered, I call the CPK_Pause function for both Movie1 and Movie2, but if I pause while Movie1 is playing (before Movie2 is played), Movie1 returns TRUE. , and Movie2 has not been played yet, so it returns FALSE, but what kind of processing should I do to determine if the pause was successful?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The CPK_Pause function should be used with caution when doing seamless branches. Before execution, be sure to use the status acquisition function (CPK_GetPlayStatus) to execute the CPK_Pause function only for what is currently being played. So don't run CPK_Pause on both as above.</P>
+<P> If you execute CPK_EntryNext, check the transition period of the next handle of the CPK_EntryNext function, and do not execute the CPK_Pause function until you are sure that Movie2 is in the play state.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_04"><HR></a><DL>
+<H3> What is Cinepak error CPK_ERR_SAMPLE_ID?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The Cinepack error code CPK_ERR_SAMPLE_ID (0x00000401) is described in the manual as "movie identifier is abnormal", but what does this movie identifier mean?</P>
+<P> Also, when playing CinePack, an error (error code 0x301) occurred that the initial value of "FLOP" was too small.What is "FLOP"? What can I do to make it bigger?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This error code is output when the data loaded into the ring buffer is not Cinepak data.<BR>
+ This error is not output when data is sent from the CD-ROM to the ring buffer, but when the data is actually expanded.</P>
+<P> In the case where this error code is output,<P><UL TYPE=DISC>
+<LI> Not loading the correct data file from the CD.<LI> The contents of the ring buffer are corrupted during other processing.</UL>
+</P>
+<P><DD> Such will be considered.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_05"><HR></a><DL>
+<H3> Please tell me about stereo/monaural settings.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How do I switch between stereo and monaural Cinepack playback?<P><DT> <FONT SIZE=5>A)</font><DD> Please control the stereo/monaural switching of Cinepack playback on the sound driver side.</P>
+<P> There is a function called CPK_SetPan, which corresponds to so-called left-right balance. Therefore, it does not make the sound of CinePack stereo/mono.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_06"><HR></a><DL>
+<H3> When doing a seamless branch, do you prepare as many buffers as there are movies?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When performing seamless branch playback of movies, do I need to prepare as many buffers as there are movies to play?</P>
+<P> For example, when playing three movies A, B, and C seamlessly, can't A and C be shared in the same buffer?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> A buffer is just a buffer, so even if you use multiple movies, you don't have to prepare as many buffers as there are movies to play.<BR>
+ Therefore, if there is an unused buffer, it is possible to reuse it.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_07"><HR></a><DL>
+<H3> How to properly play Cinepak on PAL?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When you play a CinePack that normally plays in NTSC but in PAL, you may experience symptoms such as the sound cutting out momentarily or the sound and video being out of sync.<BR>
+ What should I do to play correctly on PAL?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This phenomenon occurs because Cinepak's data transfer is not on time.<BR>
+ As a method to do it on the program side</P>
+<OL>
+<P> <B><LI>Increase the number of CPK_Tasks.</li>
+</b><BR>
+ (For PAL, the number of V-Blanks has decreased from 1/60 to 1/50, so simply increase it.)</P>
+<P> <B><LI>Execute in a mode that uses the Slave CPU, which is compatible with Cinepak library Ver. 1.10.</li>
+</b><BR>
+ (Cinepak library may malfunction if your application uses Slave CPU.)</P>
+</OL>
+<P> There are <FONT SIZE=5>two</font> possibilities.<BR>
+ In the case of this problem, there is a possibility that it can be cleared by taking action in (1). In fact, when changing from 1/60 to 1/50 (from NTSC to PAL), the same symptoms as yours occur due to the timing difference.</P>
+<P> As a countermeasure by changing the program, it is possible to change the graphics transfer timing and transfer method.</p>
+<P> For other cases, it is possible to correct the data for PAL, and possible correction methods include dropping frames or changing key frames (30 to 25, etc.).</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_08"><HR></a><DL>
+<H3> When should I register a movie when doing a seamless brunch?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I have a question about seamless branch playback of movies.<BR>
+ In the sample (smpcpk5.c), two movies are played consecutively, but when playing three or more movies, when should I register the third movie [CPK_EntryNext()]? ?</P>
+<P><DD><PRE>
+      &gt;    /* Start movie */
+      &gt;    CPK_Start( cpk[0] );
+      &gt;    
+      &gt;    /* Register the next movie to play */
+      &gt;    for ( i = 1 ; i&lt; FILE_MAX ; i++ )
+      &gt;    {
+      &gt;        CPK_EntryNext( cpk[i] );
+      &gt;    }
+</PRE></P>
+<P>It seems that this is not the case, so if you want to register when the second movie starts playing, would it be possible to detect the end of the first movie and then issue CPK_EntryNext?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> I think there is no problem with the above method.<BR>
+ If you are going to enter three or more movies one after another, it would be effective to prepare two ring buffers and switch between them.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_09"><HR></a><DL>
+<H3> What points should I be careful about when handling errors?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What points should I be careful about when handling errors?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> If an error occurs in the file system or stream system during movie playback, movie playback cannot be continued.<BR>
+ In this case, delete the movie handle and close the file. After that, please perform other processing such as playing the movie again.</P>
+<P> Be sure to set each error processing function GFS_SetErrFunc, STM_SetErrFunc, and CPK_SetErrFunc to detect errors. It also improves debugging efficiency.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_10"><HR></a><DL>
+<H3> Are there any precautions when using SCU-DMA for data transfer?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Are there any precautions when using SCU-DMA to transfer data from the CD block to the ring buffer?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> When using SCU-DMA to transfer data from the CD block to the ring buffer, peripheral information may not be obtained correctly.<BR>
+ In this case, it can be improved by setting the maximum number of transferred sectors (default value 20) to a smaller value, but if you set the value smaller, you will need to call the task function frequently enough to compensate for the smaller setting.</P>
+<P><DD> <B>[Processing example]</b><DD><PRE>
+CPK_SetTrModeCd(cpk, CPK_TRMODE_SCU); /* Transfer using SCU-DMA */
+CPK_SetLoadNum(cpk, 10); /* Maximum value of one transfer amount [sector]*/
+</PRE></P>
+<P>Also, since the bus used during SCU-DMA transfer is occupied, SH2 will be in a wait state from the moment it tries to access the CPU bus.<BR>
+ Please avoid using SCU-DMA as much as possible.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_11"><HR></a><DL>
+<H3> Please tell me about the relationship between frame size and Cinepak compression method.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me about the relationship between frame size and Cinepak compression method.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Cinepak performs compression processing by dividing one frame into 1 to 3 parts depending on the frame size (area).</P>
+<P> Before and after the splitting conditions, the internal compression efficiency and image quality become discontinuous, and the following trends are thought to occur.</P>
+<DL>
+<P><DT> <B>If it is smaller than the splitting condition and close to the splitting condition:</b><DD> Poor image quality (compression rate is slightly better)</P>
+<P><DT> <B>If it is larger than the split condition and close to the split condition:</b><DD> Good image quality (compression rate is a little bad)</P>
+</DL>
+<P> The exact dividing conditions are unknown, but the ranges we have confirmed are shown below.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=220> Area [pixel]</TH><TH WIDTH=220> Number of frame divisions (number of tiles)</TH></TR>
+<TR ALIGN=CENTER><TD> 96000 = 480×200 or more</TD><TD> 3</TD></TR>
+<TR ALIGN=CENTER><TD> 95744 = 352×272 or less<BR>
+ 59904 = 208×288 or more</TD><TD> 2</TD></TR>
+<TR ALIGN=CENTER><TD> 57344 = 256×224 or less</TD><TD> 1<BR>
+ (Do not split)</TD></TR>
+</TABLE>
+<DD> <B>*</b> The CinePack library supports <FONT SIZE=5>splitting into two or less</font> .</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_12"><HR></a><DL>
+<H3> What is the most efficient way to perform image decompression processing?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What is the most efficient way to perform image decompression processing?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> It is more efficient to output image decompression processing to WORK RAM-H than directly to VRAM, so task functions operate faster this way.<BR>
+ If you output the data to WORK RAM-H and then transfer it to VRAM using SCU-DMA, the processing time will be shorter even if you add the transfer time.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_13"><HR></a><DL>
+<H3> I want to make an uncompressed movie.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to display an uncompressed movie.</P>
+<P><DT> <FONT SIZE=5>A)</font><DL>
+<P><DT> <B>(1) Conditions for using uncompressed mode</b><DD> Use this when you want to reduce the image size and frame rate and give priority to image quality.</P>
+<P> 15-bit color movies are not supported. Although it supports 32K color display of 24-bit data, this means that high-quality data will be wasted.</P>
+<P> Convert an uncompressed QuickTime Movie with MovieToSaturn_J. There are no functions added for playing uncompressed movies.<BR>
+ Since the file header is interpreted and processed, it can be played using exactly the same procedure. However, the ring buffer must be larger than when compressed.</P>
+<P><DT> <B>(2) Ring buffer size</b><DD> Ring buffers must be allocated to meet the following conditions:</P>
+<P><DD> <B>ring ≧ header + sound + frame</b></P>
+<P><DD> ring :Ring buffer size<DD> header: File header size (converted to sector size boundary rounded up)<DD> sound: Size of 0.5 seconds of sound<DD> frame :1 frame uncompressed size</P>
+<P><DT> <B>(3) Video performance</b><DD> Based on the data transfer rate from the CD, the video performance will be as shown below.</P>
+<DD><TABLE BORDER=1>
+<TR><TH> Audio conditions</TH><TH> Limit video performance</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 44kHz, 16bit stereo</TD><TD> 320×224[dot] 0.60[fps]</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 22kHz, 8bit monaural</TD><TD> 320×224[dot] 1.32[fps]</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> video only movie</TD><TD> 320×224[dot] 1.42[fps]</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> video only movie</TD><TD> 160×112[dot] 5.71[fps] </TD></TR>
+</TABLE>
+</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_14"><HR></a><DL>
+<H3> Please tell me about the execution history output for debugging.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me about the execution history output for debugging.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Outputting the execution history of the CinePack library's main processes can be useful in determining the cause of malfunctions such as unsmooth playback. You can check whether tasks are being called regularly, whether data supply is delayed, and whether frames are being dropped.</P>
+<P> It will be easier to analyze the history if you create a simpler execution history after checking the reproducibility of malfunctions.<BR>
+ Note that this function outputs results to the SIMM area. Therefore, it will not work with CartDev + DevSaturn without SIMM.<BR>
+ In that case, you will need to separately purchase a buffer card that supports SIMM.</P>
+<P><DD> <B>[Internal processing of Cinepack library that outputs history]</b><DD> When an error occurs<BR>
+ When calling a task function<BR>
+ Ring buffer data supply and consumption<BR>
+ When display request flag is turned on/off<BR>
+ Frame drop processing PCM start/stop</P>
+<P><DD> <B>[Output specification]</b><OL TYPE=a>
+<P> <B><LI>When using the production program as is</li>
+</b><BR>
+ Break after processing CPK_Init. Check the address of the CpkdSys type structure cpkd_sys in the map file created during linking, and use the debugger command to set the value of cpkd_sys.mode to 0x00000001.</P>
+<P> Example. Operation from command line of E7000/EVA board</P>
+<P> <B>:m 060XXXXX 1;l</b></P>
+<P> The output address will be 0x04000000 to 0x047fffff.<BR>
+ (SW2-5 of the Programming Box&lt; SIMMCART&gt; Please turn off. )</P>
+<P> <B><LI>When creating a program for debugging output</li>
+</b><BR>
+ Set CPKD_SetMode(ON) after CPK_Init. CPKD_SetPrintAddr allows you to set the output address. Using CPKD_PrintStr and CPKD_PrintData, it is possible to add and output the execution history of application-side processing.</P>
+<P> When additionally outputting, please make the output size an integral multiple of 164 bytes to make history information easier to read.</P>
+</OL>
+<P><DD> <B>[Check output information]</b><DD> Display the output address as a dump using the debugger command. Saving the displayed content as a text file and viewing it with a text editor makes it easier to analyze the operation.</P>
+<P><DD> Example. E7000/EVA board operation from command line</P>
+<P><PRE>
+:&gt; hist.txt [RET]
+:d 04000000 04001000;l [RET]
+:&gt; - [RET]
+</PRE></P>
+<P><DD><B>[Format of output information]</b><DD><PRE>
+--------+--------------------------------------------+
+ADDRESS : 0 1  2 3   4 5  6 7   8 9  A B   C D  E F  :
+--------+--------------------------------------------+
+04000000: AAAA_AAAA  ---- ----  ---- ----  ---- ---- :
+04000010: "Err "     ---- VVVV  ---- ----  EEEE_EEEE :Error 
+04000020: "Task"     PPPP VVVV  HHHH_HHHH  CCCC_CCCC :start of CPK_MeTask
+04000030: "RWri"     WWWW VVVV  HHHH_HHHH  DDDD_DDDD :WRIte Ringbuffer
+04000040: "RRea"     RRRR VVVV  HHHH_HHHH  DDDD_DDDD :REAd Ringbuffer
+04000050: "DOn "     FFFF VVVV  LLLL_LLLL  TTTT_TTTT :set Disp flag On
+04000060: "DOff"     FFFF VVVV  HHHH_HHHH  TTTT_TTTT :set Disp flag Off
+04000070: "PcmS"     MODE VVVV  HHHH_HHHH  ADDR SIZE :PCM Start
+04000080: "PcmE"     MODE VVVV  HHHH_HHHH  ---- ---- :PCM Stop
+04000090: "LosF"     FFFF VVVV  LFLF_LFLF  SSSS_SSSS :LOse Frame
+                              :
+                              :
+</PRE></P>
+<P><DD><B>[Description of output information]</b><DL>
+<P><DT> <B>AAAA_AAAA :</b><DD> Current history information output address.</P>
+<P><DT> <B>---- VVVV:</b><DD> Vbl counter. Know the approximate time.</P>
+<P><DT> <B>EEEE_EEEE :</b><DD> Error code.</P>
+<P><DT> <B>PPPP ---- :</b><DD> Play status [-1, 0, 1, 2, 3, 4, 5].</P>
+<P><DT> <B>HHHH_HHHH:</b><DD> Cinepack handle.</P>
+<P><DT> <B>CCCC_CCCC:</b><DD> Cinepac task call counter.</P>
+<P><DT> <B>DDDD_DDDD :</b><DD> Remaining amount of data in the ring buffer [byte]. Find out if there is a supply disruption.</P>
+<P><DT> <B>WWWW ---- :</b><DD> Write size to ring buffer [sector].</P>
+<P><DT> <B>RRRR ---- :</b><DD> Read size from ring buffer [byte].</P>
+<P><DT> <B>FFFF ---- :</b><DD> Frame number.</P>
+<P><DT> <B>LLLL_LLLL:</b><DD> delay time. (Current time - frame display time)</P>
+<P><DT> <B>TTTT_TTTT:</b><DD> Frame time. (Frame display time + frame display duration)</P>
+<P><DT> <B>LFLF_LFLF:</b><DD> Frame drop counter.</P>
+<P><DT> <B>SSSS_SSSS:</b><DD> sample counter.</P>
+<P><DT> <B>MODE ---- :</b><DD> 0x80##:Stereo, 0x10##:8bit, 0x##03:PCM stream playback number 3<BR>
+ (In case of PCM Stop, only the PCM stream playback number is displayed)</P>
+<P><DT> <B>ADDR ----:</b><DD> PCM buffer start address (4bit right shift value)</P>
+<P><DT> <B>SIZE ----:</b><DD> PCM buffer size [sample/ch]</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_15"><HR></a><DL>
+<H3> The value shown in the playback time field of the movie playback information is different from the original playback time.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The number shown in the playback time field of the movie object's playback information is different from the original playback time. Could I ask the reason.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> QuickTime manages movie time in units called TimeScale, which are smaller than timecodes. Accuracy up to 1/600th of a second can be managed.</P>
+<P> Commercial applications typically use a maximum accuracy of 1/600 second.<BR>
+ Author Editor also handles videos assuming a TimeScale of 600.<BR>
+ However, depending on the application such as Adobe Premiere, the TimeScale is not necessarily fixed at 600.</P>
+<P> Therefore, if the resulting movie does not have a TimeScale of 600, the playback time (called DurationTime in QuickTime) will look different.<BR>
+ (However, this does not affect playback in any way.)</P>
+<P> An example is shown below.</P>
+<P><DD>&#65308; <B>Example: If you create a 30 second Cinepak movie</b>&#65310;<DD><TABLE BORDER=1>
+<TR><TH></TH><TH> TimeScale</TH><TH> TimeCode</TH><TH> DurationTime</TH><TH></TH></TR>
+<TR ALIGN=CENTER><TD> 1.</TD><TD> 600</TD><TD> 00:00:30:00</TD><TD> 18000</TD><TD> normal movie</TD></TR>
+<TR ALIGN=CENTER><TD> 2.</TD><TD> 30</TD><TD> 00:00:30:00</TD><TD> 900</TD><TD> Movie with TimeScale of 30</TD></TR>
+<TR ALIGN=CENTER><TD> 3.</TD><TD> 20</TD><TD> 00:00:30:00</TD><TD> 600</TD><TD> Movie with TimeScale of 20</TD></TR>
+</TABLE>
+<DD> <B>*</b> Note that TimeScale and DurationTime are consistent, just because the units of time management are different, so the above three movies are all genuine movies with no apparent difference! !<BR>
+ When AuthorEditor loads a movie with a TimeScale of 30, the playback time is calculated as follows by referring to the number 900 pointed to by DurationTime.</P>
+<P><DD> <B>900÷600=1.5</b></P>
+<P> Therefore, the playback time, which is originally 30 seconds, may be mistaken for 1.5 seconds.</P>
+<P><DD> <B>【countermeasure】</b><DD> To determine the TimeScale of a movie, use Dumpster (included in the QuickTime Developer's Kit).<BR>
+ Launch Dumpster and open the desired movie.<BR>
+ Among the numbers that can be referenced here, if TimeScale shows a value other than 600, correct it to 600 (there are multiple locations, so correct them all).</P>
+<P> Furthermore, modify Duration, Track Dur, and sampDur so that they are consistent with the TimeScale changes. (Modify all of these if there are multiple ones.) When you have finished making corrections, save and exit.</P>
+<P><DD> <B>【postscript】</b><DD> We are currently investigating and don't really know what determines the movie TimeScale value. What we currently know is that when creating Cinepak movies using Adobe Premiere, TimeScale is often a value other than 600.</P>
+<P> As far as I have checked, other compression tools (MovieConverter, ConvertToMovie, Movie Conversion, MovieShop, CoSA AfterEffects, etc.) always show a value of 600.</P>
+<P> Therefore, unless you absolutely have to use Premiere, the best way to avoid this problem is to use another compression tool.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#movi">FAQ</a> ★ <A HREF="index.htm#cine">Movie related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

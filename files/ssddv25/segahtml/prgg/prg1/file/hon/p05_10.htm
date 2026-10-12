@@ -1,0 +1,161 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/17&gt;Programmer's Guide/File System Library/5. Access method</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><H2 ALIGN=CENTER> Five. Access method</H2><HR NOSHADE>
+<DL>
+<P><DD> There are two access methods provided by this library:</P>
+<DD><UL TYPE="DISK">
+<P><LI> <B>Completion return type access</b><BR>
+ Do not return control to the application until the access process is complete.</P>
+<P><LI> <B>Immediate return access</b><BR>
+ Once the access request is accepted, control is returned immediately.</UL>
+</P>
+<A NAME="no5_10"></A><P><DT><H3> 5.1 Completion return type access</H3><DD> Return-on-completion access is similar to the standard C library's file access functions.<BR>
+ A program example of completion return type access is shown below.</P>
+<P><DD> <B>[example]</b><PRE>
+#define BUF_SIZE 2048<P>
+GfsHn gfs; /* file handle */
+Sint32 fid; /* File identifier */
+Sint32 nsct = 1; /* Number of read sectors */
+Uint32 buf[BUF_SIZE/4]; /* Reading area */
+
+gfs = GFS_Open(fid); /* File open */
+
+GFS_Fread(gfs, nsct, buf, BUF_SIZE); /* Read nsct sector into buf */
+
+GFS_Close(gfs); /* Close file */
+</PRE></P>
+<A NAME="no5_20"></A><P><DT><H3>5.2 Immediate return access</H3><DD> Immediate return access is achieved using request functions and server functions. The request function executes only the request acceptance process and returns immediately. The actual access processing is performed by repeatedly calling the server function while monitoring the input completion status. You can also perform application processing within a server function call loop. Once a request has been issued to a file handle, a request cannot be issued until the access process is completed.</P>
+<A NAME="no5_20_1"></A><P><DT> <B>(1) Immediate return type access to a single file</b><DD> For single file access, GFS_NwExecOne is the server function.<BR>
+ An example of a program that accesses a single file with immediate return is shown below. In this example, GFS_NwFread is the request function.</P>
+<P><DD> <B>example]</b><PRE>
+#define BUF_SIZE 2048*2
+
+GfsHn gfs; /* file handle */
+Sint32 nsct = 2; /* Number of read sectors */
+Sint32 stat; /* Server status */
+Uint32 buf[BUF_SIZE/4]; /* Reading area */
+
+gfs = GFS_Open(fid); /* File open */
+/* Request function */
+GFS_NwFread(gfs, nsct, buf, BUF_SIZE); /* Read nsct sector into buf */
+                                        /* Return immediately */
+
+for (;;) {
+     /* Server function */
+     stat = GFS_NwExecOne(gfs); /* Execute reading */
+     if (stat == GFS_SVR_COMPLETED) { /* Is loading complete? */
+          break;
+     }
+     user(); /* Any user processing */
+}<P>
+GFS_Close(gfs); /* Close file */
+</PRE></P>
+<A NAME="no5_20_2"></A><P><DT><B>(2) Immediate return type access to multiple files</b><DD> For continuous access of multiple files, GFS_NwExecSerer becomes the server function.<BR>
+ The request function is the same as accessing a single file.<BR>
+ An application issues access processing requests for multiple files. After that, access processing is executed sequentially by periodically passing control to the server. Access processing is performed one by one in the order in which requests are received.<BR>
+ The following is an example program that performs user processing while reading three files.</P>
+<P><DD> <B>[example]</b><PRE>
+/* Number of sectors read from each file */
+#define NSCT1 1
+#define NSCT2 2
+#define NSCT3 3
+
+/* Size of data storage area for each file (unit: bytes) */
+#define BSIZE1 2048*NSCT1
+#define BSIZE2 2048*NSCT2
+#define BSIZE3 2048*NSCT3<P>
+
+Sint32 fid1, fid2, fid3; /* File identifier for each file */
+GfsHn gfs1, gfs2, gfs3; /* File handle for each file */
+Uint32 buf1[BSIZE1/4]; /* Data storage area for each file */
+Uint32 buf2[BSIZE2/4];
+Uint32 buf3[BSIZE3/4];
+GfsHn now_gfs; /* File handle being accessed */
+Sint32 stat; /* Server status */
+
+gfs1 = GFS_Open(fid1); /* File open */
+gfs2 = GFS_Open(fid2);
+gfs3 = GFS_Open(fid3);
+GFS_NwFread(gfs1, NSCT1, buf1, BSIZE1); /* Start read operation */
+GFS_NwFread(gfs2, NSCT2, buf2, BSIZE2);
+GFS_NwFread(gfs3, NSCT3, buf3, BSIZE3);
+for (;;) {
+    stat = GFS_NwExecServer(&now_gfs); /* Execute reading */
+    if (stat == GFS_SVR_COMPLETED) { /* No work to do? */
+              break;
+    }
+    user(); /* Any user processing */
+}
+GFS_Close(gfs1);
+GFS_Close(gfs2);
+GFS_Close(gfs3);
+</PRE></P>
+<A NAME="no5_20_3"></A><P><DT><B>(3) Read ahead to CD buffer</b><DD> When reading large files successively little by little, you can take full advantage of the CD reading speed by specifying read ahead to the CD buffer with GFS_NwCdRead.<BR>
+ The example program shown below reads a 1000-sector file successively, 10 sectors at a time. Since GFS_NwCdRead specifies to read ahead 1000 sectors, 1000 sectors of the target file are played continuously and stored in the buffer. Since data is being extracted from the CD buffer in parallel with this process, the buffer will not become full and playback will not be interrupted.<BR>
+ If the processing in this example is performed without read-ahead, CD playback will be interrupted every 10 sectors, resulting in wasted time.</P>
+<!-- +++ Update by CRI ：1.1 -->
+<P><DD> <B>[example]</b><PRE>
+#define SECT_SIZE 2048
+#define FILE_SECT 1000
+#define FILE_SIZE (FILE_SECT*SECT_SIZE)
+#define RD_UNIT 10
+
+Uint8 *rd_bp, *proc_bp; /* Read buffer and processing buffer */
+Uint32 buf1[RD_UNIT*SECT_SIZE/4]; /* Data storage area 1 */
+Uint32 buf2[RD_UNIT*SECT_SIZE/4]; /* Data storage area 2 */
+GfsHn gfs;
+Sint32 i, stat, nbyte;<P>
+gfs = GFS_Open(fid);
+GFS_NwCdRead(gfs, FILE_SECT); /* Pre-read instruction to CD buffer */
+GFS_SetTransPara(gfs, RD_UNIT); /* Extract maximum RD_UNIT sectors at once */
+for (i = 0; i&lt; FILE_SECT / RD_UNIT; ++i) {
+    /* Read and process buffer settings */
+    if (i & 1) {
+        rd_bp = buf1;
+        proc_bp = buf2;
+    } else {
+        rd_bp = buf2;
+        proc_bp = buf1;
+    }
+    /* Execute extraction from CD buffer */
+    GFS_NwFread(gfs, RD_UNIT, rd_bp, RD_UNIT * SECT_SIZE);
+    do {
+        if (i & 0) {
+            user_process(proc_bp); /* Processing the read data */
+        } else {
+            user_process0(); /* Processing before data is read */
+        }
+          GFS_NwExecOne(gfs);
+          GFS_NwGetStat(gfs, &stat, &nbyte);
+    }while (nbyte&lt; RD_UNIT * SECT_SIZE);
+}</PRE></P>
+<!-- --- Update by CRI ：1.1 -->
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

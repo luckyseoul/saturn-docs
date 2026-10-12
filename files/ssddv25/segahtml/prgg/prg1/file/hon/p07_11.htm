@@ -1,0 +1,303 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/17&gt;Programmer's Guide/File System Library/Data Details</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no7">File system library</a><HR>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><H2 ALIGN=CENTER> 7.Data specifications</H2><HR NOSHADE>
+<A NAME="no7_10"></A><H3> 7.1 Basic data</H3><!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_0"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> basic data</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3></H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1.0</H4></TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(1) Basic data type</b><DD> Below is a list of basic data structures.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=80><PRE> Model name</TH><TH WIDTH=290><PRE> explanation</TH></TR>
+<TR><TD><PRE> Uint8</TD><TD><PRE> unsigned 1-byte integer</TD></TR>
+<TR><TD><PRE> Sint8</TD><TD><PRE> Signed 1-byte integer</TD></TR>
+<TR><TD><PRE> Uint16</TD><TD><PRE> unsigned 2-byte integer</TD></TR>
+<TR><TD><PRE> Sint16</TD><TD><PRE> signed 2-byte integer</TD></TR>
+<TR><TD><PRE> Uint32</TD><TD><PRE> unsigned 4-byte integer</TD></TR>
+<TR><TD><PRE> Sint32</TD><TD><PRE> signed 4-byte integer</TD></TR>
+<TR><TD><PRE> Bool</TD><TD><PRE> Logical 4-byte integer</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(2)Boolean constant</b><DD> Used as a logical type (Bool) value.</P>
+<DD><TABLE BORDER=1>
+<TR><TH width=80><PRE> constant name</TH><TH width=70><PRE> value</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> FALSE</TD><TD ALIGN=CENTER><PRE> 0</TD><TD><PRE> boolean false</TD></TR>
+<TR><TD><PRE> TRUE</TD><TD ALIGN=CENTER><PRE> 1</TD><TD><PRE> logical truth</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(3) Null pointer</b><DD><TABLE BORDER=1>
+<TR><TH width=80><PRE> constant name</TH><TH width=70><PRE> value</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> NULL</TD><TD><PRE> (void*)0</TD><TD><PRE> null pointer</TD></TR>
+</TABLE>
+</P>
+</DL>
+<A NAME="no7_20"></A><H3> 7.2 Constants</H3><!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_1"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD width=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> file attributes</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GFS_ATR_～</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.1</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> The constants listed below represent the presence or absence of each attribute. These constants can be used for attributes in the directory information read with GFS_Init, GFS_LoadDir, and output with GFS_GetFileInfo.<BR>
+ The contents of bits not shown here are undefined.</P>
+<!-- +++ Update by CRI ：1.3 -->
+<P><DD><PRE>
+bit 7   6   5   4   3   2   1   0
+   [ ] [ ] [ ] [ ] [ ] [-] [-] [ ] 
+    |   |   |   |   |           |
+    |   |   |   |   |           |
+    |   |   |   |   |           +---- GFS_ATR_END_TBL  1:End of directory information table
+    |   |   |   |   |
+    |   |   |   |   +---------------- GFS_ATR_FORM1    1:Includes Form1 sectors
+    |   |   |   +-------------------- GFS_ATR_FORM2    1:Includes Form2 sectors
+    |   |   +------------------------ GFS_ATR_INTLV    1:Includes interleaved sectors
+    |   +---------------------------- GFS_ATR_CDDA     1:CDDA file
+    +-------------------------------- GFS_ATR_DIR      1:Directory file
+</PRE></P>
+<!-- --- Update by CRI ：1.3 -->
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_2"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD width=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> access status</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GFS_NWSTAT_~</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.2</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> The constants listed below represent the access state of the server. Output by GFS_NwGetStat.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH width=150><PRE> constant name</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_NWSTAT_NOACT</TD><TD><PRE> haven't done anything</TD></TR>
+<TR><TD><PRE> GFS_NWSTAT_FREAD</TD><TD><PRE> GFS_NwFread running</TD></TR>
+<TR><TD><PRE> GFS_NWSTAT_CDREAD</TD><TD><PRE> GFS_NwCdRead in progress </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_3"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> access server status</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GFS_SVR_〜</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.3</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> The constants shown below are the function values of GFS_NwExecOne and GFS_NwExecServer. Represents its execution status.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH width=150><PRE> constant name</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_SVR_COMPLETED</TD><TD><PRE> Processing Exit</TD></TR>
+<TR><TD><PRE> GFS_SVR_BUSY</TD><TD><PRE> processing</TD></TR>
+<TR><TD><PRE> GFS_SVR_CDPAUSE</TD><TD><PRE> Pause due to CD buffer full</TD></TR>
+<TR><TD><PRE> GFS_SVR_ERROR</TD><TD><PRE> An error occurred while accessing </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_4"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> seek mode</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GFS_SEEK_〜</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.4</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> The constants listed below represent the criteria for moving the access pointer. Used as an argument to GFS_Seek.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH width=150><PRE> constant name</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_SEEK_SET</TD><TD><PRE> beginning of file</TD></TR>
+<TR><TD><PRE> GFS_SEEK_CUR</TD><TD><PRE> Current position</TD></TR>
+<TR><TD><PRE> GFS_SEEK_END</TD><TD><PRE> end of file </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_5"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> Eject mode</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GFS_GMODE_〜</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.5</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> The following constants represent the method for extracting from the CD buffer. Used as argument to GFS_SetGmode.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH width=150><PRE> constant name</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_GMODE_ERASE</TD><TD><PRE> Delete from buffer after transfer</TD></TR>
+<TR><TD><PRE> GFS_GMODE_RESIDENT</TD><TD><PRE> Leave in CD buffer even after transfer </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_6"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><!-- *** Update by CRI ：5.3 -->
+<TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> Transfer mode</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GFS_TMODE_~</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.6</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> The following constants represent devices that perform transfers from the CD buffer. Used as argument to GFS_SetTmode.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH width=150><PRE> constant name</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_TMODE_SCU</TD><TD><PRE> DMA transfer (level 0) by SCU<BR> *If the transfer destination is WORKRAM-L,<BR> This will be a software transfer.</TD></TR>
+<!-- *** Update by CRI ：5.4 -->
+<TR><TD><PRE> GFS_TMODE_SDMA0</TD><TD><PRE> DMA cycle steal transfer channel 0</TD></TR>
+<TR><TD><PRE> GFS_TMODE_SDMA1</TD><TD><PRE> DMA cycle steal transfer channel 1</TD></TR>
+<TR><TD><PRE> GFS_TMODE_CPU</TD><TD><PRE> software transfer </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_7"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> Error code</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GFS_ERR_～</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.7</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> The value of GFS_ERR_OK is 0. Other error codes have negative values.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH width=150><PRE> constant name</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_ERR_OK</TD><TD><PRE> normal termination</TD></TR>
+<TR><TD><PRE> GFS_ERR_CDRD</TD><TD><PRE> CD read error</TD></TR>
+<TR><TD><PRE> GFS_ERR_CDNODISC</TD><TD><PRE> CD is not set</TD></TR>
+<TR><TD><PRE> GFS_ERR_CDROM</TD><TD><PRE> A disk other than CD-ROM is set.</TD></TR>
+<TR><TD><PRE> GFS_ERR_DIRTBL</TD><TD><PRE> The contents of the directory management table are invalid.</TD></TR>
+<TR><TD><PRE> GFS_ERR_OPENMAX</TD><TD><PRE> Invalid maximum open count value</TD></TR>
+<TR><TD><PRE> GFS_ERR_DIR</TD><TD><PRE> The specified file is not a directory</TD></TR>
+<TR><TD><PRE> GFS_ERR_CDBFS</TD><TD><PRE> CD block file system error</TD></TR>
+<TR><TD><PRE> GFS_ERR_NONAME</TD><TD><PRE> Cannot handle file name in current directory</TD></TR>
+<TR><TD><PRE> GFS_ERR_NEXIST</TD><TD><PRE> non-existent file name</TD></TR>
+<TR><TD><PRE> GFS_ERR_FID</TD><TD><PRE> Bad file identifier</TD></TR>
+<TR><TD><PRE> GFS_ERR_HNDL</TD><TD><PRE> invalid file handle</TD></TR>
+<TR><TD><PRE> GFS_ERR_SEEK</TD><TD><PRE> Invalid seek position</TD></TR>
+<TR><TD><PRE> GFS_ERR_ORG</TD><TD><PRE> Invalid reference position</TD></TR>
+<TR><TD><PRE> GFS_ERR_NUM</TD><TD><PRE> negative number of bytes</TD></TR>
+<TR><TD><PRE> GFS_ERR_OFS</TD><TD><PRE> Offset fraud</TD></TR>
+<TR><TD><PRE> GFS_ERR_FBUSY</TD><TD><PRE> Processing remains for the specified file handle</TD></TR>
+<TR><TD><PRE> GFS_ERR_PARA</TD><TD><PRE> Invalid parameter</TD></TR>
+<TR><TD><PRE> GFS_ERR_BUSY</TD><TD><PRE> Library function in progress</TD></TR>
+<TR><TD><PRE> GFS_ERR_NOHNDL</TD><TD><PRE> There is no free space on the file handle</TD></TR>
+<TR><TD><PRE> GFS_ERR_PUINUSE</TD><TD><PRE> Pickup in operation</TD></TR>
+<TR><TD><PRE> GFS_ERR_ALIGN</TD><TD><PRE> Data read amount area is not on 4-byte boundary</TD></TR>
+<TR><TD><PRE> GFS_ERR_TMOUT</TD><TD><PRE> A timeout occurred in internal processing.</TD></TR>
+<TR><TD><PRE> GFS_ERR_CDOPEN</TD><TD><PRE> tray is open</TD></TR>
+<TR><TD><PRE> GFS_ERR_BFUL</TD><TD><PRE> Loading stopped due to buffer full</TD></TR>
+<TR><TD><PRE> GFS_ERR_FATAL</TD><TD><PRE> CD drive&#12296; FATAL&#12297; situation </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no2_8"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> others</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3></H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2.8</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> Other constants used in this library are listed below.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH width=150><PRE> constant name</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_RPARA_DFL</TD><TD><PRE> Initial values of read parameters</TD></TR>
+<TR><TD><PRE> GFS_BUFSIZ_INF</TD><TD><PRE> Specify to read regardless of the size of the read area with GFS_Load</TD></TR>
+</TABLE>
+</P>
+</DL>
+<A NAME="no7_30"></A><H3> 7.3 Data types</H3><!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_1"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> file handle</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GfsHn</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3.1</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> Maintains per-file information regarding file access. Generated by GFS_Open. Most functions that access files refer to this data. </P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_2"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> Directory information management</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GfsDirTbl</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3.2</H4></TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(1) Directory information table type</b><DD> The directory information management structure can manage directory information without a file name or directory information with a file name. Specify which one to manage using the following constant.</P>
+<P><DD><TABLE BORDER=1>
+<TR><TH width=150><PRE> constant name</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_DIR_ID</TD><TD><PRE> Does not have file name information</TD></TR>
+<TR><TD><PRE> GFS_DIR_NAME</TD><TD><PRE> Contains file name information</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(2) Directory information management</b><DD> A data type for managing directory information. Holds the type of directory information table, its size, and its substance.</P>
+<P><DD> GfsDirTbl *dirtbl<DD><TABLE BORDER=1>
+<TR><TH width=180><PRE> access macro</TH><TH width=100><PRE> mold</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_DIRTBL_TYPE(dirtbl)</TD><TD><PRE> Sint32</TD><TD><PRE> Directory information table type</TD></TR>
+<TR><TD><PRE> GFS_DIRTBL_NDIR(dirtbl)</TD><TD><PRE> Sint32</TD><TD><PRE> Maximum number of elements in directory information table</TD></TR>
+<TR><TD><PRE> GFS_DIRTBL_DIRID(dirtbl)</TD><TD><PRE> GfsDirId*</TD><TD><PRE> Filenameless directory information table<BR> pointer to</TD></TR>
+<TR><TD><PRE> GFS_DIR_NAME(dirtbl)</TD><TD><PRE> GfsDirName*</TD><TD><PRE> Directory information table with file name<BR> pointer to</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>(3) Setting method</b><P><DT> <B>(a) When using directory information without file name</b><DD><PRE>
+GfsDirTbl dirtbl;
+GfsDirId dir_id[MAX_DIR_ID]<P>
+GFS_DIRTBL_TYPE (&dirtbl) = GFS_DIR_ID; /* Directory information specification without file name */
+GFS_DIRTBL_NDIR (&dirtbl) = MAX_DIR_ID; /* Maximum number of elements */
+GFS_DIRTBL_DIRID(&dirtbl) = dir_id; /* Directory information table without file name */
+</PRE></P>
+<P><DT><B>(b) When using directory information with file name</b><DD><PRE>
+GfsDirTbl dirtbl;
+GfsDirName dir_name[MAX_DIR_NAME];<P>
+GFS_DIRTBL_TYPE(&dirtbl) = GFS_DIR_NAME; /* Directory information specification with file name */
+GFS_DIRTBL_NDIR(&dirtbl) = MAX_DIR_NAME; /* Maximum number of elements */
+GFS_DIRTBL_DIRNAME(&dirtbl) = dir_name; /* Directory information table with file name */
+</PRE></P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_3"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> Filenameless directory information</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GfsDirId</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3.3</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> A directory information structure that does not contain file names.<BR>
+ Specify GFS_DIR_ID for the directory information table type (GFS_DIRTBL_TYPE).</P>
+<P><DD> GfsDirId *dir<DD><TABLE BORDER=1>
+<TR><TH width=180><PRE> access macro</TH><TH width=100><PRE> mold</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_DIR_FAD(dir)</TD><TD><PRE> Sint32</TD><TD><PRE> Start of file FAD</TD></TR>
+<TR><TD><PRE> GFS_DIR_SIZE(dir)</TD><TD><PRE> Sint32</TD><TD><PRE> File size (unit: bytes)</TD></TR>
+<TR><TD><PRE> GFS_DIR_FN(dir)</TD><TD><PRE> Uint8</TD><TD><PRE> file number</TD></TR>
+<TR><TD><PRE> GFS_DIR_ATR(dir)</TD><TD><PRE> Uint8</TD><TD><PRE> file attributes</TD></TR>
+<TR><TD><PRE> GFS_DIR_UNIT(dir)</TD><TD><PRE> Uint8</TD><TD><PRE> File unit size (unit: sector)</TD></TR>
+<TR><TD><PRE> GFS_DIR_GAP(dir)</TD><TD><PRE> Uint8</TD><TD><PRE> File gap size (in sectors) </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_4"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> Directory information with file name</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GfsDirName</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3.4</H4></TD></TR>
+</TABLE>
+</P>
+<P><DD> A directory information structure containing file names.<BR>
+ Specify GFS_DIR_NAME for the directory information table type (GFS_DIRTBL_TYPE).</P>
+<P><DD> GfsDirName *dir<DD><TABLE BORDER=1>
+<TR><TH width=180><PRE> access macro</TH><TH width=100><PRE> mold</TH><TH width=220><PRE> explanation</TH></TR>
+<TR><TD><PRE> GFS_DIR_FAD(dir)</TD><TD><PRE> Sint32</TD><TD><PRE> Start of file FAD</TD></TR>
+<TR><TD><PRE> GFS_DIR_SIZE(dir)</TD><TD><PRE> Sint32</TD><TD><PRE> File size (unit: bytes)</TD></TR>
+<TR><TD><PRE> GFS_DIR_FN(dir)</TD><TD><PRE> Uint8</TD><TD><PRE> file number</TD></TR>
+<TR><TD><PRE> GFS_DIR_ATR(dir)</TD><TD><PRE> Uint8</TD><TD><PRE> file attributes</TD></TR>
+<TR><TD><PRE> GFS_DIR_UNIT(dir)</TD><TD><PRE> Uint8</TD><TD><PRE> File unit size (unit: sector)</TD></TR>
+<TR><TD><PRE> GFS_DIR_GAP(dir)</TD><TD><PRE> Uint8</TD><TD><PRE> File gap size (in sectors)</TD></TR>
+<TR><TD><PRE> GFS_DIR_FNAME(dir)</TD><TD><PRE> Sint8[]</TD><TD><PRE> File name*1</TD></TR>
+<!-- *** Update by CRI ：5.5 -->
+</TABLE>
+<DD> <B>*1:</b> The area size is 12 bytes. When the file name length is 12 bytes, the string does not end with '\0'. </P>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no3_5"><HR></a><DL>
+<P><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> error handling function</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GfsErrFunc</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> void (*GFsErrFunc) (void *obj, Sint32 ec)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> obj</TR><TD><PRE> : Object required for error handling</TD></TR><TR><TD><PRE> ec</TD><TD><PRE> :Error code</TD></TR></TABLE><DT> <B>output</b><DD> none</DL><!-- ------------------------------------------------------------------------------------ --><A NAME="no3_6"><HR></a><DL><P><DT><TABLE BORDER><TR><TD><PRE> <A HREF="p07_10.htm#t7_1">one</a><BR> <A HREF="p07_10.htm#t7_1">View</a><BR> <A HREF="p07_10.htm#t7_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> data specifications</H4></TD><TD WIDTH=270><PRE> Data<BR><H4> error condition</H4></TD><TD WIDTH=160><PRE> Data Name<BR><H3> GfsErrStat</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3.6</H4></TD></TR></TABLE></P><P><DD> This is the data output by GFS_GetErrStat.</P><P><DD> GfsErrStat *stat<DD><TABLE BORDER=1><TR><TH width=180><PRE> access macro</TH><TH width=100><PRE> mold</TH><TH width=220><PRE> explanation</TH></TR><TR><TD><PRE> GFS_ERR_FUNC(err)</TD><TD><PRE> GfsErrFunc</TD><TD><PRE> Pointer to error handling function.</TD></TR><TR><TD><PRE> GFS_ERR_OBJ(err)</TD><TD><PRE> void*</TD><TD><PRE> The first argument of the error handling function.</TD></TR><TR><TD><PRE> GFS_ERR_CODE(err)</TD><TD><PRE> Sint32</TD><TD><PRE> Error code.</TD></TR></TABLE></P></DL><HR NOSHADE> <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no7">File system library</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

@@ -1,0 +1,91 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 8&gt;CD communication I/F (MPEG part)/5.MPEG stream</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication I/F (MPEG part)</b><H2 ALIGN=CENTER> 5. MPEG stream</H2><HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A><P><DT><H3> 5.1 Transfer block</H3><A NAME="no5_511"></A><P><DT> <B>5.1.1 Function of transfer block</b><DD> The transfer block of the MPEG decoder has the following functions.<P><DT> <B>(1) Stream settings</b><DD> Set the stream to be decoded by specifying the buffer section to which the decoder is connected.<BR>
+ In order to set a more detailed stream to be decoded, the stream number and channel number can be specified. (This function is called "rear aperture.")</P>
+<P><DT> <B>(2) Registering the stream to be played next</b><DD> Specify the buffer section and register the stream to be played next. When the current stream ends, it switches to the next registered stream. At this time, you can set the conditions for switching.<BR>
+ The switching timing may be as follows.</P>
+<A NAME="z5_1"></A><P ALIGN=CENTER> <B>Figure 5.1 Registering the stream to play next</b><BR>
+<img srcset="../grp/i020_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD><OL TYPE=a>
+<B><LI></b> When a system end code (SEC) is detected<B><LI></b> When EOR bit is detected<B><LI></b> When the forced switching function is called</OL>
+</P>
+<P><DT> <B>(3) Stream data transfer</b><DD> It monitors the designated buffer section and, when the required amount of data is stored, transfers the stream data to the decoder.</P>
+<P><DT> <B>(4) Forced video switching</b><DD> Forcibly switch to the next registered stream.</P>
+<A NAME="no5_512"></A><P><DT> <B>5.1.2 Transfer block state transition</b><DD> A transfer block has the following states: This state is called the operating state of the MPEG decoder. (For details, refer to the data specification "MPEG operation status".)</P>
+<A NAME="t5_1"></A><P><DD> <B>Table 5.1 Transfer block status</b><TABLE BORDER=1>
+<TR><TH></TH><TH WIDTH=100> situation</TH><TH WIDTH=220> explanation</TH><TH WIDTH=260> Transition condition</TH><TH WIDTH=80> Transition destination</TH></TR>
+<TR><TD><PRE> 1</TD><TD> Stop</TD><TD> Stream is not registered.</TD><TD> Registration of current stream</TD><TD> Preparation 1</TD></TR>
+<TR><TD ROWSPAN=2><PRE> 2</TD><TD ROWSPAN=2> Preparation 1</TD><TD ROWSPAN=2> Waiting for 2 sectors to be stored in the specified buffer section.</TD><TD> Get decode buffer size</TD><TD> Preparation 2</TD></TR>
+<TR><TD> Cancel current stream</TD><TD> Stop</TD></TR>
+<TR><TD ROWSPAN=3><PRE> 3</TD><TD ROWSPAN=3> Preparation 2</TD><TD ROWSPAN=3> Waiting for data equal to the decode buffer size to be stored in the buffer section.</TD><TD> Stores decode buffer size</TD><TD> transfer</TD></TR>
+<TR><TD> Forced transfer instruction</TD><TD> transfer</TD></TR>
+<TR><TD> Cancel current stream</TD><TD> Stop</TD></TR>
+<TR><TD ROWSPAN=5><PRE> 4</TD><TD ROWSPAN=5> transfer<BR>
+ (reproduction)</TD><TD ROWSPAN=5> Transferring sector data to decoder. (MPEG playback status)</TD><TD> buffer compartment becomes empty</TD><TD> Resurrection process</TD></TR>
+<TR><TD> natural switching</TD><TD> switching</TD></TR>
+<TR><TD> Forced switch</TD><TD> switching</TD></TR>
+<TR><TD> natural end</TD><TD> Stop</TD></TR>
+<TR><TD> forced termination</TD><TD> Stop</TD></TR>
+<TR><TD ROWSPAN=2><PRE> 5</TD><TD ROWSPAN=2> switching</TD><TD ROWSPAN=2> Waiting for the beginning of the next stream to be output.</TD><TD> The beginning was output</TD><TD> transfer</TD></TR>
+<TR><TD> buffer compartment becomes empty</TD><TD> Resurrection process</TD></TR>
+<TR><TD ROWSPAN=1><PRE> 6</TD><TD ROWSPAN=1> Resurrection process</TD><TD ROWSPAN=1> Waiting for a sector to be stored in an empty buffer partition.</TD><TD> Necessary sectors are stored</TD><TD> Transfer/switch <B>*</b></TD></TR>
+</TABLE>
+<DD> <B>*</b> The transition destination from the resurrection process returns to the state before the buffer section became empty (starting the resurrection process).<P><DD> Figure 5.2 shows the state transition diagram of the transfer block.<A NAME="z5_2"></A><P ALIGN=CENTER> <B>Figure 5.2 Transfer block state transition diagram</b><BR>
+<img srcset="../grp/i022_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Executing the MPEG decoder initialization function (CDC_MpInit) returns the system to the stopped state from any state.</P>
+<A NAME="no5_20"></A><P><DT><H3> 5.2 Switching streams</H3><DD> Switching streams means switching the currently playing stream to another stream. By registering the storage destination buffer section of the stream to be played next, the next stream is switched and played at the end of the current stream or by a forced switching function.</P>
+<A NAME="no5_521"></A><P><DT> <B>5.2.1 Picture input order and display order</b><DD> In order to decode a B picture, an I picture or a P picture, which is a predicted picture, must be decoded first. Therefore, the input order of pictures to the decoder and the actual display order are swapped.</P>
+<A NAME="z5_3"></A><P ALIGN=CENTER> <B>Figure 5.3 Input order and display order to decoder</b><BR>
+<img srcset="../grp/i023_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no5_522"></A><P><DT> <B>5.2.2 Clearing the video decode buffer</b><DD> In order to switch streams smoothly, it is necessary to avoid outputting previously decoded data after a switching instruction is issued. To do this, the decode buffer must be cleared in a timely manner.<BR>
+ The MPEG/Video decoder has a VBV buffer in front of the decoder and an MPEG frame buffer in the back. The following two methods can be specified as the clearing method (timing and target buffer).</P>
+<P><DT> <B>(1) Immediately clear VBV buffer + MPEG frame buffer (VBV + WBC)</b><DD> In this case, since the picture waiting to be displayed in the MPEG frame buffer is cleared, the instruction is immediately reflected in the display. The displayed picture is not cleared. Therefore, the current picture is actually displayed until the first few pictures of the next stream are completely decoded.<BR>
+ The MPEG frame buffer waiting to be displayed (decoded) is abbreviated as WBC (Write Buffer Control).</P>
+<P><DT> <B>(2) Wait for the next I or P picture to start decoding and clear only the VBV buffer</b><DD> In this case, the picture waiting to be displayed in the MPEG frame buffer is not cleared. After the picture waiting to be displayed is displayed, the picture of the next stream is displayed. Therefore, after the switching instruction, there is a delay corresponding to the picture waiting to be displayed.</P>
+<A NAME="z5_4"></A><P ALIGN=CENTER> <B>Figure 5.4 MPEG video buffer structure</b><BR>
+<img srcset="../grp/i023_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no5_523"></A><P><DT> <B>5.2.3 Video stream switching example</b><DD> Due to the nature of the MPEG video stream, clearing the VBV buffer when the picture start of a P picture is detected results in a very clean connection.<BR>
+ If the switch is simply made when a picture start is detected, the response will be somewhat improved, but the switch may be made at the start of a B picture, and there is a possibility that a frame will be skipped.</P>
+<P><DD> As an example, a case where P picture and B picture are switched at the time of picture start detection will be compared. Only the VBV buffer is to be cleared.</P>
+<P><DT> <B>(1) When switching by P picture start detection</b><DD> As shown in the following diagram, if you switch the stream when the picture start of P picture (P10) is detected, the stream will switch smoothly from B5 → B6 → P7 → i1. (P10 is not decoded.)</P>
+<A NAME="z5_5"></A><P ALIGN=CENTER> <B>Figure 5.5 Example of switching based on P picture start detection</b><BR>
+<img srcset="../grp/i024_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(2) When switching by B picture start detection</b><DD> If the stream is switched when the picture start of a B picture (B6) is detected in the same stream, as shown in the following figure, B6, which is displayed earlier than P7, is not decoded, resulting in frame skipping from B5 to P7.</P>
+<A NAME="z5_6"></A><P ALIGN=CENTER> <B>Figure 5.6 Example of switching based on B picture start detection</b><BR>
+<img srcset="../grp/i024_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no5_524"></A><P><DT> <B>5.2.4 Clearing the audio decode buffer</b><DD> The MPEG/Audio decoder has a one sector buffer in front of the decoder. The following two methods can be specified as clearing methods.</P>
+<P><DT> <B>(1) Not cleared</b><DD> Switching does not occur until one sector worth of data is transferred.</P>
+<P><DT> <B>(2) Clear</b><DD> To immediately clear the buffer and switch even in the middle of one sector.</p>
+<A NAME="z5_7"></A><P ALIGN=CENTER> <B>Figure 5.7 MPEG audio buffer structure</b><BR>
+<img srcset="../grp/i025_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

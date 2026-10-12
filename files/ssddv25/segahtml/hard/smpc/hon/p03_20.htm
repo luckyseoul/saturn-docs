@@ -1,0 +1,167 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/19&gt;SMPC User's Manual/3.2 Saturn Peripheral Standard Format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p03_18.htm">Back</a> ｜ <A HREF="p03_30.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/Chapter 3 Peripheral Control</b><HR NOSHADE>
+<A NAME="no3_20"></A><H2> ■3.2 Saturn peripheral standard format</H2><DL>
+<A NAME="no3_20_1"></A><P><DT><H3> ●Purpose of Saturn Peripheral Standard Format</H3><DD> The Saturn Peripheral Standard Format is prepared for the following purposes:</P>
+<DD><OL>
+<P><B><LI></b> Be able to control multiplayer even if the data structure, type, and meaning of peripherals are different.<P><B><LI></b> Even if upper-word compatible peripherals are released in the future, such as increasing the number of buttons, increasing the number of analog channels, or adding expansion data, you can still use those peripherals to operate multiplayer.<BR>
+ Also, the ability to control previously released applications.</OL>
+<A NAME="no3_20_2"></A><P><DT><H3> ●Saturn standard format types and data formats</H3><DD> There are currently four types of Saturn standard formats in consideration of the above-mentioned purposes. Each is explained below.</P>
+<A NAME="no3_20_3"></A><P><DT><H3> ●Future expansion of the standard format</H3><DD> At present, we have the following four formats available, but we plan to add more formats in the future as the need arises.</P>
+<P><DD><UL TYPE=DISC>
+<LI> <A HREF="#no3_21">saturn digital device</a><LI> <A HREF="#no3_22">saturn analog device</a><LI> <A HREF="#no3_23">pointing device</a><LI> <A HREF="#no3_24">keyboard device</a></UL>
+</P>
+<A NAME="no3_20_4"></A><P><DT><H3> ●Notes on using standard formats</H3><DD> In order to comply with the standard format, when the data size is larger than the standard format, excess data must be deleted and used. Also, when the data size is smaller than the standard format, this is achieved by supplementing the missing data with other data. Also, as an example of how to handle this on the peripheral side, there is an analog XY control such as an analog joystick, but if there is no equivalent digital input, you can use the fact that the analog XY data exceeds a certain value to control U, There is a possibility that the peripheral side may adopt a method of turning the D, L, and R bits ON/OFF.</P>
+</DL>
+<A NAME="no3_21"><HR></a><DL>
+<P><DT><H3> ◆Saturn Digital Device</H3><DD> It is a device consisting only of buttons, such as the standard Saturn PAD.<BR>
+ Peripheral types are based on 0H and data size of 2 bytes.<BR>
+ A feature of the format is that the 1st Data has a configuration equivalent to the Mega Drive 3 button. Compatibility can be ensured by assembling the application so that it can be controlled using only 1st Data. Table 3.10 shows the formats of Saturn digital devices.</P>
+<A NAME="t3_10"></A><P><DD> <B>Table 3.10 Saturn Digital Device Standard Format</b><DD><TABLE BORDER=1>
+<TR><TD><PRE></TD><TD><PRE> bit7</TD><TD><PRE> bit6</TD><TD><PRE> bit5</TD><TD><PRE> bit4</TD><TD><PRE> bit3</TD><TD><PRE> bit2</TD><TD><PRE> bit1</TD><TD><PRE> bit0</TD></TR>
+<TR><TD><PRE> saturn peripheral id</TD><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> 0</TD><TD COLSPAN=4><PRE> Data size</TD><TR><TD><PRE> 1st Data</TD><TD><PRE> Right</TD><TD><PRE> Left</TD><TD><PRE> Down</TD><TD><PRE> Up</TD><TD><PRE> Start</TD><TD><PRE> A TRG</TD><TD><PRE> C TRG</TD><TD><PRE> B TRG</TD><TR><TD><PRE> 2nd Data</TD><TD><PRE> R TRG</TD><TD><PRE> X TRG</TD><TD><PRE> Y TRG</TD><TD><PRE> Z TRG</TD><TD><PRE> L TRG</TD><TD COLSPAN=3><PRE> extended data</TD></TR>
+<TR><TD><PRE> 3rd Data</TD><TD COLSPAN=8><PRE> extended data</TD></TR>
+<TR><TD><PRE>・</TD><TD COLSPAN=8><PRE>extended data</TD></TR>
+<TR><TD><PRE>・</TD><TD COLSPAN=8><PRE>extended data</TD></TR>
+<TR><TD><PRE> nth Data</TD><TD COLSPAN=8><PRE> extended data</TD></TR>
+</TABLE>
+</P>
+<DL>
+<P><DT> <B>A TRG,C TRG,B TRG,R TRG,X TRG,Y TRG,Z TRG,L TRG</b><DT> <B>Right, Left, Down, Up, Start</b> buttons<DD> It becomes 0 when the button is pressed.</P>
+</DL>
+</DL>
+<A NAME="no3_22"><HR></a><DL>
+<P><DT><H3> ◆Saturn analog device</H3><DD> Devices equipped with an A/D converter such as analog joysticks, analog steering wheels, and tablets.<BR>
+ Peripheral types are based on 1H and data size of 5 bytes. (Actually, it changes for each peripheral.)<BR>
+ A feature of the format is that the 1st Data has a configuration equivalent to the Mega Drive 3-button PAD. Compatibility can be ensured by assembling the application so that it can be controlled using only 1st Data. Table 3.11 shows the standard format for Saturn analog devices.</P>
+<A NAME="t3_11"></A><P><DD> <B>Table 3.11 Saturn Analog Device Standard Format</b><DD><TABLE BORDER=1>
+<TR><TD><PRE></TD><TD><PRE> bit7</TD><TD><PRE> bit6</TD><TD><PRE> bit5</TD><TD><PRE> bit4</TD><TD><PRE> bit3</TD><TD><PRE> bit2</TD><TD><PRE> bit1</TD><TD><PRE> bit0</TD></TR>
+<TR><TD><PRE> saturn peripheral id</TD><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> 1</TD><TD COLSPAN=4><PRE> Data size</TD></TR>
+<TR><TD><PRE> 1st Data</TD><TD><PRE> Right</TD><TD><PRE> Left</TD><TD><PRE> Down</TD><TD><PRE> Up</TD><TD><PRE> Start</TD><TD><PRE> A TRG</TD><TD><PRE> C TRG</TD><TD><PRE> B TRG</TD></TR>
+<TR><TD><PRE> 2nd Data</TD><TD><PRE> R TRG</TD><TD><PRE> X TRG</TD><TD><PRE> Y TRG</TD><TD><PRE> Z TRG</TD><TD><PRE> L TRG</TD><TD COLSPAN=3><PRE> extended data</TD></TR>
+<TR><TD><PRE> 3rd Data</TD><TD><PRE> AX7</TD><TD><PRE> AX6</TD><TD><PRE> AX5</TD><TD><PRE> AX4</TD><TD><PRE> AX3</TD><TD><PRE> AX2</TD><TD><PRE> AX1</TD><TD><PRE> AX0</TD></TR>
+<TR><TD><PRE> 4th Data</TD><TD><PRE> AY7</TD><TD><PRE> AY6</TD><TD><PRE> AY5</TD><TD><PRE> AY4</TD><TD><PRE> AY3</TD><TD><PRE> AY2</TD><TD><PRE> AY1</TD><TD><PRE> AY0</TD></TR>
+<TR><TD><PRE> 5th Data</TD><TD><PRE> AZ7</TD><TD><PRE> AZ6</TD><TD><PRE> AZ5</TD><TD><PRE> AZ4</TD><TD><PRE> AZ3</TD><TD><PRE> AZ2</TD><TD><PRE> AZ1</TD><TD><PRE> AZ0</TD></TR>
+<TR><TD><PRE> 6th Data</TD><TD COLSPAN=8><PRE> extended data</TD></TR>
+<TR><TD><PRE>・</TD><TD COLSPAN=8><PRE>extended data</TD></TR>
+<TR><TD><PRE>・</TD><TD COLSPAN=8><PRE>extended data</TD></TR>
+<TR><TD><PRE> nth Data</TD><TD COLSPAN=8><PRE> extended data</TD></TR>
+</TABLE>
+</P>
+<DL>
+<P><DT> <B>A TRG,C TRG,B TRG,R TRG,X TRG,Y TRG,Z TRG,L TRG</b><DT> <B>Right, Left, Down, Up, Start</b> buttons<DD> It becomes 0 when the button is pressed.</P>
+<P><DT> <B>AX7～AX0,AY7～AY0,AZ7～AZ0</b><DD> The absolute value of the A/D converter output without sign is output.</P>
+<P><DT> <B>AX7〜AX0,AY7〜AY0</b><DD> The top left is (0,0) and the bottom right is (255,255).</P>
+<P><DT> <B>AZ7~AZ0</b><DD> The bottom is 0 and the top is 255.</P>
+</DL>
+<P><DT> <B>reference:</b><DD> Developer's Information/STN-34 <A HREF="../../../info/hon/stn34.htm">"Analog Mission Stick Manual"</a><DD> Developer's Information/STN-43 <A HREF="../../../info/hon/stn43.htm">"Multi-controller User's Manual Ver1.00"</a></DL>
+<A NAME="no3_23"><HR></a><DL>
+<P><DT><H3> ◆Pointing device</H3><DD> A device that outputs the amount of movement of a rotary encoder such as a mouse, trackball, etc.<BR>
+ The peripheral type is basically 2H and the data size is 3 bytes.<BR>
+ As a feature of the format, the pointing device data table does not have data equivalent to the Mega Drive 3-button PAD, unlike digital devices, analog devices, and keyboard devices. Furthermore, since the movement of X and Y data is output as the amount of movement (△delta) of the rotary encoder, compatibility cannot be ensured unless all three defined bytes are supported. Table 3.12 shows the standard format for Saturn pointing devices.</P>
+<A NAME="t3_12"></A><P><DD> <B>Table 3.12 Saturn pointing device standard format</b><DD><TABLE BORDER=1>
+<TR><TD><PRE></TD><TD><PRE> bit7</TD><TD><PRE> bit6</TD><TD><PRE> bit5</TD><TD><PRE> bit4</TD><TD><PRE> bit3</TD><TD><PRE> bit2</TD><TD><PRE> bit1</TD><TD><PRE> bit0</TD></TR>
+<TR><TD><PRE> saturn peripheral id</TD><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> 1</TD><TD><PRE> 0</TD><TD COLSPAN=4><PRE> Data size</TD></TR>
+<TR><TD><PRE> 1st Data</TD><TD><PRE> Y Over</TD><TD><PRE> X Over</TD><TD><PRE> Y Sign</TD><TD><PRE> X Sign</TD><TD><PRE> Start</TD><TD><PRE> Middle</TD><TD><PRE> Right</TD><TD><PRE> Left</TD></TR>
+<TR><TD><PRE> 2nd Data</TD><TD><PRE> XD7</TD><TD><PRE> XD6</TD><TD><PRE> XD5</TD><TD><PRE> XD4</TD><TD><PRE> XD3</TD><TD><PRE> XD2</TD><TD><PRE> XD1</TD><TD><PRE> XD0</TD></TR>
+<TR><TD><PRE> 3rd Data</TD><TD><PRE> YD7</TD><TD><PRE> YD6</TD><TD><PRE> YD5</TD><TD><PRE> YD4</TD><TD><PRE> YD3</TD><TD><PRE> YD2</TD><TD><PRE> YD1</TD><TD><PRE> YD0</TD></TR>
+<TR><TD><PRE> 4th Data</TD><TD COLSPAN=8><PRE> extended data</TD></TR>
+<TR><TD><PRE>・</TD><TD COLSPAN=8><PRE>extended data</TD></TR>
+<TR><TD><PRE>・</TD><TD COLSPAN=8><PRE>extended data</TD></TR>
+<TR><TD><PRE> nth Data</TD><TD COLSPAN=8><PRE> extended data</TD></TR>
+</TABLE>
+</P>
+<DL>
+<P><DT> <B>Y Over,X Over</b><DD> 0:X or Y data is valid.<DD> 1: Data is overflowing. (Over 255)</P>
+<P><DT> <B>Y Sign,X Sign</b><DD> 0:X,Y data are positive values.<DD> 1:X,Y data are negative values.</P>
+<P><DT> <B>XD7～XD0,YD7～YD0</b><DD> Absolute value of mouse movement</P>
+<P><DT> Start, Middle, Right, Left nuclear buttons<DD> It becomes 1 when the button is pressed.</P>
+</DL>
+<P><DT> <B>reference:</b><DD> Developer's Information/STN-44 <A HREF="../../../info/hon/stn44.htm">"Shuttle Mouse Supplementary Information"</a></DL>
+<A NAME="no3_24"><HR></a><DL>
+<P><DT><H3> ◆Keyboard device</H3><DD> This device is typified by a full keyboard like the one used in personal computers.<BR>
+ The peripheral type is 3H and the data size is 4 bytes.<BR>
+ A feature of the format is that the 1st Data has a configuration equivalent to the Mega Drive 3-button PAD. Compatibility can be ensured by assembling the application so that it can be controlled using only 1st Data. Table 3.13 shows the standard format for Saturn keyboard devices.</P>
+<A NAME="t3_13"></A><P><DD> <B>Table 3.13 Saturn keyboard device standard format</b><DD><TABLE BORDER=1>
+<TR><TD><PRE></TD><TD><PRE> bit7</TD><TD><PRE> bit6</TD><TD><PRE> bit5</TD><TD><PRE> bit4</TD><TD><PRE> bit3</TD><TD><PRE> bit2</TD><TD><PRE> bit1</TD><TD><PRE> bit0</TD></TR>
+<TR><TD><PRE> saturn peripheral id</TD><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> 1</TD><TD><PRE> 1</TD><TD COLSPAN=4><PRE> Data size</TD></TR>
+<TR><TD><PRE> 1st Data</TD><TD><PRE> Right</TD><TD><PRE> Left</TD><TD><PRE> Down</TD><TD><PRE> Up</TD><TD><PRE> Start</TD><TD><PRE> A TRG</TD><TD><PRE> C TRG</TD><TD><PRE> B TRG</TD></TR>
+<TR><TD><PRE> 2nd Data</TD><TD><PRE> R TRG</TD><TD><PRE> X TRG</TD><TD><PRE> Y TRG</TD><TD><PRE> Z TRG</TD><TD><PRE> L TRG</TD><TD COLSPAN=3><PRE> extended data</TD></TR>
+<TR><TD><PRE> 3rd Data</TD><TD><PRE> 0</TD><TD><PRE> Caps<BR> Lock</TD><TD><PRE> Num<BR> Lock</TD><TD><PRE> Scrool<BR> Lock</TD><TD><PRE> Make</TD><TD><PRE> 1</TD><TD><PRE> 1</TD><TD><PRE> Break</TD></TR>
+<TR><TD><PRE> 4th Data</TD><TD><PRE> D7</TD><TD><PRE> D6</TD><TD><PRE> D5</TD><TD><PRE> D4</TD><TD><PRE> D3</TD><TD><PRE> D2</TD><TD><PRE> D1</TD><TD><PRE> D0</TD></TR>
+<TR><TD><PRE> 5th Data</TD><TD COLSPAN=8><PRE> extended data</TD></TR>
+<TR><TD><PRE>・</TD><TD COLSPAN=8><PRE>extended data</TD></TR>
+<TR><TD><PRE>・</TD><TD COLSPAN=8><PRE>extended data</TD></TR>
+<TR><TD><PRE> nth Data</TD><TD COLSPAN=8><PRE> extended data</TD></TR>
+</TABLE>
+</P>
+<DL>
+<P><DT> <B>A TRG,C TRG,B TRG,R TRG,X TRG,Y TRG,Z TRG,L TRG</b><DT> <B>Right, Left, Down, Up, Start</b><DD> It becomes 0 when the button is pressed.</P>
+<P><DT> The correspondence between each button and the keys on the keyboard is as follows.<DD><TABLE BORDER=0>
+<TR ALIGN=CENTER><TH><PRE> button</TH><TH><PRE> Compatible key</TH><TH></TH><TH><PRE> button</TH><TH><PRE> Compatible key</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> Right</TD><TD><PRE> →</TD><TD></TD><TD><PRE> C TRG</TD><TD><PRE> C</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Left</TD><TD><PRE> ←</TD><TD></TD><TD><PRE> B TRG</TD><TD><PRE> X</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Down</TD><TD><PRE> ↓</TD><TD></TD><TD><PRE> R TRG</TD><TD><PRE> E</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Up</TD><TD><PRE> ↑</TD><TD></TD><TD><PRE> X TRG</TD><TD><PRE> A</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> Start</TD><TD><PRE> Esc</TD><TD></TD><TD><PRE> Y TRG</TD><TD><PRE> S</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> A TRG</TD><TD><PRE> Z</TD><TD></TD><TD><PRE> Z TRG</TD><TD><PRE> D</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> L TRG</TD><TD><PRE> Q</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>Caps Lock</b><DD> 1: Caps Lock is locked (Caps Lock LED is lit)</P>
+<P><DT> <B>Num Lock</b><DD> 1: Num Lock is locked (Num Lock LED is lit)</P>
+<P><DT> <B>Scroll Lock</b><DD> 1: Scroll Lock is locked (Scroll Lock LED is lit)</P>
+<P><DT> <B>Make</b><DD> Indicates 1 when there is a valid Make code in D7-D0 (key press indicated by D7-D0 code).</P>
+<P><DT> <B>Break</b><DD> Indicates 1 when there is a valid Break code in D7 to D0 (the key press indicated by the D7 to D0 code is released).</P>
+<P><DT> <B>D7～D0</b><DD> Indicates the key number. Used with <B>Make</b> and <B>Break</b> .</P>
+</DL>
+<P><DD> <B>Key code correspondence table</b>
+	<DD><TABLE BORDER=1>
+<TR><TH></TH>
+<TH><PRE> ０ </TH><TH><PRE> １ </TH><TH><PRE> ２ </TH><TH><PRE> ３ </TH>
+<TH><PRE> ４ </TH><TH><PRE> ５ </TH><TH><PRE> ６ </TH><TH><PRE> ７ </TH>
+<TH><PRE> ８ </TH><TH><PRE> ９ </TH><TH><PRE> Ａ </TH><TH><PRE> Ｂ </TH>
+<TH><PRE> Ｃ </TH><TH><PRE> Ｄ </TH><TH><PRE> Ｅ </TH><TH><PRE> Ｆ </TH></TR>
+
+<TR>
+<TH><PRE>00H</TH><TH><PRE>　</TH><TH><PRE>Ｆ９</TH><TH><PRE>　</TH><TH><PRE>Ｆ５</TH><TH><PRE>Ｆ３</TH><TH><PRE>Ｆ１</TH><TH><PRE>Ｆ２</TH><TH><PRE>Ｆ12</TH><TH><PRE>　</TH><TH><PRE>Ｆ10</TH><TH><PRE>Ｆ８</TH><TH><PRE>Ｆ６</TH><TH><PRE>Ｆ４</TH><TH><PRE>Tab</TH><TH><PRE>半全</TH><TH><PRE>　</TH></TR>
+<TR><TH><PRE>10H</TH><TH><PRE>　</TH><TH><PRE>Alt</TH><TH><PRE>Shift</TH><TH><PRE>ひら</TH><TH><PRE>Ctrl</TH><TH><PRE>Ｑた</TH><TH><PRE>１</TH><TH><PRE>Alt</TH><TH><PRE>Ctrl</TH><TH><PRE>　</TH><TH><PRE>Ｚつ</TH><TH><PRE>Ｓと</TH><TH><PRE>Ａち</TH><TH><PRE>Ｗて</TH><TH><PRE>２</TH><TH><PRE>　</TH></TR>
+<TR><TH><PRE>20H</TH><TH><PRE>　</TH><TH><PRE>Ｃそ</TH><TH><PRE>Ｘさ</TH><TH><PRE>Ｄし</TH><TH><PRE>Ｅい</TH><TH><PRE>４</TH><TH><PRE>３</TH><TH><PRE>　</TH><TH><PRE>Ｆは</TH><TH><PRE>スペース</TH><TH><PRE>Ｖひ</TH><TH><PRE>　</TH><TH><PRE>Ｔか</TH><TH><PRE>Ｒす</TH><TH><PRE>５</TH><TH><PRE>　</TH></TR>
+<TR><TH><PRE>30H</TH><TH><PRE>　</TH><TH><PRE>Ｎみ</TH><TH><PRE>Ｂこ</TH><TH><PRE>Ｈく</TH><TH><PRE>Ｇき</TH><TH><PRE>Ｙん</TH><TH><PRE>６</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>Ｍも</TH><TH><PRE>Ｊま</TH><TH><PRE>Ｕな</TH><TH><PRE>７</TH><TH><PRE>８</TH><TH><PRE>　</TH></TR>
+<TR><TH><PRE>40H</TH><TH><PRE>　</TH><TH><PRE>＜ね</TH><TH><PRE>Ｋの</TH><TH><PRE>Ｉに</TH><TH><PRE>Ｏら</TH><TH><PRE>０</TH><TH><PRE>９</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>＞る</TH><TH><PRE>？め</TH><TH><PRE>Ｌり</TH><TH><PRE>；れ</TH><TH><PRE>Ｐせ</TH><TH><PRE>−</TH><TH><PRE>　</TH></TR>
+<TR><TH><PRE>50H</TH><TH><PRE>　</TH><TH><PRE>＿ろ</TH><TH><PRE>：け</TH><TH><PRE>　</TH><TH><PRE>＠</TH><TH><PRE>＾</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>CapsL</TH><TH><PRE>Shift</TH><TH><PRE>Enter</TH><TH><PRE>［</TH><TH><PRE>　</TH><TH><PRE>］む</TH><TH><PRE>　</TH><TH><PRE>　</TH></TR>
+<TR><TH><PRE>60H</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>変換</TH><TH><PRE>　</TH><TH><PRE>Back</TH><TH><PRE>無変</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>￥</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH></TR>
+<TR><TH><PRE>70H</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>Esc</TH><TH><PRE>　</TH><TH><PRE>Ｆ11</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>　</TH><TH><PRE>ScrL</TH><TH><PRE>　</TH></TR>
+<TR><TH><PRE>80H</TH><TH><PRE>　</TH><TH><PRE>Ins</TH><TH><PRE>Pause</TH><TH><PRE>Ｆ７</TH><TH><PRE>Print</TH><TH><PRE>Del</TH><TH><PRE>←</TH><TH><PRE>Home</TH><TH><PRE>End</TH><TH><PRE>↑</TH><TH><PRE>↓</TH><TH><PRE>UP</TH><TH><PRE>Down</TH><TH><PRE>→</TH><TH><PRE>　</TH><TH><PRE>　</TH></TR>
+</TABLE>
+<DD> <B>Two key positions</b><DD><UL TYPE=DISC>
+<LI> 11H [Alt key] is on the left side of the keyboard.<LI> 17H [Alt key]: On the right side.<LI> 12H [Shift key] is on the left side of the keyboard.<LI> 59H [Shift key]: On the right side.<LI> 14H [Ctrl key] is on the left side of the keyboard.<LI> 18H [Ctrl key]: On the right side.</UL>
+<P><DT> <B>reference:</b><DD> Developer's Information/STN-45 <A HREF="../../../info/hon/stn45.htm">"Supplementary explanation of Saturn keyboard"</a></DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_18.htm">Back</a> ｜ <A HREF="p03_30.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

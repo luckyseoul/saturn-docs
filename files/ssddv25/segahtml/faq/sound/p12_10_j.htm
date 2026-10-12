@@ -1,0 +1,154 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/12&gt;FAQ/サウンド関連/その他</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#sound">FAQ</A>
+★<a href="index_j.htm#no12">サウンド関連</A>
+<HR>
+<B>▲
+<a href="p11_10_j.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>FAQ/サウンド関連</B>
+<H2 ALIGN=CENTER>その他</H2>
+<HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_01"><HR></A><DL>
+<H3>MIDIのループで、ループ開始・終了共にControll Change 31でいいんですか？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> MIDIのループに関する質問ですが、ループ開始・終了共にControll Change 31で
+      よろしいのでしょうか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> はい、そのとおりです。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_02"><HR></A><DL>
+<H3>MIDIの分解能はどういった基準になるのですか？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> MIDIの分解能に関する質問ですが、4分音符1つ = 480ステップとして
+      コンバートされますでしょうか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> コンバート時にタイムベースの変更は行いません。セガサターンでサポートしている
+      タイムベースは24〜960の間です。<BR>実際にはご使用のシーケンサのSMF出力
+      の仕様によってタイムベースは決まってきます。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_03"><HR></A><DL>
+<H3>曲の冒頭に付加するコマンド群は、どう並べれば良いのですか？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> バンク・プログラムチェンジ等曲の冒頭に付加するコマンド群はコンバート
+      後の最小ステップで順次並べる方法で問題はありませんか？ <BR>もしくは同じ
+      ステップにまとめて配置しても問題はありませんか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> 最小ステップで順次並べる方法にしてください。<BR>まとめて配置した場合は
+      コンバート時に</P>
+<P><B>　「トラック先頭のprogram changeの位置が遅すぎます。」</B></P>
+
+<P>      などのエラーを返します。<BR>
+      以下に各トラック先頭の基本的なデータ配置を記述します。</P>
+
+<P><PRE>
+----------------------------------------------------------------------
+1/1/000(小節/拍/クロック)
+テンポイベント(通常はシーケンサが自動的に挿入)、bank change(#32) 
+1/1/001(小節/拍/クロック)
+プログラムチェンジ、コントロールチェンジ(MAIN VOLUME#7、ループ時の
+ループコマンド#31など)
+1/1/002(小節/拍/クロック)
+ノートオン 
+----------------------------------------------------------------------
+</PRE></P>
+
+<P><DT><B>備考</B>
+	<DD>1拍が何クロックかは各シーケンサの分解能により異なります。<BR>また、各
+      トラック先頭部にはControl change#7のMAIN VOLUMEの設定を行ってください。<BR>
+      シーケンサによっては、同じ小節/拍/クロックにイベントデータを複数置いた
+      場合シーケンサの画面上に表示される順序とStandard MIDI Fileに書き込ま
+      れる順序が変わる場合があります。<BR>イベントの順序を明確にしたい場合は
+      データを1クロックずらして置いてください。</P>
+<P>      セガサターンのサウンドドライバの処理は2msecが基準ですので1拍を480クロック
+      と扱うシーケンスデータを作成しても、コンバート再生を行うと1拍が250相当
+      (テンポが120の場合)の分解能になり、クオンタイズをかけたように再生
+      されます。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_04"><HR></A><DL>
+<H3>トータルメモリの上限</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> トータルメモリが0x80000を超えるとファイルが壊れてしまう症状がありますが
+      これはなぜでしょうか？<BR> サウンドメモリ上限と連動しているためでしょうか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> ファイルが壊れてしまうというのはハードディスク上のファイルのことで
+      しょうか？ <BR>もしそうなら、これまでに報告されていない例になります。<BR>
+      サウンドシミュレータ上のマップに 0x80000 を超えるデータを登録した
+      場合ですと、実機のセガサターンのサウンドメモリは512Kバイトですので
+      正常には発音されません。<BR>特にターゲットがサウンドBOXの場合は実機
+      よりも512Kバイト多い1Mバイトのメモリがのっているので転送自体は
+      できますがドライバ側では対応してないので注意が必要です。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_05"><HR></A><DL>
+<H3>PowerMac7200 で AudioMedia2 が使用できない</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> PowerMac7200 で 機能拡張ハードの AudioMedia2 が使用できない。
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> 「AudioMedia2」は「NU-BUS」にしか対応していません。<BR>よって「PCI-BUS」の
+      マックでは「AudioMedia3」を使用するしかありませんが「Sound DesignerⅡ」
+      はこれに対応していませんので「Pro-Tools」などのソフトで対応してください。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no12_06"><HR></A><DL>
+<H3>音色ライブラリにはどんなのがあるの？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> InVision社のCyberSound以外に音色ライブラリーは何かないのか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> SEGAでライセンシー向けに用意している音色ライブラリはInVision社製の
+      もの以外にありません。<BR>なお、InVision社の音色ライブラリを使用した場合、
+      各種の表記義務が発生しますのでご注意ください。
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p11_10_j.htm">戻る</A>｜
+　　■</B>
+<HR>
+<A HREF="../../index_j.htm"><IMG srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index_j.htm#sound">FAQ</A>
+★<A HREF="index_j.htm#no12">サウンド関連</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

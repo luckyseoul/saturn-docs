@@ -1,0 +1,88 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p040.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p042.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 8.5 Read parameter setting </H2>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150 align = "left"> <PRE> <B> Title </B> <BR> Function specifications </TD> <td width = 250 align = "left"> <PRE> <B> Function </B> <BR> Set retrieval mode (resident / discard) </TD> <TD WIDTH = 120 align = "left"> <PRE> <B> Function Name </B> <BR> GFS_SetGmode </TD> <TD WIDTH=120 align="left"><PRE><B>No</B><BR>5.1</TD>
+</TABLE><P>
+<DD> <UL> <PRE> <B> format </B> Sint32 GFS_SetGmode (GfsHn gfs, Sint32 gmode)
+<B> Input </B> gfs: File handle
+<B> G </mode>: Extraction mode (GFS_GMODE_ ~)
+<B> Output </B> None
+<B> Function value </B> Extraction mode before setting. Negative error code in case of error.
+<B> Function </B> Sets the retrieval mode. </PRE></UL><BR>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150 align = "left"> <PRE> <B> Title </B> <BR> Function specifications </TD> <td width = 250 align = "left"> <PRE> <B> Function </B> <BR> Transfer mode setting (software / DMA etc.) </TD> <TD WIDTH = 120 align = "left"> <PRE> <B> Function Name </B> <BR> GFS_SetTmode </TD ><TD WIDTH=120 align="left"><PRE><B>No</B><BR>5.2</TD>
+</TABLE><P>
+<DD> <UL> <PRE> <B> format </B> Sint32 GFS_SetTmode (GfsHngfs, Sint32 tmode)
+<B> Input </B> gfs: File handle
+<B>: </B> tmode: Transfer mode (GFS_TMODE_ ~)
+<B> Output </B> None
+<B> Function value </B> Transfer mode before setting. Negative error code in case of error.
+<B> Function </B> Set the transfer method from the CD buffer. </PRE></UL><BR>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150 align = "left"> <PRE> <B> Title </B> <BR> Function specifications </TD> <td width = 250 align = "left"> <PRE> <B> Function </B> <BR> Set amount of reading to CD buffer </TD> <TD WIDTH = 120 align = "left"> Function Name <BR> GFS_SetReadPara </TD> <TD WIDTH = 120 align = "left"> <PRE><B>No</B><BR>5.3</TD>
+</TABLE><P>
+<DD> <UL> <PRE> <B> format </B> Sint32 GFS_SetReadPara (GfsHngfs, Sint32 cdrsize)
+<B> Input </B> gfs: File handle
+<B>: </B> cdrsize: Maximum amount of data read into the CD buffer at one time (unit: sector)
+<B> Output </B> None
+<B> Function value </B> Amount read before setting. Negative error code in case of error.
+<B> Function </B> Sets the maximum value for one reading into the CD buffer. </PRE></UL><BR>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150 align = "left"> <PRE> <B> Title </B> <BR> Function specifications </TD> <td width = 250 align = "left"> <PRE> <B> Function </B> <BR> Set transfer amount from CD buffer </TD> <TD WIDTH = 120 align = "left"> <PRE> <B> Function Name </B> <BR> GFS_SetTransPara </TD> <TD WIDTH=120 align="left"><PRE><B>No</B><BR>5.4</TD>
+</TABLE><P>
+<DD> <UL> <PRE> <B> format </B> Sint32 GFS_SetTransPara (GfsHngfs, Sint32 tsize)
+<B> Input </B> gfs: File handle
+<B> t </B> tsize: Amount transferred at once to the specified area (unit: sector)
+<B> Output </B> None
+<B> Function value </B> Transfer amount before setting. Negative error code in case of error.
+<B> Function </B> Sets the amount of data transferred to the transfer destination area in one retrieval process. </PRE></UL><P>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150> <PRE> <B> Title </B> <BR> Function specifications </TD> <TD WIDTH = 220> <PRE> <B> Function </B> <BR> Register transfer functions </TD><TD WIDTH=160><PRE><B>Function Name</B><BR>GFS_SetTrFunc</TD><TD WIDTH=60><PRE><B>No</B><BR>5.5</TD>
+</TABLE><P>
+<DD> <UL> <PRE> <B> format </B> void GFS_SetTrFunc (GfsHngfs, GfsTrFunc func)
+<B> Input </B> gfs: File handle
+<B> </B> func: Transfer function
+<B> Output </B> None
+<B> Function value </B> None
+<B> Function </B> Registers the transfer function for the specified file.
+<B> </B> registration function is called during file transfer processing.
+<B> Remarks </B> (a) The registration function has the following format.
+<B> </B> Sint32 (* GfsTrFunc) (GfsHngfs, Sint32 nsct)
+<B>: </B>: gfs: File handle
+<B> </B> nsct: Number of sectors that can be transferred
+<B> </B> (b) The transfer function can transfer data of up to nsct sectors.
+<B>: </B> (c) Returns the number of sectors actually transferred in the function value.
+<B>: </B> If transfer is in progress at the end of the transfer function, such as DMA, (-1) must be returned.
+<B> Example </B> / * Transfer function example * /
+<B> </B> Uint32 read_buf [BUFSIZE];
+<B> S </32> Sint32 transFunc (GfsHngfs, Sint32 nsct)
+<B> </B> {
+<B> </B> Uint32 * ptr;
+<B> </B> Sint32 dadr;
+<B> </B> Sint32 i;
+<B> </B> ptr = GFS_StartTrans (gfs, & dadr);
+<B> </B> for for (i = 0; i <2048 * nsct; i ++) {
+<B> </B> read_buf [i] = * ptr;
+<B> </B> ptr + = dadr;
+<B> </B>}
+<B> </B> return (nsct);
+<B> </B>} </PRE> </UL> <P>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD WIDTH = 150> <PRE> <B> Title </B> <BR> Function Specification </TD> <TD WIDTH = 220> <PRE> <B> Function </B> <BR> Transfer in Transfer Function Start </TD> <TD WIDTH = 160> <PRE> <B> Function Name </B> <BR> GFS_StartTrans </TD> <TD WIDTH = 60> <PRE> <B> No </B> <BR >5.6</TD>
+</TABLE>
+<DD> <UL> <PRE> <B> format </B> Uint32 * GFS_StartTrans (GfsHngfs, Sint32 * dadr)
+<B> Input </B> gfs: File handle
+<B> </B> dadr: Change in source address for each longword transfer.
+<B> Output </B> None
+<B> Function value </B> Transfer source address
+<B> Function </B> Starts data transfer processing in the transfer function. </PRE></UL><P>
+</DL><P><P><HR>
+<A HREF=p040.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p042.htm> Go to next page </A>
+</BODY>
+</HTML>

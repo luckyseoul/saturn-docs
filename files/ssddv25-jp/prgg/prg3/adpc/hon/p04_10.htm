@@ -1,0 +1,153 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 8&gt;PCM・ADPCM再生ライブラリ/4.プログラミング上の注意事項</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no4">PCM・ADPCM再生ライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PCM・ADPCM再生ライブラリ</B>
+<H2 ALIGN=CENTER>4.プログラミング上の注意事項</H2>
+<HR NOSHADE>
+<DL>
+	<P><DD>　本ライブラリを使って再生するときの注意事項を次に示します。<P>
+
+<A NAME="no4_10"></A>
+	<P><DT><B>(1)アプリケーション作成上の注意</B>
+	<DT><UL TYPE="DISK">
+	<P><LI>本ライブラリはCPUのDMAとタイマを使用します。本ライブラリ動作時は、CPUのDMA及びタイマは使用しないでください。</P>
+	<P><LI><A HREF="p06_11.htm#no2_7">PCM_Task</A> を呼ぶ頻度は、最低でも、Vブランク割り込みの頻度(1回/16ms)以上にしてください。<BR>同じ音が2回なる場合は、<A HREF="p06_11.htm#no2_7">PCM_Task</A> を呼ぶ頻度が少ないことが考えられます。</P>
+	<P><LI><A HREF="p06_11.htm#no2_7">PCM_Task</A> １回の呼び出しで処理する量の上限値を関数 <A HREF="p06_11.htm#no4_9">PCM_Set1TaskSample</A> で設定できます。これにより <A HREF="p06_11.htm#no2_7">PCM_Task</A>関数の負荷を安定させることができます。</P>
+	</UL>
+
+<A NAME="no4_20"></A>
+	<P><DT><B>(2)他ライブラリとの関係</B>
+	<DT><UL TYPE="DISK">
+	<P><LI>本ライブラリは、ファイルシステム、ストリームシステム、DMAライブラリ、ADPCM伸張ライブラリを使用しています。これらのライブラリをリンクしてください。</P></UL>
+
+<A NAME="no4_30"></A>
+	<P><DT><B>(3)バッファの取り方</B>
+	<DT><UL TYPE="DISK">
+	<P><LI>次に示すサイズを確保してください。</P>
+
+	<P><TABLE BORDER=0>
+	<TR><TD><PRE>ワークバッファ</TD><TD><PRE>：ワーク構造体のサイズ。</TD></TR>
+	<TR><TD><PRE>リングバッファ<BR>　<BR>　</TD><TD><PRE>：最低 (セクタサイズ)*10 [byte]。セクタサイズの整数倍。<BR>　CD-ROM XA Audio再生の場合は 1セクタ=2324バイト。<BR>　それ以外の場合は 1セクタ=2048バイト。</TD></TR>
+	<TR><TD><PRE>ＰＣＭバッファ</TD><TD><PRE>：4096*2 〜 4096*4 [sample/1ch]。</TD></TR>
+	<TR><TD><PRE>ポーズ処理用ワーク</TD><TD><PRE>：最低 4096 [sample]。PCMバッファと同サイズが最適。</TD></TR></TABLE></P>
+	</UL>
+
+<A NAME="no4_40"></A>
+	<P><DT><B>(4)シームレスブランチ</B>
+	<DT><UL TYPE="DISK">
+	<P><LI><A HREF="p06_11.htm#no3_4">PCM_EntryNext</A> でシームレスブランチしたときは、PCMのボリュームとPANは前のハンドルと同じになります。</P>
+	<P><LI><A HREF="p06_11.htm#no3_4">PCM_EntryNext</A> でシームレスブランチするときは、60分まで連続再生できます。それ以上の連続再生はできません。</P>
+	<P><LI>シームレスブランチするときは、アプリケーションプログラムでファイルの先読み処理をしてください。</P>
+	<P><LI>ファイルシステムを使用した場合は、シームレスブランチ機能は使えません。</P>
+	<P><LI>シームレスブランチはシングル再生中にしか行えません。マルチ再生中は実行できません。</P>
+	</UL>
+
+<A NAME="no4_50"></A>
+	<P><DT><B>(5)マルチ再生</B>
+	<DT><UL TYPE="DISK">
+	<P><LI>マルチ再生するときは、PCMストリーム再生番号を違う番号にしてください。</P>
+	<P><LI>CDにある複数のファイルを同時に再生するときは、ファイルインタリーブまたはチャネルインタリーブしてください。そのときは、ストリームシステムを使用してください。</P>
+	<P><LI>同じファイルはマルチ再生できません。違うファイルを指定してください。</P>
+	<P><LI>マルチ再生は同時に4つまでできます。</P>
+	<P><LI>ADPCM圧縮のデータは1本までしか再生できません。</P>
+	</UL>
+
+<A NAME="no4_60"></A>
+	<P><DT><B>(6)ADPCM対応</B>
+	<DT><UL TYPE="DISK">
+	<P><LI>ADPCM伸張ライブラリ SEGA_ADP.LIB をリンクしてください。</P>
+	<P><LI>初期化関数の次にADPCM使用宣言 <A HREF="p06_11.htm#no1_3">PCM_DeclareUseAdpcm</A> をコールしてください。</P>
+	</UL>
+	
+	<P><DD>◆指定ADPCM形式の再生
+	<DD><UL TYPE="DISK">
+	<P><LI>AIFF形式と全く同じ手順(同じプログラム)で再生することができます。ただし、AIFF形式の場合に比べてCPU負荷が大きくなることに注意してください。</P></UL>
+
+	<P><DD>◆CD-ROM XA Audio 形式の再生
+	<DD><UL TYPE="DISK">
+	<P><LI>ライブラリは、サブヘッダ領域のコーディングインフォメーションから再生周波数、チャネル数(ステレオ/モノラル)を判断します。正しく記述されていることを確認してください。</P>
+	<P><LI>ストリームキーの設定は、ライブラリユーザが行います。</P>
+	<P><LI>リングバッファは、セクタサイズ 2324 byte の整数倍にしてください。</P>
+	<P><LI><A HREF="p06_11.htm#no4_8">PCM_SetInfo</A> で再生情報を設定してください。</P>
+	<P><LI>CD_ROM XA Audio の再生では、ストリーム再生モード以外は使用できません。</P>
+	<P><LI>サンプルプログラム smppcm5.c を参考にしてください。</P></UL>
+
+<A NAME="no4_70"></A>
+	<P><DT><B>(7)関数の使用方法</B>
+	<DT><UL TYPE="DISK">
+	<P><LI>プログラムの先頭で <A HREF="p06_11.htm#no1_1">PCM_Init</A> を必ずコールしてください。</P>
+	<P><LI>VブランクIN割り込み内で <A HREF="p06_11.htm#no2_8">PCM_VblIn</A> を必ずコールしてください。</P>
+	<P><LI><A HREF="p06_11.htm#no3_1">PCM_Start</A> はハンドルに対して、1回だけ実行できます。<BR>同じファイルを何度も再生したいときは、その都度ハンドルを生成してください。</P>
+	<P><LI><A HREF="p06_11.htm#no4_1">PCM_SetLoadNum</A>、<A HREF="p06_11.htm#no4_5">PCM_SetPcmStreamNo</A> は再生を開始する前にコールしてください。</P>
+	<P><LI><A HREF="p06_11.htm#no2_1">PCM_CreateMemHandle</A> で生成したハンドルは、必ず <A HREF="p06_11.htm#no6_2">PCM_NotifyWriteSize</A> で、リングバッファへのデータ供給量を通知してください。</P>
+	<P><LI>ポーズ機能を利用する場合、あらかじめ、<A HREF="p06_11.htm#no4_6">PCM_SetPauseWork</A> によりポーズ処理用ワークを指定しておく必要があります。このワークはハンドル毎に用意する必要はありません。<BR>このワークは、ポーズ・オン処理の中で一時的に使用される作業領域ですから、ポーズ・オン処理の直前に領域確保し、直後に領域解放しても構いません。</P>
+	<P><LI>CDブロックからリングバッファへのデータ転送方式デフォルトでは、CPUのDMAによりデータ転送を行います。<BR><A HREF="p06_11.htm#no4_7">PCM_SetTrModeCd</A> により、プログラム転送、CPUのDMA、SCUのDMAのいずれかを指定できます。<BR>
+<A HREF="p06_11.htm#no4_7">PCM_SetTrModeCd</A>は、ハンドル作成後、最初にタスク関数をコールする前にコールしてください。</P>
+	<P><LI>CD-ROM XA Audio の再生をする場合は、必ず <A HREF="p06_11.htm#no4_8">PCM_SetInfo</A> で再生情報を設定してください。</P></UL>
+
+<A NAME="no4_80"></A>
+	<P><DT><B>(8)SaturnPCM形式について</B>
+
+<A NAME="no4_8a"></A>
+	<P><DT><B>　(a) データ作成</B>
+	<DT><UL TYPE=DISC">
+	<P><LI>変換ツールAIF2SAPによりAIFF ファイルを変換し作成します。</P></UL>
+	<DL>
+	<DT><B>［書式］</B><DD> aif2sap aiffile [sapfile]
+	<DT><B>［入力］</B><DD> aiffile：AIFF ファイル名<BR>sapfile：SaturnPCM ファイル名
+	<DT><B>［機能］</B><DD>AIFF ファイルを SaturnPCM ファイル（ SAP ファイル）へ変換する。<BR>SaturnPCM ファイル名を入力しなかった場合、AIFF ファイル名のベース名に拡張子「<B>SAP</B>」を付加したファイル名で SaturnPCM ファイルが作成される。</P></DL>
+
+<A NAME="no4_8b"></A>
+	<P><DT><B>　(b) データフォーマット</B>
+	<DT><UL TYPE=DISC>
+	<P><LI>非圧縮ＰＣＭである。</P>
+	<P><LI>セクタバウンダリ構造をとる。</P>
+	<P><LI>先頭 2048 byte はヘッダ領域。以後、4096 sampleを単位に、Ｌチャネル、Ｒチャネルの順にＰＣＭデータを配置する。</P></UL>
+
+<A NAME="no4_8c"></A>
+	<P><DT><B>　(c) 使用方法</B>
+	<DT><UL TYPE=DISC>
+	<P><LI>SaturnPCM 形式には、ファイル再生モード（ファイルシステム使用）とストリーム再生モード（ストリームシステム使用）の２種類の再生モードがあります。</P>
+	<P><LI>初期化関数の次に、ファイル再生モードであれば SaturnPCM 使用宣言を行う関数 <A HREF="p06_11.htm#no1_4">PCM_DeclareUseSapGfs</A> を、ストリーム再生モードであれば関数 <A HREF="p06_11.htm#no1_5">PCM_DeclareUseSapStm</A> をコールすることで SaturnPCM 形式が使用可能となります。</P>
+	<P><LI>SaturnPCM 使用宣言後は、AIFF 形式と同じ手順で使用できます。</P>
+	<P><LI>具体的な使用方法は、サンプルプログラム smppcm41.c（ファイル再生モード）、smppcm21.c（ストリーム再生モード）を参照してください。</P></UL>
+
+<A NAME="no4_8d"></A>
+	<P><DT><B>　(d) 使用資源に関して</B>
+	<DT><UL TYPE=DISC>
+	<LI>CDバッファからサウンドメモリへのデータ転送をSCU-DMA（チャネル０）により行うようデフォルト設定されています。データ転送方式は、関数 <A HREF="p06_11.htm#no4_7">PCM_SetTrModeCd</A>により、プログラム転送、CPU-DMA、SCU-DMAのいずれかを指定できます。</P></UL>
+
+<A NAME="no4_8e"></A>
+	<P><DT><B>　(e) ワークエリア</B>
+	<DT><UL TYPE=DISC>
+	<P><LI>SaturnPCM 形式は、リングバッファを必要とせず、代わりに拡張ワークバッファが必要と     なります（拡張ワークバッファのサイズは2048 byte）。</P></UL>
+
+<A NAME="no4_8f"></A>
+	<P><DT><B>　(f) 制限事項</B>
+	<DT><UL TYPE=DISC>
+	<P><LI>SaturnPCM形式と、AIFF / ADPCM / CD-ROM XA Audio 形式を同時に使用することはできま     せん。SaturnPCM 使用宣言後は、再生するＰＣＭファイルはすべて SaturnPCM 形式が対象となります。</P></UL>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p03_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no4">PCM・ADPCM再生ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

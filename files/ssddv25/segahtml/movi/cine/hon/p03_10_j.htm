@@ -1,0 +1,139 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/11&gt;Cinepak for SEGASaturnユーザーズマニュアル/3．Cinepak for SEGASATURNの機能について</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">MOVIE TOOLS GUIDE</A>
+★<a href="../index_j.htm">Cinepak for SEGASaturn</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>Cinepak for SEGASaturn</B>
+<H2 ALIGN=CENTER>3．Cinepak for SEGASATURNの機能について</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A>
+	<P><DT><H2>3.1　シームレスブランチ</H2>
+	<DD>　複数に分割したムービを連続再生したり、再生しているムービを中断して別のムービへ分岐(分岐再生)する場合は、ストリームシステムを使ってシームレスブランチを行います（ファイルシステムではシームレスブランチをサポートしていません）。シームレスブランチは、CDバッファに先読みされたムービデータを再生中に、次に再生するムービにCDドライブのピックアップを移動することによって実現します。従って、CDバッファにはある程度のムービデータが溜まっている必要があり、ムービデータの転送レートは290KB/S（倍速モード時）を越えないようにしておくほうが良いでしょう。仮に、ムービデータの転送レートが290KB/Sの場合、1本目のムービを15秒再生したときCDバッファには約150KBのムービデータが溜まっており、次のムービを再生するまでに約0.5秒のマージンがあることになります。このマージンの間に、次のムービのヘッダと最初のサンプルデータを読み込めれば、完全にシームレスブランチを行うことができます。</P>
+
+	<P><DT><B>　●シームレスブランチを使った連続再生1</B>
+	<DD>　図3.1はもともと1本のムービを3本に分割したものです。ムービＡを再生中に、ムービBを次に再生するムービとして登録(CPK_EntryNext関数)することによって、ムービA再生終了後自動的にムービBをシームレスに再生開始します。ムービCもムービB再生中同様に登録します。これによって、分割した3本のムービを分割する前の1本のムービと全く同じに再生することができます。</P>
+
+	<P ALIGN=CENTER><B>図3.1　連続再生1</B><BR><img srcset="../grp/i015_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>　●シームレスブランチを使った連続再生2</B>
+	<DD>　図3.2はムービA再生終了後、ムービBまたはムービCのどちらかを再生する場合です。連続再生1と同様に、CDバッファに分岐に必要なデータが残っている間に分岐先を判定し、次に再生するムービを登録(CPK_EntryNext関数)します。これでムービA再生終了後、ムービBまたはムービCをシームレスに再生開始します。</P>
+
+	<P ALIGN=CENTER><B>図3.2　連続再生2</B><BR><img srcset="../grp/i015_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>　●シームレスブランチを使った分岐再生</B>
+	<DD>　図3.3はムービAの再生を中断しムービBまたはムービCへ分岐する場合です。ムービA再生中に分岐の条件が発生したとき、次に再生するムービを登録(CPK_EntryNext関数)後、再生ムービの強制切り替え（CPK_Change関数）を行います。これでムービAを再生中断後、ムービBまたはムービCをシームレスに再生開始します。</P>
+
+	<P ALIGN=CENTER><B>図3.3　分岐再生</B><BR><img srcset="../grp/i016_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>　注意</B>
+	<TD><UL TYPE="DISK">
+	<LI>シームレスブランチを行うムービは、サウンドの内容(サンプリングレート、量子化ビット数、チャネル数)およびフレームレートを同じにしてください。<BR>
+	<LI>シームレスブランチを行うムービは、CD-ROM上にできるだけ近くに配置してください。また、分岐する順にCD-ROMの内側から外側に向かって配置してください。<BR>
+	<LI>シームレスブランチは、マルチムービ再生では使用できません。</UL>
+
+<A NAME="no3_20"></A>
+	<P><DT><H2>3.2　マルチムービ再生</H2>
+	<DD>　Cinepak for SEGASATURNは、最高4つまでのムービをスクリーン上に同時に再生することができます。図3.4にマルチムービ再生のイメージを示します。マルチムービを行うムービは、通常の1本のムービを作成するときと同じ手順で行います。サウンドは、それぞれのムービに独立して持って同時に鳴らすこともできますし(または、ユーザが選択したムービのサウンドだけを鳴らし、他のサウンドはボリュームを絞ることも可)、1本だけサウンドを持たせ他のムービは画像だけで再生することもできます。</P>
+
+	<P><DD>　マルチムービには、次の形態があります。</P>
+	<DT><UL TYPE=DISC>
+	<P><LI>複数のムービをCD上にチャネルインターリーブし、CDから同時に再生する</P>
+	<P><LI>メモリ上のムービとCD上のムービを同時に再生する</P>
+	<P><LI>複数のムービをメモリ上に読み込み同時に再生する</P>
+	</UL>
+
+	<P ALIGN=CENTER><B>図3.4　マルチムービの再生</B><BR><img srcset="../grp/i017_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>　注意</B>
+	<DT><UL TYPE="DISK">
+	<LI>複数のムービをCD上にチャネルインタリーブする場合は、それぞれのムービのデータレート(ビットレート)を正確に指定しインタリーブしてください（詳細は、バーチャルCDのマニュアル参照）。<BR>
+	<LI>複数のムービそれぞれにサウンドを持つ場合は、サンプリングレートを落としてください(11KHz程度)。<BR>
+	<LI>マルチムービ再生からは、シームレスブランチを行うことはできません。</B></UL></P>
+
+<A NAME="no3_30"></A>
+	<P><DT><H2>3.3　スーパーインポーズ</H2>
+	<DD>　クロマキー撮影したムービを使って、被写体を別の静止画やムービの背景上にスーパーインポーズすることができます。スーパーインポーズは、MovieToSaturn_Jで指定した特定の色をSEGASATURN上でデコードするときに透明化することによって実現しています。従って、透明化したい背景は単一色でなければなりません。スーパーインポーズするムービは、サウンド付きでもサウンドなしでも使用することができます。</P>
+
+	<P ALIGN=CENTER><B>図3.5　スーパーインポーズ</B><BR><img srcset="../grp/i018_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DD>　スーパーインポーズを行うには、Adobe Premiereの「カラー置き換え」フィルタまたは「透明度設定」を使います。(「カラー置き換え」、「透明度設定」の詳細についてはAdobe Premiereのマニュアルを参照してください)</P>
+
+	<P><DT><B>　●「カラー置き換え」フィルタの場合</B>
+	<DD><OL>
+	<P><LI>例えば、ブルーバック撮影されたムービの場合、背景の青を対象の色として選択します。次に、置き換える色を「赤=0、緑=65536、青=0」に設定し純粋な緑に置き換えます。類似性スライダを使ったり、くり返し置き換えを行ったりして背景を純粋な緑1色にします。この際、置き換え先の色がスーパーインポーズする被写体の中に含まれないように注意してください。もし含まれるようならば、緑でなく純粋な赤や白、黒等でもかまいません。</P>
+
+	<P><LI>カラー置き換えが終了したらそのムービをCinepak圧縮します。</P>
+	<P><LI>次に、MovieToSaturn_Jで変換する際に、「オプション」ボタンをクリックしクロマキー処理を選択後キーアウトするカラー値を入力します(図3.6)。置き換えた色が純粋な緑ならば「Red=0、Green=255、Blue=0」を入力後、SEGASATURNフォーマットに変換します。</P>
+	</OL>
+
+	<P><DT><B>　●「透明度設定」の場合</B>
+	<DD>　コンストラクションウインドウのスーパトラックにはブルーバック撮影されたムービを、Aトラックにはキーアウトするブルー1色の静止画を配置します。スーパトラックのムービを選択後、透明度設定ダイアログを開きキータイプでクロマを選びます。類似性スライダを使用して背景色がきれいに透明になるように調整してください。これで、Aトラックをマットにしたムービを作ることができます。<BR>
+その後は、「カラー置き換え」同様に2.、3.を実行します。</P>
+
+	<P ALIGN=CENTER><B>図3.6　MovieToSaturn_J オプションダイアログ</B><BR><img srcset="../grp/i019_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><TABLE><TR>
+	<TH>注　意<BR><img srcset="../../../what/atto_j.png 5x"></TH>
+	<TD><B>スーパーインポーズしたムービは、Cinepak圧縮によってエッジの部分が指定した色と変わってしまいきれいにキーアウトできません。この場合は、CPK_SetKeyOutRange関数を使ってキーアウトする色の範囲を調整します。</B></TD></TR></TABLE></P>
+
+<A NAME="no3_40"></A>
+	<P><DT><H2>3.4　キーフレーム ポーズ</H2>
+	<P><DT><B>　●キーフレームについて</B>
+	<DD>　ムービの圧縮には、フレーム内でデータを圧縮する空間圧縮と、前のフレームと変化が無い部分はデータを持たないことで圧縮を行う時間圧縮の２種類があります。一般に、時間圧縮したフレームを差分フレームと呼び、これに対して空間圧縮だけのフレームをキーフレームと呼びます。<BR>
+Cinepakは差分フレームに対応したコンプレッサであり、圧縮時にキーフレームを指定して時間圧縮を行うことができます。例えば、「30フレームごとにキーフレーム」とした場合は、1個のキーフレームと29個の差分フレームで構成されます(Cinepakコンプレッサが自動的にキーフレームを挿入することがあるため、実際には30フレームごとにキーフレームが入るとはかぎりません)。差分フレームは時間圧縮した部分がブロックに見えるという一種のブロック化現象の問題がみられます。キーフレーム指定をしないで圧縮した場合は、各フレーム空間圧縮だけとなり差分フレームはなくなります。</P>
+
+	<P ALIGN=CENTER><B>図3.7　キーフレームと差分フレームの関係</B><BR><img srcset="../grp/i020_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>　●キーフレームポーズ</B>
+	<DD>　Cinepakライブラリのポーズ機能(CPK_Pause関数)には、即ポーズとキーフレームポーズを指定するためのパラメータを用意しています。キーフレームポーズを指定した場合は、当然ポーズを起動後キーフレームがあらわれるまではポーズしません。従って、1秒毎にキーフレーム指定をした場合はポーズ起動後最高1秒待たされることになります。これは、ポーズを解除した場合サウンドとの同期を確保するためです。これを避けるには、Cinepak圧縮時にキーフレーム指定をしないか、もしくはキーフレームの間隔を短くしてください。</P>
+
+<A NAME="no3_50"></A>
+	<P><DT><H2>3.5　静止画再生</H2>
+	<DD>　ムービデータを予めメモリ上に読み込み、指定フレームを展開(CPK_DecordeFrame関数)することによって、ムービのフレームデータを静止画として使用することができます。</P>
+
+	<P ALIGN=CENTER><B>図3.8　静止画再生の流れ</B><BR><img srcset="../grp/i021_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>　注意</B>
+	<DD><UL TYPE="DISK">
+	<LI>止画用ムービは、サウンドを付けないでCinepak圧縮してください。
+	<LI>Cinepak圧縮時のフレームレートは任意です(意味がありません)。
+	<LI>Cinepak圧縮時、キーフレーム指定は絶対に行わないでください。
+	<LI>静止画用ムービは、全てメモリ上に読み込まれている必要があります。フルスクリーンのフレームサイズの場合は、10〜20フレーム程度のムービファイルにするのが適当でしょう。
+	</UL></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">MOVIE TOOLS GUIDE</A>
+★<a href="../index_j.htm">Cinepak for SEGASaturn</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

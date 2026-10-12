@@ -1,0 +1,25 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p057.htm> Return to previous page </A> | <A HREF=../mokuzi.htm> Return to menu </A>
+<HR><P><P>
+<H3> 7.6 Reference data when trouble occurs </H3>
+<UL> If a problem related to sound occurs, data may be saved to help you investigate the cause. Check the following area. <P>
+<B> Error status bitmap </B> <BR>
+If an error occurs during operation of the sound driver, an error bit corresponding to the error content is set in the system interface table (4 bytes from 420h). Details are described in “Chapter 7, 7.2 Details of Error Status Bitmap”, so please refer to it. <BR>
+There are two types of bitmaps: a bit that is automatically cleared when it returns to a normal state and a bit that is not automatically cleared once it is set. Please clear. <P>
+<B> Sound control command history </B> <BR>
+The history of sound control commands is stored in the reserved area (2048 bytes from 800h to FFFh) in the system area. In this area, control commands (16 bytes) received and executed by the sound driver from the main system are written as needed in the order in which they were executed. <BR>
+Writing is done in a ring buffer format. When the area is full, it is rewritten in order from the oldest, and the latest 128 commands are always recorded. (If the command processing exceeds 128, it is overwritten in order from the beginning of the area.) Even in such a case, the next data write position is set as an offset address from 800h in the system interface table (41Ah (1 word from) is set, so you can see the position of the last written data. <BR>
+The elapsed time from the previous command processing is stored in the 15th and 16th bytes (words) in the command history (16 bytes), so the timing of command issuance can be verified. One count is about 2msec. <P>
+By referring to this area, you can check items such as the following example. <P>
+If the <UL> <LI> sound does not sound, is the correct command issued from the main system? <BR>
+<LI> Is the same command issued repeatedly? <BR>
+<LI> Whether the commands are issued in the correct order, such as in a process where the order of commands is determined. <BR>
+<LI> Check if many commands are issued at an unusually short interval. <BR></UL></UL>
+<P><P><HR>
+<A HREF=p057.htm> Return to previous page </A> | <A HREF=../mokuzi.htm> Return to menu </A>
+</BODY>
+</HTML>

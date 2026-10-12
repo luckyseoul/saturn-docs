@@ -1,0 +1,90 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/13&gt;バーチャルCDシステム/3.CDエミュレータ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">バーチャルCDシステム</A>
+<HR>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+<a href="p09_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>バーチャルCDシステムユーザーズマニュアル/第3章　ＣＤエミュレータ VCDEMU</B>
+<HR NOSHADE>
+<DL>
+	<P><DT><H3>3.2.1　ログウィンドウ</H3>
+	<DD>　ログウィンドウには、２種類の形式でメッセージが表示されます。</P>
+	<P><DD><UL TYPE=DISC>
+		<LI>コマンド表示
+		<LI>その他のメッセージ</UL></P>
+
+	<P><DT><B>　●コマンドの表示</B>
+	<DD>　コマンドの表示の場合、メッセージはフィールドに分かれています。フィールドの意味は左より順に次のようになっています。トップバーのすぐ下の行にフィールドの識別のための表示があります。</P>
+	<P><DD>
+<PRE>
+Command      Atime      FAD(10)   Rtc    NopOutPREFD
+Play         00:02:00   96        0x80   00230   000001000
+Stop         00:00:00   00        0x80   00015   001011000
+Pause        00:00:00   00        0x80   00030   001011000
+Play2        00:10:05   2F3       0x80   00224   000001000
+</PRE></P>
+
+	<P><DD><B>◆コマンド</B>
+	<DD>　コマンド名が表示されます。識別の表示は「Command」になっています。コマンド名の最後に数字が付く場合があります。これは、倍速かどうかを表すものです。２が倍速用のコマンドを受けとったことを意味します。</P>
+
+	<P><DD><B>◆絶対時間</B>
+	<DD>　アクセス位置を引数に持つコマンドを受けとった時、その引数の値を表示します。識別の表示は「Atime」になっています。その形式は、mm:ss:ffという形で、それぞれmmは分を、ssは秒をffはフレームを表します。アクセス位置を引数に持たないコマンドの場合は00:00:00と表示されます。</P>
+
+	<P><DD><B>◆フレームアドレス</B>
+	<DD>　絶対時間をフレーム数で10進数または16進数(切り替え可能、デフォルトは10進数)表示します。例えば、絶対時間が00:02:15と表示されている時はこのフィールドは165(75×2+15)と表示されます。識別の表示は「FAD(10)」になっています。</P>
+
+	<P><DD><B>◆メッセージ</B>
+	<DD>　NOPコマンドの数と、転送データのフレーム数を表示します。NOPコマンドの数は、直前に表示されているコマンドを受けとった後この行で表示しているコマンドを受けとるまでの間に受けとった数です。<BR>
+フレームの数は直前に表示されているデータ転送を伴うコマンドを受けとって、この行で表示しているコマンドを受けとるまでの間にVCD I/Fボードに送った数です。したがって、ターゲットボックスで受けとった数より大きな値になっています。識別の表示は「Message」です。</P>
+
+	<P><DD><B>◆ステータス</B>
+	<DD>　コマンドを受けとった時のI/Fボードの状態を示しています。別の表示は「Status:PREFD」になっています。０か１の値が５つ並んだものです。左から</P>
+	<DD>
+−１の時、Play状態を示します。<BR>
+　常に０です。VCD I/Fボードではセットしません。<P>
+−１の時Ready状態を示します。<BR>
+　正常な場合は１です。<P>
+−１の時Error状態を示します。<BR>
+　何らかのエラーが発生したことを示します。<P>
+−１の時DiskEnd(Finish)状態を示します。<BR>
+　常に０です。VCD I/Fボードではセットしません。<P>
+−１の時DmaEnd状態を示します。<BR>
+　再生状態の時転送の契機に使われます。<P>
+
+
+	<P><DT><B>　●その他のメッセージ</B>
+	<DD>　エラーメッセージなどその他のメッセージはフィールドに分けられていません。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+<a href="p09_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">バーチャルCDシステム</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

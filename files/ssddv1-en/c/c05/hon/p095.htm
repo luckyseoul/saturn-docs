@@ -1,0 +1,47 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p094.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p096.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H1> Appendix A. Supplementary items </H1>
+<DT> <H2> A.1 Specification change after stream system Ver.1.10 </H2>
+<DT> <H4> (1) Changes in function specifications </H4>
+<DD> <B> (a) Replace functions prior to Ver.1.01 as shown in Table A.1. </B><P>
+<B> Table A.1 Replacement of functions before Ver.1.01 </B> <BR>
+<table border cellpadding=5>
+<td align = "center"> <pre> Ver.1.01 or earlier </td> <td align = "center"> <pre> After correction </td> <tr>
+<td align = "left"> <pre> STM_Init () </td> <td align = "left"> <pre> Uint8 work [STM_WORK_SIZE (12,24)]; <br> ・ <br> ・ <br > STM_Init (12, 24, work); </td> <tr>
+<td align = "left"> <pre> STM_OpenFid (grp, fid, & key) </td> <td align = "left"> <pre> STM_OpenFid (grp, fid, & key, STM_LOOP_READ); </td> <tr>
+<td align = "left"> <pre> STM_OpenFrange (grp, & frange, & key) </td> <td align = "left"> <pre> STM_OpenFrange (grp, & frange, & key, STM_LOOP_READ); </td> <tr>
+<td align = "left"> <pre> STM_SetTrBuf (stm, buf, BUF_SIZE) </td> <td align = "left"> <pre> STM_SetTrBuf (stm, buf, BUF_SIZE, STM_UNIT_WORD); </td> <tr>
+<td align = "left"> <pre> STM_SetLoop (grp, stm) </td> <td align = "left"> <pre> For loop playback <br> STM_SetLoop (grp, stm, STM_LOOP_ENDLESS); <br> When not playing loops <br> STM_SetLoop (grp, stm, 1); </td>
+</table><p>
+(b) The error code is passed to the second argument of the <B> error function. </B><P>
+<PRE> <B> (c) Add function to specify immediate return type server execution group </B>
+∙ The STM_SetExecGrp function waits in the function until the drive is paused. As a result,
+∙ The following functions have been added to prevent processing delays.
+Specification of server execution group (immediate return) STM_NwSetExecGrp <P>
+<B> (d) When the STM_NwSetExecGrp function is added, the STM_SetExecGrp function also returns Bool.
+  did. The meaning of the function value is the same as STM_NwSetExecGrp. </B><P>
+<B> (e) Addition of recovery function when read error occurs </B >>
+∙ Added STM_Recover function. To forcibly continue when a read error occurs,
+Please call as follows within the number. <P>
+Void errfunc (void * obj, Sint32 ec)
+{
+, If (ec == STM_ERR_CDRD) {
+S: STM_Recover ();
+«Else {
+.
+.
+.
+«}
+\} <P>
+<B> (f) Add stream system reset function </B>
+∙ Added STM_Reset function. Close all open stream groups and streams
+Initialize the stream system. </PRE><BR>
+</DL><P><P><HR>
+<A HREF=p094.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p096.htm> Go to next page </A>
+</BODY>
+</HTML>

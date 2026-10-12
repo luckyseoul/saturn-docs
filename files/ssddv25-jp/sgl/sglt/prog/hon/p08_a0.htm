@@ -1,0 +1,373 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;20/30&gt;SGL Programmer's Tutorial/8-10.特殊なスクロール機能</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<A HREF="p08_90.htm">戻る</A>｜<A HREF="p08_b0.htm">進む</A>▼</B>
+<HR NOSHADE>
+
+<DL>
+<A NAME="no8_a0"></A>
+  <P><DT><H3>8-10. 特殊なスクロール機能</H3>
+     <DD>　セガサターンには、通常のスクロール機能に加え、幾つかの特殊なスクロールが用意されています。ＳＧＬライブラリ関数では、これらの内、ASCIIスクロール機能、透明カラービットの制御機能をサポートしています。</P>
+
+<A NAME="no8_a1"></A>
+  <P><DT><H3>ASCIIスクロール</H3>
+     <DD>　ASCIIスクロール機能とは、通常のスクロール用キャラクタパターンデータの代わりに、ASCIIセルと呼ばれるデータをキャラクタパターンデータとして使用することをいいます。ASCIIセルとは、いわゆるASCIIデータ（ABCDEFG･･････XYZ）を、
+	スクロールで使用可能なデータ形式（セルデータ）に変換したもので、これを図解したものが下図になります。</P>
+
+<A NAME="z8_25"></A>
+  <P ALIGN=CENTER><B>図8-25　ASCIIスクロールイメージ</B><BR>
+  <IMG SRC="../grp/p08_50.gif"></P>
+	<P>	<DD>●ASCIIスクロールは、スクロールデータとして、ASCIIデータを使用しています。
+		<DD>●半角英数字が連続して表示され、順番はASCIIコードに対応します。</P>
+
+  <P><DD>　ＳＧＬでは、ASCIIセルを、システム初期化の段階でＶＲＡＭ中に格納しています。<BR>
+	このデータを、通常のスクロール機能設定時に使用することで、ASCIIスクロールが使用可能になります。</P>
+
+  <P>　ASCIIスクロールはシステム初期化状態で、128セル・256色で構成され、ノーマルスクロール画面“NBG0”を使用するように設定されています。
+	また、ASCIIスクロールデータは、それぞれ次のＲＡＭ領域中に格納されています。</P>
+
+<PRE>
+キャラクタデータ：0x25e60000番地から2000H
+マップデータ　　：0x25e76000番地から1000H
+パレットデータ　：0x25f00000番地から20H
+</PRE>
+
+  <P><DT><TABLE><TR>
+  <TD><IMG SRC="../../../../what/atto.gif"></TD>
+  <TD><B>何らかの事情により上記領域中に他のスクロールデータを書き込んでしまった場合は、ASCIIスクロールはそれらのデータに置き換えられるため、デフォルトとは異なった（正しくない）状態で描画されます。</B></TD>
+  <TR></TABLE></P>
+
+  <P><DD>　次のサンプルプログラム（リスト8-7）は、ＴＶ画面にASCIIスクロールを描画させたものです。</P>
+
+<A NAME="l8_7"></A>
+	<P ALIGN=CENTER><B>リスト8-7　sample_8_10_1：ASCIIスクロール</B></P>
+	<P>	<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Ascii Scroll							*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+#include	"ss_scrol.h"
+
+#define		NBG1_CEL_ADR		VDP2_VRAM_B1
+#define		NBG1_MAP_ADR		( VDP2_VRAM_B1 + 0x18000 )
+#define		NBG1_COL_ADR		VDP2_COLRAM
+#define		BACK_COL_ADR		( VDP2_VRAM_A1 + 0x1fffe )
+
+void ss_main(void)
+{
+	FIXED ascii_posx = SIPOSX , ascii_posy = SIPOSY;
+
+	slInitSystem(TV_320x224,NULL,1);
+        slTVOff();
+	slPrint("Sample program 8.10.1" , slLocate(9,2));
+
+	slColRAMMode(CRM16_1024);
+	slBack1ColSet((void *)BACK_COL_ADR , 0);
+
+	slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageNbg1((void *)NBG1_CEL_ADR , 0 , PNB_1WORD|CN_10BIT);
+	slPlaneNbg1(PL_SIZE_1x1);
+	slMapNbg1((void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR);
+	Map2VRAM(ascii_map ,(void *)NBG1_MAP_ADR , 32 , 4 , 0 , 0);
+
+	slScrAutoDisp(NBG0ON | NBG1ON);
+	slTVOn();
+
+	while(1) {
+		slScrPosNbg1(ascii_posx , ascii_posy);
+		ascii_posx += POSX_UP;
+		slSynch();
+	} 
+}
+</PRE>
+
+
+<A NAME="f8_9"></A>
+  <H4>フロー8-9　sample_8_10_1：ASCIIスクロール</H4>
+  <IMG SRC="../grp/p08_52.gif">
+
+<A NAME="no8_a2"></A>
+  <P><DT><H3>透明カラービット</H3>
+     <DD>　セガサターンでは、スクロール・カラーデータにパレット形式を選択している場合、１パレット中の0番目のカラーデータを、本来登録されているカラーデータに関係なく、透明色にすることができます。<BR>
+	透明色というのは、文字通り、透明色指定されたドット部分が透明であるかのような処理を行い、透明色指定されたスクロールの背後にあるスクロールなどの描画を優先して行う色指定のことをいいます。これを図解したものが下図になります。</P>
+
+<A NAME="z8_26"></A>
+  <P ALIGN=CENTER><B>＜図8-26　透明設定イメージモデル＞</B>
+  <IMG SRC="../grp/p08_53_1.gif"></P>
+
+  <P><DD>　ＳＧＬで透明カラー機能を使用するには、ライブラリ関数“slScrTransparent”を使用してください。<BR>
+	関数“slScrTransparent”使用以後のスクロールは、関数指定に従い描画されます。</P>
+
+  <P><DT><B>【void slScrTransparent ( Uint16 trns_flag ) ;】</B>
+     <DD>　スクロール・カラーデータにパレット形式を選択している場合、パレットデータ中の0番目のカラーデータを透明処理するか、しないかの選択を行います。<BR>
+	パラメータには透明処理を実行するスクロール面に対応した下表の値を代入します。<BR>
+	また、複数のパラメータをｏｒ演算子“｜”で連結することで、複数のスクロール面の透明処理指定が可能になります。</P>
+
+<A NAME="t8_21"></A>
+	<P>	<DD><B>表8-21　“slScrTransparent”のパラメータ代入値（trns_flag）</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH ROWSPAN=2></TH><TH COLSPAN=5>透明処理を実行するスクロール面</TH></TR>	
+	<TR><TH>NBG0</TH><TH>NBG1</TH><TH>NBG2</TH><TH>NBG3</TH><TH>RBG0</TH></TR>
+	<TR><TH>代　入　値</TH><TD>NBG0ON</TD><TD>NBG1ON</TD><TD>NBG2ON</TD><TD>NBG3ON</TD><TD>RBG0ON</TD></TR>
+	</TABLE>
+	<B>注）</B>上記の値は、システム付属の“sl_def.h”で定義されています。</P>
+
+  <P>　次のサンプルプログラム（リスト8-8）は、ＳＧＬライブラリ関数“slScrTransparent”を実際に使用してスクロールの透明カラー処理を実現したものです。</P>
+
+<A NAME="l8_8"></A>
+	<P ALIGN=CENTER><B>リスト8-8　sample_8_10_2：透明コードの制御</B>
+	<P>	<DD>
+<PRE>
+#include        "sgl.h"
+#include        "ss_scrol.h"
+
+#define	        NBG1_CEL_ADR              VDP2_VRAM_B0
+#define	        NBG1_MAP_ADR            ( VDP2_VRAM_B0 + 0x10000 )
+#define         NBG1_COL_ADR            ( VDP2_COLRAM  + 0x00200 )
+#define	        NBG2_CEL_ADR            ( VDP2_VRAM_B1 + 0x02000 )
+#define	        NBG2_MAP_ADR            ( VDP2_VRAM_B1 + 0x12000 )
+#define         NBG2_COL_ADR            ( VDP2_COLRAM  + 0x00400 )
+#define         BACK_COL_ADR            ( VDP2_VRAM_A1 + 0x1fffe )
+
+void ss_main(void)
+{
+    Uint16  trns_flg = NBG1ON ;
+    FIXED   yama_posx = SIPOSX , yama_posy = SIPOSY ;
+    FIXED   am2_posx  = SIPOSX , am2_posy  = SIPOSY ;
+    
+    slInitSystem(TV_320x224,NULL,1);
+    slTVOff();
+    slPrint("Sample program 8.10.2" , slLocate(9,2)) ;
+
+    slColRAMMode(CRM16_1024) ;
+    slBack1ColSet((void *)BACK_COL_ADR , 0) ;
+
+    slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
+    slPageNbg1((void *)NBG1_CEL_ADR , 0 , PNB_1WORD|CN_10BIT);
+    slPlaneNbg1(PL_SIZE_1x1);
+    slMapNbg1((void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR);
+    Cel2VRAM(am2_cel , (void *)NBG1_CEL_ADR , 16000) ;
+    Map2VRAM(am2_map , (void *)NBG1_MAP_ADR , 32 , 32 , 1 , 0) ;
+    Pal2CRAM(am2_pal , (void *)NBG1_COL_ADR , 256) ;
+
+    slCharNbg2(COL_TYPE_256 , CHAR_SIZE_1x1) ;
+    slPageNbg2((void *)NBG2_CEL_ADR , 0 , PNB_1WORD|CN_12BIT);
+    slPlaneNbg2(PL_SIZE_1x1);
+    slMapNbg2((void *)NBG2_MAP_ADR , (void *)NBG2_MAP_ADR , (void *)NBG2_MAP_ADR , (void *)NBG2_MAP_ADR);
+    Cel2VRAM(yama_cel , (void *)NBG2_CEL_ADR , 31808) ;
+    Map2VRAM(yama_map , (void *)NBG2_MAP_ADR , 32 , 16 , 2 , 256) ;
+    Pal2CRAM(yama_pal , (void *)NBG2_COL_ADR , 256) ;
+
+    slScrPosNbg2(yama_posx , yama_posy) ;
+    slScrPosNbg1(am2_posx  , am2_posy) ;
+    slScrTransparent(trns_flg) ;
+
+    slScrAutoDisp(NBG0ON | NBG1ON | NBG2ON) ;
+    slTVOn();
+
+    while(1)
+    {
+        if(yama_posx &gt;= (SX + SIPOSX))
+        {
+            if(trns_flg == NBG1ON)
+                trns_flg = 0 ;
+            else
+                trns_flg = NBG1ON ;
+            yama_posx = SIPOSX ;
+            slScrTransparent(trns_flg) ;
+        }
+
+	slScrPosNbg2(yama_posx , yama_posy) ;
+	yama_posx += POSX_UP ;
+
+	slScrPosNbg1(am2_posx , am2_posy) ;
+	am2_posy += POSY_UP ;
+
+	slSynch();
+    } 
+}
+</PRE>
+
+<A NAME="f8_10"></A>
+  <H4>フロー8-10　sample_8_10_2：透明コードの制御</H4>
+  <IMG SRC="../grp/p08_55.gif">
+
+<A NAME="no8_a3"></A>
+  <P><DT><H3>カラー演算</H3>
+     <DD>　ＳＧＬでは、スプライトと各スクロール画面のプライオリティを比較して得た、トップ画像とセカンド画像のカラーデータを指定された割合で演算し画面に表示することが可能です。<BR>
+	この機能を使用することにより、あるスクロールの背面に隠れて配置されている他のスクロール面やスプライトを徐々に浮き上がらせるようにして描画させたりすることが可能になります。</P>
+
+  <P>　カラー演算処理を行うには次の手順を踏む必要があります。</P>
+
+  <P><DT><B>１）カラー演算処理の諸設定</B>
+     <DD>　関数“slColorCalc”を使用してカラー演算処理の諸設定を行い、関数“slColorCalcOn”を使用して、カラー演算の影響を受けるスクロール面を決定します。</P>
+
+  <P><DT><B>【void slColorCalc ( Uint16 flag ) ;】</B>
+     <DD>　カラー演算処理の諸設定を行います。</P>
+
+  <P>　パラメータには、使用するカラー演算処理制御に対応した下図の値を代入します。<BR>
+	パラメータの詳細は、“HARDWARE MANUAL vol.2 : VDP2 ユーザーズマニュアル第12章カラー演算”を参照してください。</P>
+
+<A NAME="z8_27"></A>
+  <P ALIGN=CENTER><B>図8-27　“slColorCalc”のパラメータ代入値（flag）</B>
+	<P>	<DD>
+<PRE>
+●　ColorCalc代入値　●
+演算方法　　　　：[CC_RATE | CC_ADD] |
+演算指定画像　　：[CC_TOP  | CC_2ND] |
+拡張カラー演算　：[CC_EXT  ] |
+登録面　　　　　：[NBG0ON | NBG1ON | NBG2ON | NBG3ON | RBG0ON  | LNCLON | SPRON ] |
+</PRE>
+
+  <P><DD><B>注）</B>上記の値は、システム付属の“sl_def.h”で定義されています。</P>
+
+	<P>	<DD>　カラー演算には大きく分けて２つのモードが存在します。</P>
+
+<PRE>
+割合で加算　：TOP画像と2ND画像の演算比率を指定してカラー演算（CC_RATE）
+そのまま加算：TOP画像と2ND画像の単純な加算値でカラー演算（CC_ADD）
+</PRE>
+
+  <P><DT><B>【void slColorCalcOn( Uint16 flag ) ;】</B>
+     <DD>　カラー演算処理の影響を受けるスクロール面を決定します。<BR>
+	パラメータには、カラー演算を実行したいスクロール面に対応した下表の値を代入してください。<BR>
+	また、複数のパラメータをｏｒ演算子“｜”で連結することで、同時に複数のスクロール面に対するカラー演算指定を行うことができます。</P>
+
+<A NAME="t8_22"></A>
+	<P>	<DD><B>表8-22　“slColorCalcOn”のパラメータ代入値（flag）</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH ROWSPAN=2></TH><TH COLSPAN=7>カラー演算を実行するスクロール面</TH></TR>	
+	<TR><TH>NBG0</TH><TH>NBG1</TH><TH>NBG2</TH><TH>NBG3</TH><TH>RGB0</TH><TH>LNCL</TH><TH>SPRITE</TH></TR>
+	<TR><TH>代　入　値</TH><TD>NBG0ON</TD><TD>NBG1ON</TD><TD>NBG2ON</TD><TD>NBG3ON</TD><TD>RBG0ON</TD><TD>LNCLON</TD><TD>SPRITEON</TD></TR>
+	</TABLE>
+	<B>注）</B>上表の値は、システム付属の“sl_def.h”で定義されています。</P>
+
+  <P><DT><B>２）カラー演算値の設定</B>
+     <DD>　カラー演算の諸設定と登録を済んだスクロール面は、各スクロール面に対応した関数“slColRateNbg0〜3”、“slColRateRbg0”、“slColRateLNCL”、“slColRateBACK”を使用することにより実際にカラー演算処理を実行することができます（比率で指定）。</P>
+
+  <P>　ただし、カラー演算に加算方式を採択している場合は、比率指定は意味を持ちません。</P>
+
+  <P><DT><B>【void slColRateNbg0〜3( Uint16 rate ) ;】</B>
+     <DT><B>【void slColRateRbg0( Uint16 rate ) ;】</B>
+     <DT><B>【void slColRateLNCL( Uint16 rate ) ;】</B>
+     <DT><B>【void slColRateBACK( Uint16 rate ) ;】</B>
+  <DD>　関数の指定する各スクロール面に対して、カラー演算比率を設定します。<BR>
+	パラメータにはカラー演算で使用するカラー演算比率（0〜31の範囲）を代入します。<BR>
+	関数“slColRateNbg0〜3”は各ノーマルスクロール画面、関数“slColRateRbg0”は回転スクロール画面、関数“slColRateLNCL”はラインカラー画面、関数“slColRateBACK”はバック画面のカラー演算比率の設定に使用します。</P>
+
+  <P><DD>　カラー演算処理の流れを大まかにまとめると次のようになります。</P>
+
+<A NAME="f8_11"></A>
+  <H4>フロー8-11　カラー演算処理の流れ</H4>
+  <IMG SRC="../grp/p08_57.gif">
+
+<A NAME="no8_a4"></A>
+  <P><DT><H3>ラインカラー画面</H3>
+     <DD>　ラインカラー画面とは、指定されたスクロール面のトップ画像（実際にモニターに描画される画像）のセカンド画像として強制的に挿入し、カラー演算を行うためだけに用意された特別なスクロール面です。<BR>
+	ラインカラー画面は、画面全体または各ライン毎に色の設定が行えます。<BR>
+	また、各ライン単位で使用されるカラーのカラーRAMアドレスデータの集合を、ラインカラーテーブルとしてVRAM領域中に格納する必要があります。</P>
+
+  <P><DT><B>参照</B>
+     <DD>ラインカラー画面の詳細は、“HARDWARE MANUAL vol.2：VDP2 ユーザーズマニュアルのライン画面”を参照してください。</P>
+
+  <P>　ラインカラー画面の使用には、次の手順を踏む必要があります。</P>
+
+  <P><DT><B>１）ラインカラー画面の設定</B>
+     <DD>　ラインカラー画面を使用する場合、最初に、ラインカラーデータの格納されるラインカラーテーブルを指定してやる必要があります。<BR>
+	また、ラインカラーテーブルで指定されるカラーデータをカラーRAM領域中に格納しておくのを忘れないでください。</P>
+
+  <P><DT><B>【void slLineColTable( void *adr ) ;】</B>
+     <DD>　ラインカラーテーブルアドレスを指定します。<BR>
+	パラメータには、ラインカラーテーブルが格納されるVRAM領域中のアドレスを指定します。</P>
+
+  <P>　ラインカラー画面を単色使用したい場合は、関数“slLine1ColSet”を使用してください。</P>
+
+  <P><DT><B>【void slLine1ColSet( void *adr , Uint16 col ) ;】</B>
+     <DD>　ラインカラー画面を単色とし、そのカラーも同時に決定します。</P>
+
+  <P><DT><B>２）スクロール面の登録</B>
+     <DD>　次に、ラインカラー画面の影響を受けるスクロール面を登録します。<BR>
+	スクロール面の登録には、関数“slLineColDisp”を使用してください。</P>
+
+  <P><DT><B>【void slLineColDisp( Uint16 flag ) ;】</B>
+     <DD>　ラインカラー画面の影響を受けるスクロール面を決定します。<BR>
+	パラメータには、登録したいスクロール面に対応した下表の値を代入してください。<BR>
+	また、複数のパラメータをｏｒ演算子“｜”で連結することで、同時に複数のスクロール面の登録を行うことができます。</P>
+
+<A NAME="t8_23"></A>
+	<P>	<DD><B>表8-23　“slLineColDisp”のパラメータ代入値（flag）</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH ROWSPAN=2></TH><TH COLSPAN=5>登録するスクロール面</TH></TR>	
+	<TR><TH>NBG0</TH><TH>NBG1</TH><TH>NBG2</TH><TH>NBG3</TH><TH>RBG0</TH></TR>
+	<TR><TH>代　入　値</TH><TD>NBG0ON</TD><TD>NBG1ON</TD><TD>NBG2ON</TD><TD>NBG3ON</TD><TD>RBG0ON</TD></TR>
+	</TABLE>
+	<B>注）</B>上表の値は、システム付属の“sl_def.h”で定義されています。</P>
+
+  <P><DT><B>３）ラインカラー画面を用いたカラー演算</B>
+     <DD>　関数“slLineColDisp”で登録を終了したスクロール面は、前述したカラー演算処理の各設定と共に使用することで、ラインカラー画を使用したカラー演算処理を実行できます。<BR>
+	カラー演算処理については、前項“カラー演算”を参照してください。</P>
+
+<A NAME="f8_12"></A>
+  <H4>フロー8-12　ラインカラー画面処理の流れ</H4>
+  <IMG SRC="../grp/p08_59_2.gif">
+
+<A NAME="no8_a5"></A>
+  <P><DT><H3>カラーオフセット</H3>
+     <DD>　ＳＧＬでは、スプライト及び各スクロール画面のカラーRAMデータ（この値自体は変わらない）にオフセット値を加算または減算することで、画面に表示するカラーを変化させることができます。<BR>
+	カラーオフセット機能を使用したい場合は以下の手順を踏む必要があります。</P>
+
+  <P><DT><B>１）カラーオフセットの諸設定</B>
+     <DD>　カラーオフセットには、カラーオフセットＡ・Ｂの２種類があります。<BR>
+	カラーオフセット機能を使用したいスクロール面は、２つのカラーオフセットの内のいずれか一方にスクロール面を登録してやる必要があります。<BR>
+	スクロールの登録には、関数“slColOffsetOn”“slColOffsetBUse”を使用します。</P>
+
+  <P><DT><B>【void slColOffsetOn( Uint16 flag ) ;】</B>
+     <DD>　カラーオフセット機能を使用したいスクロール面を登録します。<BR>
+	パラメータには登録するスクロール面に対応した下表の値を代入します。</P>
+
+  <P><DT><B>【void slColOffsetBUse( Uint16 flag ) ;】</B>
+     <DD>　カラーオフセットＢを使用したいスクロール面を登録します。<BR>
+	関数“slColOffsetOn”のみで登録されたスクロール面はオフセットＡを使用します。<BR>
+	パラメータには登録するスクロール面に対応した下表の値を代入します。</P>
+
+<A NAME="t8_24"></A>
+	<P>	<DD><B>表8-24　“slColOffsetOn”,“slColOffsetBUse”のパラメータ代入値（flag）</B>
+	<P>	<DD><TABLE BORDER=1>
+		<TR><TH ROWSPAN=2>　</TH><TH COLSPAN=7>登録するスクロール面</TH></TR>	
+		<TR><TH>　NBG0　</TH><TH>　NBG1　</TH><TH>　NBG2　</TH><TH>　NBG3　</TH><TH>　RBG0　</TH><TH>　BACK　</TH><TH>　SPRITE　</TH></TR>
+		<TR ALIGN=CENTER><TH>代　入　値</TH><TD>NBG0ON</TD><TD>NBG1ON</TD><TD>NBG2ON</TD><TD>NBG3ON</TD><TD>RBG0ON</TD><TD>BACKON</TD><TD>SPRON</TD></TR>
+		</TABLE>
+		<DD><B>注）</B>上表の値は、システム付属の“sl_def.h”で定義されています。</P>
+
+  <P><DT><B>２）オフセット値の設定</B>
+     <DD>　登録を終えた各スクロール面は、それぞれのカラーオフセットで設定されたオフセット値の影響を受けて画面に表示されます。<BR>
+	各カラーオフセットのオフセット値の設定には、関数“slColOffSetA,B”を使用します。</P>
+
+  <P><DT><B>【void slColOffsetA( Sint16 r , Sint16 g , Sint16 b ) ;】</B>
+     <DT>【void slColOffsetB( Sint16 r , Sint16 g , Sint16 b ) ;】</B>
+     <DD>　各カラーオフセットの、カラーオフセット値を設定します。<BR>
+	パラメータには、RGB各色要素のオフセット値（符号付９ビット）を代入します。<BR>
+	関数“slColOffSetA”はカラーオフセットＡのオフセット値の設定に、関数“slColOffSetB”はカラーオフセットＢのオフセット値の設定に使用します。</P>
+
+</DL>
+
+
+
+<HR NOSHADE>
+<B>▲<A HREF="p08_90.htm">戻る</A>｜<A HREF="p08_b0.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,117 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 5&gt;CDビルダスクリプト文法補足説明</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<B>▲
+<a href="p18_10_j.htm">戻る</A>｜
+<a href="p20_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CDビルダスクリプト文法補足説明</B>
+<H2 ALIGN=CENTER></H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A>
+	<P><DT><H3>２．相対時間指定について</H3>
+	<DD>　スクリプトではディスク上の位置を3種類の相対位置で指定するようになっています。</P>
+
+	<P><DD><UL TYPE="DISK">
+	<LI>セッション相対時間<BR>
+	<LI>エクステント相対時間<BR>
+	<LI>ファイル相対時間</UL></P>
+
+	<P><DD>　各々、開始(BeginTime)と終了（EndTime）の指定がありますが、その指定位置と実際のデータが配置される位置との関係は次のようになります。</P>
+
+<A NAME="no2_11"></A>
+	<P><DT><B>　(1)　BeginTimeが指定された場合</B>
+	<DD><PRE>
+　　　　　　Begin Time
+　　　　　　↓
+┏━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯
+┃　│　│　│■│■│■│■│■│■│■│■│■│■│■│■│
+┗━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷
+</PRE>
+
+<A NAME="no2_12"></A>
+	<P><DT><B>　(2)　EndTimeが指定された場合</B>
+	<DD><PRE>
+　　　　　　　　　　　　　　　　　　　　　　End Time
+　　　　　　　　　　　　　　　　　　　　　　↓
+┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┓
+│■│■　■│■│■│■│■│■│■│■│■│　│　│　│　┃
+┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┛
+*End Timeでファイルが終了するように開始位置が設定される。
+</PRE>
+
+<A NAME="no2_13"></A>
+	<P><DT><B>　(3)　BeginTime, UnitSize, GapSizeが指定された場合</B>
+	<DD><PRE>
+　　　　　　Begin Time
+　　　　　　↓
+┏━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┯
+┃　│　│　│■│■│　│　│　│■│■│　│　│　│■│■│
+┗━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┷
+　　　　　　　↑　　└─────┘↑　　└─────┘↑　　　
+　　　　　　　│　　　　Ｇａｐ　　│　　　　Ｇａｐ　　│　　　
+　　　　　　─┴─────────┴─────────┘　　　
+　　　　　　Unit　　　　　　　　　　　　　　　　　　　　　　　
+</PRE>
+
+<A NAME="no2_14"></A>
+	<P><DT><B>　(4)　EndTime, UnitSize, GapSizeが指定された場合</B>
+	<DD><PRE>
+　　　　　　　　　　　　　　　　　　End Time
+　　　　　　　　　　　　　　　　　　　　　↓
+　┯━┯━┯━┯━┯━┯━┯━┯━┯━┯━┓
+　│　│　│　│■│■│　│　│　│■│■┃
+　┷━┷━┷━┷━┷━┷━┷━┷━┷━┷━┛
+　　　　　　　　↑　　└─────┘↑　　　
+　　　　　　　　│　　　　Ｇａｐ　　│　　　
+　　──────┴─────────┘　　　
+　　Unit　　　　　　　　　　　　　　　　　　
+</PRE>
+
+<A NAME="no2_15"></A>
+	<P><DT><B>　(5)　セッション相対時間(BeginTimeS, EndTimeS)</B>
+	<DD>　ファイルインタリーブされていないISOファイルの配置位置を指定するものです。<BR>ファイルインタリーブされているISOファイルの定義の中で指定しても無視されます。<BR>指定する時間はセッションの始まりを00:00:00とした、(分:秒:フレーム)時間で表現します。</P>
+
+<A NAME="no2_16"></A>
+	<P><DT><B>　(6)　エクステント相対時間(BeginTimeE, EndTimeE)</B>
+	<DD>　ファイルインタリーブされているISOファイルの配置位置を指定するものです。インタリーブされているファイル間の位置関係を指示するために用います。Extent行で定義する＜拡張ファイル＞以外のところで指定するとエラーになります。<BR>指定する時間はエクステントの始まりを00:00:00とした、(分:秒:フレーム)時間で表現します。<BR>セッション内の位置を指定したい場合、Extent行の引数でインタリーブされているファイルの位置をまとめて指定します。</P>
+
+<A NAME="no2_17"></A>
+	<P><DT><B>　(7)　ファイル相対時間(BeginTimeF, EndTimeF)</B>
+	<DD>　ISOファイル内のファイルソースの配置位置を指定するものです。ファイルソース定義以外のところで指定するとエラーになります。指定する時間はファイルの始まりを00:00:00とした、(分:秒:フレーム)時間で表現します。</P>
+
+	<P>　チャネルインタリーブされているISOファイルを定義する場合、チャネルを構成するファイルソース定義でBeginTimeFまたはEndTimeFを指定することによってチャネルのISOファイル内での位置を指定でき、チャネル間の位置関係を定義できます。<BR>チャネルを構成するファイルソースの始まりがチャネルの開始位置になり、ファイルソースの終了がチャネルの最終位置になります。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p18_10_j.htm">戻る</A>｜
+<a href="p20_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#xattc">CDビルダスクリプト文法補足説明</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,273 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>Sprite Editor バイナリフォーマット</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm">Graphic Tools Guide</A>
+★<a href="../index_j.htm#frm">フォーマット一覧</A>
+<HR NOSHADE>
+<CENTER>
+<H1>Sprite Editor</H1>
+<H3>バイナリフォーマット</H3>
+<H5>Binary File Format</H5>
+</CENTER>
+
+<A NAME="top"><HR></A>
+<DL>
+<P><DT><H3>■ファイルレイアウト</H3>
+<DD><TABLE BORDER=1>
+<TR><Th><PRE>オフセット</Th><Th><PRE>サイズ</Th><Th><PRE>解   説</Th></TR>
+<TR><TD><PRE> $000 </TD><TD><PRE> $100 </TD><TD><PRE><A HREF="#no1"> ヘッダ</A></TD></TR>
+<TR><TD><PRE> $100 </TD><TD><PRE> 可変 </TD><TD><PRE><A HREF="#no2"> パレットデータ</A></TD></TR>
+<TR><TD><PRE> 可変 </TD><TD><PRE> 可変 </TD><TD><PRE><A HREF="#no3"> スプライトデータ</A></TD></TR>
+<TR><TD><PRE> 可変 </TD><TD><PRE> 可変 </TD><TD><PRE><A HREF="#no4"> パターンデータ</A></TD></TR>
+</TABLE>
+</DL>
+<!---------------------------------------------------------------------------------------->
+<A NAME="no1"><HR></A>
+<DL>
+<P><DT><H3>■ヘッダ</H3>
+<DD><TABLE BORDER=1>
+<TR><Th><PRE>オフセット</Th><Th><PRE>サイズ</Th><Th><PRE>ファンクション</Th></TR>
+<TR><TD><PRE>$00</TD><TD><PRE>$10</TD><TD><PRE>識別子="SEGA_SPRED_01.00"("_"=$20)</TD></TR>
+<TR><TD><PRE>$10</TD><TD><PRE>ロング</TD><TD><PRE>パレットデータオフセットアドレス</TD></TR>
+<TR><TD><PRE>$14</TD><TD><PRE>ロング</TD><TD><PRE>パレットデータサイズ(バイト)</TD></TR>
+<TR><TD><PRE>$20</TD><TD><PRE>ロング</TD><TD><PRE>スプライトデータオフセットアドレス</TD></TR>
+<TR><TD><PRE>$24</TD><TD><PRE>ロング</TD><TD><PRE>スプライトデータサイズ(バイト)</TD></TR>
+<TR><TD><PRE>$30</TD><TD><PRE>ロング</TD><TD><PRE>パターンデータオフセットアドレス</TD></TR>
+<TR><TD><PRE>$34</TD><TD><PRE>ロング</TD><TD><PRE>パターンデータサイズ(バイト)</TD></TR>
+<TR><TD><PRE>$38</TD><TD><PRE>$C8</TD><TD><PRE>ダミーデータ（全て$00）</TD></TR>
+</TABLE>
+</DL>
+
+<!---------------------------------------------------------------------------------------->
+<A NAME="no2"><HR></A>
+<DL>
+<P><DT><H3>■パレットデータ</H3>
+<DD><TABLE BORDER=1>
+<TR><Th>オフセット</Th><TH><PRE>サイズ</Th><Th><PRE>ファンクション</Th></TR>
+<TR><TD>$00</TD><TD><PRE>ワード</TD><TD><PRE>カラーＲＡＭモード</TD></TR>
+<TR><TD>$02</TD><TD><PRE>$0E</TD><TD><PRE>ダミーデータ(全て$00)</TD></TR>
+<TR><TD>$10</TD><TD><PRE>可変</TD><TD><PRE>カラーコード</TD></TR>
+</TABLE>
+<DL>
+<P><DT><B>●カラーＲＡＭモード</B>
+<DD><TABLE>
+<TR><TD><PRE>モード0(0x0000)</TD><TD><PRE>16bit X 1024色</TD></TR>
+<TR><TD><PRE>モード1(0x1000)</TD><TD><PRE>16bit X 2048色</TD></TR>
+<TR><TD><PRE>モード2(0x2000)</TD><TD><PRE>32bit X 1024色</TD></TR></TABLE>
+
+<P><DT><B>●カラーコード</B>
+<DD><PRE>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　　　　　　　　ＬＳＢ
+│　│　　　　Ｂ　　　　│　　　　Ｇ　　　　│　　　　Ｒ　　　　│
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│※│４│３│２│１│０│４│３│２│１│０│４│３│２│１│０│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+<B>※自由に設定可能（通常１ｂ）</B>
+</PRE>
+</DL></DL>
+
+<!---------------------------------------------------------------------------------------->
+<A NAME="no3"><HR></A>
+<DL>
+<P><DT><H3>■スプライトデータ</H3>
+<DD><TABLE BORDER=1>
+<TR><Th><PRE>オフセット</Th><Th><PRE>サイズ</Th><Th><PRE>ファンクション</Th></TR>
+<TR><TD><PRE>$00</TD><TD><PRE>ワード</TD><TD><PRE>登録スプライト数</TD></TR>
+<TR><TD><PRE>$02</TD><TD><PRE>$0E</TD><TD><PRE>ダミーデータ(全て$00)</TD></TR>
+<TR><TD><PRE>$10</TD><TD><PRE>可変</TD><TD><PRE><A HREF="#no2_1">スプライトヘッダ×登録スプライト数</A></TD></TR>
+<TR><TD><PRE>可変</TD><TD><PRE>可変</TD><TD><PRE><A HREF="#no2_2">ＣＧデータ</A></TD></TR>
+</TABLE>
+<DL>
+<A NAME="no2_1"></A>
+	<P><DT><B>●スプライトヘッダ</B>
+	<DD><TABLE BORDER=1>
+	<TR><TD><PRE>オフセット</TD><TD><PRE>サイズ</TD><TD><PRE>ファンクション</TD></TR>
+	<TR><TD><PRE>$00</TD><TD><PRE>ワード</TD><TD><PRE>スプライトＨサイズ</TD></TR>
+	<TR><TD><PRE>$02</TD><TD><PRE>ワード</TD><TD><PRE>スプライトＶサイズ</TD></TR>
+	<TR><TD><PRE>$04</TD><TD><PRE>ワード</TD><TD><PRE>カラーモード</TD></TR>
+	<TR><TD><PRE>$06</TD><TD><PRE>ワード</TD><TD><PRE>カラーオフセットアドレス※1</TD></TR>
+	<TR><TD><PRE>$08</TD><TD><PRE>ロング</TD><TD><PRE>ＣＧデータオフセットアドレス※2</TD></TR>
+	<TR><TD><PRE>$0C</TD><TD><PRE>ロング</TD><TD><PRE>ＣＧデータサイズ（バイト）※3</TD></TR>
+	</TABLE>
+	<DD><B>※1</B>カラーRAM先頭からの相対アドレス
+	<DD><B>※2</B>CGデータ先頭からの相対アドレス
+	<DD><B>※3</B>スプライト毎に0x20Byteバウンダリを適用する
+
+<A NAME="no2_2"></A>
+	<P><DT><B>●CGデータ</B>
+	<DD>カラーモード＝0x0000,0x0001(4bit/dot)の場合
+<PRE>
+ＭＳＢ　　　　　　　　　　　ＬＳＢ
+│偶数座標コード│奇数座標コード│
+┌─┬─┬─┬─┬─┬─┬─┬─┐
+│３│２│１│０│３│２│１│０│
+└─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE>
+
+<P><DD>カラーモード＝0x0002,0x0003,0x0004(８bit/dot)の場合
+<PRE>
+ＭＳＢ　　　　　　　　　　　ＬＳＢ
+│パレットコード　　　　　　　　│
+┌─┬─┬─┬─┬─┬─┬─┬─┐
+│７│６│５│４│３│２│１│０│
+└─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE>
+
+<P><DD>カラーモード＝0x0005(16bit/dot)の場合
+<PRE>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　　　　　　　　ＬＳＢ
+│　│　　　　Ｂ　　　　│　　　　Ｇ　　　　│　　　　Ｒ　　　　│
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│※│４│３│２│１│０│４│３│２│１│０│４│３│２│１│０│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE>
+<B>※自由に設定可能（通常１b）</B>
+	</DL>
+<A NAME="no4"></A>
+<P><DT><H3>■パターンデータ</H3>
+<DD><TABLE BORDER=1>
+<TR><Th><PRE>オフセット</Th><Th><PRE>サイズ</Th><Th><PRE>ファンクション</TD></TR>
+<TR><TD><PRE>$00</TD><TD><PRE>ワード</TD><TD><PRE>登録パターン数</TD></TR>
+<TR><TD><PRE>$02</TD><TD><PRE>$0E</TD><TD><PRE>ダミーデータ（全て$00）</TD></TR>
+<TR><TD><PRE>$10</TD><TD><PRE>可変</TD><TD><PRE><A HREF="#no4_1">パターンヘッダ</A>×登録パターン数</TD></TR>
+<TR><TD><PRE>可変</TD><TD><PRE>可変</TD><TD><PRE><A HREF="#no4_2">スプライト配置データ</A></TD></TR>
+</TABLE>
+
+<DL>
+<A NAME="no4_1"></A>
+	<P><DT><B>●パターンヘッダ</B>
+	<DD><TABLE BORDER=1>
+	<TR><Th><PRE>オフセット</Th><Th><PRE>サイズ</Th><Th><PRE>ファンクション</Th></TR>
+	<TR><TD><PRE>$00</TD><TD><PRE>ロング</TD><TD><PRE>スプライト配置データオフセットアドレス※</TD></TR>
+	<TR><TD><PRE>$04</TD><TD><PRE>ワード</TD><TD><PRE>スプライトエントリ数</TD></TR>
+	<TR><TD><PRE>$06</TD><TD><PRE>$0A</TD><TD><PRE>ダミーデータ（全て$00）</TD></TR>
+	</TABLE>
+	<DD><B>※スプライト配置データ先頭からの相対アドレス</B>
+
+<A NAME="no4_2"></A>
+	<P><DT><B>●スプライト配置データ</B>
+	<DD><TABLE BORDER=1>
+	<TR><Th><PRE>オフセット</Th><Th><PRE>サイズ</Th><Th><PRE>ファンクション</Th></TR>
+	<TR><TD><PRE>$00</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_1">反転情報</A></TD></TR>
+	<TR><TD><PRE>$02</TD><TD><PRE>ワード</TD><TD><PRE>ダミーデータ（$0000）</TD></TR>
+	<TR><TD><PRE>$04</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_2">カラーモード</A></TD></TR>
+	<TR><TD><PRE>$06</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_3">カラーＲＡＭオフセットアドレス</A></TD></TR>
+	<TR><TD><PRE>$08</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_4">ＣＧデータオフセットアドレス</A></TD></TR>
+	<TR><TD><PRE>$0A</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_5">スプライトサイズ</A></TD></TR>
+	<TR><TD><PRE>$0C</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_6">オフセットＡ（Ｈ座標）</A></TD></TR>
+	<TR><TD><PRE>$0E</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_6">オフセットＡ（Ｖ座標）</A></TD></TR>
+	<TR><TD><PRE>$10</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_6">オフセットＢ（Ｈ座標）</A></TD></TR>
+	<TR><TD><PRE>$12</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_6">オフセットＢ（Ｖ座標）</A></TD></TR>
+	<TR><TD><PRE>$14</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_6">オフセットＣ（Ｈ座標）</A></TD></TR>
+	<TR><TD><PRE>$16</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_6">オフセットＣ（Ｖ座標）</A></TD></TR>
+	<TR><TD><PRE>$18</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_6">オフセットＤ（Ｈ座標）</A></TD></TR>
+	<TR><TD><PRE>$1A</TD><TD><PRE>ワード</TD><TD><PRE><A HREF="#no4_2_6">オフセットＤ（Ｖ座標）</A></TD></TR>
+	<TR><TD><PRE>$1C</TD><TD><PRE>ワード</TD><TD><PRE>ダミーデータ（$FFFF）</TD></TR>
+	<TR><TD><PRE>$1E</TD><TD><PRE>ワード</TD><TD><PRE>スプライト番号</TD></TR>
+	</TABLE>
+
+<A NAME="no4_2_1"></A>
+	<P><DD><B>反転情報</B>
+	<DD><PRE>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　　　　　　　　ＬＳＢ
+│未使用　　　　　　　　　　　　　　　　│反転　│未使用　　　　│
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│０│０│０│０│０│０│０│０│０│０│Ｖ│Ｈ│０│０│０│０│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+Ｖ：VF=縦反転
+Ｈ：HF=横反転
+</PRE>
+
+<A NAME="no4_2_2"></A>
+	<P><DD><B>カラーモード</B>
+	<DD><PRE>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　ＬＳＢ
+│未使用　　　　　　　　　　　　　　　　│カラーモード　　│　　　　　│
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┼──┬──┬──┬─┬─┬─┐
+│０│０│０│０│０│０│０│０│０│０│ｂ２│ｂ１│ｂ０│０│０│０│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴──┴──┴──┴─┴─┴─┘
+b2 b1 b0
+0  0  0  モード0　16色（カラーバンク）
+0  0  1  モード1　16色（ルックアップテーブル）
+0  1  0  モード2　64色（カラーバンク）
+0  1  1  モード3　128色（カラーバンク）
+1  0  0  モード4　256色（カラーバンク）
+1  0  1  モード5　32K色（ＲＧＢ）
+</PRE>
+
+<A NAME="no4_2_3"></A>
+	<P><DD><B>カラーRAMオフセットアドレス</B>
+	<DD>
+<PRE>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　ＬＳＢ
+│カラーＲＡＭオフセットアドレス※／８Ｈ　　　　　　　　　　　　　　　　　　　　　　　　　　　
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬─┬─┐
+│ａＤ│ａＣ│ａＢ│ａＡ│ａ９│ａ８│ａ７│ａ６│ａ５│ａ４│ａ３│ａ２│ａ１│ａ０│０│０│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴─┴─┘
+<B>※カラーRAM先頭からの相対アドレス</B>
+</PRE>
+
+<A NAME="no4_2_4"></A>
+	<P><DD><B>ＣＧデータオフセットアドレス</B>
+<PRE>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　ＬＳＢ
+│ＣＧデータオフセットアドレス※／８Ｈ　　　　　　　　　　　　　　　　　　　　　　　　　　　
+┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬─┬─┐
+│ａＤ│ａＣ│ａＢ│ａＡ│ａ９│ａ８│ａ７│ａ６│ａ５│ａ４│ａ３│ａ２│ａ１│ａ０│０│０│
+└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴─┴─┘
+<B>※CGデータ先頭からの相対アドレス</B>
+</PRE>
+
+
+<A NAME="no4_2_5"></A>
+	<P><DD><B>スプライトサイズ</B>
+<PRE>
+ＭＳＢ　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　ＬＳＢ
+│　　　│Ｈサイズ／８Ｈ　　　　　　　　　　│Ｖサイズ　　　　　　　　　　　　　　　　　　　│
+┌─┬─┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+│０│０│ｈ５│ｈ４│ｈ３│ｈ２│ｈ１│ｈ０│ｖ７│ｖ６│ｖ５│ｖ４│ｖ３│ｖ２│ｖ１│ｖ０│
+└─┴─┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE>
+
+<A NAME="no4_2_6"></A>
+	<P><DD><B>オフセットA〜D</B>
+	<DD>パターン原点とスプライトの各頂点との相対座標値<BR>
+Ａ〜Ｄの各頂点は以下の位置に対応する。
+<PRE>
+Ａ　　　　　　　　Ｂ
+　┏━━━━━━┓　
+　┃　　　　　　┃　
+　┃　　　　　　┃　
+　┃　　　　　　┃　
+　┃　　　　　　┃　
+　┃　　　　　　┃　
+　┗━━━━━━┛　
+Ｄ　　　　　　　　Ｃ
+</PRE>
+	</DL>
+</DL>
+<HR NOSHADE>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm">Graphic Tools Guide</A>
+★<a href="../index_j.htm#frm">フォーマット一覧</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

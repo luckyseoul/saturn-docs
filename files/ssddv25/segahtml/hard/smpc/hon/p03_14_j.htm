@@ -1,0 +1,122 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/19&gt;SMPCユーザーズマニュアル/3.1INTBACKコマンドのリザルトパラメータ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p03_13_j.htm">戻る</A>｜
+     <a href="p03_15_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SMPCユーザーズマニュアル/3.1　SMPCコントロールモード</B>
+<H2>◆INTBACKコマンドのリザルトパラメータ</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　INTBACKコマンドによってペリフェラルデータを取得する際のリザルトパラメータについて説明します。</P>
+
+<A NAME="no3_14_1"></A>
+	<P><DT><H3>　●INTBACKコマンドにより取得されるリザルトパラメータの基本構成</H3>
+	<DD>　INTBACKコマンドを実行すると図3.10に示すリザルトパラメータがステータスレジスタおよびOREGに構成されます。<BR>
+　ペリフェラルコントロールステータスは、ペリフェラルコントロールモード時の各種ステータスを示しています。ポート1ステータスおよびポート2ステータスは、それぞれのポートのペリフェラル接続状況を示しています。ポート1データおよびポート2データには、接続されたペリフェラルのIDおよびペリフェラルデータが出力されます。ペリフェラルがペリフェラルポートに直接接続されているときには、1台分のペリフェラルデータを出力します。また、マルチタップが接続されているときには、タップ数分のペリフェラルデータを出力します。</P>
+
+<A NAME="z3_10"></A>
+	<P><DD><B>図3.10　INTBACKコマンドにより取得されるリザルトパラメータの基本構成</B>
+	<DD><PRE>
+
+　　　　┌───────────┐　　　┌─────┬─────┬─────┬─────┬─────┬─────┬─────┐　　　　　　　　　　
+　ＳＲ　│　　ペリフェラル　　　│　＝　│　　１　　│　ＰＤＬ　│ＲＥＳＢ　│Ｐ２ＭＤ１│Ｐ２ＭＤ０│Ｐ１ＭＤ１│Ｐ１ＭＤ０│　　　　　　　　　　
+　　　　│コントロールステータス│　　　└─────┴─────┴─────┴─────┴─────┴─────┴─────┘　　　　　　　　　　
+　　　　├───────────┤───┌──────────┐　　　┌────────┬────────┐　　　　　　　　　　　　　　　　　　　
+　　　　│　　　　　　　　　　　│　　　│ポート１ステータス　│　＝　│マルチタップＩＤ│　コネクタ数　　│　　　　　　　　　　　　　　　　　　　
+　　　　│　　　　　　　　　　　│　　　├──────────┤　　　└────────┴────────┘　　　　　　　　　　　　　　　　　　　
+　　　　│　　ポート１データ　　│　　　│ペリフェラル１データ│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+　　　　│　　　　　　　　　　　│　　　├──────────┤───┌──────────────┐　┌─────────┬─────────┐
+　　　　│　　　　　　　　　　　│　　　│ペリフェラル２データ│　　　│サターンペリフェラルＩＤ　　│＝│セガサターン　　　│　データサイズ　　│
+ＯＲＥＧ├─　─　─　─　─　─┤─┐　├──────────┤─┐　├──────────────┤　│ペリフェラルタイプ│　　　　　　　　　│
+　　　　│　　　　　　　　　　　│　│　│　　　　　：　　　　│　│　│拡張データサイズ　　　　　　│　└─────────┴─────────┘
+　　　　│　　　　　　　　　　　│　│　├──────────┤　│　├──────────────┤　　　　　　　　　　　　　　　　　　　　　　
+　　　　│　　ポート２データ　　│　│　│　　　　　：　　　　│　│　│ペリフェラル２　１ｓｔデータ│　　　　　　　　　　　　　　　　　　　　　　
+　　　　│　　　　　　　　　　　│　│　├──────────┤　│　├──────────────┤　　　　　　　　　　　　　　　　　　　　　　
+　　　　│　　　　　　　　　　　│　│　│　　　　　：　　　　│　│　│ペリフェラル２　２ｎｄデータ│　　　　　　　　　　　　　　　　　　　　　　
+　　　　└───────────┘　│　├──────────┤　│　├──────────────┤　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　│　│　　　　　：　　　　│　│　│　　　　　　　：　　　　　　│　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　│　├──────────┤　│　├──────────────┤　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　│　│ペリフェラルｍデータ│　│　│　　　　　　　：　　　　　　│　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　└─└──────────┘　│　├──────────────┤　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　│　　　　　　　：　　　　　　│　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　├──────────────┤　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　│ペリフェラル２　ｎｔｈデータ│　　　　　　　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　└─└──────────────┘　　　　　　　　　　　　　　　　　　　　　　
+</PRE>
+
+
+<A NAME="no3_14_2"></A>
+	<P>	<DT><H3>　●0バイトモード時のリザルトパラメータ構成</H3>
+	<DD>　どちらかのポートが0バイトモードに設定されている場合は、0バイトモードに設定されたポートのデータが抜け、詰められた構造になります。<BR>図3.11に一方が0バイトモードのときのデータ構成を示します。</P>
+
+<A NAME="z3_11"></A>
+	<P ALIGN=CENTER><B>図3.11　一方が0バイトモード時のリザルトパラメータ構成</B><BR><img srcset="../grp/i063_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　以上のようにコマンドパラメータの設定条件により、リザルトパラメータの構成が異なってきます。表3.4にコマンドパラメータの設定条件と生成されるリザルトパラメータ構成の関係を示します。</P>
+
+<A NAME="t3_4"></A>
+	<P>	<DD><B>表3.4　コマンドパラメータ設定条件とペリフェラルデータの構造</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH COLSPAN=4>コマンドパラメータ設定条件</TH><TH COLSPAN=3>リザルトパラメータ構成</TH></TR>
+	<TR>
+<TH><PRE>SMPCステータ<BR>スを返す</TH>
+<TH><PRE>ペリフェラル<BR>データを返す</TH>
+<TH><PRE>ポート１コン<BR>トロールあり</TH>
+<TH><PRE>ポート２コン<BR>トロールあり</TH>
+<TH><PRE>SMPCステータス</TH>
+<TH><PRE>ポート１データ</TH>
+<TH><PRE>ポート２データ</TH></TR>
+<TR><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH></TR>
+<TR><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜○＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH></TR>
+<TR><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜○＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH></TR>
+<TR><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜○＞</TH><TH>＜○＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH></TR>
+<TR><TH>＜×＞</TH><TH>＜○＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH><TH>＜×＞</TH></TR>
+<TR ALIGN=CENTER><TD>×</TD><TD>○</TD><TD>×</TD><TD>○</TD><TD>×</TD><TD>×</TD><TD>○</TD></TR>
+<TR ALIGN=CENTER><TD>×</TD><TD>○</TD><TD>○</TD><TD>×</TD><TD>×</TD><TD>○</TD><TD>×</TD></TR>
+<TR ALIGN=CENTER><TD>×</TD><TD>○</TD><TD>○</TD><TD>○</TD><TD>×</TD><TD>○</TD><TD>○</TD></TR>
+
+<TR ALIGN=CENTER><TD>○</TD><TD>×</TD><TD>×</TD><TD>×</TD><TD>○</TD><TD>×</TD><TD>×</TD></TR>
+<TR ALIGN=CENTER><TD>○</TD><TD>×</TD><TD>×</TD><TD>○</TD><TD>○</TD><TD>×</TD><TD>×</TD></TR>
+<TR ALIGN=CENTER><TD>○</TD><TD>×</TD><TD>○</TD><TD>×</TD><TD>○</TD><TD>×</TD><TD>×</TD></TR>
+<TR ALIGN=CENTER><TD>○</TD><TD>×</TD><TD>○</TD><TD>○</TD><TD>○</TD><TD>×</TD><TD>×</TD></TR>
+<TR ALIGN=CENTER><TD>○</TD><TD>○</TD><TD>×</TD><TD>×</TD><TD>○</TD><TD>×</TD><TD>×</TD></TR>
+<TR ALIGN=CENTER><TD>○</TD><TD>○</TD><TD>×</TD><TD>○</TD><TD>○</TD><TD>×</TD><TD>○</TD></TR>
+<TR ALIGN=CENTER><TD>○</TD><TD>○</TD><TD>○</TD><TD>×</TD><TD>○</TD><TD>○</TD><TD>×</TD></TR>
+<TR ALIGN=CENTER><TD>○</TD><TD>○</TD><TD>○</TD><TD>○</TD><TD>○</TD><TD>○</TD><TD>○</TD></TR>
+</TABLE></P>
+
+	<P>	<DD><B>＜？＞</B>は使用禁止
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p03_13_j.htm">戻る</A>｜
+     <a href="p03_15_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

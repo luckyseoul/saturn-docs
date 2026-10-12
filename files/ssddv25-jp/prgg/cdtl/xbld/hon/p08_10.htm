@@ -1,0 +1,114 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/10&gt;XBLDユーザーズマニュアル/8.VCDBUILDとの違い</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no">XBLDユーザーズマニュアル</A>
+<HR>
+<B>▲
+<A HREF="p07_11.htm">戻る</A>｜
+<A HREF="p0a_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>XBLDユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>８．VCDBUILDとの違い</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no8_10"></A>
+	<P><DT><H3>8.1　機能拡張</H3>
+	<DD>　XBLDは、VCDBUILDの持つ機能に加え、以下に示す独自の機能を備えています。</P>
+
+<A NAME="no8_11"></A>
+	<P><DT><B>　（１）オンザフライ書き込みへの対応</B>
+	<DD>　ライトワンスシステムADDCDWと連携して、オンザフライ書き込みが行えます。</P>
+
+<A NAME="no8_12"></A>
+	<P><DT><B>　（２）TOCファイルの出力</B>
+	<DD>　XBLDがTOCファイルを自動的に出力するので、TOC情報生成プログラムVCDMKTOCでTOCファイルを作成する必要がありません。</P>
+
+<A NAME="no8_13"></A>
+	<P><DT><B>　（３）チャネルインタリーブで以下のスクリプトコマンドが使用可能になりました。</B>
+	<DD><UL TYPE=DISC>
+	<LI>BitRate
+	<LI>Pack
+	<LI>Reallocation
+	<LI>SectorRate</UL></P>
+
+<A NAME="no8_14"></A>
+	<P><DT><B>　（４）SOフィイルのファイル名文字の拡張</B>
+	<DD>　XBLDはファイル名に使う文字セットを規定しません。<BR>
+　ISO9660規格外のファイル名を使うときは、アプリケーション側で十分注意して使用してください。<BR>
+　（ISO9660規格では、'0'〜'9', 'A'〜'Z', '_'の文字のみファイル名として使用可能）</P>
+
+<A NAME="no8_15"></A>
+	<P><DT><B>　（５）条件付き取り込み</B>
+	<DD>　キーワード#ifの引数が「1」あるいは「TRUE」であれば、#ifから#elseまでのブロックを取り込み、#elseから#endifまでのブロックを無視する。キーワード#ifの引数が「0」あるいは「FALSE」であれば、取り込み対象はこの逆となります。#elseブロックを定義しない使い方も可能です。</P>
+
+<A NAME="no8_20"></A>
+	<P><DT><H3>8.2　注意事項</H3>
+
+<A NAME="no8_21"></A>
+	<P><DT><B>　（１）XBLDの出力ファイル</B>
+	<DD><OL TYPE=a>
+	<P><B><LI></B>XBLDはすべての動作モードでTOCファイルを出力します。</P>
+	<P><B><LI></B>XBLDは、リアルタイムエミュレーションモード、ダイレクトDOSファイルアクセスモード時にRTIファイルを出力します。（デフォルト時にはRTIファイルを出力しません）</P></OL>
+
+<A NAME="no8_21"></A>
+	<P><DT><B>　（２）ダイレクトDOSファイルアクセスでのサブヘッダ付きファイルの取り扱い</B>
+	<DD>　CDエミュレーションをダイレクトDOSファイルアクセスで行うとき、インタリーブ機能、MPEG機能はサポートされません。サブヘッダ付きファイルへのアクセスは可能であるが、正しい動作を保証されません。（VCDEMU仕様による）<BR>
+　XBLDはVCDBUILDの障害対応を行ったため、ダイレクトDOSファイルアクセス時、サブヘッダ付きファイルにアクセスできません。<BR>
+　vcdサブコマンドで指定し、VCDBUILD互換モードでXBLDを起動することで、ダイレクトDOSファイルアクセス時に、サブヘッダ付きファイルへのアクセスが可能となります。（ただし、サブヘッダ付きファイルのサイズが不正となる障害が残る）</P>
+
+<A NAME="no8_30"></A>
+	<P><DT><H3>8.3　制限事項</H3>
+	<DD>　XBLDはVCDBUILDとの互換性を保持しているが、処理速度やメモリ利用効率を高め、システム全体のパフォーマンスを向上させるため、一部のスクリプトコマンドについては機能制限を設けました。</P>
+	<DD><OL TYPE=a>
+	<P><B><LI></B>SubEmpty、SubSourceコマンドには未対応。</P>
+
+	<P><B><LI></B>MPEGファイルを、ファイルインタリーブブロック、チャネルインタリーブブロック内で使用することはできない（一度MPEGファイルとして出力後にインタリーブする）。</P>
+
+	<P><B><LI></B>複数のMPEGビデオ、複数のMPEGオーディオとのマルチプレックスはできません。<BR>（MPEGビデオ、MPEGオーディオそれぞれ１チャネルずつのみ有効）</P>
+
+	<P><B><LI></B>MpegMultiplexコマンドでのMPEGファイル出力と、Fileコマンドでのファイル出力を同時には指定できません。</P>
+
+	<P><B><LI></B>PVD（基本ボリューム記述子）、SVD（副ボリューム記述子）、BTR（ブートレコードの定義数はそれぞれ一つとします。<BR>また、PVDをSVDより先に定義する必要があります。</P>
+
+	<P><B><LI></B>ディスクイメージファイルは、mode1セクタやform1セクタのECCデータを計算しません。<BR>EDCについては常に計算します。</P>
+
+	<P><B><LI></B>以下のコマンドを含む場合、オンザフライ書き込みは行えません。
+	<UL TYPE=DISC>
+		<LI>SupplementaryVolume
+		<LI>SameName
+		<LI>EscapeSequences
+		<LI>BootIdentifier
+		<LI>BootRecord
+		<LI>BootSystemIdentifier
+		<LI>Trigger
+		<LI>Eors</UL></P>
+
+	<P><B><LI></B>ファイルブロック（File〜EndFile）で定義できるソースファイルは一つとします。<BR>ただし、CDDAトラック内のファイルブロックでは、複数のソースファイルの定義が可能です。</P>
+
+	<P><B><LI></B>CDDAトラックではディレクトリを作成できません。</P>
+
+	<P><B><LI></B>BeginTimeコマンドで「+」記号指定に未対応。<BR>EndTimeコマンドで「-」記号指定に未対応。</P>
+	</OL>
+
+	<P><DT><TABLE><TR>
+	<TD><IMG SRC="../../../../what/atto.gif"></TD>
+	<TD><B>これらの制限事項のうち、項目(a.)、(g.)〜(j.)については今後の対応予定があります。</B></TD></TR></TABLE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p07_11.htm">戻る</A>｜
+<A HREF="p0a_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no">XBLDユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,300 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;20/31&gt;SCUユーザーズマニュアル/4.DSP制御</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p04_04.htm">戻る</A>｜
+     <A HREF="p04_51.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCUユーザーズマニュアル／第４章　DSP制御</B>
+<HR NOSHADE>
+<H2>■4.5　命令詳細</H2>
+<DL>
+<A NAME="4_50_"></A>
+  <P><DT><H3><A HREF="p04_02.htm">◆命令一覧表</A></H3></P>
+
+<A NAME="4_50"></A>
+  <P><DT><H3>◆演算命令</H3>
+     <DD>　演算命令では、X,Y,D1の各バスおよび算術演算回路(ALU)を使用します。
+         演算命令は、以下の4種類の制御に分類することができます。</P>
+
+	<P><DD><OL>
+	<B><LI></B><A HREF="p04_51.htm">ALU制御命令</A>
+	<B><LI></B><A HREF="p04_52.htm">X-Bus制御命令</A>
+	<B><LI></B><A HREF="p04_53.htm">Y-Bus制御命令</A>
+	<B><LI></B><A HREF="p04_54.htm">D1-Bus制御命令</A></OL></P>
+
+  <P><DD>　演算命令のフォーマットは、図4.5のとおりです。</P>
+
+<A NAME="z4_5"></A>
+  <P><DT>図4.5　演算命令フォーマット
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>25</TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>20</TD><TD><PRE>19</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR ALIGN=CENTER>
+  <TD>０</TD>	<!-- 31 -->
+  <TD>０</TD>	<!-- 30 -->
+  <TD COLSPAN=4  ><A HREF="p04_51.htm">ALU制御</TD>		<!-- 29 -->
+  <TD COLSPAN=6  ><A HREF="p04_52.htm">X-Bus制御</TD>	<!-- 25 -->
+  <TD COLSPAN=6  ><A HREF="p04_53.htm">Y-Bus制御</TD>	<!-- 19 -->
+  <TD COLSPAN=14 ><A HREF="p04_54.htm">D1-Bus制御</TD>	<!-- 13 -->
+  </TR></TABLE></P>
+
+  <P><DD>　演算命令は、上記の4種類の命令を並行して実行することができます。
+         ニーモニックは、ALU制御命令を左端に記載し、
+         その他、必要な命令をスペースまたはタブで区切り、記載してください。</P>
+
+  <P><DT><H3><A HREF="p04_55.htm">◆Load Immediate命令</A></H3>
+     <DD>　Load Immediate命令は、格納先にイミディエートデータを転送するものです。
+         無条件転送は図4.6、条件付転送は図4.7のフォーマットに従います。
+         次頁から命令の詳細を示します。</P>
+
+<A NAME="z4_6"></A>
+  <P><DT>図4.6　Load Immediate命令フォーマット1(無条件転送)
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>26</TD><TD><PRE>25</TD><TD><PRE>24</TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR ALIGN=CENTER>
+  <TD>１</TD>	<!-- 31 -->
+  <TD>０</TD>	<!-- 30 -->
+  <TD COLSPAN=4 >格納先</TD>	<!-- 29 -->
+  <TD>０</TD>	<!-- 25 -->
+  <TD COLSPAN=25 >Immediateデータ</TD>	<!-- 24 -->
+  </TR></TABLE></P>
+
+<A NAME="z4_7"></A>
+  <P><DT>図4.7　Load Immediate命令フォーマット2(条件付転送)
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>26</TD><TD><PRE>25</TD><TD><PRE>24</TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>19</TD><TD><PRE>18</TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR ALIGN=CENTER>
+  <TD>１</TD>				<!-- 31 -->
+  <TD>０</TD>				<!-- 30 -->
+  <TD COLSPAN=4  >格納先</TD>	<!-- 29 -->
+  <TD>１</TD>				<!-- 25 -->
+  <TD COLSPAN=6  >状態</TD>	<!-- 24 -->
+  <TD COLSPAN=19 >Immediateデータ</TD>	<!-- 18 -->
+  </TR></TABLE></P>
+
+
+  <P><DT><H3><A HREF="p04_56.htm">◆DMA命令</A></H3>
+     <DD>　DMA命令は、外部バスを介して外部とDSP内部RAMとのデータ転送を実行します。
+         直接Immデータで転送ワード数を設定する方法と、内部データRAMの番号を指定してRAM内の転送ワード数を設定する方法の２種類があります。
+         前者のフォーマットを図4.8、後者を図4.9に示します。次頁から命令の詳細を示します。</P>
+
+<A NAME="z4_8"></A>
+  <P><DT>図4.8　DMA命令フォーマット1
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>18</TD><TD><PRE>17</TD><TD><PRE>  </TD>
+<TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR ALIGN=CENTER>
+  <TD>１</TD>	<!-- 31 -->
+  <TD>１</TD>
+  <TD>０</TD>
+  <TD>０</TD>	<!-- 28 -->
+  <TD>−</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD>−</TD>	<!-- 19 -->
+  <TD>−</TD>
+  <TD COLSPAN=3>加算<BR>モード</TD>
+  <TD>Ｈ</TD>
+  <TD>０</TD>
+  <TD>dir</TD>	<!-- 12 -->
+  <TD>−</TD>
+  <TD COLSPAN=3>RAM</TD>	<!-- 11 -->
+  <TD COLSPAN=8>Immediate</TD>
+  </TR></TABLE></P>
+
+<A NAME="z4_9"></A>
+  <P><DT>図4.9　DMA命令フォーマット2
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>18</TD><TD><PRE>17</TD><TD><PRE>  </TD>
+<TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>3 </TD><TD><PRE>2 </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR ALIGN=CENTER>
+  <TD>１</TD>	<!-- 31 -->
+  <TD>１</TD>
+  <TD>０</TD>
+  <TD>０</TD>	<!-- 28 -->
+  <TD>−</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD>−</TD>	<!-- 19 -->
+  <TD>−</TD>
+  <TD COLSPAN=3>加算<BR>モード</TD>
+  <TD>Ｈ</TD>
+  <TD>０</TD>
+  <TD>dir</TD>	<!-- 12 -->
+  <TD>−</TD>
+  <TD COLSPAN=3>RAM</TD>	<!-- 11 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD COLSPAN=3>SOURCE</TD>
+  </TR></TABLE></P>
+
+
+  <P><DT><H3><A HREF="p04_57.htm">◆JUMP命令</A></H3>
+     <DD>　JUMP命令は、イミディエートデータをプログラムカウンタに格納することで実現します。図4.10にJUMP命令のフォーマットを示します。次頁から命令の詳細を示します。</P>
+
+<A NAME="z4_10"></A>
+  <P><DT>図4.10　JUMP命令フォーマット
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>26</TD><TD><PRE>25</TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>19</TD><TD><PRE>18</TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR ALIGN=CENTER>
+  <TD>１</TD>	<!-- 31 -->
+  <TD>１</TD>
+  <TD>０</TD>
+  <TD>１</TD>	<!-- 28 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD COLSPAN=7>状態</TD>	<!-- 25 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD COLSPAN=8>Immediate</TD>
+  </TR></TABLE></P>
+
+
+  <P><DT><H3><A HREF="p04_58.htm">◆LOOP BOTTOM命令</A></H3>
+     <DD>　LOOP BOTTOM命令は、1〜数ステップのプログラムを繰り返し実行するものです。フォーマットは図4.11のとおりです。次頁から命令の詳細を示します。</P>
+
+<A NAME="z4_11"></A>
+  <P><DT>図4.11　LOOP BOTTOM命令フォーマット
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR ALIGN=CENTER>
+  <TD>１</TD>	<!-- 31 -->
+  <TD>１</TD>
+  <TD>１</TD>
+  <TD>０</TD>	<!-- 28 -->
+  <TD>MOD</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD>−</TD>	<!-- 19 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 16 -->
+  <TD>−</TD>	<!-- 15 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 12 -->
+  <TD>−</TD>	<!-- 11 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 8 -->
+  <TD>−</TD>	<!-- 7 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 4 -->
+  <TD>−</TD>	<!-- 3 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 0 -->
+  </TR></TABLE></P>
+
+
+  <P><DT><H3><A HREF="p04_59.htm">◆END命令</A></H3>
+     <DD>　END命令は、現在実行しているプログラムを終了させます。フォーマットは図4.12のようになっています。次頁から命令の詳細を示します。</P>
+
+<A NAME="z4_12"></A>
+  <P><DT>図4.12　END命令フォーマット
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>24</TD>
+<TD><PRE>23</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>16</TD>
+<TD><PRE>15</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+  <TR ALIGN=CENTER>
+  <TD>１</TD>	<!-- 31 -->
+  <TD>１</TD>
+  <TD>１</TD>
+  <TD>１</TD>	<!-- 28 -->
+  <TD>IE</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD>−</TD>	<!-- 19 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 16 -->
+  <TD>−</TD>	<!-- 15 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 12 -->
+  <TD>−</TD>	<!-- 11 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 8 -->
+  <TD>−</TD>	<!-- 7 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 4 -->
+  <TD>−</TD>	<!-- 3 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 0 -->
+  </TR></TABLE></P>
+
+</DL>
+
+<HR NOSHADE>
+<B>▲<A HREF="p04_04.htm">戻る</A>｜
+     <A HREF="p04_51.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,60 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/17&gt;Programmer's Guide/File System Library/4. file access</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no4">File system library</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><H2 ALIGN=CENTER> Four. file access</H2><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H3> 4.1 Access model</H3><DD> Figure 4.1 shows a model diagram of file access.</P>
+<A NAME="z4_1"></A><P ALIGN=CENTER> <B>Figure 4.1 Access function model</b><BR>
+<img srcset="../grp/i013_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Transferring data from the CD-ROM to the CD buffer is called "reading," and transferring data from the CD buffer to the host area is called "extracting."<BR>
+ By using GFS_Fread and GFS_NwFread, applications can transfer data from CD-ROM without being aware of the read process.<BR>
+ Use GFS_NwCdRead if you want to control the reading process as well in your application.</P>
+<A NAME="no4_20"></A><P><DT><H3> 4.2 Access pointer</H3><DD> The access pointer is updated by reading, so it moves sector by sector.<BR>
+ Figure 4.2 shows the movement of the access pointer when the following formula is executed to read 5000 bytes into the host area buf. After execution, the access pointer has moved from AP1 to AP2.</P>
+<P><DD> GFS_Fread(gfs, 3, buf, 5000);</P>
+<A NAME="z4_2"></A><P ALIGN=CENTER> <B>Figure 4.2 Moving the access pointer</b><BR>
+<img srcset="../grp/i013_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Table 4.1 shows the sector size for each file type.</P>
+<A NAME="t4_1"></A><P><DD> <B>Table 4.1 Sector length for each file type</b><DD><TABLE BORDER=1>
+<TR><TH align="center" width=260><PRE> file category</TH><TH align="center" width=260><PRE> Sector length (byte)</TH></TR>
+<!-- *** Update by CRI ：7.4 -->
+<TR><TD align="left"><PRE> CD-ROM Mode1</TD><TD align="center"><PRE> 2048</TD></TR>
+<!-- *** Update by CRI ：7.4 -->
+<TR><TD align="left"><PRE> CD-ROM Mode2 Form1 only</TD><TD align="center"><PRE> 2048</TD></TR>
+<!-- *** Update by CRI ：7.4 -->
+<TR><TD align="left"><PRE> CD-ROM Mode2 Form2 only</TD><TD align="center"><PRE> 2324</TD></TR>
+<!-- *** Update by CRI ：7.4 -->
+<TR><TD align="left"><PRE> CD-ROM Mode2 mixed</TD><TD align="center"><PRE> Indeterminate</TD></TR>
+<TR><TD align="left"><PRE> DOS file</TD><TD align="center"><PRE> 2048</TD></TR>
+<TR><TD align="left"><PRE> memory file</TD><TD align="center"><PRE> 2048</TD></TR>
+</TABLE>
+</P>
+<P><DD> Reading is performed in sectors, while retrieval is performed in 4-byte units.</P>
+<A NAME="no4_30"></A><P><DT><H3> 4.3 Parameters managed per file</H3><DD> The application can change five of the parameters managed by the library for each file opened. Those parameters are shown in Table 4.2.</P>
+<A NAME="t4_2"></A><P><DD> <B>Table 4.2 Parameters for each file</b><DD><TABLE BORDER=1>
+<TR><TH align="center"><PRE> parameters</TH><TH align="center"><PRE> explanation</TH><TH align="center"><PRE> function to change</TH><TH align="center"><PRE> initial value</TH></TR>
+<TR><TD align="left"><PRE> access pointer</TD><TD align="left"><PRE> start loading<BR> Off on the file to<BR> Set (unit: sector)</TD><TD align="left"><PRE> GFS_Seek</TD><TD align="left"><PRE> 0</TD></TR>
+<!-- *** Update by CRI ：7.5 -->
+<TR><TD align="left"><PRE> Eject mode</TD><TD align="left"><PRE> After removing the CD<BR> Buffer sector data<BR> Delete or leave<BR> Specify where to store</TD><TD align="left"><PRE> GFS_SetGmode</TD><TD align="left"><PRE> GFS_GMODE_ERASE</TD></TR>
+<TR><TD align="left"><PRE> Transfer mode</TD><TD><PRE> Execute the retrieval process.<BR> Specify the device to use</TD><TD><PRE> GFS_SetTmode</TD><TD align="left"><PRE> GFS_TMODE_CPU</TD align="left"></TR><TR><TD align="left"><PRE> Load parameters</TD><TD align="left"><PRE> 1 load<BR> Transfer by processing<BR> Maximum number of sectors</TD><TD align="left"><PRE> GFS_SetReadPara</TD><TD align="left"><PRE> GFS_RPARA_DFL</TD></TR><TR><TD align="left"><PRE> Retrieval parameters</TD><TD align="left"><PRE> 1 time retrieval<BR> Transferred by processing<BR> number of sectors</TD><TD align="left"><PRE> GFS_SetTransPara</TD><TD align="left"><PRE> 1</TD></TR></TABLE></P><P><DD> An open file occupies one CD block resource, one aperture and one buffer partition.</P></DL><HR NOSHADE> <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no4">File system library</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

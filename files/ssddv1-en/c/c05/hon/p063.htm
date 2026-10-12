@@ -1,0 +1,55 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p062.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p064.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H1> 5. Stream access example </H1>
+<DT> <H2> 5.1 Basic program </H2>
+<DT> <H4> (1) Read stream </H4>
+<DD> Read streams A, B, and C into a_buf, b_buf, and c_buf. <BR>
+(A_BUFSIZE, B_BUFSIZE, and C_BUFSIZE are buffer sizes in sectors) <P>
+<PRE>
+Uint8 work [STM_WORK_SIZE (STMGRP_OPEN_MAX, STM_OPEN_MAX)]; / * Work area * /
+Sint32 a_id, b_id, c_id; / * File identifier * /
+StmGrpHn abc_grp; / * Stream group handle * /
+StmHn a_stm, b_stm, c_stm; / * Stream handle * /
+StmKey key; / * Stream key * /
+Uint8 a_buf [A_BUFSIZE * STM_UNIT_FORM1]; / * Transfer area A * /
+Uint8 b_buf [B_BUFSIZE * STM_UNIT_FORM2]; / * Transfer area B * /
+Uint8 c_buf [C_BUFSIZE * STM_UNIT_FORM1]; / * Transfer area C * / <P>
+GFS_Init (...); / * File system initialization * /
+STM_Init (STMGRP_OPEN_MAX, STM_OPEN_MAX, work); / * Stream system initialization * /
+a_id = GFS_NameToId (...); / * Get file identifier * /
+・
+・
+・
+abc_grp = STM_OpenGrp (); / * Open stream group * /
+                                                             / * Set stream key * /
+STM_KEY_CN (& key) = STM_KEY_NONE; / * Channel number * /
+STM_KEY_CIMSK (& key) = STM_KEY_CIVAL (& key) = STM_KEY_NONE; / * Coding information * /
+/ * Open stream by file identifier * /
+STM_KEY_SMMSK (& key) = STM_KEY_SMVAL (& key) = STM_SM_VIDEO; / * Video stream * /
+a_stm = STM_OpenFid (abc_grp, a_id, & key, STM_LOOP_NOREAD); / * Stream A * /
+STM_KEY_SMMSK (& key) = STM_KEY_SMVAL (& key) = STM_SM_AUDIO; / * Audio stream * /
+b_stm = STM_OpenFid (abc_grp, b_id, & key, STM_LOOP_NOREAD); / * Stream B * /
+STM_KEY_SMMSK (& key) = STM_KEY_SMVAL (& key) = STM_SM_DATA; / * Data stream * /
+c_stm = STM_OpenFid (abc_grp, c_id, & key, STM_LOOP_NOREAD); / * Stream C * / <P>
+/ * Set transfer area * /
+STM_SetTrBuf(a_stm, a_buf, A_BUFSIZE, STM_UNIT_FORM1);
+STM_SetTrBuf(b_stm, b_buf, B_BUFSIZE, STM_UNIT_FORM2);
+STM_SetTrBuf(c_stm, c_buf, C_BUFSIZE, STM_UNIT_FORM1);<P>
+/ * Stream access * /
+STM_SetExecGrp (abc_grp); / * Execution group setting * /
+while (1) {
+    if (STM_ExecServer() == STM_EXEC_COMPLETED) {
+        break; / * End of stream access * /
+    }
+    user (); / * User processing * /
+}
+STM_CloseGrp (abc_grp); / * Close stream group * / </PRE> <BR>
+</DL><P><P><HR>
+<A HREF=p062.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p064.htm> Go to next page </A>
+</BODY>
+</HTML>

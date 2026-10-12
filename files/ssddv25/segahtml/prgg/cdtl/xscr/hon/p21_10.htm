@@ -1,0 +1,61 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 5&gt; CD builder script grammar supplementary explanation</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+ <B>▲ <A HREF="p20_10.htm">Back</a> ｜ <A HREF="p22_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD builder script grammar supplementary explanation</b><H2 ALIGN=CENTER></H2><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H3> 4. Notes on building MPEG streams</H3><DD> When building an MPEG stream, please note the following:</P>
+<A NAME="no4_11"></A><P><DT> <B>●Sector rate specification</b><DD> When building an MPEG stream with CD Builder, dummy data (empty sectors) will be included for the difference between the sector rate and bit rate. As a result, the following problems occur:</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> The file size becomes large.<B><LI></b> The effect of reading ahead to the CD buffer is lost.</OL>
+</P>
+<P><DD> To remove empty sectors, specify a sector rate as low as possible while satisfying the following relationship: That is, the sector rate that is closest to and exceeds the sum of all bitrates.</P>
+<P><DD><H4> Sector rate ≧ total of all bit rates</H4></P>
+<P><DD> To calculate the sector rate, refer to the previous chapter, "About the relationship between sector rate and bit rate."<BR>
+ If you specify 0 or 65535 for the sector rate, the sector rate that minimizes the number of dummy sectors will be automatically calculated and set.</P>
+<A NAME="no4_12"></A><P><DT> <B>●Channel interleaving of MPEG files and multi-DOS files</b><DD> Channel interleaving of MPEG files and multi-DOS files is done by multiplexing an MPEG video stream and an MPEG audio stream to build an ISO11172 stream, and then using this ISO11172 stream as a source file and performing channel interleaving with the multi-DOS file again. This can be achieved using a two-pass method.</P>
+<P><DD> <B>[Execution steps]</b><DD><OL>
+<P><B><LI></b> Create script 1 that multiplexes the MPEG video stream and MPEG audio stream and outputs the ISO11172 stream as a DOS file.<P><B><LI></b> Run CD Builder using script 1.<P><B><LI></b> Create script 2 to channel interleave the created ISO11172 stream and multi-DOS file.<P><B><LI></b> Run CD Builder using script 2.</OL>
+<A NAME="no4_13"></A><P><DT> <B>●MPEG video stream definition</b><DD> When defining an MPEG video stream using the FileSource command, write the file source type as MPEG_VIDEO.<BR>
+ This description identifies that the file source is an MPEG video stream, and adds 16 words of "0" data immediately after the sequence_end_code recorded at the end of the MPEG video stream.<BR>
+ This description is necessary for normal playback of MPEG video streams on Sega Saturn.</P>
+<P><UL>
+ HFileSource input file name<BR>
+ SourceType MPEG_VIDEO<BR>
+ EndFileSource</UL>
+</P>
+<P><DD> Also, when defining an MPEG video stream using the MpegStream command, the same process is performed by identifying the parameter VIDEO.</P>
+<P><UL>
+ MpegStream source file name VIDEO</UL>
+</P>
+<A NAME="no4_14"></A><P><DT> <B>●ISO11172 stream subheader</b> When building an ISO11172 stream by multiplexing an MPEG video stream and an MPEG audio stream, a value specific to the ISO11172 stream is set in the subheader.</P>
+<DL>
+<P><DT> (a) Coding information<DD> - 7FH is set for the audio stream and 0FH is set for the video stream.</P>
+</DL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p20_10.htm">Back</a> ｜ <A HREF="p22_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#xattc">Supplementary explanation of CD builder script grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

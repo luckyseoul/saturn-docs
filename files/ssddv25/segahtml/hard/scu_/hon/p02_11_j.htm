@@ -1,0 +1,82 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/31&gt;SCUユーザーズマニュアル/2.動作説明</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCUユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p02_10_j.htm">戻る</A>｜
+     <a href="p02_12_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCUユーザーズマニュアル/第２章　動作説明</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_33"></A>
+  <P><DT><H3>　◆ＤＭＡモード</H3>
+  <DD>　SCUのDMAモードには、次に示す2種類があります。</P>
+
+  <P><OL>
+    <LI>直接モード
+    <LI>間接モード
+  </OL></P>
+
+  <P><DD><B>●直接モード</B>
+     <DD>　レベル別DMAセットレジスタのアドレス値を直接的に使用し、読み込み
+         アドレスレジスタで示された番地のメモリから、書き出しアドレスレジスタ
+         で示された番地のメモリへ、転送バイト数で示されたバイト数だけデータ転送
+         を実行します。1度の起動で1度の実行を行い、DMAを終了します。図2.4に、
+         直接モードのDMA転送動作詳細を示します。</P>
+
+<A NAME="z2_4"></A>      
+  <P ALIGN="CENTER"><B>図2.4　直接モードDMA転送動作詳細</B><BR><img srcset="../grp/i018_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+  <P><DD><B>●間接モード</B>
+     <DD>　前記、直接モードに対し、レベル別DMAセットレジスタを間接的に使用して
+         DMA転送を実行するモードを間接モードといいます。直接モードで、セット
+            レジスタに格納されていたアドレス値やバイト数は、間接モードでは
+         間接モードテンポラリバッファに格納され、その中の終了コードを検出するまで
+         DMA転送を繰り返し実行します。よって、間接モードの特徴は、1度の起動で複数
+         回のDMA転送を実行できることにあります。図2.5に、間接モードDMAの実行
+         フローを示します。</P>
+
+<A NAME="z2_5"></A>
+  <P ALIGN="CENTER"><B>図2.5　間接モードDMA転送フロー</B><BR><img srcset="../grp/i019_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+  <P><DD>　間接モードを起動すると、最初に書き出しアドレスレジスタ(DxW)に書かれてい
+     るアドレスから3ロングワード分のパラメータを読み込んで、テンポラリバッファ
+     に格納します。次にそのパラメータを元に実際のDMAを実行します。DMA終了後、
+     DxW+CHのアドレス〜パラメータを読み込んで同様に実行します。終了コードを検出
+     するまで、この動作を繰り返します。<BR>
+     　また、間接モードでのアドレスは、4バイト単位でインクリメントされます。</P>
+
+<A NAME="z2_6"></A>
+  <P ALIGN="CENTER"><B>図2.6　間接モードDMA転送動作詳細</B><BR><img srcset="../grp/i020_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p02_10_j.htm">戻る</A>｜
+     <a href="p02_12_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCUユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,146 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 4&gt;SGL Tutorial DATA/3.CD-ROM Writing</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">Data exchange</a><HR>
+ <B>▲ <A HREF="p002.htm">Back</a> ｜ <A HREF="p004.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Passing data</b><H2 ALIGN=CENTER> 3. How to burn a CD-ROM</H2><HR NOSHADE>
+<P> This chapter describes how to burn user-created games to CD-ROM.</P>
+<DL>
+<A NAME="no3_10"></A><P><DT><H2> 3-1. Work flow</H2><DD> The CD-ROM is created in the PC DOS English mode environment. Therefore, file names are subject to DOS restrictions and can be up to 8 characters + 3 characters.</P>
+<P><DD> In order to burn a user-created game onto a CD-ROM, you need to have IP, programs, and data in binary format.</P>
+<P><DD> Figure 3-1 shows the basic flow of creating a CD-ROM, and Figure 3-2 shows the files required when creating a CD-ROM.</P>
+<A NAME="z3_1"></A><P ALIGN=CENTER><H4> Figure 3-1 Flow of CD-ROM creation</H4><BR>
+<img srcset="../grp/p1_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z3_2"></A><P ALIGN=CENTER> <B>Figure 3-2 CD-ROM creation flow and files</b><BR>
+<img srcset="../grp/p1_3.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no3_20"></A><P><DT><H2> 3-2. Creating IP</H2><P><DT><H3> What is IP></H3><DD> The IP is written to the system area of the CD-ROM disk and is used by applications to use the Saturn boot system. IP is required for all CD-ROM program discs.<BR>
+ (Not required for data disks).<BR>
+ Details of the IP are described in “DISC Format Standards, Boot System” in the Programmer's Guide.</P>
+<P><DT><H3> IP configuration</H3><DD> IP consists of boot code and application initial program.<BR>
+ The boot code consists of an ID code such as the game name, a security code provided by Sega, and an area code.<BR>
+ The application initial program is placed immediately after the area code and is executed immediately after the area code is executed. From then on, the program progresses under the control of the application.</P>
+<A NAME="t3_1"></A><P><DD><H4> Table 3-1 IP configuration</H4><DD><TABLE BORDER=1>
+<TR><TH COLSPAN=3> structure</TH><TH> size</TH><TH> remarks</TH></TR>
+<TR><TD ROWSPAN=4> IP</TD><TD ROWSPAN=3><PRE> Boot Code</TD><TD><PRE> System ID</TD><TD> 100H</TD><TD><PRE> Game name, product number, version, etc.</TD></TR>
+<TR><TD><PRE> Security code</TD><TD> D00H</TD><TD><PRE> security code</TD></TR>
+<TR><TD><PRE> Area Code</TD><TD><PRE> 20H~100H</TD><TD><PRE> area code</TD></TR>
+<TR><TD COLSPAN=2> Application Initial<BR>
+ Program</TD><TD><PRE> 20H~71E0H</TD><TD> Initial program, file system, etc.</TD></TR>
+</TABLE>
+</P>
+<P><DD> For details on how to create an IP, please refer to “Programmer's Guide <A HREF="../../../../prgg/sofg/disc/hon/p04_10.htm">Boot System</a> ”.</P>
+<A NAME="no3_30"></A><P><DT><H2> 3-3. Build</H2><DD> Build is the preprocessing performed to burn all binary files (IP, programs, data, etc.) prepared by the user onto a CD-ROM. The build creates the TOC information file and disk image file needed to burn the CD-ROM.<BR>
+ Run the build using the following steps:</P>
+<P><DT> <B>1) Prepare the files you want to burn to CD-ROM</b><DD> Prepare all the files you want to write to the CD-ROM on your PC's disk. The file location is specified in the script file, so it can be anywhere. The file name must be up to 12 characters (including periods) with 8 characters and 3 characters for the extension. CDDA files must be ordered in Intel format (little endian). For Motorola format (big endian), perform a byte swap. (“SWAP.EXE” is a byte swap program for DOS.)</P>
+<P><DT> <B>2) Securing a work area</b><DD> Prepare a work area to generate a CD-ROM disk image. Requires at least the same capacity as the total file capacity. Perform all subsequent file creation and execution in this area. (Moves the current directory.)</P>
+<P><DT> <B>3) Deciding on the project name</b><DD> This is used as the body of the MS-DOS file name, so please keep it within 8 characters.<BR>
+ Here, we will use <B>“sample”</b> as an example.</P>
+<P><DT> <B>4) Create script file</b><DD> Please create a script file using an appropriate editor while referring to Sample Program 1 (Listing 3-1). The file name should be the project name with the extension <B>"scr"</b> added.<BR>
+ In this case, it is <B>“sample.scr”</b> .<BR>
+ The directory where you create the script file should be the directory where you will execute the <B>"VCDBUILD"</b> command to generate the disk configuration information file and disk image file.</P>
+<P><DT> <B>5) Generating disk configuration information file and disk image file</b><DD> Start the preprocessing program “vcdbuild.exe”.<BR>
+ The parameter is <B>“vcdbuild sample”</b> here.<BR>
+ As a result, a disk configuration information file and a disk image file are generated.<BR>
+ Here, <B>“sample.rti”</b> and <B>“sample.dsk”</b> are generated.</P>
+<P><DT> <B>6) Generate TOC file</b><DD> Start the TOC file generation program <B>“vcdmktoc.exe”</b> . Give the body part (project name) of the RTI file as a parameter.<BR>
+ In this case, it is <B>“vcdmktoc samle”</b> .<BR>
+ This results in a TOC file.<BR>
+ Here, <B>“sample.toc”</b> is generated.</P>
+<A NAME="l3_1"></A><P><DD><H4> Listing 3-1 Sample program 1 (Creating script file “sample.scr”)</H4><PRE>
+Disc  <B>sample.dsk</B>
+     Session CDROM
+            LeadIn MODE1
+            EndLeadIn
+            SystemArea <B>e:\ip.bin</B>
+
+            Track MODE1
+                  Volume ISO9660 <B>sample.pvd</B>  This is the specified part of the volume descriptor set.
+                         PrimaryVolume 0:2:16   The <B>bold text</B> part is the basic volume descriptor that will be output.
+                         EndPrimaryVolume        
+                   EndVolume
+
+                   File ASAMPLE.BIN
+                        FileSource <B>e:\mode1\asample.bin</B>   These four lines are one file.
+                        EndFileSource
+                   EndFile
+                   File ASAMPLE1.BIN
+                        FileSource <B>e:\mode1\asample1.bin</B>
+                        EndFileSource
+                   EndFile
+                   File ASAMPLE2.BIN
+                        FileSource <B>e:\mode1\asample2.bin</B>
+                        EndFileSource
+                   EndFile
+
+                       ............   If the files continue, add them as well.
+
+                   PostGap 150          EndTrack
+
+            Track CDDA                          These five lines correspond to one CDDA song.
+                   Pause 150
+                   FileSource <B>e:\cdda\samp_cd1.dat</B>
+                   EndFileSource
+            EndTrack
+            Track CDDA
+                   Pause 150
+                   FileSource <B>e:\cdda\samp_cd2.dat</B>
+                   EndFileSource
+            EndTrack
+            Track CDDA
+                   Pause 150
+                   FileSource <B>e:\cdda\samp_cd2.dat</B>
+                   EndFileSource
+            EndTrack
+
+                       ............   If the song continues, add it as well.
+
+            LeadOut <B>CDDA</B>      It is not possible to specify that CDDA is not included.
+                   Empty 500
+            EndLeadOut
+     EndSession
+EndDisc
+</PRE><A NAME="no3_40"></A><P><DT><H2>3-4. Burning the CD-ROM</H2><DD> Insert the CD-ROM into the CD writer and start it by typing the CD writer command as follows:</P>
+<P><DD> <B>“segacdw.exe”</b></P>
+<P><DD> The parameters to be set are as follows.</P>
+<P><DD><PRE>
+    segacdw [-s #] [-i #] [-t] ProjectName
+
+   -s  … Specify the write speed.
+         Specify 1 (constant speed), 2 (double speed), or 4 (quadruple speed).
+         The default is 4x speed.
+   -i  … Specify the SCSI ID number of the CD writer.
+         Default is 5.
+   -t  … Test mode performs a writing test.
+         (It is not written to the actual CD-ROM.)
+</PRE><P><DD>For example, parameter settings are</P>
+<P><DD> <B>“segacdw -s 2 sample”</b></P>
+<P><DD> It becomes. In this case, the project name “sample” will be written to the CD writer with SCSI ID number 5 at double speed.<BR>
+ We recommend that you first perform the actual writing in test mode, and if there are no errors, proceed with the actual writing.<BR>
+ If you want to run test mode, in this example,</P>
+<P><DD> <B>segacdw -s 2 -t sample</b><P><DD> It becomes.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p002.htm">Back</a> ｜ <A HREF="p004.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">Data exchange</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

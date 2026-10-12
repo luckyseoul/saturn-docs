@@ -1,0 +1,61 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;14/54&gt;VDP1 User's Manual/4.3 Plot Trigger Register</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p04_12.htm">Back</a> ｜ <A HREF="p04_14.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 4 System Registers</b><HR NOSHADE>
+<DL>
+<A NAME="no4_30"></A><P><DT><H2> ■4.3 Plot trigger register</H2><DD> The plot trigger register (PTMR, Plot trigger mode register) controls the start of drawing. This is a 16-bit write-only register located at address 100004H. After power up or reset, the value is reset to 00B. Fix unused bits to 0.</P>
+<P><DT><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> PTMR<BR> 100004H<BR> (R)</TH><TH><PRE> bit15</TH><TH><PRE> bit14</TH><TH><PRE> bit13</TH><TH><PRE> bit12</TH><TH><PRE> bit11</TH><TH><PRE> bit10</TH><TH><PRE> bit9</TH><TH><PRE> bit8</TH><TH><PRE> bit7</TH><TH><PRE> bit6</TH><TH><PRE> bit5</TH><TH><PRE> bit4</TH><TH><PRE> bit3</TH><TH><PRE> bit2</TH><TH><PRE> bit1</TH><TH><PRE> bit0</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD COLSPAN=2> PTM</TD></TR>
+</TABLE>
+</P>
+<A NAME="no4_30_1"></A><P><DT> <B>Plot trigger mode:</b> plot trigger mode(PT), bit0,1<P><DT><UL TYPE=DISC>
+<LI> Controls the start of drawing.</P>
+<P><LI> When the plot trigger mode is 10B, drawing starts automatically at the same time as the frame starts.</P>
+<P><LI> If the plot trigger mode is set to 01B, drawing will start as soon as it is written to the register. If you write 01B to the plot trigger mode while drawing, drawing will start from the beginning of the command table at that point.</P>
+<P><LI> When the plot trigger mode is 00B, drawing will not start even if the frame starts. It will be idling.</P>
+<P><LI> After power up or reset, the value is reset to 00B.</UL>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TD COLSPAN=2 ALIGN="CENTER"><PRE> PTM</TD><TD ROWSPAN=2 ALIGN="CENTER"><PRE> drawing mode</TD></TR>
+<TR><TD WIDTH=50 ALIGN="CENTER"><PRE> bit 1</TD><TD WIDTH=50 ALIGN="CENTER"><PRE> 0</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 0</TD><TD ALIGN="CENTER"><PRE> 0</TD><TD ALIGN="CENTER"><PRE> Idle with frame switching</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 0</TD><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> Start drawing when 01B is written</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> 0</TD><TD ALIGN="CENTER"><PRE> Automatically starts drawing when switching frames</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> Setting prohibited (please do not set)</TD></TR>
+</TABLE>
+</P>
+<P><DT><UL TYPE=DISC>
+<LI> When the plot trigger mode is rewritten from 01B to 00B or 10B, it becomes effective from the next frame buffer switching timing. However, when the plot trigger mode is changed from 00B or 10B to 01B, it becomes effective at that point, and drawing starts even after automatic drawing with 10B.</P>
+<P><LI> If the table is not rewritten, the same drawing will be performed, so the results of translucent color operations will change. If you want to change only the drawing start mode without drawing, do the following.</OL>
+</P>
+<P><DD><OL>
+<LI> Change the plot trigger mode from 10B to 00B.<LI> In the next frame, change the plot trigger mode from 00B to 01B.</OL>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_12.htm">Back</a> ｜ <A HREF="p04_14.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

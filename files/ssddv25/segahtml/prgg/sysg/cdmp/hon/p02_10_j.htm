@@ -1,0 +1,223 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 8&gt;CD通信I/F(MPEGパート)/2.基本事項</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信I/F(MPEGパート)</B>
+<H2 ALIGN=CENTER>２．基本事項</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A>
+	<P><DT><H3>2.1　用語と記号</H3>
+	<P><DT><B>　（１）MPEGデバイスの構成</B>
+	<P><DD><PRE>
+ＭＰＥＧデバイス─┬─ＭＰＥＧデコーダ─────┬─ＭＰＥＧ／Ｖｉｄｅｏデコーダ
+　　　　　　　　　│　　　　　　　　　　　　　　└─ＭＰＥＧ／Ａｕｄｉｏデコーダ
+　　　　　　　　　├─ＭＰＥＧフレームバッファ───フレームバンクの集合
+　　　　　　　　　└─ＭＰＥＧセクタバッファ────ＭＰＥＧセクタの集合
+</PRE></P>
+
+<A NAME="no2_20"></A>
+	<P><DT><B>　（２）用語の定義</B>
+	<DD>　使用する用語の定義を表2.1に示す。</P>
+	<DL>
+	<P><DT><B>MPEG（エムペグ）</B>
+	<DD>Moving Picture Experts Groupの略で、ISO/IEC JTC1/SC29/WG11委員会を指す。規格としては動画用高能率符号化の国際標準です。</P>
+
+	<P><DT><B>MPEGバッファ</B>
+	<DD>MPEG/Video LSI が管理しているメモリ領域。</P>
+
+	<P><DT><B>MPEGフレームバッファ</B>
+	<DD>デコードされたイメージデータが格納される領域。<BR>複数のフレームバンク（面数）で構成される。</P>
+<TABLE BORDER=1>
+<TR><TH WIDTH=160>出力モード</TH><TH WIDTH=100>解像度</TH><TH WIDTH=080>面数</TH></TR>
+<TR><TD>　NTSC通常解像度</TD>  <TD ALIGN=CENTER>352×240</TD><TD ALIGN=CENTER>４</TD></TR>
+<TR><TD>　PAL通常解像度</TD>   <TD ALIGN=CENTER>352×288</TD><TD ALIGN=CENTER>３</TD></TR>
+<TR><TD>　NTSC高精細静止画</TD><TD ALIGN=CENTER>704×480</TD><TD ALIGN=CENTER>１</TD></TR>
+<TR><TD>　PAL高精細静止画</TD> <TD ALIGN=CENTER>704×576</TD><TD ALIGN=CENTER>１</TD></TR>
+</TABLE>
+
+	<P><DT><B>フレームバンク</B>
+	<DD>MPEGビデオストリームの１ピクチャ分のイメージデータが展開される領域。</P>
+
+	<P><DT><B>フレームバッファウィンドウ</B>
+	<DD>MPEGフレームバッファに対して設定される矩形領域。<BR>この領域が出力対象となる。</P>
+
+	<P><DT><B>ディスプレイウィンドウ</B>
+	<DD>MPEG動画が出力されるディスプレイ（ＴＶモニタ）上の矩形領域。<BR>フレームバッファウィンドウのデータが出力される。</P>
+
+	<P><DT><B>イメージデータ</B>
+	<DD>MPEGビデオストリームをデコードして得られる、１画素あたり24ビットのフルカラーデータ。<BR>ホスト領域へは15ビットのカラーデータとして転送される。</P>
+
+	<P><DT><B>イメージデータウィンドウ</B>
+	<DD>MPEGフレームバッファ内に定義される、イメージデータをアクセスするための矩形領域。</P>
+
+	<P><DT><B>輝点</B>
+	<DD>ディスプレイ上の最小の表示単位（１個の点）。</P>
+
+	<P><DT><B>画素</B>
+	<DD>画像データの表示単位。複数の輝点で構成される。<BR>通常解像度：２×２輝点、高精細解像度：１×１輝点</P>
+
+	<P><DT><B>システムレイヤ</B>
+	<DD>ビデオとオーディオが同期・多重化されたMPEGストリーム。<BR>（マルチプレックス ストリーム）</P>
+
+	<P><DT><B>ビデオレイヤ</B>
+	<DD>ビデオデータだけで構成されるMPEGストリーム。</P>
+
+	<P><DT><B>オーディオレイヤ</B>
+	<DD>オーディオデータだけで構成されるMPEGストリーム。</P>
+
+	<P><DT><B>ピクチャ</B>
+	<DD>１枚の画面データ。</P>
+
+	<P><DT><B>Ｉピクチャ</B>
+	<DD>イントラ符号化画像。フレーム内の情報だけで符号化される。</P>
+
+	<P><DT><B>Ｐピクチャ</B>
+	<DD>順方向予測符号化画像。過去のI, Pピクチャからの予測によって符号化される。</P>
+
+	<P><DT><B>Ｂピクチャ</B>
+	<DD>双方向予測符号化画像。過去または未来のI, Pピクチャからの予測によって符号化される。</P>
+
+	<P><DT><B>Ｄピクチャ</B>
+	<DD>DC符号化画像。DC成分だけをもち、サーチ用に使われる。</P>
+
+	<P><DT><B>GOP</B>
+	<DD>少なくとも先頭に１枚のＩピクチャを含む、複数ピクチャの集合。<BR>GOP単位でランダムアクセスが可能です。<BR>通常0.5秒（15枚）程度のピクチャから構成される。</P>
+
+	<P><DT><B>フィールド</B>
+	<DD>１垂直走査区間の表示画面。（NTSC：60Hz, PAL：50Hz）</P>
+
+	<P><DT><B>フレーム</B>
+	<DD>１枚の表示画面。通常のTVでは２枚のフィールドで構成される。</P>
+
+	<P><DT><B>インタレース</B>
+	<DD>飛び越し走査方式。偶数フィールドと奇数フィールドの２枚のフィールドで１表示画面を構成する。</P>
+
+	<P><DT><B>ノンインタレース</B>
+	<DD>順次走査方式。１枚のフィールドで１表示画面を構成する。</P>
+
+	<P><DT><B>PSC(フレームバッファスタートコード)</B>
+	<DD>ピクチャ層の開始コード。（00000100H）</P>
+
+	<P><DT><B>SHC(シーケンスヘッダコード)</B>
+	<DD>ビデオシーケンス層の開始コード。（000001B3H）</P>
+
+	<P><DT><B>SEC(システムエンドコード)│                                                           │</B>
+	<DD>システムレイヤのストリーム終了を意味するコード。 (000001B9H)<BR>iso_11172_end_codeとして規定されている。<BR>※SECは、シーケンスエンドコード（000001B7H）の略号として使う場合もあるが、本書ではシステムエンドコードの略号とする。</P>
+
+	<P><DT><B>タイムコード（TC）</B>
+	<DD>シーケンス先頭からの時間を示す情報。</P>
+
+	<P><DT><B>タイムスタンプ（PTS）</B>
+	<DD>各フレームの再生出力の時刻管理情報。<BR>PTSに対して、復号時刻管理用のタイムスタンプをDTSと呼ぶ。</P>
+
+	<P><DT><B>テンポラルリファレンス（TR）</B>
+	<DD>GOPの中の表示順を示す情報。GOPの先頭でリセットされる1024の剰余値。</P>
+
+	<P><DT><B>VBVバッファ</B>
+	<DD>MPEGビデオストリームをデコードするために用いる領域。<BR>MPEGバッファ内に確保される。</P>
+
+	<P><DT><B>STDバッファサイズ</B>
+	<DD>システムターゲットデコーダで規定されるバッファサイズ。再生開始の前に、このバッファサイズ分のデータを確保する必要がある。</P>
+
+	<P><DT><B>WBC</B>
+	<DD>デコードバンクおよび表示バンクを管理するブロック。<BR>表示待ち（デコード済み）MPEGフレームバッファの内容を指す。</P>
+
+	<P><DT><B>ポーズ</B>
+	<DD>デコードを停止してください。結果的に画面出力も停止する。</P>
+
+	<P><DT><B>フリーズ</B>
+	<DD>画面出力を停止してください。デコード動作は続行する。</P>
+
+	<P><DT><B>デコード同期信号（DSYNC）</B>
+	<DD>ホスト同期再生時に、ホストからデコーダに与えるデコード指示。<BR>デコードタイミングとしてVSYNCの代わりに送出する。</P>
+
+	<P><DT><B>MPEGセクタ</B>
+	<DD>MPEGセクタバッファモードにおいてMPEGバッファをアクセスするためのデータの単位。（2048バイト）<BR>MPEGセクタバッファは、MPEGセクタの集合として構成される。</P>
+
+	<P><DT><B>MPEGセクタ位置</B>
+	<DD>MPEGセクタバッファ内のMPEGセクタの位置。<BR>０〜（全MPEGセクタ数−１）の値を取る。<BR>MPEGセクタは、MPEGセクタ位置をキーにしてアクセスする。</P>
+	</DL>
+
+<A NAME="no2_30"></A>
+	<P><DT><B>　（３）記号・略号の一覧</B>
+<A NAME="t2_2"></A>
+	<P><DD><B>表2.2　記号・略号の一覧</B
+	<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE>記号・略号</TH><TH WIDTH=180><PRE>意　　味</TH><TH WIDTH=260><PRE>説　　明</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> B     </TD><TD>Bidirectionally<BR>predictivecodedpicture</TD><TD>双方向予測符号化画像</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> D     </TD><TD>DCcodedpicture</TD><TD>DC符号化画像</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> DTS   </TD><TD>DecodingTimeStamp</TD><TD>復号タイムスタンプ</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> GOP   </TD><TD>GroupOfPictures</TD><TD>ピクチャのグループ</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> I     </TD><TD>Intracodedpicture</TD><TD>イントラ符号化画像</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> P     </TD><TD>Predictivecodedpicture</TD><TD>順方向予測符号化画像</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> PSC   </TD><TD>PictureStartCode</TD><TD>ピクチャスタートコード</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> PTS   </TD><TD>PresentationTimeStamp</TD><TD>再生出力タイムスタンプ</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> SEC   </TD><TD>SystemEndCode</TD><TD>システムエンドコード（本書での略号）</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>(SEC) </TD><TD>(SequenceEndCode)　</TD><TD>（シーケンスエンドコード）</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> SHC   </TD><TD>SequenceHeaderCode</TD><TD>シーケンスヘッダコード</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> STD   </TD><TD>SystemTargetDecoder</TD><TD>システムターゲットデコーダ</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> VBV   </TD><TD>VideoBufferingVerifier</TD><TD>ビデオバッファ検証器</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> WBC   </TD><TD>WriteBufferControl</TD><TD>表示待ちMPEGフレームバッファ</TD></TR>
+<TR><TD COLSPAN=3 HEIGHT=5></TD></TR>
+<TR><TD ALIGN=CENTER><PRE> actst </TD><TD>MPEGactionstatus</TD><TD>MPEG動作ステータス</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> vcnt  </TD><TD>VSYNCcounter</TD><TD>動作区間カウンタ</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> pict  </TD><TD>pictureinformation</TD><TD>ピクチャ情報</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> stat_a</TD><TD>MPEG/Audiostatus</TD><TD>MPEG/Audioステータス</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> stat_v</TD><TD>MPEG/Videostatus</TD><TD>MPEG/Videoステータス</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mpstat</TD><TD>MPEGstatusinformation</TD><TD>MPEGステータス情報</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mptc  </TD><TD>MPEGtimecode</TD><TD>タイムコード</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mpcon </TD><TD>MPEGconnectparameter</TD><TD>MPEGデコーダ接続先パラメータ</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mpstm </TD><TD>MPEGstreamparameter</TD><TD>MPEGストリームパラメータ</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mpvef </TD><TD>MPEGvideoeffect</TD><TD>画面特殊効果パラメータ</TD></TR>
+</TABLE></P>
+
+<A NAME="no2_20"></A>
+	<P><DT><H3>2.2　MPEG-1標準規格</H3>
+	<DD>　MPEG-1標準規格については、下記の規格書を参照のこと。</P>
+
+<A NAME="t2_3"></A>
+	<P><DD><B>表2.3　MPEG-1標準規格一覧</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH WIDTH=100><PRE>項　目</TH><TH WIDTH=180><PRE>規　格</TH><TH WIDTH=300><PRE>規　格　名</TH></TR>
+	<TR><TD>MPEG-1標準規格</TD><TD>ISO/IEC 11172</TD><TD><PRE>1993 Information technology - Coding of moving<BR>pictures and associated audio for digital<BR>storage media up to about 1.5 Mbit/s</TD></TR>
+	<TR><TD>MPEG/Systemレイヤ</TD><TD>ISO/IEC 11172-1</TD><TD>同上 - Part1:Systems</TD></TR>
+	<TR><TD>MPEG/Videoレイヤ</TD><TD>ISO/IEC 11172-2</TD><TD>同上 - Part2:Video</TD></TR>
+	<TR><TD>MPEG/Audioレイヤ</TD><TD>ISO/IEC 11172-3</TD><TD>同上 - Part3:Audio</TD></TR>
+	</TABLE></P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

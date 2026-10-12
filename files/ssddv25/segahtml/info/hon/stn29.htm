@@ -1,0 +1,79 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGASATURN Developer's Information STN-29</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn25.htm">STN-25</a> | <A HREF="stn27.htm">STN-27</a> | <A HREF="stn28.htm">STN-28</a> | <B>STN-29</b> | <A HREF="stn30.htm">STN-30</a> | <A HREF="stn31.htm">STN-31</a> | <A HREF="stn32.htm">STN-32</a> ▼<HR NOSHADE>
+<H1 ALIGN=CENTER> STN-29</H1><H2 ALIGN=CENTER> Regarding CD-DA volume settings</H2><HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> issue number:</TH><TD> STN-29</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> date of issue:</TH><TD> 95/03/15</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> media:</TH><TD> ○Common</TD><TD> ●CD-ROM</TH><TD> ○Cartridge</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> connection:</TH><TD> ●Program</TD><TD> ○Hard</TD><TD> ○Manual</TD><TD> ○Tools</TD><TD> ○Game</TD><TD> ○ Bug</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Information distinction:</TH><TD> ●New</TD><TD> ○Change</TD><TD> ○Addition</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> importance:</TH><TD> ●Strict observance</TD><TD> ○Recommended</TD><TD> ○Reference</TD><TD> ○Others</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> attached file:</TH><TD> ●No</TH><TD> ○ Yes</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE> Subject supplement:</TH><TD COLSPAN=7></TD></TR>
+</TABLE>
+<A NAME="No0"><HR></a><H3 ALIGN=CENTER> Contents</H3><DL>
+<P><DT><H3> ■Summary</H3><DD> When setting the CD-DA volume in the SEGASATURN application, lower the CD-DA level by 6dB so that it does not differ significantly from the music CD playback volume on the multiplayer screen.</P>
+<P><DT><H3> ■How to deal with it</H3><DD> The specific setting method is described below.</P>
+<P><DD><OL>
+<B><LI></b> <A HREF="#NO1">When setting directly to the hardware</a><B><LI></b> <A HREF="#NO2">When using SATURN Sound Driver</a><B><LI></b> <A HREF="#NO3">When using the sound I/F library</a></OL>
+<P><DT><H3> ■Supplementary information</H3><DD> When you want to actively change the CD-DA level, such as when creating a special effect, use the music CD level in the multiplayer as a reference, and adjust the balance so that there is no significant difference in volume.</P>
+</DL>
+<A NAME="NO1"><HR></a><DL>
+<P><DT><H3> <A HREF="#No0">■</a> 1. When setting directly to the hardware</H3><DD> To operate, set EFSDL[2:0] of the slot-specific control register from 111b (-0 dB) to 110b (-6 dB). Regarding CD-DA, the slot numbers are 16 and 17 on the left and right respectively.</P>
+<P><DD> <B>Left channel</b> : Slot number 16: Write FDH to address 100200H+17H.<BR>
+ The contents of FDH are: EFSDL[2:0]=110b (output level) EFPAN[4:0]=11111b (stereolocation data)</P>
+<P><DD> <B>Right channel</b> : Slot number 17: Write CFH to address 100220H+17H.<BR>
+ The contents of CFH are: EFSDL[2:0]=110b (output level) EFPAN[4:0]=01111b (stereolocation data)</P>
+<P><DD> The addresses from the main CPU are for the left and right respectively.</P>
+<P><DD> <B>Left channel</b> =25B00200H+16H<DD> <B>Right channel</b> =25B00200H+16H</P>
+<P><DD> It becomes.</P>
+<P><DT> <B>Note:</b><DD> Be sure to access the word from the main CPU.</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SCSP User's Manual" <A HREF="../../hard/scsp/hon/p04_10.htm">■4.1 Register Map</a></P>
+</DL>
+<A NAME="NO2"><HR></a><DL>
+<P><DT><H3> <A HREF="#No0">■</a> 2. When setting using “SATURN Sound Driver”</H3><DD> Use the sound control command CD-DA Level (command number 80H). Change the data from E0H (-0dB) to C0H (-6dB).<BR>
+ Specifically, write the following data to Command Block 1 (+00H) of Host interface work(700H).</P>
+<CENTER>
+<TABLE BORDER>
+<TR><TH> data</TH><TD> 80H</TD><TD> 00H</TD><TD> C0H</TD><TD> C0H</TD></TR>
+<TR><TH> meaning</TH><TD> COM</TD><TD> dummy</TD><TD> left volume</TD><TD> right volume</TD></TR>
+</TABLE>
+</CENTER>
+<P><DT> <B>reference:</b><DD> "Sound Driver Programmer's Guide"<BR>
+ 3. Sound control command/ <A HREF="../../sndt/prog/drve/sndcmd_.htm#19">●80H CD-DA LEVEL</a></DL>
+<A NAME="NO3"><HR></a><DL>
+<P><DT><H3> <A HREF="#No0">■</a> 3. When setting using the sound I/F library</H3><DD> Use the Function CD-DA Level setting.<BR>
+ Change the setting value from 0xE0 (-0dB) to 0xC0 (-6dB) for both left and right.</P>
+<P><DD><PRE>
+<H3>Format:</H3>
+<H2>SND_SetCdLev(0xC0,0xC0)</H2>
+</PRE></P>
+<P><DT><B>reference:</b><DD> "Programmer's Guide/Sound I/F Library User's Manual"<BR>
+ <A HREF="../../prgg/prg3/sund/hon/p02_13.htm#no28">CD-DA Level setting/SND_SetCdDaLev</a></P>
+</DL>
+ that's all<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../index.htm">INDEX</a> ▲ | <A HREF="stn25.htm">STN-25</a> | <A HREF="stn27.htm">STN-27</a> | <A HREF="stn28.htm">STN-28</a> | <B>STN-29</b> | <A HREF="stn30.htm">STN-30</a> | <A HREF="stn31.htm">STN-31</a> | <A HREF="stn32.htm">STN-32</a> ▼<HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,102 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;42/54&gt;VDP1ユーザーズマニュアル/7.コマンド</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+★<A HREF="p07_00.htm">第７章　コマンド</A>
+<HR>
+<B>▲<A HREF="p07_00.htm">戻る</A>｜
+     <A HREF="p07_20.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第７章　コマンド</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no7_10"></A>
+	<P>	<DT><H2>■7.1　システムクリッピング座標設定コマンド</H2>
+		<DD>　クリッピングとは、設定した表示領域以外の領域には描画しないよう切り取る(クリップする)ことです。クリッピングにはシステムの描画領域を設定するシステムクリッピングと、ソフトウエアで自由に設定することのできるユーザクリッピングがあります。
+		<BR>　コマンド選択ビット(ビット3〜0)が1001Bのときシステムクリッピング座標設定コマンドで、1000Bのときユーザクリッピング座標設定コマンドです。<BR>　システムクリッピング座標設定コマンドのテーブルの内容は次のとおりです。</P>
+
+<!-- -------------------------------------------------------------------------------- -->
+	<P>	<DT><TABLE BORDER=0<TR><TD>
+	<TABLE BORDER=1>
+	<TR><TH><PRE>ビット</TH>
+			<TH><PRE>15</TH><TH><PRE>14</TH><TH><PRE>13</TH><TH><PRE>12</TH><TH><PRE>11</TH><TH><PRE>10</TH><TH><PRE>９</TH><TH><PRE>８</TH>
+			<TH><PRE>７</TH><TH><PRE>６</TH><TH><PRE>５</TH><TH><PRE>４</TH><TH><PRE>３</TH><TH><PRE>２</TH><TH><PRE>１</TH><TH><PRE>０</TH></TR>
+
+	<TR ALIGN=CENTER><TD>CMDCTRL<BR>+00</TD>
+			<TH>0</TH><TD COLSPAN=3>JP</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TH>1</TH><TH>0</TH><TH>0</TH><TH>1</TH></TR>
+
+	<TR ALIGN=CENTER><TD>CMDLINK<BR>+02</TD>
+			<TD COLSPAN=14>LINK指定/8H</TD><TD>0</TD><TD>0</TD></TR>
+
+	<TR ALIGN=CENTER><TD>+04</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+06</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+08</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+0A</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+0C</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+0E</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+10</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+12</TD><TD COLSPAN=16></TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDXC<BR>+14</TD>
+			<TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD COLSPAN=10>右下Ｘ座標(XC)</TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDYC<BR>+16</TD>
+			<TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD COLSPAN=9>右下Ｙ座標(YC)</TD></TR>
+
+	<TR ALIGN=CENTER><TD>+18</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+1A</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+1C</TD><TD COLSPAN=16></TD></TR>
+	</TABLE>
+	</TD><TD><IMG SRC="../grp/i110.gif"></TD></TR></TABLE>
+	<TABLE><TR><TD>【注】</TD><TD><TABLE BORDER cellspacing=10><TR><TD></TD></TR></TABLE></TD><TD>は無視されます(don't care)</TD></TR></TABLE></P>
+<!-- -------------------------------------------------------------------------------- -->
+
+	<P>	<DD>システムクリピング座標設定コマンドは次のように定義します。</P>
+
+	<P>	<DT><UL TYPE=DISC>
+		<LI>エンドビット(ビット15)を0Bに、コマンド選択ビットを1001Bに設定すると、システムクリッピング座標設定コマンドになります。</P>
+
+	<P>	<LI>ジャンプ形式を指定します。ジャンプ形式がアサインまたはコールのとき、次に処理するコマンドテーブルのアドレスを8Hで割ってCMDLINKに設定します。</P>
+
+	<P>	<LI>クリッピング領域の右下座標をCMDXC、CMDYCに定義します。左上座標は(0,0)固定です。左上座標(0,0)と右下座標(XC,YC)とで表す矩形(四角形)のライン上と内側が描画領域となります。</UL></P>
+
+<A NAME="no7_11"></A>
+	<P>	<DT><H3>　●システムクリッピング</H3>
+		<DD>　システムクリッピング座標は、描画の際かならず有効になり、設定した領域の外側がクリッピングされます。つまり内側が描画されます。</P>
+
+	<P>	<DD>　クリッピング処理は矩形で行われます。指定方法は、左上座標は(0,0)固定なので、右下座標(XC,YC)の値をコマンドテーブルに定義します。<BR>
+	<P>	<DD>　クリッピング座標のチェックは行われないので、あらかじめXC≧0、YC≧0になるように設定してください。XC＜0、またはYC＜0に設定された場合は、動作は保証されません。<BR>
+	<P>	<DD>　クリッピングライン上の点は、クリッピング領域の内側として扱われ描画されます。<BR>
+	<P>	<DD>　クリッピング座標セットコマンドは内部のクリッピング座標レジスタを書き換えます。書き換えられた以降のパーツはその値を参照して描画されます。<BR>
+	<P>	<DD>　このコマンドは1フレーム内にいくつでも定義できますので、パーツ群ごとに違ったクリッピング座標を持たせることができます。<BR>
+	<P>	<DD>　システムクリッピング座標は、電源投入後またはリセット後は、値が不定なので、描画開始前に設定する必要があります。</P>
+
+<A NAME="z7_1"></A>
+	<CENTER>
+	<P>	<DT><B>図7.1　システムクリッピング</B>
+		<DT><TABLE BORDER=0>
+	<TR><TD><B>(a)　システムクリッピングの設定</B></TD></TR>
+	<TR><TD ALIGN=CENTER><IMG SRC="../grp/i111_1.gif"><BR>領域の内部が表示されます</TD></TR>
+
+	<TR><TD><B>(b)　誤ったシステムクリッピングの設定</B></TD></TR>
+	<TR><TD ALIGN=CENTER><IMG SRC="../grp/i111_2.gif"><BR>XC<0、またはYC<0に設定された場合は、動作の保証はされません。</TD></TR>
+	</TABLE></P></CENTER>
+
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p07_00.htm">戻る</A>｜
+     <A HREF="p07_20.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+★<A HREF="p07_00.htm">第７章　コマンド</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

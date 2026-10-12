@@ -1,0 +1,87 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/54&gt;VDP1 User's Manual/2.2Table on VRAM</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p02_12.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 2 Address Map</b><HR NOSHADE>
+<DL>
+<A NAME="no2_20"></A><P><DT><H2> ■2.2 Table on VRAM</H2><DD> Define a command table, color lookup table, Gouraud shading table, and character pattern table on VRAM. The table sizes and boundaries are:</P>
+<A NAME="t2_2"></A><P><DD> <B>Table 2.2 Table on VRAM</b><DD><TABLE BORDER=1>
+<TR><TD ALIGN="CENTER"><PRE> table</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> function</TD><TD ALIGN="CENTER"><PRE> command</TD><TD ALIGN="CENTER"><PRE> size</TD><TD ALIGN="CENTER"><PRE> boundary</TD></TR>
+<TR><TD ROWSPAN=10 ALIGN="LEFT"><PRE> command<BR> table</TD><TD ROWSPAN=6 ALIGN="LEFT"><PRE> drawing<BR> command</TD><TD ROWSPAN=3 ALIGN="LEFT"><PRE> texture<BR> drawing command</TD><TD ALIGN="LEFT"><PRE> Standard sprite drawing command</TD><TD ROWSPAN=10 ALIGN="CENTER"><PRE> 1EH</TD><TD ROWSPAN=10 ALIGN="CENTER"><PRE> 20H</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Rectangle sprite drawing command</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Transform sprite drawing commands</TD></TR>
+<TR><TD ROWSPAN=3 ALIGN="LEFT"><PRE> non-texture<BR> drawing command</TD><TD ALIGN="LEFT"><PRE> polygon drawing commands</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Polyline drawing command</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Line drawing command</TD></TR>
+<TR><TD ROWSPAN=3 ALIGN="LEFT"><PRE> Coordinate settings<BR> command</TD><TD ROWSPAN=2 ALIGN="LEFT"><PRE> clipping<BR> Coordinate setting command</TD><TD ALIGN="LEFT"><PRE> User clipping coordinate setting command</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> System clipping coordinate setting command</TD></TR>
+<TR><TD COLSPAN=2 ALIGN="LEFT"><PRE> Relative coordinate setting command</TD></TR>
+<TR><TD COLSPAN=3 ALIGN="LEFT"><PRE> drawing end command</TD></TR>
+<TR><TD COLSPAN=4 ALIGN="LEFT"><PRE> color lookup table</TD><TD ALIGN="CENTER"><PRE> 20H</TD><TD ALIGN="CENTER"><PRE> 20H</TD></TR>
+<TR><TD COLSPAN=4 ALIGN="LEFT"><PRE> gouraud shading table</TD><TD ALIGN="CENTER"><PRE> 8H</TD><TD ALIGN="CENTER"><PRE> 8H</TD></TR>
+<TR><TD COLSPAN=4 ALIGN="LEFT"><PRE> character pattern table</TD><TD ALIGN="CENTER"><PRE> Any*</TD><TD ALIGN="CENTER"><PRE> 20H</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>[Note] *Depends on character size and color mode.</b></P>
+<P><DD> The size of VRAM is 4Mbit (512KByte), and addresses are assigned in byte units from 000000H to 07FFFFH. Table data cannot be written beyond address 07FFFFH. Make sure that each table fits within the size of VRAM.</P>
+<A NAME="no2_21"></A><P><DT><H3> ●Command table</H3><DT><UL TYPE=DISC>
+<LI> The command table is a table in which commands are defined on VRAM, and VDP1 reads the commands and performs the drawing and clipping processing of parts.</P>
+<P><LI> The command is:</P>
+<A NAME="no2_21_0"></A><P><DT> <B>Drawing command:</b><DT> It is divided into texture drawing and non-texture drawing, and each has regular sprite, rectangular sprite, deformed sprite drawing commands, polygon, polyline, and line drawing commands to draw these parts.</P>
+<A NAME="no2_21_1"></A><P><DT> <B>Command to set clipping coordinates:</b><DT> There are user clipping and system clipping coordinate setting commands to set the drawing area of parts.</P>
+<A NAME="no2_21_2"></A><P><DT> <B>Command to set relative coordinates:</b><DT> Specify to define the drawing coordinates of parts using relative coordinates.</P>
+<A NAME="no2_21_3"></A><P><DT> <B>Draw end command:</b><DT> Finish drawing.</P>
+<P><LI> The size of the command table is 1EH (30) Byte and the boundary is 20H (32) Byte.</P>
+<P><LI> Each command is read into VDP1 and processed individually. This operation is called fetching.</P>
+<P><LI> The command table is fetched from the start address of VRAM (000000H), and the next command table is fetched according to the jump format specification.</P>
+<P><LI> The color lookup table, Gouraud shading table, and character pattern table are referenced as specified in the command table.</UL>
+</P>
+<A NAME="no2_22"></A><P><DT><H3> ●Color lookup table</H3><DT><UL TYPE=DISC>
+<LI> This is a table that defines 16-bit 16-color color codes on VRAM.</P>
+<P><LI> When the color mode is used in the lookup table method with texture drawing commands, it is referenced as color data.</P>
+<P><LI> The pixel data of the character pattern is converted to a color code and written to the frame buffer.</P>
+<P><LI> The size is 20H (32) Bytes and the boundary is also 20H (32) Bytes.</P>
+<P><LI> Referenced in lookup table address instructions for texture drawing commands.</UL>
+</P>
+<A NAME="no2_23"></A><P><DT><H3> ●Gouraud shading table</H3><DT><UL TYPE=DISC>
+<LI> This is a table that defines four 16-bit RGB codes on VRAM.</P>
+<P><LI> It is referenced when Gouraud shading processing is specified in color calculation in a part drawing command.</P>
+<P><LI> The pixel data of the part is subjected to Gouraud shading processing and written to the frame buffer.</P>
+<P><LI> The size is 8HByte and the boundary is also 8HByte.</P>
+<P><LI> Referenced in Gouraud shading table address instructions for part drawing commands.</P>
+<P><LI> When applying glow shading, the pixel data of the part must be RGB code. Results are not guaranteed when using color bank codes.</UL>
+</P>
+<A NAME="no2_24"></A><P><DT><H3> ●Character pattern table</H3><DT><UL TYPE=DISC>
+<LI> This is a table that defines character pattern pixel data on VRAM.</P>
+<P><LI> Referenced in texture drawing commands.</P>
+<P><LI> Pixel data is defined as 4, 8, or 16 bit/pixel color data according to the color mode specification.</P>
+<P><LI> Character pattern pixel data is added to a color bank in color bank mode, converted using a color lookup table in color lookup table mode, and written to the frame buffer as is in RGB mode.</P>
+<P><LI> The size is determined by the character size and color mode. The boundary is 20H (32) Bytes.</P>
+<P><LI> Referenced in character address instructions for texture drawing commands.</UL>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_12.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

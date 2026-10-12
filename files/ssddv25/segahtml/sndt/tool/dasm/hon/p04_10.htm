@@ -1,0 +1,95 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 7&gt;SCSP/DSP Assembler User's Manual/4.Program description</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">SCSP/DSP Assembler User's Manual</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCSP/DSP Assembler User's Manual</b><H2 ALIGN=CENTER> 4. Program description</H2><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H2> ■Command list</H2><DD><TABLE BORDER>
+<TR><TH><PRE> command</TH><TH><PRE> function</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> @</TD><TD><PRE> Start of multiply-add description</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> *</TD><TD><PRE> multiplication</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> +</TD><TD><PRE> addition</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> −</TD><TD><PRE> subtraction</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>&#65310;</TD><TD><PRE> Store (end of multiplication/addition description)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> (</TD><TD><PRE> left parenthesis</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> )</TD><TD><PRE> right parenthesis</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> LDI</TD><TD><PRE> Memory access and loading into MEMS</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> L.D.Y.</TD><TD><PRE> Load from INPUTS to Y register</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> LDA</TD><TD><PRE> Load from INPUTS to A register</TD></TR>
+</TABLE>
+</P>
+<A NAME="no4_20"></A><P><DT><H2> ■Parameters</H2><A NAME="no4_21"></A><P><DT><H3> ●Internal register</H3><DD><TABLE BORDER>
+<TR><TH><PRE> symbol</TH><TH><PRE> Explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> REG</TD><TD><PRE> represents the previous multiplication/addition result</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> YREGH</TD><TD><PRE> Represents a part of YREG (see syntax explanation of multiplication and addition)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> YREGL</TD><TD><PRE> Represents a part of YREG (see syntax explanation of multiplication and addition)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> FREG</TD><TD><PRE> (See store grammar explanation)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> ADREG</TD><TD><PRE> Address modulation (see store syntax explanation)</TD></TR>
+</TABLE>
+</P>
+<A NAME="no4_22"></A><P><DT><H3> ●Internal RAM</H3><DD><TABLE BORDER>
+<TR><TH><PRE> symbol</TH><TH><PRE> Explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> MEMS00～1F</TD><TD><PRE> Place data read from external memory here</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> MIXS00～0F</TD><TD><PRE> Data from the sound source section appears here</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> TEMP00~7F</TD><TD><PRE> You can temporarily store the multiplication and addition results here.</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> EFREG00~0F</TD><TD><PRE> Put the processed data here</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> EXTS00～01</TD><TD><PRE> Data from external extension input appears here</TD></TR>
+</TABLE>
+</P>
+<A NAME="no4_23"></A><P><DT><H3> ●Memory access parameters</H3><DD><TABLE BORDER>
+<TR><TH><PRE> symbol</TH><TH><PRE> Explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> MR［…］</TD><TD><PRE> Read from memory</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> MW［…］</TD><TD><PRE> Write to memory</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>※note</b><DD> Describe the memory access description elements shown below in [...] according to the rules specified separately.</P>
+<DD><UL TYPE=DISK>
+<LI> User-defined address symbol<LI> DEC<LI> ADREG<LI> 1<LI> NF</UL>
+</P>
+<A NAME="no4_30"></A><P><DT><H2> ■Program grammar</H2><DD> All mnemonics and parameters must be separated by one or more of the following defined delimiters: ``space'', ``comma (,)'', ``tab'', or ``newline''.</P>
+<A NAME="no4_31"></A><DT><H3> ●Reading external memory and specifying the load destination MEMS (LDI)</H3><DD> LDI MEMSxx, MR[AddressElement(s)/NF]</P>
+<DT><UL TYPE=DISK>
+<P><LI> Do not include delimiters in the description of the external memory read parameter "MR[...]".</P>
+<P><LI> "AddressElement(s)" represents a concatenation of separately indicated "address description elements" using the symbol "+".</P>
+<P><LI> One address constant symbol (address symbol name defined by the user) must be included in the address description element of "AddressElement(s)".</P>
+</UL>
+<A NAME="no4_32"></A><P><DT><H3> ●Load to YREG (LDY)</H3><DD> LDY INPUTS</P>
+<A NAME="no4_33"></A><P><DT><H3> ●Load to ADREG (LDA)</H3><DD> LDA INPUTS</P>
+<A NAME="no4_34"></A><P><DT><H3> ●Multiplication and addition</H3><DD> @ pM * pC ± ( pM * pC ± ( ... ( pM * pC ± ( pM * pC + pA ) ) ... ) )</P>
+<P><DD> pM: Multiplicand<BR>
+ pC: Multiplication coefficient<BR>
+ pA: aryl addition number</P>
+<P><DT><UL TYPE=DISC>
+<P><LI> The number of left parentheses "(" and ")" must match.</P>
+<P><LI> The rightmost "(" must be to the left of the leftmost ")".</P>
+<P><LI> There are restrictions on the combination of pM and pA as shown in the table below.</P>
+<P><TABLE BORDER>
+<TR><TH><PRE> pM</TH><TH><PRE> pA</TH></TR>
+<TR><TD><PRE> INPUTS</TD><TD><PRE> [PEG, TEMP00-TEMP7F]</TD></TR>
+<TR><TD><PRE> TEMP00-TEMP7F</TD><TD><PRE> [REG,T]※</TD></TR>
+</TABLE>
+</P>
+<P> If you specify {TEMP00-TEMP7F} in pM and also specify TEMP in pA, only TEMP with the same subscript can be used. For this reason, pA is designated as “T”.</P>
+<P><LI> When using a YREG value as an argument as a multiplication factor, use one of the notations {YREGH, YREGL}. Please refer to the table below for the differences between these two notations.<P><TABLE BORDER>
+<TR><TH><PRE> Notation</TH><TH><PRE> Data passed to multiplier (13bits)</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> YREGH</TD><TD><PRE><table border cellpadding=2><td> YREG bit23-bit11</td></table></TD></TR><TR ALIGN=CENTER><TD><PRE> YREGL</TD><TD><PRE><table border cellpadding=2><td> 0</td><td> YREG bit15-bit4</td></table></TD></TR></TABLE></P></UL><A NAME="no4_35"></A><P><DT><H3> ●Store</H3><DD>&gt; <B>optDestination(s)</b></P><P><DD><TABLE BORDER=0><TR><TD ALIGN=CENTER><PRE> opt</TD><TD> :Store option.<BR> One of {S1 / S2 / S3} or omitted.</TD></TR><TR><TD ALIGN=CENTER><PRE> Destination(s)</TD><TD> : Specify the storage destination.<BR> Select one or more items from "Groups A to D" shown below. Cannot be omitted.</TD></TR></TABLE></P><P><DD><TABLE BORDER><TR><TD ALIGN=CENTER><PRE> group a</TD><TD><PRE> Any one of {TEMP00~7F}</TD></TR><TR><TD ALIGN=CENTER><PRE> group b</TD><TD><PRE> FREG</TD></TR><TR><TD ALIGN=CENTER><PRE> group c</TD><TD><PRE> ADREG</TD></TR><TR><TD ALIGN=CENTER><PRE> group d</TD><TD><PRE> Any one of {EFREG00~0F}</TD></TR></TABLE></P><P><DD><TABLE><TR><TH> Note<BR><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>When specifying ADREG for Destination(s),</b><BR> <B>S3 must be specified for opt.</b></TR></TABLE></P><DT><UL TYPE="DISK"><P><LI> With opt, specify the bit shift, overflow protection, and store mode of the data to be stored. The combinations are shown in the table below.</P><TABLE BORDER><TR><TH><PRE> First parameter setting</TH><TH><PRE> shift</TH><TH><PRE> overflow protection</TH><TH><PRE> Store mode</TH></TR><TR ALIGN=CENTER><TD><PRE> omission</TD><TD><PRE> ×1</TD><TD><PRE> With protection</TD><TD><PRE> A</TD></TR><TR ALIGN=CENTER><TD><PRE> S1</TD><TD><PRE> ×2</TD><TD><PRE> With protection</TD><TD><PRE> A</TD></TR><TR ALIGN=CENTER><TD><PRE> S2</TD><TD><PRE> ×2</TD><TD><PRE> No protection</TD><TD><PRE> A</TD></TR><TR ALIGN=CENTER><TD><PRE> S3</TD><TD><PRE> ×1</TD><TD><PRE> No protection</TD><TD><PRE> B</TD></TR></TABLE></P><P><LI> Depending on the difference between store modes A and B, the data stored in ADREG and FREG differs as shown in the table below.</P><TABLE BORDER><TR><TH><PRE> Mode/register name</TH><TH><PRE> ADREG (12bits)</TH><TH><PRE> FREG (13bits)</TH></TR><TR><TD ALIGN=CENTER><PRE> A</TD><TD><PRE><table border cellpadding=2><td width=35> ssss</td><td> INPUTS bit23-bit16</TD></table></td><TD><PRE><table border cellpdding=2><td width=150> Shifter bit23-bit11</TD></table></td></TR><TR><TD ALIGN=CENTER><PRE> B</TD><TD><PRE><table border cellpadding=2><td width=170> Shifter bit23-bit12</TD></table></td><TD><PRE><table border cellpadding=2><td width=20> 0</td><td> Shifter bit11-bit0</TD></table></td></TR></TABLE></P><P><TABLE><TD><PRE> *Top 4 bits of ADREG/store mode A (in the table above)</TD><TD><table border cellpadding=2><TD><PRE> ssss</TD></TABLE></TD><TD> ) is equal to bit23 of INPUTS</TD><TR><TD COLSPAN=3> Filled (sign extended) with the value (sign bit).</TD></TABLE></UL></DL><HR NOSHADE> <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">SCSP/DSP Assembler User's Manual</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

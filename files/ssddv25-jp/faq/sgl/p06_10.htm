@@ -1,0 +1,176 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/ 8&gt;FAQ/SGLプログラミング関連</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#sgl">FAQ</A>
+★<A HREF="index.htm#SOUND">SGLプログラミング関連</A>
+<HR>
+<B>▲
+<A HREF="p05_10.htm">戻る</A>｜
+<A HREF="p07_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/SGLプログラミング関連</B>
+<H2 ALIGN=CENTER>サウンド</H2>
+<HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_01"><HR></A><DL>
+<H3>CDDAにステレオ/モノラルの設定をしたい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SGLでのステレオ/モノラル設定について</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SGLのCD-DAとシーケンスデータのステレオ/モノラル
+      設定は以下のように行ってください。</P>
+<DD><OL>
+<P><B><LI>CD-DAのステレオ/モノラル切り替え</B>
+	<UL TYPE=DISC>
+	<LI>ステレオの場合：slCDDAOn関数の左右のパンを<BR>slCDDAOn( .. , .. , -127, 127 );<BR>と設定します。
+	<LI>モノラルの場合：slCDDAOn関数の左右のパンを<BR>slCDDAOn( .. , .. , 0, 0 );<BR>と設定します。
+	</UL>
+	<P>slCDDAOn関数→SGLリファレンスマニュアル</P>
+
+	<P>但し、この関数を実行するためには予め、slInitSound関数を実行しておく
+         必要があります。<BR>
+      メインプログラムのループ内にてslSynch関数を実行していれば、CD-DAの
+      再生中にも上記の関数にてステレオとモノラルの切換が可能です。</P>
+
+<P><B><LI>シーケンスデータの変更の場合</B><BR>
+         サウンドドライバのステレオ/モノラルビットを変更します。<BR>
+         この設定は必ずサウンドドライバ設定後に行ってください。</P>
+<P><B>(例)</B>
+<PRE>
+Uint8 sndctrl;
+sndctrl = (*((volatile Uint8 *)(0x25a00483)));
+sndctrl &amp;= 0x7f;
+if (stereo) {
+   sndctrl |= 0x80;
+}
+(*((volatile Uint8 *)(0x25a00483))) = (Uint8)sndctrl;
+</PRE></P>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_02"><HR></A><DL>
+<H3>4音のPCM再生をしたい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SGLのPCM再生サンプル(sampsnd2)で、実際には4音鳴る筈のPCMが最大でも2音
+      しか鳴らないんですがどうしてなのでしょうか？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SGLのslPCMOn関数では確かに最大4音迄の再生が可能ですが、鳴らそうとする
+      PCMの種類によって最大音数が異なってきます。<BR>
+      実例をあげると</P>
+
+<P><DD><TABLE BORDER=0>
+<TR><TD>　STEREO  </TD><TD><PRE>　16 Bit</TD><TD>　1音</TD><TD>　音源使用数 4</TD></TR>
+<TR><TD>　STEREO  </TD><TD><PRE>　 8 Bit</TD><TD>　2音</TD><TD>　音源使用数 2</TD></TR>
+<TR><TD>　MONORAL </TD><TD><PRE>　16 Bit</TD><TD>　2音</TD><TD>　音源使用数 2</TD></TR>
+<TR><TD>　MONORAL </TD><TD><PRE>　 8 Bit</TD><TD>　4音</TD><TD>　音源使用数 1</TD></TR>
+</TABLE></P>
+
+<P>      となります。<BR>
+      音源使用数が4を越えた場合slPCMOnはエラーステータス-2　
+      (チャネルオーバー)を返します。<BR>
+      従って、上で記述した種類のPCM音を組み合わせる事で1〜4音のPCMデータの再生
+      が可能になります。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_03"><HR></A><DL>
+<H3>エフェクト関連の関数のパラメータ</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>下記の関数の使い方がよくわからずエフェクト関係がうまく行きません。<BR>
+      下記の関数の各引数はどこから導き出される値なのでしょうか？<BR>
+      サンプルなどあれば提供していただけませんか？</P>
+<DL>
+<P><DT><B>slSndEffect(Effect)</B>
+	<DD>Effect:エフェクトナンバー</P>
+
+<P><DT><B>slSndMixChange(Tbank,Mixno)</B>
+	<DD>Tbank:トーンバンク番号
+	<DD>Mixno:ミキサ番号</P>
+
+<P><DT><B>slSndMixParmChange(Effect,Level,Pan)</B>
+	<DD>Effect:エフェクト出力チャンネル
+	<DD>Level:エフェクトリターンレベル
+	<DD>Pan:エフェクトパン</P>
+
+<P><DT><B>slDSPOff()</B></P>
+</DL>
+      
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>結論から言いますと、これらエフェクト関連のパラメータの設定内容は
+      サウンドデータ制作側から情報としてもらって処理するものです。<BR>
+      では、実際に以下のマップ構成で作成したサウンドデータを鳴らす場合を
+      例にして簡単に説明します。</P>
+
+<P><PRE>
+---------------------------------------
+ＢＧＭ曲データ　　: シーケンスデータ0
+ＳＥ曲データ　　　: シーケンスデータ1
+ＢＧＭ音色データ　: トーンバンクデータ0
+ＳＥ音色データ　　: トーンバンクデータ1
+ディレイ効果　　　: DSPプログラム0
+リバーブ効果　　　: DSPプログラム1
+　　　　　　　　　: DSPワークエリア
+---------------------------------------
+</PRE></P>
+<OL>
+<P><B><LI></B>まず "slSndEffect(Effect)" で指定する「エフェクトナンバー」ですが
+         エフェクトが1つの場合は常に「0」を指定し、複数ある場合は
+         上記リバーブをかけたい場合は上記マップ情報から「1」を指定します。
+<P><B><LI></B>次にエフェクトをかける対象を "slSndMixChange(Tbank,Mixno)" で
+         決定します。BGMにエフェクトをかけたい場合は「トーンバンク番号」
+         に0を指定します。またエフェクトからのリターンレベルやパンを指定
+         するミキサが複数ある場合は、使用したいパラメータの「ミキサ番号」を
+         セットします。このミキサの詳細も制作側からもらう情報です。
+<P><B><LI></B>最後に "slSndMixParmChange(Effect,Level,Pan)" ですが、これは
+         プログラム側でエフェクト効果を初期設定から変更したい場合に使用
+         します。例えばリバーブ効果を小さくする場合は変更したいエフェクトを
+         「DSPエフェクト出力チャンネル」で指定し(これも制作側からチャンネル
+         の割り振りの情報をもらってください。)「エフェクトリターンレベル」を
+         下げてやります。
+<P><B><LI></B>"slDSPOff()" はサウンドDSP自体を停止して初期化する命令を発行する
+         ものでエフェクトを扱う場合にサウンドの初期化処理や終了処理に必ず
+         行う必要のある関数です。
+	</OL>
+
+<P>      残念ながらエフェクトを扱ったSGLのサンプルプログラムはまだありません。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no6_04"><HR></A><DL>
+<H3>ミキサパラメータのSGLでの設定方法</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>ミキサのパラメータでR=15のサウンドデータを実際のプログラムの上で
+      実現するにはSGLではどうすればよいのか？ PANのパラメータで下位
+      3ビットは無視すればよいのか？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>R=15は slSndMixParmChange() 関数の引数でいうと 127 になります。<BR>
+      この値は3ビット右にシフトされて23段階のエフェクト出力PANの指定に
+      なります。<BR>実際にサウンドコントロールコマンドに渡される引数の形では
+      16進で0Fになります。</P>
+
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p05_10.htm">戻る</A>｜
+<A HREF="p07_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#sgl">FAQ</A>
+★<A HREF="index.htm#SOUND">SGLプログラミング関連</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

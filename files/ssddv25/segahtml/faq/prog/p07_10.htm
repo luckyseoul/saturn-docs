@@ -1,0 +1,313 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/ 7&gt;FAQ/General program</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+ <B>▲ <A HREF="p06_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>FAQ/Program General</b><H2 ALIGN=CENTER> others</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_01"><HR></a><DL>
+<H3> When SH2 crashed.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What should I check when SH2 crashes?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> When SH2 crashes, it is best to check the PR and see if the return address from the routine is correct.<BR>
+ This lets you know which routine crashed.<BR>
+ This also works for code written in C.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_02"><HR></a><DL>
+<H3> I don't think there are enough registers for SH2.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Here's a slightly palliative technique using assembly.<P><DT> <FONT SIZE=5>A)</font><DT><OL TYPE=a>
+<P><B><LI></b> Use MACL, MACH, and GBR as temporary.</P>
+<P><B><LI></b> Store pr in a register. (sts.l pr,r14)</P>
+</OL>
+<DT><TABLE BORDER=0>
+<TR><TD><img srcset="../../what/atto.png 5x"></TD><TD> <B>This technique should only be used by those who are familiar with library behavior and SH assembly. These operations can cause the library to run out of control if not used properly.</b> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_03"><HR></a><DL>
+<H3> What are the parameter rules (at assembler level) in GCC?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to incorporate a function created in C into an assembler program, but how are the arguments and return values of the C function coded?<BR>
+ Also, which register should the contents be saved?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The details look like this:<DL>
+<P><DT> <B>r0:</b><DD> The value returned by the function.</P>
+<P><DT> <B>r0-r3:</b><DD> temporary. It can be destroyed by calling a function. - No need to save and restore.</P>
+<P><DT> <B>r4-r7:</b><DD> first four arguments. broken by callee.</P>
+<P><DT> <B>r8-r15:</b><DD> Temporary available. These must be preserved between function calls. Assembly functions handled by gcc must preserve these registers.</P>
+<P><DT> <B>pr:</b><DD> Processor Return Must be saved.</P>
+<P><DT> <B>gbr:</b><DD> C compilers usually do not create code that uses gbr. Therefore, the gbr register can be used freely. (However, SGL uses gbr in the system. If you want to use both the SGL system and assembler, you need to be careful. Specifically, gbr always uses the start address of the system variable area. It points.)</P>
+<P><DT> <B>mac?:</b><DD> It will be destroyed. Also, since all arguments after the fifth are saved on the stack, performance will improve if you limit the number of arguments to four or less for C functions.</P>
+</DL>
+ *Before calling the C function, be sure to make char and short in r4-r7 signed or extend them with 0. In the case of gcc, the argument in the register is expected to be signed and expanded to an int.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_04"><HR></a><DL>
+<H3> Are there any precautions to be taken when using the SH2 divider?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Are there any precautions to be taken when using the SH2 divider?<P><DT> <FONT SIZE=5>A)</font><DD> The SH2 divider has a unit that can perform division in about 39 cycles.<BR>
+ The thing to keep in mind when using a divider is that if an interrupt occurs while the divider is being used in main processing, and the divider is used within the interrupt processing, the calculation result of the interrupted main processing side will be That would be dishonest.</P>
+<P> To deal with this,</P>
+<DD><OL>
+<P><B><LI></b> If interrupt processing uses a divider, interrupts should be disabled in the main processing.</P>
+<P><B><LI></b> A divider is not used in interrupt processing.</P>
+</OL>
+<P><DD> there is.</P>
+<P> SH The C compiler has an option switch that uses a divider, so if you do not want to be aware of this, use the option that does not use it (-div=cpu) or the option that disables interrupts when using the divider (- div=peripheral).</P>
+<P> <B>*</b> gcc does not generate code that uses a divider unless you use it explicitly (for example, inline assembler) in your C compilation code.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_05"><HR></a><DL>
+<H3> I would like to know the time required for data transfer by CPU, DMA (CPU/SCU), etc.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Could you please tell me the time required for data transfer for program transfer, CPU-DMA transfer, and SCU-DMA transfer?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The time required to transfer 256 bytes to VDP1, VDP2, and SCSP (Sound RAM) (measured value) is shown below. This measurement was performed under the following conditions.</P>
+<P><DD><OL>
+<P><B><LI></b> It is in VBlank. (During the period when VDP2 is always writable)</P>
+<P><B><LI></b> SCSP is in a state where both 68000 and internal DSP are stopped.</P>
+<P><B><LI></b> VDP1 is not drawing or displaying.</P>
+<P><B><LI></b> CPU-DMA transfers and SCU-DMA transfers do not include the time to register data in registers.</P>
+</OL>
+<DL>
+<P><DT> <B>●WORKRAM-H--</b>&gt; <B>SCSP (256 bytes)</b><DD> Program transfer 78.14 micro/sec (32.80 clocks per 4 bytes)<DD> CPU-DMA transfer 77.74 micro/sec (32.70 clocks per 4 bytes)<DD> SCU-DMA transfer 63.89 micro/sec (26.80 clocks per 4 bytes)<DD> <B>*</b> Any transfer takes a considerable amount of time. Even when transferring 256 bytes or less, the speed per 4 bytes does not change much.</P>
+<P><DT> <B>●WORKRAM-H--</b>&gt; <B>VDP1 (256 bytes)</b><DD> Program transfer 36.75 micro/sec (15.40 clocks per 4 bytes)<DD> CPU-DMA transfer 29.56 micro/sec (12.40 clocks per 4 bytes)<DD> SCU-DMA transfer 5.36 micro/sec (2.25 clocks per 4 bytes)<DD> <B>*</b> SCU-DMA transfer speed is quite fast. However, when transferring 256 bytes or less, the number of clocks per 4 bytes becomes worse.<DD> (The number of clocks per 4 bytes required for 16 byte transfer is 5.97)</P>
+<P><DT> <B>●WORKRAM-H--</b>&gt; <B>VDP2 (256 bytes)</b><DD> Program transfer 36.58 micro/sec (15.40 clocks per 4 bytes)<DD> CPU-DMA transfer 17.98 micro/sec (7.60 clocks per 4 bytes)<DD> SCU-DMA transfer 5.20 micro/sec (2.20 clocks per 4 bytes)<DD> <B>*</b> SCU-DMA transfer speed is quite fast. However, when transferring 256 bytes or less, the number of clocks per 4 bytes becomes worse.<DD> (The number of clocks per 4 bytes required for 16 byte transfer is 5.00)</DL>
+<P><DD> SCU-DMA includes pre-processing (20 clocks or more) and post-processing (12 clocks or more) during execution, so it is especially effective when transferring large amounts of data to VDP1 or VDP2. Since SCSP requires a wait for external transfer, it is better to use CPU-DMA or program transfer. (This is because SCU-DMA is in burst mode, so if a cache miss or write occurs after execution, processing will stop until the SCU-DMA transfer is completed.)</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_06"><HR></a><DL>
+<H3> What should I be careful about when developing SEGASATURN software?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I'm going to develop a game software with SEGASATURN, and I'm looking at the hardware manual to see what kind of graphical features it has, but there are so many that I can't choose.<BR>
+ So, please tell me in simple terms what functions SATURN actually has and what limitations it has.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> It is true that SATURN has a variety of functions, and it is very difficult to know how to use them, but if we explain what to do from the perspective of graphic design, here are the points you should pay attention to when designing graphics: ,</P>
+<DL>
+<P><DT> <B>palette:</b><DD> Palettes are shared between scrolls and sprites. Therefore, where and how to allocate the limited color data is a very important issue. Saturn uses palette data of 1024 or 2048 colors. You should decide which palette to use where before you start drawing.<P><DT> <B>VRAM:</b><DD> VDP1 and VDP2 are used in different ways, so we will explain each separately.</P>
+<P> First, VDP1 stores image data, sprite display commands, color lookup tables, and Gouraud shading tables in VRAM. Including all of this, it must be kept within 512KB. In other words, it doesn't mean that you can use 512KB just for the image data. Naturally, if picture data takes up a lot of data, there will be less space for commands, which will reduce the number of pictures that can be drawn, and vice versa. It would be best to keep these things in mind when finalizing the specifications.</P>
+<P> Next is VDP2, which contains bitmap data, character pattern data, pattern name data, and in some cases, rotation coefficient data (this data can also be stored in color RAM). Of course all of this data can fit within VRAM, but there is also the issue of access.</P>
+<P> The only thing to keep in mind is that bitmaps require a large amount of RAM, so you need to be careful.</P>
+<P><DT> <B>drawing:</b><DD> VDP1 and VDP2 have different drawing capabilities for high resolution and low resolution, respectively. When using high resolution, the drawing capacity will be half that of low resolution. Therefore, please take into consideration that there are quite severe restrictions when using high-resolution and meeting the requirement of staying within 1 Int.<P><DT> <B>VDP1:</b><DD> VDP1 is responsible for processing sprites. Translucency is a problem when displaying sprites.<BR>
+ Translucency can be applied to sprites or to sprites and scrolls, but it is not possible to use translucency for both sprites and scrolls at the same time, so the initial design Careful attention must be paid to this point at this stage.<BR>
+ If you want to perform translucent processing on both sprites and scrolling at the same time, you will need to mesh them. (It is a good idea to know how different the effects are between mesh and translucent in the early stages of development.It is also a good idea to know the difference between high-resolution and low-resolution.)<BR>
+ Another problem is Gouraud shading. Gouraud shading is a useful feature that can make the connections between polygons look smooth, but this only works if the sprite image data is in RGB format or in color lookup mode, and the lookup table is in RGB. This function is valid only when In palette mode, Gouraud shading is not applied, so you need to have some idea of which sprites will be used in which mode at the design stage.</p>
+<P><DT> <B>VDP2:</b><DD> VDP2 is mainly responsible for handling scrolling. When using VDP2, you must pay attention to the parameter called the cycle pattern, which sets the order of VRAM access.<BR>
+ Basically, where to place the scroll data to be displayed depends on this cycle pattern.<BR>
+ ]]]]]]< When using SGL, this setting is automatically set with slAutoDisp, but you need to be aware of how to use VRAM when designing. Parameters that affect the cycle pattern are: rotating scroll surface, cell, map position on VRAM, VRAM division, number of colors, reduction setting, vertical cell scrolling, high resolution/low resolution, CPU to VRAM during screen display period. It will be access. All of these things consume or limit the cycle pattern, so consider in advance the design of what kind of scrolling to use and where to put the data, and whether these specifications can be implemented.</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_07"><HR></a><DL>
+<H3> What trap vectors are available?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What trap exception handling vectors are available?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Only user vectors 20H to 3FH are currently not used in the BOOT-ROM while the application is running, so you can use them freely.<BR>
+ Other vectors cannot be used by applications for purposes other than their original purpose. 48H to 7FH cannot be used by the user, so if you are using them, please change them.<BR>
+ Please note the following points when using vectors.</P>
+<DD><OL>
+<P><B><LI></b> To access the vector area, you must use the system program built into BOOT-ROM. SYS_SETSINT()</P>
+<P><B><LI></b> NMI vectors cannot be rewritten. This is for handling the reset button.</P>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_08"><HR></a><DL>
+<H3> Even if I create an IP, it won't boot.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I changed the compiler to SH Series C Compiler Ver.3.0B, it no longer boots even if I create an "IP" as before.<BR>
+ We are using your company's sample files to create the IP.<BR>
+ (However, the area code only links Japan)</P>
+<P><DD><PRE>
+\SATURN\SEGASMP\SYS\MK.BAT
+                    SMPSYS.C
+                    SMPSYS.LNK
+                    SYS_ID.SRC
+</PRE></P>
+<P><DD>It seems that the versions of ASSEMBLER and LINKAGE EDITOR are not related.<BR>
+ Is there anything I need to change in the compiler?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Line 114 of SMPSYS.C</P>
+<P><DD> <B>Sint16 vbIcnt = 0;</b></P>
+<P> from,</P>
+<P><DD> <B>volatile Sint16 vbIcnt = 0;</b></P>
+<P> Please rewrite it like this.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_09"><HR></a><DL>
+<H3> Notes on creating a PAL version.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When changing a title created for the Japanese or USA version to the PAL version, what kind of changes are required to the program, graphics, and sound data?</P>
+<P><DT> <FONT SIZE=5>A)</font><DL>
+<P><DT> <B>●Problems regarding dot aspect ratio</b><DD> In the PAL version, the dot aspect ratio is wider than in NTSC.<BR>
+ Therefore, graphic data must also take this into consideration.</P>
+<P><DT> <B>●Problems regarding V-Blank</b><DD> PAL has a shorter V-blank compared to NTSC. Therefore, if the processing during blanking is too heavy, processing will be delayed.<BR>
+ Also, since PAL has a cycle of 50Hz and NTSC has a cycle of 60Hz, if you port an NTSC game as it is, the overall speed will be 5/5 (as the 60 times per second will be reduced to 50 times per second). Since the speed will be 6, it will be necessary to devise a method to compensate for this.</P>
+<P><DT> <B>●About Cinepak and TrueMotion</b><DD> There are basically no problems with Cinepak and TrueMotion.<BR>
+ This is because these are compressed while incorporating time information when creating the movie.<BR>
+ However, since the aspect ratio will change, the picture will appear shrunk, so please be careful.</P>
+<P> Also, if the data places too much load on VDP, it may not be displayed correctly. (In other words, frames will be dropped.)</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_10"><HR></a><DL>
+<H3> Which ANSI C library can be used for SATURN development?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me the ANSI standard compliant C library functions that can be used in include files.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Basically, file input/output relations such as fopen, fget, fscanf, etc.<BR>
+ (Of course, please use the CD access related functions that come with the Sega Saturn library.) Also, functions that request input/output from the console such as printf and scanf cannot be used.<BR>
+ (Even if the compilation passes, we cannot guarantee the operation. However, if you use libcross.a in the SNASM environment, you can use it without any problems. In that case, the standard output will be the standard output window that appears on snbugsat. Masu.)</P>
+<P> Also, functions related to memory such as calloc, malloc, and sprintf compile and work, but this is not an appropriate way to program a gaming machine.<BR>
+ Calloc, malloc, etc. are functions that are deeply dependent on the OS, so if they are used on Saturn, an error will not be returned even if they are mapped to an illegal address. I think these are natural results considering that the Saturn is not a machine loaded with an OS.<BR>
+ (This is the same for both SBL and SGL.)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_11"><HR></a><DL>
+<H3> Regarding the default values of VDP, SCU, and SCSP when changing the clock.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> It is stated in the SMPC User's Manual that when a clock change is executed, VDP1, VDP2, SCU, and SCSP are set to the default values when the power is turned on. Could you please tell me the default values?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> When a clock change is performed, SCU, VDP1, and VDP2 are reset, but the setting values are set to the initial values in each hardware manual.<BR>
+ Please refer to each hardware manual for the setting values.</P>
+<P> Please refer to <A HREF="../../prgg/sysg/prog/hon/p01_10.htm#no1_114">the system program user's manual</a> in the Programmer's Guide for information on the processing after a clock change.<BR>
+ To describe it simply,</P>
+<P><DD>&#65308; <B>About reinitialization process after reset</b>&#65310;<DL>
+<P><DT> <B>●SCU</b><DD> It is necessary to reinitialize the bus, interrupt mask, etc. However, use the SYS_GETSCUIM value for the interrupt mask value.</P>
+<P><DT> <B>●VDP2</b><DD> You need to set TV mode relatively quickly. Since the device itself is in 320/640 mode after being reset, especially if you change the system clock to 352/704 mode, the synchronization signal may be out of sync with the TV and the screen may be distorted.</P>
+<P><DT> <B>●VDP1, VDP2, SCSP</b><DD> All previous settings will be invalidated and you will need to reconfigure them.<BR>
+ If you are using a library, you will need to do something similar to initializing your application.</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_12"><HR></a><DL>
+<H3> Regarding the recording range of the CD program area.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I have a question regarding the recording range of the program area.<BR>
+ Currently, the maximum length is 63 minutes and 4 seconds, but is it okay to create data that exceeds this?<BR>
+ If so, how many minutes is possible?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This restriction is to ensure a security area on the CD-ROM, and data that exceeds the maximum time cannot be used as a product as it will erode the security area.</P>
+<P> For the above reasons, it is not possible to create data longer than 63 minutes and 4 seconds.<BR>
+ If the software you create is longer than 63 minutes and 4 seconds, it will naturally not be possible to commercialize it.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_13"><HR></a><DL>
+<H3> About data cartridges.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I have <FONT SIZE=5>a question</font> regarding data cartridges.</P>
+<DD><OL>
+<P><B><LI></b> When emulating the cartridge part, is it possible to specify the address of the ROM image when setting the address on CartDev or Programming Box?</P>
+<P><B><LI></b> Does Cart Dev use SIMM memory for emulation?</P>
+<P><B><LI></b> In that case, is it possible to coexist with the file system?</P>
+<P><B><LI></b> Can ROM cartridges be accessed in byte units?</P>
+<P><B><LI></b> Are the SCU restrictions the same as normal A-Bus access?</P>
+<P><B><LI></b> We set the SCU weight, but how slow is the access compared to LOW-RAM?</P>
+<P><B><LI></b> Are there any sample programs that use data cartridges?</P>
+<P><B><LI></b> In the case of a CD, I will submit one created using a write-once writer, but how should I submit the data for the data cartridge part?<BR>
+ (Compress and submit with floppy, create ROM with ROM writer, etc.)</P>
+</OL>
+<P><DT> <FONT SIZE=5>A)</font><DD> <FONT SIZE=5>I'll answer.</font><DD><OL>
+<P><B><LI></b> Since the ROM space to be used is fixed, it is not possible to specify the address of the ROM image.</P>
+<P><B><LI></b> Emulation will be performed by setting the SIMM in a special cartridge (sold by Ado Denshi) used in the SIMM system.</P>
+<P><B><LI></b> SIMM system (GFS debug mode) and cartridge emulation may be possible if the GFMC_Base setting address does not conflict with the cartridge usage address.</P>
+<P><B><LI></b> You can also do this in bytes.</P>
+<P><B><LI></b> No change. However, unlike the CD buffer, there is an update of the read address (that is, there is an update of the read address like a normal memory copy), so be careful when setting the DMA.</P>
+<P><B><LI></b> I set it to 3 clock waits (as stated in the manual), but it actually took about 25 clocks to obtain 16 bits of data.<BR>
+ This means that it is about 4 times slower than WORKRAM-L.</P>
+<P><B><LI></b> No sample program is provided. Be careful when programming so that reading from the CD and reading the cartridge do not overlap.</P>
+<P><B><LI></b> Like old cartridge software such as MegaDrive, it is basically delivered in ROM. This format may be subject to change at the time of delivery.</P>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_14"><HR></a><DL>
+<H3> I want to create a self-starting CD.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to create a self-starting CD, but how do I do that?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The steps to create a self-starting CD are as follows:</P>
+<DD><OL>
+<P><B><LI></b> Create an executable file in BIN format.</P>
+<P><B><LI></b> Create an IP.</P>
+<P><B><LI></b> Create a virtual CD script file and create a disk image.</P>
+<P><B><LI></b> Check operation with virtual CD.</P>
+<P><B><LI></b> Create a TOC file using VCDMKTOC.EXE.</P>
+<P><B><LI></b> Create a write-once CD using SEGACDW.EXE.</P>
+</OL>
+<P> For an explanation of the IP itself and how to write a self-starting CD script file, see</P>
+<P><DT> <B>reference</b><DD> "Programmer's Guide" DISC Format Standard Specifications/ <A HREF="../../prgg/sofg/disc/hon/p04_10.htm">Boot System</a></P>
+ Please refer to.</P>
+<P> The execution procedure for each item is as follows.</P>
+<DD><OL>
+<P><H3><LI> Creating a BIN file</H3> ○For GNU environment<BR>
+ First, create a coff file as usual, then use the objcopy (sh-objcopy for IRIX) command as follows.</P>
+<P><PRE> <B>objcopy -O binary input output</b></PRE></P>
+<P> or with GCC's link option</P>
+<P><PRE> <B>-Xlinker -oformat -Xlinker binary</b></PRE></P>
+<P><H3><LI> Creating an IP</H3> In the sample version IP, the address of 1stREAD FILE is set to 0x06010000, and the sample initialization program jumps to the first address of 1stREAD FILE.</P>
+<P> If you change the read address of 1stREAD FILE, you need to recompile the IP.<BR>
+ The IP sources and security objects currently provided are for SH-C, so it is necessary to create an IP using Hitachi SH-C.<BR>
+ Alternatively, we can provide the files necessary to create an IP for GNU by email, so please contact us if you need them.</P>
+<P><H3><LI> Create script file</H3> Please refer to " <A HREF="../../prgg/sofg/disc/hon/p05_10.htm">Appendix A/Various Sample List</a> " of the DISC Format Standard Specifications in the Programmer's Guide.</P>
+<P> The file (1ST READ FILE) that is automatically loaded after loading the IP is the first file in ASCII order on the CD-ROM (synonymous with the file with file identifier 2).<BR>
+ Specify the file name on the CD-ROM with the File command, and specify the source on DOS with the FileSource command. At this time, the file name on the CD and the source file name do not need to match.<BR>
+ Also, please refer to the attached document for the meaning of the text files registered in the system area. (These text files can be dummy during development, but be sure to include text files related to rights before mastering.) Note that when using the self-starting execution method, the SNASM debugger is not used. Please note that this is not possible.</P>
+</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_15"><HR></a><DL>
+<H3> How to put data as big endian on byte boundaries?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How can I reserve relative values as big endian data on byte boundaries?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> As an example, let me introduce an example using ASMSH in the Hitachi compiler environment.<BR>
+ In the Hitachi assembler environment, divider shift can be used for absolute values. Using this function,</P>
+<P><DD><PRE>
+.DATA.B \data&gt;&gt; twenty four
+.DATA.B \data&lt;&lt; 8&gt;&gt; twenty four
+.DATA.B \data&lt;&lt; 16&gt;&gt; twenty four
+.DATA.B \data&lt;&lt; twenty four&gt;&gt; twenty four
+</PRE></P>
+<P>Please define a macro such as</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_16"><HR></a><DL>
+<H3> Where should I set the load address for 1st Read File?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Where should I set the load address for the 1st read file?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The 1st read file is the first file loaded as an application after IP.BIN. The areas that can be loaded are as follows.</P>
+<P><DD><PRE>
+6002000H + IP size┏━━━━━━━━━━━━━━━┓
+                  ┃ 1st read file ┃
+                  ┃ loadable area ┃
+                  ┃               ┃
+                  ┃               ┃
+60FF000H          ┣━━━━━━━━━━━━━━━┫
+                  ┃ System usage  ┃
+                  ┃ area          ┃
+60FFFFFH          ┗━━━━━━━━━━━━━━━┛
+</PRE></P>
+<P>60FF000H to 60FFFFFH are used by the system, so never load the 1st read file.</P>
+<P> After loading the 1st read file, it will be released to the application.<BR>
+ Also, 6000000H to 6001FFFH are used by the system and should not be used by applications.<BR>
+ However, stacks from 600E00H to 6001FFFH can be used.<BR>
+ After IP processing is completed and the application starts,</P>
+<P> If you prepare other stacks of master SH, up to 6001000H,<BR>
+ If you prepare another slave SH stack, up to 6000E00H.<BR>
+<P> Each can be used.</P>
+<P><DD><PRE>
+6000000H     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+             ┃ Vector, resident routine ┃
+6000E00H     ┣━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+             ┃ Slave SH stack           ┃
+6001000H     ┣━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+             ┃ Master SH stack          ┃
+6002000H     ┣━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+             ┃                          ┃
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_17"><HR></a><DL>
+<H3> The moment it blacks out from the SEGA logo, it goes out of control when you open the tray.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> After loading the 1st Read File, the SEGA logo appears, but immediately after this blackout occurs and the screen turns black, if you open the CD tray, the program will run out of control.<BR>
+ During normal games, if I open the CD tray, the game will jump to the multiplayer screen without any problem, but if I open the CD tray at this time, it will go out of control. Why?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The most likely cause of such symptoms is neglecting to check the CD tray open.<BR>
+ To explain the principle in detail, once the screen goes black, control is transferred to the application program.<BR>
+ After this, if a new program is loaded, if the tray open check is not performed, the program will be called with the program data incompletely loaded.<BR>
+ The result after that is self-evident, but the application will run out of control.<BR>
+ In other words, the application must always open the tray.<BR>
+ In addition, it has been confirmed that on rare occasions (although at very severe times) this kind of symptom occurs due to a bug in the GFS library.<BR>
+ If the same symptoms occur despite taking the above measures, there may be a bug in GFS, so please replace with the latest GFS library (lincd.a file in the case of SGL). .</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_18"><HR></a><DL>
+<H3> Please tell me about the hierarchical structure of 3D models.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I'm thinking of making a 3D multi-jointed game, but I don't really understand how to manipulate data that has a 3D indirect structure.<BR>
+ Please tell me about creating 3D games.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Generally, when creating a 3D game with a hierarchical structure, a method is used to calculate child data from the parent-child structure of the model.<BR>
+ In other words, the child only has a relative component from the parent, and when the parent's calculation is completed, the child's coordinates are calculated using the parent's data.<BR>
+ If you have the parent's position information in a matrix, to calculate the child's coordinates, generate the child's relative components by applying 3D affine transformation to the child's parent matrix. In the case of SGL, this can be easily done using the functions provided by the system.<BR>
+ Of course, this is not to say that it cannot be done with SBL, but it is easier to do with SGL. *SGL has a sample that uses the AKIRA model of Virtua Fighter, but the hierarchical structure of this sample program uses a very special method and is not suitable for use as a reference.<BR>
+ If you want a sample of the hierarchical structure, please see s_8_12 (sample_8_12 for IRIX). This concept itself can be used in both SGL and SBL.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_10.htm">Back</a> | ■</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#prog">FAQ</a> ★ <A HREF="index.htm">General program</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

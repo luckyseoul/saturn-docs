@@ -1,0 +1,27 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p016.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p018.htm> Go to next page </A>
+<HR><P><P><DL>
+<H3> Command issue timing </H3>
+<DD> SMPC executes internal tasks using V-BLANK-IN interrupts. <BR>
+Therefore, it is prohibited to issue commands from V-BLANK-IN in 300μS period. <BR>
+In addition, the INTBACK command used to acquire various statuses and peripheral data of SMPC has stricter timings than other commands. For details of the INTBACK command, refer to 2.4 Non-reset System Management Command and Chapter 3 Peripheral Control. <P>
+<DT> <H4> ● Common issues for command issuance timing </H4> <P>
+<DD> As mentioned above, issuance of all commands is prohibited within 300μS from V-BLANK-IN. <P>
+<DT> <H4> ● INTBACK command </H4> <P>
+<DD> INTBACK command starts peripheral data collection with V-BLANK-OUT. In order to start peripheral data collection with V-BLANK-OUT, issue it after V-BLANK-IN and after 300μS, but before V-BLANK-OUT. <P>
+Figure 2.5 shows the INTBACK command issuance timing. <P>
+The INTBACK command can be used in the following three ways. <P>
+(1) Get SMPC status only <BR>
+(2) Acquire peripheral data following acquisition of SMPC status <BR>
+(3) Get peripheral data only <P>
+(2) When acquiring peripheral data following acquisition of SMPC status, an SMPC interrupt is generated when the SMPC status is aligned with OREG, and a result parameter is requested from SH2. After SH2 requests to continue, the SMPC starts collecting peripheral data. <P>
+Therefore, when acquiring a continuation request after obtaining the SMPC status, it is necessary to issue an INTBACK command to request continuation so that the peripheral data collection can be started with V-BLANK-OUT. <P>
+In addition, SMPC status acquisition is completed in about 300μS after issuing the INTBACK command, and an SMPC interrupt is requested to SMPC. <BR>
+</DL><P><P><HR>
+<A HREF=p016.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p018.htm> Go to next page </A>
+</BODY>
+</HTML>

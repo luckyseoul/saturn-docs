@@ -1,0 +1,181 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;39/86&gt;VDP2ユーザーズマニュアル/6.1回転スクロール座標演算</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no6">VDP2ユーザーズマニュアル</A>
+<HR>
+<B>▲
+<a href="p05_30_j.htm">戻る</A>｜
+<a href="p06_20_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>第６章　回転スクロール画面</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　回転スクロール画面は、「回転パラメータA」、「回転パラメータB」と呼ばれる2組のパラメータテーブルを持ち、それぞれのパラメータテーブルによる画面を同時に表示することができます。その2組のパラメータは、回転パラメータテーブルとしてVRAMに格納するほかに、それぞれ対応した係数テーブルとしてVRAMに持つことができます。</P>
+
+	<P>	<DD>　回転パラメータは、回転パラメータAと回転パラメータBの2組あり、それぞれをテーブルに格納します。RBG0は、回転パラメータAか回転パラメータBによって指定される1画面、または回転パラメータAと回転パラメータBによって指定される2画面を同時に表示することができ、RBG1は、回転パラメータBによって指定される画面のみを表示することができます。回転スクロール画面と回転パラメータとの関係を表6.1に示します。</P>
+
+<A NAME="t6_1"></A>
+	<P>	<DD><B>表6.1　回転スクロール画面</B>
+		<DD><TABLE BORDER CELLPADDING=5>
+	</TR><TH>画面</TH><TH>単独表示</TH><TH>回転パラメータとの関係</TH></TR>
+	</TR><TD>RBG0</TD><TD>可</TD><TD>回転パラメータA、Bのどちらか一方によって指定される1画面、<BR>または回転パラメータA、Bでそれぞれ指定される2画面を同時に表示可能</TD></TR>
+	</TR><TD>RBG1</TD><TD>不可（RBG0も表示<BR>しなければならない）</TD><TD>回転パラメータBによって指定される画面を表示</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　回転パラメータAと回転パラメータBは、それぞれに係数テーブルを持つことができ、その係数データをラインごと、またはドットごとに読み込むことで多様な表示ができます。　また、回転パラメータAを使って、スプライト用フレームバッファを拡大縮小回転させることもできます。</P>
+
+<A NAME="no6_10"></A>
+	<P>	<DT><H2>■6.1　回転スクロール座標演算</H2>
+		<DD>　回転スクロール画面の表示画面は、中心点を基準に視点およびスクリーン画面(TV画面)を回転変換(平行移動も含む)させ、変換後の視点から変換後のスクリーン画面を通った視線が、固定されたスクロールマップと交差する点を集めたものです。回転スクロール画面の表示方法を図6.1に示します。</P>
+
+<A NAME="z6_1"></A>
+	<P ALIGN=CENTER><B>図6.1　回転スクロール画面の表示方法</B><BR><img srcset="../grp/i145_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　回転変換の公式から、変換後の視点座標、および変換後のスクリーン画面座標は以下の式で表されます。</P>
+
+	<P>	<DD><PRE><B>
+┌  ┐   ┌     ┐   ┌       ┐   ┌  ┐   ┌  ┐
+│Xp│   │A B C│   │Px - Cx│   │Cx│   │Mx│
+│Yp│ = │D E F│ x │Py - Cy│ + │Cy│ + │My│
+│Zp│   │G H I│   │Pz - Cz│   │Cz│   │Mz│
+└  ┘   └     ┘   └       ┘   └  ┘   └  ┘
+┌  ┐   ┌     ┐   ┌       ┐   ┌  ┐   ┌  ┐
+│Xs│   │A B C│   │Sx - Cx│   │Cx│   │Mx│
+│Ys│ = │D E F│ x │Sy - Cy│ + │Cy│ + │My│
+│Zs│   │G H I│   │Sz - Cz│   │Cz│   │Mz│
+└  ┘   └     ┘   └       ┘   └  ┘   └  ┘
+</B>
+A, B, C, D, E, F, G, H, I：回転マトリクスパラメータ
+               Px, Py, Pz：回転変換前の視点座標
+               Sx, Sy, Sz：回転変換前のスクリーン画面座標
+               Cx, Cy, Cz：回転中心座標
+               Mx, My, Mz：平行移動量
+               Xp, Yp, Zp：回転変換後の視点座標
+               Xs, Ys, Zs：回転変換後のスクリーン画面座標
+</PRE></P>
+
+	<P><DD>　また、回転変換後の視点から回転変換後のスクリーン画面を通る視線は、以下の式で表されます。</P>
+	<P><PRE><B>
+X − Xp　　 Y − Yp　 　Z − Zp
+―――― ＝ ―――― ＝ ――――
+Xs− Xp　　 Ys− Yp　 　Zs− Zp
+</B></PRE></P>
+
+	<P><DD>　ここで、スクロールマップはXY平面(Z = 0)に固定されているので、スクロールマップ上の表示座標(X, Y)は以下の式で求められます。</P>
+
+	<P><DD><PRE><B>
+X = k (Xs−Xp)＋Xp
+Y = k (Ys−Yp)＋Yp
+</B></PRE></P>
+
+	<P>	<DD>　ただし、</P>
+
+	<P>	<DD><PRE><B>
+      −Zp
+k = ――――
+     Zs− Zp
+</B></PRE></P>
+
+	<P><DD>　このkは、透視変換係数と呼ばれ、X軸回転ではスクリーン画面の垂直方向でのみ変化し、水平方向では一定になります。また、Y軸回転ではスクリーン画面の水平方向でのみ変化し、垂直方向では一定になります。Z軸回転では常に一定になります。<BR>
+　通常、回転変換前のスクリーン画面はTV画面と同一なので、SxはTV画面における水平方向座標値(Hカウンター値)に、SyはTV画面における垂直方向座標値(Vカウンター値)に、Szは0になります。このスクリーン画面の垂線(SZ軸)で回転させたときのスクリーン画面の座標値は、以下の式で求められます。</P>
+
+<P>	<DD><PRE><B>
+┌  ┐   ┌     ┐   ┌          ┐   ┌   ┐   ┌   ┐
+│Sx│   │a b 0│   │Hcnt - Csx│   │Csx│   │Msx│
+│Sy│ = │c d 0│ x │Vcnt - Csy│ + │Csy│ + │Msy│
+│Sz│   │0 0 1│   │     0    │   │ 0 │   │Msz│
+└  ┘   └     ┘   └          ┘   └   ┘   └   ┘
+</B>
+   a, b, c, d：スクリーン画面の回転マトリクスパラメータ
+   Hcnt, Vcnt：HVカウンター値
+     Csx, Csy：スクリーン画面の回転中心座標
+Msx, Msy, Msz：スクリーン画面の平行移動量
+</PRE></P>
+
+	<P>	<DD>　上記の式は、以下のように表されます。</P>
+
+	<P>	<DD><PRE><B>
+Sx = Xst＋DX・Hcnt＋DXst・Vcnt
+Sy = Yst＋DY・Hcnt＋DYst・Vcnt
+Sz = Zst
+</B></PRE></P>
+
+	<P>	<DD>　ただし、</P>
+
+	<P>	<DD><PRE><B>
+Xst = −a・Csx−b・Csy＋Csx＋Msx
+Yst = −c・Csx−d・Csy＋Csy＋Msy
+Zst = Msz
+
+△X = a
+△Y = c
+△Xst = b
+△Yst = d
+</B>
+Xst, Yst, Zst：スクリーン画面スタート座標
+ △X,   △Y  ：スクリーン画面水平方向座標増分
+ △Xst, △Yst：スクリーン画面垂直方向座標増分
+</PRE></P>
+
+	<P>	<DD>　以上の式から、スクロール画面の3軸回転とスクリーン画面の回転とを両方行う場合の表示座標(X, Y)の計算式は以下のようになります。</P>
+
+	<P>	<PRE><B>
+X = kx (Xsp＋dX・Hcnt)＋Xp
+Y = ky (Ysp＋dY・Hcnt)＋Yp
+</B></PRE></P>
+
+	<P>	<DD>　ただし、</P>
+
+	<P>	<PRE><B>
+Xsp = A{(Xst＋△Xst・Vcnt)−Px}＋B{(Yst＋△Yst・Vcnt)−Py}＋C(Zst−Pz)
+Ysp = D{(Xst＋△Xst・Vcnt)−Px}＋E{(Yst＋△Yst・Vcnt)−Py}＋F(Zst−Pz)
+Xp  = A(Px−Cx)＋B(Py−Cy)＋C(Pz−Cz)＋Cx＋Mx
+Yp  = D(Px−Cx)＋E(Py−Cy)＋F(Pz−Cz)＋Cy＋My
+dX  = A・DX＋B・DY
+dY  = D・DX＋E・DY
+</B>
+   Xst、Yst、Zst：スクリーン画面スタート座標
+    △Xst、△Yst：スクリーン画面垂直方向座標増分
+        △X、△Y：スクリーン画面水平方向座標増分
+A、B、C、D、E、F：回転マトリクスパラメータ
+      Px、Py、Pz：視点座標
+      Cx、Cy、Cz：中心座標
+          Mx、My：平行移動量
+          kx、ky：拡大縮小係数
+      Hcnt、Vcnt：HVカウンター値
+</PRE></P>
+
+	<P>	<DD>　VDP2は、VRAM上に格納された回転パラメータテーブルから各パラメータをラインごとに読み込み、上記の計算式を用いてXsp、Ysp、Xp、Yp、dX、dYを計算し、その結果を使ってドットごとの表示座標(X, Y)を求めます。拡大縮小係数のkxとkyは通常、回転パラメータテーブルから読み込んだ値を使用しますが、係数テーブルを使用することでラインごとやドットごとに値を変えることもできます。</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p05_30_j.htm">戻る</A>｜
+<a href="p06_20_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+★<a href="../index_j.htm#no6">VDP2ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,99 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;14/22&gt;CD Builder Script Grammar/3.6 Interleaving Definition</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+ <B>▲ <A HREF="p08_10.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD Builder Script Grammar Manual</b><H2 ALIGN=CENTER> 3.6 Definition of interleaving</H2><HR NOSHADE>
+<DL>
+<P><DD> An example of an interleave definition is shown below.</P>
+<DD><PRE>
+                                                    File source
+Extent                                    ┌────────────┐
+    FileInterleave  3 1             ┌←ASRC│AAAAAAAAAAAA│
+        File  AFILE                 │     └────────────┘
+            FileSource ASRC         │     ┌────────────┐           
+            EndFileSource           ├←BSRC│BBBBBBBBBBBB│
+        EndFile                     │     └────────────┘                
+    EndFileInterleave               │
+    FileInterleave  1 3             │  │←−−− Extent−−−→−−
+       File  BFILE                  │  ┌────────────────              
+           FileSource BSRC          └→ │AAABAAABAAABAAA
+           EndFileSource               └────────────────                 
+        EndFile               
+    EndFileInterleave         
+EndExtent                     
+</PRE></DL>
+<!-------------------------------------------------------------------------->
+<A NAME="6.1"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_6">one</a><BR> <A HREF="p03_10.htm#t3_1_6">View</a><BR> <A HREF="p03_10.htm#t3_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Start of extent definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Extent</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 6.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Extent [relpos]<DT> <B>parameters</b><DD> relpos: location on disk to record the extent (relative time within the session, optional)<DT> <B>function</b><DD> Begins defining an extent.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="6.2"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_6">one</a><BR> <A HREF="p03_10.htm#t3_1_6">View</a><BR> <A HREF="p03_10.htm#t3_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of extent definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> End Extent</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 6.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> End Extent<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the extent definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="6.3"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_6">one</a><BR> <A HREF="p03_10.htm#t3_1_6">View</a><BR> <A HREF="p03_10.htm#t3_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Starting file interleaving definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> FileInterleave</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 6.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> FileInterleave usize gsize<DT> <B>parameters</b><DD> usize: number of sectors in the unit<DD> gsize: number of sectors in the gap<DT> <B>function</b><DD> Begins file interleaving definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="6.4"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_6">one</a><BR> <A HREF="p03_10.htm#t3_1_6">View</a><BR> <A HREF="p03_10.htm#t3_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of file interleaving definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndFileInterleave</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 6.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndFileInterleave<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the file interleaving definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="6.5"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_6">one</a><BR> <A HREF="p03_10.htm#t3_1_6">View</a><BR> <A HREF="p03_10.htm#t3_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Starting channel definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Channel</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 6.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Channel channel<DT> <B>parameters</b><DD> chno: Channel number (0 to 255)<DT> <B>function</b><DD> Begin channel definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="6.6"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_6">one</a><BR> <A HREF="p03_10.htm#t3_1_6">View</a><BR> <A HREF="p03_10.htm#t3_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of channel definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndChannel</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 6.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndChannel<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish the channel definition.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="6.7"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_6">one</a><BR> <A HREF="p03_10.htm#t3_1_6">View</a><BR> <A HREF="p03_10.htm#t3_1_6">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> File relocation specification</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Reallocation</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 6.7</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Reallocation<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> If another file is already specified at the location where you are trying to place the file, it will be moved and relocated so that it does not overlap with the previously specified file.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_10.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

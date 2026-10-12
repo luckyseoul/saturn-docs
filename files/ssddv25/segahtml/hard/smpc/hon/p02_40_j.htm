@@ -1,0 +1,460 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/19&gt;SMPCユーザーズマニュアル/2.4　非リセット系システムマネージメントコマンド</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p02_30_j.htm">戻る</A>｜
+     <a href="p02_50_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SMPCユーザーズマニュアル/第２章　SMPCコマンド</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_40"></A>
+	<P><DT><H2>■2.4　非リセット系システムマネージメントコマンド</H2>
+		<DD>　非リセット系システムマネージメントコマンドの詳細を表形式で示します。各コマンドの表の見方および注意事項は以下の通りです。また、全てのコマンドにおいてステータスフラグを使用する事で、コマンドの二重発行が管理できます。</P>
+
+<A NAME="no2_41"></A>
+	<P><DT><B>　●SMPC割り込み</B>
+	<DD>　"発生"と記述されているものは、コマンド終了時にSCU経由にてSH-2に対してSMPC割り込みを発生します。また、SCUの設定により、割り込みのイネーブル／ディセーブルが可能です。</P>
+
+<A NAME="no2_42"></A>
+	<P><DT><B>　●IREG、OREG</B></P>
+	<DD><UL TYPE=DISC>
+		<LI>コマンドで使用しているIREG、OREGの詳細を示しています。
+		<LI>コマンドパラメータは、コマンド発行前にIREGに設定するパラメータです。
+		<LI>リザルトパラメータは、コマンド実行によりOREGにセットされるパラメータです。
+		<LI>リザルトパラメータOREG31は、SMPCがコマンド処理開始時にセットします。OREG31には、コマンドコードが出力されます。ステータスフラグ(SF)と併用することにより、
+	</UL></P>
+
+	<P><DD>　ステータスフラグ(SF)と併用することにより、
+	<P><UL TYPE=DISC>
+		<LI>どのコマンドを実行中か (<B>SF=1</B>)
+		<LI>どのコマンドが終了したか(<B>SF=0</B>)
+	</UL></P>
+
+	<P><DD>　を判断することができます。</P>
+
+<A NAME="no2_43"></A>
+	<P><DT><B>　●実行時間</B>
+		<DD>　SMPC内部ファームウェアのステップ数から計算した実行時間を示しています。RTCインクリメント等の内部タスクと衝突した場合は、コマンド実行時間が変化するので、最小値および最大値の範囲で記述しています。</P>
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c2_01"><HR></A>
+<!-- --------------------------------------------------------------------------------- -->
+<B><a href="p02_10_j.htm#t2_2">一覧表</A>
+|▲<a href="p02_30_j.htm#c1_13">戻る</A>
+|  <A HREF="#c2_02">次へ</A>▼</B>
+<DL>
+	<P>	<DT>No.1
+		<DT><H1>INTBACK</H1>
+		<DD><H2>インタラプトバック</H2>
+		<DD><H5>(SMPCステータス取得)</H5>
+
+	<P>	<DT><PRE>
+<B>コマンドコード　</B>10H
+<B>ＳＭＰＣ割込　　</B>発生
+<B>ＩＲＥＧ　　　　</B>0〜2
+<B>ＯＲＥＧ　　　　</B>0〜31
+<B>実行時間　　　　</B>max=320msec
+<B>　　　　　　　　</B>min=xxx
+</PRE></P>
+
+	<P>	<DT><B>機能内容</B>
+		<DD>SMPCの各ステータスおよびペリフェラルデータを取得します。ここではSMPCステータスの取得について説明します。
+ペリフェラルデータの取得は、<a href="p03_10_j.htm">第3章</A>を参照してください。</P>
+
+	<P>	<DT><B>コマンドパラメータ</B>
+		<DD>ペリフェラルデータ取得時のINTBACKコマンドのコマンドパラメータについて示します。</P>
+
+<A NAME="c2_01_ireg0"></A>
+	<P>	<DT><B>　●IREG0</B>
+		<DD><TABLE BORDER=1>
+		<TR ALIGN=CENTER><TH>IREG0    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+		<TR ALIGN=CENTER><TH>20100001H</TH><TD COLSPAN=8>SMPCステータス取得スイッチ(<B>00H</B>または<B>01H</B>)<BR>初期値不定／Write Only</TD></TR>
+		</TABLE></P>
+
+	<P>	<DD><B>IREG0:SMPCステータス取得スイッチの設定値</B>
+		<DD>
+<TABLE BORDER=1>
+<TR><TH>IREG0設定値</TH><TH>　　　説　明　　　</TH></TR>
+<TR><TH ALIGN=CENTER>00H</TH><TD>日時、カートリッジコード、エリアコード、端子状態、SMEM、<BR>リセットボタンの各データを返さない </TD></TR>
+<TR><TH ALIGN=CENTER>01H</TH><TD>日時、カートリッジコード、エリアコード、端子状態、SMEM、<BR>リセットボタンの各データを返す </TD></TR>
+</TABLE></P>
+
+	<P>	<DD>INTBACKコマンドを使用する際は、必ず上記設定値のいずれかを設定してください。
+		<DD>IREG0はペリフェラルをコントロールするときにも使用します。
+使用方法は、<a href="p03_10_j.htm">第3章</A>を参照してください。</P>
+
+<A NAME="c2_01_ireg1"></A>
+	<P>	<DT><B>　●IREG1</B>
+		<DD>
+<TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH>IREG1    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+	<TR ALIGN=CENTER><TH ROWSPAN=2>20100003H</TH>
+	<TD>P2MD1</TD><TD>P2MD0</TD><TD>P1MD1</TD><TD>P1MD0</TD><TD>PEN</TD><TD>0</TD><TD>OPE</TD><TD>0</TD></TR>
+	<TR ALIGN=CENTER>
+	<TD>不定<BR>W</TD><TD>不定<BR>W</TD><TD>不定<BR>W</TD><TD>不定<BR>W</TD><TD>不定<BR>W</TD><TD>不定<BR>-</TD><TD>不定<BR>W</TD><TD>不定<BR>-</TD></TR>
+</TABLE></P>
+
+	<P><DD><TABLE BORDER=1>
+	<CAPTION><B>ビット7,6:ポート2モード</B></CAPTION>
+	<TR><TH>ビット７</TH><TH>ビット６</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+	<TR><TH>P2MD1</TH><TH>P2MD0</TH></TR>
+	<TR><TH>0</TH><TH>0</TH><TD>15バイトモード </TD></TR>
+	<TR><TH>0</TH><TH>1</TH><TD>255バイトモード </TD></TR>
+	<TR><TH>1</TH><TH>0</TH><TD>SEGA RESERVED(<B>設定禁止</B>) </TD></TR>
+	<TR><TH>1</TH><TH>1</TH><TD>0バイトモード </TD></TR>
+	</TABLE></P>
+
+	<TABLE BORDER=1>
+	<CAPTION><B>ビット5,4:ポート1モード</B></CAPTION>
+	<TR><TH>ビット５</TH><TH>ビット４</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+	<TR><TH>P1MD1</TH><TH>P1MD0</TH></TR>
+	<TR><TH>0</TH><TH>0</TH><TD>15バイトモード </TD></TR>
+	<TR><TH>0</TH><TH>1</TH><TD>255バイトモード </TD></TR>
+	<TR><TH>1</TH><TH>0</TH><TD>SEGA RESERVED(<B>設定禁止</B>) </TD></TR>
+	<TR><TH>1</TH><TH>1</TH><TD>0バイトモード </TD></TR>
+	</TABLE></P>
+
+
+	<P><DD><TABLE BORDER=1>
+	<CAPTION><B>ビット3:ペリフェラルデータイネーブル</B></CAPTION>
+	<TR><TH>ビット３</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+	<TR><TH>PEN</TH></TR>
+	<TR><TH>0</TH><TD>ペリフェラルデータを返さない</TD></TR>
+	<TR><TH>1</TH><TD>ペリフェラルデータを返す</TD></TR>
+	</TABLE></P>
+
+
+	<P><DD><TABLE BORDER=1>
+	<CAPTION><B>ビット1:ペリフェラルデータ取得時間の最適化</B></CAPTION>
+	<TR><TH>ビット１</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+	<TR><TH>OPE</TH></TR>
+	<TR><TH>0</TH><TD>最適化をする</TD></TR>
+	<TR><TH>1</TH><TD>最適化をしない</TD></TR>
+	</TABLE></P>
+
+<A NAME="c2_01_ireg2"></A>
+	<P>	<DT><B>　●IREG2</B>
+		<DD>初期値：不定
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>IREG2    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>20100005H</TH><TD COLSPAN=8>F0H<BR>Write Only</TD></TR>
+</TABLE></P>
+
+	<P>	<DD>INTBACKコマンドを発行するときは、IREG2にF0Hを必ずセットしてください。</P>
+
+
+	<P>	<DT><B>リザルトパラメータ</B>
+		<DD>SMPCステータス取得に限定したリザルトパラメータについて示します。</P>
+
+<A NAME="c2_01_sr"></A>
+	<P>	<DT><B>　●SR</B>
+		<DD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>SR       </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>20100061H</TH><TD>０</TD><TD>１</TD><TD>PDE</TD><TD>RESB</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD></TR>
+</TABLE></P>
+
+<TABLE BORDER=0><TR><TD>
+<TABLE BORDER=1>
+<TR><TH>ビット５</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+<TR><TH>PDE</TH></TR>
+<TR><TH>0</TH><TD>残りペリフェラルデータなし</TD></TR>
+<TR><TH>1</TH><TD>残りペリフェラルデータあり</TD></TR>
+</TABLE></P>
+
+</TD><TD>
+
+<TABLE BORDER=1>
+<TR><TH>ビット４</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+<TR><TH>PRESB</TH></TR>
+<TR><TH>0</TH><TD>リセットボタンOFF</TD></TR>
+<TR><TH>1</TH><TD>リセットボタンON</TD></TR>
+</TABLE></P>
+</TD></TR></TABLE>
+
+<A NAME="c2_01_oreg0"></A>
+	<P>	<DT><B>　●OREG0</B>
+		<DD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>OREG0    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>20100021H</TH><TD>STE</TD><TD>RESD</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD></TR>
+</TABLE></P>
+
+<P><TABLE BORDER=1>
+<TR><TH>ビット７</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+<TR><TH>STE</TH></TR>
+<TR><TH>0</TH><TD>SMPCコールドリセット後SETTIMEされていない　<B>注1</B></TD></TR>
+<TR><TH>1</TH><TD>SMPCコールドリセット後SETTIMEされている　<B>注1</B></TD></TR>
+</TABLE></P>
+
+<P><TABLE BORDER=1>
+<TR><TH>ビット６</TH><TH ROWSPAN=2>　　　　　説　明　　　　　</TH></TR>
+<TR><TH>RESD</TH></TR>
+<TR><TH>0</TH><TD>リセットイネーブル</TD></TR>
+<TR><TH>1</TH><TD>リセットディセーブル(デフォルト)</TD></TR>
+</TABLE></P>
+
+<A NAME="c2_01_cold"></A>
+	<P>	<DD><B>注1</B>
+		<DD>SMPCコールドリセットは、以下の条件で発生します
+		<DD><OL>
+		<LI>セガサターン背面電池ボックス内リセットスイッチを押したとき
+		<LI>バッテリ未装着時または消耗時に主電源を投入(ON)したとき
+		<LI>電源OFF中に電池が投入されたとき</OL></P>
+
+<A NAME="c2_01_oreg1"></A>
+	<P>	<DT><B>　●OREG1,OREG2,OREG3</B>
+		<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>　</TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>OREG1</TH><TH>20100023H</TH><TD COLSPAN=4>西暦年号千位(BCD)</TD><TD COLSPAN=4>西暦年号百位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG2</TH><TH>20100025H</TH><TD COLSPAN=4>西暦年号十位(BCD)</TD><TD COLSPAN=4>西暦年号一位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG3</TH><TH>20100027H</TH><TD COLSPAN=4>曜日(16進)　<B>注2</B></TD><TD COLSPAN=4>月(16進)　<B>注3</B></TD></TR>
+</TABLE></P>
+
+	<P>	<DD><B>注2</B>
+		<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>曜日</TH><TH>日曜</TH><TH>月曜</TH><TH>火曜</TH><TH>水曜</TH><TH>木曜</TH><TH>金曜</TH><TH>土曜</TH></TR>
+<TR ALIGN=CENTER><TH>　値　</TH><TD>0H</TD><TD>1H</TD><TD>2H</TD><TD>3H</TD><TD>4H</TD><TD>5H</TD><TD>6H</TD></TR>
+</TABLE></P>
+
+	<P>	<DD><B>注3</B>
+		<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>　月　</TH><TH>１月</TH><TH>２月</TH><TH>３月</TH><TH>４月</TH><TH>５月</TH><TH>６月</TH><TH>７月</TH><TH>８月</TH><TH>９月</TH><TH>10月</TH><TH>11月</TH><TH>12月</TH></TR>
+<TR ALIGN=CENTER><TH>　値　</TH><TD>1H</TD><TD>2H</TD><TD>3H</TD><TD>4H</TD><TD>5H</TD><TD>6H</TD><TD>7H</TD><TD>8H</TD><TD>9H</TD><TD>AH</TD><TD>BH</TD><TD>CH</TD></TR>
+</TABLE></P>
+
+<A NAME="c2_01_oreg4"></A>
+	<P>	<DT><B>　●OREG4,OREG5,OREG6,OREG7,OREG8</B>
+		<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>　</TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>OREG4</TH><TH>20100029H</TH><TD COLSPAN=4>日十位(BCD)</TD><TD COLSPAN=4>日一位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG5</TH><TH>2010002BH</TH><TD COLSPAN=4>時十位(BCD)</TD><TD COLSPAN=4>時一位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG6</TH><TH>2010002DH</TH><TD COLSPAN=4>分十位(BCD)</TD><TD COLSPAN=4>分一位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG7</TH><TH>2010002FH</TH><TD COLSPAN=4>秒十位(BCD)</TD><TD COLSPAN=4>秒一位(BCD)</TD></TR>
+<TR ALIGN=CENTER><TH>OREG8</TH><TH>20100031H</TH><TD>０</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>CTG1</TD><TD>CTG0</TD></TR>
+</TABLE>
+	<DD><B>CTG0:</B>カートリッジコード0
+	<DD><B>CTG1:</B>カートリッジコード1</P>
+
+<A NAME="c2_01_oreg9">
+	<P>	<DT><B>　●OREG9</B>
+		<DD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>OREG9    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>20100033H</TH><TD COLSPAN=8>エリアコード(00H〜0FH)</TD></TR>
+</TABLE></P>
+
+	<P><DD><TABLE BORDER=1>
+<TR><TH>コード</TH><TH>地　域</TH><TH>主　な　国　名　等</TH></TR>
+<TR><TD ALIGN=CENTER>0H</TD><TD>使用禁止 </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER><B>1H</B></TD><TD><B>日本地域 </B></TD><TD><B>日本 </B></TD></TR>
+<TR><TD ALIGN=CENTER><B>2H</B></TD><TD><B>アジアNTSC地域 </B></TD><TD><B>台湾、韓国、フィリピン </B></TD></TR>
+<TR><TD ALIGN=CENTER>3H</TD><TD>SEGA RESERVED </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER><B>4H</B></TD><TD><B>北米地域 </B></TD><TD><B>アメリカ合衆国、カナダ 、中南米NTSC地域(ブラジルのみ)</B></TD></TR>
+<TR><TD ALIGN=CENTER>5H</TD><TD>SEGA RESERVED </TD><TD>　</TD></TR>
+<TR><TD ALIGN=CENTER>6H</TD><TD>SEGA RESERVED </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER>7H</TD><TD>SEGA RESERVED </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER>8H</TD><TD>SEGA RESERVED </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER>9H</TD><TD>SEGA RESERVED </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER>AH</TD><TD>SEGA RESERVED </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER>BH</TD><TD>SEGA RESERVED </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER><B>CH</B></TD><TD><B>欧州PAL地域 </B></TD><TD><B>欧州、オーストラリア、南アフリカ、中南米PAL地域 </B></TD></TR>
+<TR><TD ALIGN=CENTER>DH</TD><TD>SEGA RESERVED </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER>EH</TD><TD>SEGA RESERVED </TD><TD>　 </TD></TR>
+<TR><TD ALIGN=CENTER>FH</TD><TD>使用禁止 </TD><TD>　 </TD></TR>
+</TABLE></P>
+
+	<P>	<DT><B>　●OREG10</B>
+		<DD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>OREG10    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>20100035H</TH>
+<TD>0</TD>
+<TD>DOTSEL</TD>
+<TD>1</TD>
+<TD>1</TD>
+<TD>MSHNMI</TD>
+<TD>1</TD>
+<TD>SYSRES</TD>
+<TD>SNDRES</TD>
+</TABLE></P>
+
+	<P>	<DD>・システムステータス１(SMPCから出力される各コントロール信号の状態　<B>0:OFF　1:ON</B>)
+		<DD>・<B>DOTSEL信号</B>は、現在の画面モード(水平解像度)を示す。　(<B>0:320　1:352</B>)</P>
+
+	<P>	<DT><B>　●OREG11</B>
+		<DD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>OREG11    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>20100037H</TH>
+<TD>−</TD>
+<TD>CDRES</TD>
+<TD>−</TD>
+<TD>−</TD>
+<TD>−</TD>
+<TD>−</TD>
+<TD>−</TD>
+<TD>−</TD>
+</TABLE></P>
+
+	<P>	<DD>・システムステータス２(SMPCから出力される各コントロール信号の状態　<B>0:OFF　1:ON</B>)
+		<DD>・"<B>−</B>"は、RESERVEDです。</P>
+
+	<P>	<DT><B>　●OREG12,OREG13,OREG14,OREG15</B>
+		<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>　</TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>OREG12</TH><TH>20100039H</TH><TD COLSPAN=8>SMEM1保持データ</TD></TR>
+<TR ALIGN=CENTER><TH>OREG13</TH><TH>2010003BH</TH><TD COLSPAN=8>SMEM2保持データ</TD></TR>
+<TR ALIGN=CENTER><TH>OREG14</TH><TH>2010003DH</TH><TD COLSPAN=8>SMEM3保持データ</TD></TR>
+<TR ALIGN=CENTER><TH>OREG15</TH><TH>2010003FH</TH><TD COLSPAN=8>SMEM4保持データ</TD></TR>
+</TABLE>
+
+
+	<P>	<DT><B>　●OREG31</B>
+		<DD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>OREG31    </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>2010005FH</TH><TD>０</TD><TD>０</TD><TD>０</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>０</TD></TR>
+</TABLE></P>
+
+	<P>	<DD>注意：ペリフェラルのデータで、コマンドコード(OREG31)が上書される場合があります。</P>
+
+	<P>	<DT><B>備考</B>
+	<P>	<DT><B>　■INTBACKコマンドの使用方法</B>
+		<DD>SMPCステータスを取得するとくのINTBACKコマンドの使用方法について説明します。<BR>
+INTBACKコマンドには以下の3つ使用方法があります。</P>
+
+	<P>	<DD><OL>
+		<LI>SMPCステータスのみ取得する
+		<LI>SMPCステータス取得に続いて、ペリフェラルデータを取得する
+		<LI>ペリフェラルデータのみ取得する</OL></P>
+
+	<P>	<DD>本章では、SMPCステータス取得を中心に説明をすすめます。ここでは、<B>1.</B>および<B>2.</B>のステータス取得までを説明し<B>3.</B>に関しては、第3章にて説明します。</P>
+
+	<P>	<DT><B>　１．SMPCステータスのみ取得する方法</B>
+		<DD>ステータスのみ取得する際には、コマンドパラメータを以下のように設定しINTBACKコマンドを発行します。</P>
+
+	<P>	<DT><B>　　IREG0　設定値=01H</B>
+		<DD>・日時、カートリッジコード、エリアコード、端子状態、SMEM、リセットボタンモードの各データを返す 
+
+	<P>	<DT><B>　　IREG1　設定値=00H</B>
+		<DD>・端子2モード(P2MD1,P2MD0)=00B→15バイトモード
+		<DD>・端子1モード(P1MD1,P1MD0)=00B→15バイトモード
+ 		<DD>・ペリフェラルデータイネーブル(PEN)=0B→ペリフェラルデータを返さない
+		<DD>・ペリフェラル取得時間の最適化(OPE)=0B→最適化をおこなう</P>
+
+	<P>	<DT><B>　　IREG2　設定値=F0H</B>
+		<DD>・無条件にF0Hを設定してください</P>
+
+	<P>	<DD>上記設定により、SFがクリアされ、INTBACKコマンドが終了し、リザルトパラメータを取得します。
+また、コマンド終了時にSMPC割り込みを要求します。実行時間は、最少TBD〜最大TBDとなります。</P>
+
+	<P>	<DT><B>　２．SMPCステータス取得に続いて、ペリフェラルデータを取得する方法</B>
+		<DD>SMPCステータス取得に続いて、ペリフェラルデータを取得する際には、コマンドパラメータを以下のように設定しINTBACKコマンドを発行します。
+IREG1の設定値は、アプリケーション側で希望する値に設定可能です。</P>
+
+	<P>	<DT><B>　　IREG0　設定値=01H</B>
+		<DD>・日時、カートリッジコード、エリアコード、端子状態、SMEM、リセットボタンモードの各データを返す 
+
+	<P>	<DT><B>　　IREG1　設定値=08H</B>
+		<DD>・端子2モード(P2MD1,P2MD0)=00B→15バイトモード
+		<DD>・端子1モード(P1MD1,P1MD0)=00B→15バイトモード
+ 		<DD>・ペリフェラルデータイネーブル(PEN)=1B→ペリフェラルデータを返す
+		<DD>・ペリフェラル取得時間の最適化(OPE)=0B→最適化をおこなう</P>
+
+	<P>	<DT><B>　　IREG2　設定値=F0H</B>
+		<DD>・無条件にF0Hを設定してください</P>
+
+	<P>	<DD>上記設定により、SMPCはコマンドを実行しリザルトパラメータを設定した時点でSMPC割り込みを要求します。<BR>
+SMPC割り込みを要求した時点では、SFは、"1"となっています。コマンド発行からリザルトパラメータ設定完了まで時間は、最少TBD〜最大TBDとなります。<BR>
+ステータスに関するリザルトパラメータ取得後、IREG0のビット7を反転することでSMPCは、コンティニューとみなし、ペリフェラルデータ取得へと続きます。</P>
+
+	<P>	<DD>この方法は、毎フレーム各種ステータスとペリフェラルデータを取得するアプリケーションに有効な手段となります。</P>
+</DL>
+
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="c2_02"><HR></A>
+<!-- --------------------------------------------------------------------------------- -->
+<B><a href="p02_10_j.htm#t2_2">一覧表</A>
+|▲<A HREF="#c2_01">戻る</A>
+|  <a href="p02_50_j.htm#c3_01">次へ</A>▼</B>
+<DL>
+	<P>	<DT>No.2
+		<DT><H1>SETSMEM</H1>
+		<DD><H2>SMPCメモリ設定</H2></P>
+
+	<P>	<DT><PRE>
+<B>コマンドコード　</B>17H
+<B>ＳＭＰＣ割込　　</B>発生不可
+<B>ＩＲＥＧ　　　　</B>0〜3
+<B>ＯＲＥＧ　　　　</B>31
+<B>実行時間　　　　</B>max=xxx
+<B>　　　　　　　　</B>min=40μsec
+</PRE></P>
+
+	<P>	<DT><B>機能内容</B>
+		<DD>SMPCは、4バイトのバッテリバックアップ可能なメモリ(SMEM)を用意しています。本コマンドは、SMEMへのデータを設定します。</P>
+
+	<P>	<DT><B>コマンドパラメータ</B>
+		<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>　</TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>OREG0</TH><TH>20100001H</TH><TD COLSPAN=8>SMEM1へのデータ設定</TD></TR>
+<TR ALIGN=CENTER><TH>OREG1</TH><TH>20100003H</TH><TD COLSPAN=8>SMEM2へのデータ設定</TD></TR>
+<TR ALIGN=CENTER><TH>OREG2</TH><TH>20100005H</TH><TD COLSPAN=8>SMEM3へのデータ設定</TD></TR>
+<TR ALIGN=CENTER><TH>OREG3</TH><TH>20100007H</TH><TD COLSPAN=8>SMEM4へのデータ設定</TD></TR>
+</TABLE></P>
+
+	<P>	<DT><B>リザルトパラメータ</B>
+		<DD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH>OREG31   </TH><TH>bit７</TH><TH>bit６</TH><TH>bit５</TH><TH>bit４</TH><TH>bit３</TH><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TH>2010005FH</TH><TD>０</TD><TD>０</TD><TD>０</TD><TD>１</TD><TD>０</TD><TD>１</TD><TD>１</TD><TD>１</TD></TR>
+</TABLE></P>
+
+	<P>	<DT><B>備考</B>
+		<DD>●SMEMの内容はSMPCコールドリセット時に０クリアされます。
+	<P>	<DD>SMPCコールドリセットは、以下の条件で発生します
+		<DD><OL>
+		<LI>セガサターン背面電池ボックス内リセットスイッチを押したとき
+		<LI>バッテリ未装着時または消耗時に主電源を投入(ON)したとき
+		<LI>電源OFF中に電池が投入されたとき</OL></P>
+
+	<P>	<DD>●SETEMEMコマンドでは4バイト同時に設定されます。内容を更新する際はINTBACKコマンドにより現在保持しているデータをリード、デモファイライトしてください。</P>
+ 
+	<P>	<DD>●SETEMEMコマンド発行中に電源が切断(OFF)されると、</P>
+	<P>	<DD><OL>
+		<LI>SETSMEMコマンドの内部処理が電源OFFシーケンスより先に実行できた場合は、全データが更新されます。
+		<LI>電源OFFシーケンスが先に実行された場合は、コマンド発行前のデータが保持されます。</OL></P>
+</DL>
+
+<HR NOSHADE>
+<B>▲<a href="p02_30_j.htm">戻る</A>｜
+     <a href="p02_50_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

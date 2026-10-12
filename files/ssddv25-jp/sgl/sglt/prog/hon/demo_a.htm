@@ -1,0 +1,143 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/30&gt;SGL Programmer's Tutorial/デモプログラムＡ</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<A HREF="p04_10.htm">戻る</A>｜<A HREF="p05_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PROGRAMMER'S TUTORIAL</B>
+<H2 ALIGN=CENTER>デモプログラムＡ</H2>
+<H3 ALIGN=CENTER>Bounding Cube</H3>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　ここで、現在までの流れを総括する意味で、現在までに登場した関数群を用いた、ポリゴンを表示する少し複雑なプログラムを紹介します。</P>
+
+	<P>	<DD>　これまでに、次のことについて解説してきました。
+		<DD>
+<PRE>
+描画          ：ポリゴンの定義　（第2章）
+光源          ： 光源の設定と光源によるポリゴン面の変化 （第3章）
+座標系        ：セガサターンにおける座標系　（第4章）
+モデリング変換：オブジェクトの回転、移動、拡大縮小など　（第4章）
+描画領域      ：ウィンドウ及びクリッピング（第4章）
+</PRE></P>
+
+	<P>	<DD>　これらは、３Ｄグラフィックスにおいて、ハードウェアによらず、比較的共通した考え方です（もちろん使用する関数は異なりますが・・・）。<BR>
+		これらを理解した上で、次章以降を読み進めてください。<BR>
+		次章以降は、セガサターン特有の考え方や特殊な機能の説明が主となります。</P>
+
+	<P>	<DD>　デモプログラム“demo_A”は、描画から座標変換までに登場したＳＧＬライブラリ関数を複合的に使用したものです。<BR>
+		デモでは、全ての面が内側を向いた（外側から見た場合描画されない）立方体ポリゴンで表現された部屋の中を、小さな立方体ポリゴンが跳ね回るというものです。<BR>
+		部屋と小さな立方体との衝突判定は、簡単な条件分岐（ＸＹＺ座標値）で処理してあります。</P>
+
+<A NAME="za_1"></A>
+	<P ALIGN=CENTER><H4>図 A-1　デモＡの動作イメージ</H4><BR>
+	<IMG SRC="../grp/pd_a_1.gif"></P>
+
+<A NAME="la_1"></A>
+	<P>	<DD><H4>リスト A-1　demo_A：デモプログラムＡ</H4>
+		<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Cube Action							*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+#define		REFLECT_EXTENT		toFIXED(85.0)
+#define		XSPD			toFIXED(1.5)
+#define		YSPD			toFIXED(2.0)
+#define		ZSPD			toFIXED(3.0)
+
+extern PDATA PD_PLANE1, PD_PLANE2;
+
+void ss_main(void)
+{
+	static ANGLE ang1[XYZ], ang2[XYZ];
+	static FIXED pos1[XYZ], pos2[XYZ], delta[XYZ], light[XYZ];
+
+	slInitSystem(TV_320x224, NULL, 1);
+	slPrint("demo A", slLocate(9,2));
+
+	ang1[X] = ang1[Y] = ang1[Z] = DEGtoANG(0.0);
+	ang2[X] = ang2[Y] = ang2[Z] = DEGtoANG(0.0);
+	pos1[X] = pos2[X] = toFIXED(  0.0);
+	pos1[Y] = pos2[Y] = toFIXED(  0.0);
+	pos1[Z] = pos2[Z] = toFIXED(100.0);
+	delta[X] = XSPD, delta[Y] = YSPD, delta[Z] = ZSPD;
+	light[X] = slSin(DEGtoANG( 30.0));
+	light[Y] = slCos(DEGtoANG( 30.0));
+	light[Z] = slSin(DEGtoANG(-30.0));
+
+	while(-1){
+		slLight(light);
+		slPushMatrix();
+		{
+			slTranslate(pos1[X], pos1[Y], pos1[Z] + toFIXED(270.0));
+
+			pos1[X] += delta[X];
+			pos1[Y] += delta[Y];
+			pos1[Z] += delta[Z];
+
+			if(pos1[X] &gt; REFLECT_EXTENT){
+				delta[X] = -XSPD, pos1[X] -= XSPD;
+			} else if(pos1[X] &lt; -REFLECT_EXTENT){
+				delta[X] = XSPD, pos1[X] += XSPD;
+			}
+			if(pos1[Y] &gt; REFLECT_EXTENT){
+				delta[Y] = -YSPD, pos1[Y] -= YSPD;
+			} else if(pos1[Y] &lt; -REFLECT_EXTENT){
+				delta[Y] = YSPD, pos1[Y] += YSPD;
+			}
+			if(pos1[Z] &gt; REFLECT_EXTENT){
+				delta[Z] = -ZSPD, pos1[Z] -= ZSPD;
+			} else if(pos1[Z] &lt; -REFLECT_EXTENT){
+				delta[Z] = ZSPD, pos1[Z] += ZSPD;
+			}
+
+			slRotX(ang1[X]);
+			slRotY(ang1[Y]);
+			slRotZ(ang1[Z]);
+			ang1[X] += DEGtoANG(3.0);
+			ang1[Y] += DEGtoANG(5.0);
+			ang1[Z] += DEGtoANG(3.0);
+			slPutPolygon(&PD_PLANE1);
+		}
+		slPopMatrix();
+		
+		slPushMatrix();
+		{
+			slTranslate(pos2[X], pos2[Y], pos2[Z] + toFIXED(170.0));
+			slRotY(ang2[Y]);
+			slRotX(ang2[X]);
+			slRotZ(ang2[Z]);
+			slPutPolygon(&PD_PLANE2);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+</PRE>
+
+<A NAME="fa_1"></A>
+	<P ALIGN=CENTER><H4>フロー A-1　sample_1_6：デモプログラムＡのフローチャート</H4><BR>
+	<IMG SRC="../grp/pd_a_3.gif"></P>
+
+	<P>	<DD>　次章からは、階層マトリクスを始め、更に踏み入った内容の解説を行います。<BR>
+		特にスタックを用いた階層構造の考え方は３Ｄグラフィックスにおいて重要なファクターですので、熟読し、あるいは専門書なども参考にして、理解するようにしてください。</P>
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p04_10.htm">戻る</A>｜<A HREF="p05_10.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

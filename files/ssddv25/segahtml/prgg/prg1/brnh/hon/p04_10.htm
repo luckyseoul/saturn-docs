@@ -1,0 +1,46 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 8&gt; Branch playback library/4. File arrangement on disk</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no">Branch playback library</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Branch playback library</b><H2 ALIGN=CENTER> 4. File arrangement on disk</H2><HR NOSHADE>
+<DL>
+<P><DD> The total number of streams that can be read ahead is up to the CD buffer capacity (up to 200 sectors). Therefore, if a stream cannot be prefetched because its capacity has been exceeded, it will not be possible to branch without delay.</P>
+<P><DT> <B>(1) Non-interleaving of branch candidates</b><!-- *** Update by CRI ：1.4 -->
+<DD> If the branch candidates for A are B and C, and the file arrangement on the disk is as shown in Figure 4.1, then B is the only file that can be read ahead.<BR>
+ There is no problem if it is enough to seek and branch to B and C just by reading ahead of A. However, if it is necessary to read ahead of both B and C in order to further delay the branch selection timing, in this example, it will not be possible to branch to C without delay.</P>
+<A NAME="z4_1"></A><P ALIGN=CENTER> <B>Figure 4.1 Non-interleaving of branch candidates (cannot read ahead in C)</b><BR>
+<img srcset="../grp/i008_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(2) Overall interleaving of branch candidates</b><DD> To branch to B and C without delay after playing A, there is a method to interleave and place B and C next to A, as shown in Figure 4.2.</P>
+<A NAME="z4_2"></A><P ALIGN=CENTER> <B>Figure 4.2 Overall interleaving of branch candidates (all of B and C)</b><BR>
+<img srcset="../grp/i008_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>(3) Partial interleaving of branch candidates</b><DD> As shown in Figure 4.3, there is also a method of dividing B into B1 and B2 and C into C1 and C2, and interleaving and arranging only B1 and C1.<BR>
+ In this case, it is only necessary to interleave part of B and C (B1 and C1), and it is possible to seek to B2 and C2, increasing independence. However, you will need to split the file.</P>
+<A NAME="z4_3"></A><P ALIGN=CENTER> <B>Figure 4.3 Partial interleaving of branch candidates (parts of B and C)</b><BR>
+<img srcset="../grp/i008_03.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no">Branch playback library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

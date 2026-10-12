@@ -1,0 +1,67 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;18/31&gt;SCU User's Manual/4.DSP Control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p04_02.htm">Back</a> ｜ <A HREF="p04_04.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 4 DSP Control</b><HR NOSHADE>
+<A NAME="4_30"></A><H2> ■4.3 Operand execution method</H2><P> The DSP actually controls and executes the registers in this way for the following instructions.</P>
+<DL>
+<A NAME="4_31"></A><P><DT><H3> ◆Execution of JUMP instruction</H3><DD> This is achieved by storing the jump destination address (Immediate Data) in the program RAM address of the program control port. However, please note that prefetched instructions will be executed. A conditional JUMP instruction first checks the state of the flag on the program control port, and if the condition is met, stores the jump destination address in the program RAM address of the program control port. For the format of the instruction, refer to the JUMP instruction part in Section 4.5 "Instructions". Figure 4.2 shows the JUMP instruction execution flow.</P>
+<A NAME="z4_2"></A><P ALIGN=CENTER> <B>Figure 4.2 Executing the JUMP instruction</b><BR>
+<img srcset="../grp/i085_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="4_32"></A><P><DT><H3> ◆Executing the LOOP program</H3><DD> The program between the address specified by the top address register ([TOP]) and the DSP BTM instruction (see Section 4.5 "Instructions", LOOP BOTTOM instruction) is repeated the number of times specified by the loop counter ([LOP]). It will be executed. Therefore, in order to implement this process, set values in the top address register and loop counter in advance before executing it. Values can be set using the DSP's Load immediate instruction (see Section 4.5 "Instructions", Load immediate instruction). Figure 4.3 shows the execution flow of the LOOP program.</P>
+<A NAME="z4_3"></A><P ALIGN=CENTER> <B>Figure 4.3 Executing the LOOP program</b><BR>
+<img srcset="../grp/i086_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="4_33"></A><P><DT><H3> ◆Execution of DMA instructions</H3><DD> This section explains the process of setting the DMA controller registers from the DSP and actually performing DMA transfer. DMA instructions are divided into the following two types depending on the transfer direction (read/write).</P>
+<P><DD><OL>
+<B><LI></b> Data transfer from D0 bus to DSP<B><LI></b> Data transfer from DSP to D0 bus</OL>
+</P>
+<A NAME="4_33_0"></A><P><DD><H4> ●Data transfer from D0 bus to DSP</H4><DD> The DSP data RAM transfer start address and external memory transfer start address are set in the registers ([CT0-3] and [RA0]), and the transfer is started by the DMA instruction. The instruction format up to the DMA instruction is as follows.<BR>
+ For details, see Section 4.5 " <A HREF="p04_05.htm">Instruction Details</a> ".</P>
+<P><DD><PRE>
+MOV SImm,[CT0]     ; DSP data RAM0 transfer start address set
+MVI Imm,[RA0]      ; External memory transfer start address set
+DMA D0,[MD0],SImm  ; Start DMA transfer using D0 bus
+</PRE></P>
+<P><DD> Table 4.6 summarizes the characteristics of this DMA transfer. DMA transfer is executed in longword units, so set the number of transfer words (SImm of the DMA instruction above) in longword units.</P>
+<A NAME="t4_1"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 4.1 Characteristics of data transfer from D0 bus to DSP</b></CAPTION>
+<TD ALIGN="CENTER"><PRE> Item</TD><TD ALIGN="CENTER"><PRE> Features</TD><TR><TD ALIGN="CENTER"><PRE> set of flags</TD><TD ALIGN="LEFT"><PRE> The program control port TO flag is set.</TD><TR><TD ALIGN="CENTER"><PRE> Startup and termination</TD><TD ALIGN="LEFT"><PRE> Follows external data ready signal. With this signal, in units of 1 longword<BR> be transferred. Also, the DMA transfer is terminated by an external end signal, and this timing<BR> The TO flag of the program control port is reset when</TD><TR><TD ALIGN="CENTER"><PRE> Address update</TD><TD ALIGN="LEFT"><PRE> Every time one longword is transferred, the DSP data RAM transfer address ([CTO-3]) is incremented by one.<BR> The external memory transfer address ([RA0]) is added according to the address addition number.<BR> Ru.</TD><TR><TD ALIGN="CENTER"><PRE> Hold state</TD><TD ALIGN="LEFT"><PRE> Setting the Hold bit of a DMA instruction (see Section 4.5 “Instructions” DMA instruction section) to 1 causes<BR> The number of transfer words ([TN0]) and external memory transfer address ([RA0]) retain their values at the start of transfer.<BR> held.</TD></TABLE>
+</P>
+<A NAME="4_33_1"></A><P><DD><H4> ●Data transfer from DSP to D0 bus</H4><DD> The DSP data RAM transfer start address and external memory transfer start address are set in the registers ([CT0-3] and [WA0]), and the transfer is started by the DMA instruction. The instruction format up to the DMA instruction is as follows. For details, see Section 4.5 " <A HREF="p04_05.htm">Instruction Details</a> ".</P>
+<P><PRE>
+MOV SImm,[CT0]     ; DSP data RAM0 transfer start address set
+MVI Imm,[WA0]      ; External memory transfer start address set
+DMA [MD0],D0,SImm  ; Start DMA transfer using D0 bus</PRE></P>
+<P><DD> Table 4.7 summarizes the characteristics of this DMA transfer. DMA transfer is executed in longword units, so set the number of transfer words (SImm of the DMA instruction above) in longword units.</P>
+<A NAME="t4_2"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 4.2 Characteristics of data transfer from DSP to D0 bus</b></CAPTION>
+<TD ALIGN="CENTER"><PRE> Item</TD><TD ALIGN="CENTER"><PRE> Features</TD><TR><TD ALIGN="CENTER"><PRE> set of flags</TD><TD ALIGN="LEFT"><PRE> The program control port TO flag is set.</TD><TR><TD ALIGN="CENTER"><PRE> Startup and termination</TD><TD ALIGN="LEFT"><PRE> Follows external data ready signal. With this signal, in units of 1 longword<BR> be transferred. Also, the DMA transfer is terminated by an external end signal, and this timing<BR> The TO flag of the program control port is reset when</TD><TR><TD ALIGN="CENTER"><PRE> Address update</TD><TD ALIGN="LEFT"><PRE> Every time one longword is transferred, the DSP data RAM transfer address ([CTO-3]) is incremented by one.<BR> The external memory transfer address ([WAO]) is added according to the number of address additions.<BR> Ru.</TD><TR><TD ALIGN="CENTER"><PRE> Hold state</TD><TD ALIGN="LEFT"><PRE> Setting the Hold bit of a DMA instruction (see Section 4.5 “Instructions” DMA instruction section) to 1 causes<BR> The number of transfer words ([TN0]) and external memory transfer address ([WA0]) retain their values at the start of transfer.<BR> held.</TD></TABLE>
+</P>
+<A NAME="4_34"></A><P><DT><H3> ◆Execution of END command</H3><DD> When the END instruction is recognized, addition processing of the program RAM address of the program control port is stopped and the program execution control bit (EX flag) is reset. This will stop the DSP's program execution. However, data transfer using the DMA instruction continues to be executed until the transfer is completed, regardless of this END instruction. When the program stops, the program address value will stop at the address following the address where the END instruction is stored.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_02.htm">Back</a> ｜ <A HREF="p04_04.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

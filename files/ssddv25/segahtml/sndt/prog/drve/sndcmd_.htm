@@ -1,0 +1,408 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/17&gt; Sound driver Ver2.10 guide/sound control command details</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no3">Sound Driver Programmer's Guide</a><HR>
+ <B>▲ <A HREF="sndcmd0.htm">Back</a> ｜ <A HREF="sndrequ.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound Driver Programmer's Guide</b><H2 ALIGN=CENTER> Sound control command details</H2><HR NOSHADE>
+<A NAME="01"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> ■ <A HREF="#02">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●01H SEQUENCE START</font></b> Song and sound effects start playing</dl>
+<dl compact>
+<dt> P1<dd> Pronunciation control number (0-7)<p><dt> P2<dd> Sequence data bank number (0-15) If there are multiple sequence banks (sequence data storage areas) in the current area map, this is a number to distinguish between them. One area map can have up to 16 sequence banks, so the value will be between 0 and 15.<p><dt> P3<dd> Song number in sequence data (0-127) Multiple song data can be stored in one sequence data, so specify the number of song data in the sequence data. A maximum of 128 songs can be stored in one sequence data, so the value will be any value from 0 to 127. It is always 0 if there is only one song data.<p></dl>
+<A NAME="02"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#01">▲</a> <A HREF="#03">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●02H SEQUENCE STOP</font></b> Stop playing songs and sound effects</dl>
+<dl compact>
+<dt> P1<dd> Pronunciation control number (0-7)<p><dt> P2<dd> Termination mode bit7=H ---> with release off (Support to be determined)<p></dl>
+<dd> Pausing songs and sound effects</dl>
+<dl compact>
+<dt> P1<dd> Pronunciation control number (0-7)</dl>
+<A NAME="03"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#02">▲</a> <A HREF="#04">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●03H PAUSE</font></b> Pause of songs and sound effects</dl>
+<dl compact>
+<dt> P1<dd> Pronunciation control number (0-7)</dl>
+<A NAME="04"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#03">▲</a> <A HREF="#05">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●04H PAUSE OFF</font></b> Cancels the pause of songs and sound effects.</dl>
+<dl compact>
+<dt> P1<dd> Pronunciation control number (0-7)<p></dl>
+<A NAME="05"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#04">▲</a> <A HREF="#06">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●05H SEQUENCE VOLUME</font></b> Volume adjustment or fade in/out</dl>
+<dl compact>
+<dt> P1<dd> Pronunciation control number (0-7)<p><dt> P2<dd> Volume (0-255) Around 128, the higher the value, the louder the volume. Previously, the default was 127, and the volume could only be lowered, but from Ver-2.00 onwards, it is possible to increase the volume higher than the sampled volume. However, be careful as setting an extremely large value may cause distortion.<p><dt> P3<dd> Fade Rate (0-255) Specify the time it takes for the current sequence volume to reach the specified sequence volume as a rate (0-255). The larger the value, the slower the change, with 255 being the longest and 1 being the shortest. (If it is 0, there will be no fade and only the sequence volume will be set.) The fade will be performed from the current sequence volume to the specified sequence volume. Fade-in or fade-out is determined by whether the specified sequence volume is larger or smaller than the current sequence volume.<p></dl>
+<A NAME="06"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#05">▲</a> <A HREF="#07">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●06H STOP ALLStop</font></b> all performances</dl>
+<dl compact>
+<dt><dd> No parameters<p></dl>
+<A NAME="07"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#06">▲</a> <A HREF="#08">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●07H TEMPO CHANGE</font></b> Change the tempo of songs and sound effects</dl>
+<dl compact>
+<dt> P1<dd> Pronunciation control number (0-7)<p><dt> P2<dd> dummy (exists to place P3 and P4 at even addresses)<p><dt> P3-P4<dd> Tempo value (+32767 --> -32768) Relative tempo value to the standard tempo value (0000h). The tempo will double every 1000h (4096), and if it is negative, the tempo will be halved. In other words, you can control the time until the tempo doubles (or halves) with 4096 steps of precision. Since 0 is the standard tempo, you can return to the original tempo at any time by specifying 0000h.<p></dl>
+<A NAME="08"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#07">▲</a> <A HREF="#09">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●08H MAP CHANGE</font></b> Perform a map change</dl>
+<dl compact>
+<dt> P1<dd> Area map number (0-255) This is a sequential area map number that specifies the number of area maps from the beginning within the sound area map.<p></dl>
+ There are many scenes in the game, and the area maps are usually different from each other. Therefore, you must specify an area map before playing a sequence. Select the desired area map from the sound area maps and change the map. After the map change is completed, the sound data will be transferred according to the map. Preparations for sequence playback are now complete.<p> Be sure to change the map at least once after starting the sound driver. From now on, you will have to do this every time the area map changes. Please follow steps 1 to 6 below to change the map.<p> How to change map<table border width="100%">
+<tr align="center"><th> order</th><th> Processing content</th><th> explanation</th></tr>
+<tr><td align="center"> 1</td><td> stop all pronunciations</td><td> Issue the “Sound Initial (10h)” command. Specify all sound stops and all initializations with parameters.</td></tr>
+<tr><td align="center"> 2</td><td> Switch area map</td><td> Issue the "Map Change (08h)" command. In the parameter, specify the number of the area map you want to switch to.</td></tr>
+<tr><td align="center"> 3</td><td> Transfer sound data</td><td> Transfer sound data from SH address 25A0B000. If you have sound data divided into multiple files, transfer each data according to the area map.</td></tr>
+<tr><td align="center"> 4</td><td> Notify transfer completion</td><td> Set all the transferred bits of the sound area map CRNT work (from SH address 25A00500h) to "1" for the amount of data that has been transferred.</td></tr>
+<tr><td align="center"> 5</td><td> Set DSP</td><td> Issue the "Effect Change (83h)" command if necessary.</td></tr>
+<tr><td align="center"> 6</td><td> Set up the mixer</td><td> Issue the "Mixer Change (87h)" command. Be sure to set the mixer even if you are not using DSP.</td></tr>
+</table>
+<p> As long as the map change is complete, you can play the sequence at any time. To play a sequence, issue a sound control command (sequence start, sequence stop, etc.) to control sequence playback.<p><note role="caution">
+ Note 1: If you switch the area map or replace the sound data in use while the sound is still playing, the system may go out of control.</note>
+<p><note role="caution">
+ Note 2: The DSP work RAM is used for internal processing of the DSP, so the contents of this area are constantly being rewritten by the DSP while the DSP is operating. Care must be taken when changing the area map, such as changing the size or address of the DSP work RAM. If the DSP is running, the sound data transferred to the location previously used as DSP work RAM will be destroyed.</note>
+<p><A NAME="09"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#08">▲</a> <A HREF="#10">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●09H DIRECT MIDI CONTROL</font></b> Send MIDI events as commands</dl>
+<dl compact>
+<dt> P1<dd> MIDI command word (00h-FFh)<p><dt> P2<dd> MIDI channel word (00h-FFh)<p><dt> P3<dd> MIDI data 1 (00h-7Fh)<p><dt> P4<dd> MIDI data 2 (00h-7Fh)<p></dl>
+ The sound driver is a sound source that generates sounds using MIDI messages, so you can generate sounds by directly giving MIDI messages without creating sequence data. This command is an interface for that purpose, and has a message block to be given to the sound driver as a parameter.<BR>
+ The message block is a 4-byte data block consisting of a MIDI message with parameters for starting the sound, and is structured as shown below.<p><P><TABLE BORDER=1>
+<TR><TH></TH><TH> 7</TH><TH> 6</TH><TH> 5</TH><TH> 4</TH><TH> 3</TH><TH> 2</TH><TH> 1</TH><TH> 0</TH></TR>
+<TR ALIGN=CENTER><TH> 0</TH><TD COLSPAN=5> Priority level</TD><TD COLSPAN=3> CMD</TD></TR>
+<TR ALIGN=CENTER><TH> 1</TH><TD COLSPAN=3> KNo</TD><TD COLSPAN=5> MIDI Ch</TD></TR>
+<TR ALIGN=CENTER><TH> 2</TH><TD COLSPAN=8> MIDI Data #1</TD></TR>
+<TR ALIGN=CENTER><TH> 3</TH><TD COLSPAN=8> MIDI Data #2</TD></TR>
+</TABLE>
+<table border>
+<tr><td> Priority level</td><td> 0-31</td><td> Pronunciation priority at Sequence Start</td></tr>
+<tr><td> CMD</td><td> 0-7</td><td> MIDI command</td></tr>
+<tr><td> KNo</td><td> 0-7</td><td> Pronunciation control number</td></tr>
+<tr><td> MIDII Ch</td><td> 0-31</td><td> MIDI channel</td></tr>
+<tr><td> MIDI data #1</td><td> 0-127</td><td> MIDI data byte #1</td></tr>
+<tr><td> MIDI data #2</td><td> 0-127</td><td> MIDI data byte #2</td></tr>
+</table>
+<p> Correspondence with actual MIDI Event<BR>
+<table border>
+<tr><td> CMD value</td><td> Corresponding MIDI Event</td></tr>
+<tr><td> 0</td><td> (80h-8Fh) Note Off Event</td></tr>
+<tr><td> 1</td><td> (90h-9Fh) Note On Event</td></tr>
+<tr><td> 2</td><td> (A0h-AFh) After Touch</td></tr>
+<tr><td> 3</td><td> (B0h-BFh) Control Change</td></tr>
+<tr><td> 4</td><td> (C0h-CFh) Program Change</td></tr>
+<tr><td> 5</td><td> (D0h-DFh) Channel Pressure</td></tr>
+<tr><td> 6</td><td> (E0h-EFh) Pitch Wheel</td></tr>
+<tr><td> 7</td><td> (F0h-FFh) System Massage</td></tr>
+</table>
+<p> Issue the "MIDI Direct Control (09h)" command using the 4 bytes of the message block as parameters P1, P2, P3, P4. However, there are advantages and disadvantages as listed below, so please consult with your sound creator before choosing the best method.<p> Strong Points<ul>
+<li> Real-time control that is not possible with sequence data in advance is possible.<li> There is no need to create data, such as creating a sequence or compressing it.<li> Since compression and decompression processing can be omitted, no additional processing is required.</ul>
+ Cons<ul>
+<li> Although you can do everything, in some cases you may have to understand a lot of the content and create advanced programs. (It cannot be used correctly unless you know the relationship between MIDI channels and corresponding tones, DSP programs and mixer specifications, etc., so coordination with the sound creator is necessary.)</ul>
+<p><A NAME="10"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#09">▲</a> <A HREF="#11">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●0AH START VOLUME ANALYZER</font></b> Start input level analysis of Digital Audio In</dl>
+<dl compact>
+<dt><dd> no parameters<p></dl>
+<A NAME="11"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#10">▲</a> <A HREF="#12">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●0BH STOP VOLUME ANALYZER</font></b> Digital Audio In input level analysis completed</dl>
+<dl compact>
+<dt><dd> no parameters<p></dl>
+<A NAME="12"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#11">▲</a> <A HREF="#13">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●0CH DSP STOP</font></b> Stopping and initializing DSP</dl>
+<dl compact>
+<dt><dd> no parameters<p></dl>
+<A NAME="13"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#12">▲</a> <A HREF="#14">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●0DH ALL NOTE OFF</font></b> All sound stops</dl>
+<dl compact>
+<dt><dd> no parameters<p></dl>
+<note role="caution">
+ Note: This is for emergency situations, so please do not use it normally.</note>
+<p><A NAME="14"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#13">▲</a> <A HREF="#15">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●0EH SEQUENCE PAN</font></b> Control PANPOT from the game</dl>
+<dl compact>
+<dt> P1<dd> Pronunciation control number (0-7)<p><dt> P2<dd> The 7th bit is a switch. This bit instructs whether to control the sequence PAN. 0 controls the sequence PAN. If it is 1, no control will be performed. Bits 6 to 0 are the PAN data values that MIDI can take (0 to 7FH).<p></dl>
+ Details of MIDI PAN data (correspondence with SCSP PAN)<BR>
+<table border width="100%">
+<tr align="center"><td> MIDI PAN</td><td> 0</td><td> 1</td><td> 2</td><td> 3</td><td> 4</td><td> 5</td><td> 6</td><td> 7</td><td> 8</td><td> 9</td><td> A</td><td> B</td><td> C</td><td> D</td><td> E</td><td> F</td></tr>
+<tr align="center"><td> 00h - 0Fh</td><td> 1Fh</td><td> 1Fh</td><td> 1Fh</td><td> 1Fh</td><td> 1Eh</td><td> 1Eh</td><td> 1Eh</td><td> 1Eh</td><td> 1Dh</td><td> 1Dh</td><td> 1Dh</td><td> 1Dh</td><td> 1Ch</td><td> 1Ch</td><td> 1Ch</td><td> 1Ch</td></tr>
+<tr align="center"><td> 10h - 1Fh</td><td> 1Bh</td><td> 1Bh</td><td> 1Bh</td><td> 1Bh</td><td> 1Ah</td><td> 1Ah</td><td> 1Ah</td><td> 1Ah</td><td> 19h</td><td> 19h</td><td> 19h</td><td> 19h</td><td> 18h</td><td> 18h</td><td> 18h</td><td> 18h</td></tr>
+<tr align="center"><td> 20h - 2Fh</td><td> 17h</td><td> 17h</td><td> 17h</td><td> 17h</td><td> 16h</td><td> 16h</td><td> 16h</td><td> 16h</td><td> 15h</td><td> 15h</td><td> 15h</td><td> 15h</td><td> 14h</td><td> 14h</td><td> 14h</td><td> 14h</td></tr>
+<tr align="center"><td> 30h - 3Fh</td><td> 13h</td><td> 13h</td><td> 13h</td><td> 13h</td><td> 12h</td><td> 12h</td><td> 12h</td><td> 12h</td><td> 11h</td><td> 11h</td><td> 11h</td><td> 11h</td><td> 10h</td><td> 10h</td><td> 10h</td><td> 10h</td></tr>
+<tr align="center"><td> 40h - 4Fh</td><td> 00h</td><td> 00h</td><td> 00h</td><td> 00h</td><td> 01h</td><td> 01h</td><td> 01h</td><td> 01h</td><td> 02h</td><td> 02h</td><td> 02h</td><td> 02h</td><td> 03h</td><td> 03h</td><td> 03h</td><td> 03h</td></tr>
+<tr align="center"><td> 50h - 5Fh</td><td> 04h</td><td> 04h</td><td> 04h</td><td> 04h</td><td> 05h</td><td> 05h</td><td> 05h</td><td> 05h</td><td> 06h</td><td> 06h</td><td> 06h</td><td> 06h</td><td> 07h</td><td> 07h</td><td> 07h</td><td> 07h</td></tr>
+<tr align="center"><td> 60h - 6Fh</td><td> 08h</td><td> 08h</td><td> 08h</td><td> 08h</td><td> 09h</td><td> 09h</td><td> 09h</td><td> 09h</td><td> 0Ah</td><td> 0Ah</td><td> 0Ah</td><td> 0Ah</td><td> 0Bh</td><td> 0Bh</td><td> 0Bh</td><td> 0Bh</td></tr>
+<tr align="center"><td> 70h - 7Fh</td><td> 0Ch</td><td> 0Ch</td><td> 0Ch</td><td> 0Ch</td><td> 0Dh</td><td> 0Dh</td><td> 0Dh</td><td> 0Dh</td><td> 0Eh</td><td> 0Eh</td><td> 0Eh</td><td> 0Eh</td><td> 0Fh</td><td> 0Fh</td><td> 0Fh</td><td> 0Fh</td></tr>
+</table>
+<p> ○ The values in the table are SCSP PAN data (00h-1Fh: 32 steps).<BR>
+ ○ Since MIDI PAN data has 128 levels, the lower 2 bits are ignored when converting to SCSP PAN data.<p><table border>
+<tr><td><pre>
+ Left Center Right
+ 00h ←−−−−−−−→ 40h ←−−−−−−−→ 7Fh
+</pre></td></tr>
+</table>
+<p>Correspondence table between SCSP PAN and MIDI PAN<BR>
+<table border>
+<tr arign="center"><td> PAN</td><td> L (db)</td><td> R (db)</td><td> Localization</td><td></td><td> PAN</td><td> L (db)</td><td> R (db)</td><td> Localization</td></tr>
+<tr arign="center"><td> 00h</td><td> -00.0</td><td> -00.0</td><td> C</td><td></td><td> 10h</td><td> -00.0</td><td> -00.0</td><td> C</td></tr>
+<tr arign="center"><td> 01h</td><td> -03.0</td><td> -00.0</td><td> R1</td><td></td><td> 11h</td><td> -00.0</td><td> -03.0</td><td> L1</td></tr>
+<tr arign="center"><td> 02h</td><td> -06.0</td><td> -00.0</td><td> R2</td><td></td><td> 12h</td><td> -00.0</td><td> -06.0</td><td> L2</td></tr>
+<tr arign="center"><td> 03h</td><td> -09.0</td><td> -00.0</td><td> R3</td><td></td><td> 13h</td><td> -00.0</td><td> -09.0</td><td> L3</td></tr>
+<tr arign="center"><td> 04h</td><td> -12.0</td><td> -00.0</td><td> R4</td><td></td><td> 14h</td><td> -00.0</td><td> -12.0</td><td> L4</td></tr>
+<tr arign="center"><td> 05h</td><td> -15.0</td><td> -00.0</td><td> R5</td><td></td><td> 15h</td><td> -00.0</td><td> -15.0</td><td> L5</td></tr>
+<tr arign="center"><td> 06h</td><td> -18.0</td><td> -00.0</td><td> R6</td><td></td><td> 16h</td><td> -00.0</td><td> -18.0</td><td> L6</td></tr>
+<tr arign="center"><td> 07h</td><td> -21.0</td><td> -00.0</td><td> R7</td><td></td><td> 17h</td><td> -00.0</td><td> -21.0</td><td> L7</td></tr>
+<tr arign="center"><td> 08h</td><td> -24.0</td><td> -00.0</td><td> R8</td><td></td><td> 18h</td><td> -00.0</td><td> -24.0</td><td> L8</td></tr>
+<tr arign="center"><td> 09h</td><td> -27.0</td><td> -00.0</td><td> R9</td><td></td><td> 19h</td><td> -00.0</td><td> -27.0</td><td> L9</td></tr>
+<tr arign="center"><td> 0Ah</td><td> -30.0</td><td> -00.0</td><td> R10</td><td></td><td> 1Ah</td><td> -00.0</td><td> -30.0</td><td> L10</td></tr>
+<tr arign="center"><td> 0Bh</td><td> -33.0</td><td> -00.0</td><td> R11</td><td></td><td> 1Bh</td><td> -00.0</td><td> -33.0</td><td> L11</td></tr>
+<tr arign="center"><td> 0Ch</td><td> -36.0</td><td> -00.0</td><td> R12</td><td></td><td> 1Ch</td><td> -00.0</td><td> -36.0</td><td> L12</td></tr>
+<tr arign="center"><td> 0Dh</td><td> -39.0</td><td> -00.0</td><td> R13</td><td></td><td> 1Dh</td><td> -00.0</td><td> -39.0</td><td> L13</td></tr>
+<tr arign="center"><td> 0Eh</td><td> -42.0</td><td> -00.0</td><td> R14</td><td></td><td> 1Eh</td><td> -00.0</td><td> -42.0</td><td> L14</td></tr>
+<tr arign="center"><td> 0Fh</td><td> - ∞</td><td> -00.0</td><td> R15</td><td></td><td> 1Fh</td><td> -00.0</td><td> - ∞</td><td> L15</td></tr>
+</table>
+<p><A NAME="15"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#14">▲</a> <A HREF="#16">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●10H SOUND INITIALIZE</font></b> Initialize the sound driver</dl>
+<dl compact>
+<dt> P1<dd> Stop all sequence playback (0-1)<p><dt> P2<dd> Stop all PCM stream playback (0-1)<p><dt> P3<dd> Stopping CD-DA playback (0-1)<p><dt> P4<dd> DSP initialization (0-1)<p><dt> P5<dd> Mixer initialization (0-1)<p></dl>
+ * P1 to P5 are all execution instructions at 01h. Nothing is done at 00h.<p> The values of P1 to P5 of the Sound Initial (10h) command execute the corresponding process when it is 01H, and are ignored when it is any other value. This command is mainly intended to be set just before issuing a MAP change.<p> Details of P1 to P5<p><ul>
+<li type=square> The P1 execution instruction (01h) will stop all currently sounding sequences. This does not affect other sounds (PCM stream playback, CD-DA playback).<li type=square> The P2 execution instruction (01h) will stop all PCM stream playback currently in progress. This does not affect other sounds (sequence playback, CD-DA playback).<li type=square> According to the P3 execution instruction (01h), the direct components [EFSDL] and [EFPAN] of the CD-DA input components [EXTS0] and [EXTS1] are set to "00H" to turn off their output. Masu. Therefore, if the CD-DA input is processed and output using an effect, the volume will not be turned off. This does not affect other sounds (sequence playback, PCM stream playback).<p><dl compact>
+<dt><dd><table>
+<tr><td> Sound address</td><td> 100217H.b ← 00H</td></tr>
+<tr><td></td><td> 100237H.b ← 00H</td></tr>
+</table>
+</dl>
+<p><li type=square> The P4 execution instruction (01h) initializes the DSP section built in the sound source. Actually, set the following data in the DSP register to turn off the output of the effect component and prohibit the DSP from accessing (R/W) the D-RAM. The mixer will also be initialized at this time, but it will be restored. This does not affect other sounds (sequence playback, CD-DA playback, direct components of PCM stream).<dl compact>
+<dt><dd><table>
+<tr><td> [IMXL]</td><td> ← 00H</td></tr>
+<tr><td> [EFSDL],[EFPAN]</td><td> ← 00H</td></tr>
+<tr><td> [MPRO]</td><td> ← 00000000H</td></tr>
+<tr><td> [COEF]</td><td> ← 000H</td></tr>
+<tr><td> [TEMP]</td><td> ← 000000H</td></tr>
+</table>
+</dl>
+<p><li type=square> According to the execution instruction (01h) of P5, write [EFSDL]=[EFPAN]=0 to all [EFREG] in the mixer section so that the effect components will not be output. This does not affect other sounds (sequence playback, CD-DA playback, direct components of PCM stream).</ul>
+<p><A NAME="16"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#15">▲</a> <A HREF="#17">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●11H YAMAHA 3D CONTROL</font></b> YAMAHA 3D sound control</dl>
+<dl compact>
+<dt> P1<dd> Distance (0-127) The distance from the listening point to the virtual sound source for YAMAHA3D sound.<BR>
+ If the value is 0, the distance is 0, and the larger the value, the farther away it is.<p><dt> P2<dd> Direction (0-127) This is the direction of the virtual sound source of YAMAHA3D Sound as seen from the listening point.<BR>
+ A value of 0 means 0 degrees to the right, 32 means 90 degrees to the right, 64 means 180 degrees to the right, and 96 means 270 degrees to the right.<p><dt> P3<dd> Height (0-127) The height of the virtual sound source of YAMAHA3D Sound as seen from the listening point.<BR>
+ A value of 0 is directly below, 32 is at eye level, 64 is directly above, and 96 is at eye level behind.<p></dl>
+<A NAME="17"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#16">▲</a> <A HREF="#18">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●12H QSOUND CONTROL</font></b> Qsound control</dl>
+<dl compact>
+<dt> P1<dd> Channel number (0-7) This is the number of the channel that controls the Q sound.<BR>
+ The maximum number of channels is 8, so specify 0 to 7.<p><dt> P2<dd> PAN Position (0-30) Specifies the PAN position of the Q sound. There are 15 steps to the left and right: 0 is 90 degrees to the left, 15 is to the center, and 30 is 90 degrees to the right.<p></dl>
+<A NAME="18"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#17">▲</a> <A HREF="#19">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●13H YAMAHA 3D INITIALIZE</font></b> YAMAHA 3D, Qsound localization initialization</dl>
+<dl compact>
+<dt><dd> no parameters<p></dl>
+<A NAME="19"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#18">▲</a> <A HREF="#20">▼</a><hr>
+<dl>
+<dt> <b><font size=5>●14H TEMPO MODE</font></b></dl>
+<dl compact>
+<dt> P1<dd> Tempo mode (0/plus/minus) If you change the tempo during sequence playback, conventionally the original tempo will be returned to when the sequence loops. In this version, we have prepared several tempo modes to avoid this.<p><dt> 0: Normal mode<dd> Performs tempo processing as before.<p><dt> 1 - 127: ignore mode<dd> Ignores tempo changes during the sequence. Tempo control is possible using only host commands.<p><dt> 128 - 255: Relative tempo mode<dd> All tempo changes during the sequence will take effect. On the host side, set the relative value for it using the TEMPO RATIO command. The result is just like shifting the tempo changes caused by the sequence using the TEMPO RATIO command.<p></dl>
+<A NAME="20"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#19">▲</a> <A HREF="#21">▼</a><hr>
+<dl>
+<dt> <b><font size=5>●15H TEMPO RATIO</font></b> Relative tempo value setting</dl>
+<dl compact>
+<dt> P1-P2<dd> Relative tempo value (+32767 --> -32768) Relative tempo value to the standard tempo value (0000h). The tempo will double every 1000h (4096), and if it is negative, the tempo will be halved. In other words, you can control the time until the tempo doubles (or halves) with 4096 steps of precision. Since 0 is the standard tempo, you can return to the original tempo at any time by specifying 0000h.<p></dl>
+<A NAME="21"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#20">▲</a> <A HREF="#22">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●80H CD-DA LEVEL</font></b> Adjust the CD-DA level.</dl>
+<dl compact>
+<dt> P1<dd> CD-DA Level Left 8 levels (00h-E0h) CD-DA output level setting. There are 8 levels, with 00h being the lowest volume (=Off) and E0h being the highest volume.<p><P><CENTER>
+<table border>
+<tr><td><pre> Off ←−−−−−−−−→ Max 
+ 00h,20h,40h,60h,80h,A0h,C0h,E0h</pre></td></TR>
+</table>
+</CENTER>
+</P>
+<p><dt> P2<dd> CD-DA Level Right 8 levels (00h-E0h) CD-DA output PAN setting.<p> Details of 8 stages: (off) 00h,20h,40h,60h,80h,A0h,C0h,E0h (MAX)<p></dl>
+<p> CD-DA playback is a method of directly outputting audio data from CD audio tracks using hardware. This is the same principle as a tape recorder, which plays back the recorded audio as it is. The audio data read from the CD is automatically transferred to the SCSP, so all you have to do is set the CD-DA level of the SCSP to start outputting audio.<P ALIGN=CENTER> <B>CD-DA flow</b><BR>
+<img srcset="../image/sdcdda.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+ CD-DA playback is performed by reading audio data from the CD drive and setting audio output from SCSP.<BR>
+ To read audio data, use the "CDC library" of the system library. Audio data can be read by calling the following two functions. For details on the CDC library, refer to the CDC library user's manual.<p> To set the audio output from SCSP, use the "CD-DA Level (80h)" and "CD-DA Pan (81h)" commands of the sound control commands. Audio data is transferred directly from the CD interface to SCSP and output as audio. Therefore, the main system only issues a playback request to the CD interface, and there is no need to read data or transfer it to sound memory. This is the least demanding playback method for the main system and sound system, but it will occupy the CD continuously during playback. In other words, you will not be able to access the CD for anything other than producing sound. However, if this is allowed, it will be possible to achieve the maximum quality with this sound system.<BR>
+ The frequency and data width are fixed at 44.1KHz, 16 bits, which is equivalent to the CD standard, and pitch and tempo cannot be changed during playback. At the same time, achieving this quality requires an extremely large amount of audio data, so one CD can only hold about 10 to 20 songs, just like a regular music CD. In reality, it contains game programs, image data, etc., so it can only contain about 5-6 songs.<p> CD-DA data is PCM audio waveform data itself. Therefore, CD-DA data has the recorded PCM waveform data as it is as a data file. Although it is very large data, it is the simplest audio data that does not require any processing or modification.<BR>
+ CD-DA data can be created using the sound tool waveform editor provided by SEGA or commercially available waveform editing tools. Any tool will do as long as it can output 16-bit stereo PCM data at 44.1KHz. There are two methods: directly digitally recording songs and sound effects, and converting analog audio to digital. In the case of monaural, the same data is entered in Lch and Rch.<p><P><CENTER>
+<TABLE BORDER=1>
+<CAPTION> <B>CD-DA data format</b></CAPTION>
+<TR><TH ROWSPAN=4> Data 1</TH><TD><PRE> Lch low(8bit)</TD></TR>
+<TR><TD><PRE> Lch high(8bit)</TD></TR>
+<TR><TD><PRE> Rch low(8bit)</TD></TR>
+<TR><TD><PRE> Rch high(8bit)</TD></TR>
+<TR><TH ROWSPAN=4> Data 2</TH><TD><PRE> Lch low(8bit)</TD></TR>
+<TR><TD><PRE> Lch high(8bit)</TD></TR>
+<TR><TD><PRE> Rch low(8bit)</TD></TR>
+<TR><TD><PRE> Rch high(8bit)</TD></TR>
+<TR><TH><PRE> :<BR> :<BR> :<BR> :<BR> :</TH><TH><PRE> :<BR> :<BR> :<BR> :<BR> :</TH></TR>
+<TR><TH ROWSPAN=4> Data n</TH><TD><PRE> Lch low(8bit)</TD></TR>
+<TR><TD><PRE> Lch high(8bit)</TD></TR>
+<TR><TD><PRE> Rch low(8bit)</TD></TR>
+<TR><TD><PRE> Rch high(8bit)</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+ Note 1: The PCM waveform data output by various tools may have the 16-bit Low/High relationship reversed depending on the tool. Generally, it is Low/High for Intel-based CPUs and High/Low for Motorola-based CPUs, so if you are using Motorola-based format, please convert to Intel-based format. It is useful to have a tool that can reverse the low/high data as needed.<p> Note 2: When using DSP (effects) for CD-DA, mixer settings are required. When using DSP, prepare the necessary mixer data and issue the "Mixer Change (87h)" command. Even if there is no sequence playback, tone data is required for mixer settings.<p><A NAME="22"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#21">▲</a> <A HREF="#23">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●81H CD-DA PAN</font></b> CD-DA output Panpot settings</dl>
+<dl compact>
+<dt> P1<dd> CD-DA PAN Left 32 levels (0-31)<p><dt> P2<dd> CD-DA PAN Right 32 steps (0-31)<p></dl>
+<A NAME="23"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#22">▲</a> <A HREF="#24">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●82H TOTAL VOLUME</font></b> Total volume setting</dl>
+<dl compact>
+<dt> P1<dd> Total Volume 16 levels (0-15) This is the setting for the SCSP's total volume (overall volume for all playbacks). There are 16 levels, with 0 being the lowest volume (=Off) and 15 being the highest volume.<p></dl>
+<A NAME="24"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#23">▲</a> <A HREF="#25">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●83H EFFECT CHANGE</font></b> Effect switching</dl>
+<dl compact>
+<dt> P1<dd> Effect bank number (0-15) If there are multiple DSP banks (DSP microprogram storage areas) in the current area map, specify the number of DSP banks from the beginning. One area map can have up to 16 DSP banks, so the value will be between 0 and 15. Always 0 if there is only one DSP bank.<p></dl>
+<p><A NAME="25"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#24">▲</a> <A HREF="#26">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●85H START PCM STREAM</font></b> PCM stream playback starts</dl>
+<dl compact>
+<dt> P1<dd> bit7<BR>
+ 0:mono 1:stereo<p><dt><dd> bit6-5<BR>
+ unused<p><dt><dd> bit4<BR>
+ 0: 16bitPCM 1: 8bitPCM<p><dt><dd> bit3-0<BR>
+ Start playback PCM stream playback number (0-7) Up to 8 streams can be played at the same time, so specify the PCM stream playback number from 0 to 7. Please note that when playing in stereo, one playback number plays two streams, Lch/Rch. There is a maximum of 8 streams in total for monaural and stereo, so commands will be ignored if there are more than 8 streams.<p><dt> P2<dd> bit7-5<BR>
+ Direct sound output level 8 levels (0-7) Direct sound output level setting. There are 8 levels, with 0 being the lowest volume (=Off) and 7 being the highest volume.<p><dt><dd> bit4-0<BR>
+ Direct sound output PAN 32 levels (0-31) Direct sound output PAN setting. See SEQUENC PAN section on page 13 for details.<p><dt> P3-P4<dd> PCM stream buffer start address (0000h-FFFFh) This is the start address of the PCM stream buffer. Specify the upper 16 bits of the 20-bit address.<p><dt> P5-P6<dd> PCM stream buffer size (0000h-FFFFh) Size of PCM stream buffer. Since it is the number of samples for 1 channel, the same value will be entered whether it is MONO, STEREO, 16bit or 8bit.<p><dt> P7-P8<dd> pitch word (0000h-7FFFh) Specify the SCSP pitch register value (16 bits) as is.<p><P><CENTER>
+<TABLE BORDER=1>
+<CAPTION> <B>Pitch word (16bit) configuration</b></CAPTION>
+<TR><TH><PRE> 15</TH><TH><PRE> 14</TH><TH><PRE> 13</TH><TH><PRE> 12</TH><TH><PRE> 11</TH><TH><PRE> 10</TH><TH><PRE> 9</TH><TH><PRE> 8</TH><TH><PRE> 7</TH><TH><PRE> 6</TH><TH><PRE> 5</TH><TH><PRE> 4</TH><TH><PRE> 3</TH><TH><PRE> 2</TH><TH><PRE> 1</TH><TH><PRE> 0</TH><TR ALIGN=CENTER><TD> 0</TD><TD COLSPAN=4> OCT</TD><TD> 0</TD><TD COLSPAN=10> FNS</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+ OCT: Specify the octave as a two's complement number. You can specify from -8 octave to +7 octave.<BR>
+ FNS: Specify in 1024 steps from the standard pitch (0) to one octave above (1023).<BR>
+ Bit 15 and bit 10 are always 0.<p><dt> P9<dd> bit7-3<BR>
+ Effect Input Channel (0-15) [P9=Rch] DSP 16ch Effect In selection. There are 16 channels of DSP effect input, so specify 0 to 15. Please refer to "Chapter 6 Supplementary Information 6-7 DSP and Mixer" for a detailed explanation.<p><dt><dd> bit2-0<BR>
+ Effect Input Level 8 levels (0-7) Specify the level of the direct sound sent to the effect input channel from 0 to 7. There are 8 levels, with 0 being the lowest level (=Off) and 7 being the highest level.<p><dt> P10<dd> bit7-3<BR>
+ Effect input channel (0-15) [P10=Lch]<p><dt><dd> bit2-0<BR>
+ Effect input level 8 levels (0-7)<p><dt> P11<dd> Total level 256 levels (max:00h-FFh:min) This is the total level of the slot used for stream playback. Direct sound You can adjust the volume more finely than the output level.<p></dl>
+ PCM stream playback is a method of playing back long PCM waveform data by continuously performing the process of playing the PCM waveform data in a loop and writing the next waveform data at the end of the playback. You can play back long PCM waveform data that cannot fit into the sound memory, such as speaking voices, long sound effects, and recorded BGM. You can see which part of the waveform data is currently being played, so you can write the next waveform data to the part that has finished playing. In a case like the one shown below, write the next waveform data in the waveform data A section after waveform data A has finished playing and while waveform data B is being played back. By repeating this process, any long waveform data can be continuously played back.<P ALIGN=CENTER><img srcset="../image/sndstrm.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><BR>
+ <B>A, B, A, B, A, B.... will be played in a continuous loop.</b></P>
+ Please follow the steps below to play the PCM stream. Also, when stereo, the following processing must be performed for two channels, the left channel and the right channel.<p><table border>
+<tr><th> order</th><th> process</th><tr><td> 1</td><td> Transfer the first waveform data to the waveform data A and waveform data B areas.</td></tr>
+<tr><td> 2</td><td> Issue the sound control command "PCM start (85h)".</td></tr>
+<tr><td> 3</td><td> After playing waveform data A, transfer the next waveform data to the waveform data A area.</td></tr>
+<tr><td> 4</td><td> After playing waveform data B, transfer the next waveform data to the waveform data B area.</td></tr>
+<tr><td> 5</td><td> Repeat steps 3 and 4 above</td></tr>
+<tr><td> 6</td><td> To terminate, issue the "PCM stop (86h)" sound control command.</td></tr>
+</table>
+<p> Note: The buffer size, transfer method, transfer timing, etc. are at the discretion of the main system, so please choose the most suitable method according to the situation without being bound by the above steps.<p><h4> How to hold the data area</h4> To play PCM stream, a data area (PCM stream buffer) is required to play PCM waveform data. The PCM stream buffer can be specified anywhere in sound memory. Normally, areas not used for tone data, song data, etc. are used, but if there is a tone bank etc. that is not used at the same time as PCM stream playback, that area can also be used.<BR>
+ You can know the current playback position in 4K sample units. Therefore, PCM stream playback can be performed by having at least two 4K sample buffers. The PCM stream buffer size can be up to 64K samples per channel, so it can be set freely within this range.<p><h4> Buffer rewriting timing</h4> When PCM stream playback starts, the current waveform playback position is written to the host interface work. The playback position is a number from 0 to 15. The value is 0 at the start of playback, and counts up by 1 each time the 4K sample plays. When playback reaches the end of the buffer, playback starts again from the beginning of the buffer, so the playback position value returns to 0 at this point.<p><table border>
+<tr align="center"><td> Example of how to hold a buffer</td><td> Play position value</td></tr>
+<tr><td> If you have two 4K sample buffers</td><td> 0, 1, 0, 1, 0, 1 ...</td></tr>
+<tr><td> If you have three 4K sample buffers</td><td> 0, 1, 2, 0, 1, 2, 0, 1, 2 ...</td></tr>
+<tr><td> If you have 16 4K sample buffers</td><td> 0, 1, 2, 3 - - - - 12, 13, 14, 15, 0, 1, 2, 3 ...</td></tr>
+</table>
+<p> The main system should monitor this playback position and transfer the next waveform data. The PCM stream buffer can take up to 64K samples, so you can select from a minimum of 2 sides to a maximum of 16 sides.<BR>
+ It is also possible to generate an interrupt to the main system when the playback position is updated, so please use this if necessary. The control information for this interrupt is included in the system interface work, so please refer to section ``7 System Interface Work'' for the setting details.<p><h4> Transfer load</h4> Since the PCM playback slot is fixed at 44.1KHz in terms of hardware, one sample will be played every 22.68usec from the start of playback. In other words, once playback begins, each channel must continue to receive 44,100 samples of waveform data per second. 8-bit PCM is 44,100 bytes, 16-bit PCM is 88,200 bytes.<BR>
+ The time required for this transfer, including reading from the CD and transferring to sound memory, is the load on the main system. The transfer time depends on the main system hardware, so it can be calculated using the CD rotation wait, seek time, SH (or DMA) transfer clock, and number of transferred bytes.<BR>
+ However, the above number of bytes is the amount of data at 44.1KHz, so if, for example, you can use half that, 22KHz, the amount of data will be half that, and the transfer load will also be halved. Conversely, when playing stereo or playing multiple channels simultaneously, the load becomes heavier.<p><h4> stereo playback</h4> PCM stream playback can be performed in stereo. Please note that stereo playback uses twice as much memory as monaural playback, as shown below. The buffer size specified in the playback start command parameter is the number of samples for one channel, so actually prepare an area that is twice that size.<p><P ALIGN=CENTER><img srcset="../image/sdstrmbf.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<h4> Supports playback frequencies other than 44.1KHz</h4> SCSP always plays waveform data at a frequency of 44.1KHz, so if you want to play waveform data at a frequency other than this, use the pitch parameter. For example, if you want to play back half the 22KHz signal, it will be played back at twice the pitch, so if you cut the playback pitch in half and play it back, it will play back at the original pitch.<p> The pitch range is up to ±8 octaves (OCT), and one octave can be further divided into 1024 steps (FNS), so it is possible to correspond to any frequency within this precision range, but in reality, Since no irregular settings are made, they are listed in the correspondence table.<p><table border>
+<tr align="center"><td> sampling rate</td><td> OCT</td><td> FNS</td><td> Setting value</td></tr>
+<tr align="center"><td> 44.1kHz</td><td> 00</td><td> 0000</td><td> 0000</td></tr>
+<tr align="center"><td> 32kHz</td><td> 0F</td><td> 01CE</td><td> 79CE</td></tr>
+<tr align="center"><td> 22kHz</td><td> 0F</td><td> 0000</td><td> 7800</td></tr>
+<tr align="center"><td> 16kHz</td><td> 0E</td><td> 01CE</td><td> 71CE</td></tr>
+<tr align="center"><td> 11kHz</td><td> 0E</td><td> 0000</td><td> 7000</td></tr>
+<tr align="center"><td> 8kHz</td><td> 0D</td><td> 01CE</td><td> 69CE</td></tr>
+<tr align="center"><td> 5.5kHz</td><td> 0D</td><td> 0000</td><td> 6800</td></tr>
+<tr align="center"><td> 4kHz</td><td> 0C</td><td> 01CE</td><td> 61CE</td></tr>
+</table>
+<p><ul>
+<li type=circle> Notes on continuous transfer<p> When transferring waveform data, avoid continuous transfer for a long time to allow the sound CPU to operate. Please note that while the main system is accessing the sound memory, this will take priority and the sound CPU will not be able to operate. If continuous transfer is required, divide it into transfers of about 1 msec at most. By leaving a gap, the sound CPU will be able to operate.<p><li type=circle> Precautions when using DSP<p> Mixer settings are required when using DSP (effects) for PCM stream playback. When using DSP, prepare the necessary mixer data and issue the mixer setting command. Even if there is no sequence playback, tone data is required for mixer settings.<p></ul>
+ Note: 1 sample is the smallest unit of PCM waveform data, and its size depends on the data width. For 8 bits it is 1 byte, for 16 bits it is 2 bytes. Therefore, a 4K sample would require 4096 bytes for 8-bit PCM and 8192 bytes for 16-bit PCM.<p> Although it is functionally possible to play up to 8 PCM streams, it is practically impossible due to processing power. Stream playback does not run on the sound CPU alone, so we recommend taking the game's processing speed into consideration and experimenting from the early stages of development. Please be especially careful in games that heavily use SH2 for calculations using polygons, as this may cause a frame over.<p><A NAME="26"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#25">▲</a> <A HREF="#27">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●86H STOP PCM STREAM</font></b> PCM stream playback stop</dl>
+<dl compact>
+<dt> P1<dd> Stop playback PCM stream playback number (0-7)<p></dl>
+<A NAME="27"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#26">▲</a> <A HREF="#28">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●87H MIXER CHANGE</font></b> Switching the mixer</dl>
+<dl compact>
+<dt> P1<dd> Tone data bank number (0-15) If there are multiple tone banks (tone data storage areas) in the current area map, this is a number to distinguish between them. One area map can have up to 16 tone banks, so the value will be anywhere from 0 to 15. (Refer to 5-1-4 Sound Area Map CRNT Work Map Information).<p><dt> P2<dd> Mixer number in tone data (0-127) Multiple mixer data can be stored in one tone data, so specify the number of mixer data from the beginning of the tone data. One tone data can store up to 128 mixers, so the value will be any value from 0 to 127. Always 0 if there is only one mixer data.<p></dl>
+<h4> What is a mixer?</h4> A mixer is a piece of hardware that balances the volume and localization (distribution to left and right) of an SCSP sound source. There are only two types of sound sources: sound generation slots and digital audio input, but each can be passed through DSP, so the mixer can be divided into the following four types of mixer blocks.<p><P ALIGN=CENTER> <B>Mixer configuration</b><BR>
+<img srcset="../image/sndmix.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<dl compact>
+<dt> Slot Direct mixer<dd> : Direct (does not pass through DSP) output level and PAN from sound slot<dt> CD-DA Direct mixer<dd> : Direct (does not pass through DSP) output level and PAN from CD-DA<dt> Effect In mixer<dd> : Input level to DSP<dt> Effect Out mixer<dd> : Effects from DSP (through DSP) output level and PAN</dl>
+<p> Of these, the "Slot Direct mixer" and "Effect In mixer" are already set in the tone data, so there is no need to control them specially. Also, for the "CD-DA Direct mixer", dedicated "CD-DA Level (80h)" and "CD-DA Pan (81h)" commands are available, so you can control them using them.<p> Therefore, when we say "mixer" in this manual, we specifically mean the "Effect Out mixer" mentioned above. In this manual, the mixer refers to the 16ch effect level and PAN settings output from the DSP.<p><h4> DSP and mixer</h4> The mixer is the output setting for the sound from the DSP. Therefore, even if the effect processing is working properly and the effect is applied correctly, the effect sound will not be output unless the correct mixer is set. The mixer is data that sets the volume and localization for 16 DSP output channels, and is created by the sound creator as part of the tone data.<p> In addition, since all sounds from sequence playback, PCM stream playback, and CD-DA playback are input to the DSP, it is important to correctly understand which sound is going into which channel and which channel is going out in which situation. must be controlled above. When switching effects, check in advance which mixer is compatible and what the mixer specifications are.<p> Note that bank selection is not possible when using MIDI control changes to make mixer settings. This is because, due to the MIDI format, two arguments, the bank and mixer number, cannot be sent at the same time. Therefore, only the mixer number will be sent, but the bank at that time will be the bank selected by bank change.<p><A NAME="28"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#27">▲</a> <A HREF="#29">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●88H MIXER PARAMETER CHANGE</font></b> Switching mixer parameters</dl>
+<dl compact>
+<dt> P1<dd> Effect Output Channel (0-17) DSP 16ch Effect Out selection. There are 16 channels of DSP effect output, so specify 0 to 15. Also, when selecting CD-DA, specify 16 (Lch) or 17 (Rch).<p><dt> P2<dd> bit7-5<BR>
+ Effect Output Level 8 levels (0-7) Specify the level of the effect sound output from the effect output channel from 0 to 7. There are 8 levels, with 0 being the lowest level (=Off) and 7 being the highest level.<p><dt><dd> bit4-0<BR>
+ Effect Output PAN 32 levels (0-31) Specify the PAN of the effect sound output from the effect output channel from 0 to 31. For details, refer to "Chapter 7 Appendix 7-2 Details of SCSP PAN (32 levels)".<p></dl>
+<A NAME="29"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#28">▲</a> <A HREF="#30">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●89H HARDWARE CHECKHardware</font></b> check</dl>
+<dl compact>
+<dt> P1<dd> Check item<dl compact>
+<dt><dd> 00h: DRAM 4Mbit read/write<dt><dd> 01h: DRAM 8Mbit read/write<dt><dd> 02h: SCSP MIDI<dt><dd> 03h: Sound source output (L/R)<dt><dd> 04h: Sound source output (L)<dt><dd> 05h: Sound source output (R)</dl>
+</dl>
+<p> The details of the check performed by the hard check (89h) command are as follows. When checking, specify a value from 0 to 5 in command parameter P1, and the following checks will be performed depending on that value. The following values for all check results are stored in the system interface table (address 418h: word).<p> 7FFFH:Memory check Error<BR>
+ 8000H: Memory check OK<p><table border>
+<tr><td> 00h</td><td> Executes read/write check of sound D-RAM (4M bits). Please note that at this time, the DSP will be initialized to prohibit internal memory access.<BR>
+ The check will write & read & compare all bits low/high, and the result will be stored in the system interface table.</td></tr>
+<tr><td> 01h</td><td> Executes read/write check of sound D-RAM (8M bits). Others are as above.<tr><td> 02h</td><td> Executes an operation check of the SCSP built-in MIDI. At this time, short-circuit the external MIDI input/output terminals. The check results are as above.</td></tr>
+<tr><td> 03h</td><td> A square wave is output from LR. Please note that SCSP slot 025B00000H will be forcibly used at this time. This sound will also turn off automatically in a few seconds. Also, no map data, song data, or tone data is required when issuing this command.</td></tr>
+<tr><td> 04h</td><td> A square wave is output only from the L side. Others are as above.</td></tr>
+<tr><td> 05h</td><td> Value of P1</td></tr>
+</table>
+<p><A NAME="30"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#29">▲</a> <A HREF="#31">▼</a><HR>
+<dl>
+<dt> <b><font size=5>●8AH PCM PARAMETER CHANGE</font></b> Parameter switching for PCM stream during playback</dl>
+<dl compact>
+<dt> P1<dd> PCM stream playback number (0-7)<p><dt> P2<dd> bit7-5<BR>
+ Direct sound output level 8 levels (0-7)<p><dt><dd> bit4-0<BR>
+ Direct sound output PAN 32 levels (0-31)<p><dt> P3-P4<dd> pitch word(0000h-FFFFh)<p><dt> P5<dd> bit7-3<BR>
+ Effect input channel (0-15) [P5=Rch]<p><dt><dd> bit2-0<BR>
+ Effect input level 8 levels (0-7)<p><dt> P6<dd> bit7-3<BR>
+ Effect input channel (0-15) [P6=Lch]<p><dt><dd> bit2-0<BR>
+ Effect input level 8 levels (0-7)<p><dt> P7<dd> Total level 256 levels (max:00h-FFh:min)<p></dl>
+<A NAME="31"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#30">▲</a> <A HREF="#32">▼</a><hr>
+<dl>
+<dt> <b><font size=5>●8BH PCM SLOT ALLOCATION</font></b> Secure slot for PCM stream</dl>
+<dl compact>
+<dt> P1<dd> PCM stream playback number (0-7)<p></dl>
+<p> PCM streams use fixed slots, but those slots may be in use during sequence playback, and if you start a PCM stream, part of the sequence will be forcibly turned off. If you reserve a PCM slot in advance using this command, the above problem will be resolved.<A NAME="32"><HR></a> <A HREF="sndcmd0.htm#CommandList"><B>List</b></a> <A HREF="#31">▲</a> ■<hr>
+<dl>
+<dt> <b><font size=5>●8CH PCM SLOT RELEASE</font></b> Release slot for PCM stream</dl>
+<dl compact>
+<dt> P1<dd> PCM stream playback number (0-7)<p></dl>
+ Frees the reserved slot so that it can be used for sequence playback.<HR NOSHADE>
+ <B>▲ <A HREF="sndcmd0.htm">Back</a> ｜ <A HREF="sndrequ.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no3">Sound Driver Programmer's Guide</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

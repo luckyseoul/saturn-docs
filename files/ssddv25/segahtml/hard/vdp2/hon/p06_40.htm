@@ -1,0 +1,125 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;47/86&gt;VDP2 User's Manual/6.4 Coefficient table control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no6">VDP2 User's Manual</a> ★ <A HREF="p06_10.htm">Chapter 6 Rotating scroll screen</a><HR>
+ <B>▲ <A HREF="p06_35.htm">Back</a> ｜ <A HREF="p06_41.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 6 Rotating scroll screen</b><HR NOSHADE>
+<DL>
+<P><DT><H2> ■6.4 Coefficient table control</H2><DD> A rotating scroll screen can have rotation parameters used when calculating display coordinates in VRAM or color RAM as a coefficient table separate from the rotation parameter table. By reading this coefficient table line by line or dot by dot, various image expressions can be created.<BR>
+ There are two timings when coefficient table data is required, depending on how the display coordinates are calculated:</P>
+<P><DD> (1) Required for each line<DD> (2) Required for each dot</P>
+<P><DD> If coefficient table data is required for each line, store the coefficient table in VRAM. The VRAM address for reading the stored coefficient table data is specified in KAst, DKAst, DKAx and the coefficient table address offset register in the rotation parameter table.</P>
+<P><DD> If you need coefficient table data for each dot, store the coefficient table in either VRAM or color RAM. When storing in VRAM, specify at least one bank as a coefficient table using the rotation data bank specification bit in the RAM control register. At that time, specify the VRAM address for reading the stored coefficient table data in KAst, DKAst, DKAx and coefficient table address offset register in the rotation parameter table. Also, when storing the coefficient table in color RAM, store it in the latter half of color RAM (100800H to 100FFFH). At this time, specify the color RAM address for reading the stored coefficient table data to KAst, DKAst, and DKAx in the rotation parameter table. However, when reading the coefficient table data, only the lower 10 bits of the calculated coefficient table address integer part are valid.</P>
+<P><DD> You can select from the following four coefficient modes to use the data read from the coefficient table as a parameter.</P>
+<UL>
+<P><DD> <B>Mode 0:</b> Use as scaling factor kx, ky<DD> <B>Mode 1:</b> Use as scaling factor kx<DD> <B>Mode 2:</b> Use as scaling factor ky<DD> <B>Mode 3:</b> Use as viewpoint coordinates Xp after rotation transformation</P>
+</UL>
+<P><DD> In <B>mode 0</b> , kx and ky read from the rotation parameter table are disabled, and the data read from the coefficient table is used as kx and ky.</P>
+<P><DD> If <B>mode 1</b> is specified, the ky read from the rotation parameter table is used as is, but the data read from the coefficient table is used for kx.</P>
+<P><DD> If <B>mode 2</b> is specified, the kx read from the rotation parameter table is used as is, but the data read from the coefficient table is used for ky.</P>
+<P><DD> If <B>mode 3</b> is specified, the X-direction viewpoint coordinate Xp that has been rotated according to the data read from the rotation parameter table will be invalidated, and the data read from the coefficient table will be used as Xp.</P>
+<A NAME="no6_41"></A><P><DT> <B>◆Line color screen data</b><DD> Coefficient data can be used not only as rotation parameters but also as part of line color screen data. In this case, the upper 4 bits of data read from the line color screen table are added to the 7 bits of data that are part of the coefficient data. Line color screen data using the coefficient table is shown in Figure 6.6.</P>
+<A NAME="z6_6"></A><CENTER>
+ <B>Figure 6.6 Line color screen data using coefficient data</b><PRE>
+Upper 4 bits of 11 bits     7-bit line color       
+of line color screen data   screen data read from  
+read from the line color    coefficient table      
+screen table                                       
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐   ┌─┬─┬─┬─┬─┬─┬─┐          
+│ │ │ │ │ │ │ │ │ │ │ │   │ │ │ │ │ │ │ │          
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘   └─┴─┴─┴─┴─┴─┴─┘          
+ └──┬──┘                   └───────────┘           
+    │                            │                 
+    └──────┐          ┌──────────┘                 
+           ↓          ↓                            
+        ┌─────┐ ┌───────────┐                      
+       ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐                     
+       │ │ │ │ │ │ │ │ │ │ │ │                     
+       └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘                     
+   Line color data after composition               
+</PRE></CENTER>
+<P><DD>If the rotation parameter mode is specified as <B>mode 0</b> , a line color screen based on the coefficient table of rotation parameter A will be used.</P>
+<P><DD> If <B>mode 1</b> is specified, a line color screen based on the coefficient table of rotation parameter B will be used.</P>
+<P><DD> If <B>mode 2</b> is specified, the line color screen based on the coefficient table of rotation parameter A will be used for both the picture with rotation parameter A and the picture with rotation parameter B.</P>
+<P><DD> If <B>mode 3</b> is specified, the line color screen based on the coefficient table of rotation parameter A will be used for pictures with rotation parameter A, and the line color screen based on the coefficient table of rotation parameter B will be used for pictures with rotation parameter B. . Also, when displaying RBG1, a line color screen based on the coefficient table of rotation parameter A is used for both RBG0 and RBG1.</P>
+<P><DD> For details on the line color screen, see " <B>7.1 Line color screen</b> ."</P>
+<P><DT> <B>◆Bit configuration of coefficient table data</b><DD> The data size on the coefficient table can be selected as either 1 word or 2 words, and the data structure changes depending on the coefficient data size and coefficient data mode. Figure 6.7 shows the bit configuration of coefficient table data.</P>
+<A NAME="z6_7"></A><P><DD> <B>Figure 6.7 Bit configuration of coefficient table data</b><P><DT> <B>■Coefficient data mode 0~2</b><DD> ●Coefficient data size: 2 words<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> +0H</TH><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 09</TD><TD><PRE> 08</TD><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH><PRE> transparent</TH><TH COLSPAN=7><PRE> Line color screen data (7bit)</TH><TH><PRE> sign</TH><TH COLSPAN=7><PRE> Integer part (7bit)</TH></TR>
+</TABLE>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> +2H</TH><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 09</TD><TD><PRE> 08</TD><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH COLSPAN=16><PRE> Decimal part (16bit)</TH></TR>
+</TABLE>
+<DD> ●Coefficient data size: 1 word<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> +0H</TH><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 09</TD><TD><PRE> 08</TD><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH><PRE> transparent</TH><TH><PRE> sign</TH><TH COLSPAN=4><PRE> Integer part (4bit)</TH><TH COLSPAN=10><PRE> Decimal part (10bit)</TH></TR>
+</TABLE>
+<P><DT> <B>■Coefficient data mode 3</b><DD> ●Coefficient data size: 2 words<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> +0H</TH><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 09</TD><TD><PRE> 08</TD><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH><PRE> transparent</TH><TH COLSPAN=7><PRE> Line color screen data (7bit)</TH><TH><PRE> sign</TH><TH COLSPAN=7><PRE> Upper integer part (7bit)</TH></TR>
+</TABLE>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> +2H</TH><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 09</TD><TD><PRE> 08</TD><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH COLSPAN=8><PRE> Lower integer part (8bit)</TH><TH COLSPAN=8><PRE> Decimal part (8bit)</TH></TR>
+</TABLE>
+<DD> ●Coefficient data size: 1 word<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2><PRE> +0H</TH><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 09</TD><TD><PRE> 08</TD><TD><PRE> 07</TD><TD><PRE> 06</TD><TD><PRE> 05</TD><TD><PRE> 04</TD><TD><PRE> 03</TD><TD><PRE> 02</TD><TD><PRE> 01</TD><TD><PRE> 00</TD></TR>
+<TR><TH><PRE> transparent</TH><TH><PRE> sign</TH><TH COLSPAN=12><PRE> Integer part (12bit)</TH><TH COLSPAN=2><PRE> Decimal part</TH></TR>
+</TABLE>
+<P><DT> <B>◆Coefficient table start address</b><DD> The start address of the coefficient table is determined from the coefficient table address offset register and the coefficient table start address (KAst integer part 16 bits) read from the rotation parameter table. The coefficient table vertical address increment (DKAst integer part 9 bits) and coefficient table horizontal address increment (DKAx integer part 9 bits) are also read from the rotation parameter table. The address values of these address offset, start address, and address increment change depending on the data size of the coefficient table. The least significant bit of each value indicates</P>
+<P><DD> Address values are shown in Table 6.3.<BR>
+ For example, 4H when there are 2 words means that the least significant bit of the KAst integer part represents the address value of 4H, which can be calculated as follows.</P>
+<A NAME="t6_3"></A><P><DD> <B>Table 6.3 Address values indicated by the least significant bit of coefficient parameter data by coefficient data size</b><DD><TABLE BORDER>
+<TR><TD ROWSPAN=2> Coefficient data<BR>
+ size</TD><TD COLSPAN=2> Address value indicated by the least significant bit</TD></TR>
+<TR><TD> Coefficient table address offset register value</TD><TD> KAst, △KAst, △KAx integer part value</TD></TR>
+<TR ALIGN=CENTER><TD> 2 words</TD><TD> 40000H</TD><TD> 4H</TD></TR>
+<TR ALIGN=CENTER><TD> 1 word</TD><TD> 20000H</TD><TD> 2H</TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>◆Most significant bit of coefficient data</b><DD> The most significant bit of coefficient data is normally used as the transparency bit, and dots with coefficient data where this bit is 1 are forced to be transparent dots. However, in RBG0, if rotation parameter mode 2 is selected, the most significant bit of the data read from the coefficient table for rotation parameter A is used for switching the rotation parameter. When the most significant bit is 0, the image specified by rotation parameter A is displayed, and when it is 1, the image specified by rotation parameter B is displayed. At this time, the most significant bit of the coefficient data read from the coefficient table for rotation parameter B is used as the transparency bit. The most significant bit of coefficient data for RBG1 is always used as the transparency bit.<BR>
+ Table 6.4 shows the processing using the most significant bit value of coefficient data.</P>
+<A NAME="t6_4"></A><P><DD> <B>Table 6.4 Image processing using the most significant bit value of coefficient data for RBG0</b><DD><TABLE BORDER>
+<TR><TH><PRE> Rotation parameters<BR> mode</TH><TH><PRE> rotate<BR> parameters</TH><TH><PRE> most significant bit<BR> function</TH><TH><PRE> most significant bit<BR> value</TH><TH><PRE>     Image processing</TH></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=3> 0</TD><TD ROWSPAN=2> A</TD><TD ROWSPAN=2> transparent</TD><TD> 0</TD><TD> Display the image obtained using that coefficient data</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> Force dots using that coefficient data to become transparent dots</TD></TR>
+<TR ALIGN=CENTER><TD> B</TD><TD> do not use</TD><TD> −</TD><TD> −</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=3> 1</TD><TD> A</TD><TD> do not use</TD><TD> −</TD><TD> −</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> B</TD><TD ROWSPAN=2> transparent</TD><TD> 0</TD><TD> Display the image obtained using that coefficient data</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> Force dots using that coefficient data to become transparent dots</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=4> 2</TD><TD ROWSPAN=2> A</TD><TD ROWSPAN=2> Parameter switching</TD><TD> 0</TD><TD> Display the image obtained using that coefficient data</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> Disable its coefficient data and display the image obtained by rotation parameter B</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> B</TD><TD ROWSPAN=2> transparent</TD><TD> 0</TD><TD> Display the image obtained using that coefficient data</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> Force dots using that coefficient data to become transparent dots</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=2> 3</TD><TD ROWSPAN=2> A, B</TD><TD ROWSPAN=2> transparent</TD><TD> 0</TD><TD> Display the image obtained using that coefficient data</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> Force dots using that coefficient data to become transparent dots</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_35.htm">Back</a> ｜ <A HREF="p06_41.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no6">VDP2 User's Manual</a> ★ <A HREF="p06_10.htm">Chapter 6 Rotating scroll screen</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

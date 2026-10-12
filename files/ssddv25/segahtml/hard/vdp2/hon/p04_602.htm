@@ -1,0 +1,67 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>Figure 4.8 Data structure of pattern name table, Part 2</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><CENTER>
+ <A HREF="p04_601.htm">▲</a> <A HREF="p04_60.htm#t4_8">Back</a> <A HREF="p04_603.htm">▼</a></CENTER>
+<HR NOSHADE>
+<CENTER>
+ <B>Figure 4.8.2 Data structure of pattern name table, Part 2</b><H3> Pattern name data size: 1 word</H3><H3> Character pattern size: 2 cells horizontally x 2 cells vertically</H3><PRE>
+        Bit                                           
+        15                                           0
+        ┌────────────────────────────────────────────┐
+  +000H │ Pattern name data of character pattern 0-0 │
+        ├────────────────────────────────────────────┤
+  +002H │ Pattern name data of character pattern 0-1 │
+        ├────────────────────────────────────────────┤
+    :   │                     :                      │
+    :   │                     :                      │
+    :   │                     :                      │
+    :   │                     :                      │
+        ├────────────────────────────────────────────┤
+  +7FEH │Pattern name data of character pattern 31-31│
+        └────────────────────────────────────────────┘
+</PRE>▽<PRE>
+   Character　                                  
+   Pattern 0    1    2           30   31       
+Character┌────┬────┬────┬──────┬────┬────┐     
+Pattern 0│+000│+002│+004│......│+03C│+03E│     
+         ├────┼────┼────┼──────┼────┼────┤     
+        1│+040│+042│+044│......│+07C│+07E│     
+         ├────┼────┼────┼──────┼────┼────┤     
+        2│+080│+082│+084│......│+0BC│+0BE│     
+         ├────┼────┼────┼      ┼────┼────┤     
+        :                                      
+        :                                  Page
+        :                                      
+        :                                      
+         ├────┼────┼────┼      ┼────┼────┤     
+       30│+780│+782│+784│......│+7BC│+7BE│     
+         ├────┼────┼────┼──────┼────┼────┤     
+       31│+7C0│+7C2│+7C4│......│+7EE│+7EF│     
+         └────┴────┴────┴──────┴────┴────┘     
+</PRE></CENTER>
+<DL>
+<DT><B>[Note 1]</b><DD> The upper left corner of the page is the character pattern 0-0, and from there to the right ~0-1, ~0-2, ~0-3,....<DT> <B>[Note 2]</b><DD> The numbers on the page are the VRAM addresses (hexadecimal) of each character pattern name data, based on the VRAM address of the pattern name data of character patterns 0-0.</DL>
+<HR NOSHADE>
+<H4 ALIGN=CENTER> <A HREF="p04_60.htm#t4_8">return</a></H4><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

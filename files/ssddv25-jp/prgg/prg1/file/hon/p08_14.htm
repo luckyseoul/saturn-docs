@@ -1,0 +1,189 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/17&gt;プログラマーズガイド/ファイルシステムライブラリ/8.関数仕様-4</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p08_13.htm">戻る</A>｜
+<A HREF="p08_15.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>8.関数仕様-4</H2>
+<HR NOSHADE>
+<A NAME="no8_40"></A>
+<H3>8.4　即時復帰型読み込み</H3>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_1"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>データの読み込みの開始</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_NwFread</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.1</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 GFS_NwFread(GfsHn gfs, Sint32 nsct, void *buf, Sint32 bsize)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>gfs</TD><TD><PRE>：ファイルハンドル</TD></TR>
+<TR><TD><PRE>nsct</TD><TD><PRE>：読み込むセクタ数</TD></TR>
+<TR><TD><PRE>bsize</TD><TD><PRE>：読み込み領域の大きさ(単位：バイト数)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>buf  ：読み込み領域
+<DT><B>　関数値</B><DD>エラーコード。
+<DT><B>　機　能</B><DD>サーバ関数に対してデータ読み込みのリクエストを発行します。リクエストしたアクセス動作が完了すると、アクセスポインタはnsctセクタ進みます。
+<!-- *** Update by CRI ：5.10 --><DT><B>　備　考</B><DD>bufのアドレス境界についてはGFS_Freadの備考と同様の注意が必要です。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_2"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>CDバッファへの先読みの開始</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_NwCdRead</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.2</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 GFS_NwCdRead(GfsHn gfs, Sint32 nsct)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>gfs</TD><TD><PRE>：ファイルハンドル</TD></TR>
+<TR><TD><PRE>nsct</TD><TD><PRE>：読み込むセクタ数</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコード。
+<DT><B>　機　能</B><DD>サーバ関数に対してデータのCDバッファへの先読みリクエストを発行します。<BR>
+リクエストした読み込み処理の完了によってアクセスポインタは変わりません。以下の条件を満たさないと、指定されたファイルハンドルに対するアクセス動作は完了しません。
+
+<DD><UL TYPE="DISK">
+<LI>GFS_Fread関数かGFS_NwFread関数によって、nsctセクタのデータがホスト領域に転送される。
+<LI>GFS_NwStop関数によってアクセス動作が中止される。</UL>
+
+<DT><B>　備　考</B><DD>先読み開始後のGFS_NwFread関数によるホスト領域への転送が完了したことを調べるには以下の処理を行ってください。
+
+<DD><UL TYPE="DISK">
+<LI>GFS_NwGetStatで転送済みバイト数を取得する。
+<LI>転送済みバイト数が目的のバイト数に等しいか調べる。<BR>(目的のバイト数に等しければ、転送は完了している。)</UL>
+
+<!-- *** Update by CRI ：5.11 --> <DD>GFS_NwCdRead関数で先読みを行った場合、GFS_NwIsComplete関数でGFS_NwFread関数の完了を調べられないので注意が必要です。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_3"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>アクセス動作の完了のチェック</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_NwIsComplete</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.3</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Bool GFS_NwIsComplete(GfsHn gfs)
+<DT><B>　入　力</B><DD>gfs：ファイルハンドル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>アクセス動作の状態。
+<DT><B>　機　能</B><DD>サーバ関数のアクセス動作が完了したかチェックします。関数値は次の意味を持ちます。
+<DD><TABLE>
+<TR><TD><PRE>TRUE</TD><TD><PRE>：アクセス完了</TD></TR>
+<TR><TD><PRE>FALSE</TD><TD><PRE>：動作中</TD></TR></TABLE>
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_4"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>アクセス動作の中止</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_NwStop</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.4</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 GFS_NwStop(GfsHn gfs)
+<DT><B>　入　力</B><DD>gfs：ファイルハンドル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>中止した時点のアクセスポインタ。エラーのときは負のエラーコード。
+<DT><B>　機　能</B><DD>サーバ関数のアクセス動作を中止します。GFS_NwExecServerは、次のファイルに対するアクセス動作を続けます。
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_5"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>現在のアクセス状態の取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_NwGetStat</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.5</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void GFS_NwGetStat(GfsHn gfs, Sint32 *stat, Sint32 *ndata)
+<DT><B>　入　力</B><DD>gfs  ：ファイルハンドル
+<DT><B>　出　力</B><DD><TABLE>
+<TR><TD><PRE>stat</TD><TD><PRE>：現在のアクセス状態</TD></TR>
+<TR><TD><PRE>ndata</TD><TD><PRE>：データ数</TD></TR></TABLE>
+
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>サーバ関数のアクセス状態を得るために使います。<BR>アクセス状態ごとのデータの意味を次に示します。
+
+<P><DT><TABLE BORDER>
+<TR><TH width=140><PRE>アクセス状態</TH><TH width=170><PRE>処　理</TH><TH width=180><PRE>データ数の意味</TH></TR>
+<TR><TD><PRE>GFS_NWSTAT_NOACT</TD> <TD><PRE>なし</TD><TD><PRE>意味なし</TD></TR>
+<TR><TD><PRE>GFS_NWSTAT_FREAD</TD> <TD><PRE>CDからホスト領域までの読み込み</TD><TD><PRE>ホスト領域に読み込まれたバイト数</TD></TR>
+<TR><TD><PRE>GFS_NWSTAT_CDREAD</TD><TD><PRE>CDバッファへの先読み</TD><TD><PRE>CDバッファに読み込まれたセクタ数</TD></TR></TABLE></P>
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_6"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>ファイル単位でのアクセス動作の実行</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_NwExecOne</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.6</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 GFS_NwExecOne(GfsHn gfs)
+<DT><B>　入　力</B><DD>gfs：ファイルハンドル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>実行状態(GFS_SVR_〜)。エラーの場合は負のエラーコード。
+<DT><B>　機　能</B><DD>単一ファイルに対するアクセスサーバ関数です。ファイルハンドルに対して直前に呼ばれたアクセス動作に従い、以下の処理を実行します。
+<DD><UL TYPE="DISK">
+<LI><B>GFS_NwFread</B><BR>　CDバッファへの読み込み処理とホストへの転送処理を行います。
+<LI><B>GFS_NwCdRead</B><BR>　CDバッファへの読み込み処理を行います。</UL>
+
+</DL>
+
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no4_7"><HR></A><DL>
+<P><DT><TABLE BORDER><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>複数ファイルのアクセス動作の実行</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>GFS_NwExecServer</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.7</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32GFS_NwExecServer(GfsHn *now_gfs)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>now_gfs：実行対象となっているファイルハンドル
+<DT><B>　関数値</B><DD>アクセスサーバ状態(GFS_SVR_〜)。エラーの場合は負のエラーコード。
+<DT><B>　機　能</B><DD>複数ファイルに対するアクセスサーバ関数です。リクエストを発行した順に実際のアクセス(GFS_NwExecOne)を行います。<BR>１つのファイルのアクセス動作が終了してから、次の処理に移ります。<BR>複数ファイルの処理が完了するとGFS_SVR_COMPLETEDになります。
+</DL>
+
+<HR NOSHADE>
+<B>▲
+<A HREF="p08_13.htm">戻る</A>｜
+<A HREF="p08_15.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no7">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

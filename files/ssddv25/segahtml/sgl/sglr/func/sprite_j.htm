@@ -1,0 +1,1236 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 22/22&gt;          <!-- 何ページ目／総ページ数 -->
+SGL関数リファレンス/sprite関数  <!-- タイトルネーム　-->
+</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★パースペクティブ</H1><BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slSetScreenDist"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slSetScreenDist</H1>
+<HR><H3>スクリーンまでの距離定数の設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> dist;
+
+    void slSetScreenDist( dist );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> dist - スクリーンまでの距離定数。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。    
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    透視変換をする時に使用する スクリーンまでの距離定数を設定します。<BR>
+    回転スクロールの回転中心Z位置も設定します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/sprite_j.htm#slSetScreenDist"><I>slSetScreenDist</I></A>( <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 40.0 ) );
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slZdspLevel">slZdspLevel</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slPerspective">slPerspective</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenDist">MsScreenDist</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#Resolution">Resolution</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParA">RotScrParA</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParB">RotScrParB</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slGetFrameData"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slGetFrameData</H1>
+<HR><H3>フレームバッファデータの取得</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    void   *dist;
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> size_x;
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> size_y;
+
+    void slGetFrameData( dist, size_x, size_y );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void   *dist  - 
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> size_x - 読み出された後のXサイズ。<BR>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> size_y - 読み出された後のYサイズ。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    フレームバッファの内容(1画面分)を読み出し、指定されたサイズに
+    スケーリング(間引き)してセットします。<BR>
+    4ドット単位で処理しているので、Xサイズは4の倍数とします。<BR>
+    バッファには低解像度の場合2バイト/ドット、高解像度の場合(1バイト/ドット)
+    で、書き込みます。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    読み出したデータをスプライトとして表示したい場合、
+    低解像度:
+      <a href="../func/scroll_j.htm#slSpriteColMode"><I>slSpriteColMode</I></A>( <a href="../struct/constscl_j.htm#SPR_PAL_RGB"><I>SPR_PAL_RGB</I></A> );    /* default */
+    とし、
+      <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>( PN_???, <a href="../struct/constspr_j.htm#No_Palet"><I>No_Palet</I></A>, <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#SPdis"><I>SPdis</I></A>|<a href="../struct/constspr_j.htm#ECdis"><I>ECdis</I></A>|<a href="../struct/constspr_j.htm#CL32KRGB"><I>CL32KRGB</I></A>,
+        <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A> );
+    といったアトリビュートでスプライト表示関数を実行します。<BR>
+    高解像度の場合には
+      <a href="../func/scroll_j.htm#slSpriteColMode"><I>slSpriteColMode</I></A>( <a href="../struct/constscl_j.htm#SPR_PAL"><I>SPR_PAL</I></A> );
+      <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>( PN_???, <a href="../struct/constspr_j.htm#No_Palet"><I>No_Palet</I></A>, <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#SPdis"><I>SPdis</I></A>|<a href="../struct/constspr_j.htm#ECdis"><I>ECdis</I></A>|<a href="../struct/constspr_j.htm#CL256Bnk"><I>CL256Bnk</I></A>,
+        <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A> );
+    のアトリビュートで表示させます。<BR>
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数ではVDP1の描画終了を待ち、フレームバッファを飛ばし読みして、
+    バッファにセットしています。フレームバッファの読み出しにはかなりの
+    ウェイトが入るため、32x24(=768)ドットで5msec.程度の時間がかかるので、
+    処理時間に注意して使用してください。<BR>
+    読み込むバッファをワーク上にとり、ブランキングでVRAMに転送する方が、
+    直接VRAMに展開するよりはウェイトが少ないようです。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsScreenSizeX">MsScreenSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsScreenSizeY">MsScreenSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#Resolution">Resolution</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slPerspective"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slPerspective</H1>
+<HR><H3>ビューイングボリウムの設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> pers;
+
+    void slPerspective( pers );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> pers - ビューイングボリウムの角度。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    透視変換をする時に使用する スクリーンまでの距離定数を設定します。<BR>
+    回転スクロールの回転中心Z位置も設定します。<BR>
+    画角はスクリーンの横幅(ウィンドウのサイズではない)に視野が入る角度と
+    して使用します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/sprite_j.htm#slPerspective"><I>slPerspective</I></A>( <a href="../struct/macro_j.htm#DEGtoANG"><I>DEGtoANG</I></A>( 60.0 ) );
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slZdspLevel">slZdspLevel</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slSetScreenDist">slSetScreenDist</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenDist">MsScreenDist</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#SlScreenDist">SlScreenDist</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsScreenSizeX">MsScreenSizeX</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsScreenSizeY">MsScreenSizeY</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParA">RotScrParA</A></TD>
+<TD><PRE><a href="../mem/system08_j.htm#RotScrParB">RotScrParB</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★表示限界</H1><BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slZdspLevel"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slZdspLevel</H1>
+<HR><H3>表示レベルの設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> level;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slZdspLevel( level );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> level - 表示レベル。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - 引数に規定値以外を入れた場合<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A>、それ以外<a href="../struct/constenm_j.htm#TRUE"><I>TRUE</I></A>。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    スクリーンよりも手前にあるポリゴン(あるいはスプライトデータ)をどこまで
+    表示するのかを切り替えます。<BR>
+    level は1〜7のいずれかで、それ以外はエラーになります。<BR>
+    1: スクリーンまでの距離の1/2までを表示範囲にします(default)。<BR>
+    2: スクリーンまでの距離の1/4までを表示範囲にします。<BR>
+    3: スクリーンまでの距離の1/8までを表示範囲にします。<BR>
+    4: スクリーンまでの距離の1/16までを表示範囲にします。<BR>
+    5: スクリーンまでの距離の1/32までを表示範囲にします。<BR>
+    6: スクリーンまでの距離の1/64までを表示範囲にします。<BR>
+    7: スクリーンまでの距離の1/128までを表示範囲にします。<BR>
+    レベルを切り替えるとそれ以降に表示するポリゴン(あるいはスプライト)に
+    対して、<a href="../func/sprite_j.htm#slWindow"><I>slWindow</I></A>で指定したzlimの基準位置も同様に変化しますので、注意して
+    ください。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    表示レベルを7(スクリーンの距離までの1/128)にする。<BR>
+    <a href="../func/sprite_j.htm#slZdspLevel"><I>slZdspLevel</I></A>( 7 );
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/polygon_j.htm#slPutPolygon">slPutPolygon</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slPutPolygonS">slPutPolygonS</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slPutPolygonX">slPutPolygonX</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slDispPolygon">slDispPolygon</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slPutSprite">slPutSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slSetSprite">slSetSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite">slDispSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteHV">slDispSpriteHV</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteSZ">slDispSpriteSZ</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite4P">slDispSprite4P</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slPutObject">slPutObject</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlZlimit">SlZlimit</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★スプライト描画関数</H1><BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slDispSprite"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slDispSprite</H1>
+<HR><H3>スプライトの描画</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZS"><I>XYZS</I></A> ];
+    <a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A>  *attr;
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> z_ang;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slDispSprite( pos, atrb, z_ang );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZS"><I>XYZS</I></A> ] - スプライトの位置。<BR>
+    <a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A>  *attr       - スプライトの属性。<BR>
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> z_ang       - スプライトの回転角。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    ポジション、スケール、回転角を指定し、スプライトを表示します。<BR>
+    <a href="../func/polygon_j.htm#slPutPolygon"><I>slPutPolygon</I></A>() と同様 Z値によりソーティングもします。<BR>
+    スケールにマイナスの値を指定した場合、Zポジションによりスケールを算出し、
+    スケールの補数を掛け、表示用のスケールとします。<BR>
+    例えば、スケールに-2.0を指定した場合、0.5倍で表示されるような位置
+    (Zポジション)にあれば、1.0倍になって表示されます。<BR>
+    スケールがゼロ又は、スプライトの表示座標(Z)が遠過ぎるあるいは、最大表示数を
+    越えたスプライトを表示しようとした場合、エラーコード<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A>を返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZS"><I>XYZS</I></A> ] = {
+      <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 110.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( <a href="../struct/constspr_j.htm#ORIGINAL"><I>ORIGINAL</I></A> )
+    };
+    <a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A> attr = <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>( 0, 0, <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#CL16Bnk"><I>CL16Bnk</I></A>, <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A>|<a href="../struct/constspr_j.htm#_ZmCC"><I>_ZmCC</I></A>);
+
+    <a href="../func/sprite_j.htm#slDispSprite"><I>slDispSprite</I></A>( pos, attr, <a href="../struct/macro_j.htm#DEGtoANG"><I>DEGtoANG</I></A>( 0.0 ) );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は、座標値取得及びソートの決定にスレーブCPUを使用します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slZdspLevel">slZdspLevel</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slPutSprite">slPutSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slSetSprite">slSetSprite</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteHV">slDispSpriteHV</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteSZ">slDispSpriteSZ</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite4P">slDispSprite4P</A></TD>
+<TD><PRE><a href="../mem/system01_j.htm#SpritePtr">SpritePtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenDist">MsScreenDist</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsZlimit">MsZlimit</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#WinUseFlag">WinUseFlag</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#TotalPolygons">TotalPolygons</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MXPolygons">MXPolygons</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DispPolygons">DispPolygons</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#DMAEndFlag">DMAEndFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMASetFlag">DMASetFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#PutCount">PutCount</A></TD>
+<TD><PRE><a href="../struct/types_j.htm#SPR_ATTR">SPR_ATTR</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../struct/macro_j.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slDispSpriteHV"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slDispSpriteHV</H1>
+<HR><H3>スプライトの描画</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZSS"><I>XYZSS</I></A> ];
+    <a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A>  *attr;
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> z_ang;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slDispSpriteHV( pos, attr, z_ang );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZSS"><I>XYZSS</I></A> ] - スプライトの位置。<BR>
+    <a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A>  *attr        - スプライトの属性。<BR>
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> z_ang        - スプライトの回転角。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    縦、横の表示スケールを指定して、変形スプライトを表示します。<BR>
+    上記の <a href="../func/sprite_j.htm#slDispSprite"><I>slDispSprite</I></A>() 関数と異なり、スケールにマイナスを指定した
+    場合キャラクターは反転して表示されます。<BR>
+    スケールがゼロ又は、スプライトの表示座標(Z)が遠過ぎるあるいは、表示数を
+    越えたスプライトを表示しようとした場合エラー<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A>を返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    #define FX0 <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 )
+
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZSS"><I>XYZSS</I></A> ] = {
+      FX0, FX0, <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 110.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( <a href="../struct/constspr_j.htm#ORIGINAL"><I>ORIGINAL</I></A> ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 2.0 )
+    };
+    <a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A> attr = <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>( 0, 0, <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#CL16Bnk"><I>CL16Bnk</I></A>, <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A>|<a href="../struct/constspr_j.htm#_ZmCC"><I>_ZmCC</I></A>);
+
+    <a href="../func/sprite_j.htm#slDispSpriteHV"><I>slDispSpriteHV</I></A>( pos, attr, <a href="../struct/macro_j.htm#DEGtoANG"><I>DEGtoANG</I></A>( 0.0 ) );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は、座標値取得及びソートの決定にマスターCPUを使用します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slZdspLevel">slZdspLevel</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slPutSprite">slPutSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slSetSprite">slSetSprite</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite">slDispSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteSZ">slDispSpriteSZ</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite4P">slDispSprite4P</A></TD>
+<TD><PRE><a href="../mem/system01_j.htm#SpritePtr">SpritePtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#DispPolygons">DispPolygons</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMAEndFlag">DMAEndFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMASetFlag">DMASetFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#PutCount">PutCount</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../struct/types_j.htm#SPR_ATTR">SPR_ATTR</A></TD>
+<TD><PRE><a href="../struct/macro_j.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slDispSpriteSZ"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slDispSpriteSZ</H1>
+<HR><H3>スプライトの描画</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZSS"><I>XYZSS</I></A> ];
+    <a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A>  *attr;
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> z_ang;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slDispSpriteSZ( pos, attr, ang_z );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZSS"><I>XYZSS</I></A> ] - スプライトの位置。<BR>
+    <a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A>  *attr        - スプライトの属性。<BR>
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> z_ang        - スプライトの回転角。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    縦、横の表示サイズを指定して、変形スプライトを表示します。<BR>
+    サイズにマイナスが指定された場合には、反転して表示されます。<BR>
+    サイズがゼロ又は、スプライトの表示座標(Z)が遠過ぎるあるいは、表示数を
+    越えたスプライトを表示しようとした場合エラー<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A>を返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    #define FX0 <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 )
+
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZSS"><I>XYZSS</I></A> ] = {
+      <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 30.0 ), FX0, <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 110.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.5 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 2.0 )
+    };
+    <a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A> attr = <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>( 0, 0, <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, CL16Bnk[a], <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A>|<a href="../struct/constspr_j.htm#_ZmCC"><I>_ZmCC</I></A>);
+
+    <a href="../func/sprite_j.htm#slDispSpriteSZ"><I>slDispSpriteSZ</I></A>( pos, attr, <a href="../struct/macro_j.htm#DEGtoANG"><I>DEGtoANG</I></A>( 0.0 ) );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は、座標値取得及びソートの決定にマスターCPUを使用します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slZdspLevel">slZdspLevel</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slPutSprite">slPutSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slSetSprite">slSetSprite</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite">slDispSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteHV">slDispSpriteHV</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite4P">slDispSprite4P</A></TD>
+<TD><PRE><a href="../mem/system01_j.htm#SpritePtr">SpritePtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeX">FrameSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeY">FrameSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipXAdder">MsClipXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipYAdder">MsClipYAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#DispPolygons">DispPolygons</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMAEndFlag">DMAEndFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMASetFlag">DMASetFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#PutCount">PutCount</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../struct/types_j.htm#SPR_ATTR">SPR_ATTR</A></TD>
+<TD><PRE><a href="../struct/macro_j.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slDispSprite4P"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slDispSprite4P</H1>
+<HR><H3>スプライトの描画</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>    pos[ 4 ][ <a href="../struct/constenm_j.htm#XY"><I>XY</I></A> ];
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>    pos_z;
+    <a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A>*attr;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slDispSprite4P( pos, pos_z, attr );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>    pos[ 4 ][ <a href="../struct/constenm_j.htm#XY"><I>XY</I></A> ] - 4頂点の座標。<BR>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>    pos_z;         - ソートの基準値。<BR>
+    <a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A>*attr;         - 属性。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    画面上の4点を指定して、変形スプライトを表示します。<BR>
+    4点はウィンドウ中心に対するオフセット位置で指定し、全体を代表する
+    Z位置を別に指定します。<BR>
+    4点は左上、右上、右下、左下の順(時計回り)で指定します。<BR>
+    4点の内いずれでも、クリップの範囲を越えた場合エラーコード<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A>を返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ 4 ][ <a href="../struct/constenm_j.htm#XY"><I>XY</I></A> ] = {
+      { <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 ) },
+      { <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 40.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 10.0 ) },
+      { <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 70.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 60.0 ) },
+      { <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 10.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 50.0 ) }
+    };
+    <a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A> attr = <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>( 2, 0x100, <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#CL16Bnk"><I>CL16Bnk</I></A>, 
+                                  <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A> | <a href="../struct/constspr_j.htm#_ZmCC"><I>_ZmCC</I></A> );
+
+    <a href="../func/sprite_j.htm#slDispSprite4P"><I>slDispSprite4P</I></A>( pos, <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 150.0 ), attr );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は、座標値取得及びソートの決定にマスターCPUを使用します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slZdspLevel">slZdspLevel</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slPutSprite">slPutSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slSetSprite">slSetSprite</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite">slDispSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteSZ">slDispSpriteSZ</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteHV">slDispSpriteHV</A></TD>
+<TD><PRE><a href="../mem/system01_j.htm#SpritePtr">SpritePtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeX">FrameSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeY">FrameSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipXAdder">MsClipXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipYAdder">MsClipYAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#DispPolygons">DispPolygons</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMAEndFlag">DMAEndFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMASetFlag">DMASetFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#PutCount">PutCount</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../struct/types_j.htm#SPR_ATTR">SPR_ATTR</A></TD>
+<TD><PRE><a href="../struct/macro_j.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slPutSprite"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slPutSprite</H1>
+<HR><H3>スプライトの描画</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZS"><I>XYZS</I></A> ];
+    <a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A>  *attr;
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> ang_z;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slPutSprite( pos, attr, ang_z );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZS"><I>XYZS</I></A> ];
+    <a href="../struct/types_j.htm#ATTR"><I>ATTR</I></A>  *attr;
+    <a href="../struct/types_j.htm#ANGLE"><I>ANGLE</I></A> ang_z;
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    カレントマトリクスを使用してポジションを算出し、透視変換に合わせて
+    スケーリングされたスプライトを表示します。<BR>
+    上記の <a href="../func/sprite_j.htm#slDispSprite"><I>slDispSprite</I></A>() と同じように 指定されたスケール倍
+    されますが、マイナスを指定した場合、符号反転してスケーリングされます。<BR>
+    最大ポリゴン数又は最大頂点数を越えた場合、エラーコード'<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A>'を返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A> pos[ <a href="../struct/constenm_j.htm#XYZS"><I>XYZS</I></A> ] = {
+      <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 0.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A> ( 110.0 ), <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( <a href="../struct/constspr_j.htm#ORIGINAL"><I>ORIGINAL</I></A> )
+    };
+    <a href="../struct/types_j.htm#SPR_ATTR"><I>SPR_ATTR</I></A> attr = <a href="../struct/macro_j.htm#SPR_ATTRIBUTE"><I>SPR_ATTRIBUTE</I></A>( 0, 0, <a href="../struct/constspr_j.htm#No_Gouraud"><I>No_Gouraud</I></A>, <a href="../struct/constspr_j.htm#CL16Bnk"><I>CL16Bnk</I></A>, <a href="../struct/constspr_j.htm#sprNoflip"><I>sprNoflip</I></A> | <a href="../struct/constspr_j.htm#_ZmCC"><I>_ZmCC</I></A> );
+
+    <a href="../func/sprite_j.htm#slPutSprite"><I>slPutSprite</I></A>( pos, attr, <a href="../struct/macro_j.htm#DEGtoANG"><I>DEGtoANG</I></A>( 0.0 ) );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は、座標値取得及びソートの決定にスレーブCPUを使用します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slZdspLevel">slZdspLevel</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slSetSprite">slSetSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite">slDispSprite</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteSZ">slDispSpriteSZ</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite4P">slDispSprite4P</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteHV">slDispSpriteHV</A></TD>
+<TD><PRE><a href="../mem/system01_j.htm#SpritePtr">SpritePtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenDist">MsScreenDist</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsZlimit">MsZlimit</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MXPolygons">MXPolygons</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DispPolygons">DispPolygons</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMAEndFlag">DMAEndFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMASetFlag">DMASetFlag</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#PutCount">PutCount</A></TD>
+<TD><PRE><a href="../struct/types_j.htm#SPR_ATTR">SPR_ATTR</A></TD>
+<TD><PRE><a href="../struct/macro_j.htm#SPR_ATTRIBUTE">SPR_ATTRIBUTE</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slSetSprite"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slSetSprite</H1>
+<HR><H3>スプライトの描画</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#SPRITE"><I>SPRITE</I></A> *spr;
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>  pos_z;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slSetSprite( spr, pos_z );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#SPRITE"><I>SPRITE</I></A> *spr  - 表示するVDP1のコマンドデータ。<BR>
+    <a href="../struct/types_j.htm#FIXED"><I>FIXED</I></A>  pos_z - ソートのための基準。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    ハードウエアに渡すスプライトコントロールコマンドデータを転送リストに
+    セットします。<BR>
+    ライブラリ関数では作成できないような変形スプライトや、特定のスプライ
+    トにのみ影響するウィンドウの設定をしたい場合などに使用します。<BR>
+    最大ポリゴン数を越えた場合または、Zクリッピング境界を越えて使用した場合
+    エラーコード<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A>を返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#SPRITE"><I>SPRITE</I></A> attr = {
+      <a href="../struct/constspr_j.htm#FUNC_Sprite"><I>FUNC_Sprite</I></A>,                         /* Drawing Sprite              */
+      0,                                   /* Link ( Ignore )             */
+      <a href="../struct/constspr_j.htm#ECdis"><I>ECdis</I></A> | <a href="../struct/constspr_j.htm#SPenb"><I>SPenb</I></A> | <a href="../struct/constspr_j.htm#CL16Look"><I>CL16Look</I></A> | <a href="../struct/constspr_j.htm#CL_Trans"><I>CL_Trans</I></A>, /* Color mode.                 */
+      ( 0x1b000 >> 3 ),                    /* Color bank number.          */
+      ( 0x12400 >> 3 ),                    /* Character address.          */
+      ( ( 64 / 8 ) << 8 | 96 ),            /* Character size ((x/8)<<8|y) */
+      0,                                   /* A(x)                        */
+      0,                                   /* A(y)                        */
+      64,                                  /* B(x)                        */
+      0,                                   /* B(y)                        */
+      64,                                  /* C(x)                        */
+      96,                                  /* C(y)                        */
+      0,                                   /* D(x)                        */
+      96,                                  /* D(y)                        */
+      0,                                   /* Gouraud table address       */
+      0                                    /* Dummy.                      */
+    };
+
+    <a href="../func/sprite_j.htm#slSetSprite"><I>slSetSprite</I></A>( attr, <a href="../struct/macro_j.htm#toFIXED"><I>toFIXED</I></A>( 145.0 ) );
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は、ソートの決定にスレーブCPUを使用します。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slZdspLevel">slZdspLevel</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slPutSprite">slPutSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite">slDispSprite</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteSZ">slDispSpriteSZ</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite4P">slDispSprite4P</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteHV">slDispSpriteHV</A></TD>
+<TD><PRE><a href="../mem/system01_j.htm#SpritePtr">SpritePtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenDist">MsScreenDist</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsZlimit">MsZlimit</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#WinUseFlag">WinUseFlag</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#TotalPolygons">TotalPolygons</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MXPolygons">MXPolygons</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DispPolygons">DispPolygons</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#DMAEndFlag">DMAEndFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#DMASetFlag">DMASetFlag</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#PutCount">PutCount</A></TD>
+<TD><PRE><a href="../struct/types_j.htm#SPRITE">SPRITE</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★ウインドウ</H1><BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slWindow"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slWindow</H1>
+<HR><H3>スプライトウインドウの設定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> left, top, right, bottom;
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> zlim;
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> cen_x, cen_y;
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slWindow( left, top, right, bottom, zlim, cen_x, cen_y );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> left   - ウインドウの右端。<BR>
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> top    - ウインドウの上端。<BR>
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> right  - ウインドウの左端。<BR>
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> bottom - ウインドウの下端。<BR>
+    <a href="../struct/types_j.htm#Uint16"><I>Uint16</I></A> zlim   - Z限界。<BR>
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> cen_x  - 消失点(座標原点)のX座標。<BR>
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> cen_y  - 消失点(座標原点)のY座標。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - エラーコード(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    スプライト、及びポリゴンの表示を制限する範囲を設定します。<BR>
+    表示範囲は TV 画面上での位置で、表示中に2回まで指定できます。<BR>
+    zlimは これより先が表示されなくなります。<BR>
+    cen_x, cen_y は ポリゴンでは消失点の位置、スプライトでは座標原点に
+    なります。<BR>
+    画面上での位置は左上が( 0, 0 )、右下が( 319, 223 ) <通常画面サイズ>
+    です。<BR>
+    トータルのウインドウ数が3つ以上になったら、関数の戻り値として<a href="../struct/constenm_j.htm#FALSE"><I>FALSE</I></A>を
+    返します。成功した場合<a href="../struct/constenm_j.htm#TRUE"><I>TRUE</I></A>が返ります。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    ウインドウの左上座標(10,15)、右下座標(300,195)、消失点はこのウインドウの
+    中央、Z限界値を5000hとするウインドウ。<BR>
+    <a href="../func/sprite_j.htm#slWindow"><I>slWindow</I></A>( 10, 15, 300, 195, 0x5000, 145, 75 );
+    下の注意も見よ。<BR>
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    <a href="../func/sprite_j.htm#slWindow"><I>slWindow</I></A>() を 呼ぶ前に <a href="../func/polygon_j.htm#slPutPolygon"><I>slPutPolygon</I></A>(),
+    <a href="../func/sprite_j.htm#slPutSprite"><I>slPutSprite</I></A>() 等のスプライト
+    をセットする関数を使用すると、それらには全画面サイズのウィンドウが使
+    用され、改めて呼ばれた <a href="../func/sprite_j.htm#slWindow"><I>slWindow</I></A>() で設定されるウィンドウが
+    二つ目になります。<BR>
+    通常は
+      <a href="../func/sprite_j.htm#slWindow"><I>slWindow</I></A>(...) ;                /* Window 1 */
+           ...
+        <a href="../func/polygon_j.htm#slPutPolygon"><I>slPutPolygon</I></A>(...) ;
+        <a href="../func/sprite_j.htm#slPutSprite"><I>slPutSprite</I></A>(...) ;
+           ...
+      <a href="../func/sprite_j.htm#slWindow"><I>slWindow</I></A>(...) ;                /* Window 2 */
+           ...
+         <a href="../func/sprite_j.htm#slPutSprite"><I>slPutSprite</I></A>(...) ;
+         <a href="../func/polygon_j.htm#slPutPolygon"><I>slPutPolygon</I></A>(...) ;
+
+    のように、処理のはじめにウィンドウをセットし、切替えたい所でもう一度
+    別のウィンドウをセットするようにします。<BR>
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/polygon_j.htm#slPutPolygon">slPutPolygon</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slPutPolygonS">slPutPolygonS</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slPutPolygonX">slPutPolygonX</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slDispPolygon">slDispPolygon</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slPutSprite">slPutSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slSetSprite">slSetSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite">slDispSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteHV">slDispSpriteHV</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteSZ">slDispSpriteSZ</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite4P">slDispSprite4P</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slZdspLevel">slZdspLevel</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slCurWindow">slCurWindow</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slSprWinNum">slSprWinNum</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsZlimit">MsZlimit</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#WindowNumber">WindowNumber</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#WinUseFlag">WinUseFlag</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#TotalPolygons">TotalPolygons</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenLeft">MsScreenLeft</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenTop">MsScreenTop</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenRight">MsScreenRight</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenBottom">MsScreenBottom</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeX">MsWindowSizeX</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeY">MsWindowSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeX">FrameSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeY">FrameSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinXAdder">MsWinXAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinYAdder">MsWinYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinXAdder">SlWinXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinYAdder">SlWinYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipXAdder">MsClipXAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipYAdder">MsClipYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipXAdder">SlClipXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipYAdder">SlClipYAdder</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slCurWindow"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slCurWindow</H1>
+<HR><H3>ウインドウの切替え</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint8"><I>Uint8</I></A> win;
+
+    void slCurWindow( win );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint8"><I>Uint8</I></A> win - 切替えるウインドウのタイプ(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    表示するウィンドウを切り替えます。<BR>
+    win には <a href="../struct/constenm_j.htm#winFar"><I>winFar</I></A>(奥側) , <a href="../struct/constenm_j.htm#winNear"><I>winNear</I></A>(手前側) のいずれかを指定します。<BR>
+    本関数を実行すると、スクリーン位置、表示領域が設定されますが、
+    光源ベクトルは変更されませんので、注意してください。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    表示するウインドウを奥にする。<BR>
+    <a href="../func/sprite_j.htm#slCurWindow"><I>slCurWindow</I></A>( <a href="../struct/constenm_j.htm#winFar"><I>winFar</I></A> );
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slSprWinNum">slSprWinNum</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComWrPtr">ComWrPtr</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#ComRdPtr">ComRdPtr</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenDist">MsScreenDist</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#WindowNumber">WindowNumber</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenLeft">MsScreenLeft</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenTop">MsScreenTop</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenRight">MsScreenRight</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#MsScreenBottom">MsScreenBottom</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeX">MsWindowSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeY">MsWindowSizeY</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinXAdder">MsWinXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWinYAdder">MsWinYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinXAdder">SlWinXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlWinYAdder">SlWinYAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipXAdder">MsClipXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsClipYAdder">MsClipYAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipXAdder">SlClipXAdder</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipYAdder">SlClipYAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#SlZlimit">SlZlimit</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slSprWinNum"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slSprWinNum</H1>
+<HR><H3>ウインドウ番号の取得</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Uint8"><I>Uint8</I></A> slSprWinNum( void );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も与えません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint8"><I>Uint8</I></A> - 表示に使用されているウインドウ番号。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    表示に使用されているウィンドウ番号を返します。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Uint8"><I>Uint8</I></A> winno;
+
+    winno = <a href="../func/sprite_j.htm#slSprWinNum"><I>slSprWinNum</I></A>();
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slCurWindow">slCurWindow</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#WindowNumber">WindowNumber</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slFrameClipSize"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slFrameClipSize</H1>
+<HR><H3>クリッピングサイズの指定</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> size_x, size_y;
+
+    void slFrameClipSize( size_x, size_y );
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> size_x - クリップのXサイズ。<BR>
+    <a href="../struct/types_j.htm#Sint16"><I>Sint16</I></A> size_y - クリップのYサイズ。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    void - 何も返しません。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    スプライト表示関数<a href="../func/sprite_j.htm#slDispSprite"><I>slDispSprite</I></A>、<a href="../func/sprite_j.htm#slDispSpriteHV"><I>slDispSpriteHV</I></A>、
+    <a href="../func/sprite_j.htm#slDispSpriteSZ"><I>slDispSpriteSZ</I></A>、<a href="../func/sprite_j.htm#slDispSprite4P"><I>slDispSprite4P</I></A>、<a href="../func/sprite_j.htm#slPutSprite"><I>slPutSprite</I></A>と、
+    <a href="../struct/constspr_j.htm#UseClip"><I>UseClip</I></A>オプションを指定したポリゴンを表示する範囲を設定します。<BR>
+    ウィンドウサイズに対し、上下左右にそれぞれ指定された幅を加えた領域から
+    外れた点に対し非表示とします。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    <a href="../func/sprite_j.htm#slFrameClipSize"><I>slFrameClipSize</I></A>( 10, 5, 190, 200 );
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/init_j.htm#slInitSystem">slInitSystem</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slWindow">slWindow</A></TD>
+<TD><PRE><a href="../mem/system02_j.htm#WindowNumber">WindowNumber</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeX">MsWindowSizeX</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#MsWindowSizeY">MsWindowSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeX">FrameSizeX</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#FrameSizeY">FrameSizeY</A></TD>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipXAdder">SlClipXAdder</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../mem/system03_j.htm#SlClipYAdder">SlClipYAdder</A></TD>
+</TR>
+</TABLE></P>
+</DL>
+
+<!-------------------------------------------------------------------------------->
+<HR><H1>★スレーブ活動状況</H1><BR><BR><a href="index_j.htm#sprite">一覧表</A>｜<a href="../index_j.htm">リファレンス</A><BR>
+<A NAME="slCheckSlave"><HR NOSHADE></A>
+<H4>関数</H4>
+<H1>slCheckSlave</H1>
+<HR><H3>スレーブ活動状態のチェック</H3>
+<DL>
+<P><DT><H3>書  式</H3>
+<DD><PRE>
+    #include "sgl.h"
+
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> slCheckSlave( void )
+</PRE></P>
+
+<P><DT><H3>引  数</H3>
+<DD><PRE>
+    void - 何も与えません。<BR>
+</PRE></P>
+
+<P><DT><H3>返  数</H3>
+<DD><PRE>
+    <a href="../struct/types_j.htm#Bool"><I>Bool</I></A> - スレーブのステータス(後述)。<BR>
+</PRE></P>
+
+<P><DT><H3>機  能</H3>
+<DD><PRE>
+    スレーブの動作状況をチェックします。<BR>
+</PRE></P>
+
+<P><DT><H3>用  例</H3>
+<DD><PRE>
+    スレーブのタスク(ジオメトリの計算)が終了するのを待ってから、
+    <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>を呼ぶ。<BR>
+      while ( <a href="../func/sprite_j.htm#slCheckSlave"><I>slCheckSlave</I></A>() != <a href="../struct/constenm_j.htm#TRUE"><I>TRUE</I></A> );
+      <a href="../func/int_j.htm#slSynch"><I>slSynch</I></A>();
+</PRE></P>
+
+<P><DT><H3>注  意</H3>
+<DD><PRE><B><I>
+    この関数は、透視変換、ジオメトリ演算を必要とするスプライト/ポリゴン描画
+    関数の演算が終了しているかを知るもので、ユーザが<a href="../func/math_j.htm#slSlaveFunc"><I>slSlaveFunc</I></A>で
+    設定した関数の動作について調べるものではありません。 
+</I></B>
+</PRE></P>
+
+<P><DT><H3>参  照</H3>
+<DD><TABLE BORDER>
+<TR>
+<TD><PRE><a href="../func/polygon_j.htm#slPutPolygon">slPutPolygon</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slPutPolygonS">slPutPolygonS</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slDispPolygon">slDispPolygon</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slPutObject">slPutObject</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slPutSprite">slPutSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite">slDispSprite</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteSZ">slDispSpriteSZ</A></TD>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSprite4P">slDispSprite4P</A></TD>
+</TR>
+<TR>
+<TD><PRE><a href="../func/sprite_j.htm#slDispSpriteHV">slDispSpriteHV</A></TD>
+<TD><PRE><a href="../func/polygon_j.htm#slPutPolygonX">slPutPolygonX</A></TD>
+</TR>
+</TABLE>
+</DL>
+
+<HR NOSHADE>
+<A HREF="index_j.htm">戻る</A><ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

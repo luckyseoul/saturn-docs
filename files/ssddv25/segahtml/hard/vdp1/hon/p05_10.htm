@@ -1,0 +1,100 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;21/54&gt;VDP1 User's Manual/5.1 Character Pattern Table</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p04_19.htm">Back</a> ｜ <A HREF="p05_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual</b><H2 ALIGN=CENTER> Chapter 5 Table</H2><HR NOSHADE>
+<DL>
+<A NAME="5_10"></A><P><DT><H2> ■5.1 Character pattern table</H2><DD> Character patterns are the source data for sprites drawn using texture drawing commands.<BR>
+ Define character patterns consecutively in VRAM as a table. The stored data is referenced by the character address in the command table, and the size of the data is determined by the character pattern size and sprite color mode.</P>
+<A NAME="5_11"></A><P><DT> <B>●Character pattern table address</b><DD> Please define the character pattern with a boundary of 20H (32) Bytes. However, it is not possible to define a character pattern starting from address 00000H of VRAM. Character patterns are stored on a 20HByte boundary, so any memory that is less than 20HByte will be free space.<BR>
+ VRAM is up to address 7FFFFH. Do not define character patterns beyond address 80000H.</P>
+<A NAME="5_12"></A><P><DT> <B>●Table size</b><DD> Depending on the color mode, 1 pixel of the character pattern becomes 4, 8, or 16 bit data.<BR>
+ The character size can be specified in the range of 8 to 504 pixels in 8-pixel units horizontally and 1 to 255 pixels in 1-pixel units vertically.<BR>
+ For example, to represent a character pattern of 8 pixels horizontally x 3 pixels vertically, 0CH (12) Bytes are required for 4 bits/pixel, 18H (24) Bytes for 8 bits/pixel, and 30H (48) Bytes for 16 bits/pixel.<BR>
+ The minimum size of the character pattern table is 8 pixels wide x 1 pixel high and 4 HByte when the data is 4 bits/pixel, and the maximum size is 504 pixels wide x 255 pixels high and 3EC10H (257040) Bytes is required when the data size is 16 bits/pixel.</P>
+<A NAME="t5_1"></A><P><DD> <B>Table 5.1 Character pattern table size</b><DD><TABLE BORDER>
+<TR><TD ALIGN="CENTER"><PRE> item</TD><TD ALIGN="CENTER"><PRE> minimum</TD><TD ALIGN="CENTER"><PRE> maximum</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> character size</TD><TD ALIGN="LEFT"><PRE> 8 pixels horizontally x 1 pixel vertically</TD><TD ALIGN="LEFT"><PRE> 504 pixels horizontally x 255 pixels vertically</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> color mode</TD><TD ALIGN="LEFT"><PRE> 4bit/pixel</TD><TD ALIGN="LEFT"><PRE> 16bit/pixel</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> character pattern</TD><TD ALIGN="LEFT"><PRE> 4HByte <sup>*</sup></TD><TD ALIGN="LEFT"><PRE> 3EC10H (257040) Byte</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>[Note]*</b> Please note that even a 4HByte character pattern requires 20HByte on VRAM.</P>
+<A NAME="5_13"></A><P><DT> <B>●Character pattern table example</b><DD> An example of a character pattern with a character size of 8 pixels horizontally and 3 pixels vertically is shown below.</P>
+<A NAME="z5_1"></A><P><DD> <B>Figure 5.1 Example of character pattern table</b>
+<PRE>
+●0CH(12)byte is required for 4bit/pixel
+pixel 0 1 2 3 4 5 6 7　
+     ┏━┯━┳━┯━┳━┯━┳━┯━┓
+     ┃ │ ┃ │ ┃ │ ┃ │ ┃
++00H ┃+00┃+01┃+02┃+03┃
+     ┃ │ ┃ │ ┃ │ ┃ │ ┃
+     ┣━┿━╋━┿━╋━┿━╋━┿━┫
+     ┃ │ ┃ │ ┃ │ ┃ │ ┃
++04H ┃+04┃+05┃+06┃+07┃
+     ┃ │ ┃ │ ┃ │ ┃ │ ┃
+     ┣━┿━╋━┿━╋━┿━╋━┿━┫
+     ┃ │ ┃ │ ┃ │ ┃ │ ┃
++08H ┃+08┃+09┃+0A┃+0B┃
+     ┃ │ ┃ │ ┃ │ ┃ │ ┃
+     ┗━┷━┻━┷━┻━┷━┻━┷━┛
+
+●18H (24) bytes are required for 8bit/pixel
+pixel  0   1   2   3   4   5   6   7　
+     ┏━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┓
+     ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃
++00H ┃+00┃+01┃+02┃+03┃+04┃+05┃+06┃+07┃
+     ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃
+     ┣━━━╋━━━╋━━━╋━━━╋━━━╋━━━╋━━━╋━━━┫
+     ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃
++08H ┃+08┃+09┃+0A┃+0B┃+0C┃+0D┃+0E┃+0F┃
+     ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃
+     ┣━━━╋━━━╋━━━╋━━━╋━━━╋━━━╋━━━╋━━━┫
+     ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃
++10H ┃+10┃+11┃+12┃+13┃+14┃+15┃+16┃+17┃
+     ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃   ┃
+     ┗━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┛
+
+●18H (24) bytes are required for 8bit/pixel
+pixel    0       1       2       3       4       5       6       7
+     ┏━━━┯━━━┳━━━┯━━━┳━━━┯━━━┳━━━┯━━━┳━━━┯━━━┳━━━┯━━━┳━━━┯━━━┳━━━┯━━━┓
+     ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃
++00H ┃+00│+01┃+02│+03┃+04│+05┃+06│+07┃+08│+09┃+0A│+0B┃+0C│+0D┃+0E│+0F┃
+     ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃
+     ┣━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━┫
+     ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃
++08H ┃+00│+01┃+02│+03┃+04│+05┃+06│+07┃+08│+09┃+0A│+0B┃+0C│+0D┃+0E│+0F┃
+     ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃
+     ┣━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━╋━━━┿━━━┫
+     ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃
++10H ┃+00│+01┃+02│+03┃+04│+05┃+06│+07┃+08│+09┃+0A│+0B┃+0C│+0D┃+0E│+0F┃
+     ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃   │   ┃
+     ┗━━━┷━━━┻━━━┷━━━┻━━━┷━━━┻━━━┷━━━┻━━━┷━━━┻━━━┷━━━┻━━━┷━━━┻━━━┷━━━┛
+
+
+</PRE></DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p04_19.htm">Back</a> ｜ <A HREF="p05_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

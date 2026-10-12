@@ -1,0 +1,313 @@
+<HTML>
+<HEAD>
+<TITLE> Set data to be passed directly to the sound driver </TITLE>
+</HEAD><BODY>
+
+<P> <A HREF="func174.htm"> Return to previous page </A> | <A HREF="../findex.htm"> Return to menu </A> | <A HREF = "func179 .htm "> Go to next page </A> </BR> </P> <HR>
+
+
+<P ALIGN="right">
+<B>Sint8<BR>
+Sound function </B>
+</P>
+
+<H1>slSoundRequest</H1>
+
+<P ALIGN="right">
+<B> Set data to be passed directly to the sound driver </B>
+</P>
+
+<H3> Format </H3>
+<P>
+Sint8 slSoundRequest(form, ...)<BR>
+const char *form ;
+</P>
+
+<H3> Parameter </H3>
+<P>
+“Form” indicates the individual size of the following data as character string data. <BR>
+However, the first data is a function code and is not included in the character string.
+</P>
+
+<H3> Function </H3>
+<P>
+Set the data to be passed directly to the sound driver.
+</P>
+
+<H3> Return value </H3>
+<P>
+The return value is -2 if an invalid character is found in the form string, or -1 if an attempt is made to set word data from an odd address. <BR>
+Returns 0 if successful.
+</P>
+
+<H3> Remarks </H3>
+<P>
+Example of use) <BR>
+slSoundRequest("bbwwwbb" , SND_PCM_START , _Stereo|PCM16Bit , Level7&lt;&lt;5 ,StreamBuf &gt;&gt; 4 , StreamSize , Pitch , 0 , 0) ;
+In this case, SND_PCM_START is a function code and is not included in the string. <BR>
+_Stereo | PCM16Bit and Level7 &lt;&lt; 5 are passed to the sound driver as byte data, and StreamBuf &gt;&gt; 4, StreamSize and Pitch are passed as word data to the sound driver.
+</P>
+<P>
+Refer to “Table-1:“ slSndRequest ”Instruction List” in the attached document.
+</P>
+
+<P ALIGN="right">slSoundRequest</P>
+
+<H2> Function Reference Attachment </H2>
+
+<H4> Table 1 “slSoundRequest” command list </H4>
+
+
+<TABLE BORDER>
+
+<TR>
+<TH>Command Name</TH>
+<TH> Command Data </​​TH>
+<TH> Parameter Data </​​TH>
+</TR>
+
+<TR>
+<TD> Reserved </TD> <TD> 00 (hex) </TD> <TD> Nothing </TD>
+</TR>
+
+<TR>
+<TD>Sequence Start<BR>( S - - )</TD>
+<TD>01</TD>
+<TD> P1 0-7: Pronunciation management number <BR>
+P2  0-15 :Sequence bank number<BR>
+P3  0-127 :Sequence song number<BR>
+P4  0-31 :Priority level</TD>
+</TR>
+
+<TR>
+<TD>Sequence Stop<BR>( S - - )</TD>
+<TD>02</TD>
+<TD> P1 0-7: Pronunciation management number </TD>
+</TR>
+
+<TR>
+<TD>Sequence Pause<BR>( S - - )</TD>
+<TD>03</TD>
+<TD> P1 0-7: Pronunciation management number </TD>
+</TR>
+
+<TR>
+<TD>Sequence Continue<BR>( S - - )</TD>
+<TD>04</TD>
+<TD> P1 0-7: Pronunciation management number </TD>
+</TR>
+
+<TR>
+<TD>Sequence Volume<BR>( S - - )</TD>
+<TD>05</TD>
+<TD> P1 0-7: Pronunciation management number <BR>
+P2  0-127 :Sequence Volume<BR>
+P3  0-255 :Fade Rate<BR>
+For details, refer to the attached Fade in method and Feed out method.
+</TD>
+</TR>
+
+<TR>
+<TD>Tempo Change<BR>( S - - )</TD>
+<TD>07</D>
+<TD> P1 0-7: Pronunciation management number <BR>
+P2  -   :dummy<BR>
+P3-P4 +32767-> --32768: Reference tempo (0000h) <BR>
+         Relative Tempo value to <BR>
+         Double at 1000h (4096), 1/2 when minus
+         Will be
+</TD>
+</TR>
+
+<TR>
+<TD>Map Change<BR>( S P - )</TD>
+<TD>08</TD>
+<TD> P1 0-255: Area number of the sound area map to be switched </TD>
+</TR>
+
+<TR>
+<TD>MIDI direct control<BR>( S - - )</TD>
+<TD>09</TD>
+<TD>P1  00h-FFh :MIDI command word<BR>
+P2  00h-FFh :MIDI channel word<BR>
+P3  00h-7Fh :MIDI data 1<BR>
+P4  00h-7Fh :MIDI data 2<BR>
+For details, see the attached MID direct control BIT image
+</TD>
+</TR>
+
+<TR>
+<TD>Volume analize start<BR>( - - C ) </TD>
+<TD>0A</TD>
+<TD> nothing (start volume acquisition) </TD>
+</TR>
+
+<TR>
+<TD>Volume analize stop<BR>( - - C )</TD>
+<TD>0B</TD>
+<TD> nothing (end volume acquisition) </TD>
+</TR>
+
+<TR>
+<TD>DSP stop<BR>( S P C )</TD>
+<TD>0C</TD>
+<TD> nothing </DSP>
+</TR>
+
+<TR>
+<TD>Sound all OFF<BR>( S P C )</TD>
+<TD>0D</TD>
+<TD> nothing (all pronunciation slots stopped) </TD>
+</TR>
+
+<TR>
+<TD>Sequence PAN<BR>( S - - )</TD>
+<TD>0E</TD>
+<TD> P1 0-7: Pronunciation management number
+P2 bit7 0 : Control OFF 1 : Control ON<BR>
+bit6-0  MIDI PAN data(00h-7Fh)<BR>
+00h : Left&lt;---&gt;40h:Center&lt;---&gt;7Fh:Right<BR>
+(MIDI PAN is 128 steps, but SCSP PAN is <BR>
+Since there are 32 levels, the lower 2 bits of MIDI PAN data are <BR>
+Ignored. )
+</TD>
+</TR>
+
+<TR>
+<TD>CD-DA Level<BR>( - - C )</TD>
+<TD>80</TD>
+<TD>P1  00h-E0h :CD-DA level Left
+    8 levels of 00h (off), 20h, 40h, 60h, 80h, A0h, C0h, E0h, (MAX)
+P2  00h-E0h :CD-DA level Right
+    8 levels of 00h (off), 20h, 40h, 60h, 80h, A0h, C0h, E0h, (MAX)
+</TD>
+</TR>
+
+<TR>
+<TD>DataCD-DA Pan<BR>( - - C )</TD>
+<TD>81</TD>
+<TD> P1 0-31: CD-DA pan Left 32 steps <BR>
+P2 0-31: CD-DA pan Right 32 stages </TD>
+</TR>
+
+<TR>
+<TD>Total Volume<BR>( S P C )</TD>
+<TD>82</TD>
+<TD> P1 0-15: 16 steps when 0 is OFF </TD>
+</TR>
+
+<TR>
+<TD>Effect Change<BR>( S P C )</TD>
+<TD>83</TD>
+<TD>P1    0-15 :Effect bank number</TD>
+</TR>
+
+<TR>
+<TD>PCM start<BR>( - P - )</TD>
+<TD>85</TD>
+<TD>P1 bit7 0 : mono 1 : stereo<BR>
+bit6-5 not use<BR>
+bit4 0 : 16bitPCM 1 : 8bitPCM<BR>
+bit3-0 0-7: PCM stream playback number <BR>
+P2 bit7-5 0-7: Direct sound Level 8 stage <BR>
+bit4-0 0-31: Direct sound Pan 32 steps (ignored for Stereo) <BR>
+P3-P4 0000h-FFFFh: PCM stream buffer start address <BR>
+(Upper 16 bits of 20-bit data) <BR>
+P5-P6 0000h-FFFFh: PCM stream buffer size <BR>
+(Number of samples for 1ch) <BR>
+P7-P8  0000h-FFFFh :pitch word<BR>
+(SCSP pitch register data: Oct & FNS) <BR>
+P9 bit7-3 0-15: Effect in select (P9 = Rch or MONO) <BR>
+bit2-0 0-7: Effect send Level 8 stage <BR>
+P10bit7-30-15: Effect in select (P10 = Lch) <BR>
+bit2-0 0-7: Effect send Level 8 steps
+</TD>
+</TR>
+
+<TR>
+<TD>PCM stop<BR>( - P - )</TD>
+<TD>86</TD>
+<TD> P1 0-7: Playback stop PCM stream playback number </TD>
+</TR>
+
+<TR>
+<TD>Mixer change<BR>( S P C )</TD>
+<TD>87</TD>
+<TD> P1 0-15: Tone bank number <BR>
+P2 0-127 :Mixer number</TD>
+</TR>
+
+<TR>
+<TD>Mixer parameter change<BR>( S P C )</TD>
+<TD>88</TD>
+<TD>P1 0-17 :Effect out select<BR>
+P2 bit7-5 0-7: Effect return Level 8th stage <BR>
+bit4-0 0-31: Effect Pan 32 stages </TD>
+</TR>
+
+<TR>
+<TD>Hard check<BR>( - - - )</TD>
+<TD>89</TD>
+<TD> P1 0-5: Check item <BR>
+ 0-DRAM 4Mbit read/write<BR>
+1-DRAM 8Mbit read/write<BR>
+2-SCSP MIDI<BR>
+3-Sound source output (L / R) <BR>
+4-sound source output (L) <BR>
+5-sound source output (R)
+</TD>
+</TR>
+
+<TR>
+<TD>PCM parameter change<BR>( - P - )</TD>
+<TD>8A</TD>
+<TD> P1 0-7: PCM stream playback number <BR>
+P2 bit7-5 0-7: Direct sound Level 8 stage <BR>
+bit4-0 0-31: Direct sound Pan 32 steps <BR>
+P3-P4 0000h-FFFFh :pitch word<BR>
+P5 bit7-3 0-15: Effect in select (P5 = Rch or MONO) <BR>
+bit2-0 0-7: Effect send Level 8 stage <BR>
+P6 bit7-3 0-15: Effect in select (P6 = Lch) <BR>
+bit2-0 0-7: Effect send Level 8 steps
+</TD>
+</TR>
+
+<TR>
+<TD>Reserved</TD>
+<TD>8B-FF</TD>
+<TD>Nothing</TD>
+</TR>
+
+</TABLE BORDER>
+
+<P>
+(S P C) <BR>
+S: Command for Sequence playback, or command related to Sequence playback <BR>
+P: Command for PCM stream playback, or command related to PCM stream playback <BR>
+C: Command for CD-DA playback or commands related to CD = DA playback
+</P>
+
+<IMG SRC="ref-p178.gif">
+<H4> Fade in method </H4>
+<P>
+Issue the sequence volume command before issuing the start command. Starts at Volume = 0 and fades in according to the fade rate until the specified sequence volume is reached. You can freely control the fade-in curve by using the sequence volume command twice (or more).
+</P>
+
+<H4> Fade out method </H4>
+<P>
+Issue a sequence volume command with Volume = 0. Start from the current sequence volume and fade out according to the fade rate until Volume = 0 is reached. You can freely control the fade-out curve by using the sequence volume command twice (or more).
+</P>
+
+<P>
+Note 1) <BR>
+Commands such as “MIDI direct control” and “PCM start” are closely related to the relationship between MIDI channels and timbres, and the specifications of DSP programs and mixers. Please give me.
+</P>
+
+<P>
+Note 2) <BR>
+A dedicated DSP program is required for analysis by frequency band for volume analysis, so download the dedicated DSP program with the Effect change command before issuing the command. DSP program is not required for main volume. In addition, since the data update at the time of volume acquisition is performed at intervals of 16 msec, read out the volume data at intervals of 16 msec or more.
+</P>
+
+<P>
+Note 3) <BR>
+When stereo is specified with PCM start, the first half from the beginning of the area specified by P3-P4 is processed as Rch and the second half as Lch. Make sure that the PCM stream buffer starts with an even address and has an even size. The start address of the PCM stream buffer is 20-bit data (00000h-FFFFFh)

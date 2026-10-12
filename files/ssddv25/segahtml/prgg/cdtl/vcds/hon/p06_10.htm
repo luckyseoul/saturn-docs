@@ -1,0 +1,101 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/13&gt;Virtual CD System/3.CD Emulator</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">Virtual CD System</a><HR>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Virtual CD System User's Manual</b><H2 ALIGN=CENTER> Chapter 3 CD Emulator VCDEMU</H2><HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A><P><DT><H3> 3.1 Command specifications</H3><P><DT> <B>command:</b><DD> VCDEMU</P>
+<P><DT> <B>Command name:</b><DD> virtual cd emulator</P>
+<P><DT> <B>Format:</b><DD> VCDEMU file name body part [-l log file name] [-f RTI file name]<BR>
+ [-j jumper setting position] [-u update information file]<BR>
+ [-ib input buffer size] [-vb transfer buffer size]</P>
+<P><DT> <B>argument:</b><DD> Body part of file name: Body part of file targeted for CD emulation</P>
+<P><DT> <B>function:</b><DD><UL TYPE=DISC>
+<P><LI> Performs CD emulation (CD pseudo playback operation).<BR>
+ If no option is specified, the CD emulation target file is as follows.</P>
+<P><PRE>
+Disk image file: file name body part.DSK
+Script file: File name body part.SCR
+Disk configuration information file: file name body part.RTI
+Log file: not created</PRE></P>
+<P><LI> By specifying the "-u" option, you can perform CD emulation by partially updating the CD image.</P>
+<P><LI> In real-time emulation mode, fast forward scan playback/fast backward scan playback of CDDA tracks is possible. Control from the control screen of multiplayer, etc.<BR>
+ (Normal scan playback is not possible in direct DOS access mode)</P>
+<P><LI> While transferring MODE1 and MODE2 data, it is possible to intentionally cause a data transfer error by hitting the S key on the keyboard of a PC compatible computer for virtual CD.</P>
+</UL>
+<P><DT> <B>Example of use:</b><DD> VCDEMUTSTGAME</P>
+<P><DT> <B>Option specification:</b><DL>
+<P><DT> <B>-l:</b><DD> A log information file is created with the specified file name and the log information is saved.</P>
+<P><DT> <B>-f:</b><DD> The disk configuration information file name becomes the specified file name.</P>
+<P><DT> <B>-j:</b><DD> Specify the jumper number of the VCD I/F board.<BR>
+ The value will be the same as the environment variable VCDIO.</P>
+<P><DT> <B>-u:</b><DD> Performs CD emulation by partially updating the CD image.<BR>
+ Specify the update information file output by VCDUTL.EXE.</P>
+<P><DT> <B>-ib:</b><DD> Specify the size of the input buffer.<BR>
+ The value that can be specified is an integer in the range of 2 to 8, and a 4K byte buffer is secured for each unit.<BR>
+ By default, an input buffer of 32K bytes (8 with the specified value) is reserved.</P>
+<P><DT> <B>-vb :</b><DD> Specify the size of the transfer buffer.<BR>
+ The number that can be specified is an integer value in the range of 14 to 37, which specifies the number of transfer buffers to be secured. (One transfer buffer is sector size)<BR>
+ By default, 37 transfer buffers are allocated. (It may be less depending on the system memory usage)<BR>
+ The allocated input buffer size and number of transfer buffers are displayed at the bottom right of the screen after the program starts as shown below.</P>
+<P><DT> <B>Buffer：02/07</b><DD> Here, the numerator represents the size of the input buffer (in 4K units) and the denominator represents the number of transfer buffers. The number of transfer buffers displayed is an integer value divided by 2.</P>
+</DL>
+<P><DT> <B>●About the number of tracks and indexes that can be emulated</b><DD> If you have a very large number of tracks or indexes within a track, you can use the two options above to reduce the buffer amount or balance the input and transfer buffers to save memory and ensure proper emulation. You will be able to do it.</P>
+<P> However, the actual settings you need to make will vary depending on the amount of free space in the conventional memory of the PC compatible machine you are using, the length of the file name, etc. As a reference example, the following is a guideline when the free space of conventional memory is 585KB.</P>
+<P><DD><TABLE BORDER>
+<TR ALIGN=CENTER><TH WIDTH=150><PRE> Total number of indexes</TH><TH WIDTH=150><PRE> -ib setting value</TH><TH WIDTH=150><PRE> -vb setting value</TH></TR>
+<TR ALIGN=CENTER><TD><PRE> 2000</TD><TD><PRE> No settings required</TD><TD><PRE> No settings required</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 3000</TD><TD><PRE> No settings required</TD><TD><PRE> No settings required</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4000</TD><TD><PRE> No settings required</TD><TD><PRE> No settings required</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 4500</TD><TD><PRE> 4</TD><TD><PRE> No settings required</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> 5000</TD><TD><PRE> 2</TD><TD><PRE> 14</TD></TR>
+</TABLE>
+</P>
+<P> If you start the emulator program without setting the above options, the total number of tracks x number of indexes that can be emulated will be approximately 4000, and with the minimum setting of -ib 2 -vb 14, it will be approximately 5000. This works out to emulate a disk image with up to 99 tracks by default, about 40 indexes each, and with the buffer set to its minimum, about 50 indexes each.<BR>
+ With CD Builder, you can create a disc image with a maximum of 99 tracks x 99 indexes = approximately 10,000 track indexes, but the number of track indexes that can be emulated using the emulator program VCDEMU.EXE is limited to approximately 5,000. It will be.</P>
+<P><DT> <B>●VCDEMU error message</b><DD> Below are the error messages displayed by the Virtual CD emulator and their meanings. ** means any number, **** means any string. Error messages are displayed in red text on the screen.</P>
+<DL>
+<P><DT> <B>Cannot allocate read buffer</b><DD> Unable to secure buffer for reading data file</P>
+<P><DT> <B>Cannot find RTI file ****</b><DD> The specified RTI file was not found</P>
+<P><DT> <B>Cannot find the beginning of TOC info.</b><DD> The keyword indicating the start of TOC information was not found in the specified RTI file.</P>
+<P><DT> <B>Cannot find the beginning of REL info.</b><DD> The keyword indicating the start of correlation table information was not found in the specified RTI file.</P>
+<P><DT> <B>Cannot allocate memory for ISO9660 file info.</b><DD> Unable to secure memory to store ISO9660 file information</P>
+<P><DT> <B>Cannot allocate memory for DOS file info.</b><DD> Memory for storing DOS file information could not be secured.</P>
+<P><DT> <B>Illegal relation table</b><DD> There are inconsistencies in the correlation table information.</P>
+<P><DT> <B>Cannot open log file = ****</b><DD> Unable to open specified log file</P>
+<P><DT> <B>Cannot find DOS file in track **</b><DD> The DOS file corresponding to the specified address was not found in the track**</P>
+<P><DT> <B>No File at this LSA **</b><DD> A DOS file matching the specified absolute time was not found.</P>
+<P><DT> <B>File</b>&lt; <B>****</b>&gt; <B>cannot be opened</b><DD> DOS file **** could not be opened</P>
+<P><DT> <B>Illegal offset</b><DD> An address exceeding the size of the disk image file was specified during real-time emulation.</P>
+<P><DT> <B>Not read</b><DD> Failed to read data from DOS file</P>
+<P><DT> <B>Cannot read data from disk image file</b><DD> Unable to read data correctly from disk image file</P>
+<P><DT> <B>TOC is not loaded</b><DD> An attempt was made to display the TOC without it being loaded.</P>
+<P><DT> <B>REL table is not loaded</b><DD> An attempt was made to display correlation table information before it has been loaded.</P>
+</DL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">Virtual CD system</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

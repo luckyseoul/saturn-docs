@@ -1,0 +1,95 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;p=7/7&gt;汎用３Ｄモデリングツールユーザーズマニュアル/4.データフォーマット</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#win">Graphic Tools Guide</A>
+★<A HREF="../index.htm">3DMEユーザーズマニュアル</A>
+<HR>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>汎用３Ｄモデリングツールユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>４．データフォーマット</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P><DT><H3>■MDBフォーマット</H3>
+	<DD>　３ＤＭＥの出力するＭＤＬフォーマットの情報をバイナリー化したフォーマットです。</P>
+
+	<P><DT><B>　●構　造</B>
+	<DD>PDATA* (MAP_SIZE_X*MAP_SIZE_Y 個の情報)
+	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD>マップ番号０のアドレス</TD></TR>
+	<TR ALIGN=CENTER><TD>マップ番号１のアドレス</TD></TR>
+	<TR ALIGN=CENTER><TD>マップ番号２のアドレス</TD></TR>
+	<TR ALIGN=CENTER><TD>マップ番号３のアドレス</TD></TR>
+	<TR ALIGN=CENTER><TD>：</TD></TR>
+	<TR ALIGN=CENTER><TD>：</TD></TR>
+	<TR ALIGN=CENTER><TD>：</TD></TR>
+	<TR ALIGN=CENTER><TD>マップ番号ｎ−1のアドレス</TD></TR>
+	<TR ALIGN=CENTER><TD>Nullマップのオブジェクトデータ</TD></TR>
+	<TR ALIGN=CENTER><TD>マップ０番のオブジェクトデータ</TD></TR>
+	<TR ALIGN=CENTER><TD>マップ１番のオブジェクトデータ</TD></TR>
+	<TR ALIGN=CENTER><TD>マップ２番のオブジェクトデータ</TD></TR>
+	<TR ALIGN=CENTER><TD>マップ３番のオブジェクトデータ</TD></TR>
+	<TR ALIGN=CENTER><TD>：</TD></TR>
+	<TR ALIGN=CENTER><TD>：</TD></TR>
+	<TR ALIGN=CENTER><TD>：</TD></TR>
+	<TR ALIGN=CENTER><TD>マップｎ−1番のオブジェクトデータ</TD></TR>
+	</TABLE>
+	<DD>n = MAP_SIZE_X * MAP_SIZE_Y　とする。</P>
+
+	<P><DT><B>　●注　意</B>
+	<DD><UL TYPE=DISC>
+	<LI>マップ番号のアドレスは、そのマップのオブジェクトデータの格納アドレスを示します。
+	<LI>各オブジェクトは、ＳＧＬのPDATA構造体で示されています。
+	<LI>Nullマップは、ポリゴン数０個のオブジェクトです。
+	</UL></P>
+
+	<P><DD>　基本的に PDATA* の部分を参照しどのアドレスに PDATA(ポリゴン情報)が入っているのか参照しそのアドレスを slPutPolygon で出力します。</P>
+
+<A NAME="no4_20"></A>
+	<P><DT><H3>■コリジョンフォーマット</H3>
+	<DD>　グリット単位で自動分割し、情報を認識出来るようにします。</P>
+
+	<P><DT><B>　●取得出来る情報</B>
+	<OL>
+	<P><B><LI>ポリゴンの重心座標</B><BR>　どのポリゴンの上に立っているのか計算するのに使用します。</P>
+	<P><B><LI>ポリゴンの法線ベクトル</B><BR>　斜面における、自分の傾き、斜面の重力を計算するのに使用します。</P>
+	<P><B><LI>ポリゴンのアトリビュート番号</B><BR>　「道」「草原」とかのポリゴン単位での属性フラグの取得</P>
+	<P><B><LI>ポリゴンのグーループ番号</B><BR>　ポリゴン単位でのグループ番号の取得</P>
+	</OL>
+
+	<P><DT><B>　●コリジョン情報を取得する為のヘッダー情報</B>
+	<DD><PRE>
+typedef struct {
+     VECTOR norm ;        /* 法線ベクトル */
+     Uint16 att;          /* 属  性       */
+     Uint16 gru;          /* グループ     */
+     FIXED  cen_x;        /* 中  心       */
+     FIXED  cen_y;        /* 中  心       */
+     FIXED  cen_z;        /* 中  心       */
+} COLLISON;
+
+typedef struct {
+     COLLISON    *cotbl;  /* ポリゴン定義テーブル */
+     Uint32      nbCo;    /* ポリゴンの数         */
+}CDATA;
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+　　■</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#win">Graphic Tools Guide</A>
+★<A HREF="../index.htm">3DMEユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,89 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 8&gt;FAQ/SGLプログラミング関連</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#sgl">FAQ</A>
+★<a href="index_j.htm#SLAVE">SGLプログラミング関連</A>
+<HR>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/SGLプログラミング関連</B>
+<H2 ALIGN=CENTER>スレーブCPU</H2>
+<HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_01"><HR></A><DL>
+<H3>スレーブCPUを使いたい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>スレーブCPUを使いたいのですが、どのように指定すればよいのかわかりません。</P>
+
+<P><DD><B>　void slSlaveFunc(void (*func)() , void *par)</B>
+
+<P><DD>      上の関数の void *par は、何を意味するのでしょうか？<BR>
+      また、この関数の前後で、スレーブSH2のON/OFFなどは必要なのでしょうか？<BR>
+      それと、スレーブの処理が終わったのをメインに知らせる知らせ方や、
+      メインの方で、スレーブの処理を強制終了させる命令とかはどうすれば良いのか
+      教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>この関数内でスレーブCPUのON/OFFを行っていますので、必要はありません。
+      また、引数parは登録関数への引数リストへのポインタになります。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_02"><HR></A><DL>
+<H3>スレーブでSGLの関数を実行したい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>スレーブ側にサウンドを担当させたいのですが、何か注意すべき点は
+      あるでしょうか？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SGLの関数はスレーブ側で動作させることを考慮した作りになっていません。</P>
+
+<P>      原因の一つは、gbrです。SGLシステムではgbrをシステム変数領域の
+      先頭アドレスにしてそこから、相対ロードを使ってデータの読み書きを
+      行なっています。<BR>
+      しかしながら、現状ではgbrには何も設定されていないため、そのままでは動作
+      しません。<BR>
+      では、gbrを設定すれば動くかというとそうでもありません。というのは、
+      各々のCPUのキャッシュに依存する問題です。他方のCPUで更新されたデータは
+      キャッシュスルーアドレスを使って取ってこなければいけませんが、SGLの
+      各関数は、それらのデータをキャッシュスルーアドレスで取ってくるようには
+      考えられていません。SGLが相互のCPUで動いている以上、システム変数の
+      整合という問題は非常に大きいと考えられますので、正常に動くかどうかは、
+      保証できません。</P>
+
+<P>      以上のような理由からスレーブでSGLの関数郡を使用するのは避けてください。
+      SGL<!--SATURN あ1997-04-14 -->における基本的なスレーブの位置付けは計算用(ジオメトリエンジン)
+      と考えてください。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p03_10_j.htm">戻る</A>｜
+<a href="p05_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#sgl">FAQ</A>
+★<a href="index_j.htm#SLAVE">SGLプログラミング関連</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

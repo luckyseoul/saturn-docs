@@ -1,0 +1,528 @@
+﻿<HTML>
+<HEAD>
+<TITLE>&lt;76/86&gt;VDP2 User's Manual/15.3 Bit Configuration Diagram</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A>
+<HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no15">VDP2 User's Manual</a> ★ <A HREF="p15_10.htm">Chapter 15 How to use VDP2</a><HR>
+ <B>▲ <A HREF="p15_30.htm">Back</a> ｜ <A HREF="p16_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 15 How to use VDP2</b><HR NOSHADE>
+<DL>
+<A NAME="no15_40"></A><P><DT><H2> ■15.4 Usage Techniques</H3><DD> We will introduce techniques that are useful when using VDP2, as well as specific usage plans for each function.<A NAME="no15_41"></A><P><DT><H3> ■Techniques for making bitmaps any size</H3><DD> Since the horizontal size of the VDP2 bitmap can only be selected from 512 dots or 1024 dots, there is a drawback that the VRAM addresses are not consecutive when transferring image data of arbitrary size such as videos by DMA. We will explain a technique that solves this drawback and makes VRAM addresses contiguous in a bitmap of arbitrary size.</P>
+<P><DT> <B>●Principle</b><DD> We will explain the principle of the technique to realize a bitmap of arbitrary size with consecutive VRAM addresses.<BR>
+ For example, the VRAM address of a bitmap of 512 horizontal dots is continuous from the coordinates (0,0) to (511,0), and the address after (511,0) is the dot at (0,1). At this time, in order to make the VRAM addresses of the 320-dot horizontal bitmap continuous, you can change the display coordinates when displaying on the screen as shown in Figure 15.1.<A NAME="z15_1"></A><P ALIGN=CENTER> <B>Figure 15.1 Bitmap display image</b><BR>
+<img srcset="../grp/z15_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P><DD> In order to achieve display coordinates that match the size of the bitmap as shown in Figure 15.1, you can combine the line scroll function and vertical cell scroll function.</P>
+<P> The following explanation assumes that the VDP2 bitmap size is set to 512 dots horizontally x 256 dots vertically. Also, the horizontal size of the bitmap to be displayed is an integral multiple of 8, the display start line is n = 0, and the display start cell is w = 0.<P><DT> <B>1) Horizontal coordinates</b><DD> For horizontal display coordinates that change for each line, use the line scroll function to set the leftmost horizontal display coordinate value as the horizontal line scroll value. The formula for calculating the horizontal line scroll value for the nth line is as follows.</P>
+<P ALIGN=CENTER> <B>(Nth horizontal line scroll value)</b><BR>
+ = {00010000H x (horizontal size) x n} & 01ff0000H</P>
+<P><DT> <B>2) Vertical coordinate</b><DD> Vertical display coordinates that change for each line or in the middle of a line are realized by combining the line scroll function and vertical cell scroll function. First, in order to increase the vertical display coordinate by one in the middle of the line, by using the fact that the VDP2 display coordinate value truncates the decimal part of the calculated value using each scroll value, change the vertical cell scroll value. Set. The formula for calculating the vertical cell scroll value for cell w is as follows.<P ALIGN=CENTER> <B>(Vertical cell scroll value of cell w) = 00000400H x w</b><P><DD> Then, set the vertical line scroll value while considering the vertical cell scroll value. The vertical line scroll value is calculated as follows:<P><DD> <B>Step 1:</b><DD> Find the integer part I(n) of the vertical display coordinate value of the nth line.</P>
+<P><DD><UL>
+ I(n) = {00000080H x (horizontal size) x n} & 01ff0000H</UL>
+</P>
+<P><DD> <B>Step 2:</b><DD> Find the cell number m when the vertical display coordinate value increases by one on the nth line.<P><UL>
+<DD> A(n)=64×{(I(n)/00010000H)+1}<DD> B(n)={(horizontal size)/8}×(n+1)<DD> When A(n)≧B(n), m=64<DD> When A(n)&#65308; B(n), m=A(n)-B(n-1)</UL>
+</P>
+<P><DD> <B>Step 3:</b><DD> Find the vertical line scroll value for the nth line.</P>
+<P><UL>
+<DD> (Nth vertical line scroll value)<BR>
+<CENTER>
+ =I(n)+{00000400H×(64-m)}</CENTER>
+</UL>
+</P>
+<P><DT> <B>3) Setting example</b><DD> We will explain in detail a setting example in which a full-screen and full-color bitmap (NBG0, 320 dots horizontally x 224 dots vertically, 16.77 million colors) is displayed and its VRAM addresses are continuous.</P>
+<P><UL>
+<LI> Bitmap start address = 25E00000H<LI> Line scroll table address = 25E60000H<LI> Vertical cell scroll table address = 25E70000H</UL>
+</P>
+  <P><DD><B>(1) Set the VDP2 register as follows</B>
+<PRE>
+  address    +0   +2   +4   +6   +8   +A   +C   +E
+ 25F80000H  8000 0000 0000 0000 0000 0000 0000 0200 ←Because it is a vertical cell scroll
+ 25F80010H  4444 4444 ffff ffff 4444 4444 cfff ffff  table, only VRAM-B is divided.
+ 25F80020H  0001 0000 0000 0000 0042 0000 0000 0000 ←16.77 million color bitmap, size 512
+ 25F80030H  0000 0000 0000 0000 0000 0000 0000 0000  dots horizontally x 256 dots vertically
+ 25F80040H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F80050H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F80060H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F80070H  0000 0000 0000 0000 0001 0000 0001 0000  
+ 25F80080H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F80090H  0000 0000 0000 0000 0000 0007 0003 8000 ←Enable line scrolling (horizontal and
+ 25F800A0H  0003 0000 0000 0000 0000 0000 0000 0000  vertical screen scroll values) and
+ 25F800B0H  0000 0000 0000 0000 0000 0000 0000 0000  vertical cell scrolling
+ 25F800C0H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F800D0H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F800E0H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F800F0H  0000 0000 0000 0000 0007 0000 0000 0000 ←Display only NBG0
+ 25F80100H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F80110H  0000 0000 0000 0000 0000 0000 0000 0000  
+</PRE>
+
+  <P><DD><B>(2) Set the value calculated using the formula in the vertical cell scroll table</B>
+<PRE>
+  address      +0       +4       +8       +C   
+ 25E70000H  00000000 00000400 00000800 00000c00
+ 25E70010H  00001000 00001400 00001800 00001c00
+ 25E70020H  00002000 00002400 00002800 00002c00
+ 25E70030H  00003000 00003400 00003800 00003c00
+ 25E70040H  00004000 00004400 00004800 00004c00
+ 25E70050H  00005000 00005400 00005800 00005c00
+ 25E70060H  00006000 00006400 00006800 00006c00
+ 25E70070H  00007000 00007400 00007800 00007c00
+ 25E70080H  00008000 00008400 00008800 00008c00
+ 25E70090H  00009000 00009400 00009800 00009c00
+ 25E700A0H  0000a000 0000a400 0000a800 0000ac00 ←In this example, data beyond the
+                                                 41st cell is not used.
+</PRE>
+
+  <P><DD><B>(3) Set the value obtained using the formula in the line scroll table</B>
+<PRE>
+  address      +0       +4       +8       +C   
+ 25E60000H  00000000 00000000 01400000 0000a000
+ 25E60010H  00800000 00010000 01c00000 0001e000
+ 25E60020H  01000000 00028000 00400000 00030000
+ 25E60030H  01800000 0003c000 00c00000 00040000
+ 25E60040H  00000000 00050000 01400000 0005a000
+ 25E60050H  00800000 00060000 01c00000 0006e000
+ 25E60060H  01000000 00078000 00400000 00080000
+ 25E60070H  01800000 0008c000 00c00000 00090000
+ 25E60080H  00000000 000a0000 01400000 000aa000
+ 25E60090H  00800000 000b0000 01c00000 000be000
+ 25E600A0H  01000000 000c8000 00400000 000d0000
+ 25E600B0H  01800000 000dc000 00c00000 000e0000
+ 25E600C0H  00000000 000f0000 01400000 000fa000
+ 25E600D0H  00800000 00100000 01c00000 0010e000
+ 25E600E0H  01000000 00118000 00400000 00120000
+ 25E600F0H  01800000 0012c000 00c00000 00130000
+
+ 25E60100H  00000000 00140000 01400000 0014a000
+ 25E60110H  00800000 00150000 01c00000 0015e000
+ 25E60120H  01000000 00168000 00400000 00170000
+ 25E60130H  01800000 0017c000 00c00000 00180000
+ 25E60140H  00000000 00190000 01400000 0019a000
+ 25E60150H  00800000 001a0000 01c00000 001ae000
+ 25E60160H  01000000 001b8000 00400000 001c0000
+ 25E60170H  01800000 001cc000 00c00000 001d0000
+ 25E60180H  00000000 001e0000 01400000 001ea000
+ 25E60190H  00800000 001f0000 01c00000 001fe000
+ 25E601A0H  01000000 00208000 00400000 00210000
+ 25E601B0H  01800000 0021c000 00c00000 00220000
+ 25E601C0H  00000000 00230000 01400000 0023a000
+ 25E601D0H  00800000 00240000 01c00000 0024e000
+ 25E601E0H  01000000 00258000 00400000 00260000
+ 25E601F0H  01800000 0026c000 00c00000 00270000
+
+ 25E60200H  00000000 00280000 01400000 0028a000
+ 25E60210H  00800000 00290000 01c00000 0029e000
+ 25E60220H  01000000 002a8000 00400000 002b0000
+ 25E60230H  01800000 002bc000 00c00000 002c0000
+ 25E60240H  00000000 002d0000 01400000 002da000
+ 25E60250H  00800000 002e0000 01c00000 002ee000
+ 25E60260H  01000000 002f8000 00400000 00300000
+ 25E60270H  01800000 0030c000 00c00000 00310000
+ 25E60280H  00000000 00320000 01400000 0032a000
+ 25E60290H  00800000 00330000 01c00000 0033e000
+ 25E602A0H  01000000 00348000 00400000 00350000
+ 25E602B0H  01800000 0035c000 00c00000 00360000
+ 25E602C0H  00000000 00370000 01400000 0037a000
+ 25E602D0H  00800000 00380000 01c00000 0038e000
+ 25E602E0H  01000000 00398000 00400000 003a0000
+ 25E602F0H  01800000 003ac000 00c00000 003b0000
+
+  address      +0       +4       +8       +C   
+ 25E60300H  00000000 003c0000 01400000 003ca000
+ 25E60310H  00800000 003d0000 01c00000 003de000
+ 25E60320H  01000000 003e8000 00400000 003f0000
+ 25E60330H  01800000 003fc000 00c00000 00400000
+ 25E60340H  00000000 00410000 01400000 0041a000
+ 25E60350H  00800000 00420000 01c00000 0042e000
+ 25E60360H  01000000 00438000 00400000 00440000
+ 25E60370H  01800000 0044c000 00c00000 00450000
+ 25E60380H  00000000 00460000 01400000 0046a000
+ 25E60390H  00800000 00470000 01c00000 0047e000
+ 25E603A0H  01000000 00488000 00400000 00490000
+ 25E603B0H  01800000 0049c000 00c00000 004a0000
+ 25E603C0H  00000000 004b0000 01400000 004ba000
+ 25E603D0H  00800000 004c0000 01c00000 004ce000
+ 25E603E0H  01000000 004d8000 00400000 004e0000
+ 25E603F0H  01800000 004ec000 00c00000 004f0000
+
+ 25E60400H  00000000 00500000 01400000 0050a000
+ 25E60410H  00800000 00510000 01c00000 0051e000
+ 25E60420H  01000000 00528000 00400000 00530000
+ 25E60430H  01800000 0053c000 00c00000 00540000
+ 25E60440H  00000000 00550000 01400000 0055a000
+ 25E60450H  00800000 00560000 01c00000 0056e000
+ 25E60460H  01000000 00578000 00400000 00580000
+ 25E60470H  01800000 0058c000 00c00000 00590000
+ 25E60480H  00000000 005a0000 01400000 005aa000
+ 25E60490H  00800000 005b0000 01c00000 005be000
+ 25E604A0H  01000000 005c8000 00400000 005d0000
+ 25E604B0H  01800000 005dc000 00c00000 005e0000
+ 25E604C0H  00000000 005f0000 01400000 005fa000
+ 25E604D0H  00800000 00600000 01c00000 0060e000
+ 25E604E0H  01000000 00618000 00400000 00620000
+ 25E604F0H  01800000 0062c000 00c00000 00630000
+
+ 25E60500H  00000000 00640000 01400000 0064a000
+ 25E60510H  00800000 00650000 01c00000 0065e000
+ 25E60520H  01000000 00668000 00400000 00670000
+ 25E60530H  01800000 0067c000 00c00000 00680000
+ 25E60540H  00000000 00690000 01400000 0069a000
+ 25E60550H  00800000 006a0000 01c00000 006ae000
+ 25E60560H  01000000 006b8000 00400000 006c0000
+ 25E60570H  01800000 006cc000 00c00000 006d0000
+ 25E60580H  00000000 006e0000 01400000 006ea000
+ 25E60590H  00800000 006f0000 01c00000 006fe000
+ 25E605A0H  01000000 00708000 00400000 00710000
+ 25E605B0H  01800000 0071c000 00c00000 00720000
+ 25E605C0H  00000000 00730000 01400000 0073a000
+ 25E605D0H  00800000 00740000 01c00000 0074e000
+ 25E605E0H  01000000 00758000 00400000 00760000
+ 25E605F0H  01800000 0076c000 00c00000 00770000
+
+  address      +0       +4       +8       +C   
+ 25E60600H  00000000 00780000 01400000 0078a000
+ 25E60610H  00800000 00790000 01c00000 0079e000
+ 25E60620H  01000000 007a8000 00400000 007b0000
+ 25E60630H  01800000 007bc000 00c00000 007c0000
+ 25E60640H  00000000 007d0000 01400000 007da000
+ 25E60650H  00800000 007e0000 01c00000 007ee000
+ 25E60660H  01000000 007f8000 00400000 00800000
+ 25E60670H  01800000 0080c000 00c00000 00810000
+ 25E60680H  00000000 00820000 01400000 0082a000
+ 25E60690H  00800000 00830000 01c00000 0083e000
+ 25E606A0H  01000000 00848000 00400000 00850000
+ 25E606B0H  01800000 0085c000 00c00000 00860000
+ 25E606C0H  00000000 00870000 01400000 0087a000
+ 25E606D0H  00800000 00880000 01c00000 0088e000
+ 25E606E0H  01000000 00898000 00400000 008a0000
+ 25E606F0H  01800000 008ac000 00c00000 008b0000
+</PRE><P><DD>Now, the VRAM addresses of the bitmap of 320 dots horizontally x 224 dots vertically will be continuous.</P>
+<P><DT> <B>●Application</b><DD> Applying the above principle, we will explain a technique to place a bitmap smaller than the TV screen at any position on the TV screen, as shown in Figure 15.2.<A NAME="z15_2"></A><P ALIGN=CENTER> <B>Figure 15.2 Bitmap display position</b><BR>
+<img srcset="../grp/z15_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P><DD> The easiest way to place a bitmap anywhere on the TV screen is to use the screen scroll function. However, simply scrolling the screen does not work because of the following problems.</P>
+<P><UL>
+<DD> (a) Pictures are repeated in areas that you do not want to display<DD> (b) The line scroll value is different because the display start position is not at the top left of the TV screen.</UL>
+</P>
+<P><DD> These two problems can be resolved by changing the window function and the calculation formula for the line scroll value.<P><DD> <B>1) Window function</b><DD> Problem (a) can be easily solved by using the window function. Simply set a transparent processing window of the same size at the position where the bitmap is displayed, and enable the outside of that window.<P><DD> <B>2) Line scroll value</b><DD> Problem (b) can be solved by calculating the line scroll value using the principle described above using the following steps. However, the bitmap display start line is n = 0, and the bitmap display start coordinates are (Mx, My).<BR>
+ Also, the line scroll value for lines that do not display bitmaps is not relevant, so set it to 0.</P>
+<P><DD> <B>Step 1:</b><DD> Find the horizontal line scroll value for the My+nth line.</P>
+<P><DD> (Horizontal line scroll value)<CENTER>
+ = {00010000H x (horizontal size) x n} & 01ff0000H</CENTER>
+</P>
+<P><DD> <B>Step 2:</b><DD> Find the integer part I(n) of the vertical display coordinate value of the My+nth line.</P>
+<P><DD> I(n) = {00000080H x (horizontal size) x n} & 01ff0000H<P><DD> <B>Step 3:</b><DD> Find the cell number m when the vertical coordinate value increases by one on the nth line of the display bitmap.</P>
+<P><UL>
+<DD> A(n)=64×{(I(n)/00010000H)+1}<DD> B(n)={(horizontal size)/8}×(n+1)<DD> When A(n)≧B(n), m=64<DD> When A(n)&#65308; B(n), m=A(n)-B(n-1)+(Mx/8 rounded up to the nearest whole number)</UL>
+</P>
+<P><DT> <B>Step 4:</b><DD> Find the vertical line scroll value for the My+nth line.</P>
+<P><UL>
+<DD> (vertical line scroll value)<BR>
+<CENTER>
+ =I(n)+{00000400H×(64-m)}</CENTER>
+</UL>
+</P>
+<P><DT> <B>3) Setting example</b><DD> We will explain in detail a setting example in which a bitmap of 192 dots horizontally x 144 dots vertically (NBG0, 16.77 million colors) is displayed in the center of the TV screen, and its VRAM addresses are continuous.</P>
+<P><UL>
+<LI> Bitmap display start coordinates = (64, 40)<LI> Bitmap start address = 25E00000H<LI> Line scroll table address = 25E20000H<LI> Vertical cell scroll table address = 25E30000H<LI> Back screen table address = 25E7FFFEH</UL>
+</P>
+<P><DD> <B>(1) Set the VDP2 register as follows.</b></P>
+<PRE>
+  address    +0   +2   +4   +6   +8   +A   +C   +E
+ 25F80000H  8000 0000 0000 0000 0000 0000 0000 0100 ←Since the bitmap data is stored in one bank,
+ 25F80010H  4444 4444 cfff ffff ffff ffff ffff ffff  only one side is divided for double buffering.
+ 25F80020H  0001 0000 0000 0000 0042 0000 0000 0000 ←16.77 million color bitmap, size 512 dots
+ 25F80030H  0000 0000 0000 0000 0000 0000 0000 0000  wide x 256 dots tall
+ 25F80040H  0000 0000 0000 0000 0000 0000 0000 0000
+ 25F80050H  0000 0000 0000 0000 0000 0000 0000 0000
+ 25F80060H  0000 0000 0000 0000 0000 0000 0000 0000
+ 25F80070H  07c0 0000 0000 0000 0001 0000 0001 0000 ←Set the horizontal screen scroll value
+ 25F80080H  0000 0000 0000 0000 0000 0000 0000 0000  according to the display start coordinates
+ 25F80090H  0000 0000 0000 0000 0000 0007 0001 8000 ←Enable line scrolling (horizontal and vertical
+ 25F800A0H  0001 0000 0000 0000 0000 0000 0003 ffff  screen scroll values) and vertical cell scrolling
+ 25F800B0H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F800C0H  0080 0028 01fe 00b7 0000 0000 0000 0000 ←Set the window
+ 25F800D0H  0003 0000 0000 0000 0000 0000 0000 0000
+ 25F800E0H  0000 0000 0000 0000 0000 0000 0000 0000
+ 25F800F0H  0000 0000 0000 0000 0007 0000 0000 0000 ←Display only NBG0
+ 25F80100H  0000 0000 0000 0000 0000 0000 0000 0000
+ 25F80110H  0000 0000 0000 0000 0000 0000 0000 0000
+</PRE>
+  <P><DD><B>(2) Set the value calculated using the formula in the vertical cell scroll table</B></P>
+<PRE>
+  address      +0       +4       +8       +C   
+ 25E30000H  00000000 00000400 00000800 00000c00
+ 25E30010H  00001000 00001400 00001800 00001c00
+ 25E30020H  00002000 00002400 00002800 00002c00
+ 25E30030H  00003000 00003400 00003800 00003c00
+ 25E30040H  00004000 00004400 00004800 00004c00
+ 25E30050H  00005000 00005400 00005800 00005c00
+ 25E30060H  00006000 00006400 00006800 00006c00
+ 25E30070H  00007000 00007400 00007800 00007c00
+ 25E30080H  00008000 00008400 00008800 00008c00
+ 25E30090H  00009000 00009400 00009800 00009c00
+ 25E300A0H  0000a000 0000a400 0000a800 0000ac00 ←In this example, data beyond the
+                                                 41st cell is not used.
+</PRE>
+
+  <P><DD><B>(3) Set the value obtained using the formula in the line scroll table</B></P>
+<PRE>
+  address      +0       +4       +8       +C   
+ 25E20000H  00000000 00000000 00000000 00000000
+ 25E20010H  00000000 00000000 00000000 00000000
+ 25E20020H  00000000 00000000 00000000 00000000
+ 25E20030H  00000000 00000000 00000000 00000000
+ 25E20040H  00000000 00000000 00000000 00000000
+ 25E20050H  00000000 00000000 00000000 00000000
+ 25E20060H  00000000 00000000 00000000 00000000
+ 25E20070H  00000000 00000000 00000000 00000000
+ 25E20080H  00000000 00000000 00000000 00000000
+ 25E20090H  00000000 00000000 00000000 00000000
+ 25E200A0H  00000000 00000000 00000000 00000000
+ 25E200B0H  00000000 00000000 00000000 00000000
+ 25E200C0H  00000000 00000000 00000000 00000000
+ 25E200D0H  00000000 00000000 00000000 00000000
+ 25E200E0H  00000000 00000000 00000000 00000000
+ 25E200F0H  00000000 00000000 00000000 00000000
+
+ 25E20100H  00000000 00000000 00000000 00000000
+ 25E20110H  00000000 00000000 00000000 00000000
+ 25E20120H  00000000 00000000 00000000 00000000
+ 25E20130H  00000000 00000000 00000000 00000000
+ 25E20140H  00000000 00000000 00c00000 00000000 ←Bitmap display start line
+ 25E20150H  01800000 0000a000 00400000 00010000
+ 25E20160H  01000000 00010000 01c00000 0001c000
+ 25E20170H  00800000 00020000 01400000 00020000
+ 25E20180H  00000000 00030000 00c00000 00030000
+ 25E20190H  01800000 0003a000 00400000 00040000
+ 25E201A0H  01000000 00040000 01c00000 0004c000
+ 25E201B0H  00800000 00050000 01400000 00050000
+ 25E201C0H  00000000 00060000 00c00000 00060000
+ 25E201D0H  01800000 0006a000 00400000 00070000
+ 25E201E0H  01000000 00070000 01c00000 0007c000
+ 25E201F0H  00800000 00080000 01400000 00080000
+
+ 25E20200H  00000000 00090000 00c00000 00090000
+ 25E20210H  01800000 0009a000 00400000 000a0000
+ 25E20220H  01000000 000a0000 01c00000 000ac000
+ 25E20230H  00800000 000b0000 01400000 000b0000
+ 25E20240H  00000000 000c0000 00c00000 000c0000
+ 25E20250H  01800000 000ca000 00400000 000d0000
+ 25E20260H  01000000 000d0000 01c00000 000dc000
+ 25E20270H  00800000 000e0000 01400000 000e0000
+ 25E20280H  00000000 000f0000 00c00000 000f0000
+ 25E20290H  01800000 000fa000 00400000 00100000
+ 25E202A0H  01000000 00100000 01c00000 0010c000
+ 25E202B0H  00800000 00110000 01400000 00110000
+ 25E202C0H  00000000 00120000 00c00000 00120000
+ 25E202D0H  01800000 0012a000 00400000 00130000
+ 25E202E0H  01000000 00130000 01c00000 0013c000
+ 25E202F0H  00800000 00140000 01400000 00140000
+
+  address      +0       +4       +8       +C   
+ 25E20300H  00000000 00150000 00c00000 00150000
+ 25E20310H  01800000 0015a000 00400000 00160000
+ 25E20320H  01000000 00160000 01c00000 0016c000
+ 25E20330H  00800000 00170000 01400000 00170000
+ 25E20340H  00000000 00180000 00c00000 00180000
+ 25E20350H  01800000 0018a000 00400000 00190000
+ 25E20360H  01000000 00190000 01c00000 0019c000
+ 25E20370H  00800000 001a0000 01400000 001a0000
+ 25E20380H  00000000 001b0000 00c00000 001b0000
+ 25E20390H  01800000 001ba000 00400000 001c0000
+ 25E203A0H  01000000 001c0000 01c00000 001cc000
+ 25E203B0H  00800000 001d0000 01400000 001d0000
+ 25E203C0H  00000000 001e0000 00c00000 001e0000
+ 25E203D0H  01800000 001ea000 00400000 001f0000
+ 25E203E0H  01000000 001f0000 01c00000 001fc000
+ 25E203F0H  00800000 00200000 01400000 00200000
+
+ 25E20400H  00000000 00210000 00c00000 00210000
+ 25E20410H  01800000 0021a000 00400000 00220000
+ 25E20420H  01000000 00220000 01c00000 0022c000
+ 25E20430H  00800000 00230000 01400000 00230000
+ 25E20440H  00000000 00240000 00c00000 00240000
+ 25E20450H  01800000 0024a000 00400000 00250000
+ 25E20460H  01000000 00250000 01c00000 0025c000
+ 25E20470H  00800000 00260000 01400000 00260000
+ 25E20480H  00000000 00270000 00c00000 00270000
+ 25E20490H  01800000 0027a000 00400000 00280000
+ 25E204A0H  01000000 00280000 01c00000 0028c000
+ 25E204B0H  00800000 00290000 01400000 00290000
+ 25E204C0H  00000000 002a0000 00c00000 002a0000
+ 25E204D0H  01800000 002aa000 00400000 002b0000
+ 25E204E0H  01000000 002b0000 01c00000 002bc000
+ 25E204F0H  00800000 002c0000 01400000 002c0000
+
+ 25E20500H  00000000 002d0000 00c00000 002d0000
+ 25E20510H  01800000 002da000 00400000 002e0000
+ 25E20520H  01000000 002e0000 01c00000 002ec000
+ 25E20530H  00800000 002f0000 01400000 002f0000
+ 25E20540H  00000000 00300000 00c00000 00300000
+ 25E20550H  01800000 0030a000 00400000 00310000
+ 25E20560H  01000000 00310000 01c00000 0031c000
+ 25E20570H  00800000 00320000 01400000 00320000
+ 25E20580H  00000000 00330000 00c00000 00330000
+ 25E20590H  01800000 0033a000 00400000 00340000
+ 25E205A0H  01000000 00340000 01c00000 0034c000
+ 25E205B0H  00800000 00350000 01400000 00350000 ←Bitmap display end line
+ 25E205C0H  00000000 00000000 00000000 00000000
+ 25E205D0H  00000000 00000000 00000000 00000000
+ 25E205E0H  00000000 00000000 00000000 00000000
+ 25E205F0H  00000000 00000000 00000000 00000000
+
+  address      +0       +4       +8       +C   
+ 25E20600H  00000000 00000000 00000000 00000000
+ 25E20610H  00000000 00000000 00000000 00000000
+ 25E20620H  00000000 00000000 00000000 00000000
+ 25E20630H  00000000 00000000 00000000 00000000
+ 25E20640H  00000000 00000000 00000000 00000000
+ 25E20650H  00000000 00000000 00000000 00000000
+ 25E20660H  00000000 00000000 00000000 00000000
+ 25E20670H  00000000 00000000 00000000 00000000
+ 25E20680H  00000000 00000000 00000000 00000000
+ 25E20690H  00000000 00000000 00000000 00000000
+ 25E206A0H  00000000 00000000 00000000 00000000
+ 25E206B0H  00000000 00000000 00000000 00000000
+ 25E206C0H  00000000 00000000 00000000 00000000
+ 25E206D0H  00000000 00000000 00000000 00000000
+ 25E206E0H  00000000 00000000 00000000 00000000
+ 25E206F0H  00000000 00000000 00000000 00000000
+</PRE><P><DD><B>(4) Set black (0000H) to the back screen table (25E7FFFEH).</b></P>
+<P><DD> Now, the VRAM address of the bitmap of 192 dots horizontally x 144 dots vertically will be continuous. In this example, the bitmap data is stored in one bank, so a double buffer configuration can be created with VRAM-A and VRAM-B. However, since it is a bitmap of 16.77 million colors, VDP2 cannot read the table unless the vertical cell scroll table is set to the display side, not the VRAM side. Therefore, it is necessary to store exactly the same vertical cell scroll table in both VRAM-A and VRAM-B.</P>
+<P><DD> <B>●Summary</b><DD> The method to display a continuous address bitmap of a specified size at any position on the TV screen is as follows. However, the horizontal size of the display bitmap must be an integral multiple of 8.</P>
+<P><DD> <B>1) Setting the screen scroll value</b><DD> Sets the horizontal screen scroll value. However, the horizontal display start position of the bitmap on the TV screen is Mx.<P><UL>
+<DD> (Horizontal screen scroll value) = (0800H - Mx) & 07ffH</UL>
+</P>
+<P><DD> <B>2) Window settings</b><DD> Set a transparent processing window of the same size as the TV screen display position of the bitmap, and make the outside of the window effective. When displaying in full screen, there is no need to configure the window settings.</P>
+<P><DD> <B>3) Vertical cell scroll table settings</b><DD> Set the vertical cell scroll table. However, let w = 0 for the leftmost cell. Also, if the horizontal size of the display bitmap is 8 dots, 16 dots, 32 dots, 64 dots, 128 dots, or 256 dots, there is no need to use the vertical cell scroll function.</P>
+<P><UL>
+<DD> (W cell vertical cell scroll table value) = 00000400H x w</UL>
+</P>
+<P><DD> <B>4) Line scroll table settings</b><DD> Set the line scroll table. However, the display start line of the bitmap on the TV screen is set to n=0. Also, set the line scroll value to 0 for lines that do not display bitmaps.</P>
+<P><UL>
+<LI> VDP2 setting bitmap size = 512 dots horizontally x 256 dots vertically<LI> Display bitmap size = horizontal Sx dots x vertical Sy dots<LI> Display start coordinates of bitmap on TV screen = (Mx, My)<LI> 0≦n≦Sy-1</UL>
+</P>
+<UL>
+<P><DD> (My+nth horizontal line scroll value)<DD> = (00010000H×Sx×n) &01ff0000H</P>
+<P><DD> (My+nth line vertical line scroll value)<DD> =I(n)+{00000400H×(64-m)}</P>
+<P><DD> However, I(n) = {00000080H×Sx×n}&01ff0000H<DD> A(n)=64×{(I(n)/00010000H)+1}<DD> B(n)=(Sx/8)×(n+1)<DD> When A(n)≧B(n), m=64<DD> When A(n)&#65308; B(n), m=A(n)-B(n-1)+(Mx/8 rounded up to the nearest whole number)</P>
+</UL>
+<P><DD> <B>5) Advantages</b><DD> This technique has the following advantages:</P>
+<P><DD> (a) The VRAM capacity allocated to bitmap data is kept to the minimum required.<DD> (b)VRAM addresses are continuous regardless of the bitmap color setting.<A NAME="no15_42"></A><P><DT><H2> ■Technique to double buffer VRAM</H2><DD> VDP2 has two VRAMs, VRAM-A and VRAM-B. We will explain the technique of configuring these two VRAMs into a double buffer configuration for display and writing.<P><DT> <B>1) Principle</b><DD> The VRAM cycle pattern register controls VRAM access during the display period. In other words, the values set in the registers corresponding to VRAM-A and VRAM-B can be divided into display and write.</P>
+<P><DT> <B>2) Usage example</b><DD> We will explain a setting example that displays a 32,768-color bitmap (NBG0, 512 dots horizontally x 256 dots vertically) in a double buffer configuration.<P><DD><H3> (1)</H3><DD> Store the bitmap data from the VRAM-A start address (25E00000H) and set the VDP2 register as follows.
+<PRE>
+  address    +0   +2   +4   +6   +8   +A   +C   +E
+ 25F80000H  8000 0000 0000 0000 0000 0000 0000 0000 ←VRAM is not divided into two parts
+ 25F80010H  4444 ffff ffff ffff ffff ffff ffff ffff because it is not necessary.
+ 25F80020H  0001 0000 0000 0000 0032 0000 0000 0000 ←327.68 million color bitmap, size 512
+ 25F80030H  0000 0000 0000 0000 0000 0000 0000 0000  dots horizontally x 256 dots vertically
+ 25F80040H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F80050H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F80060H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F80070H  0000 0000 0000 0000 0001 0000 0001 0000 
+ 25F80080H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F80090H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F800A0H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F800B0H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F800C0H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F800D0H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F800E0H  0000 0000 0000 0000 0000 0000 0000 0000 
+ 25F800F0H  0000 0000 0000 0000 0007 0000 0000 0000 ←Display only NBG0
+ 25F80100H  0000 0000 0000 0000 0000 0000 0000 0000  
+ 25F80110H  0000 0000 0000 0000 0000 0000 0000 0000 
+</PRE><P><DD>With this setting, VRAM-A is used for display and VRAM-B is used for writing. Writing from the CPU to VRAM-B, which is used for writing, can be performed at any time during the display period.</P>
+<P><DD><H3> (2)</H3><DD> Write the bitmap data of the next picture from the VRAM-B start address (25E40000H), and change the VDP2 register as follows during the V blank immediately before the frame you want to switch.
+<PRE>
+  address    +0   +2   +4   +6   +8   +A   +C   +E
+ 25F80010H  ffff ffff ffff ffff 4444 ffff ffff ffff
+ 25F80030H  0000 0000 0000 0000 0000 0000 0002 0000
+</PRE>
+<P><DD>With this setting, VRAM-B will be used for display and VRAM-A will be used for writing. Also, the boundary address value of the bitmap pattern is set at the beginning of VRAM-B.</P>
+<P><DD><H3> (3)</H3><DD> Write the bitmap data of the next picture from the VRAM-A start address (25E00000H), and change the VDP2 register as follows during the V blank immediately before the frame you want to switch.</P>
+<PRE>
+  address    +0   +2   +4   +6   +8   +A   +C   +E
+ 25F80010H  4444 ffff ffff ffff ffff ffff ffff ffff
+ 25F80030H  0000 0000 0000 0000 0000 0000 0000 0000
+</PRE>
+<P><DD>With this setting, VRAM-A will be used for display and VRAM-B will be used for writing. Also, the boundary address value of the bitmap pattern is set at the beginning of VRAM-A.</P>
+<P><DD><H3> (Four)</H3><DD> By repeating steps ② and ③ above, you can display in a double buffer configuration.<P><DT> <B>3) Application</b><DD> If you apply this technique, you can use this technique to create a double-buffer configuration even if you think that a 16.77 million-color bitmap can only be displayed using two VRAMs due to its capacity. This takes advantage of the fact that the VDP2's display image data is read out in real time in synchronization with the TV's scanning line.<BR>
+ For example, assume that the period in which VRAM-A data is displayed is the upper half of the display screen, and the period in which VRAM-B data is displayed is the lower half of the display screen. There is no need to use VRAM-B for display while the upper half is displayed, and there is no need to use VRAM-A for display while the lower half is displayed. In other words, you can switch between display and writing using the H blank in the center line of the display screen.</P>
+<A NAME="no15_43"></A><P><DT> <B>■Suggestions for using rotation parameter mode</b><DD> There are two rotation parameter tables on the rotation scroll surface, and RBG0 can switch between the two rotation parameters on one display screen. There are two ways to switch this rotation parameter: mode 2 and mode 3. Figure 15.3 is an example of a screen that can be displayed only with RBG0, and these two examples can be displayed in either mode 2 or mode 3. Using this display screen example, we will explain the characteristics of each mode.</P>
+<A NAME="z15_3"></A><P ALIGN=CENTER> <B>Figure 15.3 Example of RBG0 display screen</b><BR>
+<img srcset="../grp/z15_3.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P><DT> <B>●Mode 2</b><DD> In rotation parameter mode 2, switching is determined based on the value of the most significant bit of the coefficient data read from the coefficient table for rotation parameter A, so when reading dot by dot from the coefficient table for rotation parameter A, It is not possible to read dot by dot from the coefficient table of . In other words, when rotating the screen using rotation parameter A on two or more axes, the screen using rotation parameter B cannot be rotated on any axis other than the Z axis. In the case of the display screen example in Figure 15.3, it is possible to rotate the screen example ① around the center of the screen, but it is not possible to rotate the screen example ② around the center of the screen.<BR>
+ In addition, since the coefficient data when performing rotation on the X-axis or Y-axis is obtained from the Z value of the screen, the boundary line between the screen with rotation parameter A and the screen with rotation parameter B in screen example ① in Figure 15.3 The advantage is that the judgment can be made at the same time as calculating the coefficient data.</P>
+<P><DT> <B>●Mode 3</b><DD> In rotation parameter mode 3, switching is determined in the rotation parameter window, so coefficient data can be read dot by dot from both the coefficient table for rotation parameter A and the coefficient table for rotation parameter B. In other words, the screen using parameter A and the screen using rotation parameter B can be rotated on two or more axes at the same time. In the case of the display screen example in Figure 15.3, both screen example (1) and screen example (2) can be rotated around the center of the screen.<BR>
+ However, in this mode, it is necessary to set a rotation parameter window, and if you want to rotate the display screen example in Figure 15.3 around the center of the screen, you must set the rotation parameter switching boundary line in the line window table. not. Therefore, I think rotation parameter mode 2 is more suitable when displaying a screen like screen example ①.<BR>
+ In the screen example in Figure 15.3, the boundary of the rotation parameter is a line, but if you make this boundary a shape that cuts out the screen according to rotation parameter B and match the movements, it will look like there are two independent rotation surfaces. You can also display the screen.</P>
+<A NAME="z15_4"></A><P ALIGN=CENTER> <B>Figure 15.4 Example of display screen in rotation parameter mode 2 and 3</b><BR>
+<img srcset="../grp/z15_4.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><A NAME="no15_44"></A><P><DT> <B>■Suggestions for using the sprite window and color calculation window</b><DD> If you want to display a sprite that looks like semi-transparent light on top of a picture like the one shown on the left in Figure 15.5, in order to perform translucent operations between sprites in VDP1, you must change the frame buffer data to RGB data. Don't. However, if the frame buffer data is converted to RGB data, it is possible to make all sprites of RGB data and the scroll surface semitransparent, but it is not possible to make only sprites such as light translucent. Pictures like this can be displayed by using a combination of the sprite window and the color calculation window. However, all sprite data must be in palette format.</P>
+<A NAME="z15_5"></A><P ALIGN=CENTER> <B>Figure 15.5 Example of displaying a sprite that is semi-transparent</b><BR>
+<img srcset="../grp/z15_5.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P><DD> The steps to display a translucent sprite using the sprite window and color calculation window are as follows.</P>
+<P><DD><H3> 1)</H3><DD> Set the sprite type of VDP2 to type 2 to 7 and enable the sprite window. Also, set the color calculation enable condition so that all sprites are enabled.</P>
+<P><DD><H3> 2)</H3><DD> Enable the sprite window bit in the color math window to enable the outside of the sprite window.</P>
+<P><DD><H3> 3)</H3><DD> Enable the line color screen for sprites and scroll planes, and set the color of translucent sprites in the line color screen data.<P><DD><H3> 4)</H3><DD> Sets the color calculation enable bit and color calculation ratio register for sprites and scroll surfaces.</P>
+<P><DD><H3> 5)</H3><DD> Draw the sprite you want to make semi-transparent using VDP1's MSB on function.</P>
+<P><DD> Sprites that use the MSB on function only draw the outer shape of the character, so the sprite picture (color data) that you want to make translucent must be specified on the VDP2 side. In the above steps, we used a single line color screen to specify it, so translucent sprites can only be made with a single color. However, if you use a scroll surface instead of a line color screen, it is not impossible to create something other than a single color.</P>
+<A NAME="no15_45"></A><P><DT> <B>■Suggestions for using color calculation ratios for sprites</b><DD> If you want to make the polygons (sprites) displayed towards the back of the screen darker or brighter in a 3D game, etc., you would probably use the VDP1's color calculation function (Gouraud shading mode); This will increase the drawing time. Therefore, I would like to introduce a proposal to use the color calculation function of VDP2 to perform pseudo color calculations for each sprite without using the color calculation function of VDP1. This proposal makes use of the fact that the sprite color calculation ratio can be selected from eight types for each sprite in VDP2's color calculation function, so it has the following limitations.</P>
+<P><UL>
+<LI> Valid only for paletted sprites<LI> Up to 8 levels of color calculation<LI> The calculation method is different from the color calculation of VDP1.</UL>
+</P>
+<P><DD> The current usage plan is to change the 3 bits corresponding to the color calculation ratio of the color bank data in the command table of VDP1 to 8 types depending on the position (Z value) of the polygon (sprite) in the depth direction, and change the line of VDP2. It performs color calculations using a color screen (single color) and a specified ratio. An example configuration procedure is as follows.</P>
+<P><DD><H3> (1)</H3><DD> Set the sprite type to one with 3 bits for color calculation ratio (for example, type 0), and set the color calculation enable condition (for example, enable only when the priority number is 4) so that color calculation is performed only on the sprite you want to perform color calculation on. To do. Also enables the line color screen for the sprite and enables color operations for the sprite.</P>
+<PRE>
+  address    +0   +2   +4   +6   +8   +A   +C   +E
+ 25F800E0H  1400 0000 0000 0000 0020 0000 0040 0000
+</PRE><P><DD><H3>(2)</H3><DD> Set a value that satisfies the color calculation enable condition and a value that does not (for example, 4 for sprite 0 and 5 for sprite 1) in the sprite priority number register.</P>
+<PRE>
+  address    +0   +2   +4   +6   +8   +A   +C   +E
+ 25F800F0H  0504 0000 0000 0000 0203 0000 0000 0000
+</PRE><P><DD><H3>(3)</H3><DD> Set the ratio in 8 stages (for example, the ratio of the second screen becomes smaller as you go from sprite 0 to sprite 7) in the color calculation ratio register for sprites.<PRE>
+  address    +0   +2   +4   +6   +8   +A   +C   +E
+ 25F80100H  1c1f 1418 0c10 0408 0000 0000 0000 0000
+</PRE><P><DD><H3>(Four)</H3><DD> Set the color RAM address (for example, address 0) where the color you want to perform color calculations with the sprite (for example, black) is stored in the VRAM address specified in the line color screen table address register (for example, the address is 7FFFC for a single color). .</P>
+<PRE>
+  address    +0   +2   +4   +6   +8   +A   +C   +E
+ 25F800A0H  0000 0000 0000 0000 0003 fffe 0003 ffff ←VDP2 register
+ 25E7FFF0H  XXXX XXXX XXXX XXXX XXXX XXXX 0000 0000 ←VRAM
+ 25F00000H  0000 XXXX XXXX XXXX XXXX XXXX XXXX XXXX ←Color RAM
+</PRE><P><DD><H3>(Five)</H3><DD> The value of a total of 4 bits, including 3 bits corresponding to the color calculation ratio of the color bank in the VDP1 command table and 1 bit of the priority bit above it, changes depending on the position in the depth direction of the polygon to be drawn (for example, (The farther it is located, the smaller the value.)
+<PRE>
+Color bank data   Depth position
+  0100 0XXX XXXX 0000    Nearest side (no color calculation)
+  0011 1XXX XXXX 0000    ↑
+  0011 0XXX XXXX 0000
+  0010 1XXX XXXX 0000
+  0010 0XXX XXXX 0000
+  0001 1XXX XXXX 0000
+  0001 0XXX XXXX 0000
+  0000 1XXX XXXX 0000    ↓
+  0000 0XXX XXXX 0000     The furthest side (becomes black)
+</PRE><P><DD>While VDP1's color calculation function (Gouraud shading mode) adds or subtracts a specified offset value, VDP2's color calculation function adds and subtracts a specified color (line color screen) at a specified ratio and makes it translucent. Therefore, it is not possible to obtain exactly the same image. However, it appears that the same effect can be achieved visually.</P>
+<A NAME="no15_46"></A><P><DT> <B>■Suggestions for using normal shadow and MSB shadow</b><DD> There are two types of sprites that become shadows using the shadow function: normal shadows and MSB shadows. Each shadow sprite has its own characteristics, and each must be used in an appropriate manner.</P>
+<P><DD>&#65308; <B>normal shadow</b>&#65310;<OL>
+<LI> A shadow sprite character is required to have fixed data.<LI> Shadows can only be applied to the scroll surface.<LI> Drawn as a normal sprite on VDP1<LI> No restrictions on sprite types<LI> No restrictions on sprite color modes</OL>
+</P>
+<P><DD>&#65308; <B>MSB Shadow</b>&#65310;<OL>
+<LI> You can reuse normal sprite character data.<LI> You can add shadows to both sprites and scroll surfaces.<LI> If you want to add shadows to both the sprite and the scroll surface, you need to use the MSB on function of VDP1, which increases the drawing time.<LI> Sprite type must be type 2-7<LI> Sprite data must be in palette format only</OL>
+</P>
+<P><DD> For example, use normal shadows for a scene where the shadow of a person (sprite) viewed from the side is on the ground (scroll surface), and the shadow of an airplane (sprite) viewed from above is on the ground (scroll surface) or a building (sprite). ), use MSB shadow.<BR>
+ MSB shadow can also be used when you want to halve the brightness of a sprite character in palette format, and in that case there is no need to use the MSB on function of VDP1. The MSB of the palette-format sprite data drawn by VDP1 is written as is the MSB of the color bank data in the command table, so all you need to do is set the MSB of the color bank data of the sprite whose brightness is halved to 1.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p15_30.htm">Back</a> ｜ <A HREF="p16_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no15">VDP2 User's Manual</a> ★ <A HREF="p15_10.htm">Chapter 15 How to use VDP2</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

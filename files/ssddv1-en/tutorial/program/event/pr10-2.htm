@@ -1,0 +1,130 @@
+<HTML>
+<HEAD>
+<TITLE> Event processing using SGL functions </TITLE>
+</HEAD><BODY>
+
+<P> <A HREF="pr10-1.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr10-3.htm"> Go to next page </A> </BR> </P>
+<HR>
+
+
+<H2>
+10-2. Event processing using SGL functions
+</H2>
+
+<P>
+Here, we will explain the actual event processing using SGL library functions.
+</P>
+
+<H3>
+<A NAME="NO1"> Initialize event </A>
+</H3>
+
+<P>
+In order to use event processing in SGL, it is necessary to first initialize the buffer and event list related to the event.
+</P>
+
+<P>
+Use the library function "slInitEvent" to execute event initialization in SGL.
+</P>
+
+<DL>
+<DT> <B> [void slInitEvent (void);] </B>
+<DD> Performs all initialization related to event processing (event list, buffer initialization, etc.).
+</DL>
+
+<BLOCKQUOTE>
+<P> <B> Caution </B> <BR>
+If event processing is used without initializing the event, it will not be consistent with the uninitialized buffer or event list, and in the worst case, the CPU may stop. (For details, refer to “10-5: Notes on event processing”).
+</P>
+</BLOCKQUOTE>
+
+<H3>
+<A NAME="NO2"> Create event list </A>
+</H3>
+
+<P>
+To perform event processing, events must be registered as an event list in the order of execution. <BR>
+Events are added to the event list by the event registration library function “slSetEvent” as shown in Figure 10-4. <BR>
+The registered events are sequentially registered at the end of the event list, and are executed in order from the top of the event list by the event execution library function “slExecuteEvent”.
+</P>
+
+<H4> Figure 10-4 Create event list </H4>
+<IMG SRC="p10-06.gif">
+
+<P>
+Use the library function “slSetEvent” to register an event.
+</P>
+
+<DL>
+<DT> <B> [EVENT * slSetEvent (void (* func) ());] </B>
+<DD> Reserves an EVENT structure (128 bytes) in the event RAM area, and adds and registers new events at the end of the event list. For the parameter, substitute the execution address value of the event to be registered. <BR>
+The function “slSetEvent” returns the start address of the registered EVENT structure as a return value.
+If event registration fails, NULL is returned.
+<P>
+See the next section for the event format and structure.
+</P>
+</DL>
+
+<H3>
+<A NAME="NO6"> Event format </A>
+</H3>
+
+<P>
+The function group to be registered as an event must take the format shown in Figure 10-5.
+</P>
+
+<H4> Figure 10-5 Event format </H4>
+<IMG SRC="p10-07-1.gif">
+
+<P>
+Events registered and executed are managed by the EVENT structure. <BR>
+In the EVENT structure, the execution address of the event to be registered and the structure for variables used in the event are stored, and these two are used to manage the event.
+</P>
+
+<H4> Figure 10-6 Event structure </H4>
+<IMG SRC="p10-07-2.gif">
+<P>
+-Functions registered as events are controlled by the EVENT structure. <BR>
+-Member "* exad ()" contains the execution address of the registered event, <BR>
+Member “user []” stores the structure used in the event. <BR>
+The structure is used for variables in the event, but <BR>
+Note that the structure does not exceed the user area (size: 112 bytes). <BR>
+If you want to use more variables, use <BR>
+Extend the user area using the WORK structure etc. <BR>
+Please make sure that the structure itself is also stored separately.
+</P>
+
+<H3>
+About structures for variables in events
+</H3>
+
+<P>
+When using various variables in an event, the variables must be defined as a structure. <BR>
+<The defined structure for event variables is stored in the user area (112 bytes) in the EVENT structure at the time of event registration (the storage work is done by the user himself), and is used from time to time during event execution thereafter. <BR>
+For this reason, the structure for event variables cannot be set exceeding the size of the user area where the structure is stored (112 bytes). <BR>
+<However, if you want to use more variables, expand the user area using the WORK structure, etc., and store and use the variable structure in the event so that it matches the size of the user area. (Refer to “Section 10-4: Expansion of user area” for how to expand the user area).
+</P>
+
+<H3>
+<A NAME="NO5"> Event execution </A>
+</H3>
+
+<P>
+Events registered in the event list are executed in order by the event management function. <BR>
+The library function “slExecuteEvent” is used to execute the event.
+</P>
+
+<P>
+For example, when event A, event B, and event C are registered in the event list in order using the library function “slSetEvent”, each event is executed according to the event list in the order shown below.
+</P>
+
+<H4> Figure 10-7 Event execution </H4>
+<IMG SRC="p10-08.gif">
+
+<DL>
+<DT> <B> [void slExecuteEvent (void);] </B>
+<DD> The events registered in the event list are executed in the order of the list.
+</DL>
+<HR>
+<P> <A HREF="pr10-1.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr10-3.htm"> Go to next page </A> </BR> </P>
+</BODY></HTML>

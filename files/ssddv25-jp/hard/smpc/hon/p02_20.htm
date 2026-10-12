@@ -1,0 +1,173 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/19&gt;SMPCユーザーズマニュアル/2.2　SMPCコマンド</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p02_10.htm">戻る</A>｜
+     <A HREF="p02_30.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SMPCユーザーズマニュアル/第２章　SMPCコマンド</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_20"></A>
+	<P>	<DT><H2>■2.2　コマンド発行</H2>
+		<DD>　SMPCへのコマンドは、SMPCステータスフラグ(SF)を"1"にセットした後コマンドパラメータが必要な場合にはコマンドパラメータを設定し、SH-2インタフェースレジスタにコマンドコードを書き込むことにより発行できます。<BR>
+			　SMPCコマンドを発行する際は、コマンドの二重発行に注意してください。SMPCへのコマンド二重発行防止は、SMPCステータスフラグで管理することができます。このフラグが"1"の時を、SMPCがビジーとします。
+			コマンドを発行する際は、ステータスフラグが"0"であることを確認し、"1"をセットしてからコマンドを発行してください。ステータスフラグは、コマンド終了時にSMPCが"0"リセットします。</P>
+
+<A NAME="no2_21"></A>
+	<P>	<DT><H3>◆コマンド発行方法</H3>
+     <DD>　SMPCのコマンドはコマンドの実行内容、コマンドパラメータ、リザルトパラメータの種類により、
+         発行手順やリザルトパラメータの取得方法を分類することができます。以下にその分類と該当するコマンドを表2.4に、
+         各分類に応じた発行方法例を図2.1から図2.5に示します。</P>
+
+	<P>	<DT><B>　(１)分類Ａ:</B>
+		<DD>　コマンド発行後、マスタSH-2がリセット、または、NMIなどの例外処理に遷移するコマンド</P>
+
+	<P>	<DT><B>　(２)分類Ｂ:</B>
+		<DD>　コマンドパラメータ設定を必要とせず、リザルトパラメータも返さないコマンド(ただしOREG31を除く)</P>
+
+	<P>	<DT><B>　(３)分類Ｃ:</B>
+		<DD>　コマンドパラメータ設定を必要とし、リザルトパラメータを返さないコマンド(ただしOREG31を除く)</P>
+
+	<P>	<DT><B>　(４)分類Ｄ:</B>
+		<DD>　コマンドパラメータ設定を必要とし、リザルトパラメータも返し、かつリザルトパラメータが揃った時点でSMPC割り込みを要求するコマンド</P>
+
+<A NAME="t2_4"></A>
+	<P>	<DD><B>表2.4　コマンド発行分類</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH><PRE>分類</TH><TH><PRE>コマンド</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>A</TD><TD><PRE><B>MSHON</B>,<B>SYSRES</B>,NMIREQ,<B>CKCHG352</B>,<B>CKCHG320</B></TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>B</TD><TD><PRE>SSHON,SSHOFF,SNDON,SNDOFF,<B>CDON</B>,<B>CDOFF</B>,RESENAB,RESDISA</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>C</TD><TD><PRE>SETTIME,SETSMEM</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>D</TD><TD><PRE>INTBACK</TD></TR>
+	</TABLE>
+	<DD><B>太字</B>はユーザーの使用禁止コマンドです。</P>
+
+<A NAME="z2_1"></A>
+	<P ALIGN=CENTER><B>図2.1　分類Aコマンドフロー</B><BR><IMG SRC="../grp/i014_01.gif"></P>
+
+<A NAME="z2_2"></A>
+	<P ALIGN=CENTER><B>図2.2　分類Bコマンドフロー</B><BR><IMG SRC="../grp/i014_02.gif"></P>
+
+<A NAME="z2_3"></A>
+	<P ALIGN=CENTER><B>図2.3　分類Cコマンドフロー</B><BR><IMG SRC="../grp/i015_01.gif"></P>
+
+<A NAME="z2_4"></A>
+	<P ALIGN=CENTER><B>図2.4　分類Dコマンドフロー</B><BR><IMG SRC="../grp/i016_01.gif"></P>
+
+<TABLE><TD>注）SMPC割り込みをマスク(SMPC割り込みを使用せず)して、SMPC割込フラグおよびSF<BR>　　クリアをコマンド発行後にポーリングすることでもSMPC割り込みルーチン同様の<BR>　　処理を実行できます。</TD></TABLE>
+
+<A NAME="no2_22"></A>
+	<P>	<DT><H3>◆コマンド発行タイミング</H3>
+		<DD>　SMPCは、V-BLANK-IN割り込みを利用して内部タスクを実行しています。そこで、V-BLANK-INから300μS期間でのコマンド発行を禁止しています。
+		また、SMPCの各種ステータス、およびペリフェラルデータを取得するために用いるINTBACKコマンドは、その他のコマンドよりも発行タイミングを厳しく規定しています。INTBACKコマンドの詳細については、
+
+<A HREF="p02_40.htm">■2.4  非リセット系システムマネージメントコマンド</A>、および
+<A HREF="p03_10.htm">第３章 ペリフェラルコントロール</A>を参照してください。</P>
+
+<A NAME="no2_22_1"></A>
+	<P>	<DT><B>　●コマンド発行タイミングの共通事項</B>
+     <DD>　前述したように全てのコマンドの発行をV-BLANK-INから300μS期間で禁止します。</P>
+
+<A NAME="no2_22_2"></A>
+	<P>	<DT><B>　●INTBACKコマンド</B>
+     <DD>　INTBACKコマンドは、ペリフェラルデータ収集開始をV-BLANK-OUTで開始します。ペリフェラルデータ収集開始をV-BLANK-OUTで、開始するためにV-BLANK-IN後、300μS以降、V-BLANK-OUT以前の期間に発行してください。
+図2.5にINTBACKコマンド発行タイミングを示します。</P>
+
+	<P>	<DD>　INTBACKコマンドには、以下の3つの使用方法があります。</P>
+
+	<P>	<DD><B>(１)ＳＭＰＣステータスのみ取得</B>
+		<DD><B>(２)ＳＭＰＣステータス取得に続いて、ペリフェラルデータを取得</B>
+		<DD><B>(３)ペリフェラルデータのみ取得</B></P>
+
+	<P>	<DD>　(２)SMPCステータス取得に続いて、ペリフェラルデータ取得を実行する場合には、SMPCステータスがOREGに揃った時点でSMPC割り込みが発生し、SH2に対してリザルトパラメータの取得を要求します。
+			SH2がコンティニュー要求した後にSMPCは、ペリフェラルデータ収集を開始します。
+			そこで、SMPCステータス取得後、コンティニュー要求をする際にも、ペリフェラルデータ収集開始をV-BLANK-OUTで、開始できるようにINTBACKコマンドを発行しコンティニュ−を要求する必要があります。
+			なお、SMPCステータス取得は、INTBACKコマンド発行後、約300μSで完了し、SMPCに対して、SMPC割り込みを要求します。</P>
+
+<A NAME="z2_5"></A>
+	<P ALIGN=CENTER><B>図2.5　INTBACKコマンド発行タイミング</B><BR><IMG SRC="../grp/i018_01.gif"></P>
+
+<A NAME="no2_22_3"></A>
+	<P><DT><B>　●SYSRES、CKCHG320、CKCHG352コマンド実行後のINTBACKコマンド発行タイミング</B>
+	<DD>　以上のコマンドでは、コマンド実行時間が100msec以上かかります。これらコマンドの実行後にINTBACKコマンドを発行する際は、次のV-BLANK-INまで待ち発行してください。
+			図2.6にSYSRES,CKCHG320,CKCHG352コマンド実行後のINTBACKコマンド発行タイミングを示します。
+			なお、SYSRES,CKCHG320,CKCHG352コマンドの発行タイミングは、V-BLANK-IN後、300μS以降、次のV-BLANK-IN以前の期間に発行してください。</P>
+
+	<P><DT><TABLE><TR>
+	<TH><IMG SRC="../../../what/atto.gif"></TH>
+	<TD><B>クロックチェンジコマンドを使用する場合は、必ず、システムライブラリを使用してください。</B></TD></TR></TABLE></P>
+
+<A NAME="z2_6"></A>
+	<P ALIGN=CENTER><B>図2.6　SYSRES,CKCHG320,CKCHG352コマンド実行後のINTBACKコマンド発行タイミング</B><BR><IMG SRC="../grp/i018_02.gif"></P>
+
+<A NAME="no2_22_4"></A>
+	<P>	<DT><B>　●その他のコマンドの発行タイミング</B>
+		<DD>　その他のコマンドを発行後、同じフレームでINTBACKコマンドを発行しないときには、V-BLANK-IN後、300μS以降、次のV-BLANK-IN以前の期間に発行してください。その他のコマンドをV-BLANK-IN後、
+			300μS以降で発行しさら同じフレームでINTBACKコマンドを発行するときには、INTBACKコマンドをV-BLANK-OUT以前の期間で発行してください。図2.7にその他のコマンドの発行タイミングを示します。</P>
+
+<A NAME="z2_7"></A>
+	<P ALIGN=CENTER><B>図2.7　その他のコマンド発行</B><BR><IMG SRC="../grp/i019_01.gif"></P>
+
+<A NAME="no2_23"></A>
+	<P>	<DT><H3>◆コマンド発行制限</H3>
+		<DD>　コマンドを発行する上での制限事項を以下に示します。</P>
+
+<A NAME="no2_23_1"></A>
+	<P>	<DD>●　SMPCに対するコマンド発行処理は、極力単一タスクで行うようにしてください。
+			発行処理が複数に分れている場合には、コマンドの二重発行等の問題点が発生し、SMPCの誤動作またはデッドロックを発生する可能性があります。やむを得ず複数のタスクで、
+			SMPCに対してコマンド発行をする必要性がある場合は、タスク間でコマンドの二重発行を発生させないような排他制御を前述のコマンド発行方法に加え、必ず実施してください。</P>
+
+<A NAME="no2_23_2"></A>
+	<P>	<DD>●　コマンドを連続して発行する場合にも、コマンドの二重発行が発生しないよう必ずステータスフラグを確認し、前のコマンド実行が終了してから次のコマンドを発行してください。</P>
+
+<A NAME="no2_23_3"></A>
+	<P>	<DD>●　１秒毎に１回、リアルタイムクロックのカウントアップを行っています。
+			また、V-BLANK-IN直後は、SMPC内部でリセットボタンの検出を行っています。これらの処理が行われている時にコマンドを発行するとコマンド処理時間にこれら処理時間が加算されるため、コマンド処理時間に変動が生じるので注意してください。</P>
+
+<A NAME="no2_23_4"></A>
+	<P>	<DD>●　SMPCコマンドは、マスタ、スレーブどちらのSH-2からも発行可能ですが、システムが動作停止するなど、発行を制限しているコマンドがあります。</P>
+
+	<P>	<DD>　表2.5に各SH-2コマンド発行制限を示します。</P>
+
+<A NAME="t2_5"></A>
+	<P>	<DD><B>表2.5　SH-2のコマンド発行制限</B>
+		<DD><TABLE BORDER=1>
+<TR><TH>No.</TH><TH COLSPAN=2>　　コマンド名称　　</TH><TH>コマンド略称</TH><TH>マスタSH-2からの<BR>コマンド発行</TH><TH>スレーブSH-2からの<BR>コマンド発行</TH></TR>
+<TR BGCOLOR="c0d080"><TD ALIGN=CENTER>1</TD> <TD>×</TD><TD><A HREF="p02_30.htm#c1_01">マスタ SH-2 ON</TD><TD>MSHON</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR><TD ALIGN=CENTER>2</TD> <TD>○</TD><TD><A HREF="p02_30.htm#c1_02">スレーブ SH-2 ON</TD><TD>SSHON</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>×</TD></TR>
+<TR><TD ALIGN=CENTER>3</TD> <TD>○</TD><TD><A HREF="p02_30.htm#c1_03">スレーブ SH-2 OFF</TD><TD>SSHOFF</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>×</TD></TR>
+<TR><TD ALIGN=CENTER>4</TD> <TD>○</TD><TD><A HREF="p02_30.htm#c1_04">サウンド ON</TD><TD>SNDON</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR><TD ALIGN=CENTER>5</TD> <TD>○</TD><TD><A HREF="p02_30.htm#c1_05">サウンド OFF</TD><TD>SNDOFF</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR BGCOLOR="#c0d080"><TD ALIGN=CENTER>6</TD> <TD>×</TD><TD><A HREF="p02_30.htm#c1_06">CD ON</TD><TD>CDON</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR BGCOLOR="#c0d080"><TD ALIGN=CENTER>7</TD> <TD>×</TD><TD><A HREF="p02_30.htm#c1_07">CD OFF</TD><TD>CDOFF</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR BGCOLOR="#c0d080"><TD ALIGN=CENTER>8</TD> <TD>×</TD><TD><A HREF="p02_30.htm#c1_08">システム全体リセット</TD><TD>SYSRES</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR BGCOLOR="#c0d080"><TD ALIGN=CENTER>9</TD> <TD>×</TD><TD><A HREF="p02_30.htm#c1_09">クロックチェンジ352</TD><TD>CKCHG352</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>×</TD></TR>
+<TR BGCOLOR="#c0d080"><TD ALIGN=CENTER>10</TD><TD>×</TD><TD><A HREF="p02_30.htm#c1_10">クロックチェンジ320</TD><TD>CKCHG320</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>×</TD></TR>
+<TR><TD ALIGN=CENTER>11</TD><TD>○</TD><TD><A HREF="p02_30.htm#c1_11">NMIリクエスト</TD><TD>NMIREQ</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR><TD ALIGN=CENTER>12</TD><TD>○</TD><TD><A HREF="p02_30.htm#c1_12">リセットイネーブル</TD><TD>RESENAB</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR><TD ALIGN=CENTER>13</TD><TD>○</TD><TD><A HREF="p02_30.htm#c1_13">リセットディセーブル</TD><TD>RESDISA</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR><TD ALIGN=CENTER>14</TD><TD>○</TD><TD><A HREF="p02_40.htm#c2_01">インタラプトバック</TD><TD>INTBACK</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>×</TD></TR>
+<TR><TD ALIGN=CENTER>15</TD><TD>○</TD><TD><A HREF="p02_40.htm#c2_02">SMPCメモリ設定</TD><TD>SETSMEM</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+<TR><TD ALIGN=CENTER>16</TD><TD>○</TD><TD><A HREF="p02_50.htm#c3_01">時刻設定</TD><TD>SETTIME</TD><TD ALIGN=CENTER>○</TD><TD ALIGN=CENTER>○</TD></TR>
+</TABLE>
+<TABLE><TR BGCOLOR="#c0d080"><TD>×印はユーザーの使用禁止</TD></TR></TABLE>
+</DL>
+
+<HR NOSHADE>
+<B>▲<A HREF="p02_10.htm">戻る</A>｜
+     <A HREF="p02_30.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

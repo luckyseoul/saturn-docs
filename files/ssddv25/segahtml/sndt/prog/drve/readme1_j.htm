@@ -1,0 +1,96 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/17&gt;サウンドドライバVer2.10ガイド</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no0">サウンドドライバプログラマーズガイド</A>
+<HR>
+<B>■
+　　｜
+<a href="sndsys_j.htm">進む</A>▼</B>
+
+<HR NOSHADE>
+<B>サウンドドライバプログラマーズガイド</B>
+<H2 ALIGN=CENTER>はじめに</H2>
+
+<HR NOSHADE>
+<P>　本マニュアルは「<B>サウンド組み込みマニュアル</B>」の改訂版で、サウンドドライバversion 2.20をターゲットに記述されています。</P>
+
+<P>　本マニュアルにはサウンドコントロールの全てを自分でプログラムする方のために詳細な説明が記述してありますが、SEGAが提供しているプログラムライブラリの「<B>サウンドI/Fライブラリ</B>」を使って簡単にサウンドを組み込む方法もあります。必要に応じてそちらも利用してください。<BR>　内容と使い方に関しては
+「<B><a href="../../../prgg/prg3/sund/index_j.htm">サウンドI/Fライブラリユーザーズマニュアル</B></A>」を参照してください。</P>
+
+<P><CENTER><H3>制限事項</H3></CENTER>
+<OL>
+<LI>以前のマニュアルに記載してある未対応機能「シーケンススタートコマンド (01h) 」の「P4  Priority level (0-31) 」はVer2.10においてもサポートされていません。
+</OL></P>
+
+
+<P><CENTER><H3>言葉の説明</H3></CENTER>
+<TABLE BORDER>
+<TR><TH>語句</TH><TH>語句の意味</TH></TR>
+<TR><TD>SCSP</TD><TD>Saturn Custom Sound Processor の略称で、サターンのサウンドシステムの中心となる音源LSIです。サウンド用のDSPが内蔵されています。SCSPに関する内容はとてもここでは記述しきれませんので、
+「<B><a href="../../../hard/scsp/index_j.htm">SCSPユーザーズマニュアル</A></B>」を参照してください。</TD></TR>
+
+<TR><TD>サウンドデータ</TD><TD>サウンドメモリに格納されるデータのことで、「音色データ」「シーケンスデータ」「DSPプログラム」の3種類があります。</TD></TR>
+<TR><TD>音色データ</TD><TD>シーケンスデータを演奏するための、音色部分のデータです。PCM波形データと、発音パラメータで構成されています。FM音色も含みます。</TD></TR>
+<TR><TD>シーケンスデータ</TD><TD>曲の演奏データです。MIDIで作曲した曲データをサターン用に圧縮したもので、音の強さ・高さ・発音の開始・終了といった演奏情報で構成されています。効果音も全く同じフォーマットで作成されます。</TD></TR>
+<TR><TD>DSPプログラム</TD><TD>サウンド用DSPを動作させるための、DSPマイクロプログラムです。リバーブやサラウンドといったエフェクトプログラム等が用意されています。</TD></TR>
+<TR><TD>DSPワークRAM</TD><TD>DSPの遅延RAMとエフェクト係数のための領域で、DSPの内部処理で使用されます。マイクロプログラムによって本領域のサイズは変わります。</TD></TR>
+<TR><TD>サウンドクリエーター</TD><TD>音色の作成・作曲・効果音やエフェクトの作成等、サウンドシステムの音作りの部分を担当する人をさします。</TD></TR>
+<TR><TD>メインシステム</TD><TD>SH側のゲームプログラムのことをさします。68000側のサウンドドライバをサウンドのサブシステム、これをコントロールするゲームプログラムをメインシステムと考えます。</TD></TR>
+<TR><TD>サンプル数</TD><TD>1サンプルはPCM波形のデータ幅に依存しますので、8ビットPCMの場合には1バイト、16ビットPCMの場合には2バイトとなります。従って、4Kサンプルといった場合には8ビット時には4096バイト、16ビット時には8192バイトとなります。</TD></TR>
+</TABLE></P>
+
+<P><CENTER><H3>Version 1.xxと2.xxの違い</H3></CENTER>
+<UL TYPE=DISC>
+<P><LI>音量計算が高速になった。ただし、アルゴリズムに互換性がありません。</P>
+<P><LI>フェードまたは音量変更が、note offのタイミングでしか反応しなかったものを改善。スムーズな変化が可能になりました。</P>
+<P><LI>ダンパーペダルに対応しました。</P>
+</UL>
+
+<P><CENTER><H3>version 2.xxと2.10の違い</H3></CENTER>
+<UL TYPE=DISC>
+<P><LI>FMを強制的に潰したりするとノイズが発生するためFM音源の発音を制限。　これは現在FMとして結線されているスロットがノートオフ直後、リリースが残った状態で別のFMにアサインされたときに起こるということが判明しています。このスロットがキャリアのとき音量が異常になり、モジュレータのとき音色に異常が発生します。この問題はリリースレベルがある程度まで下がるまで、FMスロットとして使用させないという対処方法を採っています（現在のレベルは８段階中４、完全にリリースが終了するのにはかなりの時間を費やすため、実際にはできません）。しかしこれは、「常に後着優先」という現在までの仕様に背反する可能性を残しており、レアケースですが、全スロットFMによるノートオン中であると発音がキャンセルされます。このときはエラーを返しますが（エラーステータスの項を参照）、ディレクターのかたはスペックを設計するときに注意してください。<BR>　また、スロットのチェックを複雑化した都合上、FM音源を多用すると、どうしても動作が遅くなります。</P>
+
+<P><LI>いままでのドライバはスロットが空いているかどうかの判断をノートオフで行っていましたが、これをリリースレベルで判断するようにしました。リリースを見るプログラムはLEVEL 2 INT内で動作しています。発音の手順は次のようになります。</P>
+<P><DL>
+<DT>step 1
+<DD>キーオフされていて,リリースレベルが4以下のスロットを探し,割り当てます。この条件に該当するスロットが検出できなかった場合step 2へ進む。
+<DT>step 2
+<DD>キーオフされている同一発音管理番号のスロットを探し,割り当てます。この条件に該当するスロットが検出できなかった場合step 3へ進む。
+<DT>step 3
+<DD>スロット番号の若い順から同一発音管理番号を探し出し,強制的に使用します。この条件に該当するスロットが検出できなかった場合step 4へ進む。
+<DT>step 4
+<DD>もっとも過去にキーオンされたスロットを発音管理番号とは無関係に探し出し,強制的に割り当てます。このルーチンを通過することは,最大同時発音数を超えていることになるため,基本的にはエラーです。ただしFM音源として使用中のスロットは使用しません。このときのみ発音はキャンセルされます。注意してください。
+</DL></P>
+<P><LI>マップチェンジ時のプチノイズを解消。</P>
+</UL>
+
+<HR NOSHADE>
+<B>■
+　　｜
+<a href="sndsys_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no0">サウンドドライバプログラマーズガイド</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

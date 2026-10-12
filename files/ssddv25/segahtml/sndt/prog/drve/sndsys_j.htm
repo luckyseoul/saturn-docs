@@ -1,0 +1,66 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/17&gt;サウンドドライバVer2.10ガイド/１．システムの概要</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no1">サウンドドライバプログラマーズガイド</A>
+<HR>
+<B>▲
+<a href="readme1_j.htm">戻る</A>｜
+<a href="sndctrl_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>サウンドドライバプログラマーズガイド</B>
+<H2 ALIGN=CENTER>１．システムの概要</H2>
+<HR NOSHADE>
+
+<P ALIGN=CENTER><B>Sound System Hardware</B><BR><img srcset="../image/sndsys_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<P>　サウンドシステムは音源LSIを中心として、サウンドCPUと512KBのサウンドメモリ、メインシステムとCDインターフェース等が接続されています。メインシステムはSCUを介してサウンドメモリと SCSPのIO空間全てをアクセスすることと、SMPCを通してサウンドCPUの停止（リセット）・再起動（リセット解除）をコントロールすることができます。<BR>
+　この中でも重要なのはサウンドメモリで、サウンドドライバの実行やデータの管理、音源データの格納、システム間の通信等、サウンドシステムの全てがここでコントロールされます。</P>
+
+<P>　サウンドドライバは曲や効果音の発音を行うためのサウンドコントロールプログラムです。プログラムはサウンドメモリ上に格納され、メインシステムとは独立に動作します。従って、メインシステムからはコマンドの発行を行うだけで曲や効果音の再生を行うことができます。<BR>
+　サウンドドライバやサウンドデータはいずれもサウンドメモリ上に格納されますので、一度電源を落とすとその全てが消滅してしまいます。従ってメインシステムは、電源投入時には毎回サウンドドライバの起動を行わなければなりません。電源投入時のサウンドCPUはリセット信号によって停止していますので、まずサウンドドライバをサウンドメモリへ転送して、それからリセット信号を解除します。これでサウンドドライバが起動され、曲や効果音の演奏ができるようになります。</P>
+
+<P>　サウンドメモリにはシステム領域とデータ領域とがあります。システム領域はサウンドドライバの動作とシステム管理を行うための固定領域で、データ領域は音源データの格納とDSPの内部処理のための可変領域（マッピングが可変）です。</P>
+
+<P ALIGN=CENTER><B>サウンドメモリ</B><BR><img srcset="../image/sndmem_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<DL>
+<DT>●<B>システム領域</B>
+<DD>サウンドドライバを動作させるためのプログラム格納領域と、ワーク領域です。ワーク領域にはサウンドドライバのためのプログラムワークと、メインシステムやサウンド開発システム等とのインターフェースをとるためのシステムインターフェース領域とがあります。サイズが44KBの固定領域で、他の用途で本領域を使用することはできません。
+
+<DT>●<B>データ領域</B>
+<DD>サウンドデータを格納するための領域です。音色データ・シーケンスデータ・DSPプログラムの3種類がいろいろな組み合わせ（マッピング）で格納されます。また、PCMストリーム再生を行う場合にはPCMストリーム再生のバッファとしても使われます。本領域はゲームや場面によって、格納されるデータとそのマッピングが常に変化します。言い換えればこの4Mビットの範囲内で、各場面ごとのサウンドデータのマッピングが行われます。
+
+<DT>●<B>DSPワークRAM領域</B>
+<DD>DSPの遅延RAMとエフェクト係数のための領域です。従って、DSPを使用しないような場合には本領域は必要ありません。本領域の先頭アドレスはハード的な制約から2000h境界にしなければならず、また遅延RAMと係数エリアのサイズは使用するDSPのマイクロプログラム によって変わりますので注意がいります。
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="readme1_j.htm">戻る</A>｜
+<a href="sndctrl_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm#no1">サウンドドライバプログラマーズガイド</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

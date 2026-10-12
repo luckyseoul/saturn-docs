@@ -1,0 +1,683 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;26/31&gt;SCUユーザーズマニュアル/5.DSP命令詳細</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p04_55.htm">戻る</A>｜
+     <A HREF="p04_57.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCUユーザーズマニュアル／第４章　DSP制御</B>
+<H2 ALIGN=CENTER>DMA命令</H2>
+<HR NOSHADE>
+<!-- --------------------------------------------------------- -->
+<A NAME="dma_d0_ram_simm"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">一覧表</A>|
+▲<A HREF="p04_55.htm#mvi_imm_d_nzs">戻る</A>|
+  <A HREF="#dma_ram_d0_simm">次へ</A>▼
+|<A HREF="dspasm.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>DMA D0,[RAM],SImm</H1>
+		<DD><H3>DMA転送(D0[31-0]→RAM)</H3>
+  <P><DT><B>動作内容</B>
+  <DD>D0[31-0]データをRAMに転送します。外部アドレスレジスタと転送ワード数レジスタはアドレス加算数に従い更新(加算)されます。
+転送ワード数レジスタは、ロングワード単位で転送ワード数を格納するレジスタです。このワード数が０になるか、強制終了されたときに転送終了となります。</P>
+
+  <P><DT><B>記述式</B>
+  <DD>label: DMA D0,[Destination],Counter
+  <DD>　　　Source=M0〜M3<A HREF="#c1"><B>*</B></A>
+
+  <P><DT><B>インストラクションコード</B>
+	<P>	<DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER>
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD>
+<TD COLSPAN=8>Immデータ</TD>
+</TR></TABLE></P>
+
+		<P>	<DD><TABLE BORDER=0>
+				<TR><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　加算モード選択肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit17</TH><TH>bit16</TH><TH>bit15</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>アドレス加算０</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>アドレス加算１</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>アドレス加算２</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>アドレス加算４</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>アドレス加算８</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>アドレス加算16</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>アドレス加算32</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>アドレス加算64</TD></TR>
+</TABLE>
+			</TD><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>ビットデータ</TH><TH ROWSPAN=2>　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit９</TH><TH>bit８</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+</TABLE>
+			</TD></TR></TABLE>
+	
+  <P><DT><B>フラグ</B>
+  <DD>T0;１になります。<B>**</B>
+
+<A NAME="c1"></A>
+	<P>	<DT><B>備　考</B>
+		<DD><B>*</B>[Mx(x=0〜3)]は、DATA RAMx(x=0〜3)を選択します。
+		<DD><B>**</B>外部からの転送終了を知らせるEND信号が入ったとき、T0;0となります。
+		<DD>アドレス加算の指定は、命令の後に加算数を付加し、DMA0〜DMA64となります。
+		<DD>アドレス加算数指定省略時は、加算数が１となります。</P>
+
+</DL>
+
+
+<!-- --------------------------------------------------------- -->
+<A NAME="dma_ram_d0_simm"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">一覧表</A>|
+▲<A HREF="#dma_d0_ram_simm">戻る</A>|
+  <A HREF="#dma_d0_ram_s">次へ</A>▼
+|<A HREF="dspasm.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>DMA [RAM],D0,SImm</H1>
+		<DD><H3>DMA転送(RAM→D0[31-0])</H3>
+  <P><DT><B>動作内容</B>
+  <DD>RAMデータをD0[31-0]に転送します。外部アドレスレジスタと転送ワード数レジスタはアドレス加算数に従い更新(加算)されます。
+ただし、A-Busに対しては加算数０と１のみが有効であり、書き出し単位は32bitです。B-Busに対しては、すべて(加算数0-64)につて有効です。
+書き出し単位が16bitになり、32bitのデータを２分割して16bit×(0-64)の間隔で書き出されます。
+転送ワード数レジスタは、ロングワード単位で転送ワード数を格納するレジスタです。このワード数が０になるか、強制終了されたときに転送終了となります。</P>
+
+  <P><DT><B>記述式</B>
+  <DD>label: DMA [Source],D0,Counter
+  <DD>　　　Source=M0〜M3<A HREF="#c1"><B>*</B></A>
+
+  <P><DT><B>インストラクションコード</B>
+	<P>	<DD><TABLE BORDER=1>
+<TR>
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER>
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>０</TD><TD>０</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD>
+<TD COLSPAN=8>Immデータ</TD>
+</TR></TABLE></P>
+
+		<P>	<DD><TABLE BORDER=0>
+				<TR><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　加算モード選択肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit17</TH><TH>bit16</TH><TH>bit15</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>アドレス加算０</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>アドレス加算１</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>アドレス加算２</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>アドレス加算４</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>アドレス加算８</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>アドレス加算16</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>アドレス加算32</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>アドレス加算64</TD></TR>
+</TABLE>
+			</TD><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>ビットデータ</TH><TH ROWSPAN=2>　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit９</TH><TH>bit８</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+</TABLE>
+			</TD></TR></TABLE>
+	
+  <P><DT><B>フラグ</B>
+  <DD>T0;１になります。<B>**</B>
+
+<A NAME="c1"></A>
+	<P>	<DT><B>備　考</B>
+		<DD><B>*</B>[Mx(x=0〜3)]は、DATA RAMx(x=0〜3)を選択します。
+		<DD><B>**</B>外部からの転送終了を知らせるEND信号が入ったとき、T0;0となります。
+		<DD>アドレス加算の指定は、命令の後に加算数を付加し、DMA0〜DMA64となります。
+		<DD>アドレス加算数指定省略時は、加算数が１となります。</P>
+
+</DL>
+
+
+<!-- --------------------------------------------------------- -->
+<A NAME="dma_d0_ram_s"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">一覧表</A>|
+▲<A HREF="#dma_ram_d0_simm">戻る</A>|
+  <A HREF="#dma_ram_d0_s">次へ</A>▼
+|<A HREF="dspasm.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>DMA D0,[RAM],[s]</H1>
+		<DD><H3>DMA転送(D0[31-0]→RAM)</H3>
+
+  <P><DT><B>動作内容</B>
+  <DD>bit0〜2で指定された[s]のデータを転送カウンタとし、示された数だけD0[31-0]データをRAMに転送します。
+外部アドレスレジスタと転送ワード数レジスタはアドレス加算数に従い更新(加算)されます。
+転送ワード数レジスタは、ロングワード単位で転送ワード数を格納するレジスタです。このワード数が０になるか、強制終了されたときに転送終了となります。</P>
+
+  <P><DT><B>記述式</B>
+  <DD>label: DMA D0,[Destination],[Counter]
+  <DD>　　　Counter = M0〜M3<A HREF="#c3"><B>*</B></A>,MC0〜MC3<A HREF="#c3"><B>*</B></A>,
+  <DD>　　　Destination = M0〜M3<A HREF="#c3"><B>*</B></A>,PR<A HREF="#c3"><B>*</B></A>
+
+  <P><DT><B>インストラクションコード</B>
+
+	<CENTER>
+		<TABLE BORDER=1>
+		<TR ALIGN=CENTER><TH>bit15</TH><TH>加算モード選択肢</TH></TR>
+		<TR ALIGN=CENTER><TD>０</TD><TD>アドレス加算０</TD></TR>
+		<TR ALIGN=CENTER><TD>１</TD><TD>アドレス加算１</TD></TR>
+		</TABLE>
+	</CENTER>
+
+	<P>	<DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>10</TH><TH>９</TH><TH>８</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>２</TH><TH>１</TH><TH>０</TH></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>０</TD><TD>０</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>０</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TR></TABLE></P>
+
+		<P>	<DD><TABLE BORDER=0>
+				<TR><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit10</TH><TH>bit９</TH><TH>bit８</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>PROGARM RAM</TD></TR>
+</TABLE>
+				</TD><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　[s]　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3,CT3++</TD></TR>
+</TABLE>
+
+				</TD></TR></TABLE>
+	
+	<P>	<DT><B>フラグ</B>
+		<DD>T0;１になります。<B>**</B>
+		<DD>CTx(x=0〜3);b2=1のときに限りインクリメントされます。b2=0のときは変わりません。</P>
+
+<A NAME="c3"></A>
+	<P>	<DT><B>備　考</B>
+		<DD><B>*</B>[Mx(x=0〜3)]は、DATA RAMx(x=0〜3)を選択します。MCx(x=0〜3)は、DATA RAMx(x=0〜3)を選択し、転送後、CTx(x=0〜3)をインクリメントします。
+		<DD>PRは、PROGRAM RAMを選択します。
+		<DD><B>**</B>外部からの転送終了を知らせるEND信号が入ったとき、T0;0となります。
+		<DD>アドレス加算の指定は、命令の後に加算数を付加し、DMA0〜DMA1となります。
+		<DD>アドレス加算数指定省略時は、加算数が１となります。</P>
+
+</DL>
+
+
+<!-- --------------------------------------------------------- -->
+<A NAME="dma_ram_d0_s"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">一覧表</A>|
+▲<A HREF="#dma_d0_ram_s">戻る</A>|
+  <A HREF="#dmah_d0_ram_simm">次へ</A>▼
+|<A HREF="dspasm.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>DMA [RAM],D0,[s]</H1>
+		<DD><H3>DMA転送(RAM→D0[31-0])</H3>
+
+  <P><DT><B>動作内容</B>
+  <DD>bit0〜2で指定された[s]のデータを転送カウンタとし、示された数だけRAMのデータをD0[31-0]データに転送します。
+外部アドレスレジスタと転送ワード数レジスタはアドレス加算数に従い更新(加算)されます。
+ただし、A-Busに対しては加算数０と１のみが有効であり、書き出し単位は32bitです。B-Busに対しては、すべて(加算数0-64)につて有効です。
+書き出し単位が16bitになり、32bitのデータを２分割して16bit×(0-64)の間隔で書き出されます。
+転送ワード数レジスタは、ロングワード単位で転送ワード数を格納するレジスタです。このワード数が０になるか、強制終了されたときに転送終了となります。</P>
+
+
+
+  <P><DT><B>記述式</B>
+  <DD>label: DMA [Source],D0,[Counter]
+  <DD>　　　Counter = M0〜M3<A HREF="#c4"><B>*</B></A>,MC0〜MC3<A HREF="#c4"><B>*</B></A>,
+  <DD>　　　Source = M0〜M3<A HREF="#c4"><B>*</B></A>
+
+  <P><DT><B>インストラクションコード</B>
+
+		<P>	<DD><TABLE BORDER=0>
+				<TR><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　加算モード選択肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit17</TH><TH>bit16</TH><TH>bit15</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>アドレス加算０</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>アドレス加算１</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>アドレス加算２</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>アドレス加算４</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>アドレス加算８</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>アドレス加算16</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>アドレス加算32</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>アドレス加算64</TD></TR>
+</TABLE>
+				</TD><TD>　</TD><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　[s]　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3,CT3++</TD></TR>
+</TABLE>
+				</TD></TR></TABLE>
+
+
+	<P>	<DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>２</TH><TH>１</TH><TH>０</TH></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>０</TD><TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TR></TABLE></P>
+
+
+	<CENTER>
+		<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>ビットデータ</TH><TH ROWSPAN=2>　[RAM]選択肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit９</TH><TH>bit８</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+		</TABLE>
+	</CENTER>
+
+
+	
+	<P>	<DT><B>フラグ</B>
+		<DD>T0;１になります。<B>**</B>
+		<DD>CTx(x=0〜3);b2=1のときに限りインクリメントされます。b2=0のときは変わりません。</P>
+
+<A NAME="c4"></A>
+	<P>	<DT><B>備　考</B>
+		<DD><B>*</B>[Mx(x=0〜3)]は、DATA RAMx(x=0〜3)を選択します。MCx(x=0〜3)は、DATA RAMx(x=0〜3)を選択し、転送後、CTx(x=0〜3)をインクリメントします。
+		<DD><B>**</B>外部からの転送終了を知らせるEND信号が入ったとき、T0;0となります。
+		<DD>アドレス加算の指定は、命令の後に加算数を付加し、DMA0〜DMA1となります。
+		<DD>アドレス加算数指定省略時は、加算数が１となります。</P>
+
+</DL>
+
+
+<!-- --------------------------------------------------------- -->
+<A NAME="dmah_d0_ram_simm"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">一覧表</A>|
+▲<A HREF="#dma_ram_d0_s">戻る</A>|
+  <A HREF="#dmah_ram_d0_simm">次へ</A>▼
+|<A HREF="dspasm.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>DMAH D0,[RAM],SImm</H1>
+		<DD><H3>HOLD状態でのDMA転送(D0[31-0]→RAM)</H3>
+
+	<P>	<DT><B>動作内容</B>
+		<DD>D0[31-0]データをRAMに転送します。
+外部アドレスレジスタと転送ワード数レジスタはアドレス加算数に転送開始時の値を保持します。
+転送ワード数レジスタは、ロングワード単位で転送ワード数を格納するレジスタです。
+このワード数が０になるか、強制終了されたときに転送終了となります。</P>
+
+
+  <P><DT><B>記述式</B>
+  <DD>label: DMAH DO,[Destination],Counter
+  <DD>　　　Distination = M0〜M3<A HREF="#c4"><B>*</B></A>,PR<A HREF="#c4"><B>*</B></A></P>
+
+  <P><DT><B>インストラクションコード</B>
+
+	<P>	<DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>17</TD><TD>　</DH>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>10</TH><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>０</TD><TD>０</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD COLSPAN=8>SImmデータ</TD>
+</TR></TABLE></P>
+
+		<P>	<DD><TABLE BORDER=0>
+				<TR><TD>
+		<TABLE BORDER=1>
+		<TR ALIGN=CENTER><TH>bit15</TH><TH>加算モード選択肢</TH></TR>
+		<TR ALIGN=CENTER><TD>０</TD><TD>アドレス加算０</TD></TR>
+		<TR ALIGN=CENTER><TD>１</TD><TD>アドレス加算１</TD></TR>
+		</TABLE>
+				</TD><TD>　</TD><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit10</TH><TH>bit９</TH><TH>bit８</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>PROGRAM RAM</TD></TR>
+</TABLE>
+				</TD></TR></TABLE>
+
+
+	
+	<P>	<DT><B>フラグ</B>
+		<DD>T0;１になります。<B>**</B></P>
+
+<A NAME="c4"></A>
+	<P>	<DT><B>備　考</B>
+		<DD><B>*</B>Mx(x=0〜3)は、DATA RAMx(x=0〜3)を選択します。
+		<DD>PRは、PROGRAM RAMを選択します。
+		<DD><B>**</B>外部からの転送終了を知らせるEND信号が入ったとき、T0;0となります。
+		<DD>アドレス加算の指定は、命令の後に加算数を付加し、DMAH0〜DMAH1となります。
+		<DD>アドレス加算数指定省略時は、加算数が１となります。</P>
+
+</DL>
+
+
+<!-- --------------------------------------------------------- -->
+<A NAME="dmah_ram_d0_simm"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">一覧表</A>|
+▲<A HREF="#dmah_d0_ram_simm">戻る</A>|
+  <A HREF="#dmah_d0_ram_s">次へ</A>▼
+|<A HREF="dspasm.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>DMAH [RAM],D0,SImm</H1>
+		<DD><H3>HOLD状態でのDMA転送(RAM→D0[31-0])</H3>
+
+	<P>	<DT><B>動作内容</B>
+		<DD>RAMデータをD0[31-0]に転送します。
+外部アドレスレジスタと転送ワード数レジスタはアドレス加算数に転送開始時の値を保持します。
+転送ワード数レジスタは、ロングワード単位で転送ワード数を格納するレジスタです。
+このワード数が０になるか、強制終了されたときに転送終了となります。</P>
+
+
+  <P><DT><B>記述式</B>
+  <DD>label: DMAH [Source],DO,Counter
+  <DD>　　　Source = M0〜M3<A HREF="#c4"><B>*</B></A>
+
+  <P><DT><B>インストラクションコード</B>
+
+	<P>	<DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>１</TD><TD>０</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD COLSPAN=8>SImmデータ</TD>
+</TR></TABLE></P>
+
+		<P>	<DD><TABLE BORDER=0>
+				<TR><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　加算モード選択肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit17</TH><TH>bit16</TH><TH>bit15</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>アドレス加算０</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>アドレス加算１</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>アドレス加算２</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>アドレス加算４</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>アドレス加算８</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>アドレス加算16</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>アドレス加算32</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>アドレス加算64</TD></TR>
+</TABLE>
+				</TD><TD>　</TD><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>ビットデータ</TH><TH ROWSPAN=2>　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit９</TH><TH>bit８</TH></TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+</TABLE>
+				</TD></TR></TABLE>
+
+
+	
+	<P>	<DT><B>フラグ</B>
+		<DD>T0;１になります。<B>**</B></P>
+
+<A NAME="c4"></A>
+	<P>	<DT><B>備　考</B>
+		<DD><B>*</B>Mx(x=0〜3)は、DATA RAMx(x=0〜3)を選択します。
+		<DD><B>**</B>外部からの転送終了を知らせるEND信号が入ったとき、T0;0となります。
+		<DD>アドレス加算の指定は、命令の後に加算数を付加し、DMAH0〜DMAH64となります。
+		<DD>アドレス加算数指定省略時は、加算数が１となります。</P>
+</DL>
+
+
+<!-- --------------------------------------------------------- -->
+<A NAME="dmah_d0_ram_s"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">一覧表</A>|
+▲<A HREF="#dmah_ram_d0_simm">戻る</A>|
+  <A HREF="#dmah_ram_d0_s">次へ</A>▼
+|<A HREF="dspasm.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>DMAH D0,[RAM],[s]</H1>
+		<DD><H3>HOLD状態でのDMA転送(D0[31-0]→RAM)</H3>
+
+	<P>	<DT><B>動作内容</B>
+  <DD>bit0〜2で指定された[s]のデータを転送カウンタとし、示された数だけD0[31-0]データをRAMに転送します。
+外部アドレスレジスタと転送ワード数レジスタはアドレス加算数に転送開始時の値を保持します。
+転送ワード数レジスタは、ロングワード単位で転送ワード数を格納するレジスタです。
+このワード数が０になるか、強制終了されたときに転送終了となります。</P>
+
+  <P><DT><B>記述式</B>
+  <DD>label: DMAH D0,[Destination],[Counter]
+  <DD>　　　Counter = M0〜M3<A HREF="#c4"><B>*</B></A>,MC0〜MC3<A HREF="#c4"><B>*</B></A>
+  <DD>　　　Destination = M0〜M3<A HREF="#c4"><B>*</B></A>,PR<A HREF="#c4"><B>*</B></A>
+
+  <P><DT><B>インストラクションコード</B>
+
+		<CENTER>
+		<TABLE BORDER=1>
+		<TR ALIGN=CENTER><TH>bit15</TH><TH>加算モード選択肢</TH></TR>
+		<TR ALIGN=CENTER><TD>０</TD><TD>アドレス加算０</TD></TR>
+		<TR ALIGN=CENTER><TD>１</TD><TD>アドレス加算１</TD></TR>
+		</TABLE></CENTER>
+
+	<P>	<DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>10</TH><TH>９</TH><TH>８</TH><TD>７</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>２</TH><TH>１</TH><TH>０</TH></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>０</TD><TD>０</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>Ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TR></TABLE></P>
+
+		<P>	<DD><TABLE BORDER=0>
+				<TR><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　[RAM]選択肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit10</TH><TH>bit９</TH><TH>bit８</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>PROGRAM RAM</TD></TR>
+</TABLE>
+				</TD><TD>　</TD><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　[s]　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3,CT3++</TD></TR>
+</TABLE>
+				</TD></TR></TABLE>
+
+
+	
+	<P>	<DT><B>フラグ</B>
+		<DD>T0;１になります。<B>**</B>
+		<DD>CTx(x=0〜3);b2=1のときに限りインクリメントされます。b2=0のときは変わりません。</P>
+
+<A NAME="c4"></A>
+	<P>	<DT><B>備　考</B>
+		<DD><B>*</B>[Mx(x=0〜3)]は、DATA RAMx(x=0〜3)を選択します。MCx(x=0〜3)は、DATA RAMx(x=0〜3)を選択し、転送後、CTx(x=0〜3)をインクリメントします。
+		<DD><B>**</B>外部からの転送終了を知らせるEND信号が入ったとき、T0;0となります。
+		<DD>アドレス加算の指定は、命令の後に加算数を付加し、DMA0〜DMA1となります。
+		<DD>アドレス加算数指定省略時は、加算数が１となります。</P>
+
+</DL>
+
+
+<!-- --------------------------------------------------------- -->
+<A NAME="dmah_ram_d0_s"><HR></A>
+<!-- --------------------------------------------------------- -->
+<B><A HREF="p04_02.htm#dma">一覧表</A>|
+▲<A HREF="#dmah_d0_ram_s">戻る</A>|
+  <A HREF="p04_57.htm#jmp_imm">次へ</A>▼
+|<A HREF="dspasm.htm">アセンブラ</A></B>
+
+<DL>
+	<P>	<DT><H1>DMAH [RAM],d0,[s]</H1>
+		<DD><H3>HOLD状態でのDMA転送(RAM→D0[31-0])</H3>
+
+	<P>	<DT><B>動作内容</B>
+  <DD>bit0〜2で指定された[s]のデータを転送カウンタとし、示された数だけRAMのデータをD0[31-0]データに転送します。
+外部アドレスレジスタと転送ワード数レジスタはアドレス加算数に転送開始時の値を保持します。
+転送ワード数レジスタは、ロングワード単位で転送ワード数を格納するレジスタです。
+このワード数が０になるか、強制終了されたときに転送終了となります。</P>
+
+  <P><DT><B>記述式</B>
+  <DD>label: DMAH [Source],D0,[Counter]
+  <DD>　　　Counter = M0〜M3<A HREF="#c4"><B>*</B></A>,MC0〜MC3<A HREF="#c4"><B>*</B></A>
+  <DD>　　　Source = M0〜M3<A HREF="#c4"><B>*</B></A>
+
+  <P><DT><B>インストラクションコード</B>
+
+		<P>	<DD><TABLE BORDER=0>
+				<TR><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　加算モード選択肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit17</TH><TH>bit16</TH><TH>bit15</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>アドレス加算０</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>アドレス加算１</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>アドレス加算２</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>アドレス加算４</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>アドレス加算８</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>アドレス加算16</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>アドレス加算32</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>アドレス加算64</TD></TR>
+</TABLE>
+				</TD><TD>　</TD><TD>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3>ビットデータ</TH><TH ROWSPAN=2>　[s]　選　択　肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit２</TH><TH>bit１</TH><TH>bit０</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>0</TD><TD>DATA RAM0,CT0++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>1</TD><TD>DATA RAM1,CT1++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>0</TD><TD>DATA RAM2,CT2++</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>1</TD><TD>DATA RAM3,CT3++</TD></TR>
+</TABLE>
+				</TD></TR></TABLE>
+
+
+	<P>	<DD><TABLE BORDER=1>
+<TR>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>31</TD><TD>　</TD><TD>　</TD><TD>28</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>17</TH><TH>16</TH>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TH>15</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>９</TH><TH>８</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TH>２</TH><TH>１</TH><TH>０</TH></TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24         23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD>
+<!--15         14         13         12         11         10         09         08         07         06         05         04         03         02         01         00  -->
+<TD>ｘ</TD><TD>１</TD><TD>１</TD><TD>１</TD><TD>０</TD><TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD>
+</TR></TABLE></P>
+
+
+	<CENTER>
+		<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=2>ビットデータ</TH><TH ROWSPAN=2>　[RAM]選択肢　</TH></TR>
+<TR ALIGN=CENTER><TH>bit９</TH><TH>bit８</TH></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>0</TD><TD>DATA RAM0</TD></TR>
+<TR ALIGN=CENTER><TD>0</TD><TD>1</TD><TD>DATA RAM1</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>0</TD><TD>DATA RAM2</TD></TR>
+<TR ALIGN=CENTER><TD>1</TD><TD>1</TD><TD>DATA RAM3</TD></TR>
+		</TABLE>
+	</CENTER>
+
+
+	
+	<P>	<DT><B>フラグ</B>
+		<DD>T0;１になります。<B>**</B>
+		<DD>CTx(x=0〜3);b2=1のときに限りインクリメントされます。b2=0のときは変わりません。</P>
+
+<A NAME="c4"></A>
+	<P>	<DT><B>備　考</B>
+		<DD><B>*</B>[Mx(x=0〜3)]は、DATA RAMx(x=0〜3)を選択します。MCx(x=0〜3)は、DATA RAMx(x=0〜3)を選択し、転送後、CTx(x=0〜3)をインクリメントします。
+		<DD><B>**</B>外部からの転送終了を知らせるEND信号が入ったとき、T0;0となります。
+		<DD>アドレス加算の指定は、命令の後に加算数を付加し、DMA0〜DMA1となります。
+		<DD>アドレス加算数指定省略時は、加算数が１となります。</P>
+
+</DL>
+
+<HR NOSHADE>
+<B>▲<A HREF="p04_55.htm">戻る</A>｜
+     <A HREF="p04_57.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

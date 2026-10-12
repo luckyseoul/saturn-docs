@@ -1,0 +1,43 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 7&gt;Sound Development Manual/■General steps for sound development</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">Sound development manual</a><HR>
+ <B>▲ <A HREF="p01_11.htm">Back</a> ｜ <A HREF="p01_13.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound Development Manual/1. Overview</b><HR NOSHADE>
+<DL>
+<A NAME="no1_30"></A><DT><H2> ■General steps for sound development</H2><A NAME="no1_31"></A><DT><H3> 1.Start the tool</H3><DD> First, start the sound simulator. If necessary, it is convenient to start the tone editor, waveform editor, DSP linker, and sequencer at the same time.<P><A NAME="no1_32"></A><DT><H3> 2. Sound memory mapping</H3><DD> When developing sound, first start the sound simulator, set up sound memory mapping, and transfer the 68000 sound driver program to the target board. It is convenient to create a sound area map in advance, but you can add or change it at any time as needed.<P><A NAME="no1_33"></A><DT><H3> 3. Creation of tone bank data</H3><DD> Tone bank data is created using a tone editor. Additionally, Sega plans to supply a tone library.<BR>
+ Tone bank data is a collection of four types of data: mixer, voice, layer, and waveform, and constitutes one independent tone (See page 7 of this manual for the structure of tone bank data). The voices correspond to program changes via MIDI, so one bank can have up to 128 voices. Therefore, you can tune up to 128 types of instruments with one tone bank data.<BR>
+ Transfer the tone bank data to the sound simulator target board. At this stage, it will function as a multi-sound source that generates sounds using MIDI input. The key sounding method is DVA (last arrival priority). You can edit the tone, level of each tone, pan, etc., and save multiple tone bank data.<P><A NAME="no1_34"></A><DT><H3> 4. Edit waveform</H3><DD> If you want to edit the waveform itself, which is the source of tone editing, start the waveform editor and sample and edit the waveform.<P><A NAME="no1_35"></A><DT><H3> 5.DSP effect program link</H3><DD> Link the DSP effect program. Select the effect you want to apply from the DSP library, set the wiring method, and transfer the effect DSP program to the target board. Each effect parameter can be edited after transfer.<BR>
+ Note that modulation effects use slots as modulators, so the number of notes produced at the same time is reduced from 1 to 4 notes. Please refer to the DSP linker manual for details.<BR>
+ Modules such as reverb, echo, chorus, etc. are already made into a library, so select the one you need from there and link it. Saturn's sound system allows multiple effects to be used at the same time, but they cannot exceed 128 steps in total. For example, if the echo is 20 steps, the chorus is 22 steps, and the equalizer is 5 steps, these three steps make up 47 steps.<BR>
+ *Step is the number of instructions for each effect.<P><A NAME="no1_36"></A><DT><H3> 6.Creating sequence data</H3><DD> Compose and arrange using the target board as the sound source. The target board has two MIDI INs, each supporting up to 32 sequence tracks with 16 channels. For each sequence track, you can change the tone by arbitrarily selecting the VOICE number in the tone bank data using MIDI program change, so of course all 32 tracks can have different tone settings.<P><A NAME="no1_37"></A><DT><H3> 7. Converting sequence data</H3><DD> The created songs are finally converted to MIDI standard files using sequencer software (PERFORMER, VISION, CUBASE, etc.), and then converted to Saturn format data for the target board using a sound simulator.<BR>
+ There are two types of sequence data: song data created with a MIDI sequencer, and Saturn format sequence data that is compressed and can be loaded into sound memory. However, the only difference is whether or not it is compressed, and the expanded MIDI data is basically exactly the same.<P><P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>Regarding SE, it is basically the same method as creating a song. In this development system, there is no difference in the production process or setting parameters between music and SE.</b></TD></TR>
+</TABLE>
+</P>
+<A NAME="no1_38"></A><DT><H3> 8.Simulation (real machine simulator function)</H3><DD> Transfer Saturn format sequence data (Sequence Bank DataYes.) to the target board. Use a sound simulator to simulate the state that is incorporated into the actual game, and check by playing the songs and sound effects (described later). Unless there are any particular problems, it will reproduce the exact same sound as the target board produced by commercially available sequencer software. At this stage, we perform a final evaluation of the connections and balance between songs and SEs, and if there are any areas that need to be changed, we recreate each area using a tone editor, waveform editor, DSP linker, and sequencer software.<P><A NAME="no1_38"></A><DT><H3> 9.Installed in the actual game</H3></DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_11.htm">Back</a> ｜ <A HREF="p01_13.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#no2">SOUND Manual</a> ★ <A HREF="../index.htm">Sound development manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

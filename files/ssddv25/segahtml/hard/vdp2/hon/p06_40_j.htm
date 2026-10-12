@@ -1,0 +1,200 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;47/86&gt;VDP2ユーザーズマニュアル/6.4係数テーブル制御</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no6">VDP2ユーザーズマニュアル</A>★
+<a href="p06_10_j.htm">第６章　回転スクロール画面</A>
+<HR>
+<B>▲
+<a href="p06_35_j.htm">戻る</A>｜
+<a href="p06_41_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第６章　回転スクロール画面</B>
+<HR NOSHADE>
+<DL>
+	<P>	<DT><H2>■6.4　係数テーブル制御</H2>
+		<DD>　回転スクロール画面は、表示座標を計算するときに使用する回転パラメータを、回転パラメータテーブルとは別に係数テーブルとしてVRAMまたはカラーRAMに持つことができます。この係数テーブルを、ラインごとまたはドットごとに読み込むことにより多様な画像表現ができます。<BR>
+　係数テーブルデータを必要とするタイミングには、表示座標の演算方法によって次の2つがあります。</P>
+
+	<P>	<DD>(1)ラインごとに必要とする
+		<DD>(2)ドットごとに必要とする</P>
+
+	<P>	<DD>　係数テーブルデータをラインごとに必要とする場合、係数テーブルはVRAMに格納してください。格納した係数テーブルデータを読み出すためのVRAMアドレスは、回転パラメータテーブル中のKAst、DKAst、DKAxと係数テーブルアドレスオフセットレジスタに指定します。</P>
+
+	<P>	<DD>　係数テーブルデータをドットごとに必要とする場合、係数テーブルはVRAMまたはカラーRAMのどちらか一方に格納してください。VRAMに格納するときには、RAMコントロールレジスタの回転データバンク指定ビットによって、最低1バンクを係数テーブルとなるように指定してください。その際、格納した係数テーブルデータを読み出すためのVRAMアドレスは、回転パラメータテーブル中のKAst、DKAst、DKAxと係数テーブルアドレスオフセットレジスタに指定します。また、係数テーブルをカラーRAMに格納するときには、カラーRAMの後半(100800Ｈ〜100FFFH)に格納してください。その際、格納した係数テーブルデータを読み出すためのカラーRAMアドレスは、回転パラメータテーブル中のKAst、DKAst、DKAxに指定します。ただし、係数テーブルデータを読み出すときのアドレスは、計算された係数テーブルアドレス整数部の下位10ビットのみ有効となります。</P>
+
+	<P>	<DD>　係数テーブルから読み込むデータを何のパラメータとして使用するかは、以下の4つの係数モードから選択できます。</P>
+
+	<UL>
+	<P>	<DD><B>モード0：</B>拡大縮小係数kx、kyとして使用する
+		<DD><B>モード1：</B>拡大縮小係数kxとして使用する
+		<DD><B>モード2：</B>拡大縮小係数kyとして使用する
+		<DD><B>モード3：</B>回転変換後の視点座標Xpとして使用する</P>
+	</UL>
+
+	<P>	<DD>　<B>モード0</B>では、回転パラメータテーブルから読み込んだkx、kyは無効になり、係数テーブルから読み込んだデータをkx、kyとして使います。</P>
+
+	<P>	<DD>　<B>モード1</B>を指定した場合は、回転パラメータテーブルから読み込まれたkyはそのまま使用されますが、kxは係数テーブルから読み込まれたデータが使用されます。</P>
+
+	<P>	<DD>　<B>モード2</B>を指定した場合は、回転パラメータテーブルから読み込まれたkxはそのまま使用されますが、kyは係数テーブルから読み込まれたデータが使用されます。</P>
+
+	<P>	<DD>　<B>モード3</B>を指定した場合は、回転パラメータテーブルから読み込んだデータにしたがって回転変換をしたX方向の視点座標Xpは無効となり、係数テーブルから読み込まれたデータがXpとして使用されます。</P>
+
+<A NAME="no6_41"></A>
+	<P>	<DT><B>　◆ラインカラー画面データ</B>
+		<DD>　係数データは、回転パラメータとしてだけではなく、同時にラインカラー画面データの一部としても使うことができます。この場合、係数データの一部である7ビットのデータの上位に、ラインカラー画面テーブルから読み込んだデータの上位4ビットのデータが付加されます。係数テーブルを使ったラインカラー画面データを図6.6に示します。</P>
+
+<A NAME="z6_6"></A>
+	<CENTER><B>図6.6　係数データを使ったラインカラー画面データ</B>
+<PRE>
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+ラインカラー画面テーブルから読込んだ　　　　　　　　係数テーブルから読込んだ　　　
+ラインカラー画面データ１１ビット中上位４ビット　　　ラインカラー画面データ７ビット
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐　　　┌─┬─┬─┬─┬─┬─┬─┐
+│　│　│　│　│　│　│　│　│　│　│　│　　　│　│　│　│　│　│　│　│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘　　　└─┴─┴─┴─┴─┴─┴─┘
+　└──┬──┘　　　　　　　　　　　　　　　　　　　└───────────┘　
+　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　　　　　　　
+　　　　└──────┐　　　　　　　　　　┌──────────┘　　　　　　　
+　　　　　　　　　　　↓　　　　　　　　　　↓　　　　　　　　　　　　　　　　　　
+　　　　　　　　┌─────┐　┌───────────┐　　　　　　　　　　　　
+　　　　　　　┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐　　　　　　　　　　　
+　　　　　　　│　│　│　│　│　│　│　│　│　│　│　│　　　　　　　　　　　
+　　　　　　　└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘　　　　　　　　　　　
+　　　　　　　　　　　　合成後のラインカラーデータ　　　　　　　　　　　　　　　　
+</PRE></CENTER>
+
+	<P>	<DD>　回転パラメータモードを<B>モード0</B>に指定した場合は、回転パラメータAの係数テーブルによるラインカラー画面が使用されます。</P>
+
+	<P>	<DD>　<B>モード1</B>に指定した場合は、回転パラメータBの係数テーブルによるラインカラー画面が使用されます。</P>
+
+	<P>	<DD>　<B>モード2</B>に指定した場合は、回転パラメータAによる絵と回転パラメータBによる絵のどちらにも、回転パラメータAの係数テーブルによるラインカラー画面が使用されます。</P>
+
+	<P>	<DD>　<B>モード3</B>に指定した場合は、回転パラメータAによる絵には回転パラメータAの係数テーブルによるラインカラー画面が使用され、回転パラメータBによる絵には回転パラメータBの係数テーブルによるラインカラー画面が使用されます。また、RBG1を表示する場合は、RBG0とRBG1のどちらにも回転パラメータAの係数テーブルによるラインカラー画面が使用されます。</P>
+
+	<P>	<DD>　ラインカラー画面の詳細は「<B>7.1　ラインカラー画面</B>」を参照してください。</P>
+
+	<P>	<DT><B>　◆係数テーブルデータのビット構成</B>
+		<DD>　係数テーブル上のデータサイズは、1ワードか2ワードのどちらかを選ぶことができ、この係数データサイズと係数データモードによってデータの構成が変わります。係数テーブルデータのビット構成を図6.7に示します。</P>
+
+<A NAME="z6_7"></A>
+	<P><DD><B>図6.7　係数テーブルデータのビット構成</B>
+<P><DT><B>　■係数データモード０〜２</B>
+<DD>●係数データサイズ：２ワード
+<TABLE BORDER=1><TR ALIGN=CENTER><TH ROWSPAN=2><PRE>+0H</TH>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> 09 </TD><TD><PRE> 08 </TD>
+<TD><PRE> 07 </TD><TD><PRE> 06 </TD><TD><PRE> 05 </TD><TD><PRE> 04 </TD><TD><PRE> 03 </TD><TD><PRE> 02 </TD><TD><PRE> 01 </TD><TD><PRE> 00 </TD></TR><TR>
+<TH><PRE>透明</TH>
+<TH COLSPAN=7><PRE>ラインカラー画面データ(7bit)</TH>
+<TH><PRE>符号</TH>
+<TH COLSPAN=7><PRE>整　数　部(7bit)</TH></TR></TABLE>
+
+<TABLE BORDER=1><TR ALIGN=CENTER><TH ROWSPAN=2><PRE>+2H</TH>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> 09 </TD><TD><PRE> 08 </TD>
+<TD><PRE> 07 </TD><TD><PRE> 06 </TD><TD><PRE> 05 </TD><TD><PRE> 04 </TD><TD><PRE> 03 </TD><TD><PRE> 02 </TD><TD><PRE> 01 </TD><TD><PRE> 00 </TD></TR><TR>
+<TH COLSPAN=16><PRE>小　数　部(16bit)</TH></TR></TABLE>
+
+<DD>●係数データサイズ：１ワード
+<TABLE BORDER=1><TR ALIGN=CENTER><TH ROWSPAN=2><PRE>+0H</TH>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> 09 </TD><TD><PRE> 08 </TD>
+<TD><PRE> 07 </TD><TD><PRE> 06 </TD><TD><PRE> 05 </TD><TD><PRE> 04 </TD><TD><PRE> 03 </TD><TD><PRE> 02 </TD><TD><PRE> 01 </TD><TD><PRE> 00 </TD></TR><TR>
+<TH><PRE>透明</TH>
+<TH><PRE>符号</TH>
+<TH COLSPAN=4><PRE>整数部(4bit)</TH>
+<TH COLSPAN=10><PRE>小　数　部(10bit)</TH></TR></TABLE>
+
+
+<P><DT><B>　■係数データモード３</B>
+<DD>●係数データサイズ：２ワード
+<TABLE BORDER=1><TR ALIGN=CENTER><TH ROWSPAN=2><PRE>+0H</TH>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> 09 </TD><TD><PRE> 08 </TD>
+<TD><PRE> 07 </TD><TD><PRE> 06 </TD><TD><PRE> 05 </TD><TD><PRE> 04 </TD><TD><PRE> 03 </TD><TD><PRE> 02 </TD><TD><PRE> 01 </TD><TD><PRE> 00 </TD></TR><TR>
+<TH><PRE>透明</TH>
+<TH COLSPAN=7><PRE>ラインカラー画面データ(7bit)</TH>
+<TH><PRE>符号</TH>
+<TH COLSPAN=7><PRE>整数部上位(7bit)</TH></TR></TABLE>
+
+<TABLE BORDER=1><TR ALIGN=CENTER><TH ROWSPAN=2><PRE>+2H</TH>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> 09 </TD><TD><PRE> 08 </TD>
+<TD><PRE> 07 </TD><TD><PRE> 06 </TD><TD><PRE> 05 </TD><TD><PRE> 04 </TD><TD><PRE> 03 </TD><TD><PRE> 02 </TD><TD><PRE> 01 </TD><TD><PRE> 00 </TD></TR><TR>
+<TH COLSPAN=8><PRE>整数部下位(8bit)</TH>
+<TH COLSPAN=8><PRE>小数部(8bit)</TH></TR></TABLE>
+
+<DD>●係数データサイズ：１ワード
+<TABLE BORDER=1><TR ALIGN=CENTER><TH ROWSPAN=2><PRE>+0H</TH>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> 09 </TD><TD><PRE> 08 </TD>
+<TD><PRE> 07 </TD><TD><PRE> 06 </TD><TD><PRE> 05 </TD><TD><PRE> 04 </TD><TD><PRE> 03 </TD><TD><PRE> 02 </TD><TD><PRE> 01 </TD><TD><PRE> 00 </TD></TR><TR>
+<TH><PRE>透明</TH>
+<TH><PRE>符号</TH>
+<TH COLSPAN=12><PRE>整数部(12bit)</TH>
+<TH COLSPAN=2><PRE>小数部</TH></TR></TABLE>
+
+	<P>	<DT><B>　◆係数テーブル先頭アドレス</B>
+		<DD>　係数テーブルの先頭アドレスは、係数テーブルアドレスオフセットレジスタと回転パラメータテーブルから読み込まれた係数テーブルスタートアドレス(KAst整数部16ビット)から求められます。また、回転パラメータテーブルから係数テーブル垂直方向アドレス増分(DKAst整数部9ビット)と係数テーブル水平方向アドレス増分(DKAx整数部9ビット)も読み込まれます。これらのアドレスオフセット、スタートアドレス、アドレス増分は、係数テーブルのデータサイズによって、そのアドレス値が変わります。各値の最下位ビットが示す</P>
+
+	<P>	<DD>アドレス値を表6.3に示します。<BR>
+　例えば2ワードのときの4Hは、KAst整数部の最下位ビットは4Hのアドレス値を表すことを意味し、次のように計算することができます。</P>
+
+<A NAME="t6_3"></A>
+	<P>	<DD><B>表6.3　係数データサイズ別の係数パラメータデータの最下位ビットが示すアドレス値</B>
+		<DD><TABLE BORDER>
+	<TR><TD ROWSPAN=2>係数データ<BR>サイズ</TD><TD COLSPAN=2>最下位ビットが示すアドレス値</TD></TR>
+	<TR><TD>係数テーブルアドレスオフセットレジスタ値</TD><TD>KAst、△KAst、△KAx整数部値</TD></TR>
+	<TR ALIGN=CENTER><TD>2ワード</TD><TD>40000H</TD><TD>4H</TD></TR>
+	<TR ALIGN=CENTER><TD>1ワード</TD><TD>20000H</TD><TD>2H</TD></TR>
+	</TABLE></P>
+
+	<P>	<DT><B>　◆係数データの最上位ビット</B>
+		<DD>　係数データの最上位ビットは、通常、透明ビットとして使用され、このビットが1である係数データを使用したドットは強制的に透明ドットにします。ただし、RBG0では、回転パラメータモード2を選んだ場合、回転パラメータA用の係数テーブルから読み込んだデータの最上位ビットは回転パラメータの切り替え用に使用されます。最上位ビットが0のときは回転パラメータAによって指定される画像を表示し、1のときは回転パラメータBによって指定される画像を表示します。このとき、回転パラメータB用の係数テーブルから読み込んだ係数データの最上位ビットは透明ビットとして使用されます。RBG1用の係数データの最上位ビットは、常に透明ビットとして使用されます。<BR>
+　係数データの最上位ビット値による処理を表6.4に示します。</P>
+
+<A NAME="t6_4"></A>
+	<P>	<DD><B>表6.4　RBG0用係数データ最上位ビット値による画像処理</B>
+		<DD><TABLE BORDER>
+	<TR><TH><PRE>回転パラメータ<BR>モード</TH><TH><PRE>回転<BR>パラメータ</TH><TH><PRE>最上位ビット<BR>機能</TH><TH><PRE>最上位ビット<BR>値</TH><TH><PRE>　　　　　画　像　処　理　　　　　</TH></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=3>0</TD><TD ROWSPAN=2>A</TD><TD ROWSPAN=2>透明</TD><TD>0</TD><TD>その係数データを使用して得られた画像を表示する</TD></TR>
+	<TR ALIGN=CENTER><TD>1</TD><TD>その係数データを使用したドットを強制的に透明ドットにする</TD></TR>
+	<TR ALIGN=CENTER><TD>B</TD><TD>使用しない</TD><TD>−</TD><TD>−</TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=3>1</TD><TD>A</TD><TD>使用しない</TD><TD>−</TD><TD>−</TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>B</TD><TD ROWSPAN=2>透明</TD><TD>0</TD><TD>その係数データを使用して得られた画像を表示する</TD></TR>
+	<TR ALIGN=CENTER><TD>1</TD><TD>その係数データを使用したドットを強制的に透明ドットにする</TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=4>2</TD><TD ROWSPAN=2>A</TD><TD ROWSPAN=2>パラメータ切り替え</TD><TD>0</TD><TD>その係数データを使用して得られた画像を表示する</TD></TR>
+	<TR ALIGN=CENTER><TD>1</TD><TD>その係数データは無効にし、回転パラメータBによって得られた画像を表示する</TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>B</TD><TD ROWSPAN=2>透明</TD><TD>0</TD><TD>その係数データを使用して得られた画像を表示する</TD></TR>
+	<TR ALIGN=CENTER><TD>1</TD><TD>その係数データを使用したドットを強制的に透明ドットにする</TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>3</TD><TD ROWSPAN=2>A、B</TD><TD ROWSPAN=2>透明</TD><TD>0</TD><TD>その係数データを使用して得られた画像を表示する</TD></TR>
+	<TR ALIGN=CENTER><TD>1</TD><TD>その係数データを使用したドットを強制的に透明ドットにする</TD></TR>
+	</TABLE></P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p06_35_j.htm">戻る</A>｜
+<a href="p06_41_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no6">VDP2ユーザーズマニュアル</A>★
+<a href="p06_10_j.htm">第６章　回転スクロール画面</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

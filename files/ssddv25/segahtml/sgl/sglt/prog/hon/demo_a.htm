@@ -1,0 +1,133 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/30&gt;SGL Programmer's Tutorial/Demo program A</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>PROGRAMMER'S TUTORIAL</b><H2 ALIGN=CENTER> Demo program A</H2><H3 ALIGN=CENTER> Bounding Cube</H3><HR NOSHADE>
+<DL>
+<P><DD> Here, in the sense of summarizing the flow up to now, I will introduce a slightly complicated program for displaying polygons using the functions that have appeared so far.</P>
+<P><DD> So far, we have explained the following:<DD><PRE>
+Drawing: Polygon definition (Chapter 2)
+Light source: Setting the light source and changing the polygon surface due to the light source (Chapter 3)
+Coordinate system: Coordinate system in Sega Saturn (Chapter 4)
+Modeling transformations: rotating, moving, scaling objects, etc. (Chapter 4)
+Drawing area: Window and clipping (Chapter 4)
+</PRE></P>
+<P><DD>These are relatively common ideas in 3D graphics, regardless of the hardware (of course, the functions used are different...).<BR>
+ Please understand these before proceeding to the next chapter.<BR>
+ From the next chapter onwards, we will mainly explain the ideas and special functions unique to the Sega Saturn.</P>
+<P><DD> The demo program "demo_A" uses a combination of SGL library functions from drawing to coordinate transformation.<BR>
+ In the demo, a small cubic polygon bounces around a room represented by cubic polygons with all faces facing inward (and not drawn when viewed from the outside).<BR>
+ Collision detection between the room and the small cube is processed using simple conditional branching (XYZ coordinate values).</P>
+<A NAME="za_1"></A><P ALIGN=CENTER><H4> Figure A-1 Operation image of demo A</H4><BR>
+<img srcset="../grp/pd_a_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="la_1"></A><P><DD><H4> List A-1 demo_A: Demo program A</H4><DD><PRE>
+/*------------------------------------------------ ----------------------*/
+/* Cube Action */
+/*------------------------------------------------ ----------------------*/
+#include "sgl.h"
+
+#define REFLECT_EXTENT toFIXED(85.0)
+#define XSPD toFIXED(1.5)
+#define YSPD toFIXED(2.0)
+#define ZSPD toFIXED(3.0)
+
+extern PDATA PD_PLANE1, PD_PLANE2;
+
+void ss_main(void)
+{
+	static ANGLE ang1[XYZ], ang2[XYZ];
+	static FIXED pos1[XYZ], pos2[XYZ], delta[XYZ], light[XYZ];
+
+	slInitSystem(TV_320x224, NULL, 1);
+	slPrint("demo A", slLocate(9,2));
+
+	ang1[X] = ang1[Y] = ang1[Z] = DEGtoANG(0.0);
+	ang2[X] = ang2[Y] = ang2[Z] = DEGtoANG(0.0);
+	pos1[X] = pos2[X] = toFIXED( 0.0);
+	pos1[Y] = pos2[Y] = toFIXED( 0.0);
+	pos1[Z] = pos2[Z] = toFIXED(100.0);
+	delta[X] = XSPD, delta[Y] = YSPD, delta[Z] = ZSPD;
+	light[X] = slSin(DEGtoANG( 30.0));
+	light[Y] = slCos(DEGtoANG( 30.0));
+	light[Z] = slSin(DEGtoANG(-30.0));
+
+	while(-1){
+		slLight(light);
+		slPushMatrix();
+		{
+			slTranslate(pos1[X], pos1[Y], pos1[Z] + toFIXED(270.0));
+
+			pos1[X] += delta[X];
+			pos1[Y] += delta[Y];
+			pos1[Z] += delta[Z];
+
+			if(pos1[X]&gt; REFLECT_EXTENT){
+				delta[X] = -XSPD, pos1[X] -= XSPD;
+			} else if(pos1[X]&lt; -REFLECT_EXTENT){
+				delta[X] = XSPD, pos1[X] += XSPD;
+			}
+			if(pos1[Y]&gt; REFLECT_EXTENT){
+				delta[Y] = -YSPD, pos1[Y] -= YSPD;
+			} else if(pos1[Y]&lt; -REFLECT_EXTENT){
+				delta[Y] = YSPD, pos1[Y] += YSPD;
+			}
+			if(pos1[Z]&gt; REFLECT_EXTENT){
+				delta[Z] = -ZSPD, pos1[Z] -= ZSPD;
+			} else if(pos1[Z]&lt; -REFLECT_EXTENT){
+				delta[Z] = ZSPD, pos1[Z] += ZSPD;
+			}
+
+			slRotX(ang1[X]);
+			slRotY(ang1[Y]);
+			slRotZ(ang1[Z]);
+			ang1[X] += DEGtoANG(3.0);
+			ang1[Y] += DEGtoANG(5.0);
+			ang1[Z] += DEGtoANG(3.0);
+			slPutPolygon(&PD_PLANE1);
+		}
+		slPopMatrix();
+		
+		slPushMatrix();
+		{
+			slTranslate(pos2[X], pos2[Y], pos2[Z] + toFIXED(170.0));
+			slRotY(ang2[Y]);
+			slRotX(ang2[X]);
+			slRotZ(ang2[Z]);
+			slPutPolygon(&PD_PLANE2);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+</PRE><A NAME="fa_1"></A><P ALIGN=CENTER><H4>Flow A-1 sample_1_6: Flowchart of demo program A</H4><BR>
+<img srcset="../grp/pd_a_3.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> In the next chapter, we will provide a more in-depth explanation, starting with the hierarchical matrix.<BR>
+ In particular, the concept of hierarchical structure using stacks is an important factor in 3D graphics, so please read it carefully or refer to specialized books to understand it.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

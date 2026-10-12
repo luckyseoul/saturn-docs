@@ -1,0 +1,310 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/11&gt;Cinepak for SEGASaturnユーザーズマニュアル/4．Cinepakライブラリ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">MOVIE TOOLS GUIDE</A>
+★<a href="../index_j.htm">Cinepak for SEGASaturn</A>
+<HR>
+<B>▲
+<a href="p04_10_j.htm">戻る</A>｜
+<a href="p04_11_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>Cinepak for SEGASaturn/4．Cinepakライブラリ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_30"></A>
+	<P><DT><H2>4.3　プログラミング上の注意事項</H2>
+	<DD>　Cinepakライブラリを使ってムービを再生するときの注意事項を次に示します。</P>
+
+<A NAME="4_3_01"></A>
+	<P><DT><H3>(１)アプリケーション作成上の注意</H3>
+	<DT><UL TYPE=SQUARE>
+	<P><LI>ムービ生成時に指定するバッファアドレス(CpkCreatePara のCPK_PARA_WORK_ADDR、CPK_PARA_BUF_ADDR)は、WORK_RAM-H領域(06000000H〜)を指定してください。<BR>　低速なRAM領域を指定するとCinepakのパフォーマンスが落ちます。</P>
+	<P><LI>CinepakライブラリはCPUのDMAとタイマを使用します。Cinepak動作時は、CPUのDMA及びタイマは使用しないでください。</P>
+	<P><LI>同じ音が2回なる場合は、CPK_Taskを呼ぶ回数が少ないか画像サイズが大きすぎることが考えられます。<BR>CPK_Task を頻繁に呼ぶか、画像サイズを小さくしてください。</P>
+	</UL>
+
+<A NAME="4_3_02"></A>
+	<P><DT><H3>(２)他ライブラリとの関係</H3>
+	<DT><UL TYPE=SQUARE>
+	<P><LI>本ライブラリは、ファイルシステム、ストリームシステム、DMAライブラリを使用しています。これらのファイルをリンクしてください。</P>
+	</UL>
+
+<A NAME="4_3_03"></A>
+	<P><DT><H3>(３)バッファの取り方</H3>
+	<DT><UL TYPE=SQUARE>
+	<P><LI>リングバッファのサイズはサウンド内容と大きく関ってきます。サウンドの品質を上げた場合はそれだけ多くのバッファが必要になります。具体的には、ムービファイルのヘッダサイズ＋サウンド0.5秒分のサイズ＋80KBは最低限確保してください。なお、リングバッファは大きくとった方がCinepakの処理は軽くなります。</P>
+
+	<P><B>「例」</B>
+		<UL TYPE=DISC>
+		<P><LI>ムービ1分、30fpsで44KHz,16ビット,ステレオの場合<BR>リングバッファサイズ≧32KB＋88KB＋80KB＝200KB</P>
+		<P><LI>ムービ1分、30fpsで11KHz,8ビット,モノラルの場合<BR>リングバッファサイズ≧32KB＋5.5KB＋80KB＝117.5KB</P>
+		</UL>
+
+	<P><LI>ムービ生成時のパラメータのサウンドメモリのバッファサイズ(CpkCreatePara のCPK_PARA_PCM_SIZE) は1ch分のPCM量子化数です。<BR>4096の整数倍を指定してください。範囲は4096*4〜4096*16です。<BR>バッファサイズは、1.4秒以上のPCM量子化数を指定してください。</P>
+	<P><B>「例」</B>
+		<UL TYPE=DISC>
+		<P><LI>サンプリング周波数が 44kHz の場合は、バッファサイズを64Kにする。</P>
+		<P><LI>サンプリング周波数が 22kHz の場合は、バッファサイズを 32K以上にする。</P>
+		</UL>
+	</UL>
+
+<A NAME="4_3_04"></A>
+	<P><DT><H3>(４)クロマキー処理</H3>
+	<DT><UL TYPE=SQUARE>
+	<P><LI>クロマキー処理を行うと CPK_Task の処理時間が若干増えます。
+	<P><LI>クロマキー処理を使うときは、スプライトコマンドの透明ピクセル無効ビットは0にしてください。
+	<P><LI>クロマキー処理で、透明色にする範囲を変更する場合は、キーアウト(透明色にする色)範囲の設定関数（CPK_SetKeyOutRange)で範囲を変えてください。</P>
+	</UL>
+
+<A NAME="4_3_05"></A>
+	<P><DT><H3>(５)シームレスブランチ</H3>
+	<DT><UL TYPE=SQUARE>
+	<P><LI>CPK_EntryNext でシームレスブランチしたときは、PCMのボリュームとPANは前のムービと同じになります。</P>
+	<P><LI>CPK_EntryNext でシームレスブランチするときは、60分まで連続再生できます。それ以上の連続再生はできません。一度 CPK_Startでムービの再生開始を行ってください。</P>
+	<P><LI>シームレスブランチするときは、アプリケーションプログラムでムービファイルの先読み処理をしてください。</P>
+	<P><LI>ファイルシステムを使用した場合は、シームレスブランチ機能は使えません。</P>
+	<P><LI>シームレスブランチは1つのムービ再生中にしか行えません。<BR>マルチムービ再生中は実行できません。</P>
+	</UL>
+
+<A NAME="4_3_06"></A>
+	<P><DT><H3>(６)マルチムービ再生</H3>
+	<DT><UL TYPE=SQUARE>
+	<P><LI>マルチムービ再生するときは、PCMストリーム再生番号を違う番号にしてください。</P>
+	<P><LI>CDにある複数のムービを同時に再生するときは、ファイルインタリーブまたはチャネルインタリーブしてください。そのときは、ストリームシステムを使用してください。</P>
+	<P><LI>同じファイルはマルチムービ再生できません。違うファイルを指定してください。</P>
+	<P><LI>マルチムービ再生は同時に4つまでできます。</P>
+	</UL>
+
+<A NAME="4_3_07"></A>
+	<P><DT><H3>(７)指定フレームの展開</H3>
+	<DT><UL TYPE=SQUARE>
+	<P><LI>指定フレームの展開(CPK_DecodeFrame)を使うときは、音なしのキーフレームのみのムービファイルを使ってください。<BR>
+　ムービファイルは、アプリケーションプログラムでファイルシステムまたはストリームシステムを使い、メモリにロードしてから展開処理を行ってください。CPK_CreateMemMovieを使ってください。</P>
+	</UL>
+
+<A NAME="4_3_08"></A>
+	<P><DT><H3>(８)関数使用</H3>
+	<DT><UL TYPE=SQUARE>
+	<P><LI>プログラムの先頭で CPK_Init を必ずコールしてください。</P>
+	<P><LI>VブランクIN割り込み内で CPK_VblIn を必ずコールしてください。</P>
+	<P><LI>CPK_GetTimeScale と CPK_GetHeaderはムービのヘッダ部分を読み込んでから使用してください。</P>
+	<P><LI>CPK_Start はムービハンドルに対して、1回だけ実行できます。<BR>　同じムービファイルを何度も再生したいときは、その都度ムービハンドルを生成してください。</P>
+	<P><LI>CPK_SetDecodeAddr, CPK_SetColor, CPK_SetLoadNum, CPK_SetPcmCmdBlockNo, CPK_SetPcmStreamNoはムービを再生する前にコールしてください。</P>
+	<P><LI>CPK_Taskを呼んだ後は、必ずCPK_IsDispTimeで表示タイミングになっているか調べてください。<BR>　CPK_IsDispTime が TRUE を返したときは、その後必ずCPK_CompleteDisp を呼んでください。</P>
+	<P><LI>CPK_CreateMemMovie で生成したムービハンドルは、必ずCPK_NotifyWriteSizeでムービファイルのサイズを通知してください。</P>
+	</UL>
+
+<A NAME="4_3_09"></A>
+	<P><DT><H3>(９)エラー処理</H3>
+	<DD>　ムービ再生中に、ファイルシステム，またはストリームシステムでエラーが発生すると、それ以降ムービの再生が継続できません。この場合はムービハンドルを消去しファイルをクローズしてください。その後、再度ムービを再生するなどの処理を行ってください。<BR>　各エラー処理関数 GFS_SetErrFunc, STM_SetErrFunc, CPK_SetErrFunc は必ず設定し、エラー検出をしてください。デバッグ効率も向上します。</P>
+
+<A NAME="4_3_10"></A>
+	<P><DT><H3>(10)SCU-DMA使用の注意</H3>
+	<DD>　CDブロックからリングバッファへのデータ転送をSCUのDMAで行う場合、ペリフェラル情報が正しく得られなくなることがあります。<BR>
+　この場合、最大転送セクタ数(デフォルト値 20)を小さく設定することで改善できますが、小さい設定をした場合、それに見合う十分な頻度でタスク関数をコールする必要があります。</P>
+
+	<P><DD><B>［処理例］</B>
+	<DD><PRE>
+CPK_SetTrModeCd(cpk, CPK_TRMODE_SCU);  /* SCU-DMAで転送する         */
+CPK_SetLoadNum(cpk, 10);               /* 1回の転送量の最大値 [セクタ] */
+</PRE></P>
+	<P><DD>　また、SCU-DMAで転送中は、使用するバスが占有されるので、SHはCPUバスをアクセスしようとしたときからウエイト状態になってしまいます。SCU-DMAは、極力使用しないでください。</P>
+
+<A NAME="4_3_11"></A>
+	<P><DT><H3>(11)次ハンドルの登録の変更について</H3>
+	<DD>　CPK_EntryNext は、切り替わる前に再度コールするれば、前回の登録をキャンセルする仕組みになっています。しかし、切り替わる直前で内部的には次ハンドルの処理が始まっている状態ではこれをキャンセルすることはできません。<BR>
+　アプリケーションは、次ハンドルの再生ステータスから、この移行期間であることを判断できます。</P>
+	<P><DD><PRE>
+if (CPK_GetPlayStatus(cpk_now) == CPK_STAT_PLAY_TIME) {
+	if (CPK_GetPlayStatus(cpk_next) != CPK_STAT_PLAY_STOP) {
+
+		/* 今は次ハンドルへの移行期間中だから、決して   */
+		/* CPK_EntryNext をコールしてはならない。       */
+
+	} else {
+
+		/* まだ、次ハンドルの処理が始まっていないので   */
+		/* 次ハンドルの登録を変更することが可能。       */
+		/*【注意】を参照してください。 　　　　　　　   */
+
+	}
+} else {
+
+	/* すでに、登録していたハンドルに切り替わっている。 */
+	/* 次ハンドルの登録をすることが可能。               */
+
+}
+</PRE></P>
+
+	<P><DD>　次ハンドルへの移行期間中に、目的のハンドルを再生させるには、２つの方法が考えられます。</P>
+
+	<DD><OL>
+	<P><B><LI></B>移行期間中でもシームレスを保つ方法<BR>
+　この状況で、シームレスで画面を静止させることなく切り替えるためには、次ハンドルの再生が始まるのを待ち、CPK_EntryNext して、さらに CPK_CheckChange でデータが十分供給されてきたことを確認し, CPK_Change で切り替えます。</P>
+
+	<P><B><LI></B>移行期間中に強制的に切り替える方法
+　シームレスの必要がなければ、再生中ハンドルと次ハンドルを停止（消去）し、再生したいハンドルを CPK_Start で、または CPK_EntryNext と CPK_Change で再生開始させます。</P>
+	</OL>
+
+	<P><DD><B>【注意】</B>
+	<DD>　切り替えがシームレスに行えるか否かは、次のハンドルのデータを読むためのシーク時間などに影響されるので、シネパックライブラリが保証することはできません。<BR>
+　上の判断処理例で「まだ、次ハンドルの処理が始まっていないので、次ハンドルの登録を変更することが可能。」と言っているのは、シネパックライブラリの使い方としては問題ないという意味であって、この判断基準では、シームレスにならない場合があります。</P>
+
+	<P><DD>　登録の変更のときに完全なシームレスを保つには、「現在再中のハンドルに備蓄されたデータの残り再生時間を見積もり、これより短い時間でシークとリードができること」を確認します。できなければ登録の変更を行わず、ハンドルが移行するのを待ち、
+（<B>１.</B>）の方法で切り替えます。<BR>
+　この判断を厳密に行うことは困難ですが、CPK_GetStockSize や CPK_GetStockTime　で備蓄量を見積ることができるし、シークとリード時間は最悪の時間を想定しておけば安全になります。</P>
+
+
+<A NAME="4_3_12"></A>
+	<P><DT><H3>(12)フレームサイズと、Cinepak の圧縮方式の関係</H3>
+	<DD>　Cinepak は、フレームサイズ（面積）に応じて、１フレームを１から３つに分割して圧縮処理を行います。<BR>
+　分割される条件の前後では、内部的な圧縮効率と画質が不連続になり、以下のような傾向があると考えられます。</P>
+
+	<P><DD><UL TYPE=DISC>
+	<LI>分割条件より小さく、分割条件に近い場合：画質が悪い（圧縮率が少し良い）
+	<LI>分割条件より大きく、分割条件に近い場合：画質が良い（圧縮率が少し悪い）</UL>
+
+	<P><DD>　正確な分割条件は不明ですが、確認した範囲を次に示します。</P>
+	<P><DD><TABLE BORDER=1>
+	<TR><TH><PRE>面積 [pixel]</TH><TH><PRE>フレーム分割数(タイル数)</TH></TR>
+	<TR ALIGN=CENTER><TD><PRE>96000 = 480×200 以上</TD><TD>３</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>95744 = 352×272 以下<BR>59904 = 208×288 以上</TD><TD>２</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>57344 = 256×224 以下</TD><TD>１<BR>（分割しない）</TD></TR></TABLE>
+	<DD><B>※</B>シネパックライブラリが対応しているのは、２分割以下です。</P>
+
+<A NAME="4_3_13"></A>
+	<P><DT><DT><H3>(13)画像伸張処理の効率</H3>
+	<DD>　画像伸張処理は、直接 VRAM に出力するより、WORK RAM-H に出力する方が効率が良いので、この方がタスク関数は高速に動作します。<BR>
+　一端 WORK RAM-H に出力して SCU-DMA で VRAM に転送した方が、転送時間を加えても短い処理時間になります。</P>
+
+<A NAME="4_3_14"></A>
+	<P><DT><H3>(14)非圧縮ビデオ対応</H3>
+	<DT><OL>
+	<P><B><LI>概要</B><BR>
+　２４ビット非圧縮のムービーを再生できるようになりました。画像サイズやフレームレートを抑え、画質を優先させたい場合に利用します。<BR>
+　１５ビット色のムービーには対応していません、２４ビットのデータの３万２千色表示には対応していますが、クオリティの高いデータを無駄にすることになります。<BR>
+　非圧縮の QuickTime Movie を MovieToSaturn_J でコンバートします。非圧縮ムービーの再生のために追加された関数はいっさいありません。ファイルヘッダを解釈して処理するので、全く同じ手続きで再生できます。ただし、リングバッファだけは圧縮した場合より大きく確保しなければなりません。</P>
+
+	<P><B><LI>リングバッファサイズ</B><BR>
+　リングバッファは次の条件を満たすように確保する必要があります。<BR>
+<PRE>
+<H3>ring ≧ header + sound + frame</H3>
+　ring   :リングバッファサイズ
+　header :ファイルヘッダサイズ(セクタサイズバウンダリに切り上げ換算)
+　sound  :サウンド0.5秒分のサイズ
+　frame  :１フレーム非圧縮サイズ</PRE></P>
+
+	<P><B><LI>動画性能</B><BR>
+　CDからのデータ転送レートから、次に示す程度の動画性能になります。<BR>
+<TABLE BORDER=1>
+<TR><TH>オーディオの条件</TH><TH>限界動画性能</TH></TR>
+<TR><TD><PRE>44kHz, 16bit, ステレオ</TD><TD><PRE>320×224[dot]　0.60[fps]</TD></TR>
+<TR><TD><PRE>22kHz,  8bit, モノラル</TD><TD><PRE>320×224[dot]　1.32[fps]</TD></TR>
+<TR><TD><PRE>ビデオのみムービー</TD><TD><PRE>320×224[dot]　1.42[fps]</TD></TR>
+<TR><TD><PRE>ビデオのみムービー</TD><TD><PRE>160×112[dot]　5.71[fps]</TD></TR></TABLE></P>
+	</OL>
+
+<A NAME="4_3_15"></A>
+	<P><DT><H3>(15)デバッグ用実行履歴出力</H3>
+	<DD>　シネパックライブラリの主要な処理の実行履歴を出力します。<BR>
+　スムーズに再生できないなどの動作不良がある場合、原因究明に役立ちます。<BR>
+　タスクのコールを定期的に行っているか、データの供給が滞っていないか、コマ落ちが発生していないかなどを調べることができます。<BR>
+　動作不良の再現性を確認してから、よりシンプルな実行履歴を作ったほうが履歴の解析か容易になります。</P>
+
+	<P><DD><B>［履歴を出力するシネパックライブラリの内部処理］</B>
+	<DD>　エラー発生時，タスク関数のコール時，リングバッファデータ供給時と消費時，表示要求フラグのＯＮ／ＯＦＦ時，コマ落とし処理，ＰＣＭスタート／ストップ</P>
+
+	<P><DD><B>［出力の指定］</B>
+	<DD><B>・本番用のプログラムをそのまま使用する場合</B>
+	<DD>　CPK_Init の処理後にブレークします。<BR>
+　リンク時に作成されるマップファイルで、CpkdSys 型の構造体 cpkd_sys のアドレスを調べ、ICE のコマンドで、cpkd_sys.mode の値を 0x00000001 に設定してください。</P>
+
+	<P><DD>　:m 060XXXXX 1;l</P>
+
+	<P><DD>　出力アドレスは、0x04000000 〜 0x047fffff になります。</P>
+
+	<P><DD><B>・デバッグ出力するプログラムを作成する場合</B>
+　CPK_Init のあとで CPKD_SetMode(ON) とします。<BR>
+　CPKD_SetPrintAddr により、出力アドレスの設定ができます。<BR>
+　CPKD_PrintStr 及び CPKD_PrintData により、アプリ側の処理の実行履歴を追加して出力することが可能です。追加出力する場合、履歴情報を読みやすくするために出力するサイズは１６byteの整数倍にしてください。</P>
+
+	<P><DD><B>［出力情報の確認］</B>
+	<DD>　出力アドレスを ICE のコマンドでダンプ表示します。表示内容をテキストファイルとして保存し、テキストエディタで見ると、動作の解析が容易になります。</P>
+
+	<P><DD><PRE>
+　:> hist.txt [RET]
+　:d 04000000 04001000;l [RET]
+　:>- [RET]
+</PRE></P>
+
+	<P><DD><B>［出力情報のフォーマット］</B>
+	<DD><PRE>
+========+============================================+
+ADDRESS : 0 1  2 3   4 5  6 7   8 9  A B   C D  E F  :
+========+============================================+
+04000000: AAAA_AAAA  ---- ----  ---- ----  ---- ---- :
+04000010: "Err "     ---- VVVV  ---- ----  EEEE_EEEE : Error 
+04000020: "Task"     PPPP VVVV  HHHH_HHHH  CCCC_CCCC : start of CPK_MeTask
+04000030: "RWri"     WWWW VVVV  HHHH_HHHH  DDDD_DDDD : WRIte Ringbuffer
+04000040: "RRea"     RRRR VVVV  HHHH_HHHH  DDDD_DDDD : REAd Ringbuffer
+04000050: "DOn "     FFFF VVVV  LLLL_LLLL  TTTT_TTTT : set Disp flag On
+04000060: "DOff"     FFFF VVVV  HHHH_HHHH  TTTT_TTTT : set Disp flag Off
+04000070: "PcmS"     MODE VVVV  HHHH_HHHH  ADDR SIZE : PCM Start
+04000080: "PcmE"     MODE VVVV  HHHH_HHHH  ---- ---- : PCM Stop
+04000090: "LosF"     FFFF VVVV  LFLF_LFLF  SSSS_SSSS : LOse Frame
+        :
+        :
+</PRE></P>
+
+	<P><DD><B>［出力情報の内容説明］</B>
+	<DD><PRE>
+AAAA_AAAA : 現在の履歴情報出力アドレス。
+---- VVVV : Ｖｂｌカウンタ。おおよその時刻がわかる。
+EEEE_EEEE : エラーコード。
+PPPP ---- : 再生ステータス [-1, 0, 1, 2, 3, 4, 5]。
+HHHH_HHHH : シネパックハンドル。
+CCCC_CCCC : シネパックタスクコールカウンタ。
+DDDD_DDDD : リングバッファのデータの残量 [byte]。供給が滞ってないかわかる。
+WWWW ---- : リングバッファへの書き込みサイズ [sector]。
+RRRR ---- : リングバッファからの読み取りサイズ [byte]。
+FFFF ---- : フレーム番号。
+LLLL_LLLL : 遅延時間。(現在時刻 − フレーム表示時刻)
+TTTT_TTTT : フレーム時刻。(フレーム表示時刻 ＋ フレーム表示持続時間)
+LFLF_LFLF : コマ落ちカウンタ。
+SSSS_SSSS : サンプルカウンタ。
+MODE ---- : 0x80##:ステレオ，0x10##:8bit，0x##03:PCMストリーム再生番号3
+             (PCM Stop の場合は、PCMストリーム再生番号だけ表示)
+ADDR ---- : PCMバッファスタートアドレス(4bit右シフト値)
+SIZE ---- : PCMバッファサイズ [sample/1ch]
+</PRE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p04_10_j.htm">戻る</A>｜
+<a href="p04_11_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">MOVIE TOOLS GUIDE</A>
+★<a href="../index_j.htm">Cinepak for SEGASaturn</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

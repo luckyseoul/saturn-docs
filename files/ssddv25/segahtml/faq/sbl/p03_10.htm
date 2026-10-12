@@ -1,0 +1,175 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 4&gt;FAQ/SBL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sbl">FAQ</a> ★ <A HREF="index.htm#PER">SBL programming related</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SBL programming related</b><H2 ALIGN=CENTER> peripheral</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_01"><HR></a><DL>
+<H3> Why doesn't PER_LInit return the peripheral ID?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Why is the peripheral ID not passed during initialization (PER_LInit)?<P><DT> <FONT SIZE=5>A)</font><DD> This is so that you can use different peripherals within one game.</P>
+<P> (Example → 1P = analog, 2P = mouse game)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_02"><HR></a><DL>
+<H3> What is written about multi-tap?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Regarding multi-tap.</P>
+<P><UL TYPE=DISC>
+<LI> What is multi-tap ID?<LI> What is the number of multi-tap connectors?</UL>
+</P>
+ what.<P><DT> <FONT SIZE=5>A)</font><DD> The multi-tap ID and the number of multi-tap connectors are used to obtain information about the connection status of the main body connection terminals.</P>
+<P> If you write it like a library document, it will look like this:</P>
+<DL>
+<P><DT> <B>◆Multi-tap information (obtained with PER_LGetPer function)</b><DD><PRE>
+typedef struct {
+  PerMulId id; /* Multitap ID */
+  PerMulCon con; /* Number of connectors */
+} PerMulInfo; /* Multitap information */
+</PRE></P>
+<P><DT><B>[Example of acquisition]</b><DD><PRE>
+void *per_data;
+PerMulInfo *mul_info;
+PER_LGetPer((PerGetPer **)&per_data, &mul_info);
+    mul_info[0].id Multi-tap ID of main unit terminal 1
+    mul_info[0].con Number of connectors for main unit terminal 1
+    mul_info[1].id Multi-tap ID for main unit terminal 2
+    mul_info[1].con Number of connectors for main unit terminal 2</PRE></P>
+<P><DT> <B>[detail]</b><DD> The following values are returned depending on the connection status.<UL TYPE=DISC>
+<P><LI> Multi-tap ID (value with the lower 8BIT of port status masked)<TABLE BORDER=1>
+<TR><TD> connect multitap</TD><TD> : (00~E0) Symbol undefined</TD></TR>
+<TR><TD> Not connected or directly connected</TD><TD> : (F0) PER_MID_NCON_ONE</TD></TR>
+<TR><TD> UNKNOWN device</TD><TD> : (MD-PID) Symbol undefined<BR>
+ (*)MD-PID: Mega Drive Peripheral ID</TD></TR>
+</TABLE>
+</P>
+<P><LI> Number of multi-tap connectors (value masking the upper 8 bits of port status)<TABLE BORDER=1>
+<TR><TD> Not connected or UNKNOWN device</TD><TD> : (00) PER_MCON_NCON_UNKNOWN</TD></TR>
+<TR><TD> direct connection</TD><TD> : (01) Symbol undefined</TD></TR>
+<TR><TD> Number of connected multi-tap connectors</TD><TD> : (02~0F) Symbol undefined</TD></TR>
+</TABLE>
+</P>
+</UL>
+<P><DT> <B>[remarks]</b><DD> There are two types of multi-tap currently available on the market:<OL>
+<P><B><LI></b> Sega Tap (4 peripherals for Mega Drive)<BR>
+ Multitap ID = 00, number of connectors = 04<P><B><LI></b> Multiterminal 6 (used to connect 6 Saturn peripherals)<BR>
+ Multitap ID = 10, number of connectors = 06</OL>
+</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_03"><HR></a><DL>
+<H3> Regarding peripheral data output.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Regarding peripheral data,</P>
+<UL TYPE=DISC>
+<LI> Do I need to convert?<BR>
+ Also, is it necessary to keep a large peripheral data buffer for conversion?<LI> For example, when you are expecting a digital device and the peripheral data size is larger than specified?<LI> Will there be a ``Pad+α'' like PlayStation's ``Nejikon''?<LI> How big of a buffer do I need?<LI> What is the guarantee that future peripherals will convert?<LI> Will there be devices with currently undefined IDs?<LI> What should I do with the keyboard?</UL>
+</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Peripherals other than the mouse have a structure that extends the digital device data format, so no special conversion is required.</P>
+<P> For example, in the case of a steering wheel controller,<BR>
+ "Digital PAD data" + "Analog data"<BR>
+ The data format is as follows.</P>
+<P> I don't know much about the data format of "Nejicon", but I think there will be no problem if it is in the form of an extension of the digital PAD as above. The release of new peripherals itself depends on the situation, but if the data format is new, a peripheral ID will probably be added, so it is impossible to support it with the software currently under development.</P>
+<P> Even if the software is only compatible with digital devices,<UL TYPE=DISC>
+<LI> analog device<LI> keyboard<LI> mega drive peripherals</UL>
+ If it is connected, please program it so that you can operate the game using "digital data".</P>
+<P> If a mouse is connected using software that does not support mice, please take measures such as ignoring it or converting it to operate digitally.</P>
+<P> Finally, regarding detailed information about the keyboard, we believe that the necessary information is specified in the format as long as it is used for normal game operations.</P>
+<P> For detailed peripheral data formats, see<P><DT> <B>reference</b><DD> "HARDWARE MANUAL VOL.1 SMPC User's Manual"<BR>
+ <A HREF="../../hard/smpc/hon/p03_20.htm">3.2 Saturn Peripheral Standard Format</a><BR>
+ Please refer to.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_04"><HR></a><DL>
+<H3> What happens if different types of peripherals are connected?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What happens if a different type of device is connected to Multi-Tap?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The library outputs the peripheral data collected by SMPC, aligning it to the boundary of [SIZE + 2]. At that time, the remaining peripheral data will be skipped.<BR>
+ Since the data contents are not processed other than peripheral ID processing and data boundary processing, there is no problem even if a different type of device is inserted.<BR>
+ Please use the user program to determine which peripheral is connected based on the peripheral ID and peripheral size.</P>
+<P><DD> <B>(example)</b><DD> If the ID is [PER_ID_DGT] and the size is greater than or equal to [PER_SIZE_DGT], the digital device is connected.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_05"><HR></a><DL>
+<H3> What is peripheral size used for?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> SATURN\SEGALIB\MAN\MANPER.TXT<BR>
+ "Be sure to refer to the peripheral ID and peripheral size before..."<BR>
+ How should I use the peripheral size value?<BR>
+ Isn't ID alone sufficient?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> ID alone may not be enough.<BR>
+ If the peripheral ID is [PER_ID_NCON_UNKNOWN],</P>
+<P><OL>
+<B><LI></b> Peripheral not connected<B><LI></b> SMPC UNKNOWN Peripheral connected</OL>
+</P>
+<P><DD> There are two ways, and Virtua Gun is the second one.<BR>
+ If the SMPC UNKNOWN peripheral is connected to a multitap,</P>
+<DL>
+<DT> Peripheral ID =<DD> PER_ID_NCON_UNKNOWN<DT> Peripheral size =<DD> Mega Drive Peripheral ID (MDPID) of SMPC UNKNOWN peripheral</DL>
+<P><DD> This value is returned, so it is necessary to detect from this value.<BR>
+ (Virtual Gun's [MDPID] is A in hexadecimal.)</P>
+<P><DT><TABLE>
+<TR><TH> Note<BR>
+<img srcset="../../what/atto.png 5x"></TH><TD> <B>Virtua Gun itself does not support multi-tap.</b><BR>
+ <B>(Even if connected, it will not work properly)</b></TD></TR>
+</TABLE>
+</P>
+<DD> If the Virtua Gun is connected directly to the main unit terminal, the multi-tap information will have the following values.</P>
+<DD> Multitap ID = A0<DD> Number of connectors = PER_MCON_NCON_UNKNOWN</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_06"><HR></a><DL>
+<H3> What is PER_ID_MD's "Mega Drive"?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> What is "Mega Drive" in PER_ID_MD?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is the ID when a Mega Drive PAD is connected. (Common to both 3B and 6B)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_07"><HR></a><DL>
+<H3> Peripherals connected to MultiTap suddenly become inoperable.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> The peripherals connected to my multi-tap suddenly become inoperable.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> If this phenomenon occurs, please investigate what value is returned to the peripheral ID etc. when operation becomes impossible.<BR>
+ In addition, please take the following measures:</P>
+<UL TYPE=DISC>
+<P><LI> Please lighten the processing during the V blank.</P>
+<P><LI> Change the SCU interrupt priority using the system library to make SMPC interrupts higher.</P>
+<P><LI> Make sure that DMA burst transfers do not continue during V blank and after V blank out.</P>
+<P><LI> Please change the acquisition mode from PER_KD_PERTIM to PER_KD_PER during initialization in PER_Linit.</P>
+<P><LI> Please change the SMPC I/F library to the latest library included with SBL Rel6.</P>
+</UL>
+<P> If the problem still occurs even after making the above changes, please execute the PER_Linit function again when the "Not connected" status is returned.<BR>
+ (If "Not connected" is returned even after repeating this several times, please assume that it is truly not connected.)</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_08"><HR></a><DL>
+<H3> Please tell me more about analog peripherals.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please tell me about the input/output relationship between the analog mission stick and the racing controller.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Use PER_LInit() to initialize the library.<BR>
+ At that time, please specify the peripheral size required by the application. (Example: If you need analog data for 3 axes 5)<BR>
+ Use PER_LGetPer() to retrieve peripheral data.</P>
+<P> Racing controllers, mission sticks, and multi-controllers all have analog device IDs and the data format is common, but the data size is different.</P>
+<P><UL TYPE=DISC>
+<LI> Racing controller data size = 3<LI> Mission stick data size = 5<BR>
+ (DEFINE as PER_SIZE_ANL in the library)<LI> Multi-controller data size = 6</UL>
+</P>
+<P> The application should use this information to determine what peripherals are currently connected.<BR>
+ Peripheral-specific buttons correspond to the following data formats.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_09"><HR></a><DL>
+<H3> When I connect an analog device to my multi-tap, it doesn't work.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> When I connect an analog mission stick to Multitap, it takes a long time to obtain the peripheral ID.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> If the mission stick is connected to a multi-tap, information cannot be obtained correctly due to HARDWARE.There is no need to handle this kind of connection on the application side.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sbl">FAQ</a> ★ <A HREF="index.htm#PER">SBL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

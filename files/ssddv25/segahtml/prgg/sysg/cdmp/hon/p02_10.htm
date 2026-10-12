@@ -1,0 +1,127 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 8&gt;CD communication I/F (MPEG part)/2.Basics</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication I/F (MPEG part)</b><H2 ALIGN=CENTER> 2. Basics</H2><HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A><P><DT><H3> 2.1 Terminology and symbols</H3><P><DT> <B>(1) Configuration of MPEG device</b><P><DD><PRE>
+MPEG device─┬─MPEG decoder────┬─MPEG/Video decoder
+            │                 └─MPEG/Audio decoder
+            ├─MPEG frame buffer───set of frame banks
+            └─MPEG sector buffer───set of MPEG sectors</PRE></P>
+<A NAME="no2_20"></A><P><DT> <B>(2) Definition of terms</b><DD> Table 2.1 defines the terms used.</P>
+<DL>
+<P><DT> <B>MPEG</b><DD> Abbreviation for Moving Picture Experts Group, referring to the ISO/IEC JTC1/SC29/WG11 committee. The standard is an international standard for high-efficiency video encoding.</P>
+<P><DT> <B>MPEG buffer</b><DD> Memory area managed by MPEG/Video LSI.</P>
+<P><DT> <B>MPEG frame buffer</b><DD> Area where decoded image data is stored.<BR>
+ Consists of multiple frame banks (number of sides).</P>
+<TABLE BORDER=1>
+<TR><TH WIDTH=160> Output mode</TH><TH WIDTH=100> resolution</TH><TH WIDTH=080> Number of sides</TH></TR>
+<TR><TD> NTSC normal resolution</TD><TD ALIGN=CENTER> 352×240</TD><TD ALIGN=CENTER> 4</TD></TR>
+<TR><TD> PAL normal resolution</TD><TD ALIGN=CENTER> 352×288</TD><TD ALIGN=CENTER> 3</TD></TR>
+<TR><TD> NTSC high-definition still image</TD><TD ALIGN=CENTER> 704×480</TD><TD ALIGN=CENTER> 1</TD></TR>
+<TR><TD> PAL high-definition still image</TD><TD ALIGN=CENTER> 704×576</TD><TD ALIGN=CENTER> 1</TD></TR>
+</TABLE>
+<P><DT> <B>frame bank</b><DD> An area where image data for one picture of an MPEG video stream is expanded.</P>
+<P><DT> <B>frame buffer window</b><DD> A rectangular area set for the MPEG frame buffer.<BR>
+ This area becomes the output target.</P>
+<P><DT> <B>display window</b><DD> A rectangular area on a display (TV monitor) where MPEG video is output.<BR>
+ The frame buffer window data is output.</P>
+<P><DT> <B>image data</b><DD> Full color data with 24 bits per pixel obtained by decoding an MPEG video stream.<BR>
+ It is transferred to the host area as 15-bit color data.</P>
+<P><DT> <B>image data window</b><DD> A rectangular area defined within an MPEG frame buffer for accessing image data.</P>
+<P><DT> <B>Bright spot</b><DD> The smallest display unit (one dot) on the display.</P>
+<P><DT> <B>pixel</b><DD> Display unit of image data. Consists of multiple bright spots.<BR>
+ Normal resolution: 2 x 2 bright spots, high-definition resolution: 1 x 1 bright spots</P>
+<P><DT> <B>system layer</b><DD> An MPEG stream in which video and audio are synchronized and multiplexed.<BR>
+ (Multiplex stream)</P>
+<P><DT> <B>video layer</b><DD> An MPEG stream consisting only of video data.</P>
+<P><DT> <B>audio layer</b><DD> An MPEG stream consisting only of audio data.</P>
+<P><DT> <B>picture</b><DD> One screen data.</P>
+<P><DT> <B>I picture</b><DD> Intra-coded image. Only the information within the frame is encoded.</P>
+<P><DT> <B>P picture</b><DD> Forward predictive encoded image. Encoded by prediction from past I and P pictures.</P>
+<P><DT> <B>B picture</b><DD> Bidirectional predictive encoded image. Encoded by prediction from past or future I, P pictures.</P>
+<P><DT> <B>D picture</b><DD> DC encoded image. It has only a DC component and is used for searching.</P>
+<P><DT> <B>G.O.P.</b><DD> A collection of multiple pictures that includes at least one I picture at the beginning.<BR>
+ Random access is possible in GOP units.<BR>
+ It usually consists of pictures of about 0.5 seconds (15 pictures).</P>
+<P><DT> <B>field</b><DD> Display screen for one vertical scanning section. (NTSC: 60Hz, PAL: 50Hz)</P>
+<P><DT> <B>flame</b><DD> One display screen. A normal TV consists of two fields.</P>
+<P><DT> <B>interlace</b><DD> Interlaced scanning method. Two fields, an even field and an odd field, constitute one display screen.</P>
+<P><DT> <B>non-interlaced</b><DD> Sequential scanning method. One field constitutes one display screen.</P>
+<P><DT> <B>PSC (Frame Buffer Start Code)</b><DD> Picture layer start code. (00000100H)</P>
+<P><DT> <B>SHC (sequence header code)</b><DD> Video sequence layer start code. (000001B3H)</P>
+<P><DT> <B>SEC (system end code) │ │</b><DD> A code that signifies the end of a system layer stream. (000001B9H)<BR>
+ It is specified as iso_11172_end_code.<BR>
+ *SEC is sometimes used as an abbreviation for sequence end code (000001B7H), but in this document it is used as an abbreviation for system end code.</P>
+<P><DT> <B>Time code (TC)</b><DD> Information indicating the time from the beginning of the sequence.</P>
+<P><DT> <B>Timestamp (PTS)</b><DD> Time management information for playback output of each frame.<BR>
+ In contrast to PTS, the timestamp for decoding time management is called DTS.</P>
+<P><DT> <B>Temporal Reference (TR)</b><DD> Information indicating the display order within the GOP. A remainder value of 1024 that is reset at the beginning of the GOP.</P>
+<P><DT> <B>VBV buffer</b><DD> Area used to decode MPEG video streams.<BR>
+ Allocated within the MPEG buffer.</P>
+<P><DT> <B>STD buffer size</b><DD> Buffer size specified by the system target decoder. Before starting playback, it is necessary to secure data for this buffer size.</P>
+<P><DT> <B>W.B.C.</b><DD> Block that manages decode banks and display banks.<BR>
+ Refers to the contents of the MPEG frame buffer waiting to be displayed (decoded).</P>
+<P><DT> <B>Pause</b><DD> Please stop decoding. As a result, screen output also stops.</P>
+<P><DT> <B>Freeze</b><DD> Please stop screen output. The decoding operation continues.</P>
+<P><DT> <B>Decode synchronization signal (DSYNC)</b><DD> Decoding instructions given from the host to the decoder during host synchronized playback.<BR>
+ Send instead of VSYNC as decode timing.</P>
+<P><DT> <B>MPEG sector</b><DD> A unit of data for accessing the MPEG buffer in MPEG sector buffer mode. (2048 bytes)<BR>
+ The MPEG sector buffer is configured as a collection of MPEG sectors.</P>
+<P><DT> <B>MPEG sector position</b><DD> The location of the MPEG sector within the MPEG sector buffer.<BR>
+ Takes a value from 0 to (total number of MPEG sectors - 1).<BR>
+ MPEG sectors are accessed using the MPEG sector position as a key.</P>
+</DL>
+<A NAME="no2_30"></A><P><DT> <B>(3) List of symbols and abbreviations</b><A NAME="t2_2"></A>
+<P><DD><B>Table 2.2 List of symbols and abbreviations</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE>Symbols/abbreviations</TH><TH WIDTH=180><PRE>Meaning</TH><TH WIDTH=260><PRE>Explanation</TH></TR>
+<TR><TD ALIGN=CENTER><PRE> B </TD><TD>Bidirectionally<BR>predictivecodedpicture</TD><TD>Bidirectionally predictive coded picture</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> D </TD><TD>DCcodedpicture</TD><TD>DC coded picture</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> DTS </TD><TD>DecodingTimeStamp</TD><TD>Decoding Time Stamp</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> GOP </TD><TD>GroupOfPictures</TD><TD>Group of pictures</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> I </TD><TD>Intracodedpicture</TD><TD>Intracoded picture</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> P </TD><TD>Predictivecodedpicture</TD><TD>Forward predictive coded picture</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> PSC </TD><TD>PictureStartCode</TD><TD>Picture start code</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> PTS </TD><TD>PresentationTimeStamp</TD><TD>Playback output timestamp</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> SEC </TD><TD>SystemEndCode</TD><TD>System end code (abbreviation in this document)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>(SEC) </TD><TD>(SequenceEndCode)　</TD><TD>(Sequence End Code)</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> SHC </TD><TD>SequenceHeaderCode</TD><TD>Sequence header code</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> STD </TD><TD>SystemTargetDecoder</TD><TD>System target decoder</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> VBV </TD><TD>VideoBufferingVerifier</TD><TD>Video Buffering Verifier</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> WBC </TD><TD>WriteBufferControl</TD><TD>MPEG frame buffer waiting for display</TD></TR>
+<TR><TD COLSPAN=3 HEIGHT=5></TD></TR>
+<TR><TD ALIGN=CENTER><PRE> actst </TD><TD>MPEGactionstatus</TD><TD>MPEG action status</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> vcnt </TD><TD>VSYNCcounter</TD><TD>Operation section counter</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> pict </TD><TD>pictureinformation</TD><TD>Picture information</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> stat_a</TD><TD>MPEG/Audiostatus</TD><TD>MPEG/Audio status</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> stat_v</TD><TD>MPEG/Videostatus</TD><TD>MPEG/Video status</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mpstat</TD><TD>MPEGstatusinformation</TD><TD>MPEG status information</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mptc </TD><TD>MPEGtimecode</TD><TD>Timecode</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mpcon </TD><TD>MPEGconnectparameter</TD><TD>MPEG decoder connection parameter</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mpstm </TD><TD>MPEGstreamparameter</TD><TD>MPEG stream parameter</TD></TR>
+<TR><TD ALIGN=CENTER><PRE> mpvef </TD><TD>MPEGvideoeffect</TD><TD>Screen special effect parameters</TD></TR>
+</TABLE></P>
+
+<A NAME="no2_20"></A><P><DT><H3>2.2 MPEG-1 Standard</H3><DD> For the MPEG-1 standard, please refer to the standards document below.</P><A NAME="t2_3"></A><P><DD> <B>Table 2.3 List of MPEG-1 standards</b><DD><TABLE BORDER=1><TR><TH WIDTH=100><PRE> Item</TH><TH WIDTH=180><PRE> Standard</TH><TH WIDTH=300><PRE> Standard name</TH></TR><TR><TD> MPEG-1 standard</TD><TD> ISO/IEC 11172</TD><TD><PRE> 1993 Information technology - Coding of moving<BR> pictures and associated audio for digital<BR> storage media up to about 1.5 Mbit/s</TD></TR><TR><TD> MPEG/System layer</TD><TD> ISO/IEC 11172-1</TD><TD> Same as above - Part1:Systems</TD></TR><TR><TD> MPEG/Video layer</TD><TD> ISO/IEC 11172-2</TD><TD> Same as above - Part2:Video</TD></TR><TR><TD> MPEG/Audio layer</TD><TD> ISO/IEC 11172-3</TD><TD> Same as above - Part3:Audio</TD></TR></TABLE></P></DL><HR NOSHADE> <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (MPEG part)</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

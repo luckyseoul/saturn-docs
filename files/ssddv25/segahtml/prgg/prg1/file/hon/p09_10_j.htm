@@ -1,0 +1,139 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;16/17&gt;プログラマーズガイド/ファイルシステムライブラリ/付録A</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<a href="p08_16_j.htm">戻る</A>｜
+<a href="p10_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<CENTER>
+<H4>付録Ａ</H4>
+<H2>開発サポート機能の利用</H2></CENTER>
+
+<A NAME="no9_10"><HR NOSHADE></A>
+<DL>
+	<P><DT><H2>A.1　メモリファイルを使うための手順</H2>
+	<DD>　メモリファイルを使用するには次の作業を、記載順に行う必要があります。</P>
+
+<A NAME="no9_10_1"></A>
+	<P><DT><H4>　●ファイルデータ作成</H4>
+	<DD>　メモリファイルとなるファイルをつくり、メモリファイルに変換します。メモリファイルへの変換はMFCAT.EXEで行います。</P>
+
+<A NAME="no9_10_2"></A>
+	<P><DT><H4>　●メモリファイルロード</H4>
+	<DD>　メモリファイルをメモリ領域に設定します。これはICEのコマンドで行います。メモリ領域の内容が破壊されるたびに行う必要があります。</P>
+
+<A NAME="no9_10_3"></A>
+	<P><DT><H4>　●ターゲットプログラムロード</H4>
+	<DD>　開発中のプログラムファイルをターゲットにロードします。</P>
+
+<A NAME="no9_10_4"></A>
+	<P><DT><H4>　●メモリファイル使用宣言</H4>
+	<DD>　GFS_Initを実行する前に!gfsd_mmc/GFMC_baseにメモリの先頭アドレスを設定します。これによりGFS_InitでSIMMのディレクトリ情報を取得します。!gfsd_mmc/GFMC_baseの初期値は0で、この状態ではSIMMのディレクトリ情報は参照されません。</P>
+
+	<P><DD>GFMC_baseは次のように定義されています。</P>
+
+	<P ALIGN=CENTER><FONT SIZE="5">Sint8 *GFMC_base = 0;</FONT></P>
+
+<!-- +++ Update by CRI ：1.8 -->
+	<P><DD>　変数GFMC_baseは、sega_gfs.libとsegadgfs.libの両方に定義されています。<BR>
+	　sega_gfs.lib中のGFMC_baseは、segadgfs.libとの互換性のためだけに存在します。ファイルシステムの動作には影響を与えません。</P>
+<!-- --- Update by CRI ：1.8 -->
+
+	<P><DD>　MFCAT.EXEについてはCDツールのマニュアルを参照してください。</P>
+</DL>
+
+<!------------------------------------------------------------------------------------------------>
+<A NAME="no9_20"><HR></A>
+<DL>
+	<P><DT><H2>A.2　DOSファイルを使うための手順</H2>
+	<DD>　DOSファイルを使用するには次の作業を、記載順に行う必要があります。</P>
+
+	<P><DT><H4>　●対応表ファイル作成</H4>
+	<DD>　DOSファイルとなるファイルを作成し、CD-ROM上でのファイル名とDOS上でのファイル名の対応表ファイルを作成します。</P>
+
+	<P><DT><H4>　●ブート</H4>
+	<DD>　DIPスイッチがSCSIが使えるように設定されていることを確認して、ターゲットをブートします。</P>
+
+	<P><DT><H4>　●ターゲットプログラムロード</H4>
+	<DD>　IBM-PCがターゲットをSCSIデバイスと認識したことを確認したら、ターゲットをBREAKさせ、ターゲットプログラムをロードします。</P>
+
+	<P><DT><H4>　●CDSIM.EXE実行</H4>
+	<DD>　IBM-PC上でCDSIM.EXEを実行します。<BR>　対応表ファイルとCDSIM.EXEについては、CDツールのマニュアルを参照してください。</P>
+</DL>
+
+<!------------------------------------------------------------------------------------------------>
+<A NAME="no9_30"><HR></A>
+<DL>
+	<P><DT><H2>A.3　注意事項</H2>
+	<DD>　開発サポート機能を使用する際の注意事項を次に述べます。</P>
+
+<!-- *** Delete by CRI ：5.12 -->
+<A NAME="no9_30_1"></A>
+	<P><DT><H4>　●アクセスの一時的な制限方法</H4>
+	<DD>　普段はメモリファイルとDOSファイルの両方をアクセスしている場合、DOSファイルのアクセスを一時的に中止するには、ターゲットのDIPスイッチをSCSIを使用しない設定にし、再ブートさせます。<BR>　逆に、DOSファイルのみのアクセスにするには、!gfsd_mmc/GFMC_baseに0を設定します。</P>
+
+<A NAME="no9_30_2"></A>
+	<P><DT><H4>　●ファイル名アクセスの推奨</H4>
+	<DD>　デバッグファイルの使用中は、ファイル構成の変更によってファイル識別子が変わる可能性があるので、ファイル名によるアクセスを使うことをお奨めします。</P>
+
+<A NAME="no9_30_3"></A>
+	<P><DT><H4>　●デバッグファイルのディレクトリ情報</H4>
+	<DD>　デバッグファイルのディレクトリ情報は次のように設定されます。</P>
+
+	<P><DL><DD><TABLE BORDER=0>
+	<TR><TD><PRE>ＦＡＤ　　　　</TD><TD>：デバッグファイル上でのファイル識別子</TD></TR>
+	<TR><TD><PRE>ファイル番号　</TD><TD>：0</TD></TR>
+	<TR><TD><PRE>ギャップサイズ</TD><TD>：0</TD></TR>
+	<TR><TD><PRE>ユニットサイズ</TD><TD>：0</TD></TR></TABLE></DL></P>
+
+<A NAME="no9_30_4"></A>
+	<P><DT><H4>　●DOSファイル使用時の制限</H4>
+	<DD>　DOSファイルの取り出しパラメータは処理の都合上、１度に１セクタしか転送できません。取り出しパラメータを１以外の値に設定しても無効です。</P>
+
+<A NAME="no9_30_5"></A>
+	<P><DT><H4>　●使用可能な関数の制限</H4>
+	<DD>　転送モードがGFS_TMODE_SCUの場合や、転送関数においてSCU-DMAを起動した場合は、転送が終了するまで以下の関数だけ使用可能です。<BR>
+	　SCU_DMA転送中はA-Busアクセス禁止のため、これ以外の関数は使用を禁止します。</P>
+
+	<P><UL TYPE="DISK">
+	<LI><a href="p08_11_j.htm#no1_7">GFS_Reset</A>
+	<LI><a href="p08_12_j.htm#no2_2">GFS_Close</A>
+	<LI><a href="p08_14_j.htm#no4_3">GFS_NwIsComplete</A>
+	<LI><a href="p08_14_j.htm#no4_6">GFS_NwExecOne</A>
+	<LI><a href="p08_14_j.htm#no4_7">GFS_NwExecServer</A>
+	<LI><a href="p08_16_j.htm#no6_3">GFS_GetErrStat</A>
+	</UL></P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p08_16_j.htm">戻る</A>｜
+<a href="p10_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#intr">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no7">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

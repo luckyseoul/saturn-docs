@@ -1,0 +1,95 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;22/54&gt;VDP1 User's Manual/5.2 Color Lookup Table</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p05_30.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 5 Table</b><HR NOSHADE>
+<DL>
+<A NAME="no5_20"></A><P><DT><H2> ■5.2 Color lookup table</H2><DD> A color lookup table is used to specify the color of pixels in a character pattern in lookup table mode. The color lookup table defines 16 color codes in VRAM as 16-bit data each.<BR>
+ In lookup table mode, a character pattern is defined in the character pattern table with 4 bits/pixel, and one color from the 16 colors in the color lookup table is selected using the defined 4 bit data. The 16-bit color code of the selected color is written directly to the frame buffer as a pixel color code.<BR>
+ The size of the color lookup table is 20H (32) Byte. Write the table starting from the boundary address in 20HByte units of VRAM. However, it cannot be defined as 00000H.<BR>
+ VRAM is up to address 7FFFFH. Do not define color lookup tables beyond address 80000H.<BR>
+ Both color bank codes and RGB codes are valid for the data written to the color lookup table. The RGB code is MSB=1. For the color bank code, when RGB codes are mixed, MSB = 0, and when RGB codes are not mixed, MSB is arbitrary (0 or 1).<BR>
+ Set MSB according to <A HREF="../../vdp2/hon/p09_10.htm#no9_12">VDP2 data processing</a> .</P>
+<A NAME="z5_2"></A><P><DD> <B>Figure 5.2 Color lookup table</b><PRE>
+
+     ┌───────────┐　
++00H │16-bit data│ (0H color code)
+     ├───────────┤　
++02H │16 bit data│ (1H color code)
+     ├───────────┤　
++04H │16-bit data│ (2H color code)
+     ├───────────┤　
+  :  │     :     │       :　
+  :  │     :     │       :　
+  :  │     :     │       :　
+     ├───────────┤　
++1CH │16 bit data│ (EH color code)
+     ├───────────┤　
++1EH │16 bit data│ (FH color code)
+     └───────────┘　
+</PRE><A NAME="no5_21"></A><P><DT><B>●Lookup table mode</b><DD> Specify the color mode in the sprite drawing command to lookup table mode. With this specification, the character pattern stored in VRAM at 4 bits/pixel will be converted to a color code and written to the frame buffer by referring to the specified color lookup table.<BR>
+ In the sprite drawing command, specify the storage address and size of the character pattern and the storage address of the color lookup table.</P>
+<A NAME="no5_22"></A><P><DT> <B>●Character pattern</b><DD> Character patterns in lookup table mode are stored in VRAM at 4 bits/pixel.</P>
+<A NAME="no5_23"></A><P><DT> <B>●Command table</b><DD> Specify the address of the color lookup table referenced by the sprite as the color lookup table address (start address +06H) in the command table. The value to be specified is address/8H. The color lookup table is stored in a 20HByte boundary, so the lower 2 bits are 00H.<BR>
+ The relationship between the command table, color lookup table, and character pattern table is as follows.</P>
+<A NAME="z5_3"></A><CENTER>
+ <B>Figure 5.3 Table relationships in lookup table method</b><PRE>
+         command table                       
+        ┏━━━━━━━━━━━━━━┓                     
+        ┃              ┃                     
+        ┠──────────────┨                     
+┌───────┨Lookup table  ┃                     
+│       ┃address       ┃                     
+│       ┠──────────────┨                     
+│┌──────┨Character     ┃                     
+││      ┃address       ┃                     
+││      ┠──────────────┨                     
+││      ┃Character size┃                     
+││      ┠──────────────┨                     
+││      ┃              ┃                     
+││      ┃              ┃                     
+││      ┃              ┃                     
+││      ┗━━━━━━━━━━━━━━┛     ┏━━━━━━━━━━━━━━┓
+││                           ┃ Frame buffer ┃
+│└─────→┏━━━━━━━━━━━━━━┓     ┃              ┃
+│Address┃Character     ┃     ┃ 4 bit data   ┃
+│       ┃pattern       ┃     ┃              ┃
+│       ┃table         ┃     ┃              ┃
+│       ┃       :      ┃Data ┃              ┃
+│       ┃       :      ┠─┐   ┃              ┃
+│       ┗━━━━━━━━━━━━━━┛ │   ┃              ┃
+└──────→┏━━━━━━━━━━━━━━┓ │   ┃              ┃
+ Address┃Color         ┃ │   ┃              ┃
+        ┃Lookup        ┃←┘   ┃              ┃
+        ┃Table         ┃     ┃              ┃
+        ┃       :      ┃     ┃              ┃
+        ┃       :      ┃────→┃              ┃
+        ┗━━━━━━━━━━━━━━┛     ┗━━━━━━━━━━━━━━┛
+                    16 bit data              
+</PRE></CENTER>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p05_30.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

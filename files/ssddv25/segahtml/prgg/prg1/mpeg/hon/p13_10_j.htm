@@ -1,0 +1,125 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/17&gt;MPEGライブラリ/付録Ａ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no12">MPEGライブラリ</A>
+<HR>
+<B>▲
+<a href="p12_13_j.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>MPEGライブラリ</B>
+<CENTER>
+<H4>付録Ａ</H4>
+<H2>A.1　補足説明</H2></CENTER>
+<HR NOSHADE>
+<P>　マニュアル本文への追加事項です。</P>
+
+<!-- +++ Add by CRI ：3. -->
+<HR>
+<DL>
+<A NAME="no13_10"></A>
+	<P><DT><H2>1．使用上の注意</H2>
+	<P><DT><B>　（１）MPCMフラグの状態</B>
+	<DD>　本ライブラリの関数を呼ぶときには、MPCMフラグがONの状態で呼ぶようにしてください。</P>
+
+	<P><DT><B>　（２）MPSTフラグの使用制限</B>
+	<DD>　アプリケーションでMPSTフラグのクリア、またはMPEG割り込みマスクの設定を行った場合、以下の関数の動作は保証されません。</P>
+	<DD><UL TYPE=DISC>
+	<LI>MPG_IsDecReady
+	<LI>MPG_CheckHng
+	</UL></P>
+
+	<P><DT><B>　（３）ディスプレイウィンドウオフセットの変更方法</B>
+	<DD>　アプリケーションでディスプレイウィンドウオフセットを変更する場合は、CD通信インタフェースのCDC_MpSetWinDofs関数を使用してください。</P>
+
+	<P><DT><B>　（４）ホスト転送モードにおけるデフォルトの転送関数の使用制限</B>
+	<DD>　デフォルトの転送関数を使用する場合、MPEGライブラリはDMAライブラリを用いてSCU-DMAを起動します。使用するレベルは０です。<BR>
+　そのため、次のようにINT_ChgMsk関数を実行してレベル0-DMA割り込みを許可しておく必要があります。<BR>
+（詳細はDMA／割り込み関連のドキュメントを参照してください。）</P>
+
+	<P><DD><PRE>
+/* SCU-DMA0終了割り込みを許可する */
+INT_ChgMsk(INT_MSK_DMA0, INT_MSK_NULL);
+</PRE></P>
+
+
+	<P><DD>　本処理はファイルシステムライブラリ（Ver.1.11以降）のGFS_Init関数内で実行されていますので、通常はアプリケーションで実行する必要はありません。</P>
+
+	<P><DT><B>　（５）SCU-DMA使用時の注意</B>
+	<DD>　SCU-DMA転送中はA-Busアクセス禁止のため、全てのMPEGライブラリ関数の使用を禁止します。デフォルトの転送関数もSCU-DMAを使用しますので、注意が必要です。</P>
+
+	<P><DT><B>　（６）割り込みでの関数呼び出し</B>
+	<DD>　割り込み処理内では、MPG_CaptStat以外のMPEGライブラリ関数の使用を禁止します。</P>
+</DL>
+<!-- --- Add by CRI ：3. -->
+
+<!-- +++ Add by CRI ：4.2 -->
+
+<HR>
+<DL>
+<A NAME="no13_20"></A>
+	<P><DT><H2>２．　MPEGオーディオの出力設定方法</H2>
+	<DD>　MPEGオーディオを再生して実際に音声を出力するには、SCSPに対して、CD-DAの場合と同じ設定をする必要があります。<BR>
+　ハードウェア的には、MPEGオーディオのデコード結果は、CD-DAと同じ信号となって出力されます。</P>
+
+	<P><DT><B>　（１）ＳＣＳＰの設定</B>
+	<DD>　SCSPの設定には、以下の３方法があります。</P>
+
+	<DD><OL TYPE=a>
+	<P><B><LI></B>ハードウェア（SCSP）に対して直接設定する。</P>
+
+	<P><DD><PRE>
+/*  SCSPの設定  */
+*((Uint16 *)0x25b00216) = 0x00ff;
+*((Uint16 *)0x25b00236) = 0x00ef;
+*((Uint16 *)0x25b00400) = 0x000f;
+</PRE></P>
+
+	<P><B><LI></B>サウンドI/Fライブラリを使用して設定する。</P>
+	<P><DD><PRE>
+/*  SND I/F 関数による設定  */
+/*  注意：実際には、ループ回数の上限を決めること */
+while (SND_SetCdDaLev(6, 6) == SND_RET_NSET);
+while (SND_SetCdDaPan(-15, 15) == SND_RET_NSET);
+while (SND_SetTlVl(15) == SND_RET_NSET);
+</PRE></P>
+	</OL>
+
+	<P><DT><B>　（２）送出レベル</B>
+	<DD>　送出レベルについては下記技術情報を参照してください。</P>
+
+	<P><DT><B>　参　考</B>
+	<DD>SEGASATURN Developer's Information STN-29<BR>
+	「<a href="../../../../info/hon/stn29_j.htm">CD-DAボリュームの設定に関して</A>」</P>
+</DL>
+<!-- --- Add by CRI ：4.2 -->
+<HR NOSHADE>
+<B>▲
+<a href="p12_13_j.htm">戻る</A>｜
+　　■</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no12">MPEGライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

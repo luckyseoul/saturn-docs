@@ -1,0 +1,95 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/13&gt;Virtual CD System/1. Overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">Virtual CD System</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Virtual CD System User's Manual</b><H2 ALIGN=CENTER> Chapter 1 Overview</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H2> 1.1 Overview of Virtual CD Emulator</H2><DD> Virtual CD emulator is an MS-DOS program that runs on a PC compatible machine.<BR>
+ By communicating with the VCD I/F board inserted into the expansion slot of a PC compatible machine, it receives CD access commands sent from the target box, accesses MS-DOS files according to the commands, and accesses the CD drive. is realized in a pseudo manner.</P>
+<P> The main features of the virtual CD emulator are briefly listed below.</P>
+<P><DD><UL TYPE="DISC">
+<LI> Pseudo-CD playback emulation of MS-DOS file data<LI> GAME-CD disc image pseudo-CD playback emulation<LI> Partial update playback emulation of disk image<LI> error simulation<LI> Recording and displaying communication contents between VCD emulator and CD block<BR>
+ - Received commands and status<BR>
+ -Processing result (error) message<BR>
+ −Selection of communication content display (error only, all)<BR>
+<LI> Displaying TOC information<LI> Displaying correlation information<BR>
+ - Positional relationship between MS-DOS files and the generated CD disk image</UL>
+</P>
+<P><DD> There are three types of MS-DOS file formats that can be accessed:</P>
+<P><DT> <B>(1) A collection of data files before becoming a CD image</b><DD> This is an MS-DOS file that contains data before creating a CD image. (Hereafter, it will simply be referred to as the "data file.")<BR>
+ The virtual CD emulator determines the data file according to the access position of the CD access command received from the VCD I/F board, edits it to become a CD image, and sends it to the VCD I/F board.<BR>
+ As a result, the target box can receive data in the same format as it entered from the CD drive. Emulation in this case is called <B>"direct DOS file access."</b><BR>
+ In this case, once you have the data to create the CD image, you can start emulation with simple preprocessing, but since the data is sent while being edited, it will be played back at the same timing as input from the original CD drive. You can not. Therefore, channel interleaving functions that require complex disk access cannot be supported in this mode of operation. Similarly, MPEG functionality cannot be supported.</P>
+<P><DT> <B>(2) File containing the CD image as is</b><DD> There are various format standards for CDs, and a file in which data is edited and written in a shape and length that conforms to those standards is called <B>a "CD image file."</b> The virtual CD emulator sends this "CD image file" as is to the I/F board. This requires creating a CD image before starting emulation.<BR>
+ This case is called <B>"real-time emulation."</b><BR>
+ In this operating mode, complex sector allocation such as channel interleaving is performed before emulation starts, so there are no functional limitations like the ``direct DOS file access'' described in the previous section.</P>
+<P><DT> <B>(3) CD image and data file for partially modifying it</b><DD> This is an emulation that modifies only one data file, plays that modified data file, and performs a playback test on the other parts using CD image files. Emulation in this case is called <B>"CD image partial update."</b><P> The virtual CD emulator determines which of these emulations to run based on the presence or absence of the file when the virtual CD emulator is started, and the parameters on the command line when starting the virtual CD emulator.<BR>
+ The file extension is used to identify the presence or absence of a file, and the body part is specified by the parameter on the command line when starting the virtual CD emulator.<P> To perform CD emulation, you will need a virtual CD emulator program and a preprocessing program to create a CD image.</P>
+<DD><UL TYPE=DISC>
+<P><LI> <B>CD emulator (VCDEMU.EXE)</b><BR>
+ This is a program that performs virtual CD emulation.</P>
+<P><LI> <B>CD Builder (XBLD.EXE)</b><BR>
+ This is a program that performs preprocessing for "direct DOS file access" and "real-time emulation."</P>
+<P><LI> <B>CD image partial update tool (VCDUTL.EXE)</b><BR>
+ This is a program that performs preprocessing for "CD image partial update".</P>
+</UL>
+<A NAME="no1_20"></A><P><DT><H2> 1.2 General flow of work</H2><DD> Here we will explain the general steps to perform emulation work using a virtual CD emulator.<BR>
+ Before starting the virtual CD emulator, read the VCD I/F board edition and connect the cables. The terms described in the VCD I/F board edition are also used in this book, but as they are already understood, they are not explained here.<BR>
+ Additionally, the following settings for the VCD I/F board are required to operate the virtual CD emulator.</P>
+<P><DD><UL TYPE="DISC">
+<LI> Jumper number to select interrupt number (J3)<LI> Jumper number (J4) to select channel number for DMA transfer<LI> Jumper number (J5) that selects the input/output address of the VCD I/F board</UL>
+</P>
+<P ALIGN=CENTER> <B>Figure-2. General flow of work</b><BR>
+<img srcset="../grp/i016_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Figure 2 shows the general flow of the work, and the diagram is explained below. In the next chapter, we will work with more concrete examples.</P>
+<A NAME="no1_21"></A><P><DT> <B>(1) Environment settings</b><DD> The task is to assign the settings of the VCD I/F board to the environment variable called VCDIO.<BR>
+ The settings on the virtual CD emulator program and VCD I/F board must be consistent. The required settings are the numbers of the three jumpers on the VCD I/F board. If there is a discrepancy between these values, the virtual CD emulator will not be able to communicate with the VCD I/F board. This setting is determined when the board is installed on a PC compatible machine, so if you assign a value to the environment variable with AUTOEXEC.BAT at this time, it will be automatically set every time the PC compatible machine is turned on. This environment setting will be done.</P>
+<A NAME="no1_22"></A><P><DT> <B>(2) Creation of materials, programs, etc.</b><DD> Please prepare image data and programs to be placed on the CD in the form of MS-DOS files.</P>
+<DD><UL TYPE=DISC>
+<P><LI> About the CD-DA file format<BR>
+ Data must be arranged in Intel format in the virtual CD PC compatible machine.<BR>
+ If the data is in Motorola format, byte swapping must be performed beforehand.</P>
+</UL>
+<A NAME="no1_23"></A><P><DT> <B>(3) CD location information description</b><DD> Specify how MS-DOS files such as materials and programs are arranged on the CD.<BR>
+ There is a predetermined format for describing the composition of a CD, and you enter it using a text editor according to this format. This file is called <B>a "script file"</b> and its contents are called a "script."<BR>
+ Creating this script file will describe the CD location information. How to create this script file is explained in <B>the " <A HREF="../../xbld/index.htm">CD Builder User's Manual</a> "</b> .</P>
+<A NAME="no1_24"></A><P><DT> <B>(4) Creating CD configuration information file</b><DD> Create a CD configuration information file when performing "direct DOS file access".<BR>
+ The CD configuration information file shows the correspondence between individual MS-DOS files and CD access positions (minutes, seconds, and frame values).<BR>
+ Start <B>CD builder XBLD.EXE</b> for direct DOS file access and create a CD configuration information file.</P>
+<A NAME="no1_25"></A><P><DT> <B>(5) Creation of CD image file</b><DD> Create a CD image file when performing "real-time emulation".<BR>
+ Start <B>the CD builder XBLD.EXE</b> for real-time emulation and create a CD image file.</P>
+<A NAME="no1_26"></A><P><DT> <B>(6) Starting the virtual CD emulator</b><DD> After completing steps <A HREF="#no1_24">(4)</a> or <A HREF="#no1_25">(5)</a> in the previous section, start the virtual CD emulator.<BR>
+ Whether (4) or (5) is started, the mode of emulation to be performed can be determined by the existence of the created file.<BR>
+ After starting the virtual CD emulator, operations will be mainly performed on the target box side. With virtual CD emulator, just check the playback status or messages.</P>
+<A NAME="no1_27"></A><P><DT> <B>(7) Correction work</b><DD> If it is necessary to modify materials, programs, etc. as a result of emulation, we will use the respective creation tools to make the modifications.<BR>
+ In the case of "Direct DOS file access", perform step <A HREF="#no1_24">(4)</a> again (if the file size after modification is the same, there is no need to perform step (4)).<BR>
+ For "Real-time emulation", repeat step <A HREF="#no1_25">(5)</a> .</P>
+<A NAME="no1_28"></A><P><DT> <B>(8) CD image partial update</b><DD> Use <B>VCDUTL.EXE</b> to partially update the CD image.<BR>
+ For partial CD image updates, there are two modes: a mode in which the CD image file is directly rewritten, and a mode in which real-time emulation is performed using CD image update information.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">Virtual CD System</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

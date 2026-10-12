@@ -1,0 +1,31 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p002.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p004.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H3> System clock switching </H3>
+<DD> System clock cannot be switched by issuing a single command to SMPC. <BR>
+】 This system program must be used. <P>
+<UL> <PRE> CPU clock 26MHz ← → 28MHz
+Horizontal resolution 320/640 ← → 352/704 </PRE> </UL> <P>
+System clock switching involves a reset to some hardware. <P>
+<TABLE>
+<TD ALIGN = "CENTER"> <PRE> <B> <I> Device to be reset </I>. </B> </TD> <TD ALIGN = "CENTER"> <PRE> <B> <I> OFF or no warranty device </I> </B> </TD> <TD ALIGN = "CENTER"> <PRE> <B> <I> Unaffected device </I> </B> </TD> <TR>
+<TD ALIGN = "LEFT"> <PRE> SCU <BR> VDP1 <BR> VDP2 <BR> SCSI / SCC (development only) </TD> <TD ALIGN = "LEFT"> <PRE> Slave SH (OFF ) <BR> DRAM (Destruction of previous contents) <BR> SCSP (OFF) <BR> </TD> <TD ALIGN = "LEFT"> <PRE> Master SH * Note <BR> SDRAM <BR> CD <BR > SIMM (development machine only) </TD> <TR>
+<TD COLSPAN = 3 ALIGN = "RIGHT"> <PRE> * Note: Since master SH is in standby mode during clock switching, <BR>: FRT and SCI among SH built-in modules must be reset Nina <BR> WDT is used in this process. <BR> Also, after processing, there is an NMI, for example, the DMAC control <BR> role is suspended by the NMI. Refer to the SH manual <BR> and perform processing to resume processing if necessary. </TD> </TABLE> <P>
+<PRE> <B> Re-initialization after reset: </B> <BR>
+SCU ………… Re-initialize bus, interrupt mask, etc. However, the SYS_GETSCUIM value is used as the interrupt mask value. <P>
+<B> Post-processing required by the application: </B> <BR>
+VDP2 ……………… You need to set TV mode relatively quickly. The device itself is in 320/640 mode after reset
+Since this will be a synchronization signal to the TV, especially when the system clock is changed to 352/704 mode.
+The screen is misaligned and the screen may be distorted. <P>
+VDP1, 2, SCSP …… All previous settings are invalid. Reconfiguration is required. <P>
+SMPC: Hot reset is always enabled (permitted). </PRE><P>
+The clock change processing time is approximately 110 ms. <BR>
+This is because it includes device reset time. <P>
+</DL><P><P><HR>
+<A HREF=p002.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p004.htm> Go to next page </A>
+</BODY>
+</HTML>

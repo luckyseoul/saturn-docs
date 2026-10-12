@@ -1,0 +1,199 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/11&gt;VDP1 Library/3.VDP1 3D Guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no3">VDP1 library</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 library</b><H2 ALIGN=CENTER> 3.VDP1 3D guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A><P><P><DT><H3> 3.1 Purpose</H3><DD> The purpose is to display 3D sprites using the VDP1 extended processing library.<BR>
+ The features are shown below.</P>
+<DT><UL TYPE="DISK">
+<P><LI> You can handle models in which objects, which are collections of polygons, are connected hierarchically.</P>
+<P><LI> There is no need to be aware of the model or the matrix operations involved in moving objects within the model.</P>
+<P><LI> The coordinate value of the point after conversion to the world coordinate system is notified to the user application through the user callback routine.</P>
+<P><LI> Texture mapping and various sprite color modes can be applied to polygon display.</P>
+<P><LI> Can be displayed together with 2D sprites.</P>
+</UL>
+<A NAME="no3_20"></A><P><DT><H3> 3.2 3D coordinate system and display model</H3><P><DT> <B>[Coordinate system]</b><P ALIGN=CENTER><img srcset="../grp/i009_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The distance from the viewpoint to the screen is fixed at 1.0.</P>
+<P><DT> <B>[Display model]</b><DD> The display model is a collection of polygon objects connected in a hierarchical structure as clusters as shown below. Clusters have a parent-child relationship, and the positions of objects in child clusters are located in the body coordinate system of the parent cluster. Therefore, when a parent cluster moves, all child clusters connected below it move.</P>
+<DD><PRE>
+┏━━━━━━━━━┓   ┏━━━━━━━━━┓            
+┃Object0  ┃   ┃Object1  ┃            
+┗━━━━━━━━━┛   ┗━━━━━━━━━┛            
+   :             :                 
+   :          ┌─────────┐            
+   :        ┌─┤Cluster10│            
+   :        │ └─────────┘            
+   :        │                      
+┌─────────┐ │ ┌─────────┐            
+│Cluster00├─┼─┤Cluster11│            
+└─────────┘ │ └─────────┘   ┌─────────┐
+ Root       │             ┌─┤Cluster20│
+ cluster    │ ┌─────────┐ │ └─────────┘
+            └─┤Cluster12├─┤          
+              └─────────┘ │ ┌─────────┐
+                          └─┤Cluster21│
+                            └─────────┘
+</PRE><A NAME="no3_30"></A><P><DT><H3>3.3 Program description example</H3><DD> An example of an actual program in C language is shown below.</P>
+<DD><PRE>
+#include&lt; machine.h&gt;
+#define _SPR3_ /* Use sprite 3D display library */
+#define SPR_3USE_DOUBLE_BUF /* Double buffer specification */
+#include "sega_spr.h"
+#include "sega_scl.h"
+#include "sega_int.h"
+
+SprCluster model0;
+SprCluster model1;
+
+#define COMMAND_MAX 1000 /* Maximum number of commands */
+#define GOUR_TBL_MAX 1000 /* Maximum number of GOUR_TBL_MAX */
+#define LOOKUP_TBL_MAX 1000 /* Maximum number of lookup tables */
+#define CHAR_MAX 100 /* Maximum number of characters */
+#define DRAW_PRTY_MAX 256 /* Maximum number of drawing priority blocks */
+SPR_2DefineWork(work2d, COMMAND_MAX, GOUR_TBL_MAX,
+                                 LOOKUP_TBL_MAX, CHAR_MAX, DRAW_PRTY_MAX)
+                                       /* 2D work area definition */
+#define OBJ_SURF_MAX 16 /* Maximum number of surfaces in object */
+#define OBJ_VERT_MAX 16 /* Maximum number of vertices in object */
+SPR_3DefineWork(work3d, OBJ_SURF_MAX, OBJ_VERT_MAX)
+                                       /* 3D display work area definition */
+</PRE><P><DD><PRE>
+extern void vbStart(void); /* V-BLANK IN interrupt routine */
+extern void vbEnd(void); /* V-BLANK OUT interrupt routine */ 
+main()
+{
+     set_imask(0); /* Enable interrupts */
+
+     SCL_Vdp2Init(); /* Scroll and priority initialization */
+     SCL_SetPriority(SCL_SP0|SCL_SP1|SCL_SP2|SCL_SP3|SCL_SP4|
+                              SCL_SP5|SCL_SP6|SCL_SP7,7);
+     SCL_SetSpriteMode(SCL_TYPE1,SCL_MIX,SCL_SP_WINDOW);
+
+     SPR_2Initial(&work2d); /* 2D sprite display initialization */
+
+     SPR_3Initial(&work3d); /* 3D sprite display initialization */
+
+     INT_ChgMsk(INT_MSK_NULL, INT_MSK_VBL_IN | INT_MSK_VBL_OUT);
+                                       /* Disable V-BLANK interrupt */
+     INT_SetFunc(INT_SCU_VBLK_IN, &vbStart);
+                                       /* Registering V-BLANK IN interrupt routine */
+     INT_SetFunc(INT_SCU_VBLK_OUT, &vbEnd);
+                                       /* Register V-BLANK OUT interrupt routine */
+     INT_ChgMsk( INT_MSK_VBL_IN | INT_MSK_VBL_OUT, INT_MSK_NULL);
+                                       /* Enable V-BLANK interrupt */
+
+     SPR_2FrameChgIntr(0xffff); /* Undefined frame change interval */
+                                       /* set to mode */
+
+     SPR_3SetTexture(texture); /* Set texture data for 3D */
+
+     for(;;) {
+           --------------- /* Scroll data set */
+
+          SPR_3SetLight(...); /* Set 3D light source */
+          SPR_3SetView(...); /* Set of 3D viewpoints */
+
+          SPR_2OpenCommand(SPR_2DRAW_PRTY_ON); 
+                                       /* Open for writing sprite command */
+          SPR_2SysClip(SPR_2MOST_FAR,&xy);
+                                       /* System clip area command */
+          SPR_2LocalCoord(SPR_2MOST_FAR,&xy); 
+                                       /* Local coordinate command */
+
+          SPR_3moveCluster(model0,...);/* Move root cluster of 3D model 0 */
+          SPR_3DrawModel(model0,...); /* Register 3D model 0 */
+
+          SPR_3moveCluster(model1,...);/* Move root cluster of 3D model 1 */
+          SPR_3DrawModel(model1,...); /* Register 3D model 1 */
+                            .
+                            .
+                            .
+          SPR_3Flush(); /* 3D sprite command set */
+          SPR_2CloseCommand(); /* Close sprite command writing */
+          SCL_DisplayFrame(); /* Wait for V-BLANK interrupt, */
+                                       /* Display sprite and perform scrolling */
+      }
+}
+
+−V blank processing routine (source file separate from the main above) −
+
+#include&lt; machine.h&gt;
+#include "sega_spr.h"
+#include "sega_scl.h"
+
+#pragma interrupt(VbStart)
+#pragma interrupt(VbEnd)
+
+void VbStart(void)
+{
+     SCL_VblankStart(); /* V blank start VDP interrupt processing */
+     -------- /* Other V blank start processing */
+ }
+
+void VbEnd(void)
+{
+     SCL_VblankEnd(); /* V blank end VDP interrupt processing */
+      -------- /* Other V blank end processing */
+}
+</PRE></P>
+<P><DD>Z-sorting of polygons in the viewpoint coordinate system of the sprite 3D display library is performed using the sprite command priority drawing function of the VDP1 extended processing library (2D library), so to perform Z-sorting of polygons, turn on priority drawing with the SPR_2OpenCommand() routine. (SPR_2DRAW_PRTY_ON).</P>
+<A NAME="no3_40"></A><P><DT><H3> 3.4 Connecting polygon objects between objects</H3><DD> If you want to display Object2 deformed according to the movement of Object1 as shown in the figure below, you can automatically deform the drawing by defining Object2, which is a polygon between Object0 and Object1, as an inter-object connection polygon object.</P>
+<P ALIGN=CENTER><img srcset="../grp/i013_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The cluster, object, and inter-object connection polygon information tables are connected as shown below.</P>
+<PRE>
+                  Child                  
+┌──────────────────┐ ┌──────────────────┐
+│     Cluster0     │→│     Cluster1     │
+└──────────────────┘ └──────────────────┘
+     :         :          :         :    
+     ↓         ↓          ↓         ↓    
+┌─────────┐┌───────┐ ┌─────────┐┌───────┐
+│InbetInf0││Object0│ │InbetInf1││Object1│
+└─────────┘└───────┘ └─────────┘└───────┘
+                                    :    
+                                    ↓    
+                                ┌───────┐
+                                │Object2│
+                                └───────┘
+</PRE><P><DT><B>[Processing polygon objects connected between objects]</b><DT><OL>
+<P><LI> Objects are drawn in the order of parent cluster to child cluster, and if multiple objects are connected to a cluster, they are drawn in the order of connection.<BR>
+ In the above example, Object0, Object1, Object2 are drawn in this order.</P>
+<P><LI> When drawing, if object-to-object connection polygon information is connected to a cluster, the vertex data that has been converted to the viewpoint coordinate system is set in the vertex data table of the corresponding object-to-object connection polygon object according to the specified table.<BR>
+ If Gouraud shading is used, set the calculated vertex brightness in the vertex normal data table of the object-to-object connection polygon object.<BR>
+ In the above example, InbetInf0 sets Object0's viewpoint coordinate system vertex data (0,1,2,3) to Object2's vertex data (4,5,6,7), and InbetInf1 sets Object1's viewpoint coordinate system vertex data ( 4,5,6,7) to the vertex data (0,1,2,3) of Object2.</P>
+<P><LI> If the drawing object is an inter-object connection polygon object, the normal vector of each face is calculated from the vertices that have been converted to the viewpoint coordinate system, and drawn according to the drawing mode.<BR>
+ In the above example, Object2 is the object-to-object connection polygon object.</P>
+<P><LI> Setting conditions for polygon objects connecting objects</P>
+<DD><UL TYPE="DISK">
+<P><LI> When connecting to a cluster as one of multiple objects, connect at the end of the object chain.</P>
+<P><LI> The calculation correction value of the surface normal vector in the object table is set as a negative value.</P>
+</UL>
+</OL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no3">VDP1 library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

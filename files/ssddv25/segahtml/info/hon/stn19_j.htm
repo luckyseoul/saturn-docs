@@ -1,0 +1,105 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE> SEGASATURN Developer's Information STN-19 </TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../index_j.htm">INDEX</A>
+▲
+|<a href="stn06_j.htm">STN-6</A>
+|<a href="stn09_j.htm">STN-9</A>
+|<a href="stn18_j.htm">STN-18</A>
+|<B>STN-19</B>
+|<a href="stn21_j.htm">STN-21</A>
+|<a href="stn22_j.htm">STN-22</A>
+|<a href="stn23_j.htm">STN-23</A>
+▼
+<HR NOSHADE>
+<H1 ALIGN=CENTER>STN-19</H1>
+<H2 ALIGN=CENTER>ＧＦＳ使用時のＣＤブロックの初期化方法</H2>
+<HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発行番号：</TH><TD>STN-19</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発 行 日：</TH><TD>95/01/20</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>メディア：</TH><TD>○共　通</TD><TD>●CD-ROM</TH><TD>○カートリッジ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>関　　連：</TH><TD>●プログラム</TD><TD>○ハード</TD><TD>○マニュアル</TD><TD>○ツール</TD><TD>○ゲーム</TD><TD>○バグ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>情報区別：</TH><TD>○新　規</TD><TD>●変　更</TD><TD>○追　加</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>重 要 度：</TH><TD>●厳　守</TD><TD>○推　奨</TD><TD>○参　考</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>添付資料：</TH><TD>●無</TH><TD>○有</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>件名補足：</TH><TD COLSPAN=7>対象ライブラリ：GFS Ver1.13以降</TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER>内　容</H3>
+<P>　ファイルシステムの初期化関数 <a href="../../prgg/prg1/file/hon/p08_11_j.htm#no1_1">GFS_Init()</A>は、ECC/リトライ回数を最大値に設定
+ するため、CDブロックの初期化関数 <a href="../../prgg/sysg/cdif/hon/p08_11_j.htm#no1_7">CDC_CdInit()</A>を実行します。具体的な設定内容は以下の通りです。</P>
+                                                                            
+<CENTER>
+<TABLE BORDER=1>
+<CAPTION><B>CDC_CdInit(0,0,5,0x0f);</B></CAPTION>
+<TR><TH ALIGN=LEFT>初期化フラグ：    </TH><TD ALIGN=CENTER>　デフォルト値　</TD></TR>
+<TR><TH ALIGN=LEFT>スタンバイタイム：</TH><TD ALIGN=CENTER>　デフォルト値　</TD></TR>
+<TR><TH ALIGN=LEFT>ＥＣＣ回数：      </TH><TD ALIGN=CENTER>　５回</TD></TR>
+<TR><TH ALIGN=LEFT>リトライ回数：    </TH><TD ALIGN=CENTER>１５回</TD></TR>
+</TABLE></CENTER>
+
+
+<P>　GFSの使用時にこれらの設定値を変更したい場合は、GFS_Initを呼び出した後で
+ CDC_CdInit関数を実行してください。<BR>設定を変更しない指定も可能なので、目的とす
+ るパラメータだけを変更できます。</P>
+
+<H3>■サンプルプログラム</H3>
+<PRE>
+	#include "sega_gfs.h"
+
+	#define	STNBY	90	/*スタンバイタイム:90秒*/
+	#define	NOCHG	-1	/*未変更指定*/
+
+	Sint32	sampleInit(void)
+	{
+		Sint32	ret;
+
+	/*ファイルシステムの初期化*/
+	ret = SGF_Init(......);
+	if (ret < 0){
+		return  NG;
+	}
+
+	/*スタンバイタイムの変更(他は未変更)*/
+	ret = CDC_CdInit(NOCHG, STNBY, NOCHG);
+	if (ret! = CDC_ERR_OK) {
+		return	NG;
+	}
+	return	OK;
+</PRE>
+以上
+<HR NOSHADE>
+  <a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../index_j.htm">INDEX</A>
+▲
+|<a href="stn06_j.htm">STN-6</A>
+|<a href="stn09_j.htm">STN-9</A>
+|<a href="stn18_j.htm">STN-18</A>
+|<B>STN-19</B>
+|<a href="stn21_j.htm">STN-21</A>
+|<a href="stn22_j.htm">STN-22</A>
+|<a href="stn23_j.htm">STN-23</A>
+▼
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,118 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>DGT2 data format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR NOSHADE>
+<CENTER>
+<H1> DGT2 data format</H1></CENTER>
+<HR>
+<DL>
+<P><DT><H3> ■File layout</H3><DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> word</TD><TD><PRE> <A HREF="#no1">identifier</a></TD></TR>
+<TR><TD><PRE> $02</TD><TD><PRE> $04</TD><TD><PRE> <A HREF="#no2">image size</a></TD></TR>
+<TR><TD><PRE> $06</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no3">CLUT (present if required)</a></TD></TR>
+<TR><TD><PRE> variable</TD><TD><PRE> variable</TD><TD><PRE> <A HREF="#no4">bitmap data</a></TD></TR>
+</TABLE>
+<A NAME="no1"></A><P><DT> <B>◆Identifier</b><DD><TABLE BORDER=1>
+<TR><TH> "PP"</TH><TD><PRE> Palette mode 256 colors/32768 colors</TD></TR>
+<TR><TH> "DC"</TH><TD><PRE> RGB mode 32768 colors</TD></TR>
+<TR><TH> "RL"</TH><TD><PRE> Run length mode 256 colors/32768 colors</TD></TR>
+<TR><TH> "FP"</TH><TD><PRE> Palette mode 256 colors/approximately 16.77 million colors</TD></TR>
+<TR><TH> "FC"</TH><TD><PRE> RGB mode approximately 16.77 million colors</TD></TR>
+<TR><TH> "pp"</TH><TD><PRE> Palette mode 16 colors/32768 colors</TD></TR>
+<TR><TH> "fp"</TH><TD><PRE> Palette mode 16 colors/approximately 16.77 million colors</TD></TR>
+</TABLE>
+<A NAME="no2"></A><P><DT> <B>◆Image size</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> Explanation</TH></TR>
+<TR><TD><PRE> $00</TH><TH><PRE> word</TH><TH><PRE> H image size</TH></TR>
+<TR><TD><PRE> $02</TH><TH><PRE> word</TH><TH><PRE> V image size</TH></TR>
+</TABLE>
+<A NAME="no3"></A><P><DT> <B>◆CLUT</b><DD> Exists in palette mode and run length mode.<DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> $00</TD><TD><PRE> word or<BR> Long x number of pallets (16 or 256)</TD><TD><PRE> CLUT data</TD></TR>
+</TABLE>
+<P><DD> <B>●For "PP"/"RL" mode, number of pallets = 256 For "pp" mode, number of pallets = 16</b><PRE>
+MSB     Color data            LSB
+│ │ Blue │ Green │ Red │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│*│4│3│2│1│0│4│3│2│1│0│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><P><DD><B>●For "FP" mode, number of pallets = 256 For "fp" mode, number of pallets = 16</b><PRE>
+MSB             │ Color code
+│               │     Blue      │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│*│−│−│−│−│−│−│−│7│6│5│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+　
+                              LSB
+│     Green     │     Red       │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│7│6│5│4│3│2│1│0│7│6│5│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><DD>* = Can be set freely (usually = 1b)<A NAME="no4"></A><P><DT> <B>◆Bitmap data</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> offset</TH><TH><PRE> size</TH><TH><PRE> function</TH></TR>
+<TR><TD><PRE> From $00</TH><TH><PRE> variable</TH><TH><PRE> bitmap data</TH></TR>
+</TABLE>
+<P><DD> <B>●For "PP"/"FP" mode: 8bit/dot</b><PRE>
+MSB           LSB
+│ Palette code  │
+┌─┬─┬─┬─┬─┬─┬─┬─┐
+│7│6│5│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><P><DD><B>●For "DC" mode: 16bit/dot</b><PRE>
+MSB        Color data         LSB
+│ │  Blue   │  Green  │   Red   │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│*│4│3│2│1│0│4│3│2│1│0│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><DD>* = Can be set freely (usually = 1b)<P><DD> <B>●For "FC" mode: 32bit/dot</b><PRE>
+MSB             │ Color code
+│               │     Blue      │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│*│−│−│−│−│−│−│−│7│6│5│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+　
+                              LSB
+│    Green      │      Red      │
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│7│6│5│4│3│2│1│0│7│6│5│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE><DD>* = Can be set freely (usually = 1b)<P><DD> <B>●For "pp"/"fp" mode: 4bit/dot</b><PRE>
+MSB                           LSB
+│Even coordinate│Odd coordinate │
+│code           │code           │
+┌───┬───┬───┬───┬───┬───┬───┬───┐
+│ 3 │ 2 │ 1 │ 0 │ 3 │ 2 │ 1 │ 0 │
+└───┴───┴───┴───┴───┴───┴───┴───┘
+</PRE><P><DD><B>●For "RL" mode:</b><PRE>
+
+MSB                           LSB
+│   Run length  │ CLUT index num│
+┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│7│6│5│4│3│2│1│0│7│6│5│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE></DL>
+<HR NOSHADE>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

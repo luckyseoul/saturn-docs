@@ -1,0 +1,96 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/17&gt;プログラマーズガイド/ファイルシステムライブラリ/2．基本事項</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#intr">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<H2 ALIGN=CENTER>2．基本事項</H2>
+<HR NOSHADE>
+<DL>
+
+<A NAME="no2_10"></A>
+	<P><DT><H3>2.1　用語の定義</H3>
+		<DD>　ファイルシステムライブラリの説明で使用する用語を表2.1に定義します。</P>
+
+<A NAME="t2_1"></A>
+	<P><DD><B>表2.1　用語の定義</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH width=155><PRE>用語</TH><TH><PRE>意味</TH></TR>
+	<TR><TD><PRE>CDバッファ</TD><TD><PRE>CDから読み込んだデータをセクタ単位で格納するバッ<BR>ファ。200セクタ分の容量があります。</TD></TR>
+	<TR><TD><PRE>DOSファイル</TD><TD><PRE>SCSIインタフェース経由でアクセス可能なIBM-PC上の<BR>ファイル。デバッグ用ライブラリで使用可能。</TD></TR>
+	<TR><TD><PRE>メモリファイル</TD><TD><PRE>SIMM上に配置されたファイル。デバッグ用ライブラリ<BR>で使用可能です。</TD></TR>
+	<TR><TD><PRE>アクセスポインタ</TD><TD><PRE>ファイルをアクセスする位置（単位：セクタ）。</TD></TR>
+	<TR><TD><PRE>カレントディレクトリ</TD><TD><PRE>ファイルのオープン時に参照されるディレクトリ。</TD></TR>
+	<TR><TD><PRE>デバッグファイル</TD><TD><PRE>DOSファイルとメモリファイルの総称。</TD></TR>
+	<TR><TD><PRE>バッファ区画</TD><TD><PRE>CDバッファを複数の論理的な区画に区分けしたもの。<BR>オープンされたファイル一つにつき、一つのバッファ区<BR>画が専有されます。</TD></TR>
+	<TR><TD><PRE>ファイル識別子</TD><TD><PRE>ファイルを識別するためのディレクトリ内の順序番号。<BR>0〜(ディレクトリレコード数−1)の値を取ります。た<BR>だし、0は自分のディレクトリ、1は親ディレクトリを示<BR>します。</TD></TR>
+	<TR><TD><PRE>フレームアドレス<BR>(FAD)</TD><TD><PRE>CD上の絶対時間00:00:00を0として、フレーム単位に連<BR>続的に番号を付けたもの。絶対時間と1対1に対応しま<BR>す。CDに対しては、絶対時間ではなく、フレームアドレ<BR>スをキーとしてアクセスします。</TD></TR>
+	<TR><TD><PRE>メイン処理</TD><TD><PRE>CPUのリセットから始まる一連の処理。割り込み処理に<BR>対する用語です。</TD></TR>
+	<TR><TD><PRE>割り込み処理</TD><TD><PRE>割り込みによって起動される処理。メイン処理に対する<BR>用語です。</TD></TR></TABLE></P>
+
+<A NAME="no2_20"></A>
+	<P><DT><H3>2.2　表記法</H3>
+		<DD>　ファイルシステムの説明で用いられる表記について説明します。</P>
+
+	<P><DT><B>　(1)名前のグループ化</B>
+		<DD>　ABC_〜は、ABC_で始まる名前がいくつかあることを表します。たとえばABC_X, ABC_Y, ABC_Zなどです。</P>
+
+	<P><DT><B>　(2)シンボル指定</B>
+		<DD>　!MMM/SSS、はモジュールMMMで定義されたSSSというシンボルを表します。E7000のコマンドで用いられる記法でもあります。</P>
+
+	<P><DT><B>　(3)16進数表記</B>
+		<DD>　後ろに「H」がついている数値は16進数であることを表します。</P>
+
+<A NAME="no2_30"></A>
+	<P><DT><B>2.3　名前の制限</B>
+		<DD>　ファイルシステムライブラリでは関数名、変数名、型名、マクロ名として次のような名前を使用しています。</P>
+
+	<P><DD><TABLE>
+	<TR><TH><PRE>関数名、変数名</TH><TD><PRE>　GF〜 および gf〜</TD><TR>
+	<TR><TH><PRE>型　名</TH><TD><PRE>　Gf〜</TD><TR>
+	<TR><TH><PRE>マクロ名</TH><TD><PRE>　GF〜</TD></TR></TABLE></P>
+
+	<P><DD>　このライブラリを使用するアプリケーションでは、これらの名前とぶつからないように注意が必要です。</P>
+
+<A NAME="no2_40"></A>
+	<P><DT><B>2.4　アクセスマクロ</B>
+		<DD>　ファイルシステムライブラリを含むCDライブラリでは、構造体のメンバを「アクセスマクロ」と呼ぶマクロを用いて参照します。アクセスマクロではメンバの値の取得／設定とも可能です。<BR>　アクセスマクロを用いることにより次の利点が得られます。<BR>
+
+	<P><DT><UL TYPE="DISK">
+		<LI>メンバへのアクセス形式が統一できる。
+		<LI>特定の構造体メンバをアクセスしている部分の抽出が簡単になる。</UL></P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#intr">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

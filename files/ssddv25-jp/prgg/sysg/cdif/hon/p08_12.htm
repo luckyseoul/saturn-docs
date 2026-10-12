@@ -1,0 +1,185 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/19&gt;CD通信I/F(CDパート)/関数詳細-2</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(CDパート)</A>
+<HR>
+<B>▲
+<A HREF="p08_11.htm">戻る</A>｜
+<A HREF="p08_13.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル(CDパート)</B>
+<H2 ALIGN=CENTER>関数詳細-2</H2>
+<HR NOSHADE>
+<H3>8.2.2 CDドライブ</H3>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no2_1"><HR></A><DL>
+	<P><DD>　〈OPEN〉,〈NODISC〉状態におけるトレイの開閉は、
+CDブロックの初期化(<B><A HREF="p08_11.htm#no1_7">CDC_CdInit</A></B>)を参照してください。</P>
+<P><DT><TABLE border><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_2">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>CD再生</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_CdPlay</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.1</H4></TD>
+</TR></TABLE></P>
+<DT><B>　書　式</B><DD>Sint32　CDC_CdPlay(CdcPly *ply)
+<DT><B>　入　力</B><DD>ply：再生パラメータ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　機　能</B><DD>指定した再生パラメータに従って、CDを再生します。<BR>
+CD-DA領域では音楽を再生し、CD-ROM領域ではセクタデータをリードします。<BR>
+CD-ROMとCD-DAの境界にあるギャップ／ポーズ領域は再生しないでください。<BR>
+	<P>	<DT><B>　注　意</B>
+		<DD>CD-DAを再生して実際に音声を出力するには、別途SCSPの設定が必要です。設定方法についてはSCSPのマニュアルを参照してください。</P>
+
+	<P>	<DT><B>　備　考</B>
+		<DD>CD-DAの再生では、曲の頭切れを防ぐため開始位置の4フレーム前でミュート解除しています。
+
+	<P>	<DT><B>　　例　</B><DD>
+		<DT><B>　(1)フレームアドレス指定</B>
+		<DD><PRE>
+Sint32 ret;
+CdcPly plywk, *ply=&amp;plywk;          /*　再生パラメータ変数の定義　*/
+CDC_PLY_STYPE(ply)=CDC_PTYPE_FAD;
+CDC_PLY_SFAD(ply) =fad;             /*　開始フレームアドレス　　　*/
+CDC_PLY_ETYPE(ply)=CDC_PTYPE_FAD;
+CDC_PLY_EFAS(ply) =fasnum;          /*　フレームアドレスセクタ数　*/
+CDC_PLY_PMODE(ply)=pmode;           /*　再生モード　　　　　　　　*/
+ret = CDC_CdPlay(ply);              /*　再生開始　　　　　　　　　*/
+</PRE></P>
+
+	<P>	<DT><B>　(2)トラック／インデックス指定</B>
+		<DD><PRE>
+CdcPly plywk, *ply=&amp;plywk;
+CDC_PLY_STYPE(ply)=CDC_PTYPE_TNO;
+CDC_PLY_STNO(ply) =tno1;            /*　開始トラック番号　　　*/
+CDC_PLY_SIDX(ply) =x1;              /*　開始インデックス番号　*/
+CDC_PLY_ETYPE(ply)=CDC_PTYPE_TNO;
+CDC_PLY_ETNO(ply) =tno2;            /*　終了トラック番号　　　*/
+CDC_PLY_EIDX(ply) =x2;              /*　終了インデックス番号　*/
+CDC_PLY_PMODE(ply)=pmode;           /*　再生モード　　　　　　*/
+ret = CDC_CdPlay(ply);
+</PRE></P>
+
+	<P><DT><B>　(3)省略値の指定</B>
+		<DD><PRE>
+CdcPly plywk, *ply=&amp;plywk;
+CDC_PLY_STYPE(ply)=CDC_PTYPE_DFL;   /*　開始位置はディスク先頭　　　　　　　　*/
+CDC_PLY_ETYPE(ply)=CDC_PTYPE_DFL;   /*　終了位置はディスク最後　　　　　　　　*/
+CDC_PLY_PMODE(ply)=CDC_PM_DFL;      /*　リピートなし、ピックアップを移動する　*/
+ret = CDC_CdPlay(ply);
+</PRE></P>
+
+	<P>	<DT><B>　(4)CD再生の再開（未変更の指定：現在位置から再生）……ポーズ解除</B>
+		<DD><PRE>
+CdcPly plywk, *ply=&amp;plywk;
+CDC_PLY_STYPE(ply)=CDC_PTYPE_NOCHG;
+CDC_PLY_ETYPE(ply)=CDC_PTYPE_NOCHG;
+CDC_PLY_PMODE(ply)=CDC_PM_NOCHG;
+ret = CDC_CdPlay(ply);
+</PRE></P>
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no2_2"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_2">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>再生位置のシーク</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_CdSeek</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.2</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_CdSeek(CdcPos *pos)
+<DT><B>　入　力</B><DD>pos：位置パラメータ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　機　能</B><DD>指定した位置パラメータに従って、再生位置(ピックアップ)を移動（シーク）します。<P>
+
+	<P>	<DT><B>　注　意</B>
+		<DD>　CD再生の終了時にストップコマンドを使うと、再度CDをアクセスする時に遅くなります。CDへのアクセスを続ける限り、通常はポーズコマンドを使ってください。</P>
+
+	<P>	<DT><B>　　例</B>
+		<DT><B>　(1)フレームアドレス指定</B>
+		<DD><PRE>
+Sint32 ret;
+CdcPos poswk, *pos=&amp;poswk;            /*　位置パラメータ変数の定義　*/
+CDC_POS_PTYPE(pos)=CDC_PTYPE_FAD;
+CDC_POS_FAD(pos) =fad;                /*　フレームアドレス　　　　　*/
+ret = CDC_CdSeek(pos);                /*　シーク開始　　　　　　　　*/
+</PRE></P>
+
+	<P>	<DT><B>　(2)トラック／インデックス指定</B>
+		<DD><PRE>
+CdcPos poswk, *pos= &amp;poswk;
+CDC_POS_PTYPE(pos)=CDC_PTYPE_TNO;
+CDC_POS_TNO(pos) =tno;                /*　トラック番号　　　*/
+CDC_POS_IDX(pos) =x;                  /*　インデックス番号　*/
+ret = CDC_CdSeek(pos);
+</PRE></P>
+
+	<P>	<DT><B>　(3)CD再生の中止（省略値の指定：ホーム位置へシーク）……ストップ</B>
+		<DD><PRE>
+CdcPos poswk, *pos=&amp;poswk;
+CDC_POS_PTYPE(pos)=CDC_PTYPE_DFL;
+ret = CDC_CdSeek(pos);
+</PRE></P>
+
+	<P>	<DT><B>　(4)CD再生の一時停止（未変更の指定：現在位置へシーク）……ポーズ</B>
+		<DD><PRE>
+CdcPos poswk, *pos=&amp;poswk;
+CDC_POS_PTYPE(pos)=CDC_PTYPE_NOCHG;
+ret = CDC_CdSeek(pos);
+</PRE></P>
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no2_3"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_2">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>スキャン再生</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_CdScan</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.3</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_CdScan(Sint32 scandir)
+<DT><B>　入　力</B><DD>scandir　：スキャン方向
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　機　能</B><DD>CDをスキャン再生します。
+CDドライブコマンド(CD再生、シークなど)が発行されるまでスキャンを続けます。再生範囲外に達するとスキャンは解除されポーズになります。その時のポーズ位置は不定です。
+
+	<P>	<DT><B>　(1)スキャン方向</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH=100><PRE>定数名</TH><TH WIDTH=420><PRE>説　明</TH></TR>
+	<TR><TD><PRE>CDC_SCAN_FWD</TD><TD><PRE>早送り再生（順方向スキャン）</TD></TR>
+	<TR><TD><PRE>CDC_SCAN_RVS</TD><TD><PRE>早戻し再生（逆方向スキャン）</TD></TR></TABLE></P>
+
+	<P>	<DT><B>　(2)音声の出力</B>
+		<DD>〈PLAY〉状態からスキャン再生すると、CD-DA領域では−12dBの音出しをします。<BR>
+CD-ROM領域や〈PAUSE〉状態でスキャン再生すると、音声は消音されます。</P>
+
+	<P>	<DT><B>　備　考</B>
+		<DD>CD-ROM領域をスキャン再生した場合、セクタデータはリードされません。
+再生範囲境界付近でスキャン方向を逆転させようとすると、再生範囲外に出てしまう可能性があります。逆転させる場合は境界付近(3〜6秒以内)に注意します。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p08_11.htm">戻る</A>｜
+<A HREF="p08_13.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

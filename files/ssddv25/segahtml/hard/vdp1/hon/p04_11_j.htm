@@ -1,0 +1,146 @@
+﻿<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/54&gt;VDP1ユーザーズマニュアル/4.1TVモード選択レジスタ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p04_10_j.htm">戻る</A>｜
+     <a href="p04_12_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第４章　システムレジスタ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A>
+	<P>	<DT><H2>■4.1　TVモード選択レジスタ</H2>
+		<DD>　TVモード選択レジスタ(TVMR、TV mode register)は、Vブランクイレース許可とTVの表示モードを指定します。書き込み専用の16ビットのレジスタで、100000H番地にあります。
+		電源投入後またはリセット後は、値は不定になりますので、必ずTVの表示モードを設定してください。未使用ビットは0に固定してください。</P>
+
+	<P>	<DT><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH ROWSPAN=2><PRE>TVMR<BR>100000H<BR>(W)</TH>
+	<TH><PRE>bit15</TH><TH><PRE>bit14</TH><TH><PRE>bit13</TH><TH><PRE>bit12</TH><TH><PRE>bit11</TH><TH><PRE>bit10</TH><TH><PRE>bit９</TH><TH><PRE>bit８</TH>
+	<TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+	<TR ALIGN=CENTER>
+	<TD>0</TH><TD>0</TH><TD>0</TH><TD>0</TH><TD>0</TH><TD>0</TH><TD>0</TH><TD>0</TH><TD>0</TH><TD>0</TH><TD>0</TH><TD>0</TH><TD><A HREF="#VBE_">VBE</A></TH><TD COLSPAN=3><A HREF="#TVM_">TVM</A></TH></TR>
+	</TABLE></P>
+
+<A NAME="VBE_"></A>
+	<P>	<DT><B>Vブランクイレースライト許可ビット:</B>V　blank　erase/write　enable (VBE)、bit3</P>
+
+	<P>	<DT><UL TYPE=DISC>
+		<LI>VBE＝1にすると、Vブランク中にイレースライトを行います。VBE＝1は、FCM＝1、FCT＝1を書き込んだときのみ設定可能です。詳しくは、「<B><a href="p04_12_j.htm">4.2フレームバッファ切り替えモードレジスタ</A></B>」を参照してください。</P>
+
+	<P>	<LI>VBEの値を0または1に設定するときは、設定前と同じ値のTVMを必ず同時に設定してください。</P>
+
+	<P>	<LI>VBEの設定は、VブランクINインタラプトの直後に行ってください。VブランクINインタラプト後の最初のHブランクINインタラプトから、次のHブランクINインタラプトまでは、アクセスが禁止されます。</UL></P>
+
+
+<A NAME="TVM_"></A>
+	<P>	<DT><B>TVモード選択ビット:</B>TV mode select(TVM)、bit2〜0</P>
+
+	<P>	<DT><UL TYPE=DISC>
+		<LI>TVの表示モードを指定します。</P>
+
+	<P>	<LI>表示されるエリアの座標値については「<B><a href="p01_20_j.htm">画面モードと表示範囲</A></B>」を参照してください。</P>
+
+	<P>	<LI>TVM=010B(2)のとき、フレームバッファは横512×縦256ピクセル分しかありませんので、大きく画面を傾けると、表示画面に透明領域が発生します。</P>
+
+	<P>	<LI>HDTV指定時(TVM=100B(4))はノンインタレースのみ、回転表示指定時(TVM=010B(2)、011B(3))はノンインタレース、単密インタレースのみ設定可能なので、必ず、フレームバッファ切り替えモードレジスタで倍密インタレース無効(DIEビット=0)にしてください。
+		詳しくは「<B><a href="p04_12_j.htm">4.2　フレームバッファ切り替えモードレジスタ</A></B>」を参照してください。</P>
+
+	<P>	<LI>TVMの設定は、VブランクINインタラプト後２度目のHブランクINインタラプトから、VブランクOUTインタラプト直後のHブランクINインタラプトまでの間で行ってください。</P>
+
+	<P>	<LI>各ビットの機能は次のとおりですがビットの組み合わせに制限がありますので表4.2の設定値は厳守してください。</P>
+
+<A NAME="TVM_2"></A>
+	<P>	<DT><B>ビット2:HDTV有効ビット</B>
+		<DD>0=NTSC、PAL
+		<DD>1=HDTV、31kHz</P>
+
+<A NAME="TVM_1"></A>
+	<P>	<DT><B>ビット1:フレームバッファ回転有効ビット</B>
+		<DD>0=非回転
+		<DD>1=回転</P>
+
+<A NAME="TVM_0"></A>
+	<P>	<DT><B>ビット0:ビット幅選択ビット</B>
+		<DD>0=16bit/pixel
+		<DD>1= 8bit/pixel</P>
+	</DU>
+
+<A NAME="t4_2"></A>
+	<P>	<DD><B>表4.2　画面モード</B>
+		<DT><TABLE BORDER=1>
+<TR><TD COLSPAN=3><PRE>TVM</TD><TD COLSPAN=2><PRE>画面モード</TD><TD ROWSPAN=2><PRE>ビット幅</TD><TD ROWSPAN=2><PRE>フレームバッファ<BR>画面サイズ</TD><TD ROWSPAN=2><PRE>インタ<BR>レース</TD><TD COLSPAN=2><PRE>VDP CLK（MHz）</TD></TR>
+<TR ALIGN=CENTER><TD><PRE>bit2</TD><TD><PRE>bit1</TD><TD><PRE>bit0</TD><TD><PRE>名称</TD><TD><PRE>解像度</TD><TD><PRE>NTSC時</TD><TD><PRE>PAL時</TD></TR>
+
+<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>ノーマル<BR>（NTSC、PAL）</TD>
+	<TD><PRE>320×224<BR>320×240<BR>352×224<BR>352×240</TD>
+	<TD><PRE>16bit／pixel</TD>
+	<TD><PRE>横512<BR>×<BR>縦256</TD>
+	<TD><PRE>可能</TD>
+	<TD><PRE>26.8426<BR>26.8426<BR>28.6364<BR>28.6364</TD>
+	<TD><PRE>26.6564<BR>26.6564<BR>28.4375<BR>28.4375</TD></TR>
+
+<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>ハイレゾ<BR>（NTSC、PAL<BR>ハイレゾ）</TD>
+	<TD><PRE>640×224<BR>640×240<BR>704×224<BR>704×240</TD>
+	<TD><PRE>8bit／pixel</TD>
+	<TD><PRE>横1024<BR>×<BR>縦256</TD>
+	<TD><PRE>可能</TD>
+	<TD><PRE>26.8426<BR>26.8426<BR>28.6364<BR>28.6364</TD>
+	<TD><PRE>26.6564<BR>26.6564<BR>28.4375<BR>28.4375</TD></TR>
+
+<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>回転16<BR>（NTSC、PAL<BR>回転）</TD>
+	<TD><PRE>320×224<BR>320×240<BR>352×224<BR>352×240</TD>
+	<TD><PRE>16bit／pixel</TD>
+	<TD><PRE>横512<BR>×<BR>縦256</TD>
+	<TD><PRE>単密のみ<BR>可能</TD>
+	<TD><PRE>26.8426<BR>26.8426<BR>28.6364<BR>28.6364</TD>
+	<TD><PRE>26.6564<BR>26.6564<BR>28.4375<BR>28.4375</TD></TR>
+
+<TR ALIGN=CENTER><TD><PRE>0</TD><TD><PRE>1</TD><TD><PRE>1</TD><TD><PRE>回転8<BR>（NTSC、PAL<BR>回転）</TD>
+	<TD><PRE>320×224<BR>320×240<BR>352×224<BR>352×240</TD>
+	<TD><PRE>8bit／pixel</TD><TD><PRE>横512<BR>×<BR>縦512</TD>
+	<TD><PRE>単密のみ<BR>可能</TD>
+	<TD><PRE>26.8426<BR>26.8426<BR>28.6364<BR>28.6364</TD>
+	<TD><PRE>26.6564<BR>26.6564<BR>28.4375<BR>28.4375</TD></TR>
+
+<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>0</TD><TD><PRE>0</TD><TD><PRE>HDTV<BR>（31kHz、HDTV）</TD>
+	<TD><PRE>320×240<BR>352×240</TD>
+	<TD><PRE>16bit／pixel</TD>
+	<TD><PRE>横512×<BR>縦256</TD>
+	<TD><PRE>禁止</TD>
+	<TD><PRE>26.8426<BR>28.6364</TD>
+	<TD><PRE>26.6564<BR>28.4375</TD></TR></TABLE></P>
+
+	<P>	<DT><TABLE BORDER=0><TR>
+	<TD><img srcset="../../../what/atto_j.png 5x"></TD>
+	<TD><B>厳守★上記以外設定禁止（設定しないでください）</B></TD></TR></TABLE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p04_10_j.htm">戻る</A>｜
+     <a href="p04_12_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,36 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p006.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p008.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H1> 3. Directory operations </H1>
+<DT> <H2> 3.1 Initialization </H2>
+<DD> GFS_Init must be executed before using this library. GFS_Init performs the following processing. <BR>
+<UL TYPE = "DISK"> <LI> Library work area initialization <BR>
+<LI> Mount process </UL> <P>
+<DT> <H4> (1) Initialization </H4>
+<DD> Set the work area used by the library and initialize it. All work areas and directory information storage areas must be prepared by the application. <BR>
+The size of the area varies depending on the number of files that are opened at the same time. Where open_max is the maximum number of files that can be opened simultaneously. <BR>
+GFS_WORK_SIZE (open_max) <P>
+<DT> <H4> (2) Mount processing </H4>
+<DD> Read the root directory from the CD-ROM and set it as the current directory. It also initializes the CD block and deletes all sector data in the CD buffer. Since the file system only holds the start address of the directory information storage area, applications should not change the contents of the area. <BR>
+Initialize directory information management structure as follows and call GFS_Init. <P>
+<PRE>
+#define OPEN_MAX 20 / * Maximum number of files opened simultaneously * /
+#define MAX_DIR 10 / * Maximum number of directory information * / <P>
+Uint32 work [GFS_WORK_SIZE (OPEN_MAX) / 4]; / ​​* Library work area * /
+GfsDirTbl dirtbl; / * Directory information management structure * /
+GfsDirId dir [MAX_DIR]; / * Directory information storage area * / <P>
+GFS_DIRTBL_TYPE (& dirtbl) = GFS_DIR_ID; / * Directory information storage area type * /
+GFS_DIRTBL_NDIR (& dirtbl) = MAX_DIR; / * Directory information storage area * /
+                                           / * Maximum number of elements * /
+GFS_DIRTBL_DIRID (& dirtbl) = dir; / ​​* Directory information storage area * /
+                                           / * Address * /
+GFS_Init(OPEN_MAX, work, &dirtbl);</PRE><P>
+If you change the CD-ROM, you must call GFS_Init again. <P>
+</DL><P><P><HR>
+<A HREF=p006.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p008.htm> Go to next page </A>
+</BODY>
+</HTML>

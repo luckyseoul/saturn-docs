@@ -1,0 +1,48 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<A HREF=p016.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p018.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H4> (2) Immediate return access to multiple files </H4>
+<DD> For continuous access of multiple files, GFS_NwExecSerer is the server function. <BR>
+Request function is common to single file access. <BR>
+∙ Application issues access processing requests for multiple files. After that, access processing is executed sequentially by passing control rights to the server periodically. Access processing is performed one by one in the order requested. <P>
+The following is an example of a program that performs user processing while reading three files. <P>
+<PRE> [Example]
+/ * Number of sectors read from each file * /
+#define NSCT1  1
+#define NSCT2  2
+#define NSCT3  3
+/ * Size of data storage area of ​​each file (unit: bytes) * /
+#define BSIZE1 2048*NSCT1
+#define BSIZE2 2048*NSCT2
+#define BSIZE3 2048*NSCT3<P>
+Sint32 fid1, fid2, fid3; / * File identifier of each file * /
+GfsHn gfs1, gfs2, gfs3; / * File handle of each file * /
+Uint32 buf1 [BSIZE1 / 4]; / ​​* Data storage area for each file * /
+Uint32 buf2[BSIZE2/4];
+Uint32 buf3[BSIZE3/4];
+GfsHn now_gfs; / * File handle being accessed * /
+Sint32 stat; / * Server status * / <P>
+gfs1 = GFS_Open (fid1); / * File open * /
+gfs2 = GFS_Open(fid2);
+gfs3 = GFS_Open(fid3);
+GFS_NwFread (gfs1, NSCT1, buf1, BSIZE1); / * Start of read operation * /
+GFS_NwFread(gfs2, NSCT2, buf2, BSIZE2);
+GFS_NwFread(gfs3, NSCT3, buf3, BSIZE3);
+for (;;) {
+    stat = GFS_NwExecServer (& now_gfs); / * Execution of reading * /
+    if (stat == GFS_SVR_COMPLETED) {/ * Is there any work to do? * /
+              break;
+    }
+    user (); / * Arbitrary user processing * /
+}
+GFS_Close(gfs1);
+GFS_Close(gfs2);
+GFS_Close(gfs3);</PRE><BR>
+</DL><P><P><HR>
+<A HREF=p016.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p018.htm> Go to next page </A>
+</BODY>
+</HTML>

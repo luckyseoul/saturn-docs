@@ -1,0 +1,471 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/22&gt; <!-- Number of pages/total number of pages -->
+ SGL function reference/event function <!-- Title name -->
+ </TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><!-------------------------------------------------------------------------------->
+<HR>
+<H1> ★Event</H1><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slInitEvent"><HR NOSHADE></a><H4> function</H4><H1> slInitEvent</H1><HR>
+<H3> Initialize buffer for event and work management</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void slInitEvent( void );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Initializes the buffer for event and work management. There are 64 events,
+    256 pieces of work will be prepared.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    void *eventtbl[] = {
+        init_camera,
+        init_player1,
+        init_player2,
+        init_enemyctrl
+    };
+
+    void InitGame(){
+        void **evrdptr;
+        <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *evptr;
+        int cnt;
+
+        <A HREF="../func/event.htm#slInitEvent"><I>slInitEvent</i></a> (); /* Initialize event management variables */
+        evrptr = eventtbl;
+        for( cnt = sizeof( eventtbl ) / sizeof( void * ) ; cnt-- > 0 ; ) {
+            evptr = <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> ( *evrptr++ );
+        }
+        <A HREF="../func/init.htm#slSetSprTVMode"><I>slSetSprTVMode</i></a> ( TV_320x224 );
+    }
+
+    void Game(){
+        <A HREF="../func/event.htm#slExecuteEvent"><I>slExecuteEvent</i></a> (); /* Execute event */
+        <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> (); /* Polygon data output and video display synchronization */
+    }    
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    The event and work RAM itself is not initialized, so when the area is extracted,
+    Please initialize the user program.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slGetEvent">slGetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEvent">slSetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEventNext">slSetEventNext</a></TD><TD><PRE> <A HREF="../func/event.htm#slCloseEvent">slCloseEvent</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/event.htm#slReturnEvent">slReturnEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slExecuteEvent">slExecuteEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slGetWork">slGetWork</a></TD><TD><PRE> <A HREF="../func/event.htm#slReturnWork">slReturnWork</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slGetEvent"><HR NOSHADE></a><H4> function</H4><H1> slGetEvent</H1><HR>
+<H3> Acquisition of RAM for events</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *slGetEvent( void );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> * - Pointer to the retrieved event RAM address.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Retrieves the RAM area allocated for the event and returns a pointer to it.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    void func() {
+      /* This is executed in event loop. */
+    }
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *evnt1, *evnt2;
+
+    evnt1 = <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</i></a> ();
+
+    evnt2 = <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> ( func );
+    evnt2->user = ( <A HREF="../struct/types.htm#Uint8"><I>Uint8</i></a> * )evnt1;    
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    This is a 128-byte area that can be used freely by the user. There are 64 pieces available,
+    If it is used up, <A HREF="../struct/const.htm#NULL"><I>a NULL</i></a> code is returned.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slInitEvent">slInitEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEvent">slSetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEventNext">slSetEventNext</a></TD><TD><PRE> <A HREF="../func/event.htm#slCloseEvent">slCloseEvent</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/event.htm#slReturnEvent">slReturnEvent</a></TD><TD><PRE> <A HREF="../mem/system01.htm#EventTop">EventTop</a></TD><TD><PRE> <A HREF="../mem/system01.htm#EventCount">EventCount</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slSetEvent"><HR NOSHADE></a><H4> function</H4><H1> slSetEvent</H1><HR>
+<H3> Add event</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void *( func )( void );
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *slSetEvent( func );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void *( func )( void ) - Executable function that registers for the event.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> * - <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> type pointer to the retrieved event.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Fetches the event and adds it to the end of the execution list. At this time, the specified function will be registered as an execution function.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/event.htm#slInitEvent"><I>slInitEvent</i></a> ();
+
+    <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> ( user_func1 );
+    <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> ( user_func2 );
+         :
+    while( -1 ) {
+         :
+      <A HREF="../func/event.htm#slExecuteEvent"><I>slExecuteEvent</i></a> ();
+      <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> ();
+    }
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    It is a 128-byte area, but the first 16 bytes are used by the system.</i></b><BR><B><I>
+    Returns a <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> code if there are no events left.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slInitEvent">slInitEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEvent">slSetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEventNext">slSetEventNext</a></TD><TD><PRE> <A HREF="../func/event.htm#slCloseEvent">slCloseEvent</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/event.htm#slReturnEvent">slReturnEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slExecuteEvent">slExecuteEvent</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slSetEventNext"><HR NOSHADE></a><H4> function</H4><H1> slSetEventNext</H1><HR>
+<H3> Registration of next candidate for event</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *event;
+    void *( func )( void );
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *slSetEventNext( evnt, func );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *evnt - The event before the event to register for.<BR>
+    void *( func )( void ) - Executable function to register.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> * - Pointer to a structure of type <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> indicating the retrieved event.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Fetches an event and adds it to the execution list so that it is executed next to the specified event. At this time, the specified function will be registered as an execution function.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    void func() {
+      /* This is executed in event loop. */
+    }
+
+    ss_main() {
+      <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *event;
+
+      evnt = <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</i></a> ();
+      evnt->work = ...
+              :
+      <A HREF="../func/event.htm#slSetEventNext"><I>slSetEventNext</i></a> ( evnt, func );
+              :
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    It is a 128-byte area, but the first 16 bytes are used by the system.</i></b><BR><B><I>
+    Returns a <A HREF="../struct/const.htm#NULL"><I>NULL</i></a> code if there are no events left.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slInitEvent">slInitEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEvent">slSetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slGetEvent">slGetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slCloseEvent">slCloseEvent</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/event.htm#slReturnEvent">slReturnEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slExecuteEvent">slExecuteEvent</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slReturnEvent"><HR NOSHADE></a><H4> function</H4><H1> slReturnEvent</H1><HR>
+<H3> Search for unregistered events</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *event;
+
+    void slReturnEvent( evnt );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *evnt - Pointer to an <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> type structure representing the event that requires release.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Returns events that are not registered in the execution list to the system.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *event;
+
+    evnt = <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</i></a> ();
+    <A HREF="../func/event.htm#slReturnEvent"><I>slReturnEvent</i></a> ( evnt );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    If you execute this function for an event registered in the execution list, the event will
+    remain registered in the list and execution will continue. The returned pointer is re-registered
+    in the system buffer, but at this time it is not checked even if it has been registered, so if
+    the same pointer is returned multiple times, the <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</i></a> (), <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> (), <A HREF="../func/event.htm#slSetEventNext"><I>slSetEventNext</i></a> () A problem will occur.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slInitEvent">slInitEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slGetEvent">slGetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEvent">slSetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEventNext">slSetEventNext</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/event.htm#slCloseEvent">slCloseEvent</a></TD><TD><PRE> <A HREF="../mem/system01.htm#EventLast">EventLast</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slCloseEvent"><HR NOSHADE></a><H4> function</H4><H1> slCloseEvent</H1><HR>
+<H3> Delete event</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *event;
+
+    void slCloseEvent( evnt );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *evnt - Pointer to an <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> type structure representing the event to delete.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Detaches the event registered in the execution list from the list and returns it to the system.<BR>
+    Also, if any workpieces have been set, they will also be returned.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *event;
+
+    evnt = <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> ( user_func );
+                 :
+    <A HREF="../func/event.htm#slCloseEvent"><I>slCloseEvent</i></a> ( evnt );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    If you specify an event that is not registered in the execution list, the list information will
+    be incorrect, and the list will have to be changed for an invalid event, resulting in writing to an
+    unpredictable address, and in the worst case, the CPU will be overloaded. It may stop.</i></b><BR><B><I>
+    The returned pointer is re-registered in the system buffer, but at this time it is not checked even
+    if it has already been registered, so if the same pointer is returned multiple times, the
+    <A HREF="../func/event.htm#slGetEvent"><I>slGetEvent</i></a> (), <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> (), <A HREF="../func/event.htm#slSetEventNext"><I>slSetEventNext</i></a> ()
+    A problem will occur.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slInitEvent">slInitEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slGetEvent">slGetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEvent">slSetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEventNext">slSetEventNext</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/event.htm#slReturnEvent">slReturnEvent</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slExecuteEvent"><HR NOSHADE></a><H4> function</H4><H1> slExecuteEvent</H1><HR>
+<H3> Executing an event</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    void slExecuteEvent( void );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Executes the events registered in the execution list in order from the beginning.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../func/event.htm#slInitEvent"><I>slInitEvent</i></a> ();
+
+    <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> ( ... );
+        :
+    while( -1 ) {
+      <A HREF="../func/event.htm#slExecuteEvent"><I>slExecuteEvent</i></a> ();
+      <A HREF="../func/int.htm#slSynch"><I>slSynch</i></a> ();
+    }
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    Execute it for each main loop.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slInitEvent">slInitEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEvent">slSetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEventNext">slSetEventNext</a></TD><TD><PRE> <A HREF="../func/int.htm#slSynch">slSynch</a></TD></TR>
+<TR><TD><PRE> <A HREF="../func/int.htm#slInitSynch">slInitSynch</a></TD><TD><PRE> <A HREF="../mem/system01.htm#EventTop">EventTop</a></TD><TD><PRE> <A HREF="../mem/system01.htm#EventNow">EventNow</a></TD><TD><PRE> <A HREF="../mem/system01.htm#EventCount">EventCount</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<HR>
+<H1>★Work</H1><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slGetWork"><HR NOSHADE></a><H4> function</H4><H1> slGetWork</H1><HR>
+<H3> Acquisition of work RAM for events</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#WORK"><I>WORK</i></a> *slGetWork( void );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    void - gives nothing.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    <A HREF="../struct/types.htm#WORK"><I>WORK</i></a> * - Pointer to <A HREF="../struct/types.htm#WORK"><I>a WORK</i></a> type structure indicating the allocated work area.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Fetches the RAM area allocated for work and returns a pointer to it.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#WORK"><I>WORK</i></a> *work;
+    <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> *event;
+
+    work = <A HREF="../func/event.htm#slGetWork"><I>slGetWork</i></a> ();
+    evnt = <A HREF="../func/event.htm#slSetEvent"><I>slSetEvent</i></a> ();
+    evnt->work = work;
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    The work area is 64 bytes, and the first 4 bytes are used as a list pointer.
+    used in the system. The remaining 60 bytes are free for use by the user.</i></b><BR><B><I>
+    If a pointer is set in WORK of <A HREF="../struct/types.htm#EVENT"><I>the EVENT</i></a> structure, it will be returned to the system when the event is closed.</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slInitEvent">slInitEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slReturnWork">slReturnWork</a></TD><TD><PRE> <A HREF="../mem/system01.htm#WorkCount">Work Count</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="slReturnWork"><HR NOSHADE></a><H4> function</H4><H1> slReturnWork</H1><HR>
+<H3> Release work RAM for events</H3><DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    <A HREF="../struct/types.htm#WORK"><I>WORK</i></a> *wk;
+
+    void slReturnWork( wk );
+</PRE></P>
+<P><DT><H3>argument</H3><DD><PRE>
+    <A HREF="../struct/types.htm#WORK"><I>WORK</i></a> *wk - Pointer to a WORK structure representing the work RAM to free.<BR>
+</PRE></P>
+<P><DT><H3>Return number</H3><DD><PRE>
+    void - returns nothing.<BR>
+</PRE></P>
+<P><DT><H3>function</H3><DD>
+    Return the RAM area used for work to the system.<BR>
+</PRE></P>
+<P><DT><H3>example</H3><DD><PRE>
+    <A HREF="../struct/types.htm#WORK"><I>WORK</i></a> *work;
+
+    work = <A HREF="../func/event.htm#slGetWork"><I>slGetWork</i></a> ();
+               :
+    <A HREF="../func/event.htm#slReturnWork"><I>slReturnWork</i></a> ( work );
+</PRE></P>
+<P><DT><H3>Note</H3><DD><B><I>
+    The returned pointer is re-registered in the system buffer, but at this time it is not checked even if it
+	has been registered, so if the same pointer is returned multiple times, a problem will occur in the
+	subsequent <A HREF="../func/event.htm#slGetWork"><I>slGetWork</i></a> (). .</i></b><BR><B><I>
+</i></b>
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slInitEvent">slInitEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slGetWork">slGetWork</a></TD><TD><PRE> <A HREF="../mem/system01.htm#WorkCount">Work Count</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!-------------------------------------------------------------------------------->
+<HR>
+<H1>★Global variables for events</H1><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="EventBuf"><HR NOSHADE></a><H4> global variables</H4><H1> EventBuf</H1><HR>
+<DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    extern <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> EventBuf []; /* buffer for Event use */
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slInitEvent">slInitEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slGetEvent">slGetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slReturnEvent">slReturnEvent</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="WorkBuf"><HR NOSHADE></a><H4> global variables</H4><H1> WorkBuf</H1><HR>
+<DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    extern <A HREF="../struct/types.htm#WORK"><I>WORK</i></a> WorkBuf []; /* buffer for Work use */
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slGetWork">slGetWork</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="RemainEvent"><HR NOSHADE></a><H4> global variables</H4><H1> RemainEvent</H1><HR>
+<DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    extern <A HREF="../struct/types.htm#EVENT"><I>EVENT</i></a> * RemainEvent[] ; /* Remain Event address buffer */
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slSetEvent">slSetEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slSetEventNext">slSetEventNext</a></TD><TD><PRE> <A HREF="../func/event.htm#slReturnEvent">slReturnEvent</a></TD><TD><PRE> <A HREF="../func/event.htm#slExecuteEvent">slExecuteEvent</a> </TD></TR>
+</TABLE>
+</P>
+</DL>
+<!--------------------------------------------------------------------------------><BR><BR>
+ <A HREF="index.htm#event">List</a> ｜ <A HREF="../index.htm">Reference</a><BR>
+<A NAME="RemainWork"><HR NOSHADE></a><H4> global variables</H4><H1> RemainWork</H1><HR>
+<DL>
+<P><DT><H3> Format</H3><DD><PRE>
+    #include "sgl.h"
+
+    extern <A HREF="../struct/types.htm#WORK"><I>WORK</i></a> * RemainWork[] ; /* Remain Work address buffer */
+</PRE></P>
+<P><DT><H3>reference</H3><DD><TABLE BORDER>
+<TR><TD><PRE> <A HREF="../func/event.htm#slReturnWork">slReturnWork</a></TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+ <A HREF="index.htm">return</a><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

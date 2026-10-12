@@ -1,0 +1,120 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" /><TITLE>saturnExport v2.5について </TITLE><script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<BR>
+<DL>
+<DT><FONT SIZE="+2"><CENTER>saturnExport v2.5について</CENTER></FONT></DT>
+<BR>
+<BR>
+<STRONG>データ変換の際に注意していただきたいこと。</STRONG><BR>
+Scaling and Viewing Problems<BR>
+モデルが(1,1,1)以外のスケール値を持っている階層を変換して、<STRONG>Viewer→saturnViewer</STRONG>コマンドを使用した場合、CartDev+DevSaturn環境とSoftimage上では結果が違ってきます。<BR>
+サターンでは、クラシカル変換を使用していますが、Softimageはデフォルトでノンクラシカル変換を使用しているためです。サターンとSoftimageの間では、移動、回転、スケーリングなどの順番が異なります。<BR>
+<UL>
+<LI> ノンクラシカル<BR>
+S<I><SMALL>model</SMALL></I> X S<I><SMALL>parent</SMALL></I> X R<I><SMALL>model</SMALL></I> X T<I><SMALL>model</SMALL></I> X R<I><SMALL>parent</SMALL></I> X T<I><SMALL>parent</SMALL></I>
+<LI> クラシカル<BR>
+S<I><SMALL>model</SMALL></I> X R<I><SMALL>model</SMALL></I> X T<I><SMALL>model</SMALL></I> X S<I><SMALL>parent</SMALL></I> X R<I><SMALL>parent</SMALL></I> X T<I><SMALL>parent</SMALL></I>
+</UL>
+( S=Scale、R=Rotation、T=Translation )<BR>
+<BR>
+ノンクラシカル変換からクラシカル変換への変換には簡単な方法がありません。Softimageからサターン形式に変換する時、サターン上でオブジェクトは正規の位置に現われ、正しく計算されるよう新しいローカル変換を作成します。<BR>
+<BR>
+この問題に対して二つの選択肢があります。<BR>
+<UL>
+<LI> 変換前にModelモジュールの<STRONG>Effect→Freeze→Scaling</STRONG>コマンドを使用する。
+<LI> <STRONG>Preferences→Classic Scaling</STRONG>コマンドを選択してClassical transformationsでモデリングを行う。
+</UL>
+<BR>
+<BR>
+<HR>
+<STRONG>Generate Geometry (.mdl)</STRONG><BR>
+Generate Geometryオプションは形状やマテリアル情報などをSGLフォーマットで出力できます。<BR>
+<IMG SRC=mdl.gif><BR>
+<BR>
+<I> Model Shading</I><BR>
+Model Shadingオプションは、変換されたモデルにSGLシェーディング情報を付加できます。<BR>
+<BR>
+<I> Convert Coordinate Systems</I><BR>
+このオプションをオンにするとSoftimageの座標系からサターンの座標系への変換を行います。次の項目に関してのY,Zの値を反転させます。<BR>
+<UL>
+<LI> 頂点の座標値
+<LI> ポリゴンの法線
+<LI> オブジェクトの位置および回転値
+</UL>
+<BR>
+<I> Saturn vs. Softimage Units</I><BR>
+SoftimageからSGLフォーマットに変換する際に、スケールをかけることができます。<BR>
+<BR>
+<HR>
+<STRONG>Generate Texture (.txr)</STRONG><BR>
+Genrate Textureオプションは、テクスチャ情報をSGLフォーマットで出力できます。<BR>
+<IMG SRC=txr.gif><BR>
+<BR>
+<I>Smoothing</I><BR>
+Smoothingオプションはテクスチャがリサンプルされる際の色のスムージングをコントロールします。このオプションが選択されるとき、作成されるテクスチャスライスの質を高めるためバイリニア・インターポーレーション・メソッドが使用されますが、このオプションが選択されないと、元のテクスチャの最も近いピクセルの色が使用されます。<BR>
+<STRONG>(注意)</STRONG>このオプションを使用する場合、スムージング過程では、オリジナルのテクスチャで使用されなかった色が作成される場合があります。<BR>
+<BR>
+<I>Save PIC files</I><BR>
+指定したディレクトリにテクスチャスライスした.picファイルを保存することができます。<BR>
+<BR>
+Texture Slice Density Control<BR>
+<a href="plysur_j.htm"><I>Polygon Surface</I></A><BR>
+テクスチャスライスする際にポリゴンの大きさからテクスチャのサイズを割り出します。この手法の利点は、スライスされたテクスチャの密度がモデルの大きさに対して均一になることです。テクスチャのサイズは、元のテクスチャデータに無関係になります。デフォルトの値は、Softimageの１unitに対して25ピクセルに設定されています。<BR>
+<a href="texres_j.htm"><I>Texture Resolution</I></A><BR>
+テクスチャマッピングされたポリゴンのUVテクスチャ座標値によってスライスするテクスチャのサイズを決定します。元のテクスチャの解像度によってスライスされるテクスチャのサイズが異なります。Density Factor(デフォルトは、1.0)によってテクスチャの解像度が決まります。<BR>
+<I>Maximum Slice Size</I><BR>
+テクスチャスライスされるテクスチャのX,Yの最大値を設定することができます。<BR>
+(デフォルトでは、X,Y共に256ピクセル)<BR>
+<BR>
+<HR>
+<STRONG>Generate Animation (.mtn)</STRONG><BR>
+Generate Animationオプションは、アニメーション情報をテキストデータとして出力できます。(SGLに準拠していません)<BR>
+<IMG SRC=mtn.gif><BR>
+<BR>
+<I>Compression</I><BR>
+アニメーションデータの圧縮を行います。数値が変化しない場合は、データが省略されます。<BR>
+<BR>
+Hierarchy Filtering Options(v2.2では、使用できません)<BR>
+<I>Selected Models Only</I><BR>
+選択したモデルのみ。<BR>
+<BR>
+Non Polygonal Models(ポリゴンメッシュ以外のモデルに関して)<BR>
+今回の例では、スケルトンのエフェクタにキーフレーム・アニメーションが設定されています。<BR>
+<BR>
+<I> Remove and Propagate Animation</I><BR>
+ポリゴンメッシュ以外のモデル(例えば、スケルトンなど)を階層から取り除きアニメーションを別のモデルに伝達します。<BR>
+<IMG SRC=rm_prop.gif><BR>
+<BR>
+<I> Replace by Nulls and Preserve Animation</I><BR>
+ポリゴンメッシュ以外のモデルをNull(ヌル)に置き換え、アニメーションを保持します。図の右側の<STRONG>jnt1_3</STRONG>と<STRONG>jnt1_4</STRONG>という名前のモデルにアニメーションが付いています。この二つは、Nullです。<BR>
+<IMG SRC=rep_pres.gif><BR>
+<BR>
+<I> Replace by Nulls and Propagate Animation</I><BR>
+ポリゴンメッシュ以外のモデルをNull(ヌル)に置き換え、アニメーションを別のモデルに伝達します。<BR>
+<IMG SRC=rep_prop.gif><BR>
+<BR>
+<P>
+<BR>
+<HR>
+<P>
+<a href="main_j.htm">Topへ </A>
+<P>
+
+
+
+ </BODY>
+</HTML>

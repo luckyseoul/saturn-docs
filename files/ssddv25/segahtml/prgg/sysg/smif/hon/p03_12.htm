@@ -1,0 +1,232 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 5&gt;SMPC Interface User's Manual/Function Specifications</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no3">SMPC Interface User's Manual</a><HR>
+ <B>▲ <A HREF="p03_11.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>SMPC Interface User's Manual/Reference</b><H2 ALIGN=CENTER> function specification</H2><HR NOSHADE>
+<H3 ALIGN=CENTER> non-intoback </H3><!-- ------------------------------------------------------------------------------------- -->
+<!--HIRANO 修正BIGIN-->
+<HR>
+<DL>
+<P><A NAME="no1"></A><DT><TABLE BORDER=1>
+</TR>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> Master SH2 ON</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_MSH_ON</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1</H4></TD></TR>
+</TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_MSH_ON(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT><TABLE>
+<TR><TH><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>This function is prohibited for use by users.</b></TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_01">MSHON</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no2"></A><DT><TABLE BORDER=1>
+</TR>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> Slave SH2 ON</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_SSH_ON</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 2</H4></TD></TR>
+</TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_SSH_ON(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT><TABLE>
+<TR><TH> Strict observance<BR>
+<img srcset="../../../../what/atto.png 5x"></TH><TD> <B>Use of this function from slave SH2 is prohibited.</b></TABLE>
+</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_02">SSHON</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no3"></A><DT><TABLE BORDER=1>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> Slave SH2 OFF</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_SSH_OFF</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 3</H4></TD></TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_SSH_OFF(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>Strict observance</b><DD> Do not execute this function while slave SH2 is accessing the CPU's external bus (A-BUS, B-BUS, CPU-BUS).<BR>
+ If executed during external bus access, the entire system may hang.<BR>
+ The conditions for SH2 to access the external bus are as follows.</P>
+<DD><UL TYPE=DISC>
+<LI> Cache miss when fetching instructions<LI> Write to memory (both cache/cache-through)<LI> Cache miss when reading from cache memory<LI> Read from cache-through memory</UL>
+<P><DD> Therefore, the condition for slave SH2 not to access the external bus is that slave SH2 operates only on the CPU's internal cache.<BR>
+ If it is not possible to manage the above conditions using a user program, use clock changes as an alternative method.</P>
+<DT><TABLE>
+<TR><TH> Strict observance<BR>
+<img srcset="../../../../what/atto.png 5x"></TH><TD> <B>Use of this function from slave SH2 is prohibited.</b></TABLE>
+</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_03">SSHOFF</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no4"></A><DT><TABLE BORDER=1>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> sound on</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_SND_ON</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 4</H4></TD></TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_SND_ON(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Start the sound CPU (MC68EC000).<BR>
+ This command is used with the sound OFF command when loading the sound driver into sound RAM.<BR>
+ (If you execute a system library clock change, the contents of the sound RAM are not guaranteed, so you will need to restart the sound CPU using this command after reloading the sound driver.)</P>
+<DT> <B>Limitations on stopping and starting the sound CPU</b><DD> When the sound CPU is stopped, there must not be a non-access period of 0.5 seconds or more from the main system (SH2 side) to the sound RAM.<BR>
+ Please stop it only for the minimum necessary period such as loading the sound driver, and restart it immediately.<BR>
+ Even if you do not need to use the sound CPU (MC68EC000), you will need to take measures such as running a dummy program (just an infinite loop).<BR>
+ If these restrictions are not observed, the operation of the sound RAM and sound block cannot be guaranteed.</P>
+<P><DT> <B>Reference:</b> <DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_04">SNDON</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no5"></A><DT><TABLE BORDER=1>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> Sound OFF</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_SND_OFF</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 5</H4></TD></TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_SND_OFF(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Stop the sound CPU (MC68EC000).<BR>
+ This command is used with the sound ON command when loading the sound driver into sound RAM.<BR>
+ (If you execute a system library clock change, the contents of the sound RAM are not guaranteed, so you must use this command to stop the sound CPU before executing the clock change.)<BR>
+<P><DT> <B>Strict observance:</b><BR>
+ <B>[Restrictions regarding stopping and starting the sound CPU]</b><DD> When the sound CPU is stopped, there must not be a non-access period of 0.5 seconds or more from the main system (SH2 side) to the sound RAM.<DD> Please stop it only for the minimum necessary period such as loading the sound driver, and restart it immediately.<DD> Even if you do not need to use the sound CPU (MC68EC000), you will need to take measures such as running a dummy program (just an infinite loop).<DD> If these restrictions are not observed, the operation of the sound RAM and sound block cannot be guaranteed.<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_05">SNDOFF</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no6"></A><DT><TABLE BORDER=1>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> CD ON</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_CD_ON</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 6</H4></TD></TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_CD_ON(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT><TABLE>
+<TR><TH> Strict observance<BR>
+<img srcset="../../../../what/atto.png 5x"></TH><TD> <B>Use of this function from slave SH2 is prohibited.</b></TABLE>
+</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_06">CDON</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no7"></A><DT><TABLE BORDER=1>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> CD OFF</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_CD_OFF</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 7</H4></TD></TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_CD_OFF(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT><TABLE>
+<TR><TH> Strict observance<BR>
+<img srcset="../../../../what/atto.png 5x"></TH><TD> <B>Use of this function from slave SH2 is prohibited.</b></TABLE>
+</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_07">CDOFF</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no8"></A><DT><TABLE BORDER=1>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> Whole system reset</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_SYS_RES</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 8</H4></TD></TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_SYS_RES(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT><TABLE>
+<TR><TH> Strict observance<BR>
+<img srcset="../../../../what/atto.png 5x"></TH><TD> <B>Use of this function from slave SH2 is prohibited.</b></TABLE>
+</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_08">SYSRES</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no9"></A><DT><TABLE BORDER=1>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> NMI request</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_NMI_REQ</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 9</H4></TD></TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_NMI_REQ(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Generates an NMI interrupt to master SH2.<DD> By executing this command, it is possible to generate an NMI interrupt unconditionally even if the reset button is disabled.<DD> When an NMI interrupt occurs, a boot sequence similar to when the reset button is pressed when the reset button is enabled starts. Normally, the reset button is enabled, so there is no need to use this command.<DD> Please use it for the reset process (after the line disconnection process) in an application (when using a modem) whose reset button is always disabled.<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_11">NMIREQ</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no10"></A><DT><TABLE BORDER=1>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> hot reset enable</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_RES_ENA</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 10</H4></TD></TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_RES_ENA(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Enable issuance of NMI from SMPC to master SH2 using the hot reset button.<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_12">RESENAB</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<HR>
+<DL>
+<P><A NAME="no11"></A><DT><TABLE BORDER=1>
+<TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> Hot reset disabled</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_RES_DIS</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 11</H4></TD></TABLE>
+<P><DT> <B>Format</b><DD> void PER_SMPC_RES_DIS(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Disables issuance of NMI from SMPC to master SH2 using the main unit reset button.<DD> Be sure to use this command to disable the reset button when using a backup library or modem.<DD> Also, do not disable the reset button for any purpose other than the above.<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" SMPC command/ <A HREF="../../../../hard/smpc/hon/p02_30.htm#c1_13">RESDISA</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<!--/HIRANO 修正END-->
+<HR>
+<DL>
+<P><A NAME="no12"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> SMPC memory settings</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_SET_SM</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 12</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void PER_SMPC_SET_SM(Uint32 input_dt)<DT> <B>input</b><DD> input_dt: SMPC memory<DD> For the meaning of each bit value, refer to System data output data type.<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Configure SMPC memory. SMPC memory is an area commonly used by applications and BOOT ROM, so be sure to follow <A HREF="p03_11.htm#SMPC_MEM">the data format</a> .<DD> For information on data that must be changed/referenced on the application side and data that cannot be changed, please see <A HREF="../../../../info/hon/stn27.htm">here</a> .</P>
+<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual"<BR>
+ <A HREF="../../../../hard/smpc/hon/p02_50.htm">■2.4 Non-reset system management commands</a> </DL>
+<!-- ------------------------------------------------------------------------------------- -->
+<!--HIRANO 修正BIGIN-->
+<HR>
+<DL>
+<P><A NAME="no13"></A><DT><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR> <A HREF="p03_10.htm#no3_11">View</a><BR> <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR><H4> Time setting</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> PER_SMPC_SET_TIM</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 13</H4></TD></TR>
+</TABLE>
+<DT> <B>Format</b><DD> void PER_SMPC_SET_TIM(Uint8 *input_dt)<DT> <B>input</b><DD> input_dt: Time</PRE><P><DD> Input format<DD><TABLE BORDER=1><TR><TD WIDTH=150><PRE></TD><TH WIDTH=170><PRE> bit7 bit4</TD><TH WIDTH=170><PRE> bit3 bit0</TD></TR><TR ALIGN=CENTER><TD><PRE> input_dt[0]</TD><TD><PRE> tens of seconds</TD><TD><PRE> Second place</TD></TR><TR ALIGN=CENTER><TD><PRE> input_dt[1]</TD><TD><PRE> decile</TD><TD><PRE> 1st place</TD></TR><TR ALIGN=CENTER><TD><PRE> input_dt[2]</TD><TD><PRE> 10th place</TD><TD><PRE> First place at the time</TD></TR><TR ALIGN=CENTER><TD><PRE> input_dt[3]</TD><TD><PRE> 10th place</TD><TD><PRE> No. 1 in a day</TD></TR><TR ALIGN=CENTER><TD><PRE> input_dt[4]</TD><TD><PRE> Day of the week (0-6)</TD><TD><PRE> Month (1H~CH)</TD></TR><TR ALIGN=CENTER><TD><PRE> input_dt[5]</TD><TD><PRE> Western calendar year number 10</TD><TD><PRE> First place in the Western calendar</TD></TR><TR ALIGN=CENTER><TD><PRE> input_dt[6]</TD><TD><PRE> Western calendar year thousandth rank</TD><TD><PRE> Western calendar year 100th place</TD></TR></TABLE><DD><UL TYPE=DISC><LI> The day of the week data is Monday (1) to Saturday (6), with Sunday as 0.<LI> Month data is hexadecimal data (1H to CH).<LI> Data other than monthly data is BCD data.</UL><DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Set the time.<P><DT> <B>reference:</b><DD> "HARDWARE MANUAL/SMPC User's Manual" <A HREF="../../../../hard/smpc/hon/p02_50.htm">■2.5 RTC commands</a></DL><HR NOSHADE><H3 ALIGN=CENTER> into back </H3><!--/HIRANO 修正END--><!-- ------------------------------------------------------------------------------------- --><!--HIRANO 修正BIGIN--><HR><DL><P><A NAME="no14"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR>
+ <A HREF="p03_10.htm#no3_11">View</a><BR>
+ <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR>
+<H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR>
+<H4> Intoback initialization</H4></TD><TD WIDTH=180><PRE> Function name<BR>
+<H3> PER_LInit</H3></TD><TD WIDTH=060><PRE> No<BR>
+<H4> 14</H4></TD></TR></TABLE><DT> <B>Format</b><DD> Uint32 PER_LInit(PerKind kind, PerNum num, PerSize max_size, void *work, Uint8 v_blank)<DT> <B>input</b><DD><DL><P><DT> PerKind kind:<DD> Into back type<P><DT> PerNum num:<DD> Number of required peripherals<P><DT> PerSize max_size:<DD> Maximum peripheral size to obtain<BR> We <B>recommend</b> specifying <B>an even size</b> .<BR> Details: <A HREF="#14_01">How to calculate work area</a><P><DT> Uint32 work[worksize/4]:<DD> Work area.<BR> Used to obtain peripheral data. Be sure to declare it as a global variable.<P><DT> Uint8 v_blank:<DD> V-BLANK skip number.<BR> Specify the value minus 1 from the processing unit of the entire game.<BR> (Specify 1 for 2 frame units) If there is no need to skip, please specify 0.</DL><DT> <B>Example of use</b><DD> err_code = PER_LInit( kind, num, max_size, (void *)work, v_blank);<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> running state<DD><TABLE BORDER=1><TR><TH WIDTH=150><PRE> constant</TH><TH WIDTH=250><PRE> explanation</TH></TR><TR><TD><PRE> PER_INT_ERR</TD><TD><PRE> Unable to issue intoback command.</TD></TR><TR><TD><PRE> PER_INT_OK</TD><TD><PRE> I was able to issue an intoback command.</TD></TR></TABLE><DT> <B>function</b><DD> Initializes and issues intoback commands, and registers SMPC interrupts. Please be sure to <B>strictly follow the rules</b> .<DD> Please set NULL or 0 for unnecessary parameters.<DD> Please execute it at least once before executing PER_LGetPer(), PER_GetTim(), PER_GetSys().<DT><TABLE><TR><TH> Strict observance<BR><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>Use of this function from slave SH2 is prohibited.</b></TABLE></P><DT><TABLE><TR><TH> Strict observance<BR><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>This function is prohibited from execution within interrupt processing.</b><BR> <B>Be sure to execute it within the main process.</b><BR> <B>Generally, execute it immediately after V blank OUT processing.</b></TD></TABLE><A NAME="14_01"></A><P><DT> <B>●How to calculate work area</b><DD> worksize = (num * (max_size + 2) * 2) + max_size<DD> The value of max_size that you need to ensure depends on the peripherals you use.<DD> The data size for each peripheral is as follows.</P><P><DD><TABLE BORDER=1><TR><TH WIDTH=250><PRE> peripheral</TH><TH WIDTH=100><PRE> Data size</TH></TR><TR><TD><PRE> digital device</TD><TD ALIGN=CENTER><PRE> 2</TD></TR><TR><TD><PRE> analog device</TD><TD ALIGN=CENTER><PRE> 3-9</TD></TR><TR><TD><PRE> handle</TD><TD ALIGN=CENTER><PRE> 3</TD></TR><TR><TD><PRE> Mission STICK (3 axes)</TD><TD ALIGN=CENTER><PRE> 5</TD></TR><TR><TD><PRE> Mission STICK (6 axes)</TD><TD ALIGN=CENTER><PRE> 9</TD></TR><TR><TD><PRE> Multi controller (analog)</TD><TD ALIGN=CENTER><PRE> 6</TD></TR><TR><TD><PRE> pointing device</TD><TD ALIGN=CENTER><PRE> 3</TD></TR><TR><TD><PRE> keyboard device</TD><TD ALIGN=CENTER><PRE> 4</TD></TR><TR><TD><PRE> megadrive 3 button pad</TD><TD ALIGN=CENTER><PRE> 1</TD></TR><TR><TD><PRE> megadrive 6 button pad</TD><TD ALIGN=CENTER><PRE> 2</TD></TR></TABLE></P><DD> If a peripheral with a data size larger than the set size is connected, data after max_size cannot be referenced.<BR> Data before size can be referenced without any problem.</P><P><DD> <B>example)</b><DD> If an analog device is connected when size = 2</P><DD><PRE>
+"Digital information" in the analog device → up to the 2nd byte, so it can be referenced "Analog information" in the analog device → up to the 3rd byte, so it can't be referenced</PRE><P><DT> <B>●About specifying an even number for max_size</b><DD> We recommend that you specify max_size as an even number.<DD> The reason is that the peripheral data output by the library is allocated in memory on even boundaries.<DD> When performing word access to peripheral data, be sure to specify an even size.<DD> Similarly, when performing longword access, specify in multiples of 4.<P><DT> <B>●About the setting unit of V-BLANK skip number</b><DD> If there are 2 or more frames (set 1 or more in the V-BLANK skip number set with the PER_LInit function), this library acquires peripherals only for the last frame.<DD> With this specification, peripheral data for intermediate frames is not acquired, so edges (previously unpressed and currently pressed buttons) may not be detected.<DD> If severe edge checking is required, set the V-BLANK skip count to 0 and execute the PER_LGetPer function at every interrupt.</P><P><DT> <B>●PER_LInit() execution failure</b><DD> PER_LInit() does not always succeed when run, and may fail.<DD> Be sure to check the function value of PER_LInit() and perform retry processing.<DD> If it fails, you must run PER_LInit() again.<DD> However, re-execution within the same frame is prohibited, so<DD> Please try again. </P></DL><!-- ------------------------------------------------------------------------------------- --><!--HIRANO 修正BIGIN--><HR><DL><P><A NAME="no15"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR>
+ <A HREF="p03_10.htm#no3_11">View</a><BR>
+ <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR>
+<H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR>
+<H4> Peripheral data acquisition</H4></TD><TD WIDTH=180><PRE> Function name<BR>
+<H3> PER_LGetPer</H3></TD><TD WIDTH=060><PRE> No<BR>
+<H4> 15</H4></TD></TR></TABLE><DT> <B>Format</b><DD> Uint32 PER_LGetPer( <A HREF="p03_11.htm#no6">PerGetPer</a> **output_dt, <A HREF="p03_11.htm#no7">PerMulInfo</a> **mul_info)<DT> <B>input</b><DD> none<PRE><DT><B> output</b><DD> output_dt: Peripheral data acquisition address (NULL = could not be acquired)
+<DD>mul_info: Multi-tap information acquisition address (NULL = could not be acquired)
+<DD>mul_info[0]: Multi-tap information for main unit terminal 1<DD> mul_info[1]: Multi-tap information of main unit terminal 2</PRE><DT> <B>function value</b><DD> Execution result<DD><TABLE BORDER=1><TR><TH WIDTH=150><PRE> constant</TD><TH WIDTH=250><PRE> explanation</TD></TR><TR><TD><PRE> PER_INT_ERR</TD><TD><PRE> Unable to issue intoback command.</TD></TR><TR><TD><PRE> PER_INT_OK</TD><TD><PRE> I was able to issue an intoback command.</TD></TR></TABLE><DT> <B>function</b><DD> Issues an intback command and retrieves peripheral data.<DD> Before executing this function, instruct PER_LInit() to obtain peripheral data (PER_KD_PER or PER_KD_PERTIM).<DD> If peripheral data acquisition is not instructed, NULL will be output to the peripheral data address.<P><DT> <B>how to use</b><DD> PerGetPer *output_dt<DD> PerMulInfo *mul_info<DD> err_code = PER_LGetPer( &output_dt, &mul_info);<DT><TABLE><TR><TH> Strict observance<BR><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>Use of this function from slave SH2 is prohibited.</b></TD></TABLE></P><DT><TABLE><TR><TH> Strict observance<BR><img srcset="../../../../what/atto.png 5x"></TH><TD> <B>Execution timing is limited to the following periods:</b><BR> <B><FONT SIZE=4>"300μ seconds after the start of V blank to the end of V blank"</font></b></TD></TABLE></P><P><DT> <B>Note 1: Execution timing of library functions</b><DD> When registering this function to the V-BLANK-OUT interrupt, please note the following points.<P><DD><UL TYPE=DISC><LI> Please execute this function at the beginning of interrupt processing as much as possible.<LI> However, when using the SCL_VblankEnd function of the VDP2 library, execute the PER_LGetPer function after the SCL_VblankEnd function.</UL></P><P><DD> If the execution timing of the SCL_VblankEnd function is slow, the sprite frame change will occur at the next timing, resulting in slow screen movement.</P><P><DT> <B>Note 2: Guaranteed range of peripheral data output</b><DD><UL TYPE=DISC><LI> Peripheral data is guaranteed to be within the smaller value range of the number of connectors returned in multi-tap information or the required number of peripherals specified when executing Per_LInit().</UL></P><P><DD> Therefore, when referencing peripheral data, be sure to determine the reference range based on the number of multi-tap connectors.<DD><UL TYPE=DISC><LI> When not connected, peripheral data is not initialized. Be sure to check whether it is connected or not before referencing peripheral data.</UL></P><P><DT> <B>[Connection/unconnection check procedure]</b><DD><PRE>
+1) Check the connection status of main unit terminal 1 from the multi-tap information.
+     When mul_info[0].id == 0xF0 and mul_info[0].con == 0x00 → Main unit terminal 1 is not connected.
+          The first piece of peripheral data has an undefined value.
+          The data on main body terminal 2 starts from the next data.
+     If mul_info[0].id != 0xF0 and mul_info[0].con == 0x00 → Main unit terminal 1 is connected to a peripheral that does not support SMPC.
+          The first piece of peripheral data has an undefined value.
+          The data on main body terminal 2 starts from the next data.
+     When mul_info[0].id == 0xF0 and mul_info[0].con == 0x01 → Main unit terminal 1 is a direct connection to an SMPC compatible peripheral.
+          The first one of the peripheral data is valid.
+          The data on main body terminal 2 starts from the next data.
+     If mul_info[0].id != 0xF0 and mul_info[0].con > 0x01 → Main unit terminal 1 is multi-tap connected (number of connectors is mul_info[0].con)
+          Valid for the number of connectors from the beginning of the peripheral data. Check the connection status of each terminal of the tap from the peripheral type and peripheral size of each terminal. The data of main body terminal 2 starts from the data after the data of main body terminal 1.
+
+2) Check the connection status of main unit terminal 2 from the multi-tap information using the same method as above.
+
+3) When making multi-tap connections, check the connection of each terminal using the following method.
+     peripheral type == PER_ID_NCON_UNKNOWN and
+     Peripheral size == PER_SIZE_NCON_15
+       → Not connected.
+     peripheral type == PER_ID_NCON_UNKNOWN and
+     Peripheral size != PER_SIZE_NCON_15
+       → A peripheral that does not support SMPC is connected.
+     Other than above → SMPC compatible peripherals are connected</PRE><P><DT> <B>Peripheral data output specifications</b><DD> <B>1. Data structure per peripheral</b>
+<PRE>
+  +-<A HREF="p03_11.htm#per_type">peripheral type</a>
+  |    +-<A HREF="p03_11.htm#per_size">peripheral size</a>
+  |    |    +-DATA1
+  |    |    |    +-DATA2       DATAn-+
+  |    |    |    |                   |
++----+----+----+----+              +----+
+| TP | SZ | D1 | D2 |..............| Dn |
++----+----+----+----+              +----+
+ &lt;--&gt;
+  1 Byte
+ &lt;--------------------------------------&gt;
+      (n + 2)Byte     n is equal to max_size specified in PER_LInit()
+
+・DATA1・・・DATAn（ n Byte )
+    Peripheral data
+       For the data format of each device, please refer to the
+       <a href="p03_10_j.htm#no3_10">Device information data type</A>.
+</PRE>
+<P><DD><B>2. Data structure of the entire peripheral data</b><DD> The above data will be output for the number of connectors on the main body terminal.<BR> Please refer to <A HREF="p03_10.htm#mull_info">the multi-tap information</a> for the number of connectors on the main unit terminals.</P><P><DT> <B>Specific example of output data</b><DD> ·Connection Status<DD> Main unit terminal 1 = not connected<DD> Main unit terminal 2 = digital device<DD>・Output result<DD> Array 0 = indeterminate<DD> array 1 = digital device<DD> Multi-tap information<DD> Main unit terminal 1 multi-tap ID = PER_MID_NCON_ONE (meaning not connected)<DD> Number of main unit terminals 1 connector = PER_MCON_NCON_UNKNOWN (meaning not connected)<DD> Main unit terminal 2 multi-tap ID = PER_MID_NCON_ONE (meaning direct connection)<DD> Number of main body terminals 2 connectors = 01<P><DT> <B>troubleshooting</b><DD> <B>1. Peripheral data cannot be obtained.</b><DD> Between V-BLANK OUT and next V-BLANK IN. ．．</P><DD><UL TYPE=DISC><P><LI> Isn't the SH interrupt mask set to 15?<BR> If the interrupt mask is set to 15, SMPC interrupts (and other interrupts) cannot be accepted.<BR> Please set an interrupt mask lower than the SMPC interrupt priority.</P><P><LI> Is the SMPC interrupt bit position in the SCU interrupt mask set to 1 (disabled)?<BR> If interrupts are disabled, SMPC interrupts cannot be accepted. Please set it to 0 (allow).</P><P><LI> Are interrupts with higher priority than the SMPC interrupt being executed for a long time?<BR> While processing a high-priority interrupt, it cannot accept a low-priority interrupt.<BR> Either prevent high-priority interrupt processing from running for a long time, or use the interrupt priority change routine in the system library to allow SMPC interrupts to be accepted.</P></UL><P><DD> <B>*</b> There are two types of interrupt priority: a hardware specific value and a system library setting value.<BR> For more information, please refer to the System Library and SCU hardware manual and the System Library section.</P><P><DD> <B>2. Peripherals connected to Multitap suddenly become inoperable.</b><DD> When acquiring peripheral information with this library, we have confirmed a phenomenon where operations on the peripheral via multi-tap suddenly become impossible. At this time, the library returns information that the peripheral is not connected, and the state will not return to normal until the peripheral or multitap is unplugged and reconnected. This phenomenon occurs when processing during V blanking is heavy.</P><P><DD> (Data transfer to V-RAM, etc.)<P><DD> Please change to reduce processing during V blank.</P><P><DD> If this problem still cannot be avoided, take the following measures.</P><DD><UL TYPE=DISC><LI> Change the data acquisition mode set in PER_LInit() from "PER_KD_PERTIM" to "PER_KD_PER".<LI> Use the SCU interrupt priority change function in the system library to increase the priority of SMPC interrupts.</UL></P><P><DD> If the problem still occurs even after making the above changes, please execute the PER_LInit function again when the "Not connected" status is returned.</P><P> (If "Not connected" is returned even after repeating several times, please assume that it is truly not connected.) </DL><!--/HIRANO 修正END--><!-- ------------------------------------------------------------------------------------- --><!--HIRANO 修正BIGIN--><HR><DL><P><A NAME="no16"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR>
+ <A HREF="p03_10.htm#no3_11">View</a><BR>
+ <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR>
+<H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR>
+<H4> Get time</H4></TD><TD WIDTH=180><PRE> Function name<BR>
+<H3> PER_GET_TIM</H3></TD><TD WIDTH=060><PRE> No<BR>
+<H4> 16</H4></TD></TR></TABLE><DT> <B>Format</b><DD> Uint8 *PER_GET_TIM(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> time data address<DT> <B>function</b><DD> Acquires time data. At least one frame before executing this function, it is necessary to instruct PER_LInit() to acquire peripheral data + time (PER_KD_PERTIM) and execute it. </DL><!--/HIRANO 修正END--><!-- ------------------------------------------------------------------------------------- --><!--HIRANO 修正BIGIN--><HR><DL><P><A NAME="no17"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR>
+ <A HREF="p03_10.htm#no3_11">View</a><BR>
+ <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR>
+<H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR>
+<H4> System data acquisition</H4></TD><TD WIDTH=180><PRE> Function name<BR>
+<H3> PER_GET_SYS</H3></TD><TD WIDTH=060><PRE> No<BR>
+<H4> 17</H4></TD></TR></TABLE><DT> <B>Format</b><DD> PerGetSys *PER_GET_SYS(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> System data address (NULL = could not be obtained)<DT> <B>function</b><DD> Acquire system data. One frame before executing this function, instruct PER_LInit() to acquire system data (PER_KD_SYS) and execute it at least once. (If execution of PER_LInit fails, please execute PER_LInit() again.)<DD> System data includes SMPC memory. SMPC memory is an area commonly used by applications and BOOT ROM, so be sure to follow <A HREF="p03_11.htm#SMPC_MEM">the data format</a> .<DD> For information on data that must be changed/referenced by the application and data that cannot be changed, please see <A HREF="../../../../info/hon/stn27.htm">here</a> .</P></DL><!--/HIRANO 修正END--><HR NOSHADE><H3 ALIGN=CENTER> others </H3><!-- ------------------------------------------------------------------------------------- --><!--HIRANO 修正BIGIN--><HR><DL><P><A NAME="no18"></A><DT><TABLE BORDER=1><TR><TD><PRE> <A HREF="p03_10.htm#no3_11">one</a><BR>
+ <A HREF="p03_10.htm#no3_11">View</a><BR>
+ <A HREF="p03_10.htm#no3_11">table</a></TD><TD WIDTH=150><PRE> Title<BR>
+<H4> function specification</H4></TD><TD WIDTH=220><PRE> Function<BR>
+<H4> Get hot reset</H4></TD><TD WIDTH=180><PRE> Function name<BR>
+<H3> PER_GET_HOT_RES</H3></TD><TD WIDTH=060><PRE> No<BR>
+<H4> 18</H4></TD></TR></TABLE><DT> <B>Format</b><DD> Uint8 PER_GET_HOT_RES(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Hot reset state address<DD><TABLE BORDER=1><TR><TH WIDTH=150><PRE> constant</TH><TH WIDTH=250><PRE> explanation</TH></TR><TR><TD><PRE> PER_HOT_RES_ON</TD><TD><PRE> Hot reset ON</TD></TR><TR><TD><PRE> PER_HOT_RES_OFF</TD><TD><PRE> Hot reset OFF</TD></TR></TABLE><DT> <B>function</b><DD> Get hot reset status. This function can be executed at any time.<DD> The update is executed by PER_LGetPer().</DL><!--/HIRANO 修正END--><HR NOSHADE> <B>▲ <A HREF="p03_11.htm">Back</a> | ■</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">System program user's manual</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

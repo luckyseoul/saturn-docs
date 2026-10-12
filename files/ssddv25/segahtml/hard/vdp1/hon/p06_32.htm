@@ -1,0 +1,66 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;29/54&gt;VDP1 User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p06_31.htm">Back</a> ｜ <A HREF="p06_33.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 6 Command Table</b><HR NOSHADE>
+<DL>
+<A NAME="no6_32_1"></A><P><DT><H3> ■Pre-clipping disabled</H3><DT> <B>Preclipping disable:</b> preclipping disable(Pclp), bit 11<BR>
+<DD> Specify whether to enable or disable pre-clipping. If you specify 0, pre-clipping will be performed. If you specify 1, pre-clipping will not be performed.<BR>
+ One drawing command is formed by a collection of several lines, and each line is a collection of several dots. Each dot is drawn based on the clipping area (drawing area) information specified by the CPU.<BR>
+ Lines that are completely outside the drawing area and where the entire line does not need to be drawn can be detected in advance, and drawing efficiency can be improved by not starting drawing. Also, if one end point of a line is outside the drawing area, it will be more efficient to start drawing from within the drawing area (the line must be horizontal or vertical).<BR>
+ VDP1 normally performs this detection work, but when drawing small-sized items in the vertex (A)-(B) or (D)-(C) direction, the overhead caused by the detection work (up to 5 CPU clocks per line) ) will stand out and cause a decrease in drawing efficiency.<BR>
+ If the image is large and extends far beyond the drawing area, it will be more efficient to perform pre-clipping.<BR>
+ This bit is valid only for drawing commands. Please fix it to 0 for other commands.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> Pclp</TH><TH><PRE> process</TH></TR>
+<TR><TH> 0</TH><TD> Pre-clipping, horizontal flip included</TD></TR>
+<TR><TH> 1</TH><TD> No pre-clipping, no horizontal flipping</TD></TR>
+</TABLE>
+</P>
+<A NAME="z6_6"></A><P ALIGN=CENTER> <B>Figure 6.6 Pre-clipping</b><BR>
+<img srcset="../grp/i083_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no6_32_2"></A><DT><H3> ■User clipping enabled</H3><DT> <B>User clipping enable bit:</b> user clipping enable bit(Clip), bit 10<BR>
+<DD> When using a part drawing command, specify whether or not to draw the part according to the user clipping coordinates that have already been set. When set to 0, the drawing will be clipped and drawn according to the system clipping coordinates, ignoring the user clipping coordinates. When set to 1, it is clipped and drawn according to the user clipping coordinates and clipping mode bit (Cmod) specifications. When set to 1, it will also be clipped at the system clipping coordinates.<BR>
+ Both user/system clipping coordinates are undefined upon reset, so specify the system clipping coordinates after the reset and the user clipping coordinates before specifying the user clipping using the clipping register setting command.</P>
+<A NAME="no6_32_3"></A><P><DT><H3> ■User clipping mode</H3><DT> <B>Clipping mode bit:</b> clipping mode bit(Cmod), bit 9<BR>
+<DD> When user clipping is enabled (Clip=1), select whether to draw inside or outside the user clipping coordinates. When it is 0, the inside is drawn, and when it is 1, the outside is drawn.<BR>
+ When Cmod=1, the drawing area includes the already specified user clipping rectangle line. When Cmod=0, the drawing area does not include the rectangular line.</P>
+<A NAME="z6_7"></A><P ALIGN=CENTER> <B>Figure 6.7 Drawing area</b><BR>
+<img srcset="../grp/i084_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Do not set this bit to 1 when user clipping is disabled (Clip=0).<BR>
+ The combinations of user clipping enable bit and clipping mode bit are as follows:</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> Clip</TH><TH WIDTH=50><PRE> Cmod</TH><TH><PRE> User clipping process</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TD><PRE> User clipping disabled</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TD><PRE> Setting prohibited (please do not set)</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TD><PRE> inner drawing mode</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TD><PRE> Outside drawing mode</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_31.htm">Back</a> ｜ <A HREF="p06_33.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

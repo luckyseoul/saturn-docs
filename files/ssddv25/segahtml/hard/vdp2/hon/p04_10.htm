@@ -1,0 +1,81 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/86&gt;VDP2 User's Manual/4.1 Screen Display Control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no4">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p03_40.htm">Back</a> ｜ <A HREF="p04_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual</b><H2 ALIGN=CENTER> Chapter 4 Scroll screen</H2><HR NOSHADE>
+<DL>
+<A NAME="no4_10"></A><P><DT><H2> ■4.1 Screen display control</H2><DD> For scroll screens, you can specify which screens should not be displayed by controlling display VRAM access for each screen. You can also specify for each screen whether to disable the dot color code (transparent code) that is the transparent dot on the displayed screen.</P>
+<A NAME="no4_10"></A><P><DT><H3> ●Screen display enable register</H3><DD> The screen display enable register controls the screen display and transparency code. This is a 16-bit write-only register located at address 180020H. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="BGON_"></A><P><DD> <B><FONT SIZE=5>BGON</font> <FONT SIZE=4>180020H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#R0TPON_">R0TPON</a></TH><TH><PRE> <A HREF="#N3TPON_">N3TPON</a></TH><TH><PRE> <A HREF="#N2TPON_">N2TPON</a></TH><TH><PRE> <A HREF="#N1TPON_">N1TPON</a></TH><TH><PRE> <A HREF="#N0TPON_">N0TPON</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#R1ON_">R1ON</a></TH><TH><PRE> <A HREF="#R0ON_">R0ON</a></TH><TH><PRE> <A HREF="#N3ON_">N3ON</a></TH><TH><PRE> <A HREF="#N2ON_">N2ON</a></TH><TH><PRE> <A HREF="#N1ON_">N1ON</a></TH><TH><PRE> <A HREF="#N0ON_">N0ON</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="R0TPON_">　</A><A NAME="N3TPON_">　</A><A NAME="N2TPON_">　</A><A NAME="N1TPON_">　</A><A NAME="N0TPON_">　</A><P><DT><B>Transparent enable bit</b> (N0TPON0, N1TPON, N2TPON, N3TPON, R0TPON)<DD> Specifies whether to disable transparent codes. For the transparent code, see " <B>Transparent dot</b> " in " <B><A HREF="p04_30.htm">4.3 Cell</a></b> ".</P>
+<P><DD><TABLE BORDER>
+<TR><TD WIDTH=120><PRE> N0TPON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 8</TD><TD WIDTH=200><PRE> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD><PRE> N1TPON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 9</TD><TD><PRE> For NBG1 (or for EXBG)</TD></TR>
+<TR><TD><PRE> N2TPON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 10</TD><TD><PRE> For NBG2</TD></TR>
+<TR><TD><PRE> N3TPON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 11</TD><TD><PRE> For NBG3</TD></TR>
+<TR><TD><PRE> R0TPON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 12</TD><TD><PRE> For RBG0</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> xxTPON</TH><TH><PRE> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Enable transparent code (transparent code dots will be transparent)</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> Disable transparent code (transparent code dots are displayed according to their data values)</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, or R0.</P>
+<A NAME="R1ON_">　</A><A NAME="R0ON_">　</A><A NAME="N3ON_">　</A><A NAME="N2ON_">　</A><A NAME="N1ON_">　</A><A NAME="N0ON_">　</A><P><DT><B>Screen display enable bit</b> : On bit (N0ON, N1ON, N2ON, N3ON, R0ON, R1ON)<DD> Specify whether to display each scroll screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD WIDTH=120><PRE> N0ON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 0</TD><TD WIDTH=200><PRE> For NBG0</TD></TR>
+<TR><TD><PRE> N1ON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 1</TD><TD><PRE> For NBG1</TD></TR>
+<TR><TD><PRE> N2ON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 2</TD><TD><PRE> For NBG2</TD></TR>
+<TR><TD><PRE> N3ON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 3</TD><TD><PRE> For NBG3</TD></TR>
+<TR><TD><PRE> R0ON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 4</TD><TD><PRE> For RBG0</TD></TR>
+<TR><TD><PRE> R1ON</TD><TD><PRE> 180020H</TD><TD><PRE> bit 5</TD><TD><PRE> For RBG1</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=50><PRE> xxON</TH><TH WIDTH=400><PRE> process</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> Cannot display (does not access VRAM for display)</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> can be displayed</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name can be N0, N1, N2, N3, R0, or R1.</P>
+<P><DD> If an access command for a screen with this bit set to 0 is set in the VRAM cycle pattern register, that access command is ignored and no VRAM access is performed to display that screen.<BR>
+ Do not set R1ON to 1 when R0ON is 0.<BR>
+ If both R0ON and R1ON are set to 1, the normal scroll screen cannot be displayed. At this time, VRAM-B0 is fixed to the RAM for the character pattern table of RBG1, and VRAM-B1 is fixed to the RAM for the pattern name table of RBG1.<BR>
+ If a specific screen cannot be displayed due to register settings, set the bit for that screen to 0. For example, if R0ON and R1ON are both set to 1, set the N0ON, N1ON, N2ON, and N3ON bits to 0.<BR>
+ For details on the rotating scroll screen, see " <B><A HREF="p06_20.htm">6.2 Rotating scroll screen display control</a></b> ."</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_40.htm">Back</a> ｜ <A HREF="p04_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no4">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

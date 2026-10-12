@@ -1,0 +1,179 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;60/86&gt;VDP2 User's Manual/10.1 Dot color data in palette format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no10">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p09_21.htm">Back</a> ｜ <A HREF="p10_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual</b><H2 ALIGN=CENTER> Chapter 10 Dot color data</H2><HR NOSHADE>
+<DL>
+<P><DD> If the dot color data of the sprite and each scroll screen is in palette format, the color RAM address is the dot color data made up of the palette number and dot color code, plus the value of the color RAM address offset register, and the address of that address is Outputs color data as dot color data. In the case of RGB format, the dot color data consisting of each RGB data is output as is as the color data of that dot.<BR>
+ If the dot color data on the scroll screen is in palette format, you can specify whether to use the special priority function or special color calculation function by the value of the lower 4 bits of the dot color data.</P>
+<A NAME="no10_10"></A><P><DT><H2> ■10.1 Dot color data in palette format</H2><DD> Dot color data in palette format is 11-bit data, and the value of the color RAM address offset register of the corresponding screen is added to the upper 3 bits to determine the color RAM address that stores the color data of that dot.</P>
+<A NAME="no10_11"></A><P><DT><H3> ●Sprite dot color data</H3><DD> Sprite dot color data in palette format varies depending on the specified sprite type. If you specify a sprite type with dot color data of 10 bits or less, fix the missing high-order bits to 0, add the color RAM address offset value for the sprite to the high-order 3 bits, and set the color RAM address of that dot. will do. Note that if the color RAM mode is set to mode 0 or mode 2, the most significant bit of the color RAM address is ignored.</P>
+<P><DD> Figure 10.1 shows the sprite dot color data in palette format, and Figure 10.2 shows the sprite color RAM address.</P>
+<A NAME="z10_1"></A><P><DD> <B>Figure 10.1 Sprite dot color data in palette format</b><P><DD> ◆For sprite types 0 to 3, 5<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=11> Dot color data 11 bits</TH></TR>
+</TABLE>
+</P>
+<P><DD> ◆For sprite types 4 and 6<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TH COLSPAN=10> Dot color data 10 bits</TH></TR>
+</TABLE>
+</P>
+<P><DD> ◆For sprite type 7<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TH COLSPAN=9> Dot color data 9 bits</TH></TR>
+</TABLE>
+</P>
+<P><DD> ◆For sprite types C to F<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TH COLSPAN=8> Dot color data 8 bits</TH></TR>
+</TABLE>
+</P>
+<P><DD> ◆For sprite type 8<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TH COLSPAN=7> Dot color data 7 bits</TH></TR>
+</TABLE>
+</P>
+<P><DD> ◆For sprite types 9 to B<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TH COLSPAN=6> Dot color data 6 bits</TH></TR>
+</TABLE>
+</P>
+<A NAME="z10_2"></A><P><DD> <B>Figure 10.2 Sprite color RAM address</b><P><DD>・Sprite dot color data<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=11> Dot color data 11 bits </TH></TR>
+</TABLE>
+</P>
+<P><TABLE BORDER=0>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE><H2> +</H2></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD></TR>
+</TABLE>
+<P><DD>・Color RAM address offset for sprites<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=3> Offset value<BR>
+ 3 bits</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0 </TD></TR>
+</TABLE>
+</P>
+<P><TABLE BORDER=0>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE><H2> ↓</H2></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD></TR>
+</TABLE>
+<P><DD>・Color RAM address of that dot<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=11> Color RAM address 11 bits</TH></TR>
+</TABLE>
+</P>
+<P><DD> <B>[note]</b><DD> If the color RAM mode is <B>mode 0</b> or <B>mode 2</b> , the most significant bit (LSB) of the color RAM address is ignored.</P>
+<A NAME="no10_12"></A><P><DT><H3> ●Scroll dot color data</H3><DD> Scroll dot color data in palette format varies depending on the number of specified character colors. Add the color RAM address offset value corresponding to each side to the upper 3 bits of the 11-bit dot color data to determine the color RAM address of that dot. Note that if the color RAM mode is set to mode 0 or mode 2, the most significant bit of the color RAM address is ignored.</P>
+<P><DD> Line color screens do not have a corresponding color RAM address offset value, so the 11-bit value read from the line color screen table becomes the color RAM address.</P>
+<P><DD> Figure 10.3 shows the scroll dot color data in palette format, and Figure 10.4 shows the color RAM address for the scroll screen.</P>
+<A NAME="z10_3"></A><P><DD> <B>Figure 10.3 Scroll dot color data in palette format</b><P><DD> ◆When the number of character colors is 16<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=7> pallet number<BR>
+ 7 bit</TH><TH COLSPAN=4> dot color code<BR>
+ 4 bits</TH></TR>
+</TABLE>
+</P>
+<P><DD> ◆When the number of character colors is 256<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=3> palette<BR>
+ number<BR>
+ 3 bits</TH><TH COLSPAN=8> dot color code<BR>
+ 8 bit</TH></TR>
+</TABLE>
+</P>
+<P><DD> ◆When the number of character colors is 2048 colors<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=11> dot color data<BR>
+ 11 bit</TH></TR>
+</TABLE>
+</P>
+<A NAME="z10_4"></A><P><DD> <B>Figure 10.4 Scroll color RAM address</b><P><DD>・Scroll dot color data<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=11> Dot color data 11 bits </TH></TR>
+</TABLE>
+</P>
+<P><TABLE BORDER=0>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE><H2> +</H2></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD></TR>
+</TABLE>
+<P><DD>・Color RAM address offset for each scroll<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=3> Offset value<BR>
+ 3 bits</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0 </TD></TR>
+</TABLE>
+</P>
+<P><TABLE BORDER=0>
+<TR><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE><H2> ↓</H2></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD><TD><PRE></TD></TR>
+</TABLE>
+<P><DD>・Color RAM address of that dot<TABLE BORDER=1>
+<TR><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TH COLSPAN=11> Color RAM address 11 bits</TH></TR>
+</TABLE>
+</P>
+<P><DD> <B>[note]</b><DD> If the color RAM mode is <B>mode 0</b> or <B>mode 2</b> , the most significant bit (LSB) of the color RAM address is ignored.</P>
+<A NAME="no10_13"></A><P><DT><H3> ●Color RAM address offset register</H3><DD> The color RAM address offset register specifies the color RAM address offset value for the sprite and each scroll screen. This is a 16-bit write-only register located at addresses 1800E4H to 1800E6H. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CRAOFA_"></A><P><DD> <B><FONT SIZE=5>CRAOFA</font> <FONT SIZE=4>1800E4H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCAOS_">N3CAOS2</a></TH><TH><PRE> <A HREF="#NxCAOS_">N3CAOS1</a></TH><TH><PRE> <A HREF="#NxCAOS_">N3CAOS0</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCAOS_">N2CAOS2</a></TH><TH><PRE> <A HREF="#NxCAOS_">N2CAOS1</a></TH><TH><PRE> <A HREF="#NxCAOS_">N2CAOS0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCAOS_">N1CAOS2</a></TH><TH><PRE> <A HREF="#NxCAOS_">N1CAOS1</a></TH><TH><PRE> <A HREF="#NxCAOS_">N1CAOS0</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCAOS_">N0CAOS2</a></TH><TH><PRE> <A HREF="#NxCAOS_">N0CAOS1</a></TH><TH><PRE> <A HREF="#NxCAOS_">N0CAOS0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CRAOFB_"></A><P><DD> <B><FONT SIZE=5>CRAOFB</font> <FONT SIZE=4>1800E6H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCAOS_">SPCAOS2</a></TH><TH><PRE> <A HREF="#NxCAOS_">SPCAOS1</a></TH><TH><PRE> <A HREF="#NxCAOS_">SPCAOS0</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCAOS_">R0CAOS2</a></TH><TH><PRE> <A HREF="#NxCAOS_">R0CAOS1</a></TH><TH><PRE> <A HREF="#NxCAOS_">R0CAOS0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="NxCAOS_"></A><DT> <B>Color RAM address offset bit</b> : Color RAM address offset bit<DD> (N0CAOS2~N0CAOS0, N1CAOS2~N1CAOS0, N2CAOS2~N2CAOS0, N3CAOS2~N3CAOS0, R0CAOS2~R0CAOS0, SPCAOS2~SPCAOS0)<BR>
+ Specifies the color RAM address offset value for the sprite and each scroll screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0CAOS2〜N0CAOS0</TD><TD> 1800E4H</TD><TD> bits 2-0</TD><TD> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD> N1CAOS2～N1CAOS0</TD><TD> 1800E4H</TD><TD> bits 6-4</TD><TD> For NBG1 (or for EXBG)</TD></TR>
+<TR><TD> N2CAOS2～N2CAOS0</TD><TD> 1800E4H</TD><TD> bits 10-8</TD><TD> For NBG2</TD></TR>
+<TR><TD> N3CAOS2～N3CAOS0</TD><TD> 1800E4H</TD><TD> bits 14-12</TD><TD> For NBG3</TD></TR>
+<TR><TD> R0CAOS2〜R0CAOS0</TD><TD> 1800E6H</TD><TD> bits 2-0</TD><TD> For RBG0</TD></TR>
+<TR><TD> SPCAOS2～SPCAOS0</TD><TD> 1800E6H</TD><TD> bits 6-4</TD><TD> for sprites</TD></TR>
+</TABLE>
+</P>
+<P><DD> The actual color RAM address offset value is calculated using the following formula: If the color RAM mode is mode 0 or mode 2, the most significant bit of the color RAM address resulting from adding the color RAM address offset value is ignored.</P>
+<P><DT><B>・When the color RAM mode is mode 0 or mode 1</b><DD><PRE><B>
+(Color RAM address offset value)
+       = (Color RAM address offset register value 3 bits) x 200H
+</b></PRE></P>
+<P><DT><B>・When the color RAM mode is mode 2</b><DD><PRE><B>
+(Color RAM address offset value)
+       = (Color RAM address offset register value 3 bits) x 400H
+</b></PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p09_21.htm">Back</a> ｜ <A HREF="p10_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no10">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

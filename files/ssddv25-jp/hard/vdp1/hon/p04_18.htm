@@ -1,0 +1,65 @@
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/54&gt;VDP1ユーザーズマニュアル/4.8　現処理テーブルアドレスレジスタ</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p04_17.htm">戻る</A>｜
+     <A HREF="p04_19.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第４章　システムレジスタ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_80"></A>
+	<P>	<DT><H2>■4.8　現処理テーブルアドレスレジスタ</H2>
+		<DD>　現処理テーブルアドレスレジスタ(COPR、Current operation command　address register)は現在処理中のコマンドテーブルアドレスを表します。読み出し専用の16bitのレジスタで、100014H番地にあります。</P>
+
+		<DT><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH ROWSPAN=2><PRE>COPR<BR>100014H<BR>(R)</TH>
+	<TH><PRE>bit15</TH><TH><PRE>bit14</TH><TH><PRE>bit13</TH><TH><PRE>bit12</TH><TH><PRE>bit11</TH><TH><PRE>bit10</TH><TH><PRE>bit９</TH><TH><PRE>bit８</TH>
+	<TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+	<TR ALIGN=CENTER>
+	<TD COLSPAN=14>現処理テーブルアドレス／8H</TD><TD>0</TD><TD>0</TD>
+	</TR></TABLE></P>
+
+	<P>	<DT><B>現処理テーブルアドレス:</B>　bit15〜0</P>
+	
+	<P>	<DT><UL TYPE="DISC">
+		<LI>現在処理中のパラメータを取り込んでいるコマンドテーブルアドレスを8Hで割った値が、このレジスタに書き込まれます。</P>
+
+	<P>	<LI>現在処理中のコマンドテーブルのアドレスを知ることができます。アドレスの値はコマンド処理中は常に更新されます。</P>
+
+	<P>	<LI>描画終了コマンドのフェッチ、描画強制終了の場合は、そのとき更新されたアドレスの値がフレームチェンジ、プロットトリガによる描画開始までそのまま保存されます。</P>
+
+	<P>	<LI>描画終了コマンドのフェッチの場合は描画終了コマンドテーブルのアドレス(/8H)です。描画強制終了の場合はその強制終了されたコマンドテーブルのアドレス(/8H)です。</P>
+
+	<P>	<LI>テーブルアドレスのバウンダリは20HByteなので、レジスタの下位2ビットは00Bに固定されます。</UL><P>
+
+<A NAME="no4_81"></A>
+	<P>	<DT><B>　●疑似的な描画継続</B></P>
+		<DT><UL TYPE="DISC">
+		<LI>描画するデータ量が多く1フレーム内で描画が終了しない場合、途中で描画を強制的に終了させ、疑似的な描画継続を使って、2つ以上に分けて描画します。</P>
+
+	<P>	<LI>疑似的な描画継続は次の手順で行います。描画強制終了させ、その時の処理中断テーブルアドレスへジャンプするよう先頭のコマンドを書き換え、プロットトリガモードを書き込み時点で描画開始(PTM=01B)に設定します。</P>
+
+	<P>	<LI>1フレーム内の時間で描画できる範囲まで描画させ、その時点でCPUから描画を強制終了(中断)させます。
+		次に、CPUからVRAM上の先頭コマンドテーブル内のジャンプ先を、強制終了時のコマンドテーブルアドレスに書き換え、プロットトリガモードで直ちに描画を開始(PTM=01B)させます。このようにして疑似的な描画継続をさせることができます。
+		ただし、強制終了時のコマンドテーブルアドレスがサブルーチン内の場合は描画継続はできません。この場合、それぞれのピクセルデータをフレームバッファに転送に必要な描画時間は、それぞれフレームエンドまでの時間より短いように設定します。</P>
+
+	<P>	<LI>描画の強制終了時、半透明の色演算を行っていた場合は、上記の方法で描画接続させると、2度半透明処理が行われる(2重に色演算が行われる)ドットが生じる可能性があります。半透明の色演算を行わないときに描画の強制終了をする必要があります。</UL><P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p04_17.htm">戻る</A>｜
+     <A HREF="p04_19.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

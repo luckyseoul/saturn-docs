@@ -1,0 +1,281 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;24/30&gt;SGL Programmer's Tutorial/9.Controller input</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+ <B>▲ <A HREF="p08_d0.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>PROGRAMMER'S TUTORIAL</b><H2 ALIGN=CENTER> 9.Controller input</H2><HR NOSHADE>
+<DL>
+<P> In this chapter, we will explain the recognition method and actual operation of Sega Saturn's data input device using Sega Saturn's representative input device, Sega Saturn PAD.<BR>
+ The Sega Saturn PAD has four direction keys, ABCXYZ buttons, LR button and start button on the top of the controller as input devices.<BR>
+ We will explain how the data input using each input device of these controllers is judged inside the Sega Saturn, along with sample programs.</P>
+<A NAME="no9_10"></A><P><DT><H2> 9-1. Input system used in Sega Saturn</H2><DD> The Sega Saturn can receive data from various data input devices connected to its input ports and reflect that data in programs.</P>
+<P> The data input device mainly used on the Sega Saturn is the control PAD that comes with the main unit, called the Sega Saturn PAD.<BR>
+ Sega Saturn PAD is an input device consisting of direction keys, start button, ABC button, XYZ button, and LR button arranged to point in four directions.</P>
+<A NAME="z9_1"></A><P ALIGN=CENTER> <B>Figure 9-1 Example of input device (Sega Saturn PAD)</b><BR>
+<img srcset="../grp/p09_02_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P><DD> ●For Sega Saturn PAD, the following data can be entered.<UL TYPE=DISC>
+<LI> Direction keys: Generally represent up, down, left, and right movements.<LI> START: Generally used to start the game<LI> ABC buttons: 3 buttons located at the bottom right of the pad<LI> XYZ buttons: 3 buttons located at the top right of the pad<LI> LR button: Two buttons located above the pad</UL>
+<P><DD> In addition to the Sega Saturn PAD, the Sega Saturn also supports the input devices listed in Table 9-1.<BR>
+ However, please note that some of the devices included in this table are not currently available for sale (although they are planned to be released in the future).</P>
+<A NAME="t9_1"></A><P><DD> <B>Table 9-1 List of input devices</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> Attribute</TH><TH><PRE> Name</TH><TH><PRE> Input configuration</TH><TH><PRE>      remarks</TH></TR>
+<TR><TD ROWSPAN=4> Digital</TD><TD> Sega Saturn PAD</TD><TD> Directional key, start, 8 button</TD><TD> Sega Saturn standard pad</TD></TR>
+<TR><TD> sega saturn mouse</TD><TD> XY movement amount, start, 3 buttons</TD><TD> The amount of mouse movement is stored as an absolute value.</TD></TR>
+<TR><TD> megadora 3 button pad</TD><TD> Directional key, start, 3 button</TD><TD> Can be connected with Sega Tap</TD></TR>
+<TR><TD> megadora 6 button pad</TD><TD> Directional key, start, 6 button</TD><TD> Can be connected with Sega Tap</TD></TR>
+<TR><TD> analog</TD><TD> analog joystick<BR>
+ (Mission Stick)</TD><TD> Direction lever, start, 8 buttons</TD><TD> The amount of movement is the absolute value of the unsigned A/D output.</TD></TR>
+<TR><TD> Special</TD><TD> sega saturn keyboard</TD><TD></TD><TD> Compatible with IBM keyboards</TD></TR>
+<TR><TD ROWSPAN=2> Auxiliary equipment</TD><TD> Sega Saturn 6P Multitap</TD><TD> Number of connections: 6</TD><TD></TD></TR>
+<TR><TD> sega tap</TD><TD> Number of connections 4</TD><TD> Used to connect Megadora PAD</TD></TR>
+</TABLE>
+ <B>Note)</b> For details on each input device, refer to “HARDWARE MANUAL/ <A HREF="../../../../hard/smpc/index.htm">SMPC User's Manual</a> ”.</P>
+<A NAME="no9_20"></A><P><DT><H2> 9-2. Actual operation</H2><DD> The input device connected to the input port will send a signal to the Sega Saturn when the device's input device (direction keys, buttons, etc.) is turned on.<BR>
+ The Sega Sega Saturn receives this signal and changes the device bits provided in the system, and by reading these changes, the programmer can read the status of the input device.<BR>
+ Therefore, in this chapter, we will explain the actual operation using the Sega Saturn PAD, which is a typical input device for Sega Saturn.</P>
+<A NAME="no9_21"></A><P><DT><H3> Bits used for input system</H3><DD> Devices connected to input ports (Sega Saturn PAD, etc.) are recognized by the system, and a certain amount of space is reserved in the system for each device.<BR>
+ This area includes the peripheral ID (8 bits), which is a bit string for device type recognition (specific to each device), and the input status bit string that follows.<BR>
+ The input status bit string consists of 1 data string of 8 bits, and the data strings necessary for the connected device are prepared.<BR>
+ The bit value of the input status bit string remains 1 when there is no input, and changes to 0 only when there is input (while the key or button is pressed).</P>
+<P> Sega Saturn PAD is processed as a set of bits as shown below.</P>
+<A NAME="t9_2"></A><P><DD> <B>Table 9-2 Sega Saturn PAD peripheral data format</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH></TH><TH> bit7</TH><TH> bit6</TH><TH> bit5</TH><TH> bit4</TH><TH> bit3</TH><TH> bit2</TH><TH> bit1</TH><TH> bit0</TH></TR>
+<TR ALIGN=CENTER><TH> Peripheral ID</TH><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> 0</TD></TR>
+<TR ALIGN=CENTER><TH> 1st DATA</TH><TD> →</TD><TD> ←</TD><TD> ↓</TD><TD> ↑</TD><TD> Start</TD><TD> A</TD><TD> C</TD><TD> B</TD></TR>
+<TR ALIGN=CENTER><TH> 2nd DATA</TH><TD> R</TD><TD> X</TD><TD> Y</TD><TD> Z</TD><TD> L</TD><TD> 1</TD><TD> 1</TD><TD> 1</TD></TR>
+</TABLE>
+ <B>Note:</b> The last 3 bits of 2nd DATA are unused and are set to 1 for convenience.</P>
+<P><DT> <B>reference:</b><DD> For information on peripheral data formats for input devices other than Sega Saturn PAD,<BR>
+ "HARDWARE MANUAL"/"SMPC User's Manual" <A HREF="../../../../hard/smpc/hon/p03_30.htm">■3.3 Supported peripheral data formats</a><BR>
+ Please refer to.</P>
+<P><DT><H3> About storing data formats</H3><DD> The bit string representing the state of each device is automatically stored in the area specified by the system.</P>
+<P><DT><H3> What is a peripheral?</H3><DD> Peripheral is a general term for all peripheral devices such as input/output, and peripheral ID is an ID for identifying peripheral devices.</P>
+<A NAME="no9_22"></A><P><DT><H3> Bit operation by input</H3><DD> Information about devices connected to input ports is secured in the system area as a collection of peripheral IDs followed by data strings (indicating the input status of the device).<BR>
+ Thereafter, changes in the state of the device are expressed as changes in the state of the specified area, and the programmer can receive information from the input device simply by checking the state of this area.</P>
+<P><DD> Figure 9-2 extracts only the pure device status information excluding the peripheral ID part from the Sega Saturn PAD device information and expands it into a 16-bit data string (data output by SGL as peripheral data). (also developed into this type).<BR>
+ Also, for devices other than Sega Saturn PAD, only this part is used for actual device processing (however, the data length varies depending on the device).<BR>
+ The input status bits are all 1 when there is no input, and the bits corresponding to the input device change to 0 only when there is input (while the key or button is pressed).</P>
+<A NAME="z9_2"></A><P ALIGN=CENTER> <B>Figure 9-2 Sega Saturn PAD input status bit array (16bit display)</b><BR>
+<img srcset="../grp/p09_04_1.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Figure 9-3 shows the change in the status bit string (16 bits) in the Sega Saturn PAD when there is no input at all, and then there are sequential inputs.</P>
+<A NAME="z9_3"></A><P ALIGN=CENTER> <B>Figure 9-3 Changes in input status bit string (Sega Saturn PAD)</b><BR>
+<img srcset="../grp/p09_04_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no9_23"></A><P><DT><H3> Handling of device information in SGL</H3><DD> In the case of SGL, information on the Sega Saturn PAD connected to the input port is stored in the system variable “Smpc_Peripheral[n]” (n=0 to 29).</P>
+<P><DD> The total number of devices currently connected to input port 1 and input port 2 is stored in the system variables “Per_Connect1” and “Per_Connect2”.<BR>
+ Also, if a multi-tap is connected, device information is stored in the “Smpc_Peripheral[n]” (n=0 to 14, 15 to 29) area.</P>
+<P><DD> The system variable "Smpc_Peripheral[ ]" stores a system-defined PerDigital type structure, and each member of the structure contains information as shown in the figure below.</P>
+<A NAME="z9_4"></A><P><DD> <B>Figure 9-4 “PerDigital” structure definition</b><DD><PRE>
+<B>● Definition contents of PerDigital structure ●</b>
+
+typedef struct{ /* digital device */
+	Uint8 id; /* Peripheral ID */
+	Uint16 data; /* Current peripheral data */
+	Uint16 push /* Data of the pressed switch */
+	Uint16 pull /* Released switch data */
+}PerDigital;
+</PRE><P><DD><B>Note)</b> The above structure is defined in the header file “sl_def.h” that comes with the system. </P>
+</BL
+	<P>
+<DD><PRE>
+data: 16-bit peripheral data (indicates the current bit state)
+push: 16-bit peripheral data (bits change only at the moment the input is executed)
+pull: 16-bit peripheral data (bits change only at the moment the input is released)
+id: 8-bit data string indicating the device peripheral ID</PRE></P>
+<P><DD> Peripheral data is a set of bits that represent only the input state, excluding the peripheral ID from the data set described above, and in the case of Sega Saturn PAD, it is represented by expanding the input state bits into a 16-bit length. .</P>
+<P><DT><H3> About peripheral data output</H3><DD> The members of the structure representing data for the Sega Saturn PAD introduced here consist only of the peripheral ID (8 bits) and input device switch ON/OFF information (16 bits), but for devices other than the Sega Saturn PAD, Corresponding structures are not necessarily the same.<BR>
+ For example, in the case of the Sega Saturn mouse, which is a pointing device, peripheral data holds the X and Y coordinates of the mouse pointer, in addition to the ON/OFF switch (16 bit) as a digital device. However, since the size of the structure is the same for all devices, it is also possible to refer to Sega Saturn mouse data as the Sega Saturn PAD type.</P>
+<BLOCKQUOTE>
+<P> <B>Note</b><BR>
+ For details on peripherals, please refer to “HARDWEAR MANUAL vol.1” and the header file “sl_def.h” included with the system.</P>
+</BLOCKQUOTE>
+<A NAME="no9_24"></A><P><DT><H3> Determining input data</H3><DD> The input information from the device is determined by comparing the peripheral data described above with the assignment data described next.<BR>
+ Assignment data is defined in the header file "sl_def.h" that comes with the system. For example, the assignments corresponding to each input device of the Sega Saturn PAD are defined as shown in the figure below.</P>
+<A NAME="z9_5"></A><P><DD> <B>Figure 9-5 #define value of assignment data (Sega Saturn PAD)</b><DD><PRE>
+● Pat assignment ●
+#define PER_DGT_KR (1&lt;&lt; 15) /* Direction key (→) */
+#define PER_DGT_KL (1&lt;&lt; 14) /* Direction key (←) */
+#define PER_DGT_KD (1&lt;&lt; 13) /* Direction key (↓) */
+#define PER_DGT_KU (1&lt;&lt; 12) /* Direction key (↑) */
+#define PER_DGT_ST (1&lt;&lt; 11) /* Start button */
+#define PER_DGT_TA (1&lt;&lt; 10) /* A button */
+#define PER_DGT_TC (1&lt;&lt; 9) /* C button */
+#define PER_DGT_TB (1&lt;&lt; 8) /* B button */
+#define PER_DGT_TR (1&lt;&lt; 7) /* R trigger */
+#define PER_DGT_TX (1&lt;&lt; 6) /* X button */
+#define PER_DGT_TY (1&lt;&lt; 5) /* Y button */
+#define PER_DGT_TZ (1&lt;&lt; 4) /* Z button */
+#define PER_DGT_TL (1&lt;&lt; 3) /* L trigger */
+</PRE></P>
+<P><DD>These assignments are used to check with peripheral data, so they correspond to the peripheral data length of each device. For example, the assignment for the A button on the Sega Saturn PAD is expanded as shown in the following figure (16 bit length). Also, in the assignment data, the bit corresponding to the input device to be determined is set to 1, and the other bits are set to 0.</P>
+<A NAME="z9_6"></A><P ALIGN=CENTER> <B>Figure 9-6 Pad assignment contents (for PER_DGT_TA)</b><BR>
+<img srcset="../grp/p09_06_2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><DD> <B>Note:</b> Only the bit of the same order (10th bit) that operates when the A button is input is set to 1.</P>
+<P><DD> In the case of the Sega Saturn PAD, the input device consists of a simple ON/OFF switch, so the switch status can be checked by logical operation of the assignment data and peripheral data.</P>
+<P><DD> Figure 9-7 is an example of checking the input status by ANDing peripheral data and assignment data. If the input device specified by the assignment data is ON, 0 will be output as the calculation result.</P>
+<P><DD> This method is also used in the sample program, and it is designed to display sprites on the screen if the input device pointed to by the pad assignment is in the ON state.</P>
+</>
+ <B>Figure 9-7 Checking input status using assignment data</b><BR>
+<img srcset="../grp/p09_07.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Also, here we performed data matching using an AND operation between the peripheral data and the assignment data, but of course it is not necessary to use this method.</P>
+<A NAME="no9_30"></A><P><DT><H2> 9-3. Sample program</H2><DD> The sample program (Listing 9-1) was created to test controller input.<BR>
+ The program displays a graphic imitating a Sega Saturn PAD on the screen, and when there is a controller input, an instruction mark (finger shape) is displayed on the button at the position corresponding to the controller input.<BR>
+ This program also uses sprites for instruction marks, etc.</P>
+<A NAME="l9_1"></A><P><DD> <B>Listing 9-1 sample_9_1: Input test (main.c)</b><P><DD><PRE>
+
+/*------------------------------------------------ ----------------------*/
+/* Pad Control */
+/*------------------------------------------------ ----------------------*/
+#include "sgl.h"
+#include "sega_sys.h"
+
+#define NBG1_CEL_ADR ( VDP2_VRAM_B1 + 0x02000 )
+#define NBG1_MAP_ADR ( VDP2_VRAM_B1 + 0x12000 )
+#define NBG1_COL_ADR ( VDP2_COLRAM + 0x00200 )
+#define BACK_COL_ADR ( VDP2_VRAM_A1 + 0x1fffe )
+#define PAD_NUM 13
+
+static Uint16 pad_asign[] = {
+	PER_DGT_KU,
+	PER_DGT_KD,
+	PER_DGT_KR,
+	PER_DGT_KL,
+	PER_DGT_TA,
+	PER_DGT_TB,
+	PER_DGT_TC,
+	PER_DGT_ST,
+	PER_DGT_TX,
+	PER_DGT_TY,
+	PER_DGT_TZ,
+	PER_DGT_TR,
+	PER_DGT_TL,
+};
+
+extern pad_cel[];
+extern pad_map[];
+extern pad_pal[];
+extern TEXTURE tex_spr[];
+extern PICTURE pic_spr[];
+extern FIXED stat[][XYZS];
+extern SPR_ATTR attr[];
+extern ANGLE angz[];
+
+static void set_sprite(PICTURE *pcptr , Uint32 NbPicture)
+{
+	TEXTURE *txptr;
+ 
+	for(; NbPicture--&gt; 0; pcptr++){
+		txptr = tex_spr + pcptr-&gt; texno;
+		slDMACopy((void *)pcptr-&gt; pcsrc,
+			(void *)(SpriteVRAM + ((txptr-&gt; (CGadr)&lt;&lt; 3)),
+			(Uint32)((txptr-&gt; Hsize * txptr-&gt; Vsize * 4)&gt;&gt; (pcptr-&gt; cmode)));
+	}
+}
+
+static void disp_sprite()
+{
+	static Sint32 i;
+	Uint16 data;
+
+	if(!Per_Connect1) return;
+	data = Smpc_Peripheral[0].data;
+
+	for(i=0;i&lt; PAD_NUM;i++){
+		if((data & pad_asign[i])==0){
+			slDispSprite((FIXED *)stat[i],
+				(SPR_ATTR *)(&attr[i].texno),(ANGLE)angz[i]);
+		}
+	}
+}
+
+void ss_main(void)
+{
+	slInitSystem(TV_320x224,tex_spr,1);
+	slTVOff();
+	set_sprite(pic_spr,1);
+	slPrint("Sample program 9.1" , slLocate(9,2));
+	
+	slColRAMMode(CRM16_1024);
+	slBack1ColSet((void *)BACK_COL_ADR , 0);
+
+	slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
+	slPageNbg1((void *)NBG1_CEL_ADR , 0 , PNB_1WORD|CN_12BIT);
+	slPlaneNbg1(PL_SIZE_1x1);
+	slMapNbg1((void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR , (void *)NBG1_MAP_ADR);
+	Cel2VRAM(pad_cel , (void *)NBG1_CEL_ADR , 483*64);
+	Map2VRAM(pad_map, (void *)NBG1_MAP_ADR, 32, 19, 1, 256);
+	Pal2CRAM(pad_pal , (void *)NBG1_COL_ADR , 256);
+
+	slScrPosNbg1(toFIXED(-32.0) , toFIXED(-36.0));
+	slScrAutoDisp(NBG0ON | NBG1ON);
+	slTVOn();
+	
+	while(1) {
+		disp_sprite();
+		slSynch();
+	} 
+}
+</PRE></P>
+<A NAME="no9_40"></A><P><DT><H2>9-4. Library functions used in the sample</H2><DD> Here, we will briefly introduce some of the library functions used in the sample program that were not explained in the previous chapters and are considered to be particularly important. At the same time, we will also introduce some functions related to these functions.</P>
+<A NAME="no9_41"></A><P><DT><H3> sprite function</H3><DD> This is a function to display sprites.<BR>
+ Unlike scrolling, sprites are a type of graphic data used when you want to freely move and display multiple objects in smaller units.<BR>
+ Sprites are often used for moving characters in games that use 2D graphics.</P>
+<P><DD> <B>[void slDispSprite ( FIXED *pos , ATTR *atrb , ANGLE Zrot );]</b><DD> Display the sprite on the screen by specifying the position, scale, and display angle.<BR>
+ Assign the pointer to the 4-dimensional array FIXED type variable that represents the XYZ coordinate values and scale value, the start address of the area where sprite data is stored, and the display angle to the parameters.<BR>
+ Similar to the library function “slPutPolygon”, it also performs sorting by Z value, but it is not affected by the current matrix at all.<BR>
+ Also, if a negative value is assigned to the scale value, the scale is calculated based on the Z position and then multiplied by the complement of the parameter scale value to create the display scale.<BR>
+ For example, if you specify -2.0 for the scale value and there is a sprite in a position that would be displayed at 0.5 times the scale, it will actually be displayed at 1.0 times the scale.<P><P><DD> <B>[void slPutSprite ( FIXED *pos , ATTR *atrb , ANGLE Zrot );]</b><DD> Calculates the position using the current matrix and displays the sprite on the screen scaled according to the perspective transformation. Assign the pointer to the 4-dimensional array FIXED type variable that represents the XYZ coordinate values and scale value, the start address of the area where sprite data is stored, and the display angle to the parameters. Similar to “slDispSprite”, the sprite will be scaled by the specified scale value, but if you assign a negative value, the sprite will be displayed upside down and horizontally flipped on the screen.</P>
+<P><DD> <B>[void slSetSprite ( SPRITE *parms , FIXED Zpos ) ;]</b><DD> Set the sprite control command data to be passed to the hardware in the transfer list. Assign the start address and Z coordinate position of the area where sprite data is stored to the parameters. This function is used when you want to create deformed sprites that cannot be created using library functions, or when you want to set a window that only affects a specific sprite.</P>
+<A NAME="no9_42"></A><P><DT><H3> Other functions</H3><DD> The two functions introduced here are both related to DMA transfer.<BR>
+ In the sample program, the function "slDMACopy" is used to transfer picture data for sprites (data transfer from the picture data storage area to the character generator area).</P>
+<P><DD> <B>[void slDMACopy ( void *src , void *dst , Uint32 cnt ) ;]</b><DD> It uses the CPU's built-in DMA to perform block transfers of data.<BR>
+ Assign the start address of the transfer source memory area, the start address of the transfer destination memory area, and the block transfer amount (unit: bytes) to the parameters.<BR>
+ This function ends the transfer immediately after starting the DMA, so if you want to know when the transfer is complete, use "slDMAWait".</P>
+<P><DD> <B>[void slDMAWait ( void );]</b><DD> Wait for the DMA transfer started with “slDMACopy” to complete.<BR>
+ “slDMACopy” always transfers data using the same channel, but if you use this function, if the previous DMA transfer is in progress, it will wait for the transfer to finish, and then start the next data transfer after the transfer is finished. It will be started.</P>
+<P><DD> <B>[void slDMAXCopy ( void *src , void *dst , Uint32 cnt , Uint16 mode ) ;]</b><DD> This allows you to specify how the pointer of the library function "slDMACopy" is moved. Assign the transfer start address of the transfer source memory area, block transfer amount (unit: bytes), and transfer mode flag to the parameters. The transfer mode flag specifies what to do with the address of the transfer source memory area, what to do with the address of the transfer destination memory area, and what to do with the transfer unit. The specification method is as follows.</P>
+<A NAME="z9_8"></A><P><DD> <B>Figure 9-8 Parameter substitution value (mode) for “slDMAXCopy”</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH ROWSPAN=2 COLSPAN=2><TH COLSPAN=3> Forwarding destination</TH></TR>
+<TR ALIGN=CENTER><TH> increment</TH><TH> Decrement</TH><TH> fixed</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=3> Rotation<BR>
+ Sending<BR>
+ Former</TH><TH> increment</TH><TD> Sinc_Dinc_Byte</TD><TD> Sinc_Ddec_Byte</TD><TD> Sinc_Dfix_Byte</TD></TR>
+<TR ALIGN=CENTER><TH> Decrement</TH><TD> Sdec_Dinc_Byte</TD><TD> Ban</TD><TD> Sdec_Dfix_Byte</TD></TR>
+<TR ALIGN=CENTER><TH> fixed</TH><TD> Sfix_Dinc_Byte</TD><TD> Sfix_Ddec_Byte</TD><TD> Ban</TD></TR>
+</TABLE>
+ <B>Note)</b> The above values are defined in "sl_def.h".<BR>
+ <B>Note)</b> The above values are when the transfer unit is <B>"Byte"</b> . <B>"Word"</b> and <B>"Long"</b> can be specified as other transfer units.</P>
+<A NAME="no9_f"></A><P><DT><H3> Additional notes: SGL library functions that appeared in this chapter</H3><DD> In this chapter, we explained the functions in the table below.<A NAME="t9_3"></A><P><DD> <B>Table 9-3 Library functions introduced in this chapter</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE> functional type</TH><TH><PRE> Function name</TH><TH><PRE> Parameter</TH><TH><PRE>         function</TH></TR>
+<TR><TD> void</TD><TD> slDispSprite</TD><TD> FIXED *pos,ATTR *atrb,ANGLE Zrot</TD><TD> Sprite display by specifying position, scale, and display angle</TD></TR>
+<TR><TD> void</TD><TD> slPutSprite</TD><TD> FIXED *pos,ATTR *atrb,ANGLE Zrot</TD><TD> Sprite display according to perspective transformation</TD></TR>
+<TR><TD> void</TD><TD> slSetSprite</TD><TD> SPRITE *parms,FIXED Zpos</TD><TD> Set in the buffer for transferring sprite data to hardware</TD></TR>
+<TR><TD COLSPAN=4></TD></TR>
+<TR><TD> void</TD><TD> slDMACopy</TD><TD> void *src,void *dst,Uint32 cnt</TD><TD> DMA transfer of only C from A to B (same bus transfer possible)</TD></TR>
+<TR><TD> void</TD><TD> slDMAWait</TD><TD> void</TD><TD> Wait until DMA transfer is completed</TD></TR>
+<TR><TD> void</TD><TD> slDMAXCopy</TD><TD> void *src,void *dst,Uint32 cnt,Uint16 mode</TD><TD> DMA transfer from A to B with C only in transfer mode D (same bus transfer possible)</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_d0.htm">Back</a> ｜ <A HREF="p10_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

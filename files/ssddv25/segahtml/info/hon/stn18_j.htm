@@ -1,0 +1,105 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE> SEGASATURN Developer's Information STN-18 </TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../index_j.htm">INDEX</A>
+▲
+|<a href="stn05_j.htm">STN-5</A>
+|<a href="stn06_j.htm">STN-6</A>
+|<a href="stn09_j.htm">STN-9</A>
+|<B>STN-18</B>
+|<a href="stn19_j.htm">STN-19</A>
+|<a href="stn21_j.htm">STN-21</A>
+|<a href="stn22_j.htm">STN-22</A>
+▼
+<HR NOSHADE>
+<H1 ALIGN=CENTER>STN-18</H1>
+<H2 ALIGN=CENTER>システムプログラムに関する使用制限</H2>
+<HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発行番号：</TH><TD>STN-18</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発 行 日：</TH><TD>95/01/20</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>メディア：</TH><TD>●共　通</TD><TD>○CD-ROM</TH><TD>○カートリッジ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>関　　連：</TH><TD>●プログラム</TD><TD>○ハード</TD><TD>○マニュアル</TD><TD>○ツール</TD><TD>○ゲーム</TD><TD>○バグ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>情報区別：</TH><TD>●新　規</TD><TD>○変　更</TD><TD>○追　加</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>重 要 度：</TH><TD>●厳　守</TD><TD>○推　奨</TD><TD>○参　考</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>添付資料：</TH><TD>●無</TH><TD>○有</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>件名補足：</TH><TD COLSPAN=7>SYS_SETSINT()関数のスレーブCPUからの使用制限</TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER>内　容</H3>
+<P>　SYS_SETSINT()関数をスレーブＳＨから使用した場合、ベクタ番号Numで示すスレーブ
+用ベクタテーブルの該当ベクタには、正しいデフォルト値が書き込まれません。<BR>
+ このようにアドレスを０で指定するデフォルトの登録方法は、スレーブＳＨから行わな
+いでください。<BR>
+　なお、マスタＳＨからマスタ用、スレーブ用ベクタテーブルを操作するのは問題ありま
+せん。また、これについてスレーブ用ベクタをデフォルト登録に戻す必要があれば、
+以下の方法で処理してください。</P>
+<DL>
+  <P><DT><H3>■操作方法</H3>
+     <DT><B>　●スレーブＳＨが、スレーブ用ベクタを独自に操作する場合</B>
+     <DD>　スレーブＳＨプログラムが、ワークRAMに常駐するようなケースで、スレーブが
+      自から状況に応じて割り込み処理を使い分ける場合は、初めに(デフォルトを取得可能な時点)で、</P>
+
+  <P><DD><B>　　func_org = <a href="../../prgg/sysg/prog/hon/p02_11_j.htm#no1_3">SYS_GETSINT(Num);</A></B></P>
+
+  <P><DD>により変数に保存し、目的の処理ルーチンを登録,更新した後、</P>
+
+  <P><DD><B>　　<a href="../../prgg/sysg/prog/hon/p02_11_j.htm#no1_1">SYS_SETSINT(Num, func_1st);</A><BR>
+	　　　　　　　　:<BR>
+	　　SYS_SETSINT(Num, func_2nd);<BR>
+	　　　　　　　　:</B></P>
+
+  <P><DD>デフォルトに戻すには、初めのアドレスを登録します。</P>
+
+  <P><DD>　　<B>SYS_SETSINT(Num, func_org);</B></P>
+
+
+  <P><DT><B>　●マスタＳＨがスレーブ用ベクタを操作する場合</B>
+     <DD>　スレーブＳＨプログラムがステージ毎に読み換えるようなケースで、マスタが
+      スレーブON/OFFを頻繁に行う場合は、マスタがスレーブをONする前または
+      OFFの後で、スレーブ用ベクタを初期化すれば良いので、マスタＳＨから前述の
+      タイミングで、</P>
+
+  <P><DD>　　<B>SYS_SETSINT(Num+0x100, 0);</B></P>
+
+  <P><DD>を実行する。<BR>
+      　なお、ベクタ番号に0x100を加えることにより、マスタＳＨからスレーブ用
+      ベクタを操作する方法は、通常の処理ルーチン登録にも行えます。</P>
+
+</DL>
+以上
+
+<HR NOSHADE>
+  <a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../index_j.htm">INDEX</A>
+▲
+|<a href="stn05_j.htm">STN-5</A>
+|<a href="stn06_j.htm">STN-6</A>
+|<a href="stn09_j.htm">STN-9</A>
+|<B>STN-18</B>
+|<a href="stn19_j.htm">STN-19</A>
+|<a href="stn21_j.htm">STN-21</A>
+|<a href="stn22_j.htm">STN-22</A>
+▼
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

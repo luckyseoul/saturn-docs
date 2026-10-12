@@ -1,0 +1,137 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/31&gt;SCU User's Manual/2.Operation Description</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p02_11.htm">Back</a> ｜ <A HREF="p02_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 2 Operation Description</b><HR NOSHADE>
+<DL>
+<A NAME="no1_33"></A><DT><H3> ◆Specific usage example</H3><P><DD> <B>●Direct mode</b><DD> Consider the case of transferring 1KByte from address 2000000H (A-Bus area) to address 6000000H (work RAM) using level 0 DMA. You can perform DMA (direct mode) by following the steps below.</P>
+<OL>
+<LI> Write the read address (2000000H) to the read address register D0R.<BR>
+ (Loads the read address from the CPU to address 25FE0000H.)<P><LI> Write the write address (6000000H) to the write address register D0W.<BR>
+ (Loads the write address from the CPU to address 25FE0004H.)<P><LI> Write the number of transferred bytes (400H) to the transferred byte number register D0C.<BR>
+ (Loads the number of transferred bytes from the CPU to address 25FE0008H.)<P><LI> Write the address addition value (101H) to the address addition value register D0AD.<BR>
+ (Loads the address addition value from the CPU to address 25FE000CH. Details of the address addition value are described in the address addition value section of this section. In normal DMA, specify 101H as the address addition value.)<P><LI> Set the DMA mode to 0, set the address update bit and DMA activation factor as necessary, and write to the mode/address update/DMA activation factor register D0MD. For example, if address update is set to hold mode and V-Blank-IN is used as the activation factor, write 0 to D0MD.<BR>
+ (Loads 0 from the CPU to address 25FE0014H.)<P><LI> When the DMA enable bit is set to 1 and the activation factor set in (5) occurs, DMA is activated and 1KByte data is transferred from address 2000000H (A-Bus area) to address 6000000H (work RAM) at level 0. transfer.<P><LI> After DMA ends, DMA is activated every time the activation factor set in (5) occurs. At that time, the operation changes depending on the values of the read address update bit (D0RUP) and write address update bit (D0WUP). Figure 2.7 shows the differences in DMA operation depending on the address update bit.<P></OL>
+<P><DD> However, (1) to (5) may be in any order. (When the activation factor is set to the DMA activation bit, DMA will be activated each time the DMA operation bit is set to 1 by the CPU.)</P>
+<A NAME="z2_7"></A><P><DD> <B>Figure 2.7 Differences in DMA operation depending on address update bit</b><BR>
+<P><DD> <B>D0RUP=0</b><BR>
+ <B>When D0WUP=0</b><BR>
+<img srcset="../grp/i022_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>D0RUP=0</b><BR>
+ <B>When D0WUP=1</b><BR>
+<img srcset="../grp/i022_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>D0RUP=1</b><BR>
+ <B>When D0WUP=0</b><BR>
+<img srcset="../grp/i022_03.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> <B>D0RUP=1</b><BR>
+ <B>When D0WUP=1</b><BR>
+<img srcset="../grp/i022_04.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> When the read address update bit is 0, the same address is referenced (read) both the first and second time. When the read address update bit is 1, the address referenced the second time will refer to the address following the first address.<BR>
+ When the write address update bit is 0, the first and second writes are performed to the same address. When the write address update bit is 1, the second write is performed from the address following the first write.</P>
+<P><DD> <B>●Indirect mode</b><DD> Indirect mode is used when you want to perform multiple DMA transfers with one startup. In indirect mode, instead of setting in a register as in direct mode, DMA is executed by accessing registers via RAM. As an example, consider the case where you want to execute the following three DMA transfers consecutively at level 0 via the work RAM area (6000000H).</P>
+<UL TYPE=DISC>
+<LI> (a).20HByte DMA transfer from 4000000H to 5C00000H.<LI> (b).10HByte DMA transfer from 5E00000H to 6080000H.<LI> (c).15HByte DMA transfer from 5A00000H to 6081000H.</UL>
+<P><DD> You can perform DMA (indirect mode) by following the steps below.</P>
+<P><DD><OL START=1>
+<P><B><LI></b> As shown in Figure 2.8, data is written in longword units from the work RAM area (6000000H).<A NAME="z2_8"></A><P> <B>Figure 2.8 Example of data writing</b><PRE>
+6000000H┏━━━━━━━━━━┓ ┐
+        ┃      20H ┃ │ ← (Number of bytes transferred)
+        ┠──────────┨ │
+        ┃ 5C00000H ┃ │(a)←(Transfer source address)
+        ┠──────────┨ │
+        ┃ 4000000H ┃ │ ←(Forwarding address)
+600000CH┣━━━━━━━━━━┫ ┘
+        ┃      10H ┃ │
+        ┠──────────┨ │
+        ┃ 6080000H ┃ │(b)
+        ┠──────────┨ │
+        ┃ 5E00000H ┃ │
+6000018H┣━━━━━━━━━━┫ ┘
+        ┃      15H ┃ │
+        ┠──────────┨ │
+        ┃ 6081000H ┃ │(c)
+        ┠──────────┨ │
+        ┃ DA00000H ┃ │ ←8000000H+5A00000H
+6000024H┣━━━━━━━━━━┫ ┘ (End code) (Forwarding address)
+        ┃          ┃
+
+</PRE><P><B><LI></b>Write the DMA parameter source address (6000000H) to the write address register (D0W).<P><B><LI></b> Write the address addition value (101H) to the address addition value register D0AD.<BR>
+ (Load the address addition value from the CPU to address 25FE000CH. Details of the address addition value are described in this section in Address addition value. In normal DMA, specify 101H as the address addition value.)<P><P><B><LI></b> Set the DMA mode to 1, set the address update bit and DMA activation factor as necessary, and write to the mode/address update/DMA activation factor register D0MD. For example, if address update is set to hold mode and V-Blank-IN is used as the activation factor, write 1000000H to D0MD.<BR>
+ (Loads 1000000H from the CPU to address 25FE0014H.)<P><P><B><LI></b> When the DMA enable bit is set to 1 and the activation factor set in (4) occurs, DMA is activated and DMA transfers (a) to (c) are executed in order until the DMA end code is detected. The DMA end code is a DMA indirect mode end notification code that exists only in the work RAM area, and DMA transfer will continue unless this bit is detected as "1".</OL>
+<P><DD> However, (1) to (4) may be in any order. In addition, the "read address register (D0R)" and "transfer byte count register (D0C)" that needed to be set in direct mode do not need to be set in indirect mode.<BR>
+ Furthermore, assume that the following DMA transfer is registered in memory.</P>
+<UL TYPE=DISC>
+<LI> (d).30HByte DMA transfer from 5000000H to 6090000H.<LI> (e).25HByte DMA transfer from 5100000H to 60A0000H.</UL>
+<P><DD> At this time, the contents from work RAM area 6000000H are as shown in Figure 2.9.<BR>
+ The DMA is restarted every time the activation factor set in (5) occurs.</P>
+<A NAME="z2_9"></A><P><DD> <B>Figure 2.9 Contents of work RAM area</b><PRE>
+6000000H┏━━━━━━━━━━┓
+        ┃      20H ┃
+        ┠──────────┨
+        ┃ 5C00000H ┃
+        ┠──────────┨
+        ┃ 4000000H ┃
+600000CH┣━━━━━━━━━━┫
+        ┃      10H ┃
+        ┠──────────┨
+        ┃ 6080000H ┃
+        ┠──────────┨
+        ┃ 5E00000H ┃
+6000018H┣━━━━━━━━━━┫
+        ┃      15H ┃
+        ┠──────────┨
+        ┃ 6081000H ┃
+        ┠──────────┨
+        ┃ DA00000H ┃
+6000024H┣━━━━━━━━━━┫ ┐
+        ┃      30H ┃ │
+        ┠──────────┨ │
+        ┃ 6090000H ┃ │(d)
+        ┠──────────┨ │
+        ┃ 5000000H ┃ │
+6000030H┣━━━━━━━━━━┫ ┘
+        ┃      25H ┃ │
+        ┠──────────┨ │
+        ┃ 60A0000H ┃ │(e)
+        ┠──────────┨ │
+        ┃ D100000H ┃ │ ←8000000H+5100000H
+600003CH┣━━━━━━━━━━┫ ┘ (End code) (Forwarding address)
+        ┃          ┃
+
+</PRE><P><DD>When rebooting, the behavior differs depending on whether the DMA mode is retention mode or update mode. Recognition of indirect mode retention/update mode is determined by the write address update bit.</P>
+<P><DD>&#65308; <B>In the case of retention mode (write address update bit = 0)</b>&#65310;<DD> After the first DMA transfer is completed, the address to access the parameter is held at 6000000H, so execute DMA transfers (A) to (C) again.</P>
+<P><DD>&#65308; <B>In case of update mode (write address update bit = 1)</b>&#65310;<DD> After the first DMA transfer is completed, the address for accessing the parameters will be updated to 6000024H, so execute DMA transfers (D) to (E).</P>
+<P><DD> <B>●Address addition value</b><DD> Normally, DMA accesses continuous areas, but by setting an address addition value, it is possible to access addresses at regular intervals. This function is useful when you want to change some of the parameters in a VDP1 command table where the parameters are arranged consecutively. As an example, suppose there are 32 blocks with 20H bytes as one table starting from address 5C00000H. Eventually, we will consider rewriting the parameters in the 8th byte of each block at once. Assuming that there are 40H bytes of parameters to be changed starting from address 6000000H, and when transferring using level 0 DMA, set the following steps and execute the transfer process.</P>
+<OL>
+<LI> Write read address 6000000H to read address register D0R.<P><LI> Write write address 5C00008H to write address register D0W.<P><LI> Write the number of transferred bytes, 40H, to the transferred byte number register D0C.<P><LI> Write address addition value 105H to address addition value register D0AD.<BR>
+ In this, the lower 3 bits (5=101B) indicate that the address will be updated in 20H increments.<P><LI> Set the DMA mode to 0, address update bit and DMA activation factor as necessary, and write to the mode/address update/DMA activation factor register D0MD. For example, if address update is set to retention mode and V-Blank-IN is used as the activation factor, write 0 to D0MD.<P><LI> When the DMA enable bit is set to 1 and the activation factor set in (5) occurs, DMA is activated and the shaded area shown in Figure 2.10 is rewritten at once.<P></OL>
+<A NAME="z2_10"></A><P ALIGN="CENTER"> <B>Figure 2.10 Example of DMA transfer execution by setting address addition value</b><BR>
+<img srcset="../grp/i026_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> However, (1) to (5) may be in any order.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_11.htm">Back</a> ｜ <A HREF="p02_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

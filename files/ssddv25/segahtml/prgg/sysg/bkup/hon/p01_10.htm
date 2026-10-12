@@ -1,0 +1,84 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 3&gt;Backup Library User's Manual/Guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Backup Library User's Manual</a><HR>
+ <B>▲ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>Backup Library User's Manual</b><H2 ALIGN=CENTER> guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H2> ■Purpose</H2><DD> This game console will be equipped with several types of storage devices, including internal memory, in order to save information during the game.<BR>
+ This library provides read/write and search functions for these backup storage devices.</P>
+<A NAME="no1_20"></A><P><DT><H2> ■Explanation</H2><A NAME="no1_201"></A><DT><H3> ●Introduction</H3><DD> Be sure to use this library to access backup storage devices.<P><A NAME="no1_21"></A><P><DT><H3> ●How to use the library</H3><DD> The main body of this library is compressed and stored in the BOOT ROM.<BR>
+ Application authors deploy and use it. Expansion is performed by allocating a program expansion area and executing BUP_Init(). From now on, each function will be available for use.</P>
+<A NAME="no1_22"></A><P><DT><H3> ●About storage capacity</H3><DD> The goal of this library is to be able to access devices that will be supported in the future using a common interface. Therefore, the capacity of storage devices that will be developed in the future is unknown. Also, depending on the device, it is divided into several sections. From now on, each divided unit is called a partition. (The capacity may differ for each partition.)<BR>
+ When storing data, execute <A HREF="p02_11.htm#no2_2">BUP_SelPart()</a> and <A HREF="p02_11.htm#no2_4">BUP_Stat()</a> to check the capacity before writing.<BR>
+ Built-in backup memory is 32K.</P>
+<A NAME="no1_23"></A><P><DT><H3> ●About date settings</H3><DD> This library does not have an internal date and time acquisition function to maintain library independence. For date and time data, please set the data obtained on the application side using BUP_SetDate().</P>
+<A NAME="no1_24"></A><P><DT><H3> ●Notes</H3><DD> If this library is interrupted while writing data, the data will be destroyed. Before executing <A HREF="p02_11.htm#no2_1">BUP_Init()</a> , <A HREF="p02_11.htm#no2_3">BUP_Format()</a> , <A HREF="p02_11.htm#no2_5">BUP_Write()</a> , or <A HREF="p02_11.htm#no2_7">BUP_Delete()</a> , please disable the reset button using <A HREF="../../smif/hon/p03_12.htm#no11">PER_SMPC_RES_DIS()</a> in the peripheral library.<BR>
+<A NAME="no1_30"></A><P><DT><H2> ■Program description example</H2><DD> An example of an actual program written in C language is shown below.<BR>
+<DD><PRE>
+#include  "sega_per.h"
+#define   BUP_START_ADDR　0x60????0   /* Specifying the address to load the library　*/
+#include  "sega_bup.h"
+Uint32    BackUpRamWork[2048+30];     /* 2048=Block access table */
+                                      /*   30=Backup library variable area */
+main()
+{
+  BupConfig  conf[3];
+  BupStat  sttb;
+  BupDir  writetb;
+  BupDate  datatb;
+  Uint8  *time;<P>
+  PER_SMPC_RES_DIS();                  /* Reset button disabled  */
+  BUP_Init(BUP_START_ADDR, BackUpRamWork, conf);
+  if(BUP_Stat(0, &amp;sttb)==BUP_UNFORMAT){
+  　  BUP_Format(0);
+  }
+  PER_SMPC_RES_ENA();                  /* Reset button enabled  */
+  BUP_Stat(0, &amp;sttb);
+  if(sttb.freeblock &gt; 0){
+  　  strcpy((char *)writetb.filename, "FILE_NAME01");
+  　  strcpy((char *)writetb. comment, "テスト");  /* Write "test" in Japanese */
+  　  writetb.language = BUP_JAPANESE;
+  　  time = PER_GET_TIM();            /* Get date and time  */
+  　  datetb.year = (Uint8 )( (Uint16 )(time[6]&gt;&gt;4) * 1000
+  　  　  　  + (Uint16 )(time[6] &amp; 0x0F) * 100
+  　  　  　  + (Uint16 )(time[5]&gt;&gt;4)  * 10
+  　  　  　  + (Uint16 )(time[5] &amp; 0x0F) - 1980);
+  　  datetb.month = time[4] &amp; 0x0F;
+  　  datetb.day   = (time[3]&gt;&gt;4)*10 + (time[3] &amp; 0x0F);
+  　  datetb.time  = (time[2]&gt;&gt;4)*10 + (time[2] &amp; 0x0F);
+  　  datetb.min   = (time[1]&gt;&gt;4)*10 + (time[1] &amp; 0x0F);
+  　  writetb.date = BUP_SetDate(&amp;datetb);
+  　  writetb.datasize = 10;
+  　  PER_SMPC_RES_DIS();              /* Reset button disabled  */
+  　  BUP_Write(0, &amp;writetb, "Dummy Data");
+  　  PER_SMPC_RES_ENA();              /* Reset button enabled  */
+  }
+}
+</PRE></P>
+<P><DD><B>Reference</b> Developer's Information STN-52 " <B><A HREF="../../../../info/hon/stn52.htm">Backup Library Work Area Size</a></b> "</DL>
+<HR NOSHADE>
+ <B>▲ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Backup Library User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

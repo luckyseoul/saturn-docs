@@ -1,0 +1,52 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 8&gt;FAQ/SGL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#CD">SGL programming related</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SGL programming related</b><H2 ALIGN=CENTER> CD access</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_01"><HR></a><DL>
+<H3> I want to perform detailed CD access using SGL.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I cannot find a function (obtaining sector size, number of sectors, etc.) equivalent to SBL's GFS_GetFileSize() in the SGL CD-ROM library. What should we do to achieve this?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Basically, the SGL file system-related functions have only basic functionality. If you want to perform advanced CD operations, this is not enough and you need to use the CDC/STM/GFS functions provided for SBL.</P>
+<P> These functions can be used in the current SGL, but if you find it necessary to use SGL's slCd* functions midway through, initialize SGL's internal variables with slCdInit, and when returning, It is necessary to reinitialize it using SBL's initialization functions such as GFS_Init/STM_Init/CDC_CdInit.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_02"><HR></a><DL>
+<H3> What if I want to read data multiple times?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If I want to open multiple files, is there a way other than calling the slCdOpen function for each file?</P>
+<P> Also, if you have a file that you want to read data from many times, you can read it again without closing it (for example, when reading data into the same area alternately and processing it), or seek to a location in the file and read any byte. Is there a way to read numbers?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> To be honest, the CD functions (slCd*) that come with SGL have very low functionality and are not suitable for complex CD access. (For example, functions such as immediate return and look-ahead)<BR>
+ The current SGL can now use the GFS library, stream library, and CDC library, which were originally SBL functions.<BR>
+ We recommend using these functions.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no5_03"><HR></a><DL>
+<H3> What is CDKEY?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I don't really understand CDKEY, where should I read the manual?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> CDKEY is described in SGL's TUTORIAL, but each sector has a subheader to identify the CD-ROM's multitrack format. The information in this subheader is CDKEY, which allows you to determine the type of sector information.</P>
+<P> Since MODE 1 is a single sector, the value of CDKEY does not need to be considered as CDKEY_NONE.</P>
+<P><DT> <B>reference</b><DD> “SGL/Tutorial” <A HREF="../../sgl/sglt/prog/hon/p12_10.htm">12.CD-ROM Library</a></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#CD">SGL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,98 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 9&gt;セガサターン概要マニュアル/3.機能/3.2 SCU</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#intr">HARDWARE Manual</A>
+★<A HREF="../index.htm#no3">セガサターン概要マニュアル</A>
+<HR>
+<B>▲<A HREF="p03_10.htm">戻る</A>｜
+     <A HREF="p03_30.htm">進む</A>▼</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_20"></A>
+	<P>
+	<DT><H3>■3.2　ＳＣＵ</H3>
+	<DD>　SCUは、CPU-bus, A-bus, B-busに接続する複数のプロセッサのインタフェースを円滑に実行します。更に内部には、DMAコントローラ、割り込みコントローラ、DSPを搭載しています。
+
+<A NAME="no3_21"></A>
+	<P>
+	<DT><B>　●システム構成</B>
+	<DD>　CPU-busにはSMPCが接続しており、システムリセット信号およびコントロールパッドの制御を行います。<BR>
+　A-busは、カートリッジ、CDなどのプログラムを供給するデバイスが、接続されます。<BR>
+　SCUの割り込みコントローラは、A-bus, B-bus, SMPCからの割り込みを制御します。また、タイマ割り込みをサポートしており、画面表示に同期して割り込み(INT信号)を発生させることができます(図3.1)。
+
+<A NAME="z3_1"></A>
+<P ALIGN="CENTER"><B>図3.1　SCUシステム構成</B><BR><IMG SRC="../grp/i013_01.gif">
+
+<A NAME="no3_22"></A>
+	<P>
+	<DT><B>　●システム仕様</B>
+<A NAME="t3_2"></A>
+	<DD><TABLE BORDER><CAPTION><B>表3.2　SCUシステム仕様</B></CAPTION>
+	<TR><TH>No</TH><TH>項　　目</TH><TH>仕　　　様</TH><TH>備　　考</TH></TR>
+	<TR><TH>1</TH><TD><PRE>DSP         </TD><TD><PRE>・32bit×32bit　→　48bit<BR>・14MHz　<A HREF="#t3_2_1"><B>注１</B></A><BR>・プログラムRAM　32bit×256word<BR>・DATA RAM 32bit×64word×4個<BR>・DMA用命令有り</TD><TD><PRE><PRE>　</TD></TR>
+	<TR><TH>2</TH><TD><PRE>DMA         </TD><TD><PRE>・CPU用3ch,DSP用1ch<BR>・3レベル，スタック1セット<BR>・割り込みによる起動可能<BR>・間接モード有り</TD><TD><PRE>　</TD></TR>
+	<TR><TH>4</TH><TD><PRE>割り込み制御</TD><TD><PRE>・画面に同期するタイマ（2ch）および、<BR>・外部端子からの割り込みのコントロール</TD><TD><PRE>　</TD></TR>
+	<TR><TH>5</TH><TD><PRE>A-bus制御   </TD><TD><PRE>・A-bus（外部バス）のバスサイジング<BR>・ウェイトコントロール<BR>・バーストサイズの設定<BR>・リフレッシュのコントロール</TD><TD><PRE>　</TD></TR>
+	<TR><TH>6</TH><TD><PRE>B-bus制御   </TD><TD><PRE>・B-bus（内部バス）の制御</TD><TD><PRE>・VDP1、VDP2、SCSP専用</TD></TR>
+	</TABLE></CENTER>
+
+<A NAME="no3_23"></A>
+	<P>
+	<DT><B>　●機能</B>
+	<DD>　SCUの機能を次に示します。
+
+<A NAME="no3_231"></A>
+	<P>
+	<DD><B>メインCPU(SH-2)、内部DSP、A-bus、B-bus間のデータ転送</B>
+	<DD>　SCUは、CPU I/F, A-bus I/F, B-bus I/Fを搭載しており、それぞれのI/Fとバスを介して
+			接続している複数のプロセッサとのインタフェースを円滑に実行します。さらに、メイン
+			CPUからSCU内部にあるDSPへプログラムを転送することが可能です。また、A-bus, B-bus間
+			でのデータ転送実行中に、CPUからCPU-busを使用してワークエリアをアクセスできるなど、
+			独立するバスを平行に使用して処理を実行することができます。
+
+<A NAME="no3_232"></A>
+	<P>
+	<DD><B>割り込み制御</B>
+	<DD>　他のプロセッサにまたがるような割り込みは、SCUを介して発行します。
+			例えば、音量レベルを画面表示したいときは、SCSPからSCUに対し画面表示要求の
+			割り込みを発生させます。さらに、SCUが割り込みを認識し、画面に同期しながら
+			割り込みを発行させます。このとき画面のどのポイント(ドット)でも割り込みを発行
+			できるようになっています。
+
+<A NAME="no3_233"></A>
+	<P>
+	<DD><B>内部DSP</B>
+	<DD>　SCUは内部にDSPを搭載しています。これは、メインCPUだけでは負荷がかかりすぎ、
+			実現が困難な処理を実現させるために設けられています。
+
+<A NAME="no3_234"></A>
+	<P>
+	<DD><B>動作周波数</B>
+	<DD>　SCU内部にあるDSPの動作周波数は、メインCPUの1/2の周波数で動作します。
+			メインCPUの動作周波数との関係は以下のようになります。
+
+<A NAME="t3_2_1"></A>
+	<P>
+	<DD><TABLE BORDER=1><CAPTION><B>表3.2.1　SCU-DMAのクロック詳細</B></CAPTION>
+	<TR ALIGN=CENTER><TH>　画面表示モード　</TH><TH>　SH-2動作クロック　</TH><TH>　SCU-DSP動作クロック　</TH></TR>
+	<TR ALIGN=CENTER><TD><PRE>320 ドットモード時（NTSC方式）</TD><TD><PRE>26.8741 MHz</TD><TD><PRE>13.4371 MHz</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>352 ドットモード時（NTSC方式）</TD><TD><PRE>28.6364 MHz</TD><TD><PRE>14.3182 MHz</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>320 ドットモード時（PAL方式） </TD><TD><PRE>26.6877 MHz</TD><TD><PRE>13.3439 MHz</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>352 ドットモード時（PAL方式） </TD><TD><PRE>28.4377 MHz</TD><TD><PRE>14.2189 MHz</TD></TR>
+	</TABLE>
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p03_10.htm">戻る</A>｜
+     <A HREF="p03_30.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#intr">HARDWARE Manual</A>
+★<A HREF="../index.htm#no3">セガサターン概要マニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

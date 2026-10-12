@@ -1,0 +1,150 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;13/22&gt;CDビルダスクリプト文法/3.5　論理ファイル構造の定義</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CDビルダスクリプト文法</A>
+<HR>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+<a href="p09_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CDビルダスクリプト文法マニュアル</B>
+<H2 ALIGN=CENTER>3.5　論理ファイル構造の定義</H2>
+<HR NOSHADE>
+<DL>
+	<P><DT>　論理ファイル構造定義の概要を以下に示します。</P>
+	<DD><PRE>
+Directory DIR1                        
+    Directory SUBDIR1                 
+        File FILE1                    
+            FileSource SRCFILE1    階層
+            EndFileSource          ↓
+        EndFile                    １　　　　２　　　　　　　３
+        File FILE2                 ￥─┬─ＤＩＲ１─┬─ＳＵＢＤＩＲ─┬─ＦＩＬＥ１
+            FileSource SRCFILE2    　　│　　　　　　│　　　　　　　　├─ＦＩＬＥ２
+            EndFileSource          　　│　　　　　　│　　　　　　　　│
+        EndFile                    　　│　　　　　　│　　　　　　　　│
+        :                          　　：　　　　　　：　　　　　　　　：
+        :                          　　：　　　　　　：　　　　　　　　：
+    EndDirectory 
+    :
+    :
+EndDirectory
+</PRE></P>
+</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.1"><HR></A><DL>
+<P><TABLE BORDER=1><TR>
+<TD><PRE><a href="p03_10_j.htm#t3_1_5">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>コマンド仕様</H4></TD>
+<TD WIDTH=280><PRE>Command<BR><H4>ディレクトリ定義の開始</H4></TD>
+<TD WIDTH=200><PRE>Keyword<BR><H3>Directory</H3></TD>
+<TD WIDTH=030><PRE>No<BR><H4>5.1</H4></TD>
+</TR></TABLE></P>
+<DT><B>　書　式</B><DD>Directory  dirname
+<DT><B>　パラメータ</B><DD>dirname  ：ディレクトリ名
+<DT><B>　機　能</B><DD>ディレクトリ定義を開始します。
+<DT><B>　備　考</B><DD>ISO9660規格上、ディレクトリ階層は、ルートディレクトリを１と数えて最大８階層まで定義できます。ただし、セガサターン用としては７階層以内を推奨しています。
+</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.2"><HR></A><DL>
+<P><TABLE BORDER=1><TR>
+<TD><PRE><a href="p03_10_j.htm#t3_1_5">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>コマンド仕様</H4></TD>
+<TD WIDTH=280><PRE>Command<BR><H4>ディレクトリ定義の終了</H4></TD>
+<TD WIDTH=200><PRE>Keyword<BR><H3>EndDirectory</H3></TD>
+<TD WIDTH=030><PRE>No<BR><H4>5.2</H4></TD>
+</TR></TABLE></P>
+<DT><B>　書　式</B><DD>EndDirectory
+<DT><B>　パラメータ</B><DD>なし
+<DT><B>　機　能</B><DD>ディレクトリ定義を終了します。
+
+</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.3"><HR></A><DL>
+<P><TABLE BORDER=1><TR>
+<TD><PRE><a href="p03_10_j.htm#t3_1_5">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>コマンド仕様</H4></TD>
+<TD WIDTH=280><PRE>Command<BR><H4>ファイル定義の開始</H4></TD>
+<TD WIDTH=200><PRE>Keyword<BR><H3>File</H3></TD>
+<TD WIDTH=030><PRE>No<BR><H4>5.3</H4></TD>
+</TR></TABLE></P>
+<DT><B>　書　式</B><DD>File   isofile [outfile]
+<DT><B>　パラメータ</B>
+<DD>isofile：ディスク（ISO9660規格）上のファイル名
+<DD>outfile：ファイル定義のビルド結果を出力するファイル名（省略可能）
+<DT><B>　機　能</B><DD>ファイル定義を開始します。
+<DT><B>　備　考</B><DT><UL TYPE=DISC>
+<P><LI>ファイル名フォーマット「ファイル名.拡張子;バージョン番号」で「;」以降が省略された場合、デフォルトでバージョン番号「;1」が付加されます。</P>
+<P><LI>バージョン番号に「;0」が明記された場合、「;0」は省かれ、ファイル名はバージョン番号なしに設定されます。</P>
+</UL>
+</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.4"><HR></A><DL>
+<P><TABLE BORDER=1><TR>
+<TD><PRE><a href="p03_10_j.htm#t3_1_5">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>コマンド仕様</H4></TD>
+<TD WIDTH=280><PRE>Command<BR><H4>ファイル定義の終了</H4></TD>
+<TD WIDTH=200><PRE>Keyword<BR><H3>EndFile</H3></TD>
+<TD WIDTH=030><PRE>No<BR><H4>5.4</H4></TD>
+</TR></TABLE></P>
+<DT><B>　書　式</B><DD>EndFile
+<DT><B>　パラメータ</B><DD>なし
+<DT><B>　機　能</B><DD>ファイル定義を終了します。
+</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.5"><HR></A><DL>
+<P><TABLE BORDER=1><TR>
+<TD><PRE><a href="p03_10_j.htm#t3_1_5">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>コマンド仕様</H4></TD>
+<TD WIDTH=280><PRE>Command<BR><H4>ファイルソース定義の開始</H4></TD>
+<TD WIDTH=200><PRE>Keyword<BR><H3>FileSource</H3></TD>
+<TD WIDTH=030><PRE>No<BR><H4>5.5</H4></TD>
+</TR></TABLE></P>
+<DT><B>　書　式</B><DD>FileSource   srcfile
+<DT><B>　パラメータ</B><DD>srcfile：ファイル定義の入力となるファイル名
+<DT><B>　機　能</B><DD>ファイル定義の入力となるファイルを指定します。
+
+</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="5.6"><HR></A><DL>
+<P><TABLE BORDER=1><TR>
+<TD><PRE><a href="p03_10_j.htm#t3_1_5">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>コマンド仕様</H4></TD>
+<TD WIDTH=280><PRE>Command<BR><H4>ファイルソース定義の終了</H4></TD>
+<TD WIDTH=200><PRE>Keyword<BR><H3>EndFileSource</H3></TD>
+<TD WIDTH=030><PRE>No<BR><H4>5.6</H4></TD>
+</TR></TABLE></P>
+<DT><B>　書　式</B><DD>EndFileSource
+<DT><B>　パラメータ</B><DD>なし
+<DT><B>　機　能</B><DD>ファイルソース定義を終了します。
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+<a href="p09_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#cdtl_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CDビルダスクリプト文法</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

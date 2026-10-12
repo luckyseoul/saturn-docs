@@ -1,0 +1,232 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/11&gt;VDP1ライブラリ/4.3　関数仕様</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no4">VDP1ライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ライブラリ</B>
+<H2 ALIGN=CENTER>4.3　関数仕様</H2></H2>
+<HR NOSHADE>
+<A NAME="no4_20"></A>
+	<P><DT><H3>4.2　関数一覧</H3>
+<DD><TABLE BORDER>
+<TR><TH><PRE>機    能</TH><TH><PRE>関 数 名</TH><TH><PRE> 番  号 </TH></TR>
+<TR><TD><PRE>VDP1基本処理ライブラリの初期化処理</TD>                    <TD><PRE><A HREF="#no1">SPR_Initial</A></TD>     <TD ALIGN=CENTER><PRE>1</TD></TR>
+<TR><TD><PRE>TVモードセット</TD>                                        <TD><PRE><A HREF="#no2">SPR_SetTvMode</A></TD>   <TD ALIGN=CENTER><PRE>2</TD></TR>
+<TR><TD><PRE>現スプライト制御情報の取得</TD>                            <TD><PRE><A HREF="#no3">SPR_GetStatus</A></TD>   <TD ALIGN=CENTER><PRE>3</TD></TR>
+<TR><TD><PRE>フレームバッファのイレースエリア、イレースデータセット</TD><TD><PRE><A HREF="#no4">SPR_SetEraseData</A></TD><TD ALIGN=CENTER><PRE>4</TD></TR>
+<TR><TD><PRE>フレームバッファ描画終了チェック</TD>                      <TD><PRE><A HREF="#no5">SPR_WaitDrawEnd</A></TD> <TD ALIGN=CENTER><PRE>5</TD></TR>
+<TR><TD><PRE>スプライト描画元絵座標選択モードのセット</TD>              <TD><PRE><A HREF="#no6">SPR_SetEosMode</A></TD>  <TD ALIGN=CENTER><PRE>6</TD></TR>
+<TR><TD><PRE>システムレジスタライトマクロ</TD>                          <TD><PRE><A HREF="#no7">SPR_WRITE_REG</A></TD>   <TD ALIGN=CENTER><PRE>7</TD></TR>
+<TR><TD><PRE>システムレジスタリードマクロ</TD>                          <TD><PRE><A HREF="#no8">SPR_READ_REG</A></TD>    <TD ALIGN=CENTER><PRE>8</TD></TR></TABLE></P>
+
+<HR NOSHADE>
+<A NAME="no4_30"></A>
+	<P><DT><H3>4.3　関数仕様</H3>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="no1"><HR></A>
+<TABLE BORDER>
+<TD><A HREF="#no4_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>VDP1基本処理ライブラリの初期化処理</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>SSPR_Initial</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void SPR_Initial(Uint8 **vram)
+<DT><B>　入　力</B><DD>vram：VRAMアドレスリターンエリアのポインタ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>デフォルト値として次の値をセットします。
+<DD><UL TYPE="DISK">
+<LI>イレースデータ　＝     0x8000(黒)
+<LI>イレ-スエリア　＝     (0, 0) - (319, 223)
+<LI>TVモードはノーマルで、解像度は 320 × 224
+</UL>
+
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="no2"><HR></A>
+<TABLE BORDER><TR>
+<TD><A HREF="#no4_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>TVモードセット</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>SPR_SetTvMode</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　 Spr_SetTvMode(Uint16  mode, Uint16 screenSize, Unit16 doubleInterlace)
+<DT><B>　入　力</B>
+<P><DD>mode：
+<DD>次のTVモード定義値が設定できます。
+<PRE>
+SPR_TV_NORMAL ＝ ノーマルモード
+SPR_TV_HIREZO ＝ ハイレゾモード
+SPR_TV_ROT16  ＝ 回転１６モード
+SPR_TV_ROT8   ＝ 回転８モード
+SPR_TV_HDTV   ＝ HDTVモード</PRE></P>
+
+<P><DD>screenSize：
+<DD>TVモードに対応した画面の解像度を次の定義値から選んで設定します。<BR>詳しい組み合わせについてはVDP1ハードウェアマニュアルを参照してください。
+<PRE>
+SPR_TV_320X224 ＝ 320 × 224
+SPR_TV_320X240 ＝ 320 × 240
+SPR_TV_352X224 ＝ 352 × 224
+SPR_TV_352X240 ＝ 352 × 240
+SPR_TV_640X224 ＝ 640 × 224
+SPR_TV_640X240 ＝ 640 × 240
+SPR_TV_704X224 ＝ 704 × 224
+SPR_TV_704X240 ＝ 704 × 240</PRE></P>
+
+<P><DD>doubleInterlace：
+<DD>倍密インタレース使用モードを設定します。
+<PRE>
+ON  = 倍密インタレースモードを使用する
+OFF = 倍密インタレースモードを使用しない</PRE></P>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>TVモードを設定します。
+
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="no3"><HR></A>
+<TABLE BORDER><TR>
+<TD><A HREF="#no4_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>現スプライト制御情報の取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>SPR_GetStatus</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3</H4></TD>
+</TR></TABLE></P>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_GetStatus(SprSpStatus *spStatus)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>SprSpStatus：ステータスリターンエリアのポインタ
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>スプライトの制御情報を取得します
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="no4"><HR></A>
+<TABLE BORDER><TR>
+<TD><A HREF="#no4_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様<BR> </H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>フレームバッファのイレースエリア、<BR>イレースデータセット</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>SPR_SetEraseData</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_SetEraseData(Uint16 eraseData, Uint16 leftX, Uint16 topY,Uint16 rightX, Uint16 botY)
+<DT><B>　入　力</B><DD><PRE>
+eraseData：RGBイレースデータ
+leftX    ：イレースエリア左端Ｘ座標
+topY     ：イレースエリア上端Ｙ座標
+rightX   ：イレースエリア右端Ｘ座標
+botY     ：イレースエリア下端Ｙ座標
+</PRE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>イレース処理が実行される際にどんな色でどんな範囲を塗り潰すかを指定します。
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="no5"><HR></A>
+<TABLE BORDER><TR>
+<TD><A HREF="#no4_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>フレームバッファ描画終了チェック</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>SPR_WaitDrawEnd</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>5</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_WaitDrawEnd(void)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>VDP1がフレームバッファへの描画を終了するのを待ちます。本ルーチンはV-BLANKVDP割り込み処理ルーチンから呼び出されます。
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="no6"><HR></A>
+<TABLE BORDER><TR>
+<TD><A HREF="#no4_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様<BR> </H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>スプライト描画元絵座標選択<BR>モードのセット</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>SPR_SetEosMode</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>6</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>void　SPR_SetEosMode(Sint32 eosFlag)
+<DT><B>　入　力</B>
+<DD>eosFlag：
+<DD>0=偶数座標をサンプリング(デフォルト)
+<DD>1=奇数座標をサンプリング
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>スプライトコマンドの描画モードワードで高速優先描画を指定した場合の元絵テ<BR>　　　　クスチャのサンプリング座標モードを設定します。
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="no7"><HR></A>
+<TABLE BORDER><TR>
+<TD><A HREF="#no4_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>システムレジスタライトマクロ</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>SPR_WRITE_REG</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>SPR_WRITE_REG(Uint16  reg, Uint16 val)
+<DT><B>　入　力</B>
+<DD>reg：システムレジスタの種別を次の定義値から選んで設定します。
+<PRE>
+SPR_W_TVMR ＝ TVモード選択
+SPR_W_FBCR ＝ フレームバッファ切り替えモード
+SPR_W_PTMR ＝ プロットトリガ
+SPR_W_EWDR ＝ イレースライトデータ
+SPR_W_EWLR ＝ イレースライト左上座標
+SPR_W_EWRR ＝ イレースライト右下座標
+SPR_W_ENDR ＝ 描画強制終了</PRE>
+<DD>val   ：ライト値
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>VDP1の書き込み専用システムレジスタにライトします。
+</DL>
+<!-- --------------------------------------------------------------------------------- -->
+<A NAME="no8"><HR></A>
+<TABLE BORDER><TR>
+<TD><A HREF="#no4_20"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>システムレジスタリードマクロ</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>SPR_READ_REG</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>8</H4></TD>
+</TR></TABLE>
+<DL>
+<DT><B>　書　式</B><DD>Uint16 val = SPR_READ_REG(Uint16  reg)
+<DT><B>　入　力</B><DD>reg：システムレジスタの種別を次の定義値から設定します。
+<PRE>
+SPR_R_EDSR ＝ 転送終了状態
+SPR_R_LOPR ＝ 処理中断テーブルアドレス
+SPR_R_COPR ＝ 現処理テーブルアドレス
+SPR_R_MODR ＝ モード状態</PRE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>val：リード値
+<DT><B>　機　能</B><DD>VDP1の読み込み専用システムレジスタからレジスタ値をリードします。
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p04_10.htm">戻る</A>｜
+<A HREF="p05_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no4">VDP1ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

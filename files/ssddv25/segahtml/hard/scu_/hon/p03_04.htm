@@ -1,0 +1,203 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/31&gt;SCU User's Manual/Chapter 3/■3.4 Timer Register</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a> ★ <A HREF="p03_01.htm">3.1 Register List</a><HR>
+ <B>▲ <A HREF="p03_03.htm">Back</a> ｜ <A HREF="p03_05.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 3 Register details</b><HR NOSHADE>
+<DL>
+<A NAME="no3_40"></A><P><DT><H2> ■3.4 Timer register</H2><A NAME="no3_41"></A><P><DT><H3> ◆Timer 0 compare register</H3><DD> Figure 3.18 shows details of the timer 0 compare register. (Timer 0 is a counter that counts up when receiving the H-Blank-IN signal and is cleared when receiving the V-Blank-END signal.)</P>
+<A NAME="z3_18"></A><P><DT> <B>Figure 3.18 Timer 0 compare register</b> (register: T0C) initial value undefined
+	<TABLE BORDER=1><TR><TD ALIGN=RIGHT>bit</TD>
+<TD><PRE>31</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>24</TD>
+<TD><PRE>23</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>16</TD>
+<TD><PRE>15</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR><TD> 25FE0090</TD>
+  <TD>−</TD>	<!-- 31 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 28 -->
+  <TD>−</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD>−</TD>	<!-- 19 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 16 -->
+  <TD>−</TD>	<!-- 15 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 12 -->
+  <TD>−</TD>	<!-- 11 -->
+  <TD>−</TD>
+  <TD><A HREF="#z3_18_1">１</A></TD>
+  <TD><A HREF="#z3_18_1">２</A></TD>	<!-- 8 -->
+  <TD><A HREF="#z3_18_1">３</A></TD>	<!-- 7 -->
+  <TD><A HREF="#z3_18_1">４</A></TD>
+  <TD><A HREF="#z3_18_1">５</A></TD>
+  <TD><A HREF="#z3_18_1">６</A></TD>	<!-- 4 -->
+  <TD><A HREF="#z3_18_1">７</A></TD>	<!-- 3 -->
+  <TD><A HREF="#z3_18_1">８</A></TD>
+  <TD><A HREF="#z3_18_1">９</A></TD>
+  <TD><A HREF="#z3_18_1">10</A></TD>	<!-- 0 -->
+</TR>
+</TABLE>
+</P>
+<A NAME="z3_18_1"></A><P><DT> <B>Timer 0 compare data</b> ( <A HREF="#z3_18">1 to 10 [bit 9 to 0] in Figure 3.18</a> )<DD> <B>T0C9-0(W) Timer 0 Compare data bit9-0</b><DD> When the value of timer 0 becomes equal to the value of this register, a timer 0 interrupt is generated.</P>
+<P><DT>&#65308; <B>Notes on using timer 0 compare register</b>&#65310;<DD> It is possible to set 10-bit data, but if impossible data is set, no interrupt will occur. Be sure to set a value within the usable range.</P>
+<P> For example, in the case of NTSC non-interlaced (263 lines per screen, 224 effective lines), an interrupt will occur as shown below.</P>
+<P><TABLE BORDER>
+<TR><TD><PRE> T0C9-0</TD><TD ALIGN=LEFT><PRE> =1</TD><TD><PRE> Occurs at the beginning of HBLANK-IN immediately before the first line of the effective screen</TD></TR>
+<TR><TD><PRE> T0C9-0</TD><TD ALIGN=LEFT><PRE> =2</TD><TD><PRE> Occurs at the beginning of HBLANK-IN immediately before the first two lines of the active screen</TD></TR>
+<TR><TD><PRE> T0C9-0</TD><TD ALIGN=LEFT><PRE> =224</TD><TD><PRE> Occurs at the beginning of HBLANK-IN just before the last line of the effective screen</TD></TR>
+<TR><TD><PRE> T0C9-0</TD><TD ALIGN=LEFT><PRE> =225</TD><TD><PRE> Occurs at the beginning of HBLANK-IN immediately after the valid screen ends</TD></TR>
+<TR><TD><PRE> T0C9-0</TD><TD ALIGN=LEFT><PRE> =263</TD><TD><PRE> Occurs at the beginning of HBLANK-IN immediately before the start of the valid screen.</TD></TR>
+<TR><TD><PRE> T0C9-0</TD><TD ALIGN=LEFT><PRE> = <B>264~1023</b></TD><TD><PRE> <B>no interrupt occurs</b></TD></TR>
+<TR><TD><PRE> T0C9-0</TD><TD ALIGN=LEFT><PRE> =0</TD><TD><PRE> Interrupt occurs at the same timing as VBLANK-OUT</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_42"></A><P><DT><H3> ◆Timer 1 set data register</H3><DD> Figure 3.19 shows details of the timer 1 set data register. (Timer 1 sets the data in this register upon receiving the H-blank-IN signal, automatically counts down at 7MHz, and issues an interrupt when the value of timer 1 reaches 0.)</P>
+<A NAME="z3_19"></A><P><DT> <B>Figure 3.19 Timer 1 set data register</b> (register: T1S) Initial value undefined
+	<TABLE BORDER=1><TR><TD ALIGN=RIGHT>bit</TD>
+<TD><PRE>31</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>24</TD>
+<TD><PRE>23</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>16</TD>
+<TD><PRE>15</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR><TD> 25FE0094</TD>
+  <TD>−</TD>	<!-- 31 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 28 -->
+  <TD>−</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD>−</TD>	<!-- 19 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 16 -->
+  <TD>−</TD>	<!-- 15 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 12 -->
+  <TD>−</TD>	<!-- 11 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD><A HREF="#z3_19_1">１</A></TD>	<!-- 8 -->
+  <TD><A HREF="#z3_19_1">２</A></TD>	<!-- 7 -->
+  <TD><A HREF="#z3_19_1">３</A></TD>
+  <TD><A HREF="#z3_19_1">４</A></TD>
+  <TD><A HREF="#z3_19_1">５</A></TD>	<!-- 4 -->
+  <TD><A HREF="#z3_19_1">６</A></TD>	<!-- 3 -->
+  <TD><A HREF="#z3_19_1">７</A></TD>
+  <TD><A HREF="#z3_19_1">８</A></TD>
+  <TD><A HREF="#z3_19_1">９</A></TD>	<!-- 0 -->
+</TR>
+</TABLE>
+</P>
+<A NAME="z3_19_1"></A><P><DT> <B>Timer 1 set data</b> ( <A HREF="#z3_19">1 to 9 [bits 8 to 0] in Figure 3.19</a> )<DD> <B>T1S8-0(W) Timer 1 Set data bit8-0</b><DD> Set the value set to timer 1.</P>
+<P><DT>&#65308; <B>Notes on using the timer 1 set data register</b>&#65310;<DD> The value of the timer 1 set data register is loaded into timer 1 when ``timer 1 is stopped and HBLANK-IN occurs''.<BR>
+ If data larger than 1 line is set in the timer 1 set data register, timer 1 interrupts will not occur every line.</P>
+<P><TABLE BORDER>
+<CAPTION> <B>[Count range]</b></CAPTION>
+<TR><TD> For 1 line 320 dots</TD><TD> 1~1AAH</TD></TR>
+<TR><TD> For 1 line 352 dots</TD><TD> 1~1C6H</TD></TR>
+<TR><TD> For 1 line 424 dots</TD><TD> 1~D3H</TD></TR>
+<TR><TD> For 1 line 426 dots</TD><TD> 1～D4H</TD></TR>
+</TABLE>
+</P>
+<P> (Please note that if you specify the count number 0, it will be 512.)</P>
+<A NAME="no3_43"></A><P><DT><H3> ◆Timer 1 mode register</H3><DD> Figure 3.20 shows details of the timer 1 mode register. This register determines how to set timer 1 generation.</P>
+<A NAME="z3_20"></A><P><DT> <B>Figure 3.20 Timer 1 mode register</b> (register: T1MD) Initial value 00000000H
+	<TABLE BORDER=1><TR><TD ALIGN=RIGHT>bit</TD>
+<TD><PRE>31</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>24</TD>
+<TD><PRE>23</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>16</TD>
+<TD><PRE>15</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR><TD> 25FE0098</TD>
+  <TD>−</TD>	<!-- 31 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 28 -->
+  <TD>−</TD>	<!-- 27 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 24 -->
+  <TD>−</TD>	<!-- 23 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 20 -->
+  <TD>−</TD>	<!-- 19 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 16 -->
+  <TD>−</TD>	<!-- 15 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 12 -->
+  <TD>−</TD>	<!-- 11 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD><A HREF="#z3_20_1">１</A></TD>	<!-- 8 -->
+  <TD>−</TD>	<!-- 7 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD>−</TD>	<!-- 4 -->
+  <TD>−</TD>	<!-- 3 -->
+  <TD>−</TD>
+  <TD>−</TD>
+  <TD><A HREF="#z3_20_2">２</A></TD>	<!-- 0 -->
+</TR>
+</TABLE>
+</P>
+<A NAME="z3_20_1"></A><P><DT> <B>Timer 1 mode bit</b> ( <A HREF="#z3_20">1 [bit 8] in Figure 3.20</a> )<DD> <B>T1MD(W) Timer 1 MoDe bit</b><DD> This bit is used to specify the occurrence of timer 1. Table 3.6 shows the details of the occurrence.</P>
+<A NAME="t3_6"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 3.6 Timer 1 generation selection details</b></CAPTION>
+<TR><TD WIDTH=45 ALIGN="CENTER"><PRE> T1MD</TD><TD WIDTH=400 ALIGN="CENTER"><PRE> Occurrence selection content</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 0</TD><TD ALIGN="LEFT"><PRE> An interrupt occurs on every line.</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="LEFT"><PRE> Occurs only on the line specified by timer 0.</TD></TR>
+</TABLE>
+</P>
+<A NAME="z3_20_2"></A><P><DT> <B>Timer enable bit</b> ( <A HREF="#z3_20">2 [bit 0] in Figure 3.20</a> )<DD> <B>TENB(W) Timer ENaBle bit</b><DD> This bit turns the timer operation ON/OFF. Table 3.7 shows the operation details.</P>
+<A NAME="t3_7"></A><P><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 3.7 Timer operation details</b></CAPTION>
+<TR><TD WIDTH=45 ALIGN="CENTER"><PRE> TENB</TD><TD WIDTH=400 ALIGN="CENTER"><PRE> Timer operation</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 0</TD><TD ALIGN="LEFT"><PRE> Timer operation OFF</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="LEFT"><PRE> Timer operation ON</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_03.htm">Back</a> ｜ <A HREF="p03_05.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a> ★ <A HREF="p03_01.htm">3.1 Register List</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

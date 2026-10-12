@@ -1,0 +1,131 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/17&gt;Programmer's Guide/File System Library/8.Function Specifications-1</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+ <B>▲ <A HREF="p08_10.htm">Back</a> ｜ <A HREF="p08_12.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><H2 ALIGN=CENTER> 8.Function specification-1</H2><HR NOSHADE>
+<A NAME="no8_10"></A><H3> 8.1 Directory management</H3><!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_1"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Initialize/mount file system</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_Init</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_Init(Sint32 open_max, void *work, GfsDirTbl *dirtbl)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> open_max</TD><TD><PRE> : Maximum number of files to open at the same time (1 to 24)</TD></TR>
+<TR><TD><PRE> work</TD><TD><PRE> : work area for library</TD></TR>
+<TR><TD><PRE> dirtbl</TD><TD><PRE> :Directory information management structure</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> dirtbl: Directory information management structure (directory information storage area)<DT> <B>function value</b><DD> Number of directory information read. Returns a negative error code when an error occurs.<!-- +++ Update by CRI ：1.4 -->
+<PRE> If NULL is specified for the argument pointer to the directory information management structure, the number of directory information held by the CD block file system is returned as the function value.
+</PRE><!-- --- Update by CRI ：1.4 -->
+<DT><B>function</b><DD> Initializes the file system and mounts the CD-ROM.<BR>
+ Specify the directory management function by specifying dirtbl.<P><DD><TABLE BORDER=1>
+<TR><TH width=200 align="center"><PRE> dirtbl</TH><TH width=320 align="center"><PRE> Directory management functions used</TH></TR>
+<TD><PRE> directory management structure</TD><TD><PRE> Directory management for this library</TD></TR>
+<TD><PRE> NULL</TD><TD><PRE> CD block file system directory management</TD></TR>
+</TABLE>
+<DT> <B>remarks</b><DD><OL TYPE=a>
+<P><LI> work must be aligned on a 4-byte boundary.</P>
+<P><LI> The INT_ChgMsk function enables the SCU's level 0-DMA end interrupt.<P><LI> Initialize the CD block as follows.</P>
+</OL>
+<DD> (The ECC count and retry count are set to the maximum values, and the rest remain default.)<DD><TABLE BORDER=0>
+<TR><TD>・CD block soft reset</TD><TD> :do not</TD></TR>
+<TR><TD>・Subcode decoding</TD><TD> :do not</TD></TR>
+<TR><TD>・Mode 2 subheader recognition</TD><TD> :do</TD></TR>
+<TR><TD>・Form 2 read retry</TD><TD> :do not</TD></TR>
+<TR><TD>・CD-ROM data read</TD><TD> : Maximum speed (currently 2x speed)</TD></TR>
+<TR><TD>・Standby time</TD><TD> :180 seconds</TD></TR>
+<TR><TD>・ECC number</TD><TD> :5 times</TD></TR>
+<TR><TD> ·number of retries</TD><TD> :15 times </TD></TR>
+</TABLE>
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_2"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Load directory information</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_LoadDir</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_LoadDir(Sint32 fid, GfsDirTbl *dirtbl)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> fid</TD><TD><PRE> : directory file identifier</TD></TR>
+<TR><TD><PRE> dirtbl</TD><TD><PRE> :Directory information management structure</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> dirtbl: Directory information management structure (directory information storage area)<DT> <B>function value</b><DD> Number of directories read. Returns a negative error code when an error occurs.<!-- +++ Update by CRI ：1.4 -->
+<PRE> If NULL is specified for the argument pointer to the directory information management structure, the number of directory information held by the CD block file system is returned as the function value.
+</PRE><!-- --- Update by CRI ：1.4 -->
+<DT><B>function</b><DD> Reads directory information from the specified directory file.<BR>
+ The storage location of directory information changes depending on the dirtbl specification.<TABLE BORDER=1>
+<TR><TH width=200 align="center" ><PRE> dirtbl</TH><TH width=320 align="center"><PRE> Directory information storage area</TH></TR>
+<TR><TD><PRE> directory management structure</TD><TD><PRE> dirtbl directory information storage area</TD></TR>
+<TR><TD><PRE> NULL</TD><TD><PRE> File management information area in CD block</TD></TR>
+</TABLE>
+</P>
+<DD> If NULL is specified for dirtbl, an error will occur if the CD block file system is not declared in GFS_Init. However, it is always possible to pass dirtbl a non-NULL pointer to an appropriate directory information management structure.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_3"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Setting the current directory</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_SetDir</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint 32GFS_SetDir(GfsDirTbl *dirtbl);<DT> <B>input</b><DD> dirtbl: Directory information management structure<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Error code.<DT> <B>function</b><DD> Sets the specified directory information to the current directory.<BR>
+ The directory information used changes depending on the dirtbl specification.<DD><TABLE BORDER=1>
+<TR><TH width=200 align="center" ><PRE> dirtbl</TH><TH width=320 align="center"><PRE> Directory information to use</TH></TR>
+<TR><TD><PRE> directory management structure</TD><TD><PRE> contents of dirtbl</TD></TR>
+<TR><TD><PRE> NULL</TD><TD><PRE> File management information in CD block</TD></TR>
+</TABLE>
+<DD> If you specify NULL for dirtbl, an error will occur unless you declare in GFS_Init that the CD block file system will be used. However, it is always possible to pass dirtbl a non-NULL pointer to an appropriate directory information management structure.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_4"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Convert name to file identifier</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_NameToId</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1.4</H4></TD></TR>
+</TABLE>
+</P>
+<!-- *** Update by CRI ：5.6 -->
+<DT> <B>Format</b><DD> Sint 32GFS_NameToId(Sint8 *fname)<DT> <B>input</b><DD> fname: File name<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> File identifier. A negative error code if an error occurs.<DT> <B>function</b><DD> Returns the file identifier corresponding to the file name.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_5"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Converting an identifier to a file name</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_IdToName</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1.5</H4></TD></TR>
+</TABLE>
+</P>
+<!-- *** Update by CRI ：5.7 -->
+<DT> <B>Format</b><DD> const Sint8 *GFS_IdToName(Sint32 fid)<DT> <B>input</b><DD> fid: file identifier<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Pointer to file name. NULL if an error occurs.<DT> <B>function</b><DD> Returns a pointer to the file name corresponding to the file identifier. This pointer points to the conversion table area used by this library.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_6"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Get directory information</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_GetDirInfo</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_GetDirInfo(Sint32 fid, GfsDirId *dirrec)<DT> <B>input</b><DD> fid: file identifier<DT> <B>output</b><DD> dirrec: Directory information<DT> <B>function value</b><DD> Error code<DT> <B>function</b><DD> Get directory information from a file identifier.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no1_7"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Resetting the file system</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_Reset</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 1.7</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> void GFS_Reset(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Closes all open files and resets the file system.<BR>
+ (Initializes everything other than directory information.)<DT> <B>remarks</b><DD> If you are using a stream system, close the stream before executing this function.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_10.htm">Back</a> ｜ <A HREF="p08_12.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no7">File system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

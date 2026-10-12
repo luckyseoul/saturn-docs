@@ -1,0 +1,39 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY bgcolor="FFFFFF">
+<A HREF=p020.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p022.htm> Go to next page </A>
+<HR><P><P><dl>
+<H3> ■ Specific usage examples </H3>
+<dt> <H4> ● Direct mode </H4> <P>
+<dd> Consider a case of transferring 1 KByte from address 2000000 <SUB> H </SUB> (A-Bus area) to address 6000000 <SUB> H </SUB> (work RAM) with level 0 DMA. You can execute DMA (direct mode) by following the steps below. <BR>
+<PRE> (1) Read address (2000000 <SUB> H </SUB>) and write to address register D0R
+Included. (Load the address from CPU to address 25FE0000 <SUB> H </SUB>
+. )
+(2) Write the write address (6000000 <SUB> H </SUB>) to the write address register D0W
+Included. (Load the write address from CPU to address 25FE0004 <SUB> H </SUB>
+. )
+(3) Write the transfer byte count (400 <SUB> H </SUB>) to the transfer byte count register D0C.
+(Load bytes transferred from CPU to address 25FE0008 <SUB> H </SUB>)
+(4) Write the address addition value (101 <SUB> H </SUB>) to the address addition value register D0AD.
+(Load the address addition value from CPU to address 25FE000C <SUB> H </SUB>.
+The details of the added value are described in the address added value in this section. With normal DMA,
+⿟ Specify 101 <SUB> H </SUB> as the address addition value. )
+(5) Set the DMA mode to 0, set the address update bit and DMA activation factor as necessary.
+Defined and written to mode / address update / DMA activation factor register D0MD
+. For example, address update is set to hold mode and V-blank-IN is the activation factor
+If it is, write 0 to D0MD. (CPU to address 25FE0014 <SUB> H </SUB>
+Load 0 into. )
+(6) Set the DMA enable bit to 1 and the activation factor set in (5) is generated.
+When it is created, DMA is started and the address is added from address 2000000 <SUB> H </SUB> (A-Bus area).
+レ ス Transfer 1KByte data at level 0 to less 6000000 <SUB> H </SUB> (work RAM).
+(7) After completion of DMA, DMA is activated each time the activation factor set in (5) occurs.
+It will be moved. At that time, the operation is written as read address update bit (D0RUP).
+Depends on the value of the delivery address update bit (D0WUP). Figure 2.7
+Indicates the difference in DMA operation due to the address update bit. </PRE><P>
+However, (1) to (5) can be in any order. (When the activation factor is set to the DMA activation bit, the DMA is activated every time the DMA operation bit is set to 1 by the CPU) <BR>
+</dl><P><P><HR>
+<A HREF=p020.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p022.htm> Go to next page </A>
+</BODY>
+</HTML>

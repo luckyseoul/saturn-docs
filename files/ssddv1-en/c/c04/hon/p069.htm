@@ -1,0 +1,26 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p068.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p070.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 4.3 Subcode </H2>
+<DT> <H4> (1) Subcode update and SCDQ flag </H4>
+<DD> Subcode Q is updated every frame (1 sector). The SCDQ flag is 1 each time the subcode Q is updated. (Same as the periodic response update timing) <BR>
+Subcodes R to W are updated in 4 packs (1 packet) per frame and stored in the pack buffer. The CD block has a pack buffer for 24 packs (6 packets) with a ring buffer structure. <P>
+<B> << For CD-DA playback (standard speed) >> </B> <BR>
+<IMG SRC="hyou/i069-01.gif"><BR>
+<B> Figure 4.5 Subcode update and SCDQ flag timing </B> <P>
+<DT> <H4> (2) Subcode extraction timing </H4>
+<DD> The host issues an acquisition command when the SCDQ flag is set to 1, and retrieves subcodes Q and R to W data. (To prevent polling due to continuous issuance of commands) <P>
+<DT> <H4> (3) Get subcode Q (CDC_TgetScdQch) </H4>
+<DD> The acquisition command can always be executed regardless of the CD drive status. However, an invalid value may be returned depending on the CD drive status such as 〈OPEN〉. <P>
+<DT> <H4> (4) Get subcode R to W (CDC_TgetScdRwch) </H4>
+<DD> Pack data is extracted by repeatedly issuing acquisition commands until the pack buffer is empty. However, do not take out more than 16 packs in one frame time (13.3ms). <BR>
+∙ Once the host issues an acquisition command, it is necessary to complete the data transfer within one pack decoding time (3.2ms). <BR>
+WAIT is returned when the pack buffer is empty and there is no pack data. <P>
+</DL><P><P><HR>
+<A HREF=p068.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p070.htm> Go to next page </A>
+</BODY>
+</HTML>

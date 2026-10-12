@@ -1,0 +1,72 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/17&gt; Sound driver Ver2.10 guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no0">Sound Driver Programmer's Guide</a><HR>
+ <B>■ ｜ <A HREF="sndsys.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>Sound Driver Programmer's Guide</b><H2 ALIGN=CENTER> Introduction</H2><HR NOSHADE>
+<P> This manual is a revised version of the " <B>Sound Embedded Manual</b> " and is written targeting sound driver version 2.20.</P>
+<P> This manual contains detailed explanations for those who want to program all of the sound controls themselves, but you can easily create sounds using the " <B>Sound I/F Library</b> ", a program library provided by SEGA. There are also ways to incorporate it. Please use them as necessary.<BR>
+ Please refer to the " <B><A HREF="../../../prgg/prg3/sund/index.htm">Sound I/F Library User's Manual</a></b> " for details and usage.</P>
+<P><CENTER>
+<H3> Limitations</H3></CENTER>
+<OL>
+<LI> The unsupported function "P4 Priority level (0-31)" of "Sequence start command (01h)" described in the previous manual is not supported in Ver2.10 either.</OL>
+</P>
+<P><CENTER>
+<H3> explanation of words</H3></CENTER>
+<TABLE BORDER>
+<TR><TH> phrase</TH><TH> meaning of the phrase</TH></TR>
+<TR><TD> SCSP</TD><TD> An abbreviation for Saturn Custom Sound Processor, which is a sound source LSI that is the core of Saturn's sound system. Built-in DSP for sound. There is too much information about SCSP to describe here, so please refer to the ` <B><A HREF="../../../hard/scsp/index.htm">`SCSP User's Manual</a></b> .''</TD></TR>
+<TR><TD> sound data</TD><TD> There are three types of data stored in sound memory: tone data, sequence data, and DSP program.</TD></TR>
+<TR><TD> tone data</TD><TD> This is the tone part data for playing the sequence data. It consists of PCM waveform data and sound parameters. Also includes FM tones.</TD></TR>
+<TR><TD> sequence data</TD><TD> This is the performance data of the song. This is song data composed using MIDI that has been compressed for the Saturn, and consists of performance information such as the strength and pitch of the sound, and the start and end of pronunciation. Sound effects are also created in exactly the same format.</TD></TR>
+<TR><TD> DSP program</TD><TD> This is a DSP micro program for operating sound DSP. Effect programs such as reverb and surround are available.</TD></TR>
+<TR><TD> DSP work RAM</TD><TD> Area for DSP delay RAM and effect coefficients, used in DSP internal processing. The size of this area changes depending on the microprogram.</TD></TR>
+<TR><TD> sound creator</TD><TD> A person in charge of the sound production part of a sound system, such as creating tones, composing music, and creating sound effects.</TD></TR>
+<TR><TD> main system</TD><TD> This refers to the game program on the SH side. Think of the 68000's sound driver as the sound subsystem, and the game program that controls it as the main system.</TD></TR>
+<TR><TD> The number of samples</TD><TD> One sample depends on the data width of the PCM waveform, so it is 1 byte for 8-bit PCM and 2 bytes for 16-bit PCM. Therefore, for a 4K sample, it will be 4096 bytes for 8 bits and 8192 bytes for 16 bits.</TD></TR>
+</TABLE>
+</P>
+<P><CENTER>
+<H3> Differences between Version 1.xx and 2.xx</H3></CENTER>
+<UL TYPE=DISC>
+<P><LI> Volume calculation is now faster. However, the algorithms are not compatible.</P>
+<P><LI> Improved the issue where fade or volume changes only responded at the note off timing. Smooth changes are now possible.</P>
+<P><LI> Compatible with damper pedal.</P>
+</UL>
+<P><CENTER>
+<H3> Differences between version 2.xx and 2.10</H3></CENTER>
+<UL TYPE=DISC>
+<P><LI> Since noise is generated when FM is forcibly crushed, the sound of the FM sound source is restricted. This has been found to occur when a slot currently wired as FM is assigned to another FM immediately after note-off, with the release remaining. When this slot is a carrier, the volume will be abnormal, and when it is a modulator, the tone will be abnormal. We have taken a solution to this problem by not allowing it to be used as an FM slot until the release level has fallen to a certain level (the current level is 4 out of 8, and it will take a considerable amount of time to complete the release, so in reality ). However, this leaves the possibility that it violates the current specification of ``always giving priority to the last arrival'', and in rare cases, pronunciation will be canceled if note-on is being performed by all slots FM. In this case, an error will be returned (see the error status section), but directors should be careful when designing specs.<BR>
+ Also, due to the complexity of checking the slots, if you use a lot of FM sound sources, the operation will inevitably become slower.</P>
+<P><LI> Previous drivers used note-off to determine whether a slot was empty, but now this is determined at the release level. The program to view the release is running within LEVEL 2 INT. The pronunciation steps are as follows.</P>
+<P><DL>
+<DT> step 1<DD> Find and assign a slot that is keyed off and has a release level of 4 or lower. If no slot matching this condition is detected, proceed to step 2.<DT> step 2<DD> Find the slot with the same pronunciation control number that is keyed off, and assign it. If no slot matching this condition is detected, proceed to step 3.<DT> step 3<DD> Searches for identical pronunciation management numbers starting from the lowest slot number and forcibly uses them. If no slot matching this condition is detected, proceed to step 4.<DT> step 4<DD> The slot that was keyed on the most in the past is searched for and forcibly assigned, regardless of the pronunciation control number. Passing through this routine is basically an error because it means exceeding the maximum polyphony. However, slots currently being used as FM sound sources will not be used. Only in this case, the pronunciation will be canceled. be careful.</DL>
+</P>
+<P><LI> Eliminated small noise when changing maps.</P>
+</UL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="sndsys.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no0">Sound Driver Programmer's Guide</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

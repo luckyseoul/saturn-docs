@@ -1,0 +1,117 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 8&gt;PCM・ADPCM再生ライブラリ/3.再生手順</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no3">PCM・ADPCM再生ライブラリ</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PCM・ADPCM再生ライブラリ</B>
+<H2 ALIGN=CENTER>3.再生手順</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A>
+	<P><DT><B>　(1)再生手順</B>
+	<DD>　ストリームシステムを使用して再生する手順を図3.1に示します。</P>
+
+<A NAME="z3_1"></A>
+	<P ALIGN=CENTER><B>図3.1　ストリーム再生時の再生手順</B><BR><img srcset="../grp/i110_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no3_20"></A>
+	<P><DT><B>　(2)プログラム例</B><BR>
+	<DD>　ストリームシステムを使用して、AIFF形式、または、APCM形式のファイルを再生するプログラム例を次に示します。<P>
+	<DD><PRE>
+	#define RING_BUF_SIZE  (2048L*10)
+	#define PCM_ADDR       ((void*)0x25a20000)
+	#define PCM_SIZE       (4096L*2)
+
+	/* ワーク */
+	PcmWork pcm_work;
+
+	/* リングバッファ */
+	Uint32  ring_buf[RING_BUF_SIZE / sizeof(Uint32)];
+	StmHn	stm;
+	PcmHn	pcm;
+
+	/* サウンドの初期化 */
+	SND_Init(･･);
+
+	/* 初期化 */
+	PCM_Init();
+
+	/* ＡＤＰＣＭ使用宣言 (ADPCMを使用する場合に必須) */
+	PCM_DeclareUseAdpcm();
+
+	/* 割り込み処理の設定 */
+　　　　INT_??? を使いＶブランクＩＮ割り込みを設定する。
+　　　　ＶブランクＩＮ割り込み内で PCM_VblIn(); をコールする。
+
+	/* ファイルの初期化 */
+	GFS_Init(･･);
+	STM_Init(･･);
+	STM_OpenGrp();
+	STM_SetExecGrp(･･);
+	/* ストリームのオープン */
+	stm = STM_OpenFid(･･);
+
+	/* ハンドルの生成 */
+	PCM_PARA_WORK(&amp;para) = &amp;pcm_work;
+	PCM_PARA_RING_ADDR(&amp;para) = ring_buf;
+	PCM_PARA_RING_SIZE(&amp;para) = RING_BUF_SIZE;
+	PCM_PARA_PCM_ADDR(&amp;para) = PCM_ADDR;
+	PCM_PARA_PCM_SIZE(&amp;para) = PCM_SIZE;
+	pcm = PCM_CreateStmHandle(&amp;para, stm);
+
+	/* 再生開始 */
+	PCM_Start(pcm);
+	while(TRUE) {
+                /* サーバーの実行 */
+                STM_ExecServer();
+
+		/* 再生タスク処理 */
+		PCM_Task(pcm);
+
+		/* 終了判定 */
+		if (PCM_GetPlayStatus(pcm) == PCM_STAT_PLAY_END) break;
+	}
+	/* ハンドルの放棄 */
+	PCM_DestroyStmHandle(pcm);
+
+	/* ストリームのクローズ */
+	STM_Close(stm);
+
+　　　　/* 終了処理 */
+       PCM_Finish();
+</PRE><P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no3">PCM・ADPCM再生ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,144 @@
+<HTML>
+<HEAD>
+<TITLE>Texture</TITLE>
+</HEAD><BODY>
+
+<P> <A HREF="pr7-3.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr7-5.htm"> Go to next page </A> </BR> </P> <HR>
+
+
+<H2>
+7-4. Texture
+</H2>
+
+<P>
+The third parameter “Texture” is required when using texture mapping. Specify the number of the texture to be actually used from the texture table registered with the function “slInitSystem”. <BR>
+When not using a texture, specify the macro “No_Texture”.
+Texture mapping is a general term for the function that puts two-dimensional graphics on the surface of a polygon. Needless to say, only the display color can be expressed by polygons, and its reality is limited. However, by making full use of the texture mapping function, it is possible to express more realistic 3D objects such as textures and surface patterns of objects that could not be expressed with polygons alone.
+</P>
+
+<H4> Figure 7-4 Texture mapping </H4>
+<IMG SRC="p07-07-1.gif">
+
+<P>
+Sega Saturn's texture mapping and so-called texture mapping in general CG are roughly divided into two different properties as shown in Table 7-3.
+</P>
+
+<H4> Table 7-3 Differences between texture mapping of Sega Saturn and general CG texture mapping </H4>
+<IMG SRC="p07-07-2.gif">
+
+<P>
+<B> <A NAME="NO1"> ● Paste texture </A> </B>
+</P>
+
+<H4> Figure 7-5 Texture features 1 </H4>
+<IMG SRC="p07-08.gif">
+
+<BLOCKQUOTE><P>
+Note) Texture and polygon correspond one-on-one.
+</P></BLOCKQUOTE>
+
+<P>
+General CG textures can be stretched across multiple polygons, but in the case of Sega Saturn, one texture is stretched to correspond to one polygon. When pasting a texture across two or more polygons, it is necessary to divide the texture according to each polygon as shown in Figure 7-5.
+</P>
+
+<P>
+<B> <A NAME="NO2"> ● Texture deformation </A> </B> <BR>
+For general CG textures, if the polygon is not a rectangle (including a square), the texture is clipped to the shape of the polygon. However, in Sega Saturn, the texture is deformed along the polygon without clipping. Even if the polygon is a triangle, the entire texture is transformed into a triangle.
+</P>
+
+<H4> Figure 7-6 Texture feature 2 </H4>
+<IMG SRC="p07-09-1.gif">
+
+<BLOCKQUOTE><P>
+Note) The texture is deformed according to the shape of the polygon.
+</P></BLOCKQUOTE>
+
+<H3>
+<A NAME="TEXTURE"> Texture distortion </A>
+</H3>
+
+<P>
+If the polygon is a rectangle and the texture that is applied to it is a square, the texture will be transformed into a rectangle according to the aspect ratio of the polygon. Therefore, keep in mind that texture distortion will be less if the aspect ratio of the texture is matched to the aspect ratio of the polygon as much as possible.
+</P>
+
+<H4> Figure 7-7 Texture distortion </H4>
+<IMG SRC="p07-09-2.gif">
+
+<P>
+Let's take a look at a sample program (Listing 7-4). <BR>
+A single polygon with a texture will rotate around the Y axis. <BR>
+Here, register two textures in advance. <BR>
+One is a [SONIC] picture (size: 64 x 64 pixels), and the other is an "AM2" mark (size: 64 x 32 pixels).
+</P>
+
+<H4> List 7-4 sample_7_4: main.c </H4>
+<IMG SRC="p07-10.gif">
+
+<P>
+The program flow itself is not much different from Listing 7-2.
+</P>
+
+<P>
+First look at line 29. <BR>
+Although it is an initialization routine that was used implicitly until now, the second parameter is different. Here, specify the pointer to the texture table to be passed to SGL. (The actual table is defined in “texture.c”. See Listing 7-5.) So far, we were not using textures, so we assigned “NULL”.
+</P>
+
+<P>
+Line 30 transfers texture data to V-RAM. <BR>
+This texture data transfer can be executed anytime after initialization, so you can easily perform techniques such as redrawing textures during the game.
+</P>
+
+<P>
+From the 12th line onwards, the actual texture data transfer routine is executed. <BR>
+Here, the top address of the texture table and the number of registered textures are received. The “slDMACopy” function on the 18th line transfers data at high speed using DMA. <BR>
+The first parameter of this function is the transfer source address, the second parameter is the transfer destination address, and the third parameter is the transfer size.
+</P>
+
+<DL>
+<DT> <B> [void slDMACopy (void * src, void * dst, Uint32 cnt);] </B>
+<DD> Performs block transfer of data using DMA built into the CPU <BR>.
+For the parameter, substitute the start address of the transfer source memory area, the start address of the transfer destination memory area, and the block transfer amount (in bytes). <BR>
+This function ends the transfer immediately after starting DMA. <BR>
+Use the function “slDMAWait” to know the transfer completion.
+</DL>
+
+<P>
+Next, let's look at the texture data.
+</P>
+
+<H4> List 7-5 sample_7_4: texture.c </H4>
+<IMG SRC="p07-12.gif">
+
+<P>
+The part described by the TEXDAT macro is the actual texture data. <BR>
+Although omitted in the above list, the source contains all the data. The texture data format is not mentioned here. Refer to “Function Reference” in the Reference Manual.
+</P>
+
+<P>
+The texture table that the part described by the TEXTURE macro passes to the SGL. <BR>
+Set the size of each texture (horizontal x vertical) and the offset value from the actual texture data start address.
+</P>
+
+<P>
+Finally, the PICTURE macro part becomes the VRAM transfer table. <BR>
+Set the texture number, color mode, and pointer to the texture data.
+</P>
+
+<P><A NAME="PORYGONDATE">
+Finally, let's take a look at the polygon data attributes. </A>
+</P>
+
+<H4> List 7-6 sample_7_4: polygon.c </H4>
+<IMG SRC="p07-13.gif">
+
+<P>
+The third parameter of “ATTRIBUTE” is “PN_SONIC”. <BR>
+That is, “SONIC”, which is the texture with the registration number [0], is displayed on the polygon. <BR>
+Also try changing this parameter to “PN_AM2”. <BR>
+This time the texture should change to the “AM2” mark with registration number [1]. <BR>
+Furthermore, the texture can be viewed from the back side by changing the first parameter “Single_Plane” to “Dual_Plane”.
+</P>
+<HR>
+<P> <A HREF="pr7-3.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr7-5.htm"> Go to next page </A> </BR> </P> </BODY> </HTML>
+
+</BODY></HTML>

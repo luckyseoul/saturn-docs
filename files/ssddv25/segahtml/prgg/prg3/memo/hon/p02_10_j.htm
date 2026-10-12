@@ -1,0 +1,143 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 2&gt;メモリ管理ライブラリ/2.リファレンス</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#">メモリ管理ライブラリ</A>
+<HR>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>メモリ管理ライブラリ</B>
+<H2 ALIGN=CENTER>2．リファレンス</H2>
+<HR NOSHADE>
+<A NAME="no2_10"></A>
+<H3>2.1　関数一覧</H3>
+<HR>
+<DL>
+	<DD><TABLE BORDER>
+	<TR><TH WIDTH=280><PRE>機能</TH><TH WIDTH=180><PRE>関数名</TH><TH><PRE>番号</TH></TR>
+	<TR><TD><PRE>メモリ管理領域定義</TD>	<TD><PRE><A HREF="#no1">MEM_Init</A></TD>	<TD ALIGN=CENTER><PRE>1</TD></TR>
+	<TR><TD><PRE>配列領域確保</TD>			<TD><PRE><A HREF="#no2">MEM_Calloc</A></TD>	<TD ALIGN=CENTER><PRE>2</TD></TR>
+	<TR><TD><PRE>メモリブロック解放</TD>	<TD><PRE><A HREF="#no3">MEM_Free</A></TD>	<TD ALIGN=CENTER><PRE>3</TD></TR>
+	<TR><TD><PRE>メモリ確保</TD>			<TD><PRE><A HREF="#no4">MEM_Malloc</A></TD>	<TD ALIGN=CENTER><PRE>4</TD></TR>
+	<TR><TD><PRE>メモリ再割り付け</TD>		<TD><PRE><A HREF="#no5">MEM_Realloc</A></TD><TD ALIGN=CENTER><PRE>5</TD></TR></TABLE></P>
+</DL>
+
+<HR NOSHADE>
+<A NAME="no2_20"></A>
+<H3>2.2　関数仕様</H3>
+<!-- -------------------------------------------------------------------------------- -->
+<A NAME="no1"><HR></A><DL>
+<DT><TABLE BORDER>
+<TD><PRE><A HREF="#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>メモリ管理領域設定</H4></TD>
+<TD WIDTH=200><PRE>Function Name<BR><H3>MEM_Init</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1</H4></TD>
+</TABLE><P>
+
+<DT><B>　書　式</B><DD>void　MEM_Init(Uint32 top_address, Uint32 mem_size)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>top_address</TD><TD><PRE>：メモリ管理領域先頭アドレス</TD></TR>
+	<TR><TD><PRE>mem_size   </TD><TD><PRE>：メモリ管理領域サイズ(バイト指定)</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>MEM_Calloc,MEM_Malloc,MEM_Realloc,MEM_Freeで使用するメモリ管理領域を設定します。 指定メモリの先頭アドレスからメモリサイズ分の領域をメモリ管理領域とします。
+<DT><B>　備　考</B><DD>この関数はMEM_Calloc,MEM_Malloc,MEM_Realloc,MEM_Freeを使用する前にゲームで一回のみ使用してください。二度以上使用すると、以前に確保したメモリの内容は保障できません。
+</DL>
+
+<!-- -------------------------------------------------------------------------------- -->
+<A NAME="no2"><HR></A><DL>
+<DT><TABLE BORDER>
+<TD><PRE><A HREF="#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>配列領域確保</H4></TD>
+<TD WIDTH=200><PRE>Function Name<BR><H3>MEM_Calloc</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void *MEM_Calloc(Uint32 arg_num, Uint32 arg_size)
+<DT><B>　入　力</B><DD>arg_num ：配列要素数
+<DT><B>　出　力</B><DD>arg_size：配列要素のバイト数
+<DT><B>　関数値</B><DD>正常終了した場合は、確保したメモブロックへのポインタを返します。エラーの場合はNULLを返します。
+<DT><B>　機　能</B><DD>配列要素のバイト数を配列要素数分、メモリ管理領域に確保します。確保したメモリブロックは0クリアされます。
+</DL>
+
+<!-- -------------------------------------------------------------------------------- -->
+<A NAME="no3"><HR></A><DL>
+<DT><TABLE BORDER>
+<TD><PRE><A HREF="#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>メモリブロック解放</H4></TD>
+<TD WIDTH=200><PRE>Function Name<BR><H3>MEM_Free</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>voidMEM_Free(void *mem_ptr)
+<DT><B>　入　力</B><DD>mem_ptr：メモリブロックへのポインタ
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定したメモリブロックが解放されます。指定できるメモリブロックはMEM_Calloc,MEM_Malloc,MEM_Reallocによって確保されたものです。
+</DL>
+
+<!-- -------------------------------------------------------------------------------- -->
+<A NAME="no4"><HR></A><DL>
+<DT><TABLE BORDER>
+<TD><PRE><A HREF="#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>メモリブロック確保</H4></TD>
+<TD WIDTH=200><PRE>Function Name<BR><H3>MEM_Malloc</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void*MEM_Malloc(Uint32 mem_size)
+<DT><B>　入　力</B><DD>mem_size：要求メモリブロックサイズ(バイト指定)
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>正常終了した場合は、確保したメモリ領域へのポインタを返します。エラーの場合はNULLを返します。
+<DT><B>　機　能</B><DD>要求メモリブロックサイズ分のメモリブロックをメモリ管理領域に確保し、そのポインタを返します。要求メモリブロックサイズが0の場合は関数値にNULLを返します。0での初期化は行いません。
+</DL>
+
+<!-- -------------------------------------------------------------------------------- -->
+<A NAME="no5"><HR></A><DL>
+<DT><TABLE BORDER>
+<TD><PRE><A HREF="#no2_10">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=080><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=290><PRE>Function<BR><H4>メモリ再割り付け</H4></TD>
+<TD WIDTH=200><PRE>Function Name<BR><H3>MEM_Realloc</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>5</H4></TD>
+</TR></TABLE>
+<DT><B>　書　式</B><DD>void*MEM_Realloc(void *mem_ptr, Uint32 mem_size)
+<DT><B>　入　力</B><DD><TABLE>
+	<TR><TD><PRE>mem_ptr </TD><TD><PRE>：以前のメモリブロックへのポインタ</TD></TR>
+	<TR><TD><PRE>mem_size</TD><TD><PRE>：新しいメモリブロックサイズ(バイト指定)</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>正常の場合は、再割り付けしたメモリへのポインタを返します。エラーの場合はNULLを返します。
+<DT><B>　機　能</B><DD>指定以前のメモリブロックへのポインタのメモリブロックサイズを新しいメモリブロックサイズに変更します。再割り付けにより以前のメモリブロックの内容は、新しい領域に転送されます。
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+　　■</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#">メモリ管理ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,92 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/12&gt;FAQ/Sound related/Other sound tools related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no7">Sound related</a><HR>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Sound related</b><H2 ALIGN=CENTER> Other sound tools related</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_01"><HR></a><DL>
+<H3> Latest version of sound tool</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Please let me know the latest version of Sound Tool.<P><DT> <FONT SIZE=5>A)</font><DD> As of February 5, 1997, it is as follows.</P>
+<PRE>
+Sega Saturn Sound Driver          = Ver 2.10
+Sega Saturn Sound Simulator       = Ver 3.01
+Sega Saturn Tone Editor           = Ver 2.07
+Sega Saturn Waveform Editor       = Ver 1.20
+Sega Saturn DSP Linker            = Ver 2.00
+Sega Saturn DSP Expansion Linker  = Ver 1.04
+Sega Saturn ADPCM encoder         = Ver 1.01
+</PRE></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_02"><HR></a><DL>
+<H3> How to create data when playing sound sources separately.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> On one map, I would like to set the SE-related sequence data to #32/0 and the BGM-related sequence data to #32/1, but I would like to set the sound source to #32/0, How should I create a tone editor, map, etc. to make it sound separately from #32/1?<P><DT> <FONT SIZE=5>A)</font><DD> If you create two bank data for the map, banks 0 and 1, and take care to match the "Send bank settings" in the Preference menu in the tone editor to the bank number currently being edited, the rest will be the same as when only one bank is used. The work content is the same.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_03"><HR></a><DL>
+<H3> An error occurs when using "Play Audio" in the waveform editor.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am using it to convert AIFF files created with SD2 etc. to SCSP format, but the moment I hit a key on the soft keyboard in "Play Audio", the following error message appears.</P>
+<P><B><PRE>
+  01000200 00000 501 00000000 0000
+  01000250 00000 501 00000000 0005
+</PRE></B></P>
+<P><DT><FONT SIZE=5>A)</font><DD> "Play Audio" cannot be used in the CartDev environment.<BR>
+ Sound box only. Also, SD2 AIFF is fully supported by the TONE editor, so please read it directly with the TONE editor.<BR>
+ In addition,</P>
+<P> <B>“I couldn’t get out of the loop.”</b></P>
+<P> If you receive this error, please set "Initial Settings → AIFF Loop Settings" to "Check 3 or more markers" and try loading again.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_04"><HR></a><DL>
+<H3> Please tell me the flow of effect output on the tool.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> How are effects handled in SoundTool?<P><DT> <FONT SIZE=5>A)</font><DD> The flow of effect output on the sound development tool is briefly shown below.</P>
+<OL>
+<P><B><LI></b> Specify the input channel to the DSP in "Effect Select" in the layer window.<BR>
+ For example, set it to "0 ch".<P><B><LI></b> Set the input channel of the DSP linker to "0 ch" above.<BR>
+ Install the effect module you want to use and set the output channel.<BR>
+ For example, for stereo, set it to "1 ch" and "2 ch".<P><B><LI></b> Raise the "Effect Level" specified for the above output channel on the mixer window of the tone editor.<BR>
+ (For example, set it to 7) If this level is 0, there will be no sound on the sound simulator. Then, be sure to set the level of channels not specified as output in 2) to 0.</OL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_05"><HR></a><DL>
+<H3> Are there any appropriate sequence volume settings?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it possible to control the volume only up to 8 levels with SEQ?<BR>
+ The velocity is too strong, so if it's even slightly low, I can't hear it, but if you have any recommendations for velocity settings, please let me know.<BR>
+ I believe there is a default curve for MIDI sound sources, but what do you think?<P><DT> <FONT SIZE=5>A)</font><DD> The sequence volume can be set from 0 to 255.<BR>
+ The default value is 128, and the higher the value, the louder the volume will be.<BR>
+ However, be aware that setting extremely high values may distort the sound.</P>
+<P> As for velocity settings, the curve changes depending on the MIDI sound source, so there is no standard setting value. Configure it to suit your environment.<BR>
+ An example of that setting is shown below.</P>
+<P> Values on the Velocity window from above<BR>
+<PRE>
+-------------------------------------------------
+V0:6, L0:62, V1:20, L1:91, V2:76, L2:117, L3:127
+-------------------------------------------------
+</PRE></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_06"><HR></a><DL>
+<H3> Loop settings in 98 Recomposer</H3><P><DT> <FONT SIZE=5>Q)</font><DD> If you insert "CONTROL 31" into the sequence data using the recomposer and loop it, it will be played as Intro → A → B → A → B... but the first note of the second A part will be played as follows. The sound is missing, what could be the cause?<BR>
+ "CONTROL 31" uses a dedicated track.<BR>
+ I thought it was inserted in the wrong place, so I tried a few different patterns, but nothing improved.<P><DT> <FONT SIZE=5>A)</font><DD> With the 98 Recomposer, you may have to specify the number of steps in "CONTROL 31" as well, otherwise things may go wrong.</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_07"><HR></a><DL>
+<H3> I want to set Volume and Velocity for each song.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to set Volume and Velocity for each song, but I can't set it for each individual song using Total Level or Master Volume on the tool.<P><DT> <FONT SIZE=5>A)</font><DD> This can be done by assigning voices with different Volume and Velocity settings to each song.<BR>
+ You can set up to 128 voices. At this time, the same waveform data to be assigned is shared, so there is no problem with memory size.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sound">FAQ</a> ★ <A HREF="index.htm#no7">Sound related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

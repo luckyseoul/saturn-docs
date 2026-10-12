@@ -1,0 +1,151 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 5&gt; Compression/decompression library/function list</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Compression/decompression library</a><HR>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Compression/decompression library/2. reference</b><HR NOSHADE>
+<DL>
+<A NAME="no2_20"></A><P><DT><H3> 2.2 Function list</H3><DD> The following table lists the functions of the decompression library.</P>
+<A NAME="t2_3"></A><P><DD> <B>Table 2.3 List of functions of data decompression library</b><DD><TABLE BORDER>
+<TR><TH WIDTH=280><PRE> function</TH><TH WIDTH=180><PRE> function name</TH><TH><PRE> number</TH></TR>
+<TR><TD><PRE> run length extension</TD><TD><PRE> <A HREF="#no1_0">CMP_DecRunlen</a></TD><TD><PRE> 1</TD></TR>
+<TR><TD><PRE> Run length extension/BYTE unit</TD><TD><PRE> <A HREF="#no1_1">CMP_DecRunlenByte</a></TD><TD><PRE> 1.1</TD></TR>
+<TR><TD><PRE> Run length extension/WORD unit</TD><TD><PRE> <A HREF="#no1_2">CMP_DecRunlenWord</a></TD><TD><PRE> 1.2</TD></TR>
+<TR><TD><PRE> Run length extension/DWORD unit</TD><TD><PRE> <A HREF="#no1_3">CMP_DecRunlenDword</a></TD><TD><PRE> 1.3 </TD></TR>
+</TABLE>
+</DL>
+<HR NOSHADE>
+<!------------------------------------------------------------------>
+<A NAME="no2_30"></A><H3> 2.3 Function specifications</H3><!----------------------------------------------------------------------------->
+<A NAME="no1_0"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="#t2_3">one</a><BR> <A HREF="#t2_3">View</a><BR> <A HREF="#t2_3">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> run length extension</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> CMP_DecRunlen</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 1</H4></TD></TABLE>
+<DT> <B>Format</b><DD> Sint32 CMP_DecRunlen(void *in, void **out, Sint32 size)<DT> <B>argument</b><DD><TABLE>
+<TR><TD><PRE> in (input)</TD><TD><PRE> : Compressed data input buffer pointer.</TD></TR>
+<TR><TD><PRE> out (input)</TD><TD><PRE> : Address of decompressed data output buffer pointer.</TD></TR>
+<TR><TD><PRE>  (output)</TD><TD><PRE> : Pointer to the end of decompressed data output.</TD></TR>
+<TR><TD><PRE> bufsize(input)</TD><TD><PRE> :Output buffer size [BYTE].</TD></TR>
+</TABLE>
+<DT> <B>Return value</b><DD> Processing result<DD><TABLE>
+<TR><TD><PRE> CMP_DEC_OK ( 0)</TD><TD><PRE> :normal termination. The input data has been expanded to the end.</TD></TR>
+<TR><TD><PRE> CMP_DEC_STOP ( 1)</TD><TD><PRE> : Decompression processing interrupted. Extended by the output buffer size.</TD></TR>
+<TR><TD><PRE> CMP_DEC_ERR (-1)</TD><TD><PRE> :abnormal termination. Input data is abnormal.</TD></TR>
+<TR><TD><PRE> CMP_DEC_ERR_H_ALGO(-2)</TD><TD><PRE> :abnormal termination. This is an unsupported algorithm.</TD></TR>
+<TR><TD><PRE> CMP_DEC_ERR_H_UNIT(-3)</TD><TD><PRE> :abnormal termination. This is an unsupported processing unit.</TD></TR>
+</TABLE>
+<DT> <B>function</b><DD> Decompress compressed data.<BR>
+ Processes compressed data using the system's run-length compression tool CMPRUN.EXE.<BR>
+ This function interprets the headers of the input data and invokes a decompression function that matches the compression parameters.<P><DD> Read compressed data from in.<BR>
+ Write the decompressed data to *out. *out is post-incremented every time a byte is written.<BR>
+ The user can find out the size of the expanded data from the difference between the *out value set before startup and the *out value after startup.<BR>
+ If the decompressed data exceeds bufsze [byte], processing will be interrupted at that point. Even if the process is interrupted, the correct decompressed data for the buffer size is written to the output buffer.</P>
+<DT> <B>Note</b><DD> Both input and output buffers are allocated by the user. The start address of each buffer must match the start address of a 4-byte boundary. The output buffer must be large enough to accommodate the decompressed data and must be an integer multiple of the number of bytes processed.<DT> <B>remarks</b><A NAME="z2_1"></A><DD> <B>Figure 2.1 Explanation of stretch function arguments</b><PRE>
+In (input)　
+↓　
+─┬─┬─┬─┬─┬─ ─ ─ ─┬─┬─┬─┬─　
+Input buffer │■│■│■│■│・・・・・・・・・│■│■│■│　
+─┴─┴─┴─┴─┴─ ─ ─ ─┴─┴─┴─┴──　
+　
+│←──────────────bufsize────────────────→│　
+─┬─┬─┬─┬─┬─ ─ ─ ─┬─┬─┬─┬─┬─┬─┬──┬─┬─┬─┬─　
+Output buffer │□│□│□│□│・・・・・・・│□│□│□│□│□│ │・・・│ │ │ │　
+─┴─┴─┴─┴─┴─ ─ ─ ─┴─┴─┴─┴─┴─┴─┴───┴─┴─┴─┴─　
+↑ ↑　
+*out (input) out (output)　
+</PRE></DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_1"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="#t2_3">one</a><BR> <A HREF="#t2_3">View</a><BR> <A HREF="#t2_3">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Run length extension/BYTE unit</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> CMP_DecRunlenByte</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 1.1</H4></TD></TABLE>
+<DT> <B>Format</b><DD> Sint32 CMP_DecRunlenByte(void *in, void **out, Sint32 size)<DT> <B>argument</b><DD><TABLE>
+<TR><TD><PRE> in (input)</TD><TD><PRE> : Compressed data input buffer pointer.</TD></TR>
+<TR><TD><PRE> out (input)</TD><TD><PRE> : Address of decompressed data output buffer pointer.</TD></TR>
+<TR><TD><PRE>  (output)</TD><TD><PRE> : Pointer to the end of decompressed data output.</TD></TR>
+<TR><TD><PRE> bufsize(input)</TD><TD><PRE> :Output buffer size [BYTE].</TD></TR>
+</TABLE>
+<DT> <B>Return value</b><DD> Processing result<DD><TABLE>
+<TR><TD><PRE> CMP_DEC_OK( 0)</TD><TD><PRE> :normal termination. The input data has been expanded to the end.</TD></TR>
+<TR><TD><PRE> CMP_DEC_STOP( 1)</TD><TD><PRE> : Decompression processing interrupted. Extended by the output buffer size.</TD></TR>
+<TR><TD><PRE> CMP_DEC_ERR(-1)</TD><TD><PRE> :abnormal termination. Input data is abnormal.</TD></TR>
+<TR><TD><PRE> CMP_DEC_ERR_H_ALGO(-2)</TD><TD><PRE> :abnormal termination. This is an unsupported algorithm.</TD></TR>
+<TR><TD><PRE> CMP_DEC_ERR_H_UNIT(-3)</TD><TD><PRE> :abnormal termination. This is an unsupported processing unit.</TD></TR>
+</TABLE>
+<DT> <B>function</b><DD> Decompress compressed data.<BR>
+ Run length, processing unit Processes compressed data in BYTE.<BR>
+ Read compressed data from in.<BR>
+ Write the decompressed data to *out. *out is post-incremented every time a byte is written. The user can know the size of the expanded data from the difference between the *out value set before startup and the *out value after startup.<BR>
+ If the decompressed data exceeds bufsze [byte], processing will be interrupted at that point. Even if the process is interrupted, the correct decompressed data for the buffer size is written to the output buffer.<DT> <B>Note</b><DD> Both input and output buffers are allocated by the user. The start address of each buffer must match the start address of a 4-byte boundary.<BR>
+ The output buffer must be large enough to accommodate the decompressed data and must be an integer multiple of the number of bytes processed.<DT> <B>remarks</b><DD> The function interface is the same as <A HREF="#no1_0">CMP_DecRunlen()</a> . See <A HREF="#z2_1">Figure 2.1</a> .</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_2"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="#t2_3">one</a><BR> <A HREF="#t2_3">View</a><BR> <A HREF="#t2_3">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Run length extension/WORD unit</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> CMP_DecRunlenWord</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 1.2</H4></TD></TABLE>
+<DT> <B>Format</b><DD> Sint32 CMP_DecRunlenWord(void *in, void **out, Sint32 size)<DT> <B>argument</b><DD><TABLE>
+<TR><TD><PRE> in (input)</TD><TD><PRE> : Compressed data input buffer pointer.</TD></TR>
+<TR><TD><PRE> out (input)</TD><TD><PRE> : Address of decompressed data output buffer pointer.</TD></TR>
+<TR><TD><PRE> (output)</TD><TD><PRE> : Pointer to the end of decompressed data output.</TD></TR>
+<TR><TD><PRE> bufsize(input)</TD><TD><PRE> :Output buffer size [BYTE].</TD></TR>
+</TABLE>
+<DT> <B>Return value</b><DD> Processing result<DD><TABLE>
+<TR><TD><PRE> CMP_DEC_OK( 0)</TD><TD><PRE> :normal termination. The input data has been expanded to the end.</TD></TR>
+<TR><TD><PRE> CMP_DEC_STOP( 1)</TD><TD><PRE> : Decompression processing interrupted. Extended by the output buffer size.</TD></TR>
+<TR><TD><PRE> CMP_DEC_ERR(-1)</TD><TD><PRE> :abnormal termination. Input data is abnormal.</TD></TR>
+<TR><TD><PRE> CMP_DEC_ERR_H_ALGO(-2)</TD><TD><PRE> :abnormal termination. This is an unsupported algorithm.</TD></TR>
+<TR><TD><PRE> CMP_DEC_ERR_H_UNIT(-3)</TD><TD><PRE> :abnormal termination. This is an unsupported processing unit.</TD></TR>
+</TABLE>
+<DT> <B>function</b><DD> Decompress compressed data.<BR>
+ Processes data compressed by run length, processing unit WORD.<BR>
+ Read compressed data from in.<BR>
+ Write the decompressed data to *out. *out is post-incremented every time a byte is written.<BR>
+ The user can find out the size of the expanded data from the difference between the *out value set before startup and the *out value after startup.<BR>
+ If the decompressed data exceeds bufsze [byte], processing will be interrupted at that point.<BR>
+ Even if the process is interrupted, the correct decompressed data for the buffer size is written to the output buffer.<DT> <B>Note</b><DD> Both input and output buffers are allocated by the user.<BR>
+ The start address of each buffer must match the start address of a 4-byte boundary.<BR>
+ The output buffer must be large enough to accommodate the decompressed data and must be an integer multiple of the number of bytes processed.<DT> <B>remarks</b><DD> The function interface is the same as <A HREF="#no1_0">CMP_DecRunlen()</a> . See <A HREF="#z2_1">Figure 2.1</a> .</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no1_3"><HR></a><DL>
+<DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="#t2_3">one</a><BR> <A HREF="#t2_3">View</a><BR> <A HREF="#t2_3">table</a></TD><TD WIDTH=080><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=290><PRE> Function<BR><H4> Run length extension/DWORD unit</H4></TD><TD WIDTH=180><PRE> Function name<BR><H3> CMP_DecRunlenDword</H3></TD><TD WIDTH=040><PRE> No<BR><H4> 1.3</H4></TD></TABLE>
+<DT> <B>Format</b><DD> Sint32 CMP_DecRunlenDword(void *in, void **out, Sint32 size)<DT> <B>argument</b><DD><PRE>
+in (input): Compressed data input buffer pointer.
+out (input): Address of decompressed data output buffer pointer.
+       (Output): Decompressed data output end pointer.
+bufsize(input): Output buffer size [BYTE].
+</PRE><DT><B>Return value</b> (processing result)<DD><PRE>
+CMP_DEC_OK(0): Normal end. The input data has been expanded to the end.
+CMP_DEC_STOP( 1): Stops decompression processing. Extended by the output buffer size.
+CMP_DEC_ERR(-1): Abnormal termination. Input data is abnormal.
+CMP_DEC_ERR_H_ALGO(-2): Abnormal termination. This is an unsupported algorithm.
+CMP_DEC_ERR_H_UNIT(-3): Abnormal termination. This is an unsupported processing unit.
+</PRE><DT><B>function</b><DD> Decompress compressed data.<BR>
+ Processes data compressed by run length, processing unit DWORD.<BR>
+ Read compressed data from in.<BR>
+ Write the decompressed data to *out. *out is post-incremented every time a byte is written. The user can find out the size of the expanded data from the difference between the *out value set before startup and the *out value after startup.<BR>
+ If the decompressed data exceeds bufsze [byte], processing will be interrupted at that point. Even if the process is interrupted, the correct decompressed data for the buffer size is written to the output buffer.<BR>
+<DT> <B>Note</b><DD> Both input and output buffers are allocated by the user. The start address of each buffer must match the start address of a 4-byte boundary.<BR>
+ The output buffer must be large enough to accommodate the decompressed data and must be an integer multiple of the number of bytes processed.<DT> <B>remarks</b><DD> The function interface is the same as <A HREF="#no1_0">CMP_DecRunlen()</a> . See <A HREF="#z2_1">Figure 2.1</a> .</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Compression/decompression library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

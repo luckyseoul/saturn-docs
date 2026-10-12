@@ -1,0 +1,278 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/86&gt;VDP2ユーザーズマニュアル/2.5外部信号と走査状態</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm">HARDWARE Manual</A>★
+<A HREF="../index.htm">VDP2ユーザーズマニュアル</A>★
+<A HREF="p02_10.htm">第２章　TV画面</A>
+<HR>
+<B>▲
+<A HREF="p02_40.htm">戻る</A>｜
+<A HREF="p03_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第２章　TV画面</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_50"></A>
+	<DT><H2>■2.5　外部信号と走査状態</H2>
+		<DD>　外部信号を制御するレジスタには外部信号イネーブルレジスタがあり、TVの走査状態を表示するレジスタには画面ステータスレジスタ、Hカウンターレジスタ、Vカウンターレジスタがあります。<BR>
+
+<A NAME="no2_51"></A>
+	<P><DT><H3>　●外部信号イネーブルレジスタ</H3>
+		<DD>　外部信号イネーブルレジスタは、VDP2外部からの信号を制御します。リードライト可能な16ビットのレジスタで、180002H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<A NAME="EXTEN_"></A>
+<P>	<DD><B><FONT SIZE=5>EXTEN</FONT>　<FONT SIZE=4>180002H</FONT></B>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH><A HREF="#EXLTEN_">EXLTEN</TH><TH><A HREF="#EXSYEN_">EXSYEN</TH>
+</TR></TABLE><P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH><A HREF="#DASEL_">DASEL</TH><TH><A HREF="#EXBGEN_">EXBGEN</TH>
+</TR></TABLE></P>
+
+<A NAME="EXLTEN_"></A>
+	<P><DT><B><A HREF="#EXTEN_">▲</A>外部ラッチイネーブルビット</B>：External latch enable bit (EXLTEN)、ビット9
+		<DD>　HVカウンターの値をHVカウンターレジスタにラッチする条件を指定します。</P>
+
+	<P><DD><TABLE BORDER CELLPADDING=5>
+	<TR><TH WIDTH=50><PRE>EXLTEN</TH><TH WIDTH=200><PRE>条　件</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>外部信号イネーブルレジスタをリードしたときにラッチする</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>外部からの信号によってラッチする</TD></TR>
+	</TABLE></P>
+
+	<P><DD>　ラッチされたHカウンター値はHカウンターレジスタ、Vカウンター値はVカウンターレジスタでリードすることができます。<BR>
+	　<A HREF="../../../info/hon/stn41.htm">光線銃</A>などの外部信号によって、HおよびVカウンター値をリードする場合に1にします。通常は0に設定してください。</P>
+
+<A NAME="EXSYEN_"></A>
+	<P><DT><B><A HREF="#EXTEN_">▲</A>外部同期イネーブルビット</B>：EXSYNC enable bit (EXSYEN)、ビット8
+		<DD>　外部同期信号の内部同期回路への入力を制御します。</P>
+
+	<TABLE BORDER CELLPADDING=5>
+	<TR><TH WIDTH=50><PRE>EXSYEN</TH><TH WIDTH=400><PRE>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>外部同期信号は入力しない</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>外部同期信号を入力して、TV画面の表示を外部と同期させる</TD></TR>
+	</TABLE></P>
+
+	<P><DD>　他の機器と画面表示を同期させる場合に1にして外部同期信号を入力します。通常は0にしておいてください。</P>
+
+<A NAME="DASEL_"></A>
+	<P><DT><B><A HREF="#EXTEN_">▲</A>画像表示エリアセレクトビット</B>：Display area select bit (DASEL)、ビット1
+		<DD>　画像表示エリアを指定します。EXBGENビットが1のときのみ有効です。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH WIDTH=50><PRE>DASEL</TH><TH WIDTH=400><PRE>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>設定表示エリアにだけ画像を表示する</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>規格表示エリアすべてに画像を表示する</TD></TR>
+	</TABLE></P>
+
+	<P><DD>　規格表示エリアすべてに表示する場合、外部画面データによる画像はすべてにおいて正しく表示されます。しかし、その他(スプライト、スクロール画面など)の設定表示エリア以外の画像は、正しい表示ができません。
+	したがって、その他の画像は設定表示エリア以外は、ウィンドウを使って強制的に透明になるようにしてください。</P>
+
+<A NAME="EXBGEN_"></A>
+	<P><DT><B><A HREF="#EXTEN_">▲</A>外部画面イネーブルビット</B>：EXBG enable bit (EXBGEN)、ビット0
+		<DD>　外部画面データの入力を制御します。</P>
+
+	<P><TABLE BORDER=1>
+	<TR><TH WIDTH=50><PRE>EXBGEN</TH><TH WIDTH=400><PRE>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>外部画面データは入力しない</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>外部画面データを入力する</TD></TR>
+	</TABLE></P>
+
+	<P>　外部画面データを入力する場合、そのデータはNBG1の画面データとなるので、外部画面の設定はNBG1用のものが使用されます。<BR>
+	　外部画面の設定用のレジスタビットを表2.2に示します。</P>
+
+<A NAME="t2_2"></A>
+	<P><DD><B>表2.2　外部画面設定用レジスタ</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH><PRE>アドレス</TH><TH><PRE>ビット番号</TH><TH COLSPAN=2><PRE>ビ　ッ　ト　名</TH></TR>
+	<TR><TD><PRE>180020H</TD><TD><PRE>9</TD><TD><PRE>N1TPON</TD><TD><PRE>透明表示イネーブル</TD></TR>
+	<TR><TD><PRE>180028H</TD><TD><PRE>13，12</TD><TD><PRE>N1CHCN1，N1CHCN0</TD><TD><PRE>キャラクタ色数</TD></TR>
+	<TR><TD ROWSPAN=7><PRE>1800D0H</TD><TD><PRE>8</TD><TD><PRE>N1W0A</TD><TD><PRE>W0ウィンドウエリア</TD></TR>
+	<TR><TD><PRE>9</TD><TD><PRE>N1W0E</TD><TD><PRE>W0ウィンドウイネーブル</TD></TR>
+	<TR><TD><PRE>10</TD><TD><PRE>N1W1A</TD><TD><PRE>W1ウィンドウエリア</TD></TR>
+	<TR><TD><PRE>11</TD><TD><PRE>N1W1E</TD><TD><PRE>W1ウィンドウイネーブル</TD></TR>
+	<TR><TD><PRE>12</TD><TD><PRE>N1SWA</TD><TD><PRE>SWウィンドウエリア</TD></TR>
+	<TR><TD><PRE>13</TD><TD><PRE>N1SWE</TD><TD><PRE>SWウィンドウイネーブル</TD></TR>
+	<TR><TD><PRE>15</TD><TD><PRE>N1LOG</TD><TD><PRE>ウィンドウロジック</TD></TR>
+	<TR><TD><PRE>1800E2H</TD><TD><PRE>1</TD><TD><PRE>N1SDEN</TD><TD><PRE>シャドウイネーブル</TD></TR>
+	<TR><TD><PRE>1800E4H</TD><TD><PRE>6〜4</TD><TD><PRE>N1CAOS2〜N1CAOS0</TD><TD><PRE>カラーRAMアドレスオフセット</TD></TR>
+	<TR><TD><PRE>1800E8H</TD><TD><PRE>1</TD><TD><PRE>N1LCEN</TD><TD><PRE>ラインカラー画面挿入イネーブル</TD></TR>
+	<TR><TD><PRE>1800EAH</TD><TD><PRE>3，2</TD><TD><PRE>N1SPRM1，N1SPRM0</TD><TD><PRE>特殊プライオリティモード</TD></TR>
+	<TR><TD><PRE>1800ECH</TD><TD><PRE>1</TD><TD><PRE>N1CCEN</TD><TD><PRE>カラー演算イネーブル</TD></TR>
+	<TR><TD><PRE>1800EEH</TD><TD><PRE>3，2</TD><TD><PRE>N1SCCM，N1SCCM0</TD><TD><PRE>特殊カラー演算モード</TD></TR>
+	<TR><TD><PRE>1800F8H</TD><TD><PRE>10〜8</TD><TD><PRE>N1PRIN2〜N1PRIN0</TD><TD><PRE>プライオリティナンバー</TD></TR>
+	<TR><TD><PRE>180118H</TD><TD><PRE>12〜8</TD><TD><PRE>N1CCRT4〜N1CCRT0</TD><TD><PRE>カラー演算割合</TD></TR>
+	<TR><TD><PRE>180110H</TD><TD><PRE>1</TD><TD><PRE>N1COEN</TD><TD><PRE>カラーオフセットイネーブル</TD></TR>
+	<TR><TD><PRE>180112H</TD><TD><PRE>1</TD><TD><PRE>N1COSL</TD><TD><PRE>カラーオフセットセレクト</TD></TR>
+	</TABLE></P>
+
+<A NAME="no2_52"></A>
+	<P><DT><H3>　●画面ステータスレジスタ</H3>
+		<DD>　画面ステータスレジスタは、TV画面の情報を表示します。読み出し専用の16ビットのレジスタで、180004H番地にあります。</P>
+
+<A NAME="TVSTAT_"></A>
+<P>	<DD><B><FONT SIZE=5>TVSTAT</FONT>　<FONT SIZE=4>180004H</FONT></B>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH><A HREF="#EXLTFG_">EXLTFG</TH><TH><A HREF="#EXSYFG_">EXSYFG</TH>
+</TR></TABLE><P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH><A HREF="#VBLANK_">VBLANK</TH><TH><A HREF="#HBLANK_">HBLANK</TH><TH><A HREF="#ODD_">ODD</TH><TH><A HREF="#PAL_">PAL</TH>
+</TR></TABLE></P>
+
+<A NAME="EXLTFG_"></A>
+	<P><DT><B><A HREF="#TVSTAT_">▲</A>外部ラッチフラグ</B>：External latch flag (EXLTFG)、ビット9
+		<DD>　外部からの信号によってHVカウンターの値がHVカウンターレジスタにラッチされたかどうかを示します。画面ステータスレジスタを読み出すと0にクリアされます。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH WIDTH=50><PRE>EXLTFG</TH><TH WIDTH=250><PRE>HVカウンタ値状態</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>まだレジスタにラッチされていない</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>レジスタにラッチされた</TD></TR>
+	</TABLE></P>
+
+<A NAME="EXSYFG_"></A>
+	<P><DT><B><A HREF="#TVSTAT_">▲</A>外部同期フラグ</B>：External SYNC flag (EXSYFG)、ビット8
+		<DD>　外部同期信号によって内部回路が同期したかどうかを示します。画面ステータスレジスタを読み出すと0にクリアされます。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH WIDTH=50><PRE>EXSYFG</TH><TH WIDTH=250><PRE>外部同期状態</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>同期していない</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>内部回路が同期した</TD></TR>
+	</TABLE></P>
+
+<A NAME="VBLANK_"></A>
+	<P><DT><B><A HREF="#TVSTAT_">▲</A>Vブランクフラグ</B>：Vertical blank flag (VBLANK)、ビット3
+		<DD>　TV画面の垂直走査状態を示します。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH WIDTH=50><PRE>VBLANK</TH><TH WIDTH=250><PRE>垂直走査状態</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>走査が垂直表示期間中</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>走査が垂直帰線期間中(VBLANK期間中)</TD></TR>
+	</TABLE></P>
+
+	<P><DD>　このビットは、<A HREF="p02_40.htm#no2_40">TV画面モードレジスタ</A>の<A HREF="p02_40.htm#DISP_">TV画面表示ビット(<B>DISP</B>)</A>が１のときだけ有効になります。
+TV画面表示ビット(<B>DISP</B>)が０のときはVブランクフラグ(<B>VBLANK</B>)は常に１となります。</P>
+<A NAME="HBLANK_"></A>
+	<P><DT><B><A HREF="#TVSTAT_">▲</A>Hブランクフラグ</B>：Horizontal blank flag (HBLANK)、ビット2
+		<DD>　TV画面の水平走査状態を示します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>HBLANK</TH><TH WIDTH=250><PRE>水平走査状態</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>走査が水平表示期間中</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>走査が水平帰線期間中(HBLANK期間中)</TD></TR>
+	</TABLE></P>
+
+<A NAME="ODD_"></A>
+	<P><DT><B><A HREF="#TVSTAT_">▲</A>走査フィールドフラグ</B>：Odd/even field flag (ODD)、ビット1
+		<DD>　TV画面モードがインタレースモードのとき、走査の状態を示します。<BR>
+	　ノンインタレースモードでは、常に1になっています。<P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>ODD</TH><TH WIDTH=250><PRE>表示</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>走査が偶数フィールド期間中</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>走査が奇数フィールド期間中</TD></TR>
+	</TABLE></P>
+
+<A NAME="PAL_"></A>
+	<P><DT><B><A HREF="#TVSTAT_">▲</A>TV方式フラグ</B>：PAL/NTSC flag (PAL)、ビット0
+		<DD>　TV方式の状態を示します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>PAL</TH><TH WIDTH=250><PRE>表示</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>NTSC方式</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>PAL方式</TD></TR>
+	</TABLE><P>
+
+<A NAME="no2_53"></A>
+	<P><DT><H3>　●Ｈカウンターレジスタ</H3>
+		<DD>　Hカウンターレジスタは、Hカウンター値を示します。読み出し専用の16ビットのレジスタで、180008H番地にあります。</P>
+
+<A NAME="HCNT_"></A>
+<P>	<DD><B><FONT SIZE=5>HCNT</FONT>　<FONT SIZE=4>180008H</FONT></B>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH>
+<TH><A HREF="#HCT_">HCT9</TH>
+<TH><A HREF="#HCT_">HCT8</TH>
+</TR></TABLE><P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR>
+<TH><A HREF="#HCT_">HCT7</TH>
+<TH><A HREF="#HCT_">HCT6</TH>
+<TH><A HREF="#HCT_">HCT5</TH>
+<TH><A HREF="#HCT_">HCT4</TH>
+<TH><A HREF="#HCT_">HCT3</TH>
+<TH><A HREF="#HCT_">HCT2</TH>
+<TH><A HREF="#HCT_">HCT1</TH>
+<TH><A HREF="#HCT_">HCT0</TH>
+</TR></TABLE></P>
+
+<A NAME="HCT_"></A>
+	<P><DT><B><A HREF="#HCNT_">▲</A>Hカウンター値ビット</B>：H counter bit (HCT9〜HCT0)、ビット9〜0
+		<DD>　外部信号イネーブルレジスタのEXLTENによって制御される信号で、ラッチされたHカウンターの値を表します。このレジスタのビット構成はグラフィックモードの設定によって変化し、表2.3のようになります。<BR>
+　ノーマルグラフィックの場合のHカウンター値は、最下位ビットのHCT0が無効データとなります。専用ノーマルグラフィックの場合のHカウンター値は最上位ビットのHCT9が無効データとなります。<BR>
+　また、専用ハイレゾリューショングラフィックの場合のHカウンター値は、最上位ビットのHCT9が無効データとなり、H0用のビットが無いので、2ドット単位の値になります。</P>
+
+<A NAME="t2_3"></A>
+	<DD><B>表2.3　Hカウンターレジスタビット内容</B>
+	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH><PRE>グラフィック<BR>モード</TH><TH><PRE>HCT9</TH><TH><PRE>HCT8</TH><TH><PRE>HCT7</TH><TH><PRE>HCT6</TH><TH><PRE>HCT5</TH><TH><PRE>HCT4</TH><TH><PRE>HCT3</TH><TH><PRE>HCT2</TH><TH><PRE>HCT1</TH><TH><PRE>HCT0</TH></TR>
+	<TR ALIGN=CENTER><TH><PRE>ノーマル<BR>　</TH><TD><PRE>H8</TD><TD><PRE>H7</TD><TD><PRE>H6</TD><TD><PRE>H5</TD><TD><PRE>H4</TD><TD><PRE>H3</TD><TD><PRE>H2</TD><TD><PRE>H1</TD><TD><PRE>H0</TD><TD><PRE>無効</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>ハイレゾリューション<BR>　</TH><TD><PRE>H9</TD><TD><PRE>H8</TD><TD><PRE>H7</TD><TD><PRE>H6</TD><TD><PRE>H5</TD><TD><PRE>H4</TD><TD><PRE>H3</TD><TD><PRE>H2</TD><TD><PRE>H1</TD><TD><PRE>H0</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>専　用<BR>ノーマル</TH><TD><PRE>無効</TD><TD><PRE>H8</TD><TD><PRE>H7</TD><TD><PRE>H6</TD><TD><PRE>H5</TD><TD><PRE>H4</TD><TD><PRE>H3</TD><TD><PRE>H2</TD><TD><PRE>H1</TD><TD><PRE>H0</TD></TR>
+	<TR ALIGN=CENTER><TH><PRE>専　用<BR>ハイレゾリューション</TH><TD><PRE>無効</TD><TD><PRE>H9</TD><TD><PRE>H8</TD><TD><PRE>H7</TD><TD><PRE>H6</TD><TD><PRE>H5</TD><TD><PRE>H4</TD><TD><PRE>H3</TD><TD><PRE>H2</TD><TD><PRE>H1</TD></TR>
+	</TABLE><P>
+
+<A NAME="no2_54"></A>
+	<P><DT><H3>　●Ｖカウンターレジスタ</H3>
+		<DD>　Vカウンターレジスタは、Vカウンター値を示します。読み出し専用の16ビットのレジスタで、18000AH番地にあります。</P>
+
+<A NAME="VCNT_"></A>
+<P>	<DD><B><FONT SIZE=5>VCNT</FONT>　<FONT SIZE=4>18000AH</FONT></B>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH><A HREF="#VCT_">VCT9</TH><TH><A HREF="#VCT_">VCT8</TH>
+</TR></TABLE><P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><A HREF="#VCT_">VCT7</TH><TH><A HREF="#VCT_">VCT6</TH><TH><A HREF="#VCT_">VCT5</TH><TH><A HREF="#VCT_">VCT4</TH><TH><A HREF="#VCT_">VCT3</TH><TH><A HREF="#VCT_">VCT2</TH><TH><A HREF="#VCT_">VCT1</TH><TH><A HREF="#VCT_">VCT0</TH></TR>
+</TABLE></P>
+
+<A NAME="VCT_"></A>
+	<P><DT><B><A HREF="#VCNT_">▲</A>Vカウンター値ビット</B>：V counter bit (VCT9〜VCT0)、ビット9〜0
+		<DD>　外部信号イネーブルレジスタのEXLTENによって制御される信号で、ラッチされたVカウンターの値を表します。このレジスタのビット構成はTV画面モードの設定によって変化し、表2.4のようになります。
+	ノーマル、ハイレゾリューションモードの単密インタレースの場合のVカウンター値は、偶数フィールドと奇数フィールドそれぞれのフィールドにおけるVカウンター値を表します。
+	ノーマル、ハイレゾリューションモードの倍密インタレースの場合のVカウンター値は、最下位ビットのVCT0が0のときは奇数フィールドを、1のときは偶数フィールドを表し、VCT1〜VCT9はそれぞれのフィールドにおけるVカウンター値を表します。</P>
+
+<A NAME="t2_4"></A>
+	<P><DD><B>表2.4　Vカウンターレジスタビット内容</B>
+		<DD><TABLE BORDER>
+	<TR><TH><PRE>TV画面モード<BR>(インタレース)</TH><TH><PRE>VCT9</TH><TH><PRE>VCT8</TH><TH><PRE>VCT7</TH><TH><PRE>VCT6</TH><TH><PRE>VCT5</TH><TH><PRE>VCT4</TH><TH><PRE>VCT3</TH><TH><PRE>VCT2</TH><TH><PRE>VCT1</TH><TH><PRE>VCT0</TH></TR>
+	
+	<TR ALIGN=CENTER><TD><PRE>ノーマル、<BR>ハイレゾリューション<BR>（ノンインタレース、<BR>単密インタレース)</TD>
+		<TD><PRE>V9</TD><TD><PRE>V8</TD><TD><PRE>V7</TD><TD><PRE>V6</TD><TD><PRE>V5</TD><TD><PRE>V4</TD><TD><PRE>V3</TD><TD><PRE>V2</TD><TD><PRE>V1</TD><TD><PRE>V0</TD></TR>
+
+	<TR ALIGN=CENTER><TD><PRE>ノーマル、<BR>ハイレゾリューション、<BR>(倍密インタレース)</TD>
+		<TD><PRE>V8</TD><TD><PRE>V7</TD><TD><PRE>V6</TD><TD><PRE>V5</TD><TD><PRE>V4</TD><TD><PRE>V3</TD><TD><PRE>V2</TD><TD><PRE>V1</TD><TD><PRE>V0</TD><TD><PRE>0：奇数<BR>1：偶数</TD></TR>
+
+	<TR ALIGN=CENTER><TD><PRE>専　　用<BR>モ　ニ　タ　ー</TD>
+		<TD><PRE>V9</TD><TD><PRE>V8</TD><TD><PRE>V7</TD><TD><PRE>V6</TD><TD><PRE>V5</TD><TD><PRE>V4</TD><TD><PRE>V3</TD><TD><PRE>V2</TD><TD><PRE>V1</TD><TD><PRE>V0</TD></TR>
+	</TABLE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p02_40.htm">戻る</A>｜
+<A HREF="p03_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm">HARDWARE Manual</A>★
+<A HREF="../index.htm">VDP2ユーザーズマニュアル</A>★
+<A HREF="p02_10.htm">第２章　TV画面</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

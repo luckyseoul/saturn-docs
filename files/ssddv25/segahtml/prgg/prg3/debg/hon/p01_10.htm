@@ -1,0 +1,69 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 3&gt;Debug support library/1.Guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Debug support library</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>debug support library</b><H2 ALIGN=CENTER> 1. guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Purpose</H3><DD> By incorporating this library into the system under development, you can display character strings on the screen, input data using the software keyboard, and read and write memory contents.</P>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 Explanation</H3><DT><UL TYPE="DISK">
+<P><LI> This library uses the VDP2 graphics library to build a simple debugging environment on top of NBG0 on the normal scroll screen. This library cannot be used unless you use the VDP2 graphics library.</P>
+<P><LI> This library only supports dedicated pads. You cannot use this library without using the peripheral library.</P>
+</UL>
+<A NAME="no1_30"></A><P><DT><H3> 1.3 Limitations</H3><DD> The debug display screen uses normal scroll 0 with priority 7.<BR>
+ Therefore, lower the priority of other sprite surfaces and scroll surfaces as necessary.</P>
+<A NAME="no1_40"></A><P><DT><H3> 1.4 Program description example</H3><DD> An example of an actual program in C language is shown below.</P>
+<DD><PRE>
+#include "sega_scl.h"
+#include "sega_dbg.h"
+
+
+void err(Uint8 *mess);
+
+
+
+Uint16 PadData;<P>
+main()
+{
+          SCL_Vdp2Init();
+          DBG_Initial(&PadData,RGB16_COLOR(31,31,31),0);<P>
+          .......... /* Program */
+
+          if(......)     
+                    err("An error occurred in the ~ function of main()");
+          .......... /* Program */
+
+
+}
+
+void err(Uint8 *mess)
+{
+          DBG_Printf("%s\n",mess); /* Display message */
+          DBG_Monitor(); /* Create a simple debug environment *
+
+}</PRE><P></DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Debug support library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

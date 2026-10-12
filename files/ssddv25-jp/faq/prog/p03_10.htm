@@ -1,0 +1,385 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 7&gt;FAQ/プログラム全般</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#prog">FAQ</A>
+★<A HREF="index.htm">プログラム全般</A>
+<HR>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+<A HREF="p04_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/プログラム全般</B>
+<H2 ALIGN=CENTER>CDアクセス関係</H2>
+<HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_01"><HR></A><DL>
+<H3>オーバーレイプログラミングの仕方は?</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>オーバーレイ(メインプログラムでCDROM上のサブプログラムを読みだし実行する。)の方法を教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>以下に一例として(SGL GNU環境の場合)示しますので参考にしてください。
+
+<P><DT><H3>1)　常駐部プログラムの作成</H3>
+<DD>常駐プログラムは、最低限ファイルの読み込みや共通に使用するライブラリを置いておく部分として使用します。<BR>
+手順としては、CD-ROMから非常駐プログラムを指定のアドレスに読み込み、以下の2通りの方法のどちらかでその非常駐プログラムを実行します。</P>
+
+<DT><OL TYPE=a>
+<P><B><LI></B>指定アドレスから呼び出す方法<BR>
+非常駐プログラムを実行するアドレスをあらかじめ記述しておき、非常駐プログラムを読み込んだ後、このアドレスから実行します。</P>
+
+<P><B>＜プログラムの記述例＞</B>
+<PRE>
+fid = GFS_NameToId((Sint8 *)fname); /* fnameは非常駐プログラム */
+GFS_Load(fid, 0, 0x6080000, GFS_BUFSIZ_INF);
+
+/* 開始アドレスは非常駐プログラムのマップファイルから取得する */
+((volatile void (*)())(0x6081000))();  
+</PRE></P>
+
+<P><B>＜プログラムのリンク時の宣言＞</B>
+<PRE>
+GCC -m2 -Xlinker -Tkernal.cof -Xlinker -e -Xlinker ___Start ....
+</PRE></P>
+
+<P>この例の場合、非常駐プログラムの実行開始関数のアドレスが変わった場合、このプログラムの再コンパイルが必要になります。</P>
+
+<P><B><LI></B>外部宣言で関数を定義しておき、リンク時に<B>-defsymオプション</B>で外部宣言した関数に対してアドレスを設定します。関数の実行は、
+非常駐プログラムを読み込んだ後、実行します。</P>
+
+<P><B>＜プログラムの記述例＞</B>
+<PRE>
+extern void SUB_main1( void );
+#define SUB_ADDR    0x06080000
+void main( void ) 
+{
+        :
+   /* 非常駐プログラムのロード例 */
+   buf[0].type = CDBUF_COPY;
+   buf[0].trans.copy.addr = (Uint32)SUB_ADDR;
+        :
+   slCdLoadFile();
+   /* 非常駐プログラムの実行 */
+   SUB_main1();
+        :
+}
+</PRE></P>
+
+<P><B>＜プログラムのリンク時の宣言＞</B>
+<PRE>
+GCC -m2 -Xlinker -defsym -Xlinker _SUB_main1=0x06081000 ¥
+   -Xlinker -Tkernal.cof -Xlinker -e -Xlinker ___Start ....
+</PRE></P>
+
+<P>非常駐部の実行開始関数のアドレスが不定になりますので、一度仮に
+アドレスを設定して、非常駐プログラムを作成後、その非常駐部分の
+マップファイルから本当の実行開始アドレスを取得して再度アドレスを
+設定し直してリンクする必要が場合があります。</P>
+</OL>
+
+<P><DT><H3>2)　非常駐部プログラムの作成方法</H3>
+<DD>非常駐プログラムは、常に使用するプログラムやデータではなく、例えばステージ単位でしか使用しないプログラムを実行するようにします。<BR>
+非常駐プログラムは複数存在しても構いませんが、以下の点に注意して作成してください。</P>
+<DT><OL TYPE=a>
+<P><B><LI>プログラミング時の注意</B><BR>
+オブジェクトファイル内に常駐部と同じ関数名で作成しないように注意してプログラミングします。(例えば、main関数などがぶつかる可能性があります。)</P>
+
+<P><B><LI>非常駐部の読み込み時の注意</B><BR>
+非常駐部のスタートアドレスを常駐部の読み込み開始アドレスと同じアドレスに設定してください。</P>
+
+<P><B><LI>常駐部プログラムのマップ情報の受け渡し</B><BR>
+非常駐部を作成するときにリンカの-Rオプションを指定して常駐部の実行ファイル(例としてKernal.COF)を指定します。</P>
+
+<P><B>　GCC -m2 -Xlinker -R -Xlinker kernal.cof  .....</B></P>
+
+<P>この指定により、常駐部のシンボルを抽出して非常駐プログラムに組み込みます。<BR>
+使用するライブラリを常駐部と同様にリンクしても同じ関数が存在した場合は、-Rで指定したCOFFファイルの情報を優先します。
+</OL>
+
+<P><DT><H3>3)　常駐部から呼び出す非常駐部の実行開始アドレスの再登録</H3>
+<DD>非常駐プログラムを作成後、マップファイルから常駐部から呼び出される関数のアドレスを調べて、リンク時に <B>-defsymオプション</B>で再度実行開始関数のアドレスを再設定します。<BR>
+すでに常駐プログラム作成時のアドレスと同じ場合は行う必要はありません。</P>
+</DL>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_02"><HR></A><DL>
+<H3>CDトレイオープンチェックの仕方は?</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CDトレイオープンチェックをしたいのですが、どのような方法で行なえばいいのでしょうか？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>CDのトレイオープンチェックに関しては<B><FONT SIZE=5>必ず</FONT></B>次のような方法を取ってください。</P>
+<DD><PRE>
+if ( CDC_GetHirqReq() &amp; CDC_HIRQ_DCHG ) {
+   SYS_EXECDMP();   /* マルチプレイヤを呼び出す */
+} 
+</PRE></P>
+
+<P>この処理をしても問題ないのは、
+<UL TYPE=DISC>
+<LI>メインループ内
+<LI>Vブランク割込み処理内
+<LI>CDエラー例外処理ルーチン</UL></P>
+
+<P>だけです。これ以外の方法でトレイオープンチェックを行なった場合、動作を保証できません。</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_03"><HR></A><DL>
+<H3>CDバッファに常駐したストリームをセクタ毎に取り出すには?</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CDバッファに常駐したストリームを、セクタ単位に切り分けてホスト領域に取り出す方法を教えてください。<BR>
+また、他のCDライブラリと併用し、同様に取り出す方法も教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>CDバッファに常駐するモード(<A HREF="../../prgg/prg1/file/hon/p08_15.htm#no5_1">GFS_SetGmode関数</A>)場合、CDバッファ内のデータは、
+<A HREF="../../prgg/prg1/file/hon/p08_12.htm#no2_3">GFS_Seek関数</A>で目的のセクタ位置に移動して<A HREF="../../prgg/prg1/file/hon/p08_13.htm#no3_2">GFS_Fread関数</A>でデータを取得することができます。<BR>
+ただし、最大200セクタしかないのでこのサイズを越えてシークやリードするとCDからデータを読み込みにいきます。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_04"><HR></A><DL>
+<H3>GFS_FReadの戻り値が正常に返ってこない事がある?</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>GFS_Fread()の戻り値が正常に返ってこないことがあります。<BR>
+数百バイト程度の1セクタ以下のファイルの時におかしくなる事があるようです。<BR>
+調査をお願いします。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>GFS Ver2.00までの不具合です。必ずGFSライブラリの<FONT SIZE=5>Ver2.01以上</FONT>、
+SGLのCDライブラリはSGLの提供バージョン<FONT SIZE=5>2.0A以降</FONT>(96/02/06 02:01)を使用ください。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_05"><HR></A><DL>
+<H3>CDC関数郡を使ったフレームアドレス(FAD)の求め方。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CD通信インターフェースによる任意のファイル(名称)からフレームアドレス(FAD)を求める方法を教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>GFSライブラリ上で取り扱えるファイルの場合、GfsDirName *dirの構造体中の
+GFS_DIR_FADによりファイル先頭のFAD(Frame ADress)を取得出来ます。<BR>
+CDDAトラックの先頭を取得する場合には以下のような方法もあります。</P>
+<P><PRE>
+/* tracknoで指定したCDDAトラックの先頭フレームアドレスを取得する */
+Sint32 GetCDStartFrame(Uint8 trackno)
+{
+  CdcPos          Pos;
+  CdcStat         stat;
+  CDC_POS_PTYPE(&amp;pos) = CDC_PTYPE_TNO;
+  CDC_POS_TNO(&amp;pos) = trackno;
+  CDC_POS_IDX(&amp;pos) = 1;
+  CDC_CdSeek(&amp;pos);
+  while(1) {
+    CDC_GetCurstat(&amp;stat);
+    if ( CDC_STAT_STATUS(&amp;stat) == CDC_ST_PAUSE ) {
+      break;
+    }
+  }
+  return CDC_STAT_FAD(&amp;stat);
+}
+</PRE></P>
+
+<P>他の方法としてはディスクのTOC(Table Of Contents)を参照し、取得出来たテーブルから参照することも出来ます。<BR>
+このテーブルにはトラック1からリードアウトの開始フレームアドレスまでが各トラック毎4バイト分ずつ格納されています。</P>
+
+<P>TOCを取得する関数CDC_TgetToc関数については<BR>
+『PROGRAMMER'S GUIDE CD通信インタフェースユーザズマニュアル(CDパート)』<BR>
+  <A HREF="../../prgg/sysg/cdif/hon/p08_11.htm#no1_5">8.2 関数詳細 No 1.5</A></P>
+
+<P>取得したTOCの情報については<BR>
+『PROGRAMMER'S GUIDE CD通信インタフェースユーザズマニュアル(CDパート)』<BR>
+  7.2 データ詳細 7.2.3 <A HREF="../../prgg/sysg/cdif/hon/p07_11.htm#no3_0">TOC情報/セッション情報 No 3.0</A></P>
+
+<P>に記述があります。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_06"><HR></A><DL>
+<H3>CDDAの再生方法について教えて下さい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CDC関数群を使用したCDDAの再生について「CDDAの再生」、「CDDAの停止」、「CDDAのリピート再生」、「CDDAの一時停止」の方法が分かりません。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>付属のサンプルプログラムを御覧ください。</P><!--サンプルって？-->
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_07"><HR></A><DL>
+<H3>CD-ROMで読み取りエラーが発生した場合の処理はどうすれば良いでしょうか。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CD-ROMで読み取りエラーが発生した場合の処理はどうすれば良いでしょうか。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>CD-ROMのエラーは、種々の条件で起こり得ます。ディスクに付着したゴミ等によってエラー訂正不可能なデータが現れた場合、エラーとなります。<BR>
+また、ディスクやCD-ROMドライブメカによってエラー発生頻度はばらつきがあります。これに対処する為には一度の読み取りではなく、エラーが起こったら再度読み取りを行います。</P>
+
+<P>GFSライブラリを用いている場合は、ファイルが既にオープンされているならば
+<A HREF="../../prgg/prg1/file/hon/p08_13.htm#no3_1">GFS_Load()</A>を繰り返せば目的は達成されます。<BR>
+通常、数回のリトライ処理を行うようにすれば良いでしょう。リトライ処理は無限ループで回し続けることは避け、エラー表示は行わずマルチプレーヤへ処理を移してください。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_08"><HR></A><DL>
+<H3>CDバッファの有効的な使用方法を教えてください。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CDバッファの有効的な使用方法を教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>CDバッファは200セクタ(1セクタはMode1,Mode2 Form1の場合2048バイトで、
+Mode2 Form2の場合2324バイト)のデータ領域として使用できる大きさを
+持っています。<BR>セガサターンではこのCDバッファをメモリのように使用することが
+できます。</P>
+
+<P>これは、GFSライブラリのGFS_SetGmode関数で常駐モードを指定して、
+1度CD-ROMからファイルを読み込んで常駐させておき、通常CD-ROMからと同
+じようにGFS関数のGFS_Seek関数やGFS_Fread関数などを使用すると、再度
+CD-ROMからアクセスせずにCDバッファから読み込むことができます。</P>
+
+<P>GFSライブラリは、上記のGFS_SetGmode関数で指定するモードのデフォルト
+値は破棄(GFS_GMODE_ERASE)になっており、常駐(GFS_GMODE_RESIDENT)にす
+ることで、例えば常駐モードでCD-ROMからデータを読み込んだ後、CDDA再生
+を実行させます。<BR>その実行中にGFS関数を使用してCDバッファからデータを読
+み込むことでデータバッファのような形で使用が可能です。</P>
+
+<P>注意点として、200セクタを越えて移動(シーク)または読み込み(リード)させ
+ると、CD-ROMにアクセスしてしまいますので、最大200セクタの範囲内で行っ
+てください。<BR>また、このような使用方法をしない場合は、必ずGFS_SetGmode関
+数で破棄のモードに戻すようにしてください。</P>
+
+<P><B>＜例＞</B>CD<BR>
+バッファにデータを常駐させて、CDDA再生中に読み込むサンプルプログラム
+(但し、今回のプログラムは流れを説明するものなので、エラーチェックは行っていません。組み込み時には<B><FONT SIZE=5>必ず</FONT></B>加えてください。)</P>
+<P><PRE>
+/* 常駐モードの設定*/
+GFS_SetGmode(gfs, GFS_GMODE_RESIDENT);
+
+/* ファイルのCDバッファへの読み込み */
+fid = GFS_NameToId( "sample.dat");
+if ( fid &gt;= 0 ) {
+    GFS_Open( fid);
+    GFS_NwCdRead( gfs, 200 );
+}
+/* CDDA の再生 */
+CDC_PLY_STYPE(&amp;ply) = CDC_PTYPE_TNO;
+CDC_PLY_STNO(&amp;ply) = 2;
+CDC_PLY_SIDX(&amp;ply) = 0;
+CDC_PLY_ETYPE(&amp;ply) = CDC_PTYPE_TNO;
+CDC_PLY_ETNO(&amp;ply) = 3;
+CDC_PLY_EIDX(&amp;ply) = 0;
+CDC_PLY_PMODE(&amp;ply) = CDC_PM_DFL;
+ret = CDC_CdPlay(&amp;ply);
+
+/* CDDA 再生中にCDバッファから読み込み */
+GFS_Seek( gfs, GFS_SEEK_SET );
+GFS_Fread( gfs, 10, buf, 10*2048 );
+</PRE>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_09"><HR></A><DL>
+<H3>CDDA再生の途中で再生を中止し別のデータをCDから取りCDDAを続きから再生したい</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>CDDA再生中に一度曲を止めて、ほかのCDデータを読み込み、その読み込みが
+終了後、先ほど途中で止めた位置から再生させる方法について教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>CDDA再生中に、一時的にCD-ROMデータをリードし、再び元の位置から再生を再開する場合のポイントは次の3点です。</P>
+<DT><OL>
+<P><B><LI></B>CDC I/Fライブラリを使用する。</P>
+<P><B><LI></B>CD-ROMアクセスが途中で入るため、CD-DA再生範囲とリピート回数を再度設定し直す。</P>
+<P><B><LI></B>元の位置にシークしてから再生再開するため、「ピックアップ位置を変更しない」設定にする。</P>
+</OL>
+<P><DD>この設定は、CD再生パラメータ(CdcPly)の再生モードで指定できます。<BR>
+(CDCマニュアル No6.4 CD再生パラメータ-CdcPlyを参照のこと。)<BR>
+再開処理におけるフレームアドレスの取得方法は、ポーズコマンド実行後に
+&lt;PAUSE&gt;状態になるのを待ってから、CDステータス情報を取得して取り出します。<BR>
+以下に上記の手順を示したサンプルプログラムを示します。<BR>
+(このサンプルは処理の流れを重視して記述してますので、
+ 実際のプログラムには、<B><FONT SIZE=5>関数値のエラーチェックをする</FONT></B>ようにお願いします。)</P>
+
+<P>また、プレイ、シーク等のドライブコマンドを実行する直前には、トレイの開閉
+(DCHGフラグ)や&lt;FATAL&gt;状態を<B><FONT SIZE=5>チェック</FONT></B>すべきです。</P>
+
+<P><B>＜例＞</B><BR>CDDA再生とポーズ位置の取得方法を示した簡単なサンプルプログラム。</P>
+<P><DD><PRE>
+  /* 初期化 */
+  Sint32        ret;
+  Sint32        fad;
+  CdcStat       stat;
+  CdcPly        ply;
+  CdcPos        pos;
+  // トラック番号5〜17を無限回演奏する
+  CDC_PLY_STYPE(&amp;ply)=CDC_PTYPE_TNO;
+  CDC_PLY_STNO (&amp;ply)=5;
+  CDC_PLY_SIDX (&amp;ply)=0;
+  CDC_PLY_ETYPE(&amp;ply)=CDC_PTYPE_TNO;
+  CDC_PLY_ETNO (&amp;ply)=17;
+  CDC_PLY_EIDX (&amp;ply)=0;
+  CDC_PLY_PMODE(&amp;ply)=0x0F;
+  // 再生開始
+  CDC_CdPlay(&amp;ply);
+  while (1)
+  {
+  /* メインループ */
+       ：
+       ：
+      /* GFS ないし SGL による CD アクセスの発生 */
+      if (access==TRUE){
+          CDC_POS_TYPE(&amp;pos)=CDC_PTYPE_NOCHG;  /* CD-CA PAUSE */
+          CDC_CdSeek(&amp;pos);                    /* PAUSE 実行  */
+          /* ポーズ位置のFADを取得する(数フレームの誤差あり) */
+          ret = CDC_GetCurStat(&amp;stat);
+          if (ret != CDC_ERR_OK) {
+             return NG;
+          }
+          fad = CDC_STAT_FAD(&amp;stat);                         ：
+          /* GFS ないし SGL による CD アクセス実行 */
+                   ：
+          /* CD-DA 再生再開処理 */
+          CDC_POS_TYPE(&amp;pos)=CDC_PTYPE_FAD; /* 再開位置指定 */
+-&gt;        CDC_POS_FAD (&amp;pos)=fad;           /* FAD で指定 */
+          CDC_CdSeek(&amp;pos);                 /* シーク実行 */
+          /* CD再生パラメータの設定 */
+          /* ・5〜17トラック */
+          /* ・無限回リピート */
+          /* ・ピックアップ位置を変更せず */
+          CDC_PLY_STYPE(&amp;ply)=CDC_PTYPE_TNO;
+          CDC_PLY_STNO (&amp;ply)=5;
+          CDC_PLY_SIDX (&amp;ply)=0;
+          CDC_PLY_ETYPE(&amp;ply)=CDC_PTYPE_TNO;
+          CDC_PLY_ETNO (&amp;ply)=17;
+          CDC_PLY_EIDX (&amp;ply)=0;
+          CDC_PLY_PMODE(&amp;ply)=(CDC_PM_PIC_NOCHG | 0x0F);
+          CDC_CdPlay(&amp;ply);    /* 再開実行 */
+      }
+                ：
+                ：
+                ：
+      slSynch();      /* 等々 */
+  ｝
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p02_10.htm">戻る</A>｜
+<A HREF="p04_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#prog">FAQ</A>
+★<A HREF="index.htm">プログラム全般</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

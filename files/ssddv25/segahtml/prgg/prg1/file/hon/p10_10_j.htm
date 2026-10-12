@@ -1,0 +1,269 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/17&gt;プログラマーズガイド/ファイルシステムライブラリ/付録B</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ファイルシステムライブラリ</A>
+<HR>
+<B>▲
+<a href="p09_10_j.htm">戻る</A>｜
+　　■</B>
+<HR NOSHADE>
+<B>ファイルシステムライブラリ</B>
+<CENTER>
+<H4>付録Ｂ</H4>
+<H2>エラー対処法</H2></CENTER>
+<HR NOSHADE>
+<DL>
+	<DT>　以下のエラーコードについて原因と対処法を述べます。
+<HR><DL>
+<A NAME="GFS_ERR_CDRD"></A>
+	<DT><H4>GFS_ERR_CDRD</H4>
+	<DT><B>　原　因:</B>
+		<DD>CDブロックがリードエラーを起こしました。
+	<DT><B>　対　処:</B>
+		<DD><a href="p08_14_j.htm#no4_6">GFS_NwExecOne</A>,<a href="p08_14_j.htm#no4_7">GFS_NwExecServer</A>においてリードエラーが発生した場合、
+		関数値としてGFS_ERR_CDRDを返しますが、そのままサーバ関数を呼ぶとリカバリ処理をします。
+		完了復帰型アクセスでは、<a href="p07_11_j.htm#no2_7">GFS_ERR_CDRD</A>を返すだけでリカバリ処理は行いません。
+		この場合は、再度ファイルの読み込みを実行してください。<BR>
+		リードエラーが頻繁に発生する場合には、CD-ROMのハードウェアとメディアを確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_CDNODISC"></A>
+	<DT><H4>GFS_ERR_CDNODISC</H4>
+	<DT><B>　原　因:</B>
+		<DD>CD-ROMがセットされていません。
+	<DT><B>　対　処:</B>
+		<DD>CD-ROMをセットしてやり直してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_CDROM"></A>
+	<DT><H4>GFS_ERR_CDROM</H4>
+	<DT><B>　原　因:</B>
+		<DD>CD-ROMでないディスクがセットされています。
+	<DT><B>　対　処:</B>
+		<DD>正しいCD-ROMをセットしてやり直してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_DIRTBL"></A>
+	<DT><H4>GFS_ERR_DIRTBL</H4>
+	<DT><B>　原　因:</B>
+		<DD>ディレクトリ管理構造体の内容が不正です。
+	<DT><B>　対　処:</B>
+		<DD><a href="p08_11_j.htm#no1_1">GFS_Init</A>、<a href="p08_11_j.htm#no1_2">GFS_LoadDir</A>の呼び出しの前に、ディレクトリ管理構造体の各メンバに値の設定し忘れがないか、不正な値が設定されていないか確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_OPENMAX"></A>
+	<DT><H4>GFS_ERR_OPENMAX</H4>
+	<DT><B>　原　因:</B>
+		<DD>最大オープン数の値が不正です。
+	<DT><B>　対　処:</B>
+		<DD><a href="p08_11_j.htm#no1_1">GFS_Init</A>の呼び出しで最大オープン数の指定が1から24の範囲を超えていないか確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_DIR"></A>
+	<DT><H4>GFS_ERR_DIR</H4>
+	<DT><B>　原　因:</B>
+		<DD>指定されたファイルはディレクトリではありません。
+	<DT><B>　対　処:</B>
+		<DD>ファイル識別子とファイルの対応を確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_CDBFS"></A>
+	<DT><H4>GFS_ERR_CDBFS</H4>
+	<DT><B>　原　因:</B>
+		<DD>CDブロックファイルシステムの使用宣言をしていないのに使おうとしました。
+	<DT><B>　対　処:</B>
+		<DD>CDブロックファイルシステムを利用するなら、ディレクトリ管理領域のアドレスにNULLを指定して<a href="p08_11_j.htm#no1_1">GFS_Init</A>を呼び出してください。<BR>
+		CDブロックファイルシステムを使用しないなら、<a href="p08_11_j.htm#no1_2">GFS_LoadDir</A>,<a href="p08_11_j.htm#no1_3">GFS_SetDir</A>でNULLを指定しないようにしてください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_NONAME"></A>
+	<DT><H4>GFS_ERR_NONAME</H4>
+	<DT><B>　原　因:</B>
+		<DD>現在のディレクトリではファイル名を扱えません。
+	<DT><B>　対　処:</B>
+		<DD><a href="p07_11_j.htm#no3_2">GFS_DIRTBL_TYPE</A>に<a href="p07_11_j.htm#no3_2">GFS_DIR_NAME</A>を設定したディレクトリ管理領域を指定して、
+		<a href="p08_11_j.htm#no1_1">GFS_Init</A>か<a href="p08_11_j.htm#no1_2">GFS_LoadDir</A>を呼び出してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_NEXIST"></A>
+	<DT><H4>GFS_ERR_NEXIST</H4>
+	<DT><B>　原　因:</B>
+		<DD>指定されたファイル名は存在しません。
+	<DT><B>　対　処:</B>
+		<DD>カレントディレクトリの設定かファイル名の指定が間違っていないか確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_FID"></A>
+	<DT><H4>GFS_ERR_FID</H4>
+	<DT><B>　原　因:</B>
+		<DD>ファイル識別子の指定が不正です。
+	<DT><B>　対　処:</B>
+		<DD>指定したファイル識別子が、カレントディレクトリに設定したディレクトリ管理構造体の<a href="p07_11_j.htm#no3_2">GFS_DIR_NDIR</A>の範囲を超えていないか確認してください。</DL>
+<HR><DL>
+<A NAME="GFS_ERR_HNDL"></A>
+	<DT><H4>GFS_ERR_HNDL</H4>
+	<DT><B>　原　因:</B>
+		<DD>ファイルハンドルが不正です。
+	<DT><B>　対　処:</B>
+		<DD>ファイルハンドルを格納する変数に<a href="p08_12_j.htm#no2_1">GFS_Open</A>の関数値を設定し忘れていないこと、およびその変数の内容を破壊していないことを確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_SEEK"></A>
+	<DT><H4>GFS_ERR_SEEK</H4>
+	<DT><B>　原　因:</B>
+		<DD>シーク位置が不正です。
+	<DT><B>　対　処:</B>
+		<DD>基準位置とオフセットより計算したシーク位置を確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_ORG"></A>
+	<DT><H4>GFS_ERR_ORG</H4>
+	<DT><B>　原　因:</B>
+		<DD><a href="p08_12_j.htm#no2_3">GFS_Seek</A>の基準位置が不正です。
+	<DT><B>　対　処:</B>
+		<DD>基準位置が、<a href="p07_11_j.htm#no2_4">GFS_SEEK_SET、GFS_SEEK_CUR、GFS_SEEK_END</A>のどれかであることを確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_NUM"></A>
+	<DT><H4>GFS_ERR_NUM</H4>
+	<DT><B>　原　因:</B>
+		<DD>バイト数が負で指定されました。
+	<DT><B>　対　処:</B>
+		<DD><a href="p08_12_j.htm#no2_6">GFS_ByteToSct</A>で指定したバイト数を確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_OFS"></A>
+	<DT><H4>GFS_ERR_OFS</H4>
+	<DT><B>　原　因:</B>
+		<DD>オフセットが不正です。
+	<DT><B>　対　処:</B>
+		<DD><a href="p08_13_j.htm#no3_1">GFS_Load</A>で指定した読み込み開始セクタ位置を確認してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_FBUSY"></A>
+	<DT><H4>GFS_ERR_FBUSY</H4>
+	<DT><B>　原　因:</B>
+		<DD>指定ファイルハンドルに対する処理が残っています。
+	<DT><B>　対　処:</B>
+		<DD>目的のファイルのアクセスが終了してから再アクセスするようプログラムを修正するか、あるいはファイル構成を再検討してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_PARA"></A>
+	<DT><H4>GFS_ERR_PARA</H4>
+	<DT><B>　原　因:</B>
+		<DD>パラメータが不正です。
+	<DT><B>　対　処:</B>
+		<DD>次の各関数に正しい引数が与えられていることを確認してください。
+	<DD><UL TYPE=DISC>
+		<LI><a href="p08_14_j.htm#no4_1">GFS_NwFread</A>
+		<LI><a href="p08_13_j.htm#no3_2">GFS_Fread</A>
+		<LI><a href="p08_15_j.htm#no5_1">GFS_SetGmode</A>
+		<LI><a href="p08_15_j.htm#no5_2">GFS_SetTmode</A>
+		<LI><a href="p08_15_j.htm#no5_3">GFS_SetReadPara</A>
+		<LI><a href="p08_15_j.htm#no5_4">GFS_SetTransPara</A>
+	</UL></DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_BUSY"></A>
+	<DT><H4>GFS_ERR_BUSY</H4>
+	<DT><B>　原　因:</B>
+		<DD>多重処理を行おうとしました。
+	<DT><B>　対　処:</B>
+		<DD>「<a href="p06_10_j.htm#no6_30">6.3 多重処理</A>」を参照してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_NOHNDL"></A>
+	<DT><H4>GFS_ERR_NOHNDL</H4>
+	<DT><B>　原　因:</B>
+		<DD>ファイルハンドルに空きがありません。
+	<DT><B>　対　処:</B>
+		<DD><a href="p08_11_j.htm#no1_1">GFS_lnit</A>で同時に開くファイルの最大数の指定を大きくするか、同時に開くファイルの数を減らしてください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_FATAL"></A>
+	<DT><H4>GFS_ERR_FATAL</H4>
+	<DT><B>　原　因:</B>
+		<DD>CDドライブが&lt;FATAL&gt;状態です。
+	<DT><B>　対　処:</B>
+	<DT><OL TYPE=a>
+	<P><B><LI></B><a href="p08_11_j.htm#no1_1">GFS_Init</A>,<a href="p08_11_j.htm#no1_2">GFS_LodDir</A>の場合は、再度実行してください。</P>
+	<P><B><LI></B>ファイルの読み込み中は、一度ファイルをクローズし再度オープンして読み直してください。</P>
+	<P><B><LI></B>くり返し実行してもエラーになる場合は、故障などが考えられます。メッセージを表示するかマルチプレイヤに移ってください。</P></OL></DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_PUINUSE"></A>
+	<DT><H4>GFS_ERR_PUINUSE</H4>
+	<DT><B>　原　因:</B>
+		<DD>ピックアップ動作中に<a href="p08_16_j.htm#no6_1">GFS_CdMovePickup</A>を呼び出しました。
+	<DT><B>　対　処:</B>
+		<DD>ファイルアクセスを行っていない状態でGFS_CdMovePikupを呼び出すようにしてください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_ALIGN"></A>
+	<DT><H4>GFS_ERR_ALIGN</H4>
+	<DT><B>　原　因:</B>
+		<DD>ファイルの読み込み先がワード境界に配置されていません。
+	<DT><B>　対　処:</B>
+		<DD>読み込み領域をワード境界に配置してください。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_TMOUT"></A>
+	<DT><H4>GFS_ERR_TMOUT</H4>
+	<DT><B>　原　因:</B>
+		<DD>CDブロックから所定の時間内に応答が得られませんでした。
+	<DT><B>　対　処:</B>
+		<DD>ハードウェアの異常が考えられます。</DL>
+
+<HR><DL>
+<A NAME="GFS_ERR_CDOPEN"></A>
+	<DT><H4>GFS_ERR_CDOPEN</H4>
+	<DT><B>　原　因:</B>
+		<DD>CDドライブのトレイが開いています。
+<!-- +++:Update by CRI ：1.6 -->
+	<DT><B>　対　処:</B>
+		<DD><a href="../../../sysg/prog/hon/p02_11_j.htm#no6_1">SYS_EXECDMP()</A>を呼び出して、マルチプレーヤに戻ってください。</P>
+
+	<P><DD>　CDブロックの割り込み要因レジスタ(HIRQREQ)の<a href="../../../sysg/cdif/hon/p03_10_j.htm#t3_3">DCHGビット(bit5)</A>が1の時も、トレイが開いている状態として扱います。<BR>
+	　開発中は、<a href="p08_11_j.htm#no1_1">GFS_Init</A>を呼ぶ前にCDステータスがオープンでないことを確認してDCHGビットをクリアする処理を行ってください。<BR>
+	　製品版では、BOOT ROMがDCHGフラグをクリアするのでアプリケーションがクリアしてはいけません。</P></DL>
+<!-- --- Update by CRI ：1.6 -->
+
+<HR><DL>
+<A NAME="GFS_ERR_BFUL"></A>
+	<DT><H4>GFS_ERR_BFUL</H4>
+	<DT><B>　原　因:</B>
+		<DD>取り出しモードが<a href="p07_11_j.htm#no2_5">GFS_GMODE_RESIDENT</A>の時に、CDバッファがいっぱいになり、読み込みが中止されます。
+	<DT><B>　対　処:</B>
+		<DD>取り出しモードがGFS_GMODE_RESIDENTの時には、CDバッファがいっぱいにならないようにアクセスの順序、読み込み量を調整してください。</DL>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p09_10_j.htm">戻る</A>｜
+　　■</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#intr">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no7">ファイルシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

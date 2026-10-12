@@ -1,0 +1,108 @@
+<HTML>
+<HEAD>
+<TITLE> Expanding user area </TITLE>
+</HEAD><BODY>
+
+<P> <A HREF="pr10-3.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr10-5.htm"> Go to next page </A> </BR> </P>
+<HR>
+
+
+<H2>
+10-4. Expansion of user area
+</H2>
+
+<P>
+When writing a program using event processing, the variable group (structure) used by the function executed as an event may not fit in the user area (112 bytes) of the event. <BR>
+In such a case, SGL can be used by expanding the user area. <BR>
+There are two ways to expand the user area: a method that uses a dedicated extension area called work, and a method that acquires an extended area of ​​the same size as the EVENT structure from the event RAM area.
+</P>
+
+<H3>
+<A NAME="NO1"> Extension of user area using work area </A>
+</H3>
+
+<P>
+In SGL, the user area extension dedicated area called work can be used, and the user area of ​​the EVENT structure can be extended. <BR>
+The work is defined as a WORK structure (64 bytes) in the work RAM area, and up to 256 works can be used. <BR>
+The size of the user area that can be expanded per work is 60 bytes. <BR>
+The remaining 4 bytes of the WORK structure are used for addressing the linked WORK structures.
+</P>
+
+<H4> Figure 10-12 WORK structure </H4>
+<IMG SRC="p10-11.gif">
+
+<P>
+The members of the WORK structure are as follows.
+</P>
+
+<PRE>
+* next: The start address of the WORK structure to be linked as a chain structure.
+If there is no subsequent work as a chain structure, NULL is assigned.
+user []: Extended user area (60 bytes).
+</PRE>
+
+<P>
+The work acquired as the WORK structure is linked by substituting the start address of the WORK structure for “* work” in the EVENT structure to form a chain structure. <BR>
+In addition, the user can further expand the user area by acquiring the work again in the WORK structure.
+At this time, the work to be linked can be made into a chain structure by substituting the start address of the WORK structure to be linked to “* next” in the WORK structure. <BR>
+When there is no WORK structure that follows as a chain structure, NULL is assigned to “* next”.
+</P>
+
+<H4> Figure 10-13 Work connection </H4>
+<IMG SRC="p10-12.gif">
+
+<P>
+To use work in SGL, use library functions “slGetWork” and “slReturnWork”. “SlGetWork” is used to acquire a work, and “slReturnWork” is used to release a work.
+</P>
+
+<DL>
+<DT> <B> [WORK * slGetWork (void);] </B>
+<DD> Allocate a WORK structure (64 bytes) in the work RAM area. <BR>
+The function “slGetWork” returns the WORK structure address value of the secured work area as a return value.
+If space allocation fails, the function returns NULL.
+</DL>
+
+<DL>
+<DT> <B> [void slReturnWork (WORK * wkptr);] </B>
+Returns / releases the work area specified by the <DD> parameter. For the parameter, substitute the WORK structure address value of the work area to be returned. Also, when returning or releasing a part of the work connected with the chain structure to the system, adjust the remaining work so that the chain structure is correct. If adjustment is not performed, the chain structure and work processing may not be consistent, and the worst CPU may stop (see “10-5: Notes on event processing” for details).
+</DL>
+
+<H3>
+About the operation of the linked WORK structure by releasing the EVENT structure
+</H3>
+
+<P>
+The work does not necessarily need to form a chain structure using "* work" and "* next", and the start address of the WORK structure to be linked can be stored in the user area. <BR>
+However, the work connected by “* work” and “* next” is also released / released to the system at the same time by releasing the event, but the work connected from the user area releases the event. Even release of the WORK structure is not performed. <BR>
+For this reason, the WORK structure linked from the user area must be returned to the system and released with the library function “slReturnWork” when the event is released.
+</P>
+
+<H3>
+<A NAME="NO2"> Extension of user area using event area </A>
+</H3>
+
+<P>
+If the size of one user area to be expanded is insufficient for the WORK structure (60 bytes), a user area of ​​the same size (128 bytes) as the EVENT structure can be secured from the event RAM area. <BR>
+However, since the area allocated for one event is originally used as the user area, the maximum number of events that can be registered is reduced accordingly.
+</P>
+
+<H4> Figure 10-14 Expansion of user area using event RAM area </H4>
+<IMG SRC="p10-13.gif">
+
+<P>
+Use the library functions “slGetEvent” and “slReturnEvent” to extend the user area of ​​the EVENT structure using the event RAM area in SGL.
+“SlGetEvent” is used to secure the user area, and “slReturnEvent” is used to release the user area.
+</P>
+
+<DL>
+<DT> <B> [EVENT * slGetEvent (void);] </B>
+<DD> The RAM area of ​​the same size (128 bytes) as the event is taken out from the event RAM area and used as the user area. Also, since the area allocated for the EVENT structure is used as the user area, the number of events that can be registered is reduced accordingly. <BR>
+The function “slGetEvent” returns the start address of the allocated RAM area as a return value. <BR>
+If space allocation fails, the function returns NULL.
+</DL>
+
+<DL>
+<DT> <B> [void slReturnEvent (EVENT * evptr);] </B>
+The event RAM area specified by the <DD> parameter is returned to the system and released. <BR>
+For the parameter, substitute the start address of the RAM area to be returned. <BR>
+The function “slReturnEvent” does not check whether the area to return is an extended user area. Therefore, even if the EVENT structure registered as an event by mistake is returned to the system, it is not understood. In this case, since various troubles occur, it is considered that the CPU stops in the worst case

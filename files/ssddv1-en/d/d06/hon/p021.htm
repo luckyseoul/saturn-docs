@@ -1,0 +1,31 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p020.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p022.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H3> 3. Program part description (#PROG) </H3>
+<DD> <B> 3-1 Prepare data on Lch side </B> <P>
+Looking at the <UL> signal flow diagram, we can see that memory access (reading from the ring buffer) is required to obtain the data required for the operation. The address on the ring buffer to read is <P>
+<PRE>     raL
+     raL+1</PRE><P>
+is. However, since these addresses are only relative positions on the ring buffer, the address description element “DEC” is added to the “...” part of the external memory read parameter “MR [...]”. “DEC” represents a counter that is decremented by 1 per sample, and the ring buffer operation is realized only by adding this to the address description element. The data read from the raL and raL + 1 positions on the ring buffer is <P>
+<PRE>     MEMS00
+     MEMS01</PRE><P>
+The above is expressed on the dAsms source code as follows. <P>
+<PRE>     LDI MEMS00,MR[raL+DEC]
+     LDI MEMS01,MR[raL+DEC+1]</PRE><P>
+For reference, the addresses on the ring buffer accessed by the above two “MR [...]” are one address per sample by the action of “DEC” while keeping one address interval from each other. It will shift in the lower direction </UL><P>
+<DD> <B> 3-2 Calculation of Lch side feedback filter part </B> <P>
+<UL> Once you have the necessary data, you can write a description for performing calculations using those data. The calculation of the first-order IIR filter that is the feedback path for the delay signal is as follows. <P>
+(1) Multiply the value loaded in MEMS00 by the coefficient C0L. <BR>
+(2) Multiply the value loaded in MEMS01 by the coefficient C1L and add it to the result of (1). <BR>
+(3) Multiply the value of TEMP01 by the coefficient C2L and add it to the result of (2). <BR>
+(4) Store the result of (3) in TEMP00. <P>
+The important thing here is that TEMP is a ring buffer. In TEMPxx, the subscript xx indicates the relative address as a ring buffer, and the data stored in TEMP00 appears in TEMP01 in the next sample. In (3) and (4) above, a delay of one sample is realized using this. <P>
+In dAsms, due to the characteristics of the SCSP / DSP hardware that it targets, the description method of the calculation formula is a little special. The contents of (1) to (4) above are expressed on the dAsms source code as follows. </UL><BR>
+</DL><P><P><HR>
+<A HREF=p020.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p022.htm> Go to next page </A>
+</BODY>
+</HTML>

@@ -1,0 +1,191 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/30&gt;SGL Programmer's Tutorial/1.About SGL</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a>★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+ <B>■ ｜ <A HREF="p01_20.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>PROGRAMMER'S TUTORIAL</b><H2 ALIGN=CENTER> 1.About Sega Saturn 3D game library</H2><HR NOSHADE>
+<P> The Sega 3D Game Library (abbreviation: SGL) is a group of functions that can control three-dimensional graphics, provided for Sega Saturn software developers. Each function in the library (especially each function in the calculation library) is an algorithm designed by a programmer who is familiar with Saturn's processing capabilities, so it can be processed at high speed.</P>
+<P> This chapter explains the steps for developing software using the Sega 3D Game Library and precautions when using the library.</P>
+<DL>
+<A NAME="no1_10"></A><P><DT><H2> 1-1. Flow of programming work</H2><DD> The flow of programming Sega Saturn software using SGL is shown in the diagram below.</P>
+<A NAME="z1_1"></A><P ALIGN=CENTER> <B>Figure 1-1 Programming work flow</b><BR>
+<img srcset="../grp/p01_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>●Host machine</b><DD> Perform programming work, compilation, debugging, etc.<P><DT> <B>●Make</b><DD> Generates an executable file including compilation work.<P><DT> <B>●ICE</b><DD> Emulates the operation of SH2 of Sega Saturn's main CPU. By loading the executable program into ICE, you can check the operation of the created program.<P><DT> <B>●Debugger</b><DD> You can load, run, and debug programs at the source level.<P><DT> <B>●Target box</b><DD> It can be connected to ICE and works similar to Sega Saturn.</P>
+<P><DT><TABLE>
+<TR><TD ROWSPAN=2><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>For detailed instructions on how to use ICE and debugger, please refer to their respective manuals.</b></TD></TR>
+<TR><TD><LI> HITACHI E7000 SH7604 emulator<LI> SEGA SH7604 E7000 Graphical User Interface Software</TD></TR>
+</TABLE>
+</P>
+<A NAME="no1_11">　</A><P><DT><H3>Host machine settings</H3><DD> The following two items are required to configure the host machine environment. These settings are<BR>
+ “.cshrc” or “.tcshrc”<BR>
+ You need to set it in a script such as , or register it in your own script.</P>
+<P><DD><OL>
+<LI> Add the path for the debugger to the path environment variable.</P>
+<P> example<CENTER>
+ <B>Set△path=($path/usr/local/lib/sh2/GUI)</b><BR>
+ △=space</CENTER>
+</P>
+<P><LI> Set the following three environment variables: SHC library path, debugger help path, and ICE address.</P>
+</OL>
+<A NAME="z1_2"></A><TABLE BORDER=0>
+<CAPTION> <B>Figure 1-2 Setting environment variables</b></CAPTION>
+<TR><TD> ●Environment variables●</TD><TD></TD></TR>
+<TR><TD> setenv SHC_LIB</TD><TD>&#65308; library path&#65310;</TD></TR>
+<TR><TD> setenv SH76GIHOST</TD><TD>&#65308; IP address&#65310;</TD></TR>
+<TR><TD> setenv HELPPATH</TD><TD>&#65308; help path&#65310;</TD></TR>
+</TABLE>
+</P>
+<A NAME="no1_12">　</A><P><DT><H3>ICE settings</H3><DD> To connect ICE and a host machine, some initial settings such as setting a network ID and registering the host machine are required. This is explained below.</P>
+<P><DT> <B>●Connection of ICE and terminal</b><DD><OL>
+<LI> Remove the floppy disk from the ICE.<LI> Turn off S8 of the ICE rear dip switch. <BR
+			　（後面に向かって左側に倒すとＯＦＦ）
+
+		<LI>
+Connect your laptop, etc. and ICE via RS-232C.<BR>
+ (Connect to CRT on E7000 side)<LI> Start the terminal software on your computer.</OL>
+</P>
+<P><DT><TABLE>
+<TR><TD ROWSPAN=2><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>Notes on using Wterm</b><BR>
+ <B>Once you have made all the settings, press the [Control] + [GRAPH] + [S] keys at the same time to complete the connection. If you have not configured various settings, you will need to match the settings of ICE and Wterm. For ICE settings, please refer to page 29 of "ICE Emulator User's Manual"</b></TR>
+</TABLE>
+</P>
+<P><DT> <B>●IP address (ID on the network) settings</b><DD><OL>
+<LI> If the connection is successful, a message like the one below will be displayed.</P>
+<P><DD> <B>START ICE</b><DD> <B>S:START ICE</b><DD> <B>R:RELOAD&START ICE</b><DD> <B>B:BACKUP FD</b><DD> <B>F:FORMAT FD</b><DD> <B>L:SET LAN PATAMETER</b><DD> <B>T:START DIAGNOSTIC TEST</b><DD> <B>(S/R/B/F/L/T)?</b></P>
+<P><LI> When the message is output, enter “ <B>L</b> ” and the message below will be displayed.</P>
+<P><DD> <B>IP ADDRESS=XXXX</b></P>
+<P><LI> Please enter the address you want to set here. for example,</P>
+<P><DD> <B>IP ADDRESS=XXXX123.456.78.987</b></P>
+<P><LI> When you have finished inputting, turn off the power.</OL>
+</P>
+<P><DD> This completes the address setting.</P>
+<P><DT> <B>●Registering the host machine</b><DD><OL>
+<LI> Connect your network.<LI> Turn on S8 of the ICE rear dip switch.<BR>
+ (Turns it on when you tilt it to the right when facing the rear)<LI> Turn on the ICE.</P>
+<P><LI> Run the “telnet” command on your workstation. for example,</P>
+<P><DD> <B>telnet 157.109.50.120</b> or <B>telnet[hostname|IP address]</b></P>
+<P><LI> When “ <B>(file name / return) ?</b> ” is displayed, please return.</P>
+<P><LI> When the prompt “:” appears, enter the following:<BR>
+ A list of registered workstations will be displayed.</P>
+<P><DD> <B>LAN_HOST;S</b><BR>
+ (You can also enter "lh;s". "llhh;;ss" will be displayed on the screen.)</P>
+<P><LI> When “ <B>PLEASE SELECT NO?</b> ” is displayed, select the number (01 to 09) you wish to register or change.</P>
+<P><LI> Enter the host name (workstation controlling the ICE).</P>
+<P><DD> example)<DD> <B>01 HOST NAME SUN214 ?</b> SUNXXX<P><DD> SUNXXX=Host name of the host machine to use<P><LI> Enter the host's IP address.</P>
+<DD> <B>01 IP ADDRESS ?157.109.50.47</b><P><DD> 157.109.50.47=Hostname of your host machine<P><LI> When all entries are complete, you will see the following message:</P>
+<P><DD> <B>PLEASE SELECT NO? . [RET]</b></P>
+<P><LI> Press “ctrl” + “]” keys to terminate the “telnet” command.<LI> The prompt is “telnet”&gt; ”, type “quit” to exit.<LI> Turn off the ICE.<LI> Insert the floppy disk into the ICE and start the ICE again.</OL>
+</P>
+<P><DD> The ICE settings are now complete.</P>
+<A NAME="no1_13">　</A><P><DT><H3>Makefile settings/execution</H3><DD> Make generates a sequence of commands that the UNIX shell executes according to a file called a “Makefile,” which is a set of steps and rules. Make can efficiently control the relationships between files that are related to each other, so if you change only one of multiple source files, you can avoid having to recompile all the source files. It has several functions.</P>
+<P> SGL provides a special make file. By executing the Make command, the source programs specified in this file are compiled and an executable file is automatically generated.</P>
+<P><DT><TABLE>
+<TR><TD ROWSPAN=2><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>This makefile must be placed at the same level as the source file.</b></TR>
+</TABLE>
+</P>
+<P><DD> When a user creates a new application, the Makefile must be recreated accordingly. Please refer to commercially available books regarding Make's functions and format.</P>
+<P> Reference book example: make (Keigaku Publishing/written by Andrew Oram and Steve Talbot)</P>
+<A NAME="no1_14">　</A><P><DT><H3>Debugger startup/initial settings</H3><DD> HITACHI E7000 ICE is controlled by software with a dedicated graphical user interface (GUI). This software is called the "debugger" in this manual. The following explains how to start and initialize this debugger.</P>
+<P><DD><OL>
+<LI> Power on the ICE first, then the target (power off in the reverse order).</P>
+<P><LI> Creating files for automation<BR>
+ Create two files “ <A HREF="gish">gish</a> ” and “ <A HREF="PRESET">PRESET</a> ” in the current directory.</P>
+<P><DD> <B>gish</b><BR>
+<DD> gish76△PRESET</P>
+<P><DD> <B>PRESET</b><DD> HOST△Host machine△Login name△Password<DD> R.S.<DD> G</P>
+<P><DD> △=space</P>
+</OL>
+<P><DD> The settings in these files allow you to automate the following tasks:</P>
+<P><DD><UL>
+<LI> Set HOST NAME, USER NAME, and PASSWORD in the "HOST dialog box".<LI> Perform a target reset<LI> Since gish is executed as a shell script, set execution permissions using the chmod△+x△gish command. (△=space)</UL>
+</P>
+<P><DD><OL START=3>
+<LI> Starting the debugger<BR>
+ Type “gish” on the host machine and return to start the debugger.<BR>
+ If the following message appears during startup and the program is waiting for input, click inside the window to enable key input and return.</P>
+<P><DD> <B>(file name/return)?</b><P><DD> When the target is reset and the initial screen is displayed, click “STOP”.</P>
+<P><LI> Loading the initial program<BR>
+ Type “g 400” and when the screen disappears, click “STOP”.</P>
+<P><LI> Development settings (disabling interrupts)<BR>
+ Select “REGISTER” from the [VIEW] menu to display the “Register Dialog Box”.<BR>
+ Enter “000000f0” in the status register (SR) and click “ENTER”.</P>
+</OL>
+<P><DT><TABLE>
+<TR><TD ROWSPAN=2><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>This development setting is for using ICE. There is no need to set this in the software that will actually be released.</b></TR>
+</TABLE>
+</P>
+<A NAME="no1_15">　</A><P><DT><H3>Loading and running the program</H3><DD> This section explains how to use a debugger to load and execute an executable program on the ICE.</P>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>If you do not use an initialization file such as “PRESET” explained in the previous section, select “HOST” from the [FILE] menu to open the “HOST dialog” and enter the HOST NAME, USER NAME, and PASSWORD. Also, enter "rs [return] g [return]" in the command area of the debugger to reset the target.</b></TD></TR>
+</TABLE>
+</P>
+<P><DD><OL>
+<LI> Select [LOAD] → “PROGRAM FILE” from the [FILE] menu and enter the file name with the full path.</P>
+<P><LI> Click “LOAD”.<BR>
+ The executable program is now loaded.</P>
+</OL>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>If tcsh is used for the USER's LOGIN SHELL, FTP will not work unless tcsh is registered in the host machine's /etc/shells file, and the executable program will not be loaded.</b><BR>
+ <B>For more information, please see reference books on FTP.</b></TD></TR>
+</TABLE>
+</P>
+<P><DD><OL START=3>
+<LI> Select “GO” from the [EXECUTION] menu.</P>
+<P><LI> In the "GO Dialog Box", click the "START ADDRESS" input area, move the text cursor, and enter "6004000" in the same area. Next, select “order” from the pull-down menu of the “START MODE” button and click “Done”.</P>
+</OL>
+<P><DD> The executable program will now start running.</P>
+<A NAME="no1_16"></A><P><DT><H3> debug</H3><P><DT> <B>●Displaying the source program</b><OL>
+<LI> Select “SOURCE DISPLAY” from the [VIEW] menu to display the “SOURCE DISPLAY dialog box”.</P>
+<P><LI> Click on the name of the program you want to display to highlight it.</OL>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>The highlighted area expands each time you click the mouse button. It is OK if you can reverse specific lines, including the path name.</b></TD></TR>
+</TABLE>
+</P>
+<P><OL START=3>
+<LI> Click “DISPLAY”.<BR>
+ If you click “DISPLAY” while the lease program is loading or running, an error will occur. Please wait for the ICE command to finish loading or STOP before clicking.</P>
+</OL>
+<P><DT><TABLE>
+<TR><TD><img srcset="../../../../what/atto.png 5x"></TD><TD> <B>Click “CANCEL” if you want to clear the dialog box.</b></TD></TR>
+</TABLE>
+</P>
+<P><DT> <B>●Trace</b><DT> The trace function allows you to trace the source program step by step.</P>
+<P><DD><OL>
+<LI> After running the program, with “STOP” clicked or with the above source program displayed, double-click the area surrounded by the frame in the list section shown below. The beginning of the line will be reversed.</P>
+<A NAME="z1_3"></A><P ALIGN=CENTER> <B>Figure 1-3 Tracing from source program</b><BR>
+<img srcset="../grp/p01_09.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><LI> Click “SET” here.<BR>
+ Breakpoint [P] is set. However, it cannot be set on a line without a B.</P>
+<P><LI> Select “GO” from the [EXECUTION] menu.<BR>
+ The program counter [PC>] stops at the breakpoint [P].</P>
+</OL>
+<P><DD> There are two ways to trace step by step from here:</P>
+<P><DD><UL>
+<LI> STEP: When a subroutine is reached, the steps of the subroutine are also traced step by step.<LI> STEP_OVER: When a subroutine is reached, the subroutine is traced as one step.</P>
+</UL>
+</DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p01_20.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0></a> ★ <A HREF="../../../index.htm">SGL User's Manual</a> ★ <A HREF="../index.htm">PROGRAMMER'S TUTORIAL</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

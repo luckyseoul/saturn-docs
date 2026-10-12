@@ -1,0 +1,386 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;30/30&gt;SGL Programmer's Tutorial/14.サウンドライブラリ</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<A HREF="p13_10.htm">戻る</A>｜　　■</B>
+<HR NOSHADE>
+<B>PROGRAMMER'S TUTORIAL</B>
+<H2 ALIGN=CENTER>14.サウンドライブラリ</H2>
+<HR NOSHADE>
+<DL>
+
+<P>　本章では、サウンドコントロールライブラリを使って、セガサターンでサウンドを出力する際の手順と注意点について説明します。</P>
+<A NAME="no14_10"></A>
+	<P><DT><H2>14-1.　サウンドコントロールの概要</H2>
+	<DD>　セガサターンではサウンドコントロール用CPUとしてMC68000を登載し、マスターCPUとは独立して動作できるようになっています。<BR>
+		マスターＣＰＵとサウンドＣＰＵとは、コマンドバッファと呼ばれるＲＡＭを通してファンクションのやり取りをします。ファンクションの発行はサウンドコントロールライブラリが行いますので、
+		ユーザーはCPU間のやり取りを意識することなくサウンドをコントロールすることができます。<BR>
+		セガサターンで使用できる音源には、ＰＣＭとＣＤとがありますが、サウンドドライバーはこのうちのＰＣＭ音源に対するコントロールを行います。</P>
+
+<A NAME="z14_1"></A>
+	<P><DD>
+<CENTER><B>図14-1　サウンドドライバーシステム構成</B>
+<PRE>
+┏━━━━━━┓　　┏━━━━━━┓　　┏━━━━━━┓　　　　　
+┃サウンド　　┃　　┃　　　　　　┃　　┃　　　　　　┃　　　　　
+┃ライブラリ　┃←→┃　マスター　┃←→┃　スレーブ　┃　　　　　
+┠──────┨　　┃　ＣＰＵ　　┃　　┃　ＣＰＵ　　┃　　　　　
+┃　　　　　　┃　　┃　　　　　　┃　　┃　　　　　　┃　　　　　
+┃　　　　　　┃　　┗━━━━━━┛　　┗━━━━━━┛　　　　　
+┃　　　　　　┃　　　　　　↑　　　　　　　　　　　　　　　　　　
+┃　　　　　　┃　　　　　　↓　　　　　　　　　　　　　　　　　　
+┃　　　　　　┃　　┏━━━━━━┓　　　　　　　　　　　　　　　
+┃　　　　　　┃　　┃　サウンド　┃　　　　　　　　　　　　　　　
+┃　　　　　　┃　　┃　ドライバ　┃　　┏━━━━━━━━┓　　　
+┃　　　　　　┃　　┠──────┨　　┃サウンドＣＰＵ　┃　　　
+┗━━━━━━┛　　┃　コマンド　┃←→┃ＭＣ６８０００　┃　　　
+　　　　　　　　　　┃　バッファ　┃　　┃　　　　　　　　┃　　　
+　　　　　　　　　　┃　　　　　　┃　　┗━━━━━━━━┛　　　
+　　　　　　　　　　┠──────┨　　　　　　↓　　　　　　　　
+　　　　　　　　　　┃　　　　　　┃　　　┏━━━━━┓　　　　　
+　　　　　　　　　　┃　サウンド　┃　　　┃ＰＣＭ音源┃→スピーカ
+　　　　　　　　　　┃　データ　　┃　　　┗━━━━━┛　　　　　
+　　　　　　　　　　┗━━━━━━┛　　　　　　　　　　　　　　　
+　　　　　　　　　　　　共有ＲＡＭ　　　　　　　　　　　　　　　　
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+</PRE></CENTER>
+
+<A NAME="no14_20"></A>
+	<P><DT><H2>14-2.　サウンドドライバーの設定</H2>
+	<DD>　サウンドドライバーを用いてセガサターンでサウンドを制御するには、次の操作手順で行います。</P>
+
+<A NAME="z14_2"></A>
+<CENTER><B>図14-2　サウンドの制御手順</B><PRE>
+┏━━━━━━━━━━━━━━┓
+┃　サウンドドライバのセット  ┃
+┃　とＭＣ６８０００の起動　　┃
+┗━━━━━━━━━━━━━━┛
+　　　　　　　↓　　　　　　　　
+┏━━━━━━━━━━━━━━┓
+┃　サウンドデータのセット　　┃
+┗━━━━━━━━━━━━━━┛
+　　　　　　　↓　　　　　　　　
+┏━━━━━━━━━━━━━━┓
+┃　　ＢＧＭ演奏／効果音、　　┃
+┃　　ＰＣＭ音源の制御　　　　┃
+┗━━━━━━━━━━━━━━┛
+</PRE></CENTER>
+　　　　　　　　　　　　　　　　
+<A NAME="no14_21"></A>
+	<P><DT><H3>サウンドドライバーのセットとMC68000の起動</H3>
+	<DD>　サウンドを使用するためにはまず、サウンド制御用のMC68000を起動しなければなりません。また、このMC68000上で動作するドライバープログラムも必要です。これらはライブラリ関数“slInitSound()”を実行することによりセットできます。</P>
+
+	<P><DD><B>【void slInitSound(void *drv , Uint32 drvsz , void *map , Uint32 mapsz) ;】</B>
+	<DD>　サウンドドライバーのセットとサウンドCPU(MC68000)の初期化を実行します。“drv”は MC68000上で動作するサウンドドライバープログラムで、MC68000の０番地からロードされます。“drvsz”はこのドライバープログラムの大きさです。<BR>
+		通常は、<BR>slInitSound(drv , sizeof(drv) , maptbl , sizeof(maptbl)) ;<BR>
+		のように使用します。</P>
+
+	<P><DD>　この関数“slInitSound()”では、以下に示す手順が実行されます。</P>
+
+	<P><DD><OL>
+	<B><LI></B>MC68000のリセット
+	<B><LI></B>MC68000のメモリ領域 0xB000までの０クリア
+	<B><LI></B>ドライバープログラムの転送 (０番地からサイズ分)
+	<B><LI></B>マップデータの転送 (0xA000番地からサイズ分)
+	<B><LI></B>PCM再生用のメモリ領域の登録
+	<B><LI></B>MC68000のスタート
+	<B><LI></B>マップデータの登録
+	</OL></P>
+
+<A NAME="no14_22"></A>
+	<P><DT><H3>サウンドデータのセット</H3>
+	<DD>　上記の“slInitSound()”を実行しただけでは、まだ演奏用のデータがセットされていませんので、これをセットします。演奏用のデータは、MC68000のメモリ領域の０ｘＢ０００(プログラム上では０ｘ２５Ａ０Ｂ０００)以降に格納します(マップデータにより異		なる場合がありますのでサウンドデザイナーの方に問い合わせてください)。次の関数を使って転送します。</P>
+
+	<CENTER><B>図14-3　サウンドデータのセット例</B>
+<PRE>
+┌                                                             ┐
+│slDMACopy(sounddat , (void *)0x25a0b000 , sizeof(sounddat)) ;│
+│slDMAWait() ;                                                │
+└                                                             ┘
+</PRE></CENTER>
+
+	<P>	<DD>　これで、演奏の準備ができました。</P>
+
+<A NAME="no14_23"></A>
+	<P><DT><H3>ＢＧＭの演奏</H3>
+	<DD>　音楽(および効果音)はシーケンスという単位で扱われます。シーケンスとは、一連の音の組み合わせ(流れ)を始めから終わりまで演奏することであり(これが曲であったり、ワンショットの効果音であったりします)、セガサターンのサウンドドライバーでは、これ		を同時に８つまで演奏することができます。ＳＧＬでは、この８つのシーケンスの内、０番をＢＧＭ用に割り振っています。ＢＧＭを鳴らす場合は、“slBGMOn()”関数を実行します。</P>
+
+	<P>	<DD><B>【Bool slBGMOn(Uint16 Song , Uint8 Prio , Uint8 Volume , Uint8 Rate) ;】</B>
+	<DD>　BGM演奏を開始させます。</P>
+<PRE>
+Song  : 曲(効果音)番号
+Prio  : 音源を使用する際の優先順位
+Volume: 音量
+Rate  : Volumeに達するまでの時間
+</PRE>
+
+	<P>	<DD>　プライオリティ“Prio”は音源を使用する際の優先順位と呼ばれるもので、３２チャンネルある音源を複数のシーケンスが共有して音を出すため、それぞれで使用するチャンネル数の
+		合計が３２を超えた場合に優先度の低い音から削除してチャンネルを確保するためのものです。</P>
+
+	<P>	<DD>　音量“volume”は ０〜１２７ が選べ、数値が大きいほど音量も大きくなります。レート“Rate”とは指定された音量に達するまでの時間で、０〜２５５が指定できます。０の場合は即座にその音量となり、
+		１〜２５５の場合は音量０から指定音量までフェードインするようになります。</P>
+
+	<P>	<DD>　ＢＧＭは、以下の関数によってテンポや音量を変更したり、演奏を停止、一時停止、再開したりすることができます。</P>
+
+<PRE>
+slBGMTempo(Sint16 Tempo) ;　/* テンポの変更 */
+slBGMFade(Uint8 Volume , Uint8 Rate) ;　/* 音量の変更 */
+slBGMOff() ;　/* 演奏の停止 */
+slBGMPause() ;　/* 演奏の一時停止 */
+slBGMCont() ;　/* 演奏の再開 */
+slBGMStat() ;　/* 演奏中であるか調べる */
+</PRE>
+
+<A NAME="no14_24"></A>
+	<P><DT><H3>効果音の出力</H3>
+	<DD>　効果音も上記のＢＧＭ同様、シーケンスとして管理されています。
+		効果音を出力するには、関数“slSequenceOn()”を実行します。</P>
+
+	<P>	<DD><B>【Uint8 slSequenceOn(Uint16 Song , Uint8 Prio , Uint8 Volume , Uint8 Pan) ;】</B>
+<PRE>
+Song  : 曲(効果音)番号
+Prio  : 音源を使用する際の優先順位
+Volume: 音量
+Pan   : 左右の音量の振り分け
+</PRE>
+
+	<P>	<DD>　パラメータはＢＧＭ用の関数に似ていますが、Ｐａｎというパラメータが異なっています。これは、左右の音量をどのように振り分けるかを示すもので、どの方向から音が聞こえるかということに使えます。
+		Ｐａｎには −１２８〜＋１２７の値が指定でき、−１２８が左、０が正面、＋１２７が右を表します。</P>
+
+	<P>	<DD>　パラメータＰａｎの代入値：<BR>
+		Left : -128  &lt;&lt;  0  &gt;&gt; +127 : Right</P>
+
+	<P>	<DD>　３Ｄのシューティングゲームの爆発などで、距離や方向によってVolumeやPanを設定すると臨場感が増すはずです。</P>
+
+	<P>	<DD>　この関数“slSequenceOn()”は、指定された効果音が何番の発音管理番号で出力されているかを返します。この発音管理番号は、出力している効果音に対して、以下の関数を使って変更を行う際に使用されます。</P>
+<PRE>
+slSequenceTempo(Uint8 Seqnm , Sint16 Tempo) ;　/* テンポを変更 */
+
+slSequenceFade(Uint8 Seqnm , Uint8 Volume , Uint8 Rate) ;　/* 音量を変更 */
+
+slSequencePan(Uint8 Seqnm , Uint8 Pan) ;　/* 発生方向を変更 */
+
+slSequenceOff(Uint8 Seqnm) ;　/* シーケンスを停止する */
+
+slSequencePause(Uint8 Seqnm) ;　/* シーケンスを一時停止する */
+
+slSequenceCont(Uint8 Seqnm) ;　/* 一時停止中のシーケンスを再開する */
+
+slSequenceStat(Uint8 Seqnm) ;　/* シーケンスが演奏中であるかを調べる */
+</PRE>
+
+<A NAME="no14_25"></A>
+	<P><DT><H3>ＰＣＭ音源を使用した効果音の出力</H3>
+	<DD>　音声や爆発音などのサンプリングした効果音を出力する場合は、ＰＣＭ音源を使用することができます。ＰＣＭストリームによる効果音再生は上記のシーケンスとは別に、最大４チャンネルまで同時に出力することができます。
+		ＰＣＭストリームを使用する場合には関数“slPCMOn()”実行します。</P>
+
+<DL>
+<DT><B>【Sint8 slPCMOn(PCM *pdat , void *data , Uint32 size) ;】</B>
+<DD>ＰＣＭ音源による演奏を開始します。
+<PRE>
+pdat : ＰＣＭストリームの再生モード等のＰＣＭ型構造体データ
+data : ＰＣＭストリームの音源データ
+size : ＰＣＭストリームデータのサイズ
+</PRE>
+</DL>
+
+<P>
+ＰＣＭ型構造体データは以下のような構成で、ＰＣＭストリームの再生パラメータを指定するために使用されます。
+</P>
+
+<A NAME="z14_4"></A>
+	<P ALIGN=CENTER><B>図14-4　PCM型構造体データ</B><BR>
+	<P>	<DD>
+<PRE><B>
+typedef struct{
+	Uint8	mode;		/* Mode */
+	Uint8	channel;	/* PCM Channel Number */
+	Uint8	level;		/* 0 ‾ 127 */
+	Sint8	pan;		/* -128 ‾ +127 */
+	Uint16	pitch;
+	Uint8	eflevelR;	/* Effect level for Right(nomo) 0 ‾ 7 */
+	Uint8	efselectR;	/* Effect select for Right(mono) 0 ‾ 15 */
+	Uint8	eflevelL;	/* Effect level for Left(mono) 0 ‾ 7 */
+	Uint8	efselectL;	/* Effect select for Left(mono) 0 ‾ 15 */
+	}PCM;
+</B>
+	mode		:_Stereo or _Mono、_PCM16Bit or _PCM8Bitを指定します
+	channel		:PCM再生チャンネル(この関数がセットします)
+	level		:音量
+	pan		:音量の左右の振り分け
+	pitch		:再生レート(音程が変化します)
+	eflevelR	:エフェクトをかける度合(右チャンネル用)
+	efselectR	:エフェクトナンバー(右チャンネル用)
+	eflevelL	:エフェクトをかける度合(左チャンネル用)
+	efselectL	:エフェクトナンバー(左チャンネル用)
+</PRE></P>
+
+	<P>	<DD>　ＰＣＭストリームは上述のシーケンスと異なり、マスターＣＰＵがサウンド用ＳＣＳＰ ＬＳＩの使用するデータをセットしながら再生を行なうため、マスターＣＰＵの負荷が増えることになります。
+		サウンドデザイナーの方と相談して、上述のシーケンスでサウンド出力するかＰＣＭストリームを使用するかを決めてください。この関数“slPCMOn()”は、指定されたＰＣＭストリームが、何番の管理番号で出力されているかを返します。
+		この関数以外に、ＰＣＭストリームによる効果音再生に使用する関数を次に示します。</P>
+
+<PRE>
+slPCMOff(PCM *pdat) ; /*演奏を停止する*/
+slPCMParmChange(PCM *pdat) ; /*パラメータを変更する*/
+slPCMStat(PCM *pdat) ;/*指定したＰＣＭチャンネルが演奏中であるかを調べる*/
+</PRE>
+
+<A NAME="no14_26"></A>
+	<P><DT><H3>サウンド出力全体に影響する関数</H3>
+	<DD>　上述の関数は個々のサウンド出力に対するものでしたが、以下の関数はサウンド出力全体に影響します。</P>
+<PRE>
+slSndVolume(Uint8 Volume) ;　/* 全体音量 */
+slSoundAllOff() ;　/* 全サウンドシーケンスの停止 */
+slDSPOff() ;　/* 効果用ＤＳＰの停止 */
+slSndMixChange(Uint8 Tbank , Uint8 Mixno) ;　/* ミキサーの切替え */
+slSndMixParmChange(Uint8 Effect , Uint8 Level , Uint8 Pan) ;
+　　　　　　　　　　　　　　/* ミキサーのパラメータ変更 */
+</PRE>
+
+<A NAME="no14_30"></A>
+	<P><DT><H2>14-3.　メモリマップ</H2>
+	<DD>サウンドＣＰＵのメモリマップは大まかに以下のようになっています。ＰＣＭストリームを使用しない場合には、ＰＣＭ再生バッファは必要ありませんので、シーケンスデータに使用することができます。</P>
+
+<A NAME="z14_5"></A>
+	<CENTER><B>図14-5　サウンドＣＰＵのメモリマップ</B>
+<PRE>
+25A00000┏━━━━━━━━━━━━┓
+        ┃　　　　　　　　　　　　┃
+        ┃　    例外ベクタ等　　　┃
+        ┃　　　　　　　　　　　　┃
+25A00500┣━━━━━━━━━━━━┫
+        ┃　　　　　　　　　　　　┃
+        ┃　カレントマップデータ　┃
+        ┃　　　　　　　　　　　　┃
+25A00700┣━━━━━━━━━━━━┫
+        ┃　　　　　　　　　　　　┃
+        ┃　　コマンドバッファ　　┃
+        ┃　　　　　　　　　　　　┃
+25A00800┣━━━━━━━━━━━━┫
+        ┃　　　　　　　　　　　　┃
+        ┃　サウンドドライバー　　┃
+        ┃　　　　　　　　　　　　┃
+25A0A000┣━━━━━━━━━━━━┫
+        ┃　　　　　　　　　　　　┃
+        ┃　　　マップデータ　　　┃
+        ┃　　　　　　　　　　　　┃
+25A0B000┣━━━━━━━━━━━━┫
+        ┃　　　　　　　　　　　　┃
+        ┃　　音色、シーケンス　　┃
+        ┃　　　　　　　　　　　　┃
+25A78000┣━━━━━━━━━━━━┫
+        ┃　　　　　　　　　　　　┃
+        ┃　ＰＣＭ再生バッファ　　┃
+        ┃　　　　　　　　　　　　┃
+25A7FFFF┗━━━━━━━━━━━━┛
+</PRE></CENTER>
+
+<A NAME="no14_40"></A>
+	<P><DT><H2>14-4.　サンプルプログラム</H2>
+
+<A NAME="no14_41"></A>
+	<P><DT><H3>BGMと効果音の再生テスト用サンプルプログラム</H3>
+	<DD>　次のサンプルプログラムは、ＢＧＭと効果音の再生テストのために作成されたものです。
+		本サンプルで使用しているデータファイルは以下のような構成になっています。</P>
+
+<A NAME="z14_6"></A>
+	<P>	<DD><B>図14-6　サンプルプログラムのデータファイル</B><BR></P>
+<PRE><H3>
+バンク　ソング　　　　内　容
+------  ------      -------
+　０　　　０　　　曲（ループ無し）
+　　　　　１　　　曲（ループあり）
+　１　　　０　　　パシッ（Ｃ３）
+　　　　　１　　　パシッ（Ｄ３）
+　　　　　２　　　パシッ（Ｅ３）
+　　　　　３　　　パシッ（Ｆ３）
+　　　　　４　　　パシッ（Ｇ３）
+　　　　　５　　　パシッ（Ａ３）
+　　　　　６　　　パシッ（Ｂ３）
+　　　　　７　　　パシッ（Ｃ４）
+　２　　　０　　　イェー
+　３　　　０　　　長いバイオリンの音
+　　　　　１　　　短いバイオリンの音（ループ）
+</H3></PRE></P>
+
+
+	<P>	<DD>　バンクおよびソングで指定した曲を、ＸボタンでＢＧＭとして再生し、Ａボタンで効果音として再生します。
+		バンク、ソングの指定は、スタートキーと十時キーで行います。
+		Ｙボタン、Ｂボタンが、それぞれＢＧＭと効果音に対するポーズオン・オフとなっており、Ｚボタン、Ｃボタンが、フェードイン・アウトとなっています。
+		効果音のシーケンスナンバーの指定は、十時キーの左右で、全体のボリューム設定は十時キーの上下で行えます。</P>
+
+<A NAME="l14_1"></A>
+	<P>
+	<CENTER><B><A NAME="LIST14-1">リスト14-1　sampsnd1：BGMと効果音の再生テスト</A></B><BR>
+	<A HREF="../prg/p13_smp1.htm"><H1>main.c</H1>
+	</CENTER></P>
+
+<A NAME="f14_1"></A>
+	<P ALIGN=CENTER><B>フロー14-1　sampsnd1：BGMと効果音の再生テスト</B><BR>
+	<IMG SRC="../grp/p14_15.gif"></P>
+
+<A NAME="no14_42"></A>
+	<P><DT><H3>PCM音源再生テスト用サンプルプログラム</H3>
+	<DD>　次のサンプルプログラムは、ＰＣＭ音源再生のテストのために作成されたものです。<BR>
+		ＰＣＭ音源のサンプルデータは、１６ビットステレオ、８ビットステレオ、１６ビットモノラルの３種類が用意されており、それぞれ、Ｘボタン、Ｙボタン、Ｚボタンの入力によって再生されます。</P>
+
+<A NAME="l14_2"></A>
+	<P>
+	<CENTER><B>リスト14-2　sampsnd2：PCM音源再生テスト</B><BR>
+	<A HREF="../prg/p13_smp2.htm"><H1>main.c</H1>
+	</CENTER></P>
+
+<A NAME="z14_"></A>
+	<P ALIGN=CENTER><B>フロー14-2　sampsnd2：PCM音源再生テスト</B><BR><IMG SRC="../grp/p14_18.gif"></P>
+
+<A NAME="no14_f"></A>
+	<P><DT><H3>付記　本章に登場したサウンドライブラリ関数</H3>
+	<DD>　本章では、次表の関数を解説しました。</P>
+
+<A NAME="t14_1"></A>
+	<P>	<DD><B>表14-1　本章に登場したサウンドライブラリ関数</B>
+	<TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH><PRE>関数型</TH><TH><PRE>　　　関 数 名　　　</TH><TH><PRE>　　　　　パ　ラ　メ　ー　タ　　　　</TH><TH><PRE>　　　　　　　　　機　　　能　　　　　　　　　</TH></TR>
+	<TR><TD>void</TD><TD>slInitSound</TD><TD>void *drv,Uint32 drvsz,void *map,Uint32 mapsz</TD><TD>サウンドドライバーのセットとサウンドコントロールＣＰＵの初期化</TD></TR>
+	<TR><TD>Bool</TD><TD>slBGMOn</TD><TD>Uint16 Song,Uint8 Prio,Uint8 Volume,Uint8 Rate</TD><TD>ＢＧＭ演奏の開始</TD></TR>
+	<TR><TD>Bool</TD><TD>slBGMTempo</TD><TD>Sint16 Tempo</TD><TD>ＢＧＭ演奏速度の変更</TD></TR>
+	<TR><TD>Bool</TD><TD>slBGMFade</TD><TD>Uint8 Volume,Uint8 Rate</TD><TD>ＢＧＭ演奏音量の変更</TD></TR>
+	<TR><TD>Bool</TD><TD>slBGMOff</TD><TD>void</TD><TD>ＢＧＭ演奏の停止</TD></TR>
+	<TR><TD>Bool</TD><TD>slBGMPause</TD><TD>void</TD><TD>ＢＧＭ演奏の一時停止</TD></TR>
+	<TR><TD>Bool</TD><TD>slBGMCont</TD><TD>void</TD><TD>一時停止中ＢＧＭの演奏再開</TD></TR>
+	<TR><TD>Bool</TD><TD>slBGMStat</TD><TD>void</TD><TD>ＢＧＭ再生中チェック</TD></TR>
+	<TR><TD>Uint8</TD><TD>slSequenceOn</TD><TD>Uint16 Song,Uint8 Prio,Uint8 Volume,Uint8 Rate</TD><TD>指定した効果音の発生開始</TD></TR>
+	<TR><TD>Bool</TD><TD>slSequenceTempo</TD><TD>Uint8 Seqnm,Uint16 Tempo</TD><TD>指定した効果音の速度変更</TD></TR>
+	<TR><TD>Bool</TD><TD>slSequenceFade</TD><TD>Uint8 Seqnm,Uint8 Volume,Uint8 Rate</TD><TD>指定した効果音の音量変更</TD></TR>
+	<TR><TD>Bool</TD><TD>slSequencePan</TD><TD>Uint8 Seqnm,Uint8 Pan</TD><TD>指定した効果音の発生方向変更</TD></TR>
+	<TR><TD>Bool</TD><TD>slSequenceOff</TD><TD>Uint8 Seqnm</TD><TD>指定した効果音の発生停止</TD></TR>
+	<TR><TD>Bool</TD><TD>slSequencePause</TD><TD>Uint8 Seqnm</TD><TD>指定した効果音の発生一時停止</TD></TR>
+	<TR><TD>Bool</TD><TD>slSequenceCont</TD><TD>Uint8 Seqnm</TD><TD>一時停止中効果音の発生再開</TD></TR>
+	<TR><TD>Bool</TD><TD>slSequenceStat</TD><TD>Uint8 Seqnm</TD><TD>指定した効果音の再生中チェック</TD></TR>
+	<TR><TD>Sint8</TD><TD>slPCMOn</TD><TD>PCM *pdat,void *data,Uint32 size</TD><TD>ＰＣＭ音源による演奏開始</TD></TR>
+	<TR><TD>Bool</TD><TD>slPCMOff</TD><TD>PCM *pdat</TD><TD>ＰＣＭ音源による演奏停止</TD></TR>
+	<TR><TD>Bool</TD><TD>slPCMParmChange</TD><TD>PCM *pdat</TD><TD>ＰＣＭ再生用パラメータの変更</TD></TR>
+	<TR><TD>Bool</TD><TD>slPCMStat</TD><TD>PCM *pdat</TD><TD>指定したＰＣＭチャンネルの再生中チェック</TD></TR>
+	<TR><TD>Bool</TD><TD>slSndVolume</TD><TD>Uint8 Volume</TD><TD>全体の音量セット</TD></TR>
+	<TR><TD>Bool</TD><TD>slSoundAllOff</TD><TD>void</TD><TD>全てのサウンドシーケンスの演奏停止</TD></TR>
+	<TR><TD>Bool</TD><TD>slDSPOff</TD><TD>void</TD><TD>ＤＳＰ演奏の停止</TD></TR>
+	<TR><TD>Bool</TD><TD>slSndMixChange</TD><TD>Uint8 Tbank,Uint8 Mixno</TD><TD>音色バンクに対応するミキサの切替え</TD></TR>
+	<TR><TD>Bool</TD><TD>slSndMixParmChange</TD><TD>UInt Effect,Uint8 Level,Uint8 Pan</TD><TD>ミキサのパラメータ変更</TD></TR>
+	</TABLE></P>
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p13_10.htm">戻る</A>｜　　■</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

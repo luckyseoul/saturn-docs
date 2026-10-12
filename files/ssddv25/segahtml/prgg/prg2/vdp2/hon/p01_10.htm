@@ -1,0 +1,255 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 5&gt;VDP2 Library/1.Guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">VDP2 library</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 library</b><H2 ALIGN=CENTER> 1. Guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Purpose</H3><UL TYPE="DISK">
+<LI> It hides hardware-related processing and reduces the burden on application creators who use VDP2 features such as displaying images on scroll screens.<BR>
+<LI> By using this library, you can set registers without paying much attention to V-BLANK.<BR>
+ It hides the hardware-related processing of V-BLANK interrupt processing, reducing the burden on application creators.<BR>
+ Provides V-BLANK interrupt processing routine and frame change setting routine for VDP1 and VDP2 display.</UL>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 Explanation</H3><DD> VDP2 allows access to registers and color RAM only during the V-BLANK period. Also, many registers are not readable.<BR>
+ The VDP2 library has a register buffer within the library, and writing/reading to normal registers is performed to this register buffer, and is copied to the register during the next V-BLANK period. (See reference for details on register buffer)<BR>
+ This library is broadly divided into the following function groups. I will explain each of them.</P>
+<P><DT> <B>[Initialization function]</b><DD> This must be executed first when using the VDP2 library.</P>
+<P><DT> <B>[Table creation & dataset functions]</b><DD> Please refer to the VDP2 user's manual and reference to set various parameters.</P>
+<P><DT> <B>[Display screen operation related functions]</b><DD> You can move, enlarge/reduce, and rotate the scroll screen.<P><P><DT> <B>[Line screen setting function]</b><DD> Set the data for the line screen and back screen.</P>
+<P><DT> <B>[Window setting function]</b><DD> Configure the window.</P>
+<P><DT> <B>[VDP1 related functions]</b><DD> This is a function that must be set to display the contents of the frame buffer of VDP1 (sprite).</P>
+<P><DT> <B>[Color RAM related functions]</b><DD> Performs palette settings and palette rewriting.</P>
+<P><DT> <B>[Priority related functions]</b><DD> Set priorities and obtain information.</P>
+<P><DT> <B>[Color calculation related functions]</b><DD> Performs color calculation processing. It can be used to create effects that gradually appear, such as the expression of translucent objects, the appearance of ghosts, and the warping out of spaceships.</P>
+<P><DT> <B>[Color offset related functions]</b><DD> A process that adds an offset to a color. Applications include fade in, fade out, blackout, whiteout, etc. It is also effective when expressing the change from a blue sky to a sunset sky.</P>
+<P><DT> <B>[Other special effects related functions]</b><DD> You can set blur operations, line color screen insertion, and shadow bits. (Line color screen can only be used for color calculations)</P>
+<P><DT> <B>[Register buffer write/read macro]</b><DD> Provides macros for bit access to priority-related register buffers used by this library. There are approximately 90 types of macros for writing and reading.</P>
+<DT><UL TYPE="DISK">
+<P><LI> Write macro syntax<BR>
+ SCL_SET_&lt; BitName&gt; (arg);</P>
+<P><LI> Loading macro syntax<BR>
+ ret = SCL_GET_&lt; BitName&gt; ();<BR>
+&#12296; BitName&#12297; : Bit name (see "VDP2 User's Manual")<BR>
+ arg,ret: See "VDP2 User's Manual"></P>
+</UL>
+<P><DT> <B>[V-BLANK interrupt processing related functions]</b><DD> This section describes frame change processing using the V-BLANKVDP interrupt routine provided by this library to display sprites (VDP1) and scrolls (VDP2).</P>
+<P><DT> <B>[Frame change processing]</b><DT><UL TYPE="DISK">
+<P><LI> <B>Auto change mode (asynchronous mode)</b><BR>
+ The VRAM is automatically switched every 1/60 seconds to write erase data to the frame buffer and write sprites (frame change).<BR>
+ Therefore, calling the SCL_DisplayFrame() routine is not necessary.</P>
+<P><LI> <B>Constant interval manual change mode (synchronous mode)</b><BR>
+ If you specify 1 or more as the V-BLANK interval number in the SCL_SetFrameInterval routine described below, frame changes will be performed by the V-BLANKVDP interrupt routine once per interval. However, to do this, it is necessary to finish writing the command to VRAM and call the SCL_DisplayFrame() routine. Waiting for the frame change to complete is performed within the SCL_DisplayFrame() routine.</P>
+<P><LI> <B>Irregular interval manual change mode (synchronous mode)</b><BR>
+ If you specify 0xffff as the V-BLANK interval number in the SCL_SetFrameInterval() routine, it will become indefinite interval manual change mode.<BR>
+ Indeterminate is a mode in which a frame change occurs at the same time as the first V-BLANK interrupt when the command is finished writing to VRAM and the SCL_DisplayFrame routine is called. However, before performing a frame change, VDP1 waits in a loop to see if it has completed drawing to the current frame buffer. Also, since the frame buffer is not erased when changing frames, the user must clear the frame buffer using polygons at the beginning of the VRAM command.</P>
+</UL>
+<P><DT> <B>[V-BLANKVDP interrupt processing]</b><DD> When using the sprite (VDP1) or scroll (VDP2) display library, the user must create a V-BLANK interrupt routine that calls the following routine provided by this library and set it using INT_SetScuFunc(). You can also call your own interrupt handling routine without using the routine below.</P>
+<DT><UL TYPE="DISK">
+<P><LI> <B>V-BLANK start VDP interrupt handling routine</b><BR>
+ If the frame change is constant interval manual change mode, count the number of V-BLANKs, and turn on the frame change flag when the number of intervals is reached. If you are in indefinite interval manual change mode, turn on the frame change flag immediately.<BR>
+ In addition, in this access routine, the scroll operation and the prite frame change are synchronized by writing the contents of the scroll data to the scroll register during V-BLANK at the timing of the frame change. If this method does not suit your AP, you will need to register your own interrupt routine.</P>
+<P><LI> <B>V-BLANK end VDP interrupt handling routine</b><BR>
+ If the frame change flag is on, perform a frame change.</P>
+</UL>
+<A NAME="no1_30"></A><P><DT><H3> 1.3 Basic library usage</H3><DD> The basic usage of the VDP2 library follows the "VDP2 User's Manual Chapter 15 How to Use VDP2 15.1 Operation Flow". Please use the appropriate library accordingly.<BR>
+ Here, we will explain VRAM mapping, which is particularly important when using this library, the setting of cycle patterns that have a high degree of freedom in setting and are complex, and how to code using sample programs.</P>
+<P><DT> <B>VRAM mapping</b><A NAME="z1"></A><P ALIGN=CENTER> <B>Figure 1 Comparison of VRAM and data size</b><BR>
+<img srcset="../grp/i048_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> To use VDP2 effectively, it is important to determine how data is placed on VRAM.<BR>
+ For example, when displaying a bitmap image with 16.77 million colors, all VRAM is used and no other pictures can be displayed.<BR>
+ Next, I will give an example of VRAM mapping and explain each. In addition, a bitmap is used as an example of image data. Because the data size is fixed, this diagram can be used as a reference for direct mapping. In cell format, the data size changes depending on how the data is stored, and if there are many common parts, memory efficiency will be better than bitmap.</P>
+<P><DD> <B>[Example 1] When using 5 displayable surfaces of VDP2</b><BR>
+ If all data other than NBG2 and NBG3 are bitmaps and one rotating surface is set to 256 colors and all four normal surfaces are set to 16 colors, the result will be as follows. A rotation parameter table is required to move the rotating surface. Furthermore, when performing X-axis and Y-axis rotation, a rotation parameter coefficient table must also be prepared.<BR>
+ In this library, the rotation parameter coefficient table is normally placed from the beginning of each bank (VRAM A0, VRAM A1, VRAM B0, VRAM B1). However, only 2kWord (4kByte) is used for X-axis and Y-axis rotation in this library. Therefore, rotation parameter table, line scroll table, line color table, back screen data, etc. can be placed in the remaining area (124kByte). (1M bit = 128kByte)</P>
+<A NAME="z2"></A><DD> <B>Figure 2 When using five displayable screens of VDP2</b><PRE>
+┏━━━━━━━━━━━━━┓ ┌──────────────────────┐RBG0
+┃VRAM A0      ┃ │256 color bitmap      │    
+┃             ┃ │data (512×256)        │    
+┃             ┃ │1M bit                │    
+┃             ┃ │                      │    
+┃             ┃ │                      │    
+┣━━━━━━━━━━━━━┫ ┝━━━━━━━━━━━━━━━━━━━━━━┥    
+┃VRAM A1      ┃ │Rotation parameter    │    
+┃             ┃ │coefficient table     │
+┃             ┃ │(1 word)              │    
+┃             ┃ ├──────────────────────┤    
+┃             ┃ │Rotation parameter    │    
+┃             ┃ │table                 │    
+┣━━━━━━━━━━━━━┫ ┝━━━━━━━━━━━━━━━━━━━━━━┥NBG0
+┃VRAM B0      ┃ │16-color bitmap data  │    
+┃             ┃ │(512×256)0.5Mbit      │    
+┃             ┃ ├──────────────────────┤NBG2
+┃             ┃ │Character pattern data│    
+┃             ┃ │Pattern name data     │    
+┣━━━━━━━━━━━━━┫ ┝━━━━━━━━━━━━━━━━━━━━━━┥NBG1
+┃VRAM B1      ┃ │16-color bitmap data  │    
+┃             ┃ │(512×256)0.5Mbit      │    
+┃             ┃ ├──────────────────────┤NBG3
+┃             ┃ │Character pattern data│    
+┃             ┃ │Pattern name data     │    
+┗━━━━━━━━━━━━━┛ └──────────────────────┘    
+</PRE><P><DD><B>[Example 2] When using two rotating surfaces</b><BR>
+ Each type of rotating surface data, such as character data (bitmap data) and pattern name data, can only be placed in one bank. Furthermore, the arrangement of RGB1 is fixed to character pattern data in VRAMB0 and pattern name data in VRAMB1.</P>
+<A NAME="z3"></A><P><DD> <B>Figure 3 When using two rotating surfaces</b><PRE>
+┏━━━━━━━━━━━━━┓ ┌──────────────────────┐RBG0
+┃VRAM A0      ┃ │256 color bitmap data │    
+┃             ┃ │(512×256)             │    
+┃             ┃ │1M bit                │    
+┃             ┃ │                      │    
+┃             ┃ │                      │    
+┣━━━━━━━━━━━━━┫ ┝━━━━━━━━━━━━━━━━━━━━━━┥    
+┃VRAM A1      ┃ │Rotation parameter    │    
+┃             ┃ │coefficient table     │    
+┃             ┃ │(1 word)              │    
+┃             ┃ ├──────────────────────┤    
+┃             ┃ │Rotation parameter    │    
+┃             ┃ │table                 │    
+┣━━━━━━━━━━━━━┫ ┝━━━━━━━━━━━━━━━━━━━━━━┥RBG1
+┃VRAM B0      ┃ │Character pattern data│    
+┃             ┃ │1Mbit                 │    
+┃             ┃ │                      │    
+┃             ┃ │                      │    
+┃             ┃ │                      │    
+┣━━━━━━━━━━━━━┫ ┝━━━━━━━━━━━━━━━━━━━━━━┥    
+┃VRAM B1      ┃ │Pattern name data     │    
+┃             ┃ │1Mbit                 │    
+┃             ┃ │                      │    
+┃             ┃ │                      │    
+┃             ┃ │                      │    
+┗━━━━━━━━━━━━━┛ └──────────────────────┘    
+</PRE><P><DT><B>Partitioning VRAM and setting cycle patterns</b><DD> VDP2 displays scroll screen data while reading it from VRAM in synchronization with TV scanning. VRAM accesses during the display period are repeated 4 times (high-resolution screen) or 8 times (normal screen) as an access operation unit (1 cycle).<BR>
+ A cycle pattern register is provided for each VRAM and bank of VRAM A (VRAM A0, VRAM A1) and VRAM B (VRAM B0, VRAM B1). Access is represented by 4 bits per command.<BR>
+ (Please refer to "VDP2 User's Manual 3.4 How to access VRAM during display period".)<BR>
+ The number of accesses set in the cycle pattern varies depending on the data type and usage. These must be assigned to the cycle pattern table.</P>
+<A NAME="t1"></A><P><DD> <B>Table 1 Number of accesses to pattern name table data required for one cycle</b><DD><TABLE BORDER>
+<TR><TH><PRE> Item</TH><TH><PRE> NBG0 ~ NBG3</TH><TH><PRE> RBG0 , RBG1</TH></TR>
+<TR><TD ALIGN="LEFT"><PRE> Reduce settings</TD><TD ALIGN="CENTER" WIDTH=50><PRE> 1x</TD><TD ALIGN="CENTER" WIDTH=50><PRE> 1/2 times</TD><TD ALIGN="CENTER" WIDTH=50><PRE> 1/4 times</TD><TD ALIGN="CENTER"><PRE> −</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Number of VRAM accesses required in one cycle</TD><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> 2</TD><TD ALIGN="CENTER"><PRE> 4</TD><TD ALIGN="CENTER"><PRE> 8</TD></TR>
+</TABLE>
+</P>
+<A NAME="t2"></A><P><DD> <B>Table 2 Number of accesses to character pattern data (bitmap pattern data) data</b><DD><TABLE BORDER>
+<TR><TH><PRE> Item</TH><TH COLSPAN=8><PRE> NBG0 ~ NBG3</TH><TH COLSPAN=3><PRE> RBG0 , RBG1</TH></TR>
+<TR><TD ALIGN="LEFT"><PRE> TV screen mode </TD><TD COLSPAN=3 ALIGN="CENTER"><PRE></TD><TD COLSPAN=2 ALIGN="CENTER"><PRE></TD><TD ALIGN="CENTER"><PRE></TD><TD ALIGN="CENTER"><PRE></TD><TD ALIGN="CENTER"><PRE></TD><TD ALIGN="CENTER"><PRE> normal</TD><TD ALIGN="CENTER"><PRE> high resolution</TD><TD ALIGN="CENTER"><PRE> exclusive</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Number of character colors</TD><TD COLSPAN=3 ALIGN="CENTER"><PRE> 16</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> 256</TD><TD ALIGN="CENTER"><PRE> 2048</TD><TD ALIGN="CENTER"><PRE> 32768</TD><TD ALIGN="CENTER"><PRE> 16.77 million</TD><TD ALIGN="CENTER"><PRE> −</TD><TD ALIGN="CENTER"><PRE> −</TD><TD ALIGN="CENTER"><PRE> −</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Reduction settings (x)</TD><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> 1/2</TD><TD ALIGN="CENTER"><PRE> 1/4</TD><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> 1/2</TD><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> −</TD><TD ALIGN="CENTER"><PRE> −</TD><TD ALIGN="CENTER"><PRE> −</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Number of VRAM accesses required in one cycle</TD><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="CENTER"><PRE> 2</TD><TD ALIGN="CENTER"><PRE> 4</TD><TD ALIGN="CENTER"><PRE> 2</TD><TD ALIGN="CENTER"><PRE> 4</TD><TD ALIGN="CENTER"><PRE> 4</TD><TD ALIGN="CENTER"><PRE> 4</TD><TD ALIGN="CENTER"><PRE> 8</TD><TD ALIGN="CENTER"><PRE> 8</TD><TD ALIGN="CENTER"><PRE> 4</TD><TD ALIGN="CENTER"><PRE> 4</TD></TR>
+</TABLE>
+</P>
+<P><DD> For example, in the case of 16-color bitmap data (handled as character pattern data), four pieces of 512x256 data can be stored in either VRAM A or VRAM B. If this is assigned to each normal scroll surface, the total number of accesses will be 4. However, NBG0 and NBG1 on the normal scroll surface have a reduction function. If you use this function to set each image to 1/4 times smaller, the total number of accesses will be 10 times, which will exceed 8 times and will not be displayed correctly on the screen. In this case, dividing the VRAM will distribute the number of accesses, so it will be displayed correctly on the screen.</P>
+<A NAME="z4"></A><P><DD> <B>Figure 4 For 16-color bitmap data</b><PRE>
+┏━━━━━━━━━━━━━┓ ┌──────────────────────┐NBG0 1x
+┃VRAM A       ┃ │16-color bitmap data  │     
+┃             ┃ │                      │     
+┃             ┃ ├──────────────────────┤NBG1 1x
+┃             ┃ │16-color bitmap data  │     
+┃             ┃ │                      │     
+┃             ┃ ├──────────────────────┤NBG2 1x
+┃             ┃ │Character pattern data│     
+┃             ┃ │Pattern name data     │     
+┃             ┃ ├──────────────────────┤NBG3 1x
+┃             ┃ │Character pattern data│     
+┃             ┃ │Pattern name data     │     
+┣━━━━━━━━━━━━━┫ ┝━━━━━━━━━━━━━━━━━━━━━━┥NBG0 1/4x
+┃VRAM B0      ┃ │16-color bitmap data  │     
+┃             ┃ │                      │     
+┃             ┃ ├──────────────────────┤NBG1 1/4x
+┃             ┃ │16-color bitmap data  │     
+┃             ┃ │                      │     
+┣━━━━━━━━━━━━━┫ ┝━━━━━━━━━━━━━━━━━━━━━━┥NBG2 1x
+┃VRAM B1      ┃ │Character pattern data│     
+┃             ┃ │Pattern name data     │     
+┃             ┃ ├──────────────────────┤NBG3 1x
+┃             ┃ │Character pattern data│     
+┃             ┃ │Pattern name data     │     
+┗━━━━━━━━━━━━━┛ └──────────────────────┘     
+</PRE><P><DT><B>Program description example</b><DD> An example of an actual program in C language is shown below.</P>
+<DD><PRE>
+#include&lt; machine.h&gt;
+#include "sega_scl.h"
+
+                                     /* Cycle pattern table settings */
+Uint16 n0_cycle[]={0x44ff, 0x0fff, /* VRAM A(A0)NBG0 character pattern and pattern name table included */
+                    0xffff, 0xffff, /* VRAM A1 VRAM A is not divided */
+                                     /* unused */
+                    0xffff, 0xffff, /* VRAM B(B0) No data */
+                    0xffff, 0xffff}; /* VRAM B1 VRAM B is not divided */
+                                     /* unused */
+
+extern Uint16 ColData[]; /* Pointer to palette data */
+
+SclConfig scfg;
+main()
+{
+     SCL_Vdp2Init(); /* Initialize VDP2 library */
+
+     SCL_SetDisplayMode(SCL_NON_INTER,SCL_224LINE,SCL_NOMAL_A);
+                                                 /* Screen mode settings */
+
+     SCL_SetColRamMode(SCL_CRM_2048);
+                                                 /* Color RAM mode settings */
+     SCL_AllocColRam(SCL_NBG0,256,ON);
+                                                 /* Reserve pallet area */
+     SCL_SetColRam(SCL_NBG0,0,265,ColData);
+                                                 /* Palette data settings */
+
+     ................... /* Store scroll data in VDP2 VRAM. */
+     SCL_InitConfigTb(&scfg); /* Scroll NBG0 configuration initialization */
+
+
+     scfg.dispenbl = ON; /* Display NBG0 on screen */
+     scfg.charsize = SCL_CHAR_SIZE_1X1;
+     scfg.pnamesize = SCL_PN1WORD;
+     scfg.platesize = SCL_PL_SIZE_1X1;
+     scfg.coltype = SCL_COL_TYPE_256;
+     scfg.flip = SCL_PN_12BIT;
+     scfg.datatype = SCL_CELL;
+     scfg.plate_addr[0] = SCL_VDP2_VRAM_A+0x0000;
+     scfg.plate_addr[1] = SCL_VDP2_VRAM_A+0x2000;
+     scfg.plate_addr[2] = SCL_VDP2_VRAM_A+0x4000;
+     scfg.plate_addr[3] = SCL_VDP2_VRAM_A+0x6000;
+     SCL_SetConfig(SCL_NBG0, &scfg);
+
+     SCL_SetPriority(SCL_NBG0,7); /* Set priority to maximum */
+
+     SCL_SetCycleTable(n0_cycle); /* Set cycle pattern */
+
+     INT_SetScuFunc(.....); /* Register V-Blank routine */
+
+     set_imask(0); /* Enable interrupts. */
+
+     SCL_Open(SCL_NBG0); /* NBG0 open processing */
+     SCL_Move(FIXED(1), FIXED(1), 0); /* Various scroll movement functions */
+          .
+          .
+          .
+     SCL_Close(SCL_NBG0); /* End of scroll processing */
+
+     SCL_DisplayFrame(); /* Wait for V_BLANK and scroll display */
+}
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg2_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">VDP2 library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

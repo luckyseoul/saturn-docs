@@ -1,0 +1,104 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 3&gt;Timer library/1.Guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Timer library</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>timer library</b><H2 ALIGN=CENTER> 1. guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Purpose</H3><DD> This library mainly provides function-like macros to obtain programmable WAIT and processing times.</P>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 Overview</H3><DD> The timer uses the free running timer (FRT) in the CPU and the timer interrupt in the SCU. We have prepared function-like macros considering the following uses for each device.</P>
+<P><DT> <B>●SCU</b><UL TYPE="DISK">
+<LI> You can obtain time synchronized with V-Blank and H-Blank. It can be used as information for creating game screen effects.</UL>
+</P>
+<P><DT> <B>●CPU</b><UL TYPE="DISK">
+<LI> You can set the exact wait time (WAIT) required during programming. You can perform a relatively accurate WAIT within a C language program.</P>
+<P><LI> You can get the elapsed time. It can be used to measure program processing time.</P>
+</UL>
+<A NAME="no1_30"></A><P><DT><H3> 1.3 Detailed explanation</H3><P><DT> <B>●SCU</b><DD>&#65308; how to use&#65310;<DD> For details on how to use it, see timer interrupt in the SCU user's manual.</P>
+<P><DD>&#65308; calling sequence&#65310;<DD> The following is a calling sequence that uses timer 1 to generate a timer 1 interrupt when drawing the 10th bit of each line, and inverts that line if it is an odd numbered line.</P>
+<DD><PRE>
+Uint32 time_flg; /* Interrupt flag */
+...
+void vblankOut() /* V-BLANK OUT execution function */
+{
+     Uint32 intr_count = 0; /* Interrupt counter */
+     ...
+     TIM_T1_DISABLE(); /* Disable timer 1 interrupt */
+     TIM_T1_SET_MODE(TIM_MD_LINE); /* Specify interrupt generation every line */
+     TIM_T1_SET_DATA(10);                 
+                  /* Specify the interrupt generation timing at the 10th bit of the line */
+     time_flg = OFF; /* Turn off interrupt flag */
+     TIM_T1_ENABLE(); /* Timer 1 interrupt enable */
+     ...
+     for(intr_count&lt; ALL_LINE_NUM){
+                                           /* Until all line interrupts are executed */
+               changeLine(intr_count); /* Invert odd line */
+               intr_count ++; /* Line count */
+     }
+}
+void timeIntr() /* Interrupt execution function */
+{
+     time_flg = ON; /* Turn on interrupt flag */
+}</PRE></P>
+<P><DT> <B>●CPU</b><DD>&#65308; Basics&#65310;<DD> <B>counter value</b><DD> A counter value is used to specify time to FRT. This counter value is explained below.<P><DD> The count-up period of the counter value changes depending on the division specification and graphic mode specification. The count-up period can be calculated using the following calculation.<P><DD> Count-up period (s) = Divide x 1/Clock frequency (Hz)<P><DD> It is convenient to use the following function-like macros to convert count values to microseconds and microseconds to count values.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=170><PRE> function</TH><TH WIDTH=170><PRE> function-like macro</TH><TH WIDTH=100><PRE> number</TH></TR>
+<TR><TD><PRE> Counter value -&#65310; microsecond conversion</TD><TD><PRE> TIM_FRT_CNT_TO_MCR</TD><TD><PRE> 15</TD></TR>
+<TR><TD><PRE> microsecond -&#65310; Counter value conversion</TD><TD><PRE> TIM_FRT_MCR_TO_CNT</TD><TD><PRE> 16</TD></TR>
+</TABLE>
+</P>
+<P><DD>&#65308; how to use&#65310;<DD> <B>Initialization</b><DD> Execute the following function-like macro before obtaining the elapsed time and using the wait time (WAIT) function.</P>
+<P><TABLE BORDER>
+<TR><TH WIDTH=170><PRE> function</TH><TH WIDTH=170><PRE> function-like macro</TH><TH WIDTH=100><PRE> number</TH></TR>
+<TR><TD><PRE> FRT initialization</TD><TD><PRE> TIM_FRT_INIT</TD><TD><PRE> 8</TD></TR>
+</TABLE>
+</P>
+<P><DD> <B>How to obtain elapsed time</b><DD> The following functions are provided to obtain the elapsed time.</P>
+<P><DD><TABLE BORDER>
+<TR><TH WIDTH=170><PRE> function</TH><TH WIDTH=170><PRE> function-like macro</TH><TH WIDTH=100><PRE> number</TH></TR>
+<TR><TD><PRE> Counter value setting (16 bits)</TD><TD><PRE> TIM_FRT_SET_16</TD><TD><PRE> 9</TD></TR>
+<TR><TD><PRE> Obtain counter value (16 bit)</TD><TD><PRE> TIM_FRT_GET_16</TD><TD><PRE> 10</TD></TR>
+</TABLE>
+</P>
+<P><DD><PRE>
+void sysInit()
+{
+     TIM_FRT_INIT(8); /* Set divider to 8 */
+     ...
+}</PRE><P><PRE> void writeFrameBuff()
+{
+     Uint16 count; /* Obtained count value storage area */
+     float micro_sec; /* Microsecond storage area */
+     TIM_FRT_SET_16(0); /* Set the count value to 0 */
+     WriteAllVram(); /* Execute the process you want to measure */
+     count = TIM_Frt_Get_16(); /* Get the count value */
+                                           /* count indicates the execution time of WriteAllVram() */
+     micro_sec = TIM_FRT_CNT_TO_MCR(count);/* Convert counter value to microseconds */
+     printDisplay(micro_sec); /* Display the elapsed time on the screen */
+}</PRE></UL>
+<P></DL>
+<HR NOSHADE>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Timer library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

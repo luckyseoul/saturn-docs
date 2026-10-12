@@ -1,0 +1,121 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;62/86&gt;VDP2 User's Manual/10.3 Special Function Code</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no10">VDP2 User's Manual</a> ★ <A HREF="p10_10.htm">Chapter 10 Dot Color Data</a><HR>
+ <B>▲ <A HREF="p10_20.htm">Back</a> ｜ <A HREF="p11_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 10 Dot Color Data</b><HR NOSHADE>
+<DL>
+<P><DT><H2> ■10.3 Special function code</H2><DD> Special functions are functions that are performed for each scroll screen, and there are two types: special priority function and special color calculation function. When using these dot by dot, the dot color code that enables the special function can be specified in two special function code registers, and each scroll screen can be specified in either of the two special function code registers. You can also specify whether to use</P>
+<P><DD> The special function code register has two 8-bit registers each, special function code A and special function code B, and each bit corresponds to two values of the lower 4 bits of the dot color code that uses the special function. I am. The number of bits in the dot color code changes depending on the number of character colors on each scroll screen, but each bit in the special function code register always corresponds to the value of the lower 4 bits of the dot color code. Also, use the special function code only when the color format of the scroll screen is palette format.</P>
+<P><DD> For information on how to use the special functions, see " <B><A HREF="p11_20.htm">11.2 Special Priority Function</a></b> " and " <B><A HREF="p12_20.htm">12.2 Special Color Calculation Function</a></b> ."</P>
+<P><DD> Figure 10.7 shows the dot color codes that correspond to the special function codes.</P>
+<A NAME="z10_7"></A><P><DD> <B>Figure 10.7 Dot color codes corresponding to special function codes</b><DD><PRE>
+●If the number of character colors is 16
+ Bit 3  2  1  0
+    ┌──┬──┬──┬──┐
+    │Compatible │ (4 bits)
+    │bits       │
+    └──┴──┴──┴──┘
+
+●If the number of character colors is 256
+ Bit 7  6  5  4  3  2  1  0
+    ┌──┬──┬──┬──┬──┬──┬──┬──┐
+    │− │− │− │− │Compatible │ (4 bits)
+    │  │  │  │  │bits       │
+    └──┴──┴──┴──┴──┴──┴──┴──┘
+
+●If the number of character colors is 2048
+ Bit 15                   8  7           3  2  1  0
+    ┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+    │− │− │− │− │− │− │− │− │− │− │− │− │Compatible │ (4 bits)
+    │  │  │  │  │  │  │  │  │  │  │  │  │bits       │
+    └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+</PRE></P>
+<A NAME="no10_31"></A><P><DT><H3>●Special function code select register</H3><DD> The special function code select register specifies the special function code to be enabled for each scroll screen. This is a 16-bit write-only register located at address 180024H. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SFSEL_"></A><P><DD> <B><FONT SIZE=5>SFSEL</font> <FONT SIZE=4>180024H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxSFCS_">R0SFCS</a></TH><TH><PRE> <A HREF="#NxSFCS_">N3SFCS</a></TH><TH><PRE> <A HREF="#NxSFCS_">N2SFCS</a></TH><TH><PRE> <A HREF="#NxSFCS_">N1SFCS</a></TH><TH><PRE> <A HREF="#NxSFCS_">N0SFCS</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="NxSFCS_"></A><DT> <B>Special function code select bit</b> (N0SFCS, N1SFCS, N2SFCS, N3SFCS, R0SFCS)<DD> Specifies the special function code to enable for each scroll screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0SFCS</TD><TD> 180024H</TD><TD> bit 0</TD><TD> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD> N1SFCS</TD><TD> 180024H</TD><TD> bit 1</TD><TD> For NBG1</TD></TR>
+<TR><TD> N2SFCS</TD><TD> 180024H</TD><TD> bit 2</TD><TD> For NBG2</TD></TR>
+<TR><TD> N3SFCS</TD><TD> 180024H</TD><TD> bit 3</TD><TD> For NBG3</TD></TR>
+<TR><TD> R0SFCS</TD><TD> 180024H</TD><TD> bit 4</TD><TD> For RBG0</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> xxSFCS</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Enable special function code A</TD></TR>
+<TR><TH> 1</TH><TD> Enable special function code B</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, or R0.</P>
+<A NAME="no10_32"></A><P><DT><H3> ●Special function code register</H3><DD> The special function code register specifies special function code A and special function code B. This is a 16-bit write-only register located at address 180026H. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="SFCODE_"></A><P><DD> <B><FONT SIZE=5>SFCODE</font> <FONT SIZE=4>180026H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#SFCDx_">SFCDB7</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDB6</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDB5</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDB4</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDB3</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDB2</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDB1</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDB0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#SFCDx_">SFCDA7</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDA6</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDA5</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDA4</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDA3</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDA2</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDA1</a></TH><TH><PRE> <A HREF="#SFCDx_">SFCDA0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="SFCDx_"></A><DT> Special function <B>code</b> bit<DD> (SFCDA7～SFCDA0, SFCDB7～SFCDB0)<BR>
+ Specify special function codes A and B.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> SFCDA7～SFCDA0</TD><TD> 180026H</TD><TD> Bits 7-0</TD><TD> For special function code A</TD></TR>
+<TR><TD> SFCDB7～SFCDB0</TD><TD> 180026H</TD><TD> bits 15-8</TD><TD> For special function code B</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> bit name</TH><TH> dot color code</TH></TR>
+<TR><TH> SFCDx0</TH><TD> When the lower 4 bits of the dot color code are 0H or 1H</TD></TR>
+<TR><TH> SFCDx1</TH><TD> When the lower 4 bits of the dot color code are 2H or 3H</TD></TR>
+<TR><TH> SFCDx2</TH><TD> When the lower 4 bits of the dot color code are 4H or 5H</TD></TR>
+<TR><TH> SFCDx3</TH><TD> When the lower 4 bits of the dot color code are 6H or 7H</TD></TR>
+<TR><TH> SFCDx4</TH><TD> When the lower 4 bits of the dot color code are 8H or 9H</TD></TR>
+<TR><TH> SFCDx5</TH><TD> When the lower 4 bits of the dot color code are AH or BH</TD></TR>
+<TR><TH> SFCDx6</TH><TD> When the lower 4 bits of the dot color code are CH or DH</TD></TR>
+<TR><TH> SFCDx7</TH><TD> When the lower 4 bits of the dot color code are EH or FH</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> A or B is entered for x in the bit name.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> Setting value</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Don't use special features</TD></TR>
+<TR><TH> 1</TH><TD> Use special features</TD></TABLE>
+</P>
+<P><DD> The special function code is used when mode 2 is specified in the special priority mode register or when mode 2 is specified in the special color calculation mode register. For details, see " <B><A HREF="p11_20.htm">11.2 Special priority function</a></b> " or " <B><A HREF="p12_20.htm">12.2 Special color calculation function</a></b> ."</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p10_20.htm">Back</a> ｜ <A HREF="p11_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no10">VDP2 User's Manual</a> ★ <A HREF="p10_10.htm">Chapter 10 Dot Color Data</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

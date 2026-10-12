@@ -1,0 +1,133 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;14/17&gt;Programmer's Guide/File System Library/8.Function Specifications-5</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no1">File system library</a><HR>
+ <B>▲ <A HREF="p08_14.htm">Back</a> ｜ <A HREF="p08_16.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>file system library</b><H2 ALIGN=CENTER> 8.Function specification-5</H2><HR NOSHADE>
+<A NAME="no8_50"></A><H3> 8.5 Load parameter settings</H3><!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no5_1"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Setting the retrieval mode (resident/discard)</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_SetGmode</H3></TD><TD WIDTH=060><PRE> No<BR> 5.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_SetGmode(GfsHn gfs, Sint32 gmode)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> gmode</TD><TD><PRE> : Retrieval mode (GFS_GMODE_〜)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Eject mode before setting. Negative error code in case of error.<DT> <B>function</b><DD> Set the eject mode.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no5_2"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Transfer mode settings<BR> (Software/DMA etc.)</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_SetTmode</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 5.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_SetTmode(GfsHn gfs, Sint32 tmode)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> tmode</TD><TD><PRE> : Transfer mode (GFS_TMODE_～)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Transfer mode before setting. Negative error code in case of error.<DT> <B>function</b><DD> Set the transfer method from the CD buffer.<!-- +++ Update by CRI ：1.7 -->
+<DT> <B>remarks</b><DD><PRE> Even if the transfer mode is set to GFS_TMODE_SCU, software transfer by the CPU will be forced if the transfer destination address is included in the following space.
+WORKRAM-L space 00200000H ~ 002FFFFFH
+A-Bus space 02000000H ~ 058FFFFFH
+</PRE><!-- --- Update by CRI ：1.7 -->
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no5_3"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Setting the amount read into the CD buffer</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_SetReadPara</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 5.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_SetReadPara(GfsHn gfs, Sint32 cdrsize)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> cdrsize</TD><TD><PRE> : Maximum amount of one read into CD buffer (unit: sector)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Load amount before setting. Negative error code in case of error.<DT> <B>function</b><DD> Set the maximum amount of data that can be read into the CD buffer at one time.</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no5_4"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Setting the transfer amount from the CD buffer</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_SetTransPara</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 5.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 GFS_SetTransPara(GfsHn gfs, Sint32 tsize)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> tsize</TD><TD><PRE> : Amount transferred to the specified area at one time (unit: sector)</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Transfer amount before setting. Negative error code in case of error.<DT> <B>function</b><DD> Set the amount of data to be transferred to the destination area in one retrieval process.<!-- +++ Update by CRI ：6.1 -->
+<PRE>
+[remarks]
+  Due to processing reasons, the DOS file extraction parameters can only transfer one sector at a time. Setting the retrieval parameter to a value other than 1 has no effect.
+</PRE><!-- --- Update by CRI ：6.1 -->
+</DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no5_5"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Registering a transfer function</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_SetTrFunc</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 5.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> void GFS_SetTrFunc(GfsHn gfs, GfsTrFunc func)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> func</TD><TD><PRE> : transfer function</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Registers a transfer function for the specified file.<BR>
+ The registration function is called during the file transfer process.<DT> <B>remarks</b><DD><OL TYPE=a>
+<P><B><LI></b> The registration function has the following format:<BR>
+ Sint32 (*GfsTrFunc)(GfsHn gfs, Sint32 nsct)<TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> nsct</TD><TD><PRE> : Number of transferable sectors</TD></TR>
+</TABLE>
+</P>
+<P><B><LI></b> The transfer function can transfer data up to nsct sectors.</P>
+<P><B><LI></b> The function value returns the number of sectors actually transferred. If a transfer is in progress at the end of the transfer function due to DMA, etc., it is necessary to return (-1).</P>
+</OL>
+<DT> <B>example</b><DD><PRE>
+/* Transfer function example */
+Uint32　read_buf[BUFSIZE];
+Sint32　transFunc(GfsHn gfs, Sint32 nsct)
+{
+　　　　Uint32　*ptr;
+　　　　Sint32　dadr;
+　　　　Sint32　i;
+　　　　ptr=GFS_StartTrans(gfs,&dadr);
+　　　　for　(i = 0 ; i &lt; 2048 * nsct; i++){
+　　　　　　　read_buf[i] = *ptr;
+　　　　　　　ptr += dadr;
+　　　　}
+　　　　return(nsct);
+}
+</PRE></DL>
+<!-- ------------------------------------------------------------------------------------ -->
+<A NAME="no5_6"><HR></a><DL>
+<P><DT><TABLE BORDER>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1">one</a><BR> <A HREF="p08_10.htm#t8_1">View</a><BR> <A HREF="p08_10.htm#t8_1">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Transfer start in transfer function</H4></TD><TD WIDTH=160><PRE> Function name<BR><H3> GFS_StartTrans</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 5.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Uint32 *GFS_StartTrans(GfsHn gfs,Sint32 *dadr)<DT> <B>input</b><DD><TABLE>
+<TR><TD><PRE> gfs</TD><TD><PRE> : file handle</TD></TR>
+<TR><TD><PRE> dadr</TD><TD><PRE> : The amount of change in the transfer source address for each longword transfer.</TD></TR>
+</TABLE>
+<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Transfer source address<DT> <B>function</b><DD> Starts data transfer processing in the transfer function.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_14.htm">Back</a> ｜ <A HREF="p08_16.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#intr">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no7">File system library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

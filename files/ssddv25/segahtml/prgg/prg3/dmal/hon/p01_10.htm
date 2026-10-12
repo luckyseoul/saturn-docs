@@ -1,0 +1,75 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/5&gt;DMA library/1. guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#">DMA library</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>DMA library</b><H2 ALIGN=CENTER> 1. guide</H2><HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Purpose</H3><DD> DMA performs data transfer processing on behalf of the CPU to reduce the burden on the CPU. This library provides basic functionality for DMA.</P>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 Overview</H3><DD> DMA is provided in two devices: CPU and SCU. The library supports both.<BR>
+ We have prepared high-level and low-level function libraries for CPU and SCU, respectively.</P>
+<P><DD> The contents of the high-level and low-level functions are explained below.</P>
+<DD><UL TYPE=DISC>
+<P><LI> <B>high level functions</b><BR>
+ We have provided basic functions that allow you to perform byte, word, and longword transfers with simple settings.</P>
+<P><LI> <B>low level functions</b><BR>
+ We have prepared functions that allow detailed settings such as status acquisition, mode settings, and interrupts.</P>
+</UL>
+<P><DD> The main differences between CPU and SCU applications are explained below (please see the hardware manual for details).</P>
+<DD><UL TYPE=DISC>
+<P><LI> <B>CPU</b><BR>
+ This cannot be achieved with SCU, so it is effective for transfers between the same buses (between work RAMs, etc.).</P>
+<P><LI> <B>SCU</b><BR>
+ Since the CPU can operate in parallel during transfer, it is effective for transfers that do not use CPU_Bus. Since it is faster than the CPU, it is effective when performing high-speed transfers.</P>
+</UL>
+<A NAME="no1_30"></A><P><DT><H3> 1.3 Precautions for use</H3><DD><UL TYPE="DISK">
+<P><LI> Check the access units of the source and destination you want to use for transfer, and use the appropriate function. For access units, please refer to each hardware manual.</P>
+<P><LI> In high-level DMA transfers, if the destination meets the following conditions, the cache in the destination area is purged after the transfer.<BR>
+ <B>[Condition]</b> When the destination is work RAM.<BR>
+ <B>[Reason]</b> The RAM that is read using the cache is assumed to be work RAM.<BR>
+ The above is assumed because there is little need to use the cache to read anything other than work RAM.</P>
+<P><LI> Burst mode is not available for CPUs.</P>
+<P><LI> When using low-level SCU DMA, enable the DMA end interrupt mask register corresponding to the channel used.</P>
+</UL>
+<A NAME="no1_40"></A><P><DT><H3> 1.4 Calling Sequence</H3><DD> The calling sequence for DMA transfer is shown below.</P>
+<DD><PRE>
+#define SCLA_CFRAME ((void *)0x5e60000) /* VDP2 VRAM scroll factor address */
+#define K_NUM (424) /* Scroll coefficient data size */
+Uint32 scl_k_data[512]; /* Scroll coefficient data area of work RAM */
+...
+void copyToData()
+{
+     DMA_ScuCopyMem(SCLA_CFRAME, scl_k_data, K_NUM);
+/*Transfer data from work RAM to VDP2 VRAM */
+     ...
+     if(DMA_ScuResult() == DMA_SCU_BUSY){ /* Check completion of DMA_ScuCopyMem() */
+     ...
+     }
+}
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#">DMA library</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

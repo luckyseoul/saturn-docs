@@ -1,0 +1,119 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;21/86&gt;VDP2ユーザーズマニュアル/4.3　セル</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>★
+<A HREF="../index.htm#no4">VDP2ユーザーズマニュアル</A>★
+<A HREF="p04_10.htm">第４章　スクロール画面</A>
+<HR>
+<B>▲
+<A HREF="p04_20.htm">戻る</A>｜
+<A HREF="p04_40.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第４章　スクロール画面</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no4_30"></A>
+	<P>	<DT><H2>■4.3　セル</H2>
+		<DD>　セルは、横8ドット×縦8ドットの絵のパターンで、VRAMに格納します。キャラクタ色数(1セルあたりの色数)は、16色、256色、2048色、32768色、1677万色(16,777,216色)中から選ぶことができます。色数によって各ドットカラーデータのサイズ、1セル分のデータに必要なVRAM容量が変わります。</P>
+
+<A NAME="no4_31"></A>
+	<P>	<DT><H3>　●キャラクタ色数</H3>
+		<DD>　キャラクタを表示するためのカラー形式には、パレット形式とRGB形式があります。パレット形式は、パターンネームデータ中のパレットナンバーとセルデータ中のドットカラーコードで指定するカラーRAMアドレスのデータを、表示カラーデータとします。RGB形式は、セルデータをそのまま表示カラーデータとします。それぞれのカラー形式における、キャラクタ色数とそのときの1ドットあたりのビット数を表4.1に示します。</P>
+
+<A NAME="t4_1"></A>
+	<P>	<DD><B>表4.1　キャラクタ色数とドットデータサイズ</B>
+		<DD><TABLE BORDER CELLPADDING=5>
+	<TR><TD><PRE>カラー形式</TD><TD><PRE>キャラクタ色数</TD><TD WIDTH=400ALIGN="CENTER"><PRE>1ドットあたりのビット数</TD></TR>
+	<TR><TD ROWSPAN=3><PRE>パレット形式</TD><TD ALIGN="RIGHT"><PRE>16色</TD><TD><PRE>4ビット</TD></TR>
+	<TR><TD ALIGN="RIGHT"><PRE>256色</TD><TD><PRE>8ビット</TD></TR>
+	<TR><TD ALIGN="RIGHT"><PRE>2048色</TD><TD><PRE>16ビット(下位11ビットのみ使用)</TD></TR>
+	<TR><TD ROWSPAN=2><PRE>RGB形式</TD><TD ALIGN="RIGHT"><PRE>32768色</TD><TD><PRE>16ビット</TD></TR>
+	<TR><TD ALIGN="RIGHT"><PRE>1677万色</TD><TD><PRE>32ビット(MSBと下位24ビットのみ使用)</TD></TR>
+	</TABLE>
+	<P>	<DD><B>[注]</B>カラーRAMモード0、2では、2048色は1024色になります。</P>
+
+<A NAME="no4_32"></A>
+	<P>	<DT><H3>　●セルデータ構成</H3>
+		<DD>　キャラクタパターンテーブルに格納する各セルのデータ構成は、1ドットのビット数によって変わります。VRAMに格納するときのバウンダリは、1ドットあたりのビット数に関係なく20Hです。<BR>　セルデータの構成を表4.2、「詳細」に示します。</P>
+
+<A NAME="t4_2"></A>
+	<P>	<DD><B>表4.2　セルのデータ構成</B>
+		<DD><TABLE BORDER CELLPADDING=5>
+	<TR ALIGN=CENTER><TH><PRE>1ドットあたりのビット数</TH><TH><PRE>セルデータ</TH><TH><PRE>バウンダリ</TH><TH>詳細</TH></TR>
+	<TR ALIGN=CENTER> <TD><PRE>4ビット／ドット</TD> <TD><PRE>32バイト／セル</TD><TD><PRE>20Hバイト</TD><TD><A HREF="p04_31.htm"><B>→</B></A></TD></TR>
+	<TR ALIGN=CENTER> <TD><PRE>8ビット／ドット</TD> <TD><PRE>64バイト／セル</TD><TD><PRE>20Hバイト</TD><TD><A HREF="p04_32.htm"><B>→</B></A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>16ビット／ドット</TD><TD><PRE>128バイト／セル</TD><TD><PRE>20Hバイト</TD><TD><A HREF="p04_33.htm"><B>→</B></A></TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>32ビット／ドット</TD><TD><PRE>256バイト／セル</TD><TD><PRE>20Hバイト</TD><TD><A HREF="p04_34.htm"><B>→</B></A></TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><B>参照:</B>キャラクタ色数によるセルのデータ構成は「表4.2」の詳細欄をクリックしてください</P>
+
+<A NAME="no4_33"></A>
+	<P>	<DT><H3>　●透明ドット</H3>
+		<DD>　透明ドットとなるドットカラーコード(透明コード)は、カラー形式によって変わります。カラー形式がパレット形式の場合は、1ドットあたりのすべてのビットが0のときに透明ドットとなります。RGB形式の場合は、ドットデータの最上位ビットが0のときに透明ドットとなります。<BR>
+　パレット形式の場合、パレットの先頭にあるカラーデータは透明コードに対応したものなので、通常は使用されません。透明コードを無効にすれば、このカラーデータも使うことができるようになり、その制御は画面表示イネーブルレジスタで行います。</P>
+
+	<P>	<DD>　透明ドットのデータ値を表4.3に示します。</P>
+
+<A NAME="t4_3"></A>
+	<P>	<DD><B>表4.3　透明ドットのデータ値</B>
+		<DD><TABLE BORDER CELLPADDING=5>
+	<TR><TD><PRE>カラー形式</TD><TD><PRE>キャラクタ色数</TD><TD><PRE>1ドットあたりのビット数</TD><TD><PRE>透明コード</TD></TR>
+	<TR><TD ROWSPAN=3><PRE>パレット形式</TD><TD><PRE>16色</TD><TD><PRE>4ビット／ドット</TD><TD><PRE>0H(4ビット)</TD></TR>
+	<TR><TD><PRE>256色</TD><TD><PRE>8ビット／ドット</TD><TD><PRE>00H(8ビット)</TD></TR>
+	<TR><TD><PRE>2048色</TD><TD><PRE>16ビット／ドット</TD><TD><PRE>000H(下位11ビット)</TD></TR>
+	<TR><TD ROWSPAN=2><PRE>RGB形式</TD><TD><PRE>32768色</TD><TD><PRE>16ビット／ドット</TD><TD><PRE>MSB(ビット15)が0</TD></TR>
+	<TR><TD><PRE>1677万色</TD><TD><PRE>32ビット／ドット</TD><TD><PRE>MSB(ビット31)が0</TD></TR>
+	</TABLE></P>
+
+<A NAME="no4_34"></A>
+	<P>	<DT><H3>　●RGB形式のドットデータ</H3>
+		<DD>　カラー形式がRGB形式の場合、キャラクタ色数は32768色、1677万色の2つから選択することができます。1677万色の場合はRGB各8ビットで指定しますが、32768色の場合はRGB各8ビットの内の上位5ビットを指定し、下位3ビットは0に固定されます。また、最上位ビットは透明ドットかどうかを指定する透明ビットで、0のときに透明ドットになります。<BR>
+　画面表示イネーブルレジスタにおいて、透明コードを無効にするように指定した場合、透明ビットは無視されます。<BR>
+　RGB形式のドットデータを図4.6に示します。</P>
+
+<A NAME="z4_6"></A>
+	<P><DD><B>図4.6　RGB形式のドットデータ</B>
+<P><DT><B>　●３２７６８色の場合</B>
+<DD>カラーデータ
+<TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> 09 </TD><TD><PRE> 08 </TD>
+<TD><PRE> 07 </TD><TD><PRE> 06 </TD><TD><PRE> 05 </TD><TD><PRE> 04 </TD><TD><PRE> 03 </TD><TD><PRE> 02 </TD><TD><PRE> 01 </TD><TD><PRE> 00 </TD></TR><TR>
+<TH><PRE>透明</TD>
+<TH COLSPAN=5><PRE>BLUEデータ5ビット</TH>
+<TH COLSPAN=5><PRE>GREENデータ5ビット</TH>
+<TH COLSPAN=5><PRE>REDデータ5ビット</TH></TR></TABLE>
+
+<P><DT><B>　●ＲＧＢ各５ビットの場合</B>
+<DD>カラーデータ
+<TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE> 31 </TD><TD><PRE> 30 </TD><TD><PRE> 29 </TD><TD><PRE> 28 </TD><TD><PRE> 27 </TD><TD><PRE> 26 </TD><TD><PRE> 25 </TD><TD><PRE> 24 </TD>
+<TD><PRE> 23 </TD><TD><PRE> 22 </TD><TD><PRE> 21 </TD><TD><PRE> 20 </TD><TD><PRE> 19 </TD><TD><PRE> 18 </TD><TD><PRE> 17 </TD><TD><PRE> 16 </TD></TR><TR>
+<TH><PRE>透明</TD>
+<TH COLSPAN=7><PRE>無　視</TH>
+<TH COLSPAN=8><PRE>BLUEデータ8ビット</TH></TR></TABLE>
+
+<TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE> 15 </TD><TD><PRE> 14 </TD><TD><PRE> 13 </TD><TD><PRE> 12 </TD><TD><PRE> 11 </TD><TD><PRE> 10 </TD><TD><PRE> 09 </TD><TD><PRE> 08 </TD>
+<TD><PRE> 07 </TD><TD><PRE> 06 </TD><TD><PRE> 05 </TD><TD><PRE> 04 </TD><TD><PRE> 03 </TD><TD><PRE> 02 </TD><TD><PRE> 01 </TD><TD><PRE> 00 </TD></TR><TR>
+<TH COLSPAN=8><PRE>GREENデータ8ビット</TH>
+<TH COLSPAN=8><PRE>REDデータ8ビット</TH></TR></TABLE>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p04_20.htm">戻る</A>｜
+<A HREF="p04_40.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>
+<A HREF="../index.htm#no4">VDP2ユーザーズマニュアル</A>★
+<A HREF="p04_10.htm">第４章　スクロール画面</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

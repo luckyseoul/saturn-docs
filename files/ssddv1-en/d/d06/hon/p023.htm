@@ -1,0 +1,56 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p022.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p024.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD> <B> 3-6 Coding end </B> <P>
+This completes the description of the source code of this program example. dAsms User's Manual The source code according to “Source Code Structure” shown in the main text is as follows. <P>
+<PRE>--------------------------------------------------------------------------
+     'dAsms sample program.
+     'Function:L/R independent delay
+     'CD Lch Direct + Delayed-> EFREG00
+     'CD Rch Direct + Delayed-> EFREG01 <P>
+     #COEF<P>
+     'Levels
+     EffSendLevelL=%100
+     EffSendLevelR=%100
+     DrctLevelL=%50
+     DrctLevelR=%50
+     EffRtnLevelL=%75
+     EffRtnLevelR=%75
+     FbL=%50
+     FbR=%50<P>
+     'FilterCoefs
+     C0L=0.40893
+     C0R=0.40893
+     C1L=0.40893
+     C1R=0.40893
+     C2L=0.18164
+     C2R=0.18164<P>
+     #ADRS
+     waL=ms0.0
+     raL=ms149.9
+     waR=ms150.0
+     raR=ms249.9<P>
+     #PROG<P>
+     'Lch
+     LDI MEMS00,MR[raL+DEC]
+     LDI MEMS01,MR[raL+DEC+1]
+     @ TEMP01 * C2L + ( MEMS01 * C1L + ( MEMS00 * C0L + ) ) 〉TEMP00
+     @ TEMP00 * FbL + ( EXTS00 * EffSendLevelL + ) 〉MW[waL+DEC]
+     @ EXTS00 * DrctLevelL + ( MEMS00 * EffRtnLevelL + ) 〉EFREG00<P>
+     'Rch
+     LDI MEMS02,MR[raR+DEC]
+     LDI MEMS03,MR[raR+DEC+1]
+     @ TEMP03 * C2R + ( MEMS03 * C1R + ( MEMS02 * C0R + ) ) 〉TEMP02
+     @ TEMP02 * FbR + ( EXTS01 * EffSendLevelR + ) 〉MW[waR+DEC]
+     @ EXTS01 * DrctLevelR + ( MEMS02 * EffRtnLevelR + ) 〉EFREG01
+<P>
+     #END
+--------------------------------------------------------------------------</PRE></UL><BR>
+</DL><P><P><HR>
+<A HREF=p022.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p024.htm> Go to next page </A>
+</BODY>
+</HTML>

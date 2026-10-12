@@ -1,0 +1,31 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p080.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p082.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H3> 6.2.1 File information retention method </H3>
+<DD> The CD block has a file information table for 256 files and holds the file information to be accessed. <BR>
+The information of the current directory (self) and the parent directory is always retained in the top two of this table. Up to 254 general file information can be stored. (The number cannot be specified.) <P>
+<DT> <H4> (1) Move directory </H4>
+<DD> When the directory is moved, the directory record is read and the file information (12 bytes) is extracted and stored in the table. The range to keep is from the beginning of the directory block. <P>
+<DT> <H4> (2) Retaining file information (specifying the range to retain) </H4>
+<DD> File information can be retained from any location in the current directory by specifying a file identifier. In this case as well, the first two of the table will hold your own and parent information. <P>
+<DT> <H3> 6.2.2 File access procedure </H3>
+<DT> <H4> (1) Move to root directory </H4>
+<DD> To use the file system, you must first move to the root directory and create a file information table. The same applies when the file information is cleared, such as when starting or replacing a disk. <BR>
+If the disk is not in ISO9660 format (standard identifier is “CD001”), the table is not created and the file system cannot be used. To check the table creation result, try to get the retention file information range. If it cannot be created, it becomes REJECT. <P>
+<DT> <H4> (2) Retain file information </H4>
+<DD> The file system can only access files and directories in the file information table. To read a file, move a directory, and obtain retained file information, the file information must be retained in advance. If the target file information is not retained, REJECT will occur. <P>
+<DT> <H4> (3) Import file </H4>
+<DD> Specify the file identifier and offset (in sectors) and read the file. Specify the destination selector by aperture number. <P>
+<DT> <H4> (4) Extracting sector data </​​H4>
+<DD> The file read into the buffer section is transferred and extracted by retrieving sector data (CDC_GetSctData, etc.). Data can be retrieved while reading, and there is no need to wait for the end of reading. <BR>
+When the CD buffer becomes full in the middle of the file, it pauses and when there is a free space, the pause is canceled and the rest of the file is read. <P>
+<DT> <H4> (5) Finish reading file </H4>
+<DD> When reading of the file is completed, the EFLS flag of the interrupt factor register is set to 1. To stop reading the file, execute Cancel File Access. (The same applies when accessing files by moving directories or holding file information.) <P>
+</DL><P><P><HR>
+<A HREF=p080.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p082.htm> Go to next page </A>
+</BODY>
+</HTML>

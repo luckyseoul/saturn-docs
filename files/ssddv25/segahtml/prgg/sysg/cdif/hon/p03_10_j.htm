@@ -1,0 +1,319 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/19&gt;CD通信I/F(CDパート)/CDブロックとの通信</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>CDブロックとの通信</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A>
+	<P>	<DT><H3>3.1　通信用レジスタ</H3>
+		<DD>　CDブロックとの通信用レジスタの一覧と、対応するアクセス関数を表3.1に示します。</P>
+
+<A NAME="t3_1"></A>
+	<P>	<DD><B>表3.1　通信用レジスタ一覧</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH><PRE>レジスタ名</TH><TH><PRE>R/W</TH><TH><PRE>説　明</TH><TH><PRE>アクセス関数</TH></TR>
+	<TR><TD><PRE>DATATRNS</TD><TD><PRE>R/W</TD><TD><PRE>データ転送レジスタ</TD><TD><PRE>CDC_GetDataPtr</TD></TR>
+	<TR><TD><PRE>HIRQREQ</TD><TD><PRE>R/W</TD><TD><PRE>割り込み要因レジスタ</TD><TD><PRE>CDC_GetHirqReq<BR>CDC_ClrHirqReq</TD></TR>
+	<TR><TD><PRE>HIRQMSK</TD><TD><PRE>R/W</TD><TD><PRE>割り込みマスクレジスタ</TD><TD><PRE>CDC_GetHirqMsk<BR>CDC_SetHirqMsk</TD></TR>
+	<TR><TD><PRE>MPEGRGB</TD><TD><PRE>R</TD><TD><PRE>MPEGレジスタ（RGBデータ）</TD><TD><PRE>CDC_GetMpegPtr</TD></TR>
+	</TABLE>
+	<DD><B>※</B>アクセス幅はすべて16ビット（1ワード）</P>
+
+	<P>	<DD>　通信用レジスタの詳細を以下に示します。</P>
+
+	<P>	<DD>　図中、予約ビットは「−」で表します。予約ビットには必ず0を指定します。<BR>
+　ビット構成は、最上位ビット(MSB)が15、最下位ビット（LSB）が0です。</P>
+
+
+<A NAME="no3_11"></A>
+	<P>	<DT><B>　(1)データ転送レジスタ（DATATRNS）</B>
+		<DD>　データ転送時に、ホストとCDブロックの間でデータを入出力するレジスタです。<BR>
+　レジスタの内部はFIFOになっており、ホストがデータを取り出すとCDブロックが自動的にデータをセットします。(データを書き込む場合も同様)</P>
+
+<A NAME="t3_2"></A>
+	<P><DD><B>表3.2　データ転送レジスタのビット構成</B>
+	<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD><PRE>レジスタ名</TD><TD><PRE>R/W</TD><TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>9</TD><TD><PRE>8</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>DATATRNS</TD><TD><PRE>R/W</TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR><TR></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2> </TD><TD><PRE>7</TD><TD><PRE>6</TD><TD><PRE>5</TD><TD><PRE>4</TD><TD><PRE>3</TD><TD><PRE>2</TD><TD><PRE>1</TD><TD><PRE>0</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR></TABLE></P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>ビットの初期値は不定です。</OL></P>
+
+
+<A NAME="no3_12"></A>
+	<P>	<DT><B>　(2)割り込み要因レジスタ（HIRQREQ）</B>
+		<DD>　CDブロックからホストへの割り込み要因レジスタです。<BR>
+　CDブロックからは各ビットのセットだけが可能で、ホストからは各ビットのクリアだけが可能です。ホストは目的のビットをクリアしておき、１になるのを待ちます。</P>
+
+<A NAME="t3_3"></A>
+	<P>	<DD><B>表3.3　割り込み要因レジスタのビット構成</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD><PRE>レジスタ名</TD><TD><PRE>R/W</TD><TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>9</TD><TD><PRE>8</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>HIRQREQ</TD><TD><PRE>R/W</TD><TD><PRE>−</TD><TD><PRE>−</TD><TD><PRE>MPST</TD><TD><PRE>MPCM</TD><TD><PRE>MPED</TD><TD><PRE>SCDQ</TD><TD><PRE>EFLS</TD><TD><PRE>ECPY</TD></TR><TR></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2><PRE></TD><TD><PRE>7</TD><TD><PRE>6</TD><TD><PRE>5</TD><TD><PRE>4</TD><TD><PRE>3</TD><TD><PRE>2</TD><TD><PRE>1</TD><TD><PRE>0</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>EHST</TD><TD><PRE>ESEL</TD><TD><PRE>DCHG</TD><TD><PRE>PEND</TD><TD><PRE>BFUL</TD><TD><PRE>CSCT</TD><TD><PRE>DRDY</TD><TD><PRE>CMOK</TD></TR></TABLE></P>
+
+	<P>	<DD><TABLE BORDER=1>
+<TR><TH><PRE>ビット</TH><TH><PRE>名　称</TH><TH><PRE>説　明</tH><TH><PRE>初期値</TH></TR>
+<TR><TD ALIGN=CENTER><PRE>bit0</TD> <TD ALIGN=CENTER><PRE>CMOK</TD><TD><PRE>1：コマンド発行可能（レスポンスセット完了）</TD>                                       <TD ALIGN=CENTER><PRE>1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit1</TD> <TD ALIGN=CENTER><PRE>DRDY</TD><TD><PRE>1：データ転送準備完了</TD>                                                             <TD ALIGN=CENTER><PRE>0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit2</TD> <TD ALIGN=CENTER><PRE>CSCT</TD><TD><PRE>1：1セクタ読み込み完了<p>（CD-ROMからリードした1セクタを区画に格納または消去した）</TD><TD ALIGN=CENTER><PRE>0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit3</TD> <TD ALIGN=CENTER><PRE>BFUL</TD><TD><PRE>1：CDバッファフル（CDバッファが満杯になった）</TD>                                     <TD ALIGN=CENTER><PRE>0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit4</TD> <TD ALIGN=CENTER><PRE>PEND</TD><TD><PRE>1：CD再生の終了（現在のFADが再生範囲外になった）</TD>                                  <TD ALIGN=CENTER><PRE>0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit5</TD> <TD ALIGN=CENTER><PRE>DCHG</TD><TD><PRE>1：ディスク交換の発生（トレイが開いた）</TD>                                           <TD ALIGN=CENTER><PRE>0※</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit6</TD> <TD ALIGN=CENTER><PRE>ESEL</TD><TD><PRE>1：ソフトリセット、セレクタ設定処理の終了</TD>                                         <TD ALIGN=CENTER><PRE>1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit7</TD> <TD ALIGN=CENTER><PRE>EHST</TD><TD><PRE>1：ホスト入出力処理の終了</TD>                                                         <TD ALIGN=CENTER><PRE>1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit8</TD> <TD ALIGN=CENTER><PRE>ECPY</TD><TD><PRE>1：バッファ区画間の複写／移動処理の終了</TD>                                           <TD ALIGN=CENTER><PRE>1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit9</TD> <TD ALIGN=CENTER><PRE>EFLS</TD><TD><PRE>1：CDブロックファイルシステム処理の終了</TD>                                           <TD ALIGN=CENTER><PRE>1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit10</TD><TD ALIGN=CENTER><PRE>SCDQ</TD><TD><PRE>1：サブコードQの更新完了（CDドライブの通信タイミング）</TD>                            <TD ALIGN=CENTER><PRE>0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit11</TD><TD ALIGN=CENTER><PRE>MPED</TD><TD><PRE>1：MPEG関連処理の終了</TD>                                                             <TD ALIGN=CENTER><PRE>1</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit12</TD><TD ALIGN=CENTER><PRE>MPCM</TD><TD><PRE>1：MPEG動作不定区間の終了</TD>                                                         <TD ALIGN=CENTER><PRE>0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit13</TD><TD ALIGN=CENTER><PRE>MPST</TD><TD><PRE>1：MPEG割り込みステータスの通知（MPEG関連の割り込み発生）</TD>                         <TD ALIGN=CENTER><PRE>0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit14</TD><TD ALIGN=CENTER><PRE>−</TD><TD><PRE>予約ビット</TD>                                                                          <TD ALIGN=CENTER><PRE>0</TD></TR>
+<TR><TD ALIGN=CENTER><PRE>bit15</TD><TD ALIGN=CENTER><PRE>−</TD><TD><PRE>予約ビット</TD>                                                                          <TD ALIGN=CENTER><PRE>0</TD></TR>
+</TABLE>
+
+	<P><DD><B>※</B>ハードリセット時にはDCHG＝1ですが、BOOT ROM内で0クリアされます。
+	<DD>ソフトリセット時にはDCHGは初期化されません。（CDC関数は0BE1Hを書き込む）
+	<DD>原則として、DCHGはディスクチェック時にBOOT ROMが0クリアするものとします。</P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>ビットの書き込みは0(クリア)だけが可能です。</P>
+	<P>	<B><LI></B>ホストへのIRQ出力は全要因のOR出力です。<BR>割り込み処理時は、該当要因ビットをクリアしてください。</P>
+	<P>	<B><LI></B>ESEL, EHST, ECPY, EFLS, MPEDの各ビットをコマンド終了フラグと総称します。<BR>各フラグに属するコマンドの実行終了を通知します。</P>
+	<P>	<B><LI></B>ビットの初期値は、CMOKとコマンド終了フラグが1で、その他が0です。<BR>(初期値のビットパターン：0BC1H)<BR>実際には、１以外のビットは不定なので、CDC関数が0クリアしています。</P>
+	</OL>
+
+<A NAME="no3_13"></A>
+	<P>	<DT><B>　(3)割り込みマスクレジスタ（HIRQMSK）</B>
+		<DD>　CDブロックからホストへの割り込みをマスクするためのレジスタです。</P>
+
+<A NAME="t3_4"></A>
+	<P>	<DD><B>表3.4　割り込みレジスタのビット構成</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD><PRE>レジスタ名</TD><TD><PRE>R/W</TD><TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>9</TD><TD><PRE>8</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>HIRQMSK</TD><TD><PRE>R/W</TD><TD><PRE>−</TD><TD><PRE>−</TD><TD><PRE>MPST</TD><TD><PRE>MPCM</TD><TD><PRE>MPED</TD><TD><PRE>SCDQ</TD><TD><PRE>EFLS</TD><TD><PRE>ECPY</TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2></TD><TD><PRE>7</TD><TD><PRE>6</TD><TD><PRE>5</TD><TD><PRE>4</TD><TD><PRE>3</TD><TD><PRE>2</TD><TD><PRE>1</TD><TD><PRE>0</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>EHST</TD><TD><PRE>ESEL</TD><TD><PRE>DCHG</TD><TD><PRE>PEND</TD><TD><PRE>BFUL</TD><TD><PRE>CSCT</TD><TD><PRE>DRDY</TD><TD><PRE>CMOK</TD></TR></TABLE></P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>ビットの意味は割り込み要因レジスタと同じです。<BR>(1：割り込み許可、0：マスク)</P>
+	<P>	<B><LI></B>割り込みをマスクした場合、割り込み信号が入力されると次のようになります。<BR>・IRQ出力に反映されない。<BR>・割り込み要因レジスタには反映される。(ポーリング処理可能)</P>
+	<P>	<B><LI></B>ビットの初期値はすべて０です。(ソフトリセットでは初期化されません)</P>
+	</OL>
+
+<A NAME="no3_"></A>
+	<P>	<DT><B>　(4)MPEGレジスタ（MPEGRGB）</B>
+		<DD>　MPEGフレームバッファのイメージデータをRGB形式でホストへ転送するためのレジスタです。</P>
+
+<A NAME="t3_5"></A>
+	<P>	<DD><B>表3.5　MPEGレジスタのビット構成</B>
+		<DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TD><PRE>レジスタ名</TD><TD><PRE>R/W</TD><TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>9</TD><TD><PRE>8</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>MPEGRGB</TD><TD><PRE>R</TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR>
+	<TR ALIGN=CENTER><TD COLSPAN=2 ROWSPAN=2></TD><TD><PRE>7</TD><TD><PRE>6</TD><TD><PRE>5</TD><TD><PRE>4</TD><TD><PRE>3</TD><TD><PRE>2</TD><TD><PRE>1</TD><TD><PRE>0</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD><TD><PRE>    </TD></TR></TABLE></P>
+
+	<P>	<DD>　bit0〜bit15 ：RGBデータ(詳細は<B><a href="../../cdmp/index_j.htm">MPEGパート</A></B>を参照してください)</P>
+
+<A NAME="no3_20"></A>
+	<P>	<DT><H3>3.2　通信方法</H3>
+
+<A NAME="no3_21"></A>		
+	<P>	<DT><B>　(1)通信時間</B>
+		<DD>　コマンド／レスポンスの応答時間の間、全ての割り込みは禁止されます。コマンドが連続的に発行された場合、応答時間は遅れる可能性があります。</P>
+
+<A NAME="no3_22"></A>
+	<P>	<DT><B>　(2)通信エラー</B>
+		<DD>　コマンド発行後、CDブロックが規定時間内に応答しない(レスポンスを返さない)場合、通信タイムアウトエラーとなります。レスポンスの有無は、ソフトウェアループによる一定回数のポーリングで判定しています。</P>
+
+<A NAME="no3_23"></A>
+	<P>	<DT><B>　(3)コマンド発行規定</B>
+		<DD>　コマンドの発行は、以下の規定に従う必要があります。</P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>任意の 6.7ms中に発行できるコマンドの回数は、最大30回までとします。</P>
+	<P>	<B><LI></B>任意の16.7ms中に発行できるコマンドの回数は、最大60回までとします。</P>
+	<P>	<B><LI></B>サブコードの取得の場合は、任意の13.3ms中に最大34回までコマンドを発行できます。<BR>(サブコードR〜Wを16個＋サブコードQを1個取得：計17×2＝34回)</P>
+	<P>	<B><LI></B>同じコマンド終了フラグに属するコマンドは、処理終了を待って発行します。</P>
+	</OL>
+
+	<P>	<DD><B>《プログラムの指針》</B>
+		<DD>　コマンド連続発行によるポーリング処理は禁止します。<BR>
+　状態の変化をポーリングするには定期レスポンスや割り込み要因レジスタを使用します。また、SCDQ, CSCTフラグやVSYNCなどによるタイミングを利用してコマンドを発行します。</P>
+
+
+<A NAME="no3_24"></A>
+	<P>	<DT><B>　(4)コマンド終了フラグ</B>
+		<DD>　コマンド／レスポンスだけでは処理が終了しない(処理に時間のかかる)コマンドに対して、処理終了を通知します。コマンド処理中に、同一の終了フラグに属するコマンドは実行できません。（MPEDフラグについては<B><a href="../../cdmp/index_j.htm">MPEGパート</A></B>を参照）</P>
+
+<A NAME="t3_6"></A>
+	<P>	<DD><B>表3.6　コマンド終了フラグに属するコマンド(CDパート)</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH><PRE>フラグ</TH><TH><PRE>コマンド</TH></TR>
+	<TR><TD ALIGN=CENTER><PRE>ESEL</TD><TD><PRE>・CDデバイスの接続先の設定（CDC_CdSetCon）<BR>・絞りフレームアドレス範囲の設定（CDC_SetFiltRange）<BR>・絞りサブヘッダ条件の設定（CDC_SetFiltSubh）<BR>・絞りモードの設定（CDC_SetFiltMode）<BR>・絞りの接続先の設定（CDC_SetFiltCon）<BR>・セレクタのリセット（CDC_ResetSelector）<BR>・実データサイズの計算（CDC_CalActSiz）<BR>・フレームアドレス検索の実行（CDC_ExeFadSearch）<BR>・セクタ長の設定（CDC_SetSctLen）</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>EHST</TD><TD><PRE>・セクタデータの取り出し（CDC_GetSctData）<BR>・セクタデータの消去（CDC_DelSctData）<BR>・セクタデータの取り出し消去（CDC_GetdelSctData）<BR>・セクタデータの書き込み（CDC_PutSctData）</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>ECPY</TD><TD><PRE>・セクタデータの複写（CDC_CopySctData）<BR>・セクタデータの移動（CDC_MoveSctData）</TD></TR>
+	<TR><TD ALIGN=CENTER><PRE>EFLS</TD><TD><PRE>・ディレクトリの移動（CDC_ChgDir）<BR>・ファイル情報の保持（CDC_ReadDir）<BR>・ファイルの読み込み（CDC_ReadFile）</TD></TR></TABLE></P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>ESELフラグは、ソフトリセット(CDC_CdInit)の処理終了も通知します。</P>
+	<P>	<B><LI></B>EFLSフラグは、次のコマンドを実行した場合も1になります。<BR>・トレイのオープン(CDC_CdOpen)<BR>・ファイルアクセスの中止(CDC_AbortFile)</P>
+	</OL>
+
+<A NAME="no3_25"></A>
+	<P>	<DT><B>　(5)コマンド発行の排他処理（CD通信インタフェース関数内）</B>
+<!-- +++ Update by CRI ：6.2 DDC を　CDC 変更 -->
+ 		<DD>　CDC関数はコマンド終了後フラグをチェックして、以下の排他処理をします。</P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>コマンド終了フラグが0ならば、コマンドを発行せずにエラーを返す。</P>
+	<P>	<B><LI></B>1ならば、コマンド終了フラグを0クリアしてコマンドを発行する。</P>
+	</OL>
+
+	<P>	<DD>　例外的に、コマンド終了フラグを0クリアだけ、またはチェックだけする場合があります。</P>
+
+<A NAME="t3_7"></A>
+	<P>	<DD><B>表3.7　例外的なコマンド終了フラグの処理</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH COLSPAN=2><PRE>フラグ</TH><TH><PRE>コマンド</TH></TR>
+	<TR><TD COLSPAN=3><PRE>0クリアだけする（チェックはしない）</TD></TR>
+	<TR><TD ROWSPAN=2 WIDTH=20><PRE></TD>
+		<TD><PRE>ESEL</TD><TD><PRE>・ソフトリセット（CDC_CdInitのパラメータで指定）</TD></TR>
+	<TR><TD><PRE>EFLS</TD><TD><PRE>・ファイルアクセスの中止（CDC_AbortFile）</TD></TR>
+	<TR><TD COLSPAN=3><PRE>チェックだけする（0クリアはしない）</TD></TR>
+	<TR><TD ROWSPAN=1><TD><PRE>ESEL</TD><TD><PRE>・実データサイズの取得　　　　　（CDC_GetActSiz）<BR>・フレームアドレス検索結果の取得（CDC_GetFadSearch）</TD></TR></TABLE></P>
+
+<A NAME="no3_26"></A>
+	<P>	<DT><B>　(6)REJECT, WAIT時のコマンド終了フラグ</B>
+		<DD>　コマンドに対するレスポンスでREJECT, WAITが返った場合、コマンド終了フラグは１になりません。そのため、REJECT, WAIT後にもコマンド発行できるよう、CDC内部でコマンド終了フラグの値を保持しています。CDC関数は、この値をチェックしてコマンド発行の排他処理をします。</P>
+
+<A NAME="no3_27"></A>
+	<P>	<DT><B>　(7)CDCライブラリの注意事項</B>
+		<DD><TABLE><TR>
+		<TD><img srcset="../../../../what/atto_j.png 5x"></TD>
+		<TD><B>CDCが保持しているコマンド終了フラグの値は、別々にリンクされたCDCのプログラムコードを実行すると不整合が生じてしまいます。そのため、コマンド終了フラグが初期化されていないと、コマンド発行できなくなる可能性があります。<BR>CDCライブラリの使用にあたっては、次の点に注意してください。</B></TD></TR></TABLE>
+	<B>	<DL><DD><OL TYPE="a">
+		<B><LI></B>原則として、１つのプログラムコードだけをメモリに常駐させて使用する。
+		<B><LI></B>別のプログラムコードを実行する場合には、必ず最初にソフトリセットを実行して、コマンド終了フラグを初期化する。
+	</OL></DL></B></P>
+
+<A NAME="no3_30"></A>
+	<P>	<DT><H3>3.3　レスポンス</H3>
+
+<A NAME="no3_31"></A>		
+	<P>	<DT><B>　(1)レスポンスの内容</B>
+		<DD>　レスポンスは1バイトのステータスと7バイトのレポートで構成されています。ステータスは共通ですが、レポートはコマンドに依存します。最も基本的なレポートはCDレポートです。</P>
+
+<A NAME="no3_32"></A>
+	<P>	<DT><B>　(2)ステータス</B>
+		<DD>　ステータスには、次の情報が返ります。</P>
+
+	<P>	<DD><TABLE>
+	<TR><TD><PRE>・REJECT(不正)</TD><TD><PRE>：コマンド形式が間違っているなど、コマンド自体が無効である。</TD></TR>
+	<TR><TD><PRE>・WAIT(実行保留)</TD><TD><PRE>：現在の状態では実行できないので、コマンドを受け付けられない。</TD></TR>
+	<TR><TD><PRE>・データ転送要求</TD><TD><PRE>：データ転送が必要であることを示す。</TD><TR>
+	<TR><TD><PRE>・定期レスポンス</TD><TD><PRE>：定期レスポンスか、コマンドに対するレスポンスかを示す。</TD></TR>
+	<TR><TD><PRE>・CDドライブ状態</TD><TD><PRE>：ホストから見たCDドライブの論理的な状態を示します。</TD></TR></TABLE></P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>REJECT時のレスポンスは無効です。</P>
+	<P>	<B><LI></B>WAIT時のドライブ状態とCDレポートは有効ですが、他のレポートは無効です。</P>
+	</OL>
+
+
+<A NAME="no3_33"></A>
+	<P>	<DT><B>　(3)定期レスポンス</B>
+		<DD>　定期レスポンスは、CDブロックがCDドライブとの通信タイミングで返すレスポンスで、ホストはコマンドを発行せずに情報(ステータスとCDレポート)を得られます。<BR>
+　CDドライブとの通信周期で定期的に更新されます。(SCDQフラグの更新タイミングも同じ)</P>
+	<P>	<DD><PRE>
+　　　　　　　　　　　　　　　・標準速再生時：13.3ms
+　　定期レスポンスの更新周期　・２倍速再生時： 6.7ms
+　　　　　　　　　　　　　　　・再生時以外　：16.7ms
+</PRE></P>
+
+	<P>	<DD>　定期レスポンスは、コマンド／レスポンス中には更新されません。コマンドによるレスポンスを読み取った後、次のCDドライブ通信タイミングで更新され取得可能になります。</P>
+
+	<P>	<DD><B>注意
+		<DD>ここに示した定期レスポンス(SCDQフラグ)の更新周期は通常の場合の値です。CDドライブとの通信状況によっては、更新周期が延びる可能性があります。<BR>
+(ディスクの傷等によって、CDドライブとの通信が失敗した時など)</B></P>
+
+
+<A NAME="no3_40"></A>
+	<P>	<DT><H3>3.4　データ転送</H3>
+
+<A NAME="no3_41"></A>		
+	<P>	<DT><B>　(1)データ転送の手順</B>
+		<DD>　データ転送を伴うコマンドの場合、コマンド／レスポンス後、ホストはデータ転送処理をする必要があります。その手順を以下に示します。</P>
+
+	<P>	<DD><OL TYPE=a>
+		<B><LI></B>データ転送を伴うコマンド(データを取り出す／書き込む)を実行する。</P>
+	<P>	<B><LI></B>データ転送の準備待ち(CDC_DataReady)を実行する。（DRDYが1になるのを待つ）</P>
+	<P>	<B><LI></B>データ転送レジスタを通してデータを入出力する。<BR>レジスタのポインタを取得するには、CDC_GetDataPtr関数を実行する。</P>
+	<P>	<B><LI></B>必要なデータを転送したら、データ転送の終了(CDC_DataEnd)を実行する。</P>
+	</OL>
+
+<A NAME="no3_32"></A>
+	<P>	<DT><B>　(2)データ転送の終了</B>
+		<DD>　ステータスでデータ転送要求ありの場合、実際にデータを転送しなくても、エラーでも、必ずデータ転送の終了を実行する必要があります。REJECT, WAIT時には不要です。<BR>
+　データ転送の準備待ちでエラーが発生した場合、アプリケーションはデータ転送の終了を実行する必要はありません。準備待ち関数内部で自動的に実行します。</P>
+
+<A NAME="no3_33"></A>
+	<P>	<DT><B>　(3)データ転送エラー</B>
+		<DD>　データ転送の準備待ちで発生するエラーを表3.8に示します。</P>
+
+<A NAME="t3_8"></A>
+	<P>	<DD><B>表3.8　データ転送エラー</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH><PRE>データ転送エラー</TH><TH><PRE>説　明</TH></TR>
+	<TR><TD><PRE>データ転送タイムアウト</TD><TD><PRE>CDブロックが規定時間内にデータ転送準備完了とならない。<BR>（DRDYフラグが1にならない）</TD></TR>
+	<TR><TD><PRE>書き込み用セクタの確保不可</TD><TD><PRE>セクタデータの書き込みで、空きセクタを確保できなかった。<BR>（DRDYフラグが0のままで、EHSTフラグが1になる）</TD></TR>
+	</TABLE></P>
+
+<A NAME="no3_"></A>
+	<P>	<DT><B>　(4)禁止事項</B>
+		<DD><TABLE><TR>
+		<TD><img srcset="../../../../what/atto_j.png 5x"></TD>
+		<TD><B>データ転送を伴うコマンドを実行した場合、DRDYフラグが1になる前にデータ転送の終了を実行してはいけません。たとえ実際にはデータを転送しなくても、必ずDRDYフラグが1になるのを待ってから終了させてください。<BR>
+(データ転送の準備待ちを実行してから終了させる)</B></TD></TR></TABLE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

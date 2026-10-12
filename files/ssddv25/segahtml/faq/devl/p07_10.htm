@@ -1,0 +1,121 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/10&gt;FAQ/Development environment/SNASM environment</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a> ★ <A HREF="index.htm#no7">SNASM environment</a><HR>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/Development environment</b><H2 ALIGN=CENTER> SNASM environment </H2><HR NOSHADE>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_01"><HR></a><DL>
+<H3> I want to restart snbugsat with the memory contents intact after it hangs.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am using CartDev + Snbugsat.<BR>
+ There is no problem in normal use, but if the program becomes unable to communicate with the debugger monitor due to a runaway, etc., you will have to reload the monitor and check the memory state at the time of the runaway. I want to do this, but when the monitor loads, the memory used by the application is cleared.<BR>
+ Is there a way to restore the debugger functionality without clearing memory?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> <FONT SIZE=5>there is no.</font> </P>
+<!--トホホ．．．．-->
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_02"><HR></a><DL>
+<H3> I want to use the READ/WRITE cycle condition settings and history functions in SNASM.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is it possible to use SNBUGSAT to set conditions for "READ/WRITE cycles" and "data bus value size" as in GUISH?<BR>
+ Also, please let us know if you have any plans for version upgrades, such as adding history functions.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> In the case of GUI-SH, the CPU used is an EVA chip (with debugging function), so READ/WRITE cycle conditions were possible, but this is not possible in the SNASM2 operating environment.<BR>
+ It is possible with simple condition settings (compared to ICE etc.). (Break at what time, etc.)<BR>
+ Similar to the history function, this cannot be done.<BR>
+ If you want to do this kind of debugging, you can use a combination of ProgrammingBox and ROM Debugger (manufactured by Sophia Systems).<BR>
+ One set costs <FONT SIZE=5>about 800,000 yen</font> (including software), but it can read both the SH-C output format (SYSROF format) and the GNU-C output format (COFF format).<BR>
+ It seems that the software bugs have also been fixed.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_03"><HR></a><DL>
+<H3> Does SNASM have a function to dump the contents of RAM into a coff file, etc.?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> Is there a way to use SNASM2's debugger to output data such as BG and MAP recorded in work RAM to a file format that can be used by the linker by specifying an arbitrary address and number of bytes?<BR>
+ Also, are there any detailed translated materials on how to use the debugger?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> It is not a feature of SNBUGSAT. (However, it is possible if you only load/save the binary)<BR>
+ The English translation of the manual SNASM2.09y is provided in the Technical Information Forum's data library as a text file and a Microsoft Word file for Windows.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_04"><HR></a><DL>
+<H3> Please tell me how to read the SIMM address in a SNASM environment.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> From SNASM2, it appears that the SIMM address of CartDev does not exist from the same address as the Programming Box (0x04000000).<BR>
+ When I looked at the address using snbugsat.exe's Alt+W (Window), M (Memory), '**' was displayed, indicating that it was not active.<BR>
+ Can the simple SIMM system actually be used in a CartDev + DevSaturn environment?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> Similarly, in the CartDev + DevSaturn environment, a SIMM is assigned to address 0x04000000 (0x24000000 for a cache-through address).<BR>
+ Specifically, give memory space access rights to the SNBUG.CFG file.</P>
+<P><DD><PRE>
+[SAT_SH2_MAIN]
+Read      = 0x00000000, 0x0007FFFF, BYTE
+Write     = 0x00100000, 0x0010001F, BYTE
+Read      = 0x00100020, 0x0010005F, BYTE
+Write     = 0x00180000, 0x0018FFFF, BYTE
+ReadWrite = 0x00200000, 0x002FFFFF, BYTE
+ReadWrite = 0x01000000, 0x01000003, BYTE
+ReadWrite = 0x01800000, 0x01800003, BYTE
+ReadWrite = 0x04000000, 0x04FFFFFF, BYTE　←These two lines
+ReadWrite = 0x24000000, 0x24FFFFFF, BYTE　←
+
+[SAT_SH2_SUB]
+Read      = 0x00000000, 0x0007FFFF, BYTE
+Write     = 0x00100000, 0x0010001F, BYTE
+Read      = 0x00100020, 0x0010005F, BYTE
+Read      = 0x00180000, 0x0018FFFF, BYTE
+ReadWrite = 0x00200000, 0x002FFFFF, BYTE
+ReadWrite = 0x01000000, 0x01000003, BYTE
+ReadWrite = 0x01800000, 0x01800003, BYTE
+ReadWrite = 0x04000000, 0x04FFFFFF, BYTE　←These two lines
+ReadWrite = 0x24000000, 0x24FFFFFF, BYTE　←
+</PRE></P>
+<P><DD>Add these two lines.</P>
+<P><DD> This area is assigned to SIMM memory, so you can use it by loading the necessary data here in binary.<BR>
+ Booting from SIMM and changing memory addresses are not possible in the CartDev environment.<BR>
+ The same goes for modems, etc., by allowing read/write permissions in this configuration file for the addresses of applications and devices that access SNASM's prohibited areas.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_05"><HR></a><DL>
+<H3> How to debug with SNASM?</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I am developing in the SNASM2 environment. How can I display the contents of variables using this debugger?<BR>
+ In addition, debugging by displaying the source code (step trace, etc.) is possible without any problems.<BR>
+ The compile-time options are</P>
+<P><DD> <B>-Wall -O2 -m2 -g (and include directory specification)</b></P>
+<P> is.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> procedure<OL>
+<P><B><LI></b> Run the program.</P>
+<P><B><LI></b> Open the source file in which variables have been registered using the "Mixed" command.</P>
+<P><B><LI></b> Set a breakpoint and stop the program.</P>
+<P><B><LI></b> If you want to see global variables, use the "watch" command, or if you want to see local variables, use the "watch" command.<BR>
+ Use the "local var" command.</P>
+<P><B><LI></b> For "watch", use the "Edit" → "add" command to display the value of the variable.<BR>
+ (For structures, double-click the item with a "+" to see detailed information.)</P>
+<P><B><LI></b> In the case of "local var", the memory value set in the local variable is automatically displayed.</P>
+</OL>
+<P><DD> Although variable values can be referenced in both windows, they cannot be directly rewritten.<BR>
+ Please rewrite it in the "Memory" window.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_06"><HR></a><DL>
+<H3> I can't see inside the structure with SNASM.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I can use watch with SNASM, but the contents of the structure are not displayed.<BR>
+ Is it a replacement?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> This is because SNASM depends on the development environment, which assumes development in assembler, but snasmld does not import internal symbols of structures and symbols of automatic variables as debug information when linking.<BR>
+ Therefore, if you want to reference the symbols of internal members of a structure or perform source code debugging such as displaying Auto variables (as much as possible in other cases), please do not use snasmld as a linker.<BR>
+ All of these things can be done using GNU ld.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#devl">FAQ</a> ★ <A HREF="index.htm">Development environment</a> ★ <A HREF="index.htm#no7">SNASM environment</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

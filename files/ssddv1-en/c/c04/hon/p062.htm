@@ -1,0 +1,32 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p061.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p063.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 3.4 Data transfer </H2>
+<DT> <H4> (1) Data transfer procedure </H4>
+<DD> For commands that involve data transfer, the host must perform data transfer processing after the command / response. The procedure is shown below. <P>
+<PRE> (a) Execute a command (data extraction / writing) with data transfer.
+(B) Wait for data transfer preparation (CDC_DataReady). (Wait for DRDY to become 1)
+(C) Input / output data through the data transfer register.
+Execute the CDC_GetDataPtr function to obtain the register pointer.
+(D) When necessary data is transferred, end data transfer (CDC_DataEnd). </PRE><P>
+<DT> <H4> (2) End of data transfer </H4>
+If there is a data transfer request in the <DD> status, the data transfer must be terminated even if there is an error even if the data is not actually transferred. Not required for REJECT and WAIT. <BR>
+∙ If an error occurs while waiting for data transfer preparation, the application does not need to execute data transfer termination. It is automatically executed inside the preparation wait function. <P>
+<DT> <H4> (3) Data transfer error </H4>
+<DD> Table 3.8 shows errors that occur while waiting for data transfer preparation. <P>
+<B> Table 3.8 Data transfer error </B> <BR>
+<table border cellpadding=5>
+<th align = "center"> <pre> Data transfer error </th> <th align = "center"> <pre> Description </th> <tr>
+<td align = "left"> <pre> Data transfer time-out </td> <td align = "left"> <pre> The CD block is not ready for data transfer within the specified time. <br> (DRDY flag is not 1) </td> <tr>
+<td align = "left"> <pre> Reserving write sector <br> Not possible </td> <td align = "left"> <pre> Sector data writing cannot secure a free sector <br> It was. <br> (DRDY flag remains 0, EHST flag is 1) </td>
+</table><p>
+<DT> <H4> (4) Prohibited matters </H4>
+<DD> <TABLE> <TD> <IMG SRC = "hyou / atto.gif"> </TD> <TD> <B> When a command that involves data transfer is executed, the data is returned before the DRDY flag becomes 1. Do not perform a transfer termination. Even if data is not actually transferred, be sure to wait for the DRDY flag to become 1 before exiting. (Exit after waiting for data transfer preparation) </B> </TD> </TABLE> <P>
+</DL><P><P><HR>
+<A HREF=p061.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p063.htm> Go to next page </A>
+</BODY>
+</HTML>

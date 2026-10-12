@@ -1,0 +1,55 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/31&gt;SCU User's Manual/2.Operation Description</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p02_20.htm">Back</a> ｜ <A HREF="p03_01.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 2 Operation Description</b><HR NOSHADE>
+<DL>
+<A NAME="no2_30"></A><P><DT><H2> ■2.3 DSP</H2><A NAME="no2_31"></A><DT><H3> ◆DSP control from main CPU</H3><DD> DSP can be controlled from the main CPU. The DSP control items that can be controlled from the CPU are as follows.<OL>
+<LI> Loading the DSP program<LI> DSP data access<LI> Start execution of DSP program<LI> Forced stop of DSP program</OL>
+<DD><H4> ●Loading the DSP program</H4><DD> To load a DSP program, you can use the DSP's DMA instructions, but you can also write directly from the main CPU to the DSP's program RAM area. Program data can be loaded by controlling from the main CPU in the following order.<OL>
+<LI> Set bit16 and bit17 of the program control port to 0.<LI> Writes the transfer start address to the program RAM address of the same port. It cannot be set unless the DSP is stopped.<LI> Writes program data sequentially in longword units to the program RAM data port.</OL>
+<DD> Figures 2.15 to 2.17 show the control method from the CPU step by step.<A NAME="z2_15"></A><P ALIGN="CENTER"> <B>Figure 2.15 Loading DSP program Step1</b><BR>
+<img srcset="../grp/i034_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z2_16"></A><P ALIGN="CENTER"> <B>Figure 2.16 Loading DSP program Step2</b><BR>
+<img srcset="../grp/i035_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z2_17"></A><P ALIGN="CENTER"> <B>Figure 2.17 Loading DSP program Step3</b><BR>
+<img srcset="../grp/i035_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<DD><H4> ●DSP data access</H4><DD> To access DSP data, you can use the DSP's DMA instructions, but you can also access the DSP's data RAM area from the main CPU. Data can be accessed by controlling from the main CPU in the order shown below.<OL>
+<LI> Set bit16 and bit17 of the program control port to 0.<LI> Writes the access start address to the data RAM address port. It cannot be set unless the DSP is stopped.<LI> Data is accessed sequentially in longword units via the data RAM data port.</OL>
+<DD> Figures 2.18 to 2.20 show the control method from the CPU step by step.<A NAME="z2_18"></A><P ALIGN="CENTER"> <B>Figure 2.18 DSP data access step1</b><BR>
+<img srcset="../grp/i034_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z2_19"></A><P ALIGN="CENTER"> <B>Figure 2.19 DSP data access step 2</b><BR>
+<img srcset="../grp/i037_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z2_20"></A><P ALIGN="CENTER"> <B>Figure 2.20 DSP data access step 3</b><BR>
+<img srcset="../grp/i037_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<DD><H4> ●Start execution of DSP program</H4><DD> To start executing the DSP program, write 1 to bit 16 of the program control port (see Figure 2.21). When the DSP recognizes that it has been written, it begins execution from the address stored in the program RAM address of the program control port. Therefore, the execution start address must be set before writing 1 to bit 16 of the program control port.<A NAME="z2_21"></A><P ALIGN="CENTER"> <B>Figure 2.21 DSP program execution start control from CPU</b><BR>
+<img srcset="../grp/i038_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<DD><H4> ●Forced stop of DSP program</H4><DD> To forcibly stop the execution of a DSP program, write 0 to bit 16 of the program control port, which is the opposite of starting execution. Figure 2.22 shows forced stop control.<A NAME="z2_22"></A><P ALIGN="CENTER"> <B>Figure 2.22 Forced stop control of DSP program from CPU</b><BR>
+<img srcset="../grp/i038_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_20.htm">Back</a> ｜ <A HREF="p03_01.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

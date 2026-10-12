@@ -1,0 +1,152 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/54&gt;VDP1 User's Manual/3.Processing flow</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p02_20.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual</b><H2 ALIGN=CENTER> Chapter 3 Process flow</H2><HR NOSHADE>
+<DL>
+<A NAME="no3_10"></A><P><H3> ●Flow of drawing procedure</H3><DD> The flow of the drawing procedure using VDP1 is as follows.<A NAME="3_11"></A><P><DT> <B>step 1.</b><DD> Power on the system.<A NAME="3_12"></A><P><DT> <B>Step 2.</b><DD> Set the required values in the VDP1 system registers.<A NAME="3_13"></A><P><DT> <B>Step 3.</b><DD> Write the required character pattern table to VRAM.<A NAME="3_14"></A><P><DT> <B>Step 4.</b><DD> Write the required color lookup table to VRAM.<A NAME="3_15"></A><P><DT> <B>Step 5.</b><DD> Write the required Gouraud shading table to VRAM.<A NAME="3_16"></A><P><DT> <B>Step 6.</b><DD> Write the required command table to VRAM.<A NAME="3_17"></A><P><DT> <B>Step 7.</b><DD> At the same time as a frame change, drawing automatically begins in the frame buffer and will be displayed at the next frame change.<A NAME="3_18"></A><P><DT> <B>Step 8.</b><DD> Repeat <A HREF="#3_13">steps 3-6</a> as necessary.<P><DT><H3> ●Table access</H3><DD> The steps for VDP1 to access and draw a table on VRAM are as follows:<A NAME="3_21"></A><P><DT> <B>step 1.</b><DD> Controls drawing and display according to instructions set in system registers.<A NAME="3_22"></A><P><DT> <B>Step 2.</b><DD> Fetch the command table at the start address of VRAM.<A NAME="3_23"></A><P><DT> <B>Step 3.</b><DD> The fetched command table is<P><DD> (1) When using the drawing end command, drawing ends. → <A HREF="#3_29">Step 9</a><P><DD> (2) When the jump format is skip, the command table is ignored. Reading of the table is finished and the table is not processed. → <A HREF="#3_28">Step 8</a><P><DD> (3) In cases other than (1) and (2) above, go to step 4.<A NAME="3_24"></A><P><DT> <B>Step 4.</b><DD> For clipping coordinate setting commands and relative coordinate setting commands, the respective processing is performed. → <A HREF="#3_28">Step 8</a><A NAME="3_25"></A><P><DT> <B>Step 5.</b><DD> When using a drawing command, if specified, reads the Gouraud shading table and color lookup table.<A NAME="3_26"></A><P><DT> <B>Step 6.</b><DD> When drawing textures, reads the character pattern table and writes it to the frame buffer according to the specifications. At this time, it handles color mode processing, color calculations, flipping, scaling, and rotation.<A NAME="3_27"></A><P><DT> <B>Step 7.</b><DD> When drawing non-texture, writes to the frame buffer according to the specifications.<A NAME="3_28"></A><P><DT> <B>Step 8.</b><DD> Follow the instructions in the jump format to fetch the next command table and repeatedly process the command table. → <A HREF="#3_23">Step 3</a><A NAME="3_29"></A><P><DT> <B>Step 9.</b><DD> Repeats drawing at the start of the frame. → <A HREF="#3_21">Step 1</a><A NAME="no3_11"></A><P><DT><H3> ●Command table flow</H3><DD> For all commands other than the drawing end command, you can specify the jump format to the next command table to be processed. Jump formats include:<P><DT><UL TYPE=DISC>
+<LI> Jump to command table<LI> Skip command table<LI> Command table group (subroutine) call<LI> Return (to main routine)</UL>
+<P><DD> An example of the command flow in jump format is as follows:<A NAME="z3_1"></A><P><DD> <B>Figure 3.1 Command table flow</b><PRE>
+VRAM command table
+┌───────────┐
+│Clipping   │
+│coordinates│·
+├───────────┤│
+│Relative   ││
+│coordinates││
+├───────────┤│
+│Parts      ││
+├───────────┤↓
+│Subroutine ││
+│call       │└─┐·The specified table is called as a subroutine
+├───────────┤  │
+│Parts      │┌←┼─┐
+├───────────┤│ │ │
+│Parts      ││ │ │
+├───────────┤↓ │ │
+│Jump       │└─┼─┼─┐·Moves to the specified table
+├───────────┤  │ │ │
+│:          │  │ │ │
+├───────────┤  │ │ │
+│Parts      │┌←┘ │ │
+├───────────┤│   │ │
+│Parts      ││   │ │
+├───────────┤↓   │ │
+│Return     │└───┘ │
+├───────────┤      │
+│:          │      │
+├───────────┤      │
+│Parts      │┌←────┘
+├───────────┤│
+│Parts      ││
+├───────────┤↓
+│Skip/Parts │·Skip (this part will not be drawn)
+├───────────┤│
+│Parts      ││
+├───────────┤│
+│Parts      ││
+├───────────┤↓
+│Jump       │└─┐
+├───────────┤  │
+│Parts      │  │
+├───────────┤  │
+│Parts      │  │
+├───────────┤  │
+│Jump       │  │
+├───────────┤  │
+│:          │  │
+├───────────┤  │
+│Changing   │  │
+│clipping   │┌←┘
+│coordinates││
+├───────────┤│
+│Parts      ││
+├───────────┤│
+│Relative   ││
+│coordinate ││
+│change     ││
+├───────────┤│
+│Parts      ││
+├───────────┤│
+│:          ││
+├───────────┤↓
+│End drawing│·End drawing
+├───────────┤
+│:          │
+└───────────┘
+</PRE><A NAME="no3_12"></A><P><DT><H3>●Table reference</H3><DD> References to tables stored in VRAM are made from the command table.<A NAME="z3_2"></A><P><DD> <B>Figure 3.2 Table reference</b><PRE>
+        VRAM　
+┌──────────────────┐
+│        :         │
+│        :         │
+┣━━━━━━━━━━━━━━━━━━┫
+┃   Parts drawing  ┃
+┃   commands       ┃
+┃        :         ┃
+┠──────────────────┨
+┃ Color mode,      ┃
+┃ color calculation┃
+┠──────────────────┨
+┃ Lookup table     ┃
+┃ address          ┃─┐
+┠──────────────────┨ │
+┃Character address ┃─┼─┐
+┠──────────────────┨ │ │
+┃Character size    ┃ │ │
+┠──────────────────┨ │ │
+┃        :         ┃ │ │
+┃        :         ┃ │ │
+┠──────────────────┨ │ │
+┃Guro shading      ┃ │ │
+┃table address     ┃─┼┐│
+┠──────────────────┨ │││
+┃        :         ┃ │││
+┣━━━━━━━━━━━━━━━━━━┫ │││
+│        :         │ │││
+│        :         │ │││
+┣━━━━━━━━━━━━━━━━━━┫ │││
+┃Color lookup table┃←┘││
+┃        :         ┃  ││
+┣━━━━━━━━━━━━━━━━━━┫  ││
+│        :         │  ││
+│        :         │  ││
+┣━━━━━━━━━━━━━━━━━━┫  ││
+┃Guro shading table┃←─┘│
+┃        :         ┃   │
+┃        :         ┃   │
+┣━━━━━━━━━━━━━━━━━━┫   │
+│        :         │   │
+│        :         │   │
+┣━━━━━━━━━━━━━━━━━━┫   │
+┃Character pattern ┃←──┘
+┃table             ┃
+┃        :         ┃
+┣━━━━━━━━━━━━━━━━━━┫
+│        :         │
+│        :         │
+</PRE></DL>
+<HR NOSHADE>
+<B>▲ <A HREF="p02_20.htm">Back</a> ｜ <A HREF="p04_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

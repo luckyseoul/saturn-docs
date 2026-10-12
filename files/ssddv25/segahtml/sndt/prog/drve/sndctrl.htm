@@ -1,0 +1,85 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/17&gt; Sound driver Ver2.10 guide/2. sound control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no2">Sound Driver Programmer's Guide</a><HR>
+ <B>▲ <A HREF="sndsys.htm">Back</a> ｜ <A HREF="sndcmd0.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound Driver Programmer's Guide</b><H2 ALIGN=CENTER> 2. sound control</H2><HR NOSHADE>
+<DL>
+<a name="colum1"></a><h3> Required data files</h3> Basically, all that is required to start the sound driver is the sound driver program itself. The reason why the sound area map is also transferred here is that once the sound area map is transferred for the first time, there is no need to transfer it thereafter. All area maps in the game will be stored in the sound area map area here. When starting the sound driver using this procedure, please prepare the following two data files.<BR>
+<ol>
+<li> Sound driver (SDDRVS.TSK)<BR>
+ The sound driver is provided as a binary file called "sddrvs.tsk". However, the file "sddrv.tsk" is used only when developing with Saturn Target Model M. These file names should not be changed.<p><li> Sound area map (any name)<BR>
+ This is a binary data file that combines all area maps in the game. It varies depending on the game, so ask a sound creator to create it for you.<p></ol>
+<a name="colum2"><hr></a><h3> sound area map</h3> The sound area map is a combination of all area maps in the game, and was created (output) using the sound simulator, a sound development tool.<BR>
+ A 1-byte end code (FFh) is included at the end of each area map, and an all-end code (FFh) is also included at the end of the sound area map. The size of the sound area map is variable length, and its size is determined by the number of area maps, but the maximum is 4096 bytes.<p><P ALIGN=CENTER> <B>Sound area map configuration</b><BR>
+<img srcset="../image/sndmap0.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<a name="colum3"><hr></a><h3> What is an area map?</h3> There are several scenes in the game, and when the scene changes, the music usually changes as well. As the music changes, the way the sound data is stored (how to use the 512KB sound memory) also changes, so the area map is used to decide how to store the data in that situation. There are only three types of data to be placed: ``timbre data'', ``sequence data'', and ``DSP program'', so the area map determines where and how large these three types of data are placed in the sound memory. is. Also, when using DSP, "DSP work RAM" is required, so specify the location and size of DSP work RAM in the same way.<BR>
+ Normally, sequence playback is possible if there are two types of map information, tone data and sequence data, in one area map, but if you divide frequently used songs, sound effects, etc. into separate locations, you can improve memory efficiency and development efficiency. You can build a good system.<BR>
+ If you assume that the sound changes as the game scene changes, you will need as many area maps as there are game scenes. However, the area map mentioned here is just an area map seen from the sound, so it does not necessarily correspond one-to-one with the game scene. If the sound remains the same even if the game scene changes, there is no need to change the area map, and if you only need to replace some sound data, there is no need to change the area map.<p><P ALIGN=CENTER> <B>Relationship between area map and sound data</b><BR>
+<img srcset="../image/sndmap2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+ An area map is a combination of several map information, and its size is variable. You can have up to 32 map information, and the size of the area map is determined by the number of map information. Since the size is variable length, a 1-byte end code is included at the end of the area map.<BR>
+ Map information is an 8-byte data block that describes where sound data is placed in memory, and has a structure like the one shown below.<p><P ALIGN=CENTER> <B>Bit image of map information</b><BR>
+<img srcset="../image/sndmap3.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+ Map information data description<BR>
+<table border>
+<tr><td> E</td><td> data end bit</td><td> End bit of map information. Actually, it is 1 byte of FFh.</td><tr><td> Data ID</td><td> Data type</td><td> This is the type of data to be stored in the area defined here.</td><tr><td> ID number</td><td> Identification number within data type</td><td> This is an identification number when there is multiple data of the same type.</td><tr><td> start address</td><td> start address</td><td> This is the start address of the area defined here.</td><tr><td> L</td><td> Transferred bit</td><td> This flag indicates that data has been transferred to this area.</td><tr><td> area size</td><td> area size</td><td> This is the area size of the area defined here.</td></table>
+<p><a name="colum4"><hr></a><h3> type of sound</h3> There are three ways to shape the sound: In addition, each has its own advantages and disadvantages as shown in the table below, so please select the optimal playback method that suits the game content and each situation.<ol>
+<li> Sequence playback<li> PCM stream playback<li> CD-DA playback</ol>
+ Sequence playback<BR>
+<table border width="100%">
+<tr><td nowrap> How to pronounce</td><td> This method uses the tone data (waveform data) on the sound memory as the sound source and plays the sequence data while decompressing it.</td><tr><td> Features</td><td> This method uses waveform data as a sound source (one instrument) and treats the Saturn itself as a multi-sound source instrument.</td><tr><td> Strong Points</td><td><ul>
+<li> Since the song data is small, you can have many songs.<li> It is easy to change and modify songs.<li> Real-time tempo changes are possible.<li> No need for CD access.<li> The main thing is just making a request.<BR>
+ (The sound driver controls everything)</ul>
+</td><tr><td> Cons</td><td><ul>
+<li> There is a restriction on the capacity of waveforms that can be held at one time to 4Mbit (512KB).</ul>
+</td></table>
+<p> PCM stream playback<BR>
+<table border width="100%">
+<tr><td nowrap> How to pronounce</td><td> This method plays back waveform data in a loop, and then transfers the next waveform data to the part where the sound has finished, repeatedly, thereby continuously playing back long waveform data.</td><tr><td> Features</td><td> This is a method of playing back pre-recorded long waveform data as is.<BR>
+ However, the waveform data must continue to be transferred so that the sound does not stop.</td><tr><td> Strong Points</td><td><ul>
+<li> Long waveform data exceeding 4M bits can be played back.<li> You can edit various playback patterns by adjusting the transfer. (Editing and compositing possible)<li> The data width can be selected from 8 bits or 16 bits, and the frequency can be changed freely.<BR>
+ (Memory efficiency is good, and the pitch can be changed during recording and playback.)<li> You can play multiple channels at the same time.</ul>
+</td><tr><td> Cons</td><td><ul>
+<li> Transferring waveform data places a considerable load on the main system and sound CPU.</ul>
+</td></table>
+<p> CD-DA playback<BR>
+<table border width="100%">
+<tr><td nowrap> How to pronounce</td><td> This is a method of directly playing the audio recorded on the audio track of a CD using hardware.<BR>
+ This is exactly the same method as playing commercially available music CDs.</td><tr><td> Features</td><td> This is a method of playing back pre-recorded long waveform data as is.<BR>
+ Audio is output automatically by hardware.</td><tr><td> Strong Points</td><td><ul>
+<li> Since you can record live, you can play back realistic and highly expressive performances.<li> There is no load on the main and sound CPU.</ul>
+</td><tr><td> Cons</td><td><ul>
+<li> It is not easy to change or modify songs. I have to record it again.<li> A large amount of waveform data is required with a data width of 16 bits and a fixed frequency of 44.1KHz.<li> During playback, the CD must be constantly accessed, occupying the CD drive.<li> You cannot change the tempo in real time.</ul>
+</td></table>
+<p><a name="colum5"><hr></a><h3> About 3D sound</h3> This sound driver supports the following two types of 3D sound. The types of stereo location and number of channels that can be specified are as follows. Specify the desired stereo location using the "3D control (11h)" or "Qsound control (12h)" command of the sound control commands. The virtual sound source moves to the specified position.<BR>
+ For both Q sound and YAMAHA 3D sound, the movement of the virtual sound source is likely to be random, so all localization movement control is performed by the main system. The sound driver simply moves the sound image to the specified location. However, if a simple linear movement is sufficient, or if you want the sound driver to have more intelligent control, we will handle this on a project-by-project basis. YAMAHA's DSP expansion module provides three types of DSP programs: Q Sound 4ch, Q Sound 8ch, and YAMAHA 3D Sound 1ch.If you want to use 3D sound, you will need one of the four types of DSP programs listed above. Download the appropriate DSP program using the "Effect Change (83h)" command.<p><A NAME="no2_51"></A><h4> Q sound</h4> You can swing a wide-angle pan up to 180 degrees left and right. The only type of stereo location is PAN, but up to 8 channels can be controlled simultaneously.<BR>
+<table border width="100%">
+<tr><td> Channel (0-7)</td><td> You can specify 4 channels (0-3) or 8 channels (0-7).</td><tr><td> PAN position (0-30)</td><td> You can pan up to 15 steps of 180 degrees left and right with a value of 0 to the left, 15 to the center, and 30 to the right.</td></table>
+<p><A NAME="no2_52"></A><h4> YAMAHA 3D sound</h4> You can move the virtual sound source to any position in 360 degrees horizontally, 360 degrees vertically, and 128 distances apart. The number of channels used is one, but any position above, below, left or right can be specified.<table border width="100%">
+<tr><td> Distance (0-127)</td><td> If the value is 0, the distance is 0, and the larger the value, the farther away it is.</td><tr><td> Direction (0-127)</td><td> Specify the 360 degree direction in 128 steps. A value of 0 means 0 degrees to the right, 32 means 90 degrees to the right, 64 means 180 degrees to the right, and 96 means 270 degrees to the right.</td><tr><td> Height (0-127)</td><td> Specify the height in 128 steps. A value of 0 is directly above, 32 is at eye level, 64 is directly below, and 96 is behind eye level.</td></table>
+<p></DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="sndsys.htm">Back</a> ｜ <A HREF="sndcmd0.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no2">Sound Driver Programmer's Guide</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,110 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/86&gt;VDP2 User's Manual/3.1 Address Map</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p02_50.htm">Back</a> ｜ <A HREF="p03_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual</b><H2 ALIGN=CENTER> Chapter 3 RAM</H2><HR NOSHADE>
+<DL>
+<P><DD> A dedicated VRAM for defining pattern name tables, character patterns, etc. is connected to VDP2. VRAM is divided into two parts of equal capacity called VRAM-A and VRAM-B, respectively. VRAM-A and VRAM-B can be divided into two with the same capacity, called bank 0 and bank 1, respectively. The four banks with the same capacity divided in this way are called VRAM-A0, VRAM-A1, VRAM-B0, and VRAM-B1. Define the data shown in Table 3.1 in VRAM.<BR>
+ It also has built-in color RAM for defining color data for scroll screens and sprites.</P>
+<A NAME="t3_1"></A><P><DD> <B>Table 3.1 Data defined in VRAM</b><DD><TABLE BORDER CELLPADDING=5>
+<TR><TD><PRE> Always when the display format is cell format.<BR> Data that must be defined</TD><TD><PRE> Display format is bitmap<BR> For formats, be sure to define<BR> data that must be</TD><TD><PRE> Data defined as required</TD></TR>
+<TR><TD><PRE> pattern name table data<BR> Character pattern data<BR><BR><BR><BR><BR></TD><TD><PRE> bitmap pattern data <BR><BR><BR><BR><BR><BR></TD><TD><PRE> line scroll table data<BR> Vertical cell scroll table data<BR> Rotation parameter table data<BR> Coefficient table data<BR> Line color screen table data<BR> Back screen table data<BR> line window table data</TD></TR>
+</TABLE>
+</P>
+<A NAME="no3_10"></A><P><DT><H2> ■3.1 Address map</H2><DD> VDP2 can support two types of VRAM: 4Mbit and 8Mbit. A program written for a system using 4Mbits of VRAM can also be used on a system using 8Mbits of VRAM, but not vice versa.</P>
+<P><DD> The address map changes as shown in Figure 3.1 depending on the amount of VRAM used in the system.</P>
+<A NAME="z3_1"></A><CENTER>
+ <B>Figure 3.1 VRAM address map by capacity</b><PRE>
+ ●VRAM capacity: 4M bits　
+  000000H┌────────────┐
+         │            │
+         │   VRAM-A0  │
+  01FFFFH│            │
+  020000H├────────────┤
+         │            │
+         │   VRAM-A1  │
+  03FFFFH│            │
+  040000H├────────────┤
+         │            │
+         │   VRAM-B0  │
+  05FFFFH│            │
+  060000H├────────────┤
+         │            │
+         │   VRAM-B1  │
+         │            │
+  07FFFFH└────────────┘
+</PRE><PRE>
+
+ ●VRAM capacity: 8M bits　
+  000000H┌────────────┐
+         │            │
+         │            │
+         │   VRAM-A0  │
+         │            │
+  03FFFFH│            │
+  040000H├────────────┤
+         │            │
+         │            │
+         │   VRAM-A1  │
+         │            │
+  07FFFFH│            │
+  080000H├────────────┤
+         │            │
+         │            │
+         │   VRAM-B0  │
+         │            │
+  0BFFFFH│            │
+  0C0000H├────────────┤
+         │            │
+         │            │
+         │   VRAM-B1  │
+         │            │
+         │            │
+  0FFFFFH└────────────┘
+</PRE></CENTER>
+<A NAME="no3_11"></A><P><DT><H3>●VRAM size register</H3><DD> The VRAM size register specifies the amount of VRAM used in the system. It is a readable and writable 16-bit register located at address 180006H. However, bits 3-0 are read-only bits. The value of bit 15 (VRAMSZ) is cleared to 0 after power-on or reset, so be sure to set it.</P>
+<A NAME="VRSIZE_"></A><P><DD> <B><FONT SIZE=5>VRSIZE</font> <FONT SIZE=4>180006H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH> <A HREF="#VRAMSZ_">VRAMSZ</a></TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH> -</TH><TH> -</TH><TH> -</TH><TH> -</TH><TH> <A HREF="#VER_">VER3</a></TH><TH> <A HREF="#VER_">VER2</a></TH><TH> <A HREF="#VER_">VER1</a></TH><TH> <A HREF="#VER_">VER0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="VRAMSZ_"></A><P><DT> <B><A HREF="#VRSIZE_">▲</a> VRAM size bit</b> : VRAM size bit (VRAMSZ), bit 15<DD> Specify the amount of VRAM used in your system.</P>
+<P><DD><TABLE BORDER CELLPADDING=5>
+<TR><TH WIDTH=50><PRE> VRAMSZ</TH><TH WIDTH=250><PRE> VRAM capacity</TH></TR>
+<TR><TH><PRE> 0</TH><TD><PRE> 4Mbit</TD></TR>
+<TR><TH><PRE> 1</TH><TD><PRE> 8Mbit</TD></TR>
+</TABLE>
+</P>
+<P><DD> This bit must be set before writing data to VRAM.</P>
+<A NAME="VER_"></A><P><DT> <B><A HREF="#VRSIZE_">▲</a> Version number bit</b> : Version number bit (VER3 to VER0), bits 3 to 0<DD> Represents the version number of VDP2. Initially it is 0.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p02_50.htm">Back</a> ｜ <A HREF="p03_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> <A HREF="../index.htm#no3">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

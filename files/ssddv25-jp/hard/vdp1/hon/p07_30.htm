@@ -1,0 +1,95 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;44/54&gt;VDP1ユーザーズマニュアル/</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+★<A HREF="p07_00.htm">第７章　コマンド</A>
+<HR>
+<B>▲<A HREF="p07_20.htm">戻る</A>｜
+     <A HREF="p07_40.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第７章　コマンド</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no7_30"></A>
+	<P>	<DT><H2>■7.3　相対座標設定コマンド</H2>
+		<DD>　相対座標設定コマンドは、描画コマンドで指定する座標を相対座標値とし、相対座標コマンドで指定した値を加算して描画座標とします。<BR>
+		　コマンド選択ビットが1010Bのとき相対座標設定コマンドです。<BR>
+		　コマンドテーブルの内容は次のとおりです。</P>
+
+<!-- -------------------------------------------------------------------------------- -->
+	<P>	<DT><TABLE BORDER=0<TR><TD>
+	<TABLE BORDER=1>
+	<TR><TH><PRE>ビット</TH>
+			<TH><PRE>15</TH><TH><PRE>14</TH><TH><PRE>13</TH><TH><PRE>12</TH><TH><PRE>11</TH><TH><PRE>10</TH><TH><PRE>９</TH><TH><PRE>８</TH>
+			<TH><PRE>７</TH><TH><PRE>６</TH><TH><PRE>５</TH><TH><PRE>４</TH><TH><PRE>３</TH><TH><PRE>２</TH><TH><PRE>１</TH><TH><PRE>０</TH></TR>
+
+	<TR ALIGN=CENTER><TD>CMDCTRL<BR>+00</TD>
+			<TH>0</TH><TD COLSPAN=3>JP</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TH>1</TH><TH>0</TH><TH>1</TH><TH>0</TH></TR>
+
+	<TR ALIGN=CENTER><TD>CMDLINK<BR>+02</TD>
+			<TD COLSPAN=14>LINK指定/8H</TD><TD>0</TD><TD>0</TD></TR>
+
+	<TR ALIGN=CENTER><TD>+04</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+06</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+08</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+0A</TD><TD COLSPAN=16></TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDXA<BR>+0C</TD>
+			<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>相対座標(XA)</TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDYA<BR>+0E</TD>
+			<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>相対座標(YA)</TD></TR>
+
+	<TR ALIGN=CENTER><TD>+10</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+12</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+14</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+16</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+18</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+1A</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+1C</TD><TD COLSPAN=16></TD></TR>
+	</TABLE>
+	</TD><TD><IMG SRC="../grp/i116.gif"></TD></TR></TABLE>
+	<TABLE><TR><TD>【注】</TD><TD><TABLE BORDER cellspacing=10><TR><TD></TD></TR></TABLE></TD><TD>は無視されます(don't care)</TD></TR></TABLE></P>
+<!-- -------------------------------------------------------------------------------- -->
+
+	<P>	<DD>相対座標設定コマンドは次のように定義します。</P>
+	<P>	<DT><UL TYPE=DISC>
+		<LI>エンドビットを0Bに、コマンド選択ビットを1010Bに設定すると、相対座標設定コマンドになります。</P>
+
+	<P>	<LI>ジャンプ形式を指定します。ジャンプ形式がアサインまたはコールのとき、次に処理するコマンドテーブルのアドレスを8Hで割ってCMDLINKに設定します。</P>
+
+	<P>	<LI>相対座標をCMDXA, CMDYAに定義します。</UL></P>
+
+<A NAME="no7_31"></A>
+	<P>	<DT><H3>　●相対座標</H3>
+		<DD>　相対座標レジスタに相対座標を設定します。描画コマンドで指定された座標は相対座標の値が加算されて描画座標となります。パーツは描画座標を基にしてフレームバッファに描画されます。</P>
+
+	<P>	<DD>　相対座標が(0,0)のとき、パーツは画面の左上角を(0,0)として描画コマンドで指定した座標で描画されます。画面のほぼ中央を(0,0)にするときは相対座標を(160,112)と指定します。</P>
+
+	<P>	<DD>　相対座標は再設定するまでレジスタに保持されるので、いくつかのパーツの座標をまとめて移動させて描画したいとき、それらの描画コマンドの前に設定します。</P>
+
+	<P>	<DD>　クリッピングにおける座標比較は、パーツの描画指定座標にこの相対座標を加えた値で処理されます。</P>
+
+	<P>	<DD>　また、クリッピング座標には相対座標が加算されないので、クリッピングのエリアが移動してしまうことはありません。</P>
+
+	<P>	<DD>　相対座標レジスタは、電源投入後またはリセット後は値が不定になりますので、描画開始前にかならず設定してください。</P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p07_20.htm">戻る</A>｜
+     <A HREF="p07_40.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+★<A HREF="p07_00.htm">第７章　コマンド</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

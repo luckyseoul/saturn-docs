@@ -1,0 +1,106 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>System regulations</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><P> <A HREF="betu1-1.htm">Return to previous page</a> | <A HREF="index.htm">Return to menu</a> | <A HREF="betu1-3.htm">Proceed to next page</a></BR>
+</P>
+<HR>
+<H3> 2&#65310; System regulations</H3><P> The basic system flow is shown in Figure Appendix 1-1. <B><I>
+This must be included in the processes, functions, and messages shown in this flow.</i>
+</b></P>
+<H4> − Figure Separate Volume 1-1. Basic backup system flow −</H4><img srcset="bessatu2.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><P> *The flow may differ depending on the application.</P>
+<H4> <A NAME="NO1">Initialization check</a></H4><P> <I>
+Before starting the main game, be sure to check the initialization of the main unit RAM and cartridge RAM.</i><BR>
+ <B><I>
+If either one has not been initialized, do not start the game.</i>
+</b> In this case, notify the user and urge the user to either perform the initialization process directly within the application, or to perform the initialization process on the saved data management screen in the Sega Saturn's BOOT ROM.</P>
+<P> *Be sure to use BACKUPRAM BIOS when accessing backup RAM.<BR>
+ *Do not format the main unit RAM, cartridge RAM, or extended memory using any method other than SEGASATURN_BACKUP_FORMAT.</P>
+<H4> <A NAME="NO2">Presence/capacity check</a></H4><P> <I>
+Before the main game starts, confirm the existence of data that can be used by the own application and check the remaining capacity of each backup RAM.</i><BR>
+ <I>
+If your data does not exist or there is not enough remaining space, a warning message will be displayed depending on the situation. (The specific message content will be explained later)</i>
+<H4> <A NAME="NO3">Load</a></H4><P> <I>
+Always check for data corruption when loading data.</i><BR>
+ If the data is unusable, the user must be notified of this fact, and the data must be distinguished and displayed in some way to make it clear that the data is unusable.</P>
+<H4> <A NAME="NO4">save</a></H4></P>
+ <I>
+Before saving data, check the remaining capacity, and after saving, check whether or not it was written correctly.</i><BR>
+ If there is not enough space or if writing cannot be done correctly, the user will be notified.</P>
+<P> <B>===Regulations regarding records===</b></P>
+<P>&#65308; <B>About the format</b>&#65310;</P>
+<UL>
+<LI> <B><I>
+Do not divide records unnecessarily.</i>
+</b> (In principle, one record per save)<LI> <B><I>
+Do not create a format where you will be completely unable to play if even one record is missing</i>
+</b> (it is possible to have independent records for each mode)<LI> The maximum number of records for one type is 99 (_01 to _99).</UL>
+<P>&#65308; <B>About the name</b>&#65310;</P>
+<UL>
+<LI> In order to avoid using the same record name in different games, <I>
+the "record name" when saving is managed by SEGA (Second Design Department).</i>
+<LI> The only characters that can be used in the record name, etc. are numbers, uppercase letters, and underscores. However, do not use a number as the first character. (See table Appendix 1-1)<LI> <I>
+Record names must be 11 characters long.</i>
+ If it is less than 11 characters, pad it with underscores (_) to make it 11 characters. Spaces are not allowed.<LI> When saving multiple records in one game, the first eight characters should be the same, and the three characters that can be changed should be composed of an underscore (_) and a number.<LI> The number of records shall be up to 99, and the three characters that can be changed in the record name shall start from _01 and end with _99.<LI> Avoid using generic names that are difficult to distinguish, such as GM_DATA_000.<PRE>
+Example) In the case of "Panzer Dragoon" (requires saving in 3 locations)
+1st location: PANZER_D01
+2nd location: PANZER_D02
+3rd location: PANZER_D03
+              └─┬──┘ └┬┘
+                │     Only 3 characters can be changed
+                8 characters in common</PRE></UL>
+<P>&#65308; <B>About usage amount</b>&#65310;</P>
+<UL>
+<LI> <I>
+When expressing the “usage amount” of records (data), use the value calculated according to the following formula.</i>
+<P> Usage amount = ([Number of bytes used] + 32) ÷ 64</P>
+<LI> <I>
+In principle, the unit of usage should not be included</i>
+ , but if it is absolutely necessary to indicate it, the word "block" should be used.<LI> The amount of records used should not exceed 256K bytes. (Limitations due to the program specifications of the copy function of the main unit's BOOT ROM)<LI> If the recording usage exceeds 256K bytes, be sure to make copies available on the application side.</UL>
+<H4> <A NAME="NO5">Comment support</a></H4><P> <B><I>
+Be sure to include some comments.</i>
+</b> <I>
+Be sure to use ASCII characters (half-width alphanumeric characters, kana characters, table, refer to Appendix 1-1), up to a maximum of 10 characters.</i><BR>
+ Comments are used to learn more about the contents of the save data, so please use them effectively in each application. <I>
+In particular, if you cannot find the intended use, please enter the game name (information that can be identified) in katakana.</i>
+</P>
+<PRE>
+Example) Example of effective use of comments
+  PANZER_D_01: 5 Men-Boss         (Continue information)
+  PHANT_ST_01: Alephkardonomachi  (name of the town where you saved)
+  SEGARACE_01: Time attack M      (mode name)
+  DERBY_ST_01: Mochikane69        (ranch name)
+</PRE><P>* Users are free to choose whether or not they can rewrite the content of their comments.</P>
+<H4> <A NAME="NO6">Supports timestamps</a></H4><P> <B><I>
+A timestamp must be included</i>
+</b> and <I>
+cannot be changed by the user</i>
+ . As a general rule, records are displayed in ascending order of the timestamps (starting with the newest saved date).</P>
+<H4> <A NAME="NO7">Body RAM/Cartridge RAM selection</a></H4><P> <B><I>
+All applications that support backup must be able to store their records in either internal RAM or cartridge RAM.</i>
+</b> Even if the amount of recording used is too large to fit in the main body RAM, the principle is to use a simple storage method that can also be stored in the main body RAM.</P>
+<P> *Excluding cases of extremely trivial recorded content (such as only high scores in shooting games)<BR>
+ *There are no specific regulations regarding where in the sequence this selection must be made.</P>
+<P> *All characters can be used for “comments”. Only the part can be used as the “record name”.</P>
+<img srcset="bessatu6.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><H4> − Table Separate volume 1-1. ASCII table of usable characters for record names and comments −</H4><HR>
+<P> <A HREF="betu1-1.htm">Return to previous page</a> | <A HREF="index.htm">Return to menu</a> | <A HREF="betu1-3.htm">Proceed to next page</a></BR>
+</P>
+</BODY>
+</HTML>

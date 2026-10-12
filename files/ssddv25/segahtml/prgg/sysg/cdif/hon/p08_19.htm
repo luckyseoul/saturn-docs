@@ -1,0 +1,83 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;19/19&gt;CD communication I/F (CD part)/Function details-9</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>▲ <A HREF="p08_18.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>CD communication interface user's manual (CD part)</b><H2 ALIGN=CENTER> Function details-9</H2><HR NOSHADE>
+<H3> 8.2.9 Register access</H3> When accessing the interrupt factor register and interrupt mask register (obtaining, clearing, and setting values), the lower 16 bits are valid.<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_1"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_9">one</a><BR> <A HREF="p08_10.htm#t8_1_9">View</a><BR> <A HREF="p08_10.htm#t8_1_9">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Obtain data transfer register pointer</H4></TD><TD WIDTH=160><PRE> Function Name［--］<BR><H3> CDC_GetDataPtr</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 9.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Uint32 *CDC_GetDataPtr(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Register pointer (address value)<DT> <B>function</b><DD> Get the data transfer register (DATATRNS) pointer.<P><DT> <B>(1) Access method</b><DD> There are three types of data transfer methods for data transfer registers and MPEG registers:<DD><UL TYPE=DISC>
+<LI> DMA transfer by SCU<LI> DMA transfer by CPU<LI> Software transfer by CPU</UL>
+</P>
+<P><DD> DMA transfers by the CPU and software transfers require longword (32-bit) access to registers. In other words, the data to be transferred is in units of long words (even words).<BR>
+ Longword accessed data is stored in the order of upper word and lower word. When transferring odd words of data, the lower word of the last longword access is undefined.</P>
+<P><DD> <B>(2) volatile declaration</b><DD> When assigning a pointer to a variable, a volatile declaration is required to prevent incorrect optimization.</P>
+<P><DT> <B>example</b><DD><PRE>
+volatile Uint32 *ptr;
+ptr=CDC_GetDataPtr();
+</PRE></DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_2"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_9">one</a><BR> <A HREF="p08_10.htm#t8_1_9">View</a><BR> <A HREF="p08_10.htm#t8_1_9">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Obtaining interrupt factor register value</H4></TD><TD WIDTH=160><PRE> Function Name［--］<BR><H3> CDC_GetHirqReq</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 9.2</H4></TD></TR>
+</TABLE>
+</p>
+<DT> <B>Format</b><DD> Sint32 CDC_GetHirqReq(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Register value...See data specifications (Constant) for bit names.<DT> <B>function</b><DD> Get the value of the interrupt factor register (HIRQREQ).</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_3"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_9">one</a><BR> <A HREF="p08_10.htm#t8_1_9">View</a><BR> <A HREF="p08_10.htm#t8_1_9">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Clearing the interrupt factor register</H4></TD><TD WIDTH=160><PRE> Function Name［--］<BR><H3> CDC_ClrHirqReq</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 9.3</H4></TD></TR>
+</TABLE>
+</p>
+<DT> <B>Format</b><DD> void CDC_ClrHirqReq(Sint32 bitpat)<DT> <B>input</b><DD> bitpat: Clear bit pattern (set the bits you want to clear to 0, and set the others to 1)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Clears the interrupt factor register according to the specified bit pattern.<DT> <B>remarks</b><DD> The CMOK flag in the interrupt factor register is used by the CD communication interface, so clearing it by the application program is prohibited. Also, the DCHG flag is cleared by the BOOT ROM when checking the disk, so do not clear it when initializing the application program. (As an exception, it can be cleared only during DCHG interrupt processing.)</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_4"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_9">one</a><BR> <A HREF="p08_10.htm#t8_1_9">View</a><BR> <A HREF="p08_10.htm#t8_1_9">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Obtain interrupt mask register value</H4></TD><TD WIDTH=160><PRE> Function Name［--］<BR><H3> CDC_GetHirqMsk</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 9.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Sint32 CDC_GetHirqMsk(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Register value...See data specifications (Constant) for bit names.<DT> <B>function</b><DD> Get the value of the interrupt mask register (HIRQMSK).</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_5"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_9">one</a><BR> <A HREF="p08_10.htm#t8_1_9">View</a><BR> <A HREF="p08_10.htm#t8_1_9">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Setting the interrupt mask register</H4></TD><TD WIDTH=160><PRE> Function Name［--］<BR><H3> CDC_SetHirqMsk</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 9.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> void CDC_SetHirqMsk(Sint32 bitpat)<DT> <B>input</b><DD> bitpat: Mask bit pattern (set the bits you want to mask to 0, and set the others to 1)<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> none<DT> <B>function</b><DD> Sets the interrupt mask register according to the specified bit pattern.</DL>
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no9_6"><HR></a><DL>
+<P><DT><TABLE border>
+<TR><TD><PRE> <A HREF="p08_10.htm#t8_1_9">one</a><BR> <A HREF="p08_10.htm#t8_1_9">View</a><BR> <A HREF="p08_10.htm#t8_1_9">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> function specification</H4></TD><TD WIDTH=270><PRE> Function<BR><H4> Obtain MPEG register pointer</H4></TD><TD WIDTH=160><PRE> Function Name［--］<BR><H3> CDC_GetMpegPtr</H3></TD><TD WIDTH=060><PRE> No<BR><H4> 9.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Uint32 *CDC_GetMpegPtr(void)<DT> <B>input</b><DD> none<DT> <B>output</b><DD> none<DT> <B>function value</b><DD> Register pointer (address value)<DT> <B>function</b><DD> Gets the pointer to the MPEG register (MPEGRGB).<BR>
+ The MPEG register is accessed in the same way as the data transfer register. For precautions, see Obtaining the data transfer register pointer ( <A HREF="#no9_1">CDC_GetDataPtr</a> ).</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_18.htm">Back</a> | ■</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

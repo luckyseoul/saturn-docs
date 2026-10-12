@@ -1,0 +1,29 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p039.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p041.htm> Go to next page </A>
+<HR><P><P><dl>
+<dt> <B> Erase & Change (Manual Mode) </B> <BR>
+<dd> <ul type = "disc"> <li> V blank erase is specified by setting VBE = 1 in the register, and FCM = 1 and FCT = 1 are set together. Specifies switching of the frame buffer. <BR>
+<li> Used when the frame change is unknown until the previous V blank, such as when the frame buffer is not switched until the CPU processing is completed. <BR>
+<li> Once VBE = 1 is set, erase write is automatically performed even at the next V blank, so set VBE = 0 before the next V blank after the frame change. <BR>
+<li> Erase & change should be set immediately after the V blank IN interrupt. Otherwise, it may change without being erased. <BR>
+<li> If normal, high resolution, and frame change timing is known in advance, such as interlace, specify erase and change and perform erase light during the display period. In this case, the entire display screen can be erased. </ul><P>
+<dt> <B> Sequence when using erase and change </B> <BR>
+<dd><pre>
+(1) Set VBE = 0, FCM = 1, FCT = 1.
+(2) Wait for the end of processing such as CPU without setting the TV mode selection and FB switching mode.
+(3) H blank IN interrupt immediately before V blank (the 224th line when 224 lines are displayed, the 240th when 240 lines are displayed)
+   When CPU processing is completed by the first line), VBE = 1, FCM = 1, FCT = 1 (erase and change) are set.
+   Set. Set Erase & Change immediately after the V Blank IN interrupt.
+(4) V blank erase starts after V blank IN interrupt ends.
+(5) At the end of V-blank, the erase light is interrupted and the frame is changed.
+(6) If the erase write is not complete, erase the unerased part with polygons.
+(7) Immediately after the V blank OUT interrupt, return VBE to 0 and stop the V blank erase.
+(8) Return to (2). </pre><P>
+</dl><P><P><HR>
+<A HREF=p039.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p041.htm> Go to next page </A>
+</BODY>
+</HTML>

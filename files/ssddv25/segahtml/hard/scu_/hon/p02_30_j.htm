@@ -1,0 +1,128 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/31&gt;SCUユーザーズマニュアル/2.動作説明</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCUユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p02_20_j.htm">戻る</A>｜
+     <a href="p03_01_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCUユーザーズマニュアル／第２章　動作説明</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_30"></A>
+  <P><DT><H2>■2.3 ＤＳＰ</H2>
+
+<A NAME="no2_31"></A>
+  <DT><H3>　◆メインCPUからのDSP制御</H3>
+  <DD>　メインCPUからDSPの制御をすることができます。CPUから可能なDSP制御項目は
+      以下の通りです。
+  <OL>
+    <LI>DSPプログラムのロード
+    <LI>DSPのデータのアクセス
+    <LI>DSPプログラムの実行開始
+    <LI>DSPプログラムの強制停止
+  </OL>
+
+  <DD><H4>●DSPプログラムのロード</H4>
+  <DD>　DSPのプログラムをロードするためには、DSPのDMA命令を使用するやり方もあ
+      りますが、メインCPUからDSPのプログラムRAMエリアに直接書き込む方法もあり
+      ます。次に示す順序でメインCPUから制御すると、プログラムデータのロードが
+      できます。
+  <OL>
+    <LI>プログラム制御ポートのbit16およびbit17を0にします。
+    <LI>同ポートのプログラムRAMアドレスに転送開始アドレスを書き出します。
+　　    DSPが停止していないと、セットできません。
+    <LI>プログラムRAMデータポートにロングワード単位で順次プログラムデータを書き
+        出します。
+  </OL>
+  
+  <DD>　図2.15から図2.17にCPUからの制御方法をステップごとに示します。
+  
+<A NAME="z2_15"></A>
+  <P ALIGN="CENTER"><B>図2.15　DSPプログラムのロードStep1</B><BR>
+  <img srcset="../grp/i034_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+  
+<A NAME="z2_16"></A>
+  <P ALIGN="CENTER"><B>図2.16　DSPプログラムのロードStep2</B><BR>
+  <img srcset="../grp/i035_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z2_17"></A>
+  <P ALIGN="CENTER"><B>図2.17　DSPプログラムのロードStep3</B><BR>
+  <img srcset="../grp/i035_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+  
+  <DD><H4>●DSPのデータのアクセス</H4>
+  <DD>　DSPのデータをアクセスするためには、DSPのDMA命令を使用するやり方もありま
+      すが、メインCPUからDSPのデータRAMエリアをアクセスする方法もあります。次に
+      示す順序でメインCPUから制御すると、データのアクセスができます。
+
+  <OL>
+    <LI>プログラム制御ポートのbit16およびbit17を0にします。
+    <LI>データRAMアドレスポートにアクセス開始アドレスを書き出します。
+    　　DSPが停止していないと、セットできません。
+    <LI>データRAMデータポートを介して、ロングワード単位で順次データをアクセス
+        します。
+  </OL>
+  
+  <DD>　図2.18から図2.20にCPUからの制御方法をステップごとに示します。
+
+<A NAME="z2_18"></A>
+  <P ALIGN="CENTER"><B>図2.18　DSPデータのアクセスstep1</B><BR>
+  <img srcset="../grp/i034_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z2_19"></A>
+  <P ALIGN="CENTER"><B>図2.19　DSPデータのアクセスstep2</B><BR>
+  <img srcset="../grp/i037_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="z2_20"></A>
+  <P ALIGN="CENTER"><B>図2.20　DSPデータのアクセスstep3</B><BR>
+  <img srcset="../grp/i037_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+  <DD><H4>●DSPプログラムの実行開始</H4>
+  <DD>　DSPプログラムの実行を開始するには、プログラム制御ポートのbit16に1を書
+      き込むことで実行します(図2.21を参照)。DSPは、書き込まれたことを認識する
+      と、プログラム制御ポートのプログラムRAMアドレスに格納されている番地より
+      実行を開始します。よって、実行開始アドレスのセットは、プログラム制御
+      ポートのbit16に1を書き込むより以前に行わなければなりません。
+
+<A NAME="z2_21"></A>
+  <P ALIGN="CENTER"><B>図2.21　CPUからDSPプログラムの実行開始制御</B><BR>
+  <img srcset="../grp/i038_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+  <DD><H4>●DSPプログラムの強制停止</H4>
+  <DD>　DSPプログラムの実行を強制的に停止させるには、実行開始とは逆に、
+      プログラム制御ポートのbit16に0を書き込むことで実行します。図2.22に、
+      強制停止制御を示します。
+      
+<A NAME="z2_22"></A>
+  <P ALIGN="CENTER"><B>図2.22　CPUからDSPプログラムの強制停止制御</B><BR>
+  <img srcset="../grp/i038_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p02_20_j.htm">戻る</A>｜
+     <a href="p03_01_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" ALIGN=MIDDLE BORDER=0></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SCUユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

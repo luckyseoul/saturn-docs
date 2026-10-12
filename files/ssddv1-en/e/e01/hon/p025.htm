@@ -1,0 +1,38 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p024.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p026.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H2> 4.3 Programming notes </H2>
+The following are notes on playing movies using the <DD> Cinepak library. <P>
+<DT> <B> (1) Notes on creating an application </B> <BR>
+<UL> <UL TYPE = "DISK"> <LI> Specify the WORK_RAM-H area (06000000H ~) for the buffer address (CPK_PARA_WORK_ADDR, CPK_PARA_BUF_ADDR in CpkCreatePara) specified when creating a movie. <BR>
+If you specify a low-speed RAM area, Cinepak performance will drop. <BR>
+<LI> Cinepak library uses CPU DMA and timer. Do not use CPU DMA and timer during Cinepak operation. <BR>
+<LI> If the same sound occurs twice, it is possible that the number of calls to CPK_Task is too small or the image size is too large. <BR>
+Please call CPK_Task frequently or reduce the image size. </UL></UL><P>
+<DT> <B> (2) Relationship with other libraries </B> <BR>
+<UL> <UL TYPE = "DISK"> <LI> This library uses a file system, stream system, and DMA library. Please link these files. </UL></UL><P>
+<DT> <B> (3) How to remove buffer </B> <BR>
+<UL> <UL TYPE = "DISK"> <LI> The size of the ring buffer has a lot to do with the sound content. If you increase the quality of the sound, you need more buffers. Specifically, please keep the minimum size of movie file header size + sound size for 0.5 seconds + 80KB. The larger the ring buffer, the lighter the Cinepak process. </UL></UL><BR>
+<DD> <UL> "Example" <BR>
+<UL> <LI> Movie 1 minute, 44fps at 30fps, 16bit, stereo <BR>
+Ring buffer size ≧ 32KB + 88KB + 80KB = 200KB <BR>
+<LI> Movie 1 minute, 30fps, 11KHz, 8-bit, monaural <BR>
+Ring buffer size ≧ 32KB + 5.5KB + 80KB = 117.5KB </UL> </UL> <BR>
+<UL TYPE = "DISK"> <LI> The parameter sound memory buffer size (CPK_PARA_PCM_SIZE in CpkCreatePara) when creating a movie is the PCM quantization number for 1ch. <BR>
+Specify an integer multiple of 4096. The range is 4096 * 4 to 4096 * 16. <BR>
+Please specify a PCM quantization number of 1.4 seconds or more for the buffer size. </UL><BR>
+<UL> "Example" <BR>
+<UL> <LI> If the sampling frequency is 44 kHz, set the buffer size to 64K. <BR>
+<LI> If the sampling frequency is 22kHz, set the buffer size to 32K or more. </UL></UL><P>
+<DT> <B> (4) Chroma key processing </B> <BR>
+<UL> <UL TYPE = "DISK"> <LI> Chrome key processing slightly increases the CPK_Task processing time. <BR>
+When using <LI> chroma key processing, set the transparent pixel invalid bit of the sprite command to 0. <BR>
+<LI> To change the range to be transparent with chroma key processing, change the range with the key out (transparent color) range setting function (CPK_SetKeyOutRange). </UL></UL><BR>
+</DL><P><P><HR>
+<A HREF=p024.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p026.htm> Go to next page </A>
+</BODY>
+</HTML>

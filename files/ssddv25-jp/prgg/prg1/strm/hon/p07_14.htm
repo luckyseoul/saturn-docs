@@ -1,0 +1,246 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/18&gt;ストリームシステムライブラリ/7.関数仕様-4</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<B>▲
+<A HREF="p07_13.htm">戻る</A>｜
+<A HREF="p07_15.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ストリームシステムライブラリ</B>
+<H2 ALIGN=CENTER>7.関数仕様-4</H2>
+<HR NOSHADE>
+
+<A NAME="no7_40"></A>
+<H3>7.4　転送設定</H3>
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no4_1"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>転送領域の設定</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_SetTrBuf</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.1</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void　STM_SetTrBuf(StmHn stm, void *buffer, Sint32 nunit,Sint32 unitsize)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>stm</TD><TD><PRE>：ストリームハンドル</TD></TR>
+<TR><TD><PRE>buffer</TD><TD><PRE>：転送領域</TD></TR>
+<TR><TD><PRE>nunit</TD><TD><PRE>：転送領域のサイズ(転送ユニット単位)</TD></TR>
+<TR><TD><PRE>unitsize</TD><TD><PRE>：転送ユニットサイズ</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定したストリームにデータ転送領域を設定します。
+	<P><DD><B>(1)転送ユニットサイズ</B>
+	<DD><table border>
+	<TR><TH align="center"><pre>定数名</TH><TH align="center"><pre>転送ユニットサイズ</TH></tr>
+	<TR><td><pre>STM_UNIT_FORM1</td><td><pre>Mode1,Mode2 Form1セクタ長（2048バイト）</td></tr>
+	<TR><td><pre>STM_UNIT_FORM2</td><td><pre>Mode2,Form2セクタ長（2324バイト）</td></tr>
+	<TR><td><pre>STM_UNIT_WORD</td><td><pre>ワード単位（2バイト）</td></tr>
+	<TR><td><pre>STM_UNIT_BYTE</td><td><pre>バイト単位（1バイト）</td></TR></table></P>
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>デフォルトの転送モードは、CPUです。</P>
+<P><B><LI></B>転送関数が設定されている場合、転送関数を優先します。</P>
+<P><B><LI></B>ソフトウェア転送、CPUのDMA転送の場合、転送領域はロングワード境界に配置してください。</P></OL>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no4_2"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>転送関数の登録</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_SetTrFunc</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.2</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void STM_SetTrFunc(StmHn stm, StmTrFunc func, void *obj)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>stm</TD><TD><PRE>：ストリームハンドル</TD></TR>
+<TR><TD><PRE>func</TD><TD><PRE>：転送関数(取り消す場合、STM_TR_NULLFUNC)</TD></TR>
+<TR><TD><PRE>obj</TD><TD><PRE>：登録オブジェクト</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定したストリームに対して、転送関数を登録します。<BR>登録関数は、ストリームの転送処理時に呼び出されます。
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>登録関数は、以下の形式です。<BR>Sint32 (*StmTrFunc)(void *obj, StmHn stm, Sint32 nsct)
+<TABLE>
+<TR><TD><PRE>obj </TD><TD><PRE>：登録オブジェクト</TD></TR>
+<TR><TD><PRE>stm </TD><TD><PRE>：ストリームハンドル</TD></TR>
+<TR><TD><PRE>nsct</TD><TD><PRE>：転送可能セクタ数</TD></TR></TABLE>
+
+<P><B><LI></B>登録オブジェクトが登録関数の第１引き数に渡されます。</P>
+<P><B><LI></B>転送関数は、最大nsctセクタのデータを転送することができます。</P>
+<P><B><LI></B>関数値には、実際に転送したセクタ数を返します。<BR>DMAなどにより転送関数終了時点で転送中の場合は、(-1)を返す必要があります。</P></OL>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no4_3"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>転送関数における転送開始</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_StartTrans</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.3</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Uint32 *STM_StartTrans(StmHn stm, Sint32 *dadr)
+<DT><B>　入　力</B><DD>stm ：ストリームハンドル
+<DT><B>　出　力</B><DD>dadr：ロングワードワード転送するごとの転送元アドレスの変化分
+<DT><B>　関数値</B><DD>転送元アドレス
+<DT><B>　機　能</B><DD>転送関数においてデータの転送処理を開始します。
+<P><DD>(1)転送元のアドレスの変化分(Uint32へのポインタ単位)
+<DD><table border>
+<TR><TH align="center"><pre>ファイルの種類</TH><TH align="center"><pre>転送元アドレスの変化分の値</TH></tr>
+<TR><td><pre>CD-ROMファイル</td><td align="center"><pre> 0</td></tr>
+<TR><td><pre>メモリファイル、SCSIファイル</td><td align="center"><pre> 1</td></TR></table></P>
+
+<DT><B>　備　考</B><DD>転送関数において、STM_SctToWord, STM_WordToSctを使用する場合は、本関数を実行する前に呼び出してください。
+<DT><B>　　例</B><DD><PRE>
+volatile Uint32 *src;
+
+src = STM_StartTrans(stm, &amp;dadr);
+for (i = 0; i &lt; n; i++) {
+	*dst = *src;
+	src += dadr;
+	dst++;
+</PRE>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no4_4"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>転送ゲートの開閉</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_SetTrGate</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.4</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void STM_SetTrGate(StmHn stm, Sint32 gate)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>stm </TD><TD><PRE>：ストリームハンドル</TD></TR>
+<TR><TD><PRE>gate</TD><TD><PRE>：転送ゲート状態</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>指定したストリームの転送ゲートを開閉します。
+
+<P><DD>(1)転送ゲート状態
+<table border>
+<TR><TH width=100 align="center"><pre>定数名</TH><TH width=250 align="center"><pre>転送ゲート状態</TH></tr>
+<TR><td><pre>STM_GATE_OPEN</td><td><pre>開いた状態</td></tr>
+<TR><td><pre>STM_GATE_CLOSE</td><td><pre>閉じた状態</td></TR></table></P>
+<DT><B>　備　考</B><DD>デフォルトは、STM_GATE_OPENです。
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no4_5"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>最大転送セクタ数の設定</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_SetTrPara</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.5</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void STM_SetTrPara(StmHn stm, Sint32 tsct)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>stm</TD><TD><PRE>：ストリームハンドル</TD></TR>
+<TR><TD><PRE>tsct</TD><TD><PRE>：最大転送セクタ数(読み込みセクタ数全ての場合、STM_TR_ALL)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>CDバッファ区画から転送領域に１度に転送する最大セクタ数を設定します。
+<DT><B>　備　考</B><DD><OL TYPE=a>
+<P><B><LI></B>CDバッファ区画に読み込んだデータを、このセクタ数以下に分割して転送します。</P>
+<P><B><LI></B>デフォルトは、１セクタです。</P></OL>
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no4_6"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>転送開始FADの設定</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_SetTrFad</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.6</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void STM_SetTrFad(StmHn stm, Sint32 fad)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>stm</TD><TD><PRE>：ストリームハンドル</TD></TR>
+<TR><TD><PRE>fad</TD><TD><PRE>：転送開始FAD</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>CDバッファ区画にあるデータの転送を開始するFADを設定します。
+<DT><B>　備　考</B><DD>デフォルトは、STM_FAD_CDTOPです。
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no4_7"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>転送モードの設定</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_SetTrMode</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.7</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void STM_SetTrMode(StmHn stm, Sint32 tmode)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>stm</TD><TD><PRE>：ストリームハンドル</TD></TR>
+<TR><TD><PRE>tmode</TD><TD><PRE>：転送モード</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>CDバッファ区画から転送領域への転送方法を設定します。
+<P><DD>(1)転送モード
+<DD><table border>
+<TR><TH align="center"><pre>定数名</TH><TH align="center"><pre>転送方法</TH><TH align="center"><pre>CPUに対する負荷</TH></tr>
+<TR><td><pre>STM_TR_SCU</td><td><pre>SCUのDMA</td><td><pre>転送先がBバス上なら、CPUは完全に独立動作</td></tr>
+<TR><td><pre>STM_TR_SDMA0</td><td><pre>CPUのDMAチャネル0</td><td><pre>CPUの処理能力が落ちる</td></tr>
+<TR><td><pre>STM_TR_SDMA1</td><td><pre>CPUのDMAチャネル1</td><td><pre>CPUの処理能力が落ちる</td></tr>
+<TR><td><pre>STM_TR_CPU</td><td><pre>ソフトウエア</td><td><pre>CPUは占有されるが、割り込み処理は可能</td></TR></table></P>
+<DT><B>　備　考</B><DD>デフォルトは、STM_TR_CPUです。
+</DL>
+
+<!-- ------------------------------------------------------------------------------- -->
+<A NAME="no4_8"><HR></A><DL>
+<P><DT><table border><TR>
+<TD><A HREF="p07_10.htm#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>転送領域のリセット</H4></TD>
+<TD WIDTH=160><PRE>Function Name<BR><H3>STM_ResetTrBuf</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.8</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>void STM_ResetTrBuf(StmHn stm)
+<DT><B>　入　力</B><DD>stm：ストリームハンドル
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>なし
+<DT><B>　機　能</B><DD>転送先ポインタを初期化します。
+<DT><B>　備　考</B><DD>STM_SetTrBufにより別領域を指定し、転送領域を変更する事も可能です。
+</DL>
+
+<HR NOSHADE>
+<B>▲
+<A HREF="p07_13.htm">戻る</A>｜
+<A HREF="p07_15.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

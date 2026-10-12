@@ -1,0 +1,117 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;40/86&gt;VDP2ユーザーズマニュアル/6.2回転スクロール画面表示制御</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>★
+<A HREF="../index.htm#no6">VDP2ユーザーズマニュアル</A>★
+<A HREF="p06_10.htm">第６章　回転スクロール画面</A>
+<HR>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+<A HREF="p06_30.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第６章　回転スクロール画面</B>
+<HR NOSHADE>
+<DL>
+	<P>	<DT><H2>■6.2　回転スクロール画面表示制御</H2>
+		<DD>　回転スクロール画面は、RBG0とRBG1の2面があり、1面のみ表示させる場合はRBG0を表示させます。RBG1を表示させる場合は、必ずRBG0も表示させなければならず、そのときはノーマルスクロール画面が、すべて表示できなくなります。<BR>
+　回転スクロール画面を表示させる場合は、その画像データ(パターンネームテーブルとキャラクタパターンテーブル、またはビットマップパターン)は、ノーマルスクロール画面用の画像データと共通に使用することはできません。RBG0とRBG1の画像データを共通にすることもできません。また、回転スクロール画面の画像データは、それぞれ別のVRAMに格納しなければなりません。画像データのうち、RBG1のパターンネームテーブルはVRAM-B1に、キャラクタパターンテーブルはVRAM-B0に格納することになっています。</P>
+
+	<P>	<DD>　RBG0が、係数データをラインごとにしか必要としないときは、係数テーブルはVRAMのどのバンクにも格納できますが、ドットごとに必要なときは、画像データとは別のバンクに格納しなければなりません。<BR>
+　回転スクロール画面の表示を制御するレジスタには、画面表示イネーブルレジスタ、RAMコントロールレジスタがあります。画面表示イネーブルレジスタは、画面表示と透明コードを制御します。レジスタの内容はノーマルスクロール画面と同じです。
+詳しくは、「<B><A HREF="p04_10.htm">4.1　画面表示制御</A></B>」を参照してください。</P>
+
+<A NAME="no6_21"></A>
+	<P>	<DT><H3>　●RAMコントロールレジスタ</H3>
+		<DD>　RAMコントロールレジスタは、VRAMのバンク分割、回転スクロール画面のVRAMの使用目的およびカラーRAMモードを指定します。リードライト可能な16ビットのレジスタで、18000EH番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="RAMCTL_"></A>
+<P>	<DD><B><FONT SIZE=5>RAMCTL</FONT>　<FONT SIZE=4>18000EH</FONT></B>
+<TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR><TR>
+<TH><PRE><A HREF="#CRKTE_">CRKTE  </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE><A HREF="#CRMD_">CRMD1  </A></TH>
+<TH><PRE><A HREF="#CRMD_">CRMD0  </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE>   -   </A></TH>
+<TH><PRE><A HREF="#VRBMD_">VRBMD  </A></TH>
+<TH><PRE><A HREF="#VRAMD_">VRAMD  </A></TH>
+</TR></TABLE>
+<P><TABLE BORDER=1><TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR><TR>
+<TH><PRE><A HREF="#RDBS_">RDBSB11</A></TH>
+<TH><PRE><A HREF="#RDBS_">RDBSB10</A></TH>
+<TH><PRE><A HREF="#RDBS_">RDBSB01</A></TH>
+<TH><PRE><A HREF="#RDBS_">RDBSB00</A></TH>
+<TH><PRE><A HREF="#RDBS_">RDBSA11</A></TH>
+<TH><PRE><A HREF="#RDBS_">RDBSA10</A></TH>
+<TH><PRE><A HREF="#RDBS_">RDBSA01</A></TH>
+<TH><PRE><A HREF="#RDBS_">RDBSA00</A></TH>
+</TR></TABLE></P>
+
+<A NAME="CRKTE_"></A>
+	<P><DT><B>カラーRAM係数テーブルイネーブルビット</B>：Color RAM coefficient table enable bit(CRKTE)、ビット15
+	<DD>「<B><A HREF="p06_40.htm">6.4　係数テーブル制御</A></B>」を参照してください。</P>
+
+<A NAME="CRMD_"></A>
+	<P><DT><B>カラーRAMモードビット</B>：Color RAM mode bit (CRMD1, CRMD0)、ビット13、12
+	<DD>「<B><A HREF="p03_40.htm">3.4　カラーRAMモード</A></B>」を参照してください。<BR>
+　CRKTEビットを1にしたときには、カラーRAMモードをモード1にしてください。その際、カラーRAMの後半(100800H〜100FFFH)は、係数テーブルデータ用に使用されるので、カラーデータを格納できなくなります。</P>
+
+<A NAME="VRAMD_">　</A>
+<A NAME="VRBMD_">　</A>
+	<P><DT><B>VRAMモードビット</B>：VRAM mode bit (VRAMD, VRBMD)、ビット9、8
+	<DD>「<B><A HREF="p03_20.htm">3.2　VRAMバンク分割</A></B>」を参照してください。</P>
+
+<A NAME="RDBS_"></A>
+	<P><DT><B>回転データバンク指定ビット</B>：Data bank select bit
+	<DD>(RDBSA01, RDBSA00, RDBSA11, RDBSA10, RDBSB01, RDBSB00, RDBSB11, RDBSB10)<BR>
+　回転スクロール画面での、VRAMの使用目的を指定します。このビットは、回転スクロール画面を表示する場合にのみ有効です。</P>
+
+	<P>	<DD><TABLE BORDER CELLPADDING=5>
+	<TR><TD>RDBSA00,RDBSA01</TD><TD>18000EH</TD><TD>ビット1,0</TD><TD>VRAM-A0用（またはVRAM-A用）</TD></TR>
+	<TR><TD>RDBSA10,RDBSA11</TD><TD>18000EH</TD><TD>ビット3,2</TD><TD>VRAM-A1用</TD></TR>
+	<TR><TD>RDBSB00,RDBSB01</TD><TD>18000EH</TD><TD>ビット5,4</TD><TD>VRAM-B0用（またはVRAM-B用）</TD></TR>
+	<TR><TD>RDBSB10,RDBSB11</TD><TD>18000EH</TD><TD>ビット7,6</TD><TD>VRAM-B1用</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD><TABLE BORDER CELLPADDING=5>
+	<TR><TH>RDBSx1</TH><TH>RDBSx0</TH><TH>VRAM使用目的</TH></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TD>RBG0用RAMとしては使用しない</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TD>RBG0の係数テーブル用RAM</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TD>RBG0のパターンネームテーブル用RAM</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TD>RBG0のキャラクタパターンテーブル（またはビットマップパターン）用<BR>RAM</TD></TR>
+	</TABLE>
+	<DD><B>[注]</B>ビット名のxには、A0、A1、B0、またはB1が入ります。</P>
+
+	<P>	<DD>　VRAMをバンク分割しない場合は、VRAM-A0用のビットがVRAM-A用に、VRAM-B0用のビットがVRAM-B用に使われます。<BR>
+　ドットごとに係数データを必要としない場合には、係数テーブル用RAM(01B)を設定する必要はありません。<BR>
+　ビットマップ形式で表示する場合には、パターンネームテーブル用RAM(10B)を設定する必要はありません。<BR>
+　回転スクロール用RAMに指定したVRAMバンクのVRAMサイクルパターンレジスタの設定は無視されます。<BR>
+　画像データの読み出しアドレスが、指定したバンク内にない場合は、データが読み出されないので正しい画面表示ができなくなります。<BR>
+　RBG1を表示する場合には、VRAM-B0用とVRAM-B1用ビットに必ず00Bを設定してください。<BR>
+　係数データの読み出しアドレスが、指定したバンク内のアドレスでなかった</P>
+
+	<P>	<DD>場合は、係数データが読み出されずに正しい画面表示ができなくなります。<BR>
+　係数テーブルをカラーRAMに格納する場合は、RBG0の係数テーブル用RAM(01B)を設定しないでください。<BR>
+　CRKTEビットを1にしたとき、VRAMの4バンクは、係数テーブルデータ用RAMとして使用するように指定しないでください。</P>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+<A HREF="p06_30.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm#hard"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm#vdp2">HARDWARE Manual</A>
+<A HREF="../index.htm#no6">VDP2ユーザーズマニュアル</A>★
+<A HREF="p06_10.htm">第６章　回転スクロール画面</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

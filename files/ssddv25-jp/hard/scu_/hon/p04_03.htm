@@ -1,0 +1,114 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;18/31&gt;SCUユーザーズマニュアル/4.DSP制御</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p04_02.htm">戻る</A>｜
+     <A HREF="p04_04.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SCUユーザーズマニュアル／第４章　DSP制御</B>
+<HR NOSHADE>
+
+<A NAME="4_30"></A>
+	<H2>■4.3　オペランド実行方法</H2>
+	<P>　DSPは、以下の命令に対しては、実際にレジスタをこのように制御し、実行しています。</P>
+
+<DL>
+<A NAME="4_31"></A>
+	<P><DT><H3>◆JUMP命令の実行</H3>
+	<DD>　ジャンプ先アドレス(Immediate Data)をプログラム制御ポートのプログラムRAMアドレスに格納することで実現します。但し、プリフェッチされた命令は実行されますので注意してください。
+         条件付きのJUMP命令は、まずプログラム制御ポートのフラグの状態を調査し、条件を満たしていれば、プログラム制御ポートのプログラムRAMアドレスにジャンプ先アドレスを格納します。
+         命令のフォーマットは、4.5項『命令』のJUMP命令部を参照してください。図4.2に、JUMP命令実行フローを示します。</P>
+
+<A NAME="z4_2"></A>
+	<P ALIGN=CENTER><B>図4.2　JUMP命令の実行</B><BR><IMG SRC="../grp/i085_01.gif"></P>
+
+<A NAME="4_32"></A>
+	<P><DT><H3>◆LOOPプログラムの実行</H3>
+	<DD>　トップアドレスレジスタ([TOP])で指定されたアドレスと、DSPのBTM命令(4.5項『命令』、LOOP BOTTOM命令参照)の間のプログラムがループカウンタ（[LOP]）で指定された回数だけ繰り返し実行されます。
+         よって、この処理を実現させるためには、トップアドレスレジスタやループカウンタに、あらかじめ値を設定してから実行させるようにしてください。
+         値の設定は、DSPのLoad immediate命令（4.5項『命令』、Load immediate命令参照）にて行うことができます。
+         図4.3に、LOOPプログラムの実行フローを示します。</P>
+
+<A NAME="z4_3"></A>
+	<P ALIGN=CENTER><B>図4.3　LOOPプログラムの実行</B><BR><IMG SRC="../grp/i086_01.gif"></P>
+
+<A NAME="4_33"></A>
+	<P><DT><H3>◆DMA命令の実行</H3>
+	<DD>　DSPからDMAコントローラのレジスタを設定して、実際にDMA転送を行う過程を説明します。
+         DMA命令は、転送方向(読み込み／書き出し)により、次の2種類に分けられます。</P>
+
+	<P><DD><OL>
+	<B><LI></B>D0バスからDSPへのデータ転送
+	<B><LI></B>DSPからD0バスへのデータ転送
+	</OL></P>
+
+<A NAME="4_33_0"></A>
+	<P><DD><H4>●D0バスからDSPへのデータ転送</H4>
+	<DD>　DSPデータRAM転送開始アドレスと、外部メモリ転送開始アドレスをレジスタ([CT0-3]と[RA0])に設定し、DMA命令により転送が開始されます。DMA命令までの命令フォーマットは以下のようになります。<BR>
+	詳細は、4.5項『<A HREF="p04_05.htm">命令詳細</A>』を参照してください。</P>
+
+	<P><DD><PRE>
+MOV	SImm,[CT0]     ; DSPデータRAM0転送開始アドレスセット
+MVI	Imm,[RA0]      ; 外部メモリ転送開始アドレスセット
+DMA	D0,[MD0],SImm  ; D0バスを使用し、DMA転送開始
+</PRE></P>
+
+	 <P><DD>　表4.6に、このDMA転送での特徴をまとめます。DMA転送は、1ロングワード単位で実行されますので、
+         転送ワード数の設定(上記、DMA命令のSImm)は、ロングワード単位で設定してください。</P>
+
+<A NAME="t4_1"></A>
+	<P><DD><TABLE BORDER=1><CAPTION><B>表4.1　D0バスからDSPへのデータ転送の特徴</B></CAPTION>
+  <TD ALIGN="CENTER"><PRE>項　　目</TD><TD ALIGN="CENTER"><PRE>特　　　　徴</TD><TR>
+  <TD ALIGN="CENTER"><PRE>フラグのセット</TD><TD ALIGN="LEFT"><PRE>プログラム制御ポートのTOフラグがセットされる。</TD><TR>
+  <TD ALIGN="CENTER"><PRE>起動と終了</TD><TD ALIGN="LEFT"><PRE>　外部からのデータレディ信号に従う。この信号により、1ロングワード単位で<BR>転送される。また、外部からのエンド信号によりDMA転送を終了し、このタイミ<BR>ングでプログラム制御ポートのTOフラグがリセットされる。</TD><TR>
+  <TD ALIGN="CENTER"><PRE>アドレス更新</TD><TD ALIGN="LEFT"><PRE>　1ロングワード転送される毎に、DSPデータRAM転送アドレス([CTO-3])は1加<BR>算され、外部メモリ転送アドレス（[RA0]）はアドレス加算数に従って加算され<BR>る。</TD><TR>
+  <TD ALIGN="CENTER"><PRE>ホールド状態</TD><TD ALIGN="LEFT"><PRE>　DMA命令のHoldビット(4.5項「命令」DMA命令の部参照)を1にセットすると、<BR>転送ワード数([TN0])や外部メモリ転送アドレス([RA0])は転送開始時の値が保<BR>持される。</TD>
+  </TABLE></P>
+
+<A NAME="4_33_1"></A>
+	<P><DD><H4>●DSPからD0バスへのデータ転送</H4>
+    <DD>　DSPデータRAM転送開始アドレスと、外部メモリ転送開始アドレスをレジスタ([CT0-3]と[WA0])に設定し、DMA命令により転送が開始されます。DMA命令までの命令フォーマットは以下のようになります。
+         詳細は、4.5項『<A HREF="p04_05.htm">命令詳細</A>』を参照してください。</P>
+
+  <P><PRE>
+MOV	SImm,[CT0]     ; DSPデータRAM0転送開始アドレスセット
+MVI	Imm,[WA0]      ; 外部メモリ転送開始アドレスセット
+DMA	[MD0],D0,SImm  ; D0バスを使用し、DMA転送開始
+</PRE></P>
+
+  <P><DD>　表4.7に、このDMA転送での特徴をまとめます。DMA転送は、1ロングワード単位で実行されますので、
+         転送ワード数の設定(上記、DMA命令のSImm)は、ロングワード単位で設定してください。</P>
+
+<A NAME="t4_2"></A>
+	<P><DD><TABLE BORDER=1><CAPTION><B>表4.2　DSPからD0バスへのデータ転送の特徴</B></CAPTION>
+  <TD ALIGN="CENTER"><PRE>項　　目</TD><TD ALIGN="CENTER"><PRE>特　　　　徴</TD><TR>
+  <TD ALIGN="CENTER"><PRE>フラグのセット</TD><TD ALIGN="LEFT"><PRE>プログラム制御ポートのTOフラグがセットされる。</TD><TR>
+  <TD ALIGN="CENTER"><PRE>起動と終了</TD><TD ALIGN="LEFT"><PRE>　外部からのデータレディ信号に従う。この信号により、1ロングワード単位で<BR>転送される。また、外部からのエンド信号によりDMA転送を終了し、このタイミ<BR>ングでプログラム制御ポートのTOフラグがリセットされる。</TD><TR>
+  <TD ALIGN="CENTER"><PRE>アドレス更新</TD><TD ALIGN="LEFT"><PRE>　1ロングワード転送される毎に、DSPデータRAM転送アドレス([CTO-3])は1加<BR>算され、外部メモリ転送アドレス（[WAO]）はアドレス加算数に従って加算され<BR>る。</TD><TR>
+  <TD ALIGN="CENTER"><PRE>ホールド状態</TD><TD ALIGN="LEFT"><PRE>　DMA命令のHoldビット(4.5項「命令」DMA命令の部参照)を1にセットすると、<BR>転送ワード数([TN0])や外部メモリ転送アドレス([WA0])は転送開始時の値が保<BR>持される。</TD>
+  </TABLE></P>
+
+<A NAME="4_34"></A>
+	<P><DT><H3>◆END命令の実行</H3>
+	<DD>　END命令を認識すると、プログラム制御ポートのプログラムRAMアドレスの加算処理が停止され、
+         プログラム実行制御ビット(EXフラグ)がリセットされます。これによって、DSPのプログラムの実行は停止します。
+         但し、DMA命令によるデータ転送は、このEND命令とは無関係に転送完了まで実行が継続されます。
+         プログラムが停止したときのプログラムアドレスの値は、END命令の格納されているアドレスの次のアドレスで停止します。</P>
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p04_02.htm">戻る</A>｜
+     <A HREF="p04_04.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" ALIGN=MIDDLE BORDER=0></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SCUユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

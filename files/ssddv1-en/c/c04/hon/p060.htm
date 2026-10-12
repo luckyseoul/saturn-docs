@@ -1,0 +1,29 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p059.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p061.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H4> (5) Command issue exclusion process (within CD communication interface function) </H4>
+<DD> The DDC function checks the flag after the command ends and performs the following exclusive processing. <BR>
+(A) If the command end flag is 0, return an error without issuing a command. <BR>
+(B) If 1, clear command end flag to 0 and issue command. <P>
+Exceptionally, the command end flag may only be cleared to 0 or checked. <P>
+<B> Table 3.7 Exceptional command end flag processing </B> <BR>
+<table border cellpadding=5>
+<th colspan = 2 align = "center"> <pre> flag </th> <th align = "center"> <pre> command </th> <tr>
+<td colspan = 3> <pre> Only clear 0 (do not check) </td> <tr>
+<td rowspan = 2> <pre> </td> <td align = "left"> <pre> ESEL </td> <td align = "left"> <pre> Soft reset (specified by the CDC_CdInit parameter) </td><tr>
+<td align = "left"> <pre> EFLS </td> <td align = "left"> <pre> Abort file access (CDC_AbortFile) </td> <tr>
+<td colspan = 3> <pre> Only check (do not clear 0) </td> <tr>
+<td rowspan = 2> <td align = "left"> <pre> ESEL </td> <td align = "left"> <pre>-Get actual data size (CDC_GetActSiz) <br>-Frame address search result Get (CDC_GetFadSearch) </td>
+</table><P>
+<DT> <H4> (6) Command end flag at REJECT, WAIT </H4>
+If REJECT or WAIT is returned in response to the <DD> command, the command end flag will not be 1. For this reason, the value of the command end flag is held inside the CDC so that commands can be issued after REJECT or WAIT. The CDC function checks this value and performs exclusive processing for issuing commands. <P>
+<DT> <H4> (7) Notes on CDC library </H4>
+<DD> <TABLE> <TD> <IMG SRC = "hyou / atto.gif"> </TD> <TD> <B> The value of the command end flag held by the CDC is the separately linked CDC If you run the program code, inconsistencies will occur. For this reason, commands may not be issued unless the command end flag is initialized. <BR> Please note the following points when using the CDC library. <BR> (a) As a rule, only one program code is resident in the memory and used. <BR> (b) When executing another program code, be sure to execute a soft reset first to initialize the <BR> command end flag. </B></TD></TABLE><P>
+</DL><P><P><HR>
+<A HREF=p059.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p061.htm> Go to next page </A>
+</BODY>
+</HTML>

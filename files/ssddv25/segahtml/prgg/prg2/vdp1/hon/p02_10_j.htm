@@ -1,0 +1,198 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/11&gt;VDP1ライブラリ/2.VDP1拡張処理ガイド</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">VDP1ライブラリ</A>
+<HR>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ライブラリ</B>
+<H2 ALIGN=CENTER>2.VDP1拡張処理ガイド</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A>
+	<P><DT><H3>2.1　目的</H3>
+	<DT><UL TYPE="DISK">
+	<P><LI>基本処理ライブラリに登載されていなかったVRAMの管理および、VRAMへのスプライトコマンド書き込みをサポートします。</P>
+	<P><LI>スプライトコマンドに対応するプリミティブなスプライト表示が行えます。</P>
+	</UL>
+
+<A NAME="no2_20"></A>
+	<P><DT><H3>2.2　VRAMエリアの管理方法</H3>
+	<DD>VRAMエリア(512Kバイト)を以下に示すように割付使用します。</P>
+
+	<P ALIGN=CENTER><img srcset="../grp/i004_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>　［各エリアの説明］</B>
+	<DT><UL TYPE "DISK">
+	<P><LI><B>VRAMエリア参照スイッチコマンドエリア</B><BR>VRAMエリア0、1をフレームチェンジに合わせ切り替えるためのスプライトジャンプコマンドです。</P>
+
+	<P><LI><B>システムコマンドエリア</B><BR>フレームチェンジを不定インターバルマニュアルチェンジで行う場合に、フレームバッファのイレーズをポリゴン描画で行うためのコマンドを本アクセスルーチンが展開するためのエリアです。エリア0、1に同サイズ存在します。</P>
+	<P><LI><B>ユーザコマンドエリア</B><BR>SPR_2OpenCommand()からSPR_2CloseCommand()ルーチンまでの間に呼び出された各種コマンド設定ルーチンによりスプライトコマンドが上から順次設定されるエリアです。エリア0、1に同サイズ存在します。</P>
+
+	<P><LI><B>グーローシェーディングテーブルエリア</B><BR>1エントリ8バイトのグーローシェーディングテーブルを格納するエリアで、0からの番号で管理されます。エリア0、1に同サイズ存在します。</P>
+
+	<P><LI><B>カラールックアップテーブルエリア</B><BR>1エントリ32バイトのカラールックアップテーブルを格納するエリアで、0からの番号で管理されます。エリア0、1から共通に参照されます。</P>
+
+	<P><LI><B>ブロックプールエリア</B><BR>コマンドエリア0、1から共通に参照されるエリアでキャラクタデータやサブルーチンコマンド(サブルーチンコマンドは現在サポートされていません)などを格納します。キャラクタデータは0からの番号で管理されます。このエリアへのキャラクタデータ等の割付はブロック単位(32バイト)にダイナミックに獲得／解放を行います。</P>
+	</UL>
+
+	<P><DT><B>　［各エリアの割付サイズ］</B>
+	<DD>各エリアのサイズは次のように割り付けます。１ブロックは32バイトです。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH><PRE>エリア名</TH><TH><PRE>ブロック数</TH></TR>
+	<TR><TD><PRE>VRAMエリア参照スイッチコマンド</TD><TD><PRE>1</TD></TR>
+	<TR><TD><PRE>システムコマンドエリア</TD><TD><PRE>4×2</TD></TR>
+	<TR><TD><PRE>ユーザコマンドエリア</TD><TD><PRE>COMMAND_MAX×2</TD></TR>
+	<TR><TD><PRE>グーローシェーディングテーブルエリア</TD><TD><PRE>(GOUR_TBL_MAX+3)/4×2</TD></TR>
+	<TR><TD><PRE>カラールックアップテーブルエリア</TD><TD><PRE>LOOKUP_TBL_MAX</TD></TR>
+	<TR><TD><PRE>ブロックプールエリア</TD><TD><PRE>残りブロック全て</TD></TR></TABLE></P>
+	<DD>COMMANND_MAX     ：最大コマンド数
+	<DD>GOUR_TBL_MAX     ：最大グーローシェーディングテーブル数
+	<DD>LOOKUP_TBL_MAX   ：最大ルックアップテーブル数</P>
+	<P><DD>これらの値は後述するVDP1拡張処理ワークエリア定義マクロで定義します。</P>
+
+	<P><DT><B>　［ブロックプールエリア内のブロック割付アルゴリズム］</B></P>
+	<P><DD><B>●獲得の場合</B><BR>　獲得要求ブロックサイズを満たす空き連続ブロックエリアを検索し、最小のエリアを割り付けます。</P>
+	<P><DD><B>●解放の場合</B><BR>　指定ブロックエリアを解放して隣接する空きブロックがある場合、空きブロックの連続化を計り大きな空きブロックにまとめます。</P>
+
+<A NAME="no2_30"></A>
+	<P><DT><H3>2.3　スプライトコマンドのフレームバッファへの描画順番</H3>
+	<DD>　以下のスプライトコマンド設定ルーチンを呼び出す時に描画のプライオリティ番<BR>号を指定することで、コマンドごとに描画順番を設定できます。</P>
+	<DD><TABLE BORDER=0>
+	<TR><TD><PRE>　SPR_2LocalCoord()</TD><TD><PRE>　SPR_2SysClip()</TD><TD><PRE>　SPR_2UserClip()</TD><TD><PRE>　SPR_2line()</TD></TR>
+	<TR><TD><PRE>　SPR_2polyLine()</TD>  <TD><PRE>　SPR_2Polygon()</TD><TD><PRE>　SPR_2NormSpr()</TD> <TD><PRE>　SPR_2ScaleSpr()</TD></TR>
+	<TR><TD><PRE>　SPR_2DistSpr()</TD>   <TD><PRE>　SPR_2Cmd()</TD><TD>　</TD><TD>　</TD></TR></TABLE></P>
+
+	<P><DD>　描画のプライオリティ番号は描画のブロック番号を示し、ブロック番号0が一番先に描画されます。また、同一ブロック内ではコマンドの登録順に描画されます。</P>
+
+	<P ALIGN=CENTER><img srcset="../grp/i006_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+描画順番の設定操作は、SPR_2CloseCommand() および SPR_2FlushDrawPrty() ルーチ ン呼び出し時に行<BR>
+われ、コマンド内のコントロールワードジャンプ指定とリンク指定ワードが変更されます。<P>
+この描画順番管理のブロック数は2Dワークエリア定義で予め指定します。描画のプライオリティ付けを<BR>
+行いたくない場合、2Dワークエリア定義およびSPR_2OpenCommand()で指定できます。<BR>
+
+
+<A NAME="no2_40"></A>
+	<P><DT><H3>2.4　プログラムの記述例</H3>
+	<DD>C言語による実際のプログラム例を以下に示します。</P>
+	<DD><PRE>
+#include  &lt;machine.h&gt;
+#define  _SPR2_                           /* スプライト表示拡張ライブラリの使用     */
+#include &quot;sega_spr.h&quot;
+#include &quot;sega_scl.h&quot;
+#include &quot;sega_int.h&quot;<P>
+#define COMMAND_MAX           512         /*     最大コマンド数　                  */
+#define GOUR_TBL_MAX          512         /*     最大グーローテーブル数　　　　     */
+#define LOOKUP_TBL_MAX   512              /*     最大ルックアップテーブル数　       */
+#define CHAR_MAX               100        /*     最大キャラクタ数                  */
+#define DRAW_PRTY_MAX 256                 /*     最大描画プライオリティブロック数   */
+SPR_2DefineWork(work2d, COMMAND_MAX, GOUR_TBL_MAX,
+                      LOOKUP_TBL_MAX, CHAR_MAX, DRAW_PRTY_MAX)
+                                          /*     2Dワークエリア定義                */
+extern void vbStart(void);                /*     V-BLANK IN     割り込みルーチン   */
+extern void vbEnd(void);                  /*     V-BLANK OUT  割り込みルーチン     */
+
+main()
+{
+      set_imask(0);                       /*     割り込みを可にする                */
+
+     SCL_Vdp2Init();                      /*     スクロールとプライオリティの初期化 */
+
+     SCL_SetPriority(SCL_SP0|SCL_SP1|SCL_SP2|SCL_SP3|SCL_SP4|
+                              SCL_SP5|SCL_SP6|SCL_SP7,7);
+     SCL_SetSpriteMode(SCL_TYPE1,SCL_MIX,SCL_SP_WINDOW);
+     SPR_2Initial(&amp;work2d);               /*     2Dスプライト表示初期化            */
+
+     INT_ChgMsk(INT_MSK_NULL, INT_MSK_VBL_IN | INT_MSK_VBL_OUT);
+                                          /*     V-BLANK割り込みをディセーブル     */
+     INT_SetFunc(INT_SCU_VBLK_IN, &amp;vbStart);
+                                          /*     V-BLANK IN 割り込みルーチンの登録 */
+     INT_SetFunc(INT_SCU_VBLK_OUT, &amp;vbEnd);     
+                                          /*    V-BLANK OUT  割り込みルーチンの登録*/
+     INT_ChgMsk( INT_MSK_VBL_IN | INT_MSK_VBL_OUT, INT_MSK_NULL);
+                                          /*     V-BLANK割り込みをイネーブル　     */
+
+     for(;;){
+         SPR_2SetChar(...);               /* VRAMへのキャラクタデータセット　　　　 */
+     }
+
+     SPR_2FrameChgIntr(0xffff);           /*     フレームチェンジインターバルを　　 */
+                                          /*     不定モードにセット　              */
+
+     for(;;){
+
+                   -------------          /*     スクロールデータセット            */
+
+          SPR_2OpenCommand(SPR_2DRAW_PRTY_OFF);
+                                          /*     コマンド書き込みのオープン　　　　 */
+          SPR_2SysClip(0,&amp;xy);            /*     システムクリップエリアコマンド　　 */
+          SPR_2LocalCoord(0,&amp;xy);         /*     ローカル座標コマンド              */
+
+          SPR_2Polygon(...);              /*     各種スプライトコマンド             */
+          SPR_2NormSpr(...);              /*                                                                    .
+                          .
+                          .
+
+          SPR_2CloseCommand()  ;          /*     コマンド書き込みクローズ           */
+
+          SCL_DisplayFrame();             /*     V-BLANK割り込みを待ち　　　　　    */
+                                          /*   スプライト表示とスクロール動作を行う　*/
+     }
+}
+
+−Vブランク処理ルーチン(上記メインとは別ソースファイル)−
+
+#include &lt;machine.h&gt;
+#include &quot;sega_spr.h&quot;
+#include &quot;sega_scl.h&quot;
+
+#pragma  interrupt(VbStart)
+#pragma  interrupt(VbEnd)
+
+void VbStart(void)
+{
+     SCL_VblankStart();                   /*     Vブランク開始VDP割り込み処理       */
+             --------                     /*     その他Vブランク開始処理            */
+}
+
+void VbEnd(void)
+{
+     SCL_VblankEnd();                     /*     Vブランク終了VDP割り込み処理       */
+             -------- 
+}
+</PRE></P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p01_10_j.htm">戻る</A>｜
+<a href="p03_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg2_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no2">VDP1ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

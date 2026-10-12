@@ -1,0 +1,780 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/ 8&gt;CD通信I/F(MPEGパート)/7.MPEGデータ仕様</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+<A HREF="p08_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信I/F(MPEGパート)</B>
+<H2 ALIGN=CENTER>７．MPEGデータ仕様</H2>
+<HR NOSHADE>
+<DL>
+	<P>　MPEG通信インタフェースで使用する定数、データ型、アクセスマクロなどを記述する。</P>
+
+	<P><DT><B>　（１）書式</B>
+	<DD>　図中、予約領域は「−」で表す。予約領域には必ず０を指定する。</P>
+
+<A NAME="no7_10"></A>
+	<P><DT><H3>7.1　MPEGデータ一覧</H3>
+	<DD>　MPEG通信インタフェースのデータ一覧を表7.1に示す。</P>
+
+<A NAME="t7_1"></A>
+	<P><DD><B>表7.1　MPEGデータ一覧</B>
+<TABLE BORDER=1>
+<TR><TH COLSPAN=2 WIDTH=240>データ</TH><TH WIDTH=180>データ名</TH><TH WIDTH=040>番号</TH></TR>
+<TR><TD COLSPAN=2>定数</TD><TD><A HREF="#20.0">Constant</A></TD><TD>20.0</TD></TR>
+<TR><TD COLSPAN=2>ステータスとMPEGレポート </TD><TD><A HREF="#21.0">Status &amp; MPEG Report</A></TD><TD>21.0</TD></TR>
+<TR><TD ROWSPAN=5 WIDTH=10></TD>
+	<TD>MPEG動作ステータス</TD><TD><A HREF="#21.1">actst</A></TD><TD>21.1</TD></TR>
+<TR><TD>動作区間カウンタ </TD><TD><A HREF="#21.2">vcnt</A></TD><TD>21.2</TD></TR>
+<TR><TD>ピクチャ情報 </TD><TD><A HREF="#21.3">pict</A></TD><TD>21.3</TD></TR>
+<TR><TD>MPEG/Audioステータス </TD><TD><A HREF="#21.4">stat_a</A></TD><TD>21.4</TD></TR>
+<TR><TD>MPEG/Videoステータス </TD><TD><A HREF="#21.5">stat_v</A></TD><TD>21.5</TD></TR>
+
+<TR><TD COLSPAN=2>MPEG割り込み要因フラグ</TD><TD><A HREF="#22.0">Intreq</A></TD><TD>22.0</TD></TR>
+
+<TR><TD COLSPAN=3>データ型</TD><TD>23.0</TD></TR>
+<TR><TD ROWSPAN=5 WIDTH=10></TD>
+	<TD>MPEGステータス情報</TD><TD><A HREF="#23.1">CdcMpStat</A></TD><TD>23.1</TD></TR>
+<TR><TD>タイムコード </TD><TD><A HREF="#23.2">CdcMpTc</A></TD><TD>23.2</TD></TR>
+<TR><TD>MPEGデコーダ接続先パラメータ </TD><TD><A HREF="#23.3">CdcMpCon</A></TD><TD>23.3</TD></TR>
+<TR><TD>MPEGストリームパラメータ </TD><TD><A HREF="#23.4">CdcMpStm</A></TD><TD>23.4</TD></TR>
+<TR><TD>画面特殊効果パラメータ </TD><TD><A HREF="#23.5">CdcMpVeff</A></TD><TD>23.5</TD></TR>
+</TABLE>
+
+
+<A NAME="no7_20"></A>
+	<P><DT><H3>7.2　MPEGデータ詳細</H3>
+
+<A NAME="no7_721"></A>
+	<P><DT><B>7.2.1　定数</B>
+</DL>
+<A NAME="20.0"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>定数</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>Constant</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>20.0</H4></TD>
+</TR></TABLE>
+<P><DT><B>　（１）エラーコード（MPEGパート）</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=160>定数名</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_ERR_MP_COMU</TH><TD>コマンド発行時、MPCMフラグが１になっていない</TD></TR></TABLE></P>
+
+<P><DT><B>　（２）次ストリームフラグ</B>
+<DD>以下の関数で、現在と次のストリームを選択するときに使用する。
+<DD><UL TYPE=DISC>
+	<LI>CDC_MpSetCon
+	<LI>CDC_MpGetCon
+	<LI>CDC_MpSetStm
+	<LI>CDC_MpGetStm
+</UL></P>
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=160>定数名</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPSTF_CUR</TH><TD>現在の接続先／ストリームの指定</TD></TR>
+<TR><TD>CDC_MPSTF_NEXT</TH><TD>次の接続先／ストリームの指定</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（３）ウィンドウのサイズ・座標の最大値</B>
+<DD>以下の関数で、ウィンドウのサイズと座標を設定するときに使用する。
+<DD><UL TYPE=DISC>
+	<LI>CDC_MpSetWinFpos
+	<LI>CDC_MpSetWinDpos
+	<LI>CDC_MpSetWinDsiz
+	<LI>CDC_MpSetImgPos
+	<LI>CDC_MpSetImgSiz
+	</UL></P>
+
+<P><DD>NTSC/PAL方式、通常/高精細出力で各最大値は異なる。
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=120>定数名</TH><TH WIDTH=040>値</TH><TH WIDTH=220 COLSPAN=4>説　　明</TH></TR>
+<TR ALIGN=CENTER><TD>CDC_MPNT_NSX</TD><TD>352</TD><TD ROWSPAN=8>NTSC</TD><TD ROWSPAN=4>普　通</TD><TD ROWSPAN=2>サイズ</TD><TD>Ｘ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPNT_NSY</TD><TD>240</TD><TD>Ｙ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPNT_NPX</TD><TD>351</TD><TD ROWSPAN=2>座　標</TD><TD>Ｘ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPNT_NPY</TD><TD>239</TD><TD>Ｙ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPNT_HSX</TD><TD>704</TD><TD ROWSPAN=4>高精細</TD><TD ROWSPAN=2>サイズ</TD><TD>Ｘ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPNT_HSY</TD><TD>480</TD><TD>Ｙ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPNT_HPX</TD><TD>703</TD><TD ROWSPAN=2>座　標</TD><TD>Ｘ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPNT_HPY</TD><TD>479</TD><TD>Ｙ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPPL_NSX</TD><TD>352</TD><TD ROWSPAN=8>PAL</TD><TD ROWSPAN=4>普　通</TD><TD ROWSPAN=2>サイズ</TD><TD>Ｘ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPPL_NSY</TD><TD>288</TD><TD>Ｙ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPPL_NPX</TD><TD>351</TD><TD ROWSPAN=2>座　標</TD><TD>Ｘ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPPL_NPY</TD><TD>287</TD><TD>Ｙ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPPL_HSX</TD><TD>704</TD><TD ROWSPAN=4>高精細</TD><TD ROWSPAN=2>サイズ</TD><TD>Ｘ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPPL_HSY</TD><TD>576</TD><TD>Ｙ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPPL_HPX</TD><TD>703</TD><TD ROWSPAN=2>座　標</TD><TD>Ｘ方向</TD></TR>
+<TR ALIGN=CENTER><TD>CDC_MPPL_HPY</TD><TD>575</TD><TD>Ｙ方向</TD></TR>
+</TABLE>
+</DL>
+
+<DL>
+<A NAME="no7_722"></A>
+	<P><DT><B>7.2.2　ステータスとMPEGレポート（MPEGステータス情報）</B>
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="21.0"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>ステータスとMPEGレポート</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>Status &amp; MPEG Report</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.0</H4></TD>
+</TR></TABLE>
+<P><DT><B>　（１）MPEGステータス情報</B>
+<DD>MPEGコマンドのレスポンスでは、ＣＤレポートを返すことはない。通常はMPEGレポート（MPEG Report）を返すことが多い。レポートとしてMPEGレポートを返すか、他の情報を返すかは、コマンドによる。（定期レスポンスは常にＣＤレポートを返す。）<BR>
+　ステータスとMPEGレポートを合わせて、MPEGステータス情報と呼ぶ。</P>
+<PRE>
+byte     ０       １       ２       ３       ４       ５       ６       ７    
+     +--------+--------+--------+--------+--------+--------+--------+--------+
+     | Status |                        Report                                |
+     +--------+--------+--------+--------+--------+--------+--------+--------+
+</PRE>
+
+<P><DT><B>　（２）MPEGレポート（MPEG Report）</B>
+<DD>REJECT時のMPEGレポートは無効、WAIT時は有効です。</P>
+<PRE>
+MPEG Report
+byte     １       ２       ３       ４       ５       ６    
+     +--------+--------+--------+--------+--------+--------+
+     | actst  |       vcnt      |  pict  | stat_a | stat_v |
+     +--------+--------+--------+--------+--------+--------+
+     actst   ：MPEG動作ステータス
+     vcnt    ：動作区間（VSYNC）カウンタ
+     pict    ：ピクチャ情報
+     stat_a  ：MPEG/Audioステータス
+     stat_v  ：MPEG/Videoステータス
+</PRE>
+
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="21.1"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>MPEG動作ステータス</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>actst</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.1</H4></TD>
+</TR></TABLE>
+<P><DT><B>　（１）MPEG動作ステータス</B>
+<DD><PRE>
+    bit　７　６　５　４　３　２　１　０
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+  actst│−│　　　　　│　│　　　　　│　初期値：19H
+       └─┴─┴─┴─┴─┴─┴─┴─┘
+       　　　　　│　　　│　　　│
+       　　　　　│　　　│　　　└────MPEG/Video動作状態
+       　　　　　│　　　│
+       　　　　　│　　　└────────MPEGデコード状態
+       　　　　　│　　　　　　　　　　　　CDC_MPASTD_STOP    1：停止  0：デコード中
+       　　　　　│
+       　　　　　└────────────MPEG/Audio動作状態
+</PRE>
+
+<P><DT><B>　（２）MPEGデコーダの動作状態</B>
+<DD>　状態遷移については「<A HREF="p05_10.htm#no5_512">5.1.2　転送ブロックの状態遷移</A>」を参照のこと。</P>
+<P><TABLE BORDER=1>
+<TR><TH COLSPAN=2 WIDTH=220>MPEG/Video動作状態</TH><TH COLSPAN=2 WIDTH=220>MPEG/Audio動作状態</TH><TH ROWSPAN=2>説　　明</TH></TR>
+<TR><TH>定数名</TH><TH>値</TH><TH>定数名</TH><TH>値</TH></TR>
+<TR><TD>CDC_MPSTV_STOP </TD><TD ALIGN=CENTER>01H </TD><TD>CDC_MPSTA STOP </TD><TD ALIGN=CENTER>10H </TD><TD>停止           </TD></TR>
+<TR><TD>CDC_MPSTV_PREP1</TD><TD ALIGN=CENTER>02H </TD><TD>CDC_MPSTA PREP1</TD><TD ALIGN=CENTER>20H </TD><TD>準備１         </TD></TR>
+<TR><TD>CDC_MPSTV_PREP2</TD><TD ALIGN=CENTER>03H </TD><TD>CDC_MPSTA PREP2</TD><TD ALIGN=CENTER>30H </TD><TD>準備２         </TD></TR>
+<TR><TD>CDC_MPSTV_TRNS </TD><TD ALIGN=CENTER>04H </TD><TD>CDC_MPSTA TRNS </TD><TD ALIGN=CENTER>40H </TD><TD>転送（再生）   </TD></TR>
+<TR><TD>CDC_MPSTV_CHNG </TD><TD ALIGN=CENTER>05H </TD><TD>CDC_MPSTA CHNG </TD><TD ALIGN=CENTER>50H </TD><TD>切り替え       </TD></TR>
+<TR><TD>CDC_MPSTV_RCV  </TD><TD ALIGN=CENTER>06H </TD><TD>CDC_MPSTA RCV  </TD><TD ALIGN=CENTER>60H </TD><TD>復活処理       </TD></TR>
+</TABLE>
+
+<P><DT><B>　（３）MPEGデコード状態</B>
+<DD>１が停止状態を、０がデコード中状態を表す。状態遷移図を以下に示す。</P>
+<DD><PRE>
+
+　　　　　　　　　　　ピクチャスタートコード入力
+　　　　┌─────┐────────────→┌─────┐
+初期状態│　停　止　│　　　　　　　　　　　　　│デコード中│
+　　　　└─────┘←────────────└─────┘
+　　　　　　　　　　　　　シーケンスエンド入力
+</PRE>
+
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="21.2"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>動作区間カウンタ</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>vcnt</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.2</H4></TD>
+</TR></TABLE>
+<P><DD>VSYNCごとに１だけ増えるカウンタです。MPEGデコーダの初期化関数（CDC_MpInit）を実行すると０クリアされる。<BR>
+ホスト同期によってデコードする場合は、CDC_MpOutDsync関数を実行すると、この値が２増える。</P>
+
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="21.3"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>ピクチャ情報</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>pict</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.3</H4></TD>
+</TR></TABLE>
+<P><DT><B>　（１）ピクチャ情報</B>
+<DD><PRE>
+    bit　７　６　５　４　３　２　１　０
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   pict│−│−│−│−│−│　　　　　│　初期値：00H
+       └─┴─┴─┴─┴─┴─┴─┴─┘
+　　　　　　　　　　　　　　　　　└──デコード中のピクチャタイプ
+</PRE>
+
+<P><DT><B>　（２）ピクチャタイプ</B>
+<DD>デコーダがピクチャスタートコードを検出した時点でのピクチャタイプ。<BR>
+デコーダが停止している場合は、デコード待機中のピクチャのタイプが得られる。</P>
+<P><DD><TABLE BORDER=1
+<TR><TH WIDTH=160>定数名</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPPICT_I</TD><TD>Ｉピクチャ</TD></TR>
+<TR><TD>CDC_MPPICT_P</TD><TD>Ｐピクチャ</TD></TR>
+<TR><TD>CDC_MPPICT_B</TD><TD>Ｂピクチャ</TD></TR>
+<TR><TD>CDC_MPPICT_D</TD><TD>Ｄピクチャ</TD></TR>
+</TABLE></P>
+
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="21.4"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>MPEG/Audioステータス</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>stat_a</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.4</H4></TD>
+</TR></TABLE>
+<P><DT><B>　（１）MPEG/Audioステータス</B>
+<DD><PRE>
+    bit　７　６　５　４　３　２　１　０
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+ stat_a│　│　│　│　│　│−│−│　│
+       └┬┴┬┴┬┴┬┴┬┴─┴─┴┬┘
+       　│　│　│　│　│　　　　　└─CDC_MPSTA_DEC     1：デコード動作中
+       　│　│　│　│　└───────CDC_MPSTA_ILG     1：オーディオイリーガル
+       　│　│　│　└─────────CDC_MPSTA_BEMPTY  1：バッファ区画が空
+       　│　│　└───────────CDC_MPSTA_ERR     1：オーディオエラー発生
+       　│　└─────────────CDC_MPSTA_OUTL    1：左チャンネル出力中
+       　└───────────────CDC_MPSTA_OUTR    1：右チャンネル出力中
+</PRE>
+
+<P><DT><B>　（２）各フラグの意味</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=040>bit</TH><TH WIDTH=320>フラグ</TH><TH>説　　明</TH></TR>
+<TR><TD>０</TD><TD>オーディオデコード動作</TD><TD>オーディオデコーダ動作中を示す。（０：停止中）</TD></TR>
+<TR><TD>３</TD><TD>オーディオイリーガル</TD><TD>MPEG/Audioのレイヤ、サンプリング周波数、ビットレートに異常があることを示す。</TD></TR>
+<TR><TD>４</TD><TD>オーディオ用バッファ区画<BR>エンプティ</TD><TD>オーディオ用バッファ区画が空になり、オーディオ再生用のストリームデータがなくなったことを示す。</TD></TR>
+<TR><TD>５</TD><TD>オーディオエラー</TD><TD>オーディオ関係のエラー発生を示す。エラー要因は、CDC_MpGetInt関数によって得ることができる。</TD></TR>
+<TR><TD>６</TD><TD>左チャンネル出力</TD><TD>左チャンネル出力中を示す。（０：ミュート中）</TD></TR>
+<TR><TD>７</TD><TD>右チャンネル出力</TD><TD>右チャンネル出力中を示す。（０：ミュート中）</TD></TR>
+</TABLE>
+<DD>　各フラグの値はVSYNCごとに更新される。</P>
+
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="21.5"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>MPEG/Videoステータス</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>stat_v</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>21.5</H4></TD>
+</TR></TABLE>
+
+<P><DT><B>　（１）MPEG/Videoステータス</B>
+<DD><PRE>
+    bit　７　６　５　４　３　２　１　０
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+ stat_v│　│　│　│　│　│　│　│　│
+       └┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┘
+       　│　│　│　│　│　│　│　└─CDC_MPSTV_DEC     1：デコード動作中
+       　│　│　│　│　│　│　└───CDC_MPSTV_DISP    1：ピクチャ表示中
+       　│　│　│　│　│　└─────CDC_MPSTV_PAUSE   1：ポーズ中
+       　│　│　│　│　└───────CDC_MPSTV_FREEZE  1：フリーズ中
+       　│　│　│　└─────────CDC_MPSTV_LSTPIC  1：最終ピクチャ表示中
+       　│　│　└───────────CDC_MPSTV_FIELD   1：奇数フィールド
+       　│　└─────────────CDC_MPSTV_UPDPIC  1：ピクチャが更新された
+       　└───────────────CDC_MPSTV_ERR     1：ビデオエラー発生
+
+    bit  15 14  13  12  11 10  ９  ８
+       ┌─┬─┬─┬─┬─┬─┬─┬─┐
+ stat_v│　│−│−│　│　│−│−│　│
+       └┬┴─┴─┴┬┴┬┴─┴─┴┬┘
+       　│　　　　　│　│　　　　　└─CDC_MPSTV_RDY     1：出力準備完了
+       　│　　　　　│　└───────CDC_MPSTV_1STPIC  1：先頭ピクチャ表示中
+       　│　　　　　└─────────CDC_MPSTV_BEMPTY  1：バッファ区画が空
+       　└───────────────不定
+</PRE></P>
+<P><DT><B>　（２）各フラグの意味</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=040>bit</TH><TH WIDTH=320>フラグ</TH><TH>説　　明</TH></TR>
+<TR><TD>０</TD><TD>ビデオデコード動作</TD>
+	<TD>ビデオデコーダ動作中を示す。（０：停止中）<BR>このフラグが１の時、デコーダは空いているフレームバンクがあると、そのバンクでデコードを行う。</TD></TR>
+<TR><TD>１</TD><TD>ピクチャ表示</TD>
+	<TD>デコードされたピクチャが表示中であることを示す。</TD></TR>
+<TR><TD>２</TD><TD>ポーズ</TD>
+	<TD>ビデオデコーダがポーズ中であることを示す。</TD></TR>
+<TR><TD>３</TD><TD>フリーズ</TD>
+	<TD>ビデオデコーダがフリーズ中であることを示す。</TD></TR>
+<TR><TD>４</TD><TD>最終ピクチャ表示</TD>
+	<TD>現在表示中のピクチャがストリームの最終ピクチャであることを示す。</TD></TR>
+<TR><TD>５</TD><TD>奇数フィールド<BR>（フレーム同期信号）</TD>
+	<TD>奇数フィールド表示中を示す。（１：偶数フィールド）<BR>VDP2へ出力している場合、フレームは奇数フィールドから始まり２フィールドで１フレームとなる。</TD></TR>
+<TR><TD>６</TD><TD>ピクチャ更新</TD>
+	<TD>ピクチャが更新されたことを示す。<BR>２動作区間単位（VSYNC×２ または CDC_MpOutDsync）で変化する。<BR>表示が更新された時と、フリーズ状態でピクチャが破棄された時に１となる。</TD></TR>
+<TR><TD>７</TD><TD>ビデオエラー</TD>
+	<TD>ビデオ関係のエラー発生を示す。エラー要因は、CDC_MpGetInt関数によって得ることができる。</TD></TR>
+<TR><TD>８</TD><TD>出力準備完了</TD>
+	<TD>画像が出力可能になったことを示す。デコード済みのフレームバンクが２つ（Ｉ、Ｐ）になると１になる。ポーズ状態でデコードを開始すると、表示されずに出力準備完了フラグが１の状態になる。この状態でコマ送りするとすぐに１枚目の画像が出力される。</TD></TR>
+<TR><TD>11</TD><TD>先頭ピクチャ表示</TD>
+	<TD>現在表示中のピクチャがストリームの先頭ピクチャであることを示す。先頭とは、メディア上あるいはデコード順のことであり、表示順のことではない。</TD></TR>
+<TR><TD>12</TD><TD>ビデオ用バッファ区画エンプティ</TD>
+	<TD>ビデオ用バッファ区画が空になり、ビデオ再生用のストリームデータがなくなったことを示す。</TD></TR>
+</TABLE>
+<DD>　各フラグの値はVSYNCごとに更新される。
+</DL>
+
+
+<A NAME="no7_723"></A>
+	<P><DT><B>7.2.3　MPEG割り込み要因フラグ</B>
+</DL>
+
+<!------------------------------------------------------------------------->
+<A NAME="22.0"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>MPEG割り込み要因フラグ</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>Intreq</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>22.0</H4></TD>
+</TR></TABLE>
+<P><DD>MPEG割り込みの要因は、CDC_MpGetInt関数により、以下の形式（４バイト）で通知される。<BR>CDC_MpSetIntMsk関数により割り込みをマスクする場合も、同一のビット配置です。</p>
+<DD><PRE>
+MPEG割り込み要因フラグ
+byte      ０      　　１      　　２      　　３
+    ┌─────┬─────┬─────┬─────┐
+    │　　−　　│オーディオ│　　　ビ　デ　オ　　　│
+    │　　　　　│割り込み　│　　割　り　込　み　　│
+    └─────┴─────┴─────┴─────┘
+</PRE>
+<P><DD>以下の説明図において、V/Aはそれぞれビデオ／オーディオを表すものとする。</P>
+
+<P><DT><B>　（１）ビデオ割り込み</B>
+<A NAME="0byte"></A>
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│　│　│　│　│　│　│　│　初期値：00H
+   └┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┘
+   　│　│　│　│　│　│　│　└─CDC_MPINT_VSRDY   1：<A HREF="#_00">Vストリーム準備完了</A>
+   　│　│　│　│　│　│　└───CDC_MPINT_VSCHG   1：<A HREF="#_01">Vストリーム切り替え完了</A>
+   　│　│　│　│　│　└─────CDC_MPINT_VORDY   1：<A HREF="#_02">ビデオ出力準備完了</A>
+   　│　│　│　│　└───────CDC_MPINT_VOSTRT  1：<A HREF="#_03">ビデオ出力開始</A>
+   　│　│　│　└─────────CDC_MPINT_VDERR   1：<A HREF="#_04">ビデオデコードエラー</A>
+   　│　│　└───────────CDC_MPINT_VSERR   1：<A HREF="#_05">Vストリームデータエラー</A>
+   　│　└─────────────CDC_MPINT_VBERR   1：<A HREF="#_06">Vバッファ区画接続エラー</A>
+   　└───────────────CDC_MPINT_VNERR   1：<A HREF="#_07">次発Vストリームデータエラー</A>
+
+<A NAME="1byte"></A>
+bit　15　14　13　12　11　10　10　9 
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│　│　│　│　│　│　│　│　初期値：00H
+   └┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┘
+   　│　│　│　│　│　│　│　└─CDC_MPINT_PSTRT   1：<A HREF="#_08">ピクチャスタート検出</A>
+   　│　│　│　│　│　│　└───CDC_MPINT_GSTRT   1：<A HREF="#_09">GOPスタート検出</A>
+   　│　│　│　│　│　└─────CDC_MPINT_SQEND   1：<A HREF="#_10">シーケンスエンド検出</A>
+   　│　│　│　│　└───────CDC_MPINT_SQSTRT  1：<A HREF="#_11">シーケンススタート検出</A>
+   　│　│　│　└─────────CDC_MPINT_VTRG    1：<A HREF="#_12">Vセクタのトリガビット検出</A>
+   　│　│　└───────────CDC_MPINT_VEOR    1：<A HREF="#_13">VセクタのEORビット検出</A>
+   　│　└─────────────CDC_MPINT_ATRG    1：<A HREF="#_14">Aセクタのトリガビット検出</A>
+   　└───────────────CDC_MPINT_AEOR    1：<A HREF="#_15">AセクタのEORビット検出</A>
+</PRE></P>
+
+<P><DT><B>　（２）オーディオ割り込み</B>
+<A NAME="2byte"></A>
+<DD><PRE>
+bit　23　22　21　20　21　20　19　18
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│　│　│　│　│　│　│　│　初期値：00H
+   └┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┘
+   　│　│　│　│　│　│　│　└─CDC_MPINT_ASRDY   1：<A HREF="#_16">Aストリーム準備完了</A>
+   　│　│　│　│　│　│　└───CDC_MPINT_ASCHG   1：<A HREF="#_17">Aストリーム切り替え完了</A>
+   　│　│　│　│　│　└─────CDC_MPINT_AORDY   1：<A HREF="#_18">オーディオ出力準備完了</A>
+   　│　│　│　│　└───────CDC_MPINT_AOSTRT  1：<A HREF="#_19">オーディオ出力開始</A>
+   　│　│　│　└─────────CDC_MPINT_ADERR   1：<A HREF="#_20">オーディオデコードエラー</A>
+   　│　│　└───────────CDC_MPINT_ASERR   1：<A HREF="#_21">Aストリームデータエラー</A>
+   　│　└─────────────CDC_MPINT_ABERR   1：<A HREF="#_22">Aバッファ区画接続エラー</A>
+   　└───────────────CDC_MPINT_ANERR   1：<A HREF="#_23">次発Aストリームデータエラー</A>
+</PRE>
+
+<P><DT><B>　（３）ビデオ割り込み要因</B>
+	<DL>
+	<P><DT><B>bit　フラグ</B>
+<A NAME="_00"></A>
+	<P><DT><B><A HREF="#0byte">０</A>　ビデオストリーム準備完了</B>
+	<DD>ビデオ用バッファ区画に（STDバッファサイズ＋16KB）以上のデータが格納されたことを示す。（自動転送の場合）</P>
+<A NAME="_01"></A>
+	<P><DT><B><A HREF="#0byte">１</A>　ビデオストリーム切り替え完了</B>
+	<DD>次発ストリームがVBVバッファに転送開始されたことを示す。</P>
+<A NAME="_02"></A>
+	<P><DT><B><A HREF="#0byte">２</A>　ビデオ出力準備完了</B>
+	<DD>フレームバッファに２枚分のピクチャがデコードされ、次の動作区間で出力可能になったことを示す。フィールド割り込みでチェックし、ホストに割り込みをかける。（ストリーム切り替え前の１回だけ有効）</P>
+<A NAME="_03"></A>
+	<P><DT><B><A HREF="#0byte">３</A>　ビデオ出力開始</B>
+	<DD>ビデオストリームの１枚目のピクチャが出力されたことを示す。（ストリーム切り替え後も有効）</P>
+<A NAME="_04"></A>
+	<P><DT><B><A HREF="#0byte">４</A>　ビデオデコードエラー</B>
+	<DD>ビデオLSIにデコードエラーが発生したことを示す。</P>
+<A NAME="_05"></A>
+	<P><DT><B><A HREF="#0byte">５</A>　ビデオストリームデータエラー</B>
+	<DD>再生中のストリームにエラーが発生したことを示す。（バッファ区画にビデオ以外のデータが存在）</P>
+<A NAME="_06"></A>
+	<P><DT><B><A HREF="#0byte">６</A>　ビデオ用バッファ区画接続エラー</B>
+	<DD>バッファ区画からデータを転送中に、バッファ区画とデコーダの接続が切られたことを示す。</P>
+<A NAME="_07"></A>
+	<P><DT><B><A HREF="#0byte">７</A>　次発ビデオストリームデータエラー</B>
+	<DD>次発ストリームにエラーが発生したことを示す。（次発のバッファ区画にビデオ以外のデータが存在）</P>
+<A NAME="_08"></A>
+	<P><DT><B><A HREF="#1byte">８</A>　ピクチャスタート検出</B>
+	<DD>ピクチャスタートコード(PSC)が検出されたことを示す。</P>
+<A NAME="_09"></A>
+	<P><DT><B><A HREF="#1byte">９</A>　GOPスタート検出</B>
+	<DD>GOPスタートコードが検出されたことを示す。</P>
+<A NAME="_10"></A>
+	<P><DT><B><A HREF="#1byte">10</A>　シーケンスエンド検出</B>
+	<DD>シーケンスエンドコードが検出されたことを示す。</P>
+<A NAME="_11"></A>
+	<P><DT><B><A HREF="#1byte">11</A>　シーケンススタート検出</B>
+	<DD>シーケンススタートコードが検出されたことを示す。</P>
+<A NAME="_12"></A>><DT><B><A HREF="#1byte">12</A>　ビデオセクタのトリガビット検出</B>
+	<DD>後方絞りの前で、ビデオセクタサブヘッダ内のトリガビットが検出されたことを示す。</P>
+<A NAME="_13"></A>
+	<P><DT><B><A HREF="#1byte">13</A>　ビデオセクタのEORビット検出</B>
+	<DD>後方絞りの前で、ビデオセクタサブヘッダ内のEORビットが検出されたことを示す。</P>
+<A NAME="_14"></A>
+	<P><DT><B><A HREF="#1byte">14</A>　オーディオセクタのトリガビット検出</B>
+	<DD>後方絞りの前で、オーディオセクタサブヘッダ内のトリガビ ットが検出されたことを示す。</P>
+<A NAME="_15"></A>
+	<P><DT><B><A HREF="#1byte">15</A>　オーディオセクタのEORビット検出</B>
+	<DD>後方絞りの前で、オーディオセクタサブヘッダ内のEORビットが検出されたことを示す。</P>
+<A NAME="_16"></A>
+	<P><DT><B><A HREF="#2byte">16</A>オーディオストリーム準備完了</B>
+	<DD>オーディオ用バッファ区画に１セクタ以上のデータが格納されたことを示す。</P>
+<A NAME="_17"></A>
+	<P><DT><B><A HREF="#2byte">17</A>　オーディオストリーム切り替え完了</B>
+	<DD>次発ストリームがオーディオデコーダに転送開始されたことを示す。</P>
+<A NAME="_18"></A>
+	<P><DT><B><A HREF="#2byte">18</A>　オーディオ出力準備完了</B>
+	<DD>ストリームデータがオーディオデコーダに転送開始されたことを示す。（ストリーム切り替え前の１回だけ有効）</P>
+<A NAME="_19"></A>
+	<P><DT><B><A HREF="#2byte">19</A>　オーディオ出力開始</B>
+	<DD>ストリームデータがオーディオデコーダに転送開始されたことを示す。（ストリーム切り替え後も有効）</P>
+<A NAME="_20"></A>
+	<P><DT><B><A HREF="#2byte">20</A>　オーディオデコードエラー</B>
+	<DD>オーディオLSIにデコードエラーが発生したことを示す。</P>
+<A NAME="_21"></A>
+	<P><DT><B><A HREF="#2byte">21</A>　オーディオストリームデータエラー</B>
+	<DD>再生中のストリームにエラーが発生したことを示す。（バッファ区画にオーディオ以外のデータが存在）</P>
+<A NAME="_22"></A>
+	<P><DT><B><A HREF="#2byte">22</A>　オーディオ用バッファ区画接続エラー</B>
+	<DD>バッファ区画からデータを転送中に、バッファ区画とデコーダの接続が切られたことを示す。</P>
+<A NAME="_23"></A>
+	<P><DT><B><A HREF="#2byte">23</A>　次発オーディオストリームデータエラー</B>
+	<DD>次発ストリームにエラーが発生したことを示す。（次発のバッファ区画にオーディオ以外のデータが存在）</P>
+	</DL>
+</DL>
+<DL>
+<A NAME="no7_724"></A>
+	<P><DT><B>7.2.4　データ型</B>
+</DL>
+
+<!------------------------------------------------------------------------->
+<A NAME="23.1"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>MPEGステータス情報</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>CdcMpStat</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.1</H4></TD>
+</TR></TABLE>
+<P><DD>ＣＤブロックのステータスとMPEGレポートを合わせて、MPEGステータス情報と呼ぶ。</P>
+<P><DT><B>　（１）MPEGステータス情報……CDC_MpGetCurStat, CDC_MpGetLastStat関数</B>
+<DD>CdcMpStat　*mpstat
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>アクセスマクロ</TH><TH WIDTH=060>型</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPSTAT_STS(mpstat)</TD><TD>Uint8</TD><TD>ステータス（ＣＤパートを参照）</TD></TR>
+<TR><TD>CDC_MPSTAT_AST(mpstat)</TD><TD>Uint8</TD><TD>MPEG動作ステータス</TD></TR>
+<TR><TD>CDC_MPSTAT_VCNT(mpstat)</TD><TD>Uint16</TD><TD>動作区間（VSYNC）カウンタ</TD></TR>
+<TR><TD>CDC_MPSTAT_PICT(mpstat)</TD><TD>Uint8</TD><TD>ピクチャ情報</TD></TR>
+<TR><TD>CDC_MPSTAT_STA(mpstat)</TD><TD>Uint8</TD><TD>MPEG/Audioステータス</TD></TR>
+<TR><TD>CDC_MPSTAT_STV(mpstat)</TD><TD>Uint16</TD><TD>MPEG/Videoステータス</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（２）関連するマクロ</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>アクセスマクロ</TH><TH WIDTH=360>説　　明</TH></TR>
+<TR><TD>CDC_MPGET_STC(mpstat) </TD><TD>MPEGステータス情報からステータスコードを取得</TD></TR>
+<TR><TD>CDC_MPGET_ASTV(mpstat)</TD><TD>MPEGステータス情報からMPEG/Video動作状態を取得</TD></TR>
+<TR><TD>CDC_MPGET_ASTA(mpstat)</TD><TD>MPEGステータス情報からMPEG/Audio動作状態を取得</TD></TR>
+</TABLE>
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="23.2"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>タイムコード</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>CdcMpTc</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.2</H4></TD>
+</TR></TABLE>
+<P><DT><B>　（１）タイムコード……CDC_MpGetTc関数</B>
+<DD>CdcMpTc  *mptc
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>アクセスマクロ</TH><TH WIDTH=060>型</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPTC_HOUR(mptc)</TD><TD>Uint8</TD><TD>時　間　（０〜23）</TD></TR>
+<TR><TD>CDC_MPTC_MIN(mptc)</TD><TD>Uint8</TD> <TD>　分　　（０〜59）</TD></TR>
+<TR><TD>CDC_MPTC_SEC(mptc)</TD><TD>Uint8</TD> <TD>　秒　　（０〜59）</TD></TR>
+<TR><TD>CDC_MPTC_PIC(mptc)</TD><TD>Uint8</TD> <TD>ピクチャ（０〜63）</TD></TR>
+</TABLE>
+
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="23.3"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>MPEGデコーダ接続先パラメータ</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>CdcMpCon</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.3</H4></TD>
+</TR></TABLE>
+<P><DT><B>　（１）MPEGデコーダ接続先パラメータ……CDC_MpSetCon, CDC_MpGetCon関数</B>
+<DD>CdcMpCon　*mpcon
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>アクセスマクロ</TH><TH WIDTH=060>型</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPCON_CMOD(mpcon)</TD><TD>Uint8</TD><TD>接続モード</TD></TR>
+<TR><TD>CDC_MPCON_LAY(mpcon)</TD><TD>Uint8</TD><TD>レイヤ指定とピクチャサーチ指定</TD></TR>
+<TR><TD>CDC_MPCON_BN(mpcon)</TD><TD>Uint8</TD><TD>バッファ区画番号</TD></TR>
+</TABLE>
+
+<P><DT><B>（２）　MPEG/Audioの接続モード</B>
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│−│−│−│−│　│　│　│　初期値：00H   未変更：CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴┬┴┬┴┬┘
+   　│　　　　　　　　　│　│　└─CDC_MPCMOD_EOR   1：EOR検出で切り替える
+   　│　　　　　　　　　│　└───CDC_MPCMOD_SEC   1：SEC検出で切り替える
+   　│　　　　　　　　　└─────CDC_MPCMOD_DEL   1：区画内セクタを消去
+   　└───────────────1：設定を変更しない          0：変更する
+</PRE>
+
+<P><DT><B>　（３）MPEG/Videoの接続モード</B>
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│　│　　　│　│　│　│　│　初期値：00H   未変更：CDC_PARA_NOCHG
+   └┬┴┬┴─┴─┴┬┴┬┴┬┴┬┘
+   　│　│　　│　　│　│　│　└─CDC_MPCMOD_EOR   1：EOR検出で切り替える
+   　│　│　　│　　│　│　└───CDC_MPCMOD_SEC   1：SEC検出で切り替える
+   　│　│　　│　　│　└─────CDC_MPCMOD_DEL   1：区画内セクタを消去
+   　│　│　　│　　└───────CDC_MPCMOD_IGPTS 1：PTS識別をしない
+   　│　│　　└──────────ビデオデコードバッファのクリア方式
+   　│　│　　　　　　　　　　　　　　0 (00B)：クリアしない
+   　│　│　　　　　　　　　　　　　　1 (01B)：VBVをクリア  (CDC_MPCMOD_VCLR)
+   　│　│　　　　　　　　　　　　　　2 (10B)：VBV+WBCをクリア (CDC_MPCMOD_VWCLR)
+   　│　└─────────────CDC_MPCMOD_BEF（GAME-CDでは必ず0を指定）
+   　└───────────────1：設定を変更しない          0：変更する
+</PRE>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>定数名</TH><TH WIDTH=360>説　　明</TH></TR>
+<TR><TD>CDC_MPCMOD_EOR<BR>CDC_MPCMOD_SEC</TD>
+	<TD>自然切り替えのための条件を指定する。EORビット／SEC（システムエンドコード）検出の各ビットは、OR条件による組み合わせが可能です。<BR>次発ストリームが未登録の場合、本条件は終了条件となる。</TD></TR>
+
+<TR><TD>CDC_MPCMOD_DEL</TD>
+	<TD>デコード時、バッファ区画内セクタを消去する。（０：保持する）</TD></TR>
+
+<TR><TD>CDC_MPCMOD_IGPTS</TD>
+	<TD>PTSを識別せずに、デコーダへセクタを転送する。PTSのないセクタも転送可能となる。ただし音声・映像の同期に不整合が生じる。</TD></TR>
+
+<TR><TD>CDC_MPCMOD_VCLR<BR>CDC_MPCMOD_VWCLR</TD>
+	<TD>先発ストリーム接続時のビデオデコードバッファのクリア方式を指定する。切り替え時のクリア方式ではない。現在の接続先の設定時だけ有効です。</TD></TR>
+
+<TR><TD>CDC_MPCMOD_BEF</TD>
+	<TD>後方絞りの前で終了条件判定をする。通常のGAME-CDでは必ず０を指定してください。値の取得時は常に０が返る。（Video CD専用）</TD></TR>
+</TABLE>
+
+<P><DT><B>　（４）MPEG/Audioのレイヤ指定</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>アクセスマクロ</TH><TH WIDTH=060>型</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPLAY_SYS</TD><TD>00H</TD><TD>システムレイヤ……初期値</DT></TR>
+<TR><TD>CDC_MPLAY_AUDIO</TD><TD>01H</TD><TD>ビデオレイヤ</DT></TR>
+</TABLE>
+
+<P><DT><B>　（５）MPEG/Videoのレイヤ指定とピクチャサーチ指定</B>
+<DD>ピクチャサーチとは、ビデオストリーム中のSHC（シーケンスヘッダコード）を検索することです。</P>
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　　　│−│−│−│−│−│　│　初期値：00H
+   └─┴─┴─┴─┴─┴─┴─┴┬┘
+   　　│　　　　　　　　　　　　└─レイヤ指定
+   　　└──────────────ピクチャサーチ指定
+</PRE></P>
+
+<P><DD><B>(a) レイヤ指定</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>定数名</TH><TH WIDTH=060>値</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPLAY_SYS</TD><TD>00H</TD><TD>システムレイヤ……初期値</TD></TR>
+<TR><TD>CDC_MPLAY_VIDEO</TD><TD>01H</TD><TD>ビデオレイヤ</TD></TR>
+</TABLE></P>
+
+<P><DD><B>(b) ピクチャサーチ指定</B>
+<DD>先発ストリーム接続時のピクチャサーチについて指定する。<BR>切り替え時のピクチャサーチではない。現在の接続先の設定時だけ有効です。</P>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>定数名</TH><TH WIDTH=060>値</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPSRCH_OFF</TD><TD>00H</TD><TD>ピクチャサーチをしない……初期値</TD></TR>
+<TR><TD>CDC_MPSRCH_VIDEO</TD><TD>80H</TD><TD>ピクチャサーチをする</TD></TR>
+<TR><TD>CDC_MPSRCH_AV</TD><TD>C0H</TD><TD>ピクチャサーチに合わせオーディオデータを破棄</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（６）バッファ区画番号</B>
+<DD>オーディオまたはビデオデコーダの接続先のバッファ区画番号を指定する。<BR>
+バッファ区画にCDC_NUL_SELを指定すると、設定を取り消すことができる。ただし、MPEGデコーダの動作状態によっては、設定を取り消すことができない。（WAITとなってしまう。）</P>
+
+<P><DD><TABLE BORDER=1>
+<TR><TH WIDTH=160>ストリーム</TH><TH WIDTH=160>取り消し可能な状態</TH><TH WIDTH=220>取り消し不可能な状態</TH></TR>
+<TR><TD>先発ストリーム</TD><TD>停止,準備１,準備２</TD><TD>転送（再生）、切り替え、復活</TD></TR>
+<TR><TD>次発ストリーム</TD><TD>停止,準備１,準備２,転送</TD><TD>切り替え</TD></TR>
+</TABLE></P>
+<P><DD>転送（再生）状態で先発ストリームの接続を切断（強制終了）させるには、CDC_MpChgCon関数を使用する。</P>
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="23.4"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>MPEGストリームパラメータ</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>CdcMpStm</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.4</H4></TD>
+</TR></TABLE>
+<P><DD>デコード対象ストリームのストリーム番号とチャネル番号の設定／取得時に使用する。</P>
+
+<P><DT><B>　（１）MPEGストリームパラメータ……CDC_MpSetStm, CDC_MpGetStm関数</B>
+<DD>CdcMpStm　*mpstm
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>定数名</TH><TH WIDTH=060>値</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPSTM_SMOD(mpstm)</TD><TD>Uint8</TD><TD>ストリームモード</TD></TR>
+<TR><TD>CDC_MPSTM_ID(mpstm)</TD><TD>Uint8</TD><TD>ストリーム番号（ストリームＩＤ）</TD></TR>
+<TR><TD>CDC_MPSTM_CN(mpstm)</TD><TD>Uint8</TD><TD>チャネル番号</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（２）ストリームモード</B>
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│−│　│　│−│−│　│　│　初期値：00H   未変更：CDC_PARA_NOCHG
+   └┬┴─┴┬┴┬┴─┴─┴┬┴┬┘
+   　│　　　│　│　　　　　│　└─CDC_MPSMOD_SNSET  1：ストリーム番号の設定を行う
+   　│　　　│　│　　　　　└───CDC_MPSMOD_SNIDF  1：ストリーム番号を識別する
+   　│　　　│　└─────────CDC_MPSMOD_CNSET  1：チャネル番号の設定を行う
+   　│　　　└───────────CDC_MPSMOD_CNIDF  1：チャネル番号を識別する
+   　└───────────────1：設定を変更しない          0：変更する
+</PRE>
+</DL>
+<!------------------------------------------------------------------------->
+<A NAME="23.5"><HR></A><DL>
+<TABLE BORDER=1><TR>
+<TD><A HREF="#t7_1"><PRE>一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=280><PRE>Data<BR><H4>画面特殊効果パラメータ</H4></TD>
+<TD WIDTH=220><PRE>Data Name<BR><H3>CdcMpVeff</H3></TD>
+<TD WIDTH=040><PRE>No<BR><H4>23.5</H4></TD>
+</TR></TABLE>
+<P><DT><B>　（１）画面特殊効果パラメータ……CDC_MpSetVeff関数</B>
+<DD>CdcMpVef　*mpvef
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>定数名</TH><TH WIDTH=060>値</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPVEF_ITP(mpvef)</TD><TD>Uint8</TD><TD>補間モード</TD></TR>
+<TR><TD>CDC_MPVEF_TRP(mpvef)</TD><TD>Uint8</TD><TD>透明ビットモード</TD></TR>
+<TR><TD>CDC_MPVEF_MOZH(mpvef)</TD><TD>Uint8</TD><TD>水平方向モザイクモード</TD></TR>
+<TR><TD>CDC_MPVEF_MOZV(mpvef)</TD><TD>Uint8</TD><TD>垂直方向モザイクモード</TD></TR>
+<TR><TD>CDC_MPVEF_SOFTH(mpvef)</TD><TD>Uint8</TD><TD>水平方向ぼかしモード</TD></TR>
+<TR><TD>CDC_MPVEF_SOFTV(mpvef)</TD><TD>Uint8</TD><TD>垂直方向ぼかしモード</TD></TR>
+</TABLE>
+
+<P><DT><B>　（２）補間モード</B>
+<DD>輝度（Ｙ）・色差（Ｃ）について、水平・垂直方向の補間をするか指定する。</P>
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│−│−│−│　│　│　│　│　初期値：00H   未変更：CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴┬┴┬┴┬┴┬┘
+   　│　　　　　　　│　│　│　└─CDC_MPITP_YH  1：Ｙの水平補間をする
+   　│　　　　　　　│　│　└───CDC_MPITP_CH  1：Ｃの水平補間をする
+   　│　　　　　　　│　└─────CDC_MPITP_YV  1：Ｙの垂直補間をする
+   　│　　　　　　　└───────CDC_MPITP_CV  1：Ｃの垂直補間をする
+   　└───────────────1：設定を変更しない          0：変更する
+</PRE>
+
+<P><DT><B>　（３）透明ビットモード</B>
+<DD>各ピクセルの輝度が指定輝度レベル以下の場合、MPEGレジスタの透明ビットを１にする。<BR>透明領域は、プライオリティ領域とも呼ぶ。</P>
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│−│−│−│−│　│　　　│　初期値：00H   未変更：CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴┬┴─┴─┘
+   　│　　　　　　　　　│　　│
+   　│　　　　　　　　　│　　└──輝度レベル
+   　│　　　　　　　　　└─────CDC_MPTRP_MAG  1：透明領域の拡大をする
+   　└───────────────1：設定を変更しない        　0：変更する
+</PRE>
+<DD><B>(a) 輝度レベル</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>定数名</TH><TH WIDTH=060>値</TH><TH WIDTH=300>説　　明</TH></TR>
+<TR><TD>CDC_MPTRP_DFL</TD><TD>00H</TD><TD>通常（透明ビット処理をしない）</TD></TR>
+<TR><TD>CDC_MPTRP_64</TD><TD>01H</TD><TD>輝度64</TD></TR>
+<TR><TD>CDC_MPTRP_96</TD><TD>02H</TD><TD>輝度96</TD></TR>
+<TR><TD>CDC_MPTRP_128</TD><TD>03H</TD><TD>輝度128</TD></TR>
+</TABLE></p>
+
+<P><DT><B>　（４）モザイクモード（水平・垂直方向）</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=180>値</TH><TH WIDTH=360>説　　明</TH></TR>
+<TR><TD>00H</TD><TD>通常（モザイクをかけない）……初期値</TD></TR>
+<TR><TD>01H〜0AH（ｎ）00H</TD><TD>２のｎ乗倍（2,4,8,16,32,64,128,256,512,1024倍）</TD></TR>
+<TR><TD>FFH</TD><TD>設定を変更しない（CDC_PARA_NOCHG）</TD></TR>
+</TABLE></P>
+
+<P><DT><B>　（５）ぼかしモード（水平・垂直方向）</B>
+<DD><PRE>
+bit　７　６　５　４　３　２　１　０
+   ┌─┬─┬─┬─┬─┬─┬─┬─┐
+   │　│−│−│−│−│−│−│　│　初期値：00H   未変更：CDC_PARA_NOCHG
+   └┬┴─┴─┴─┴─┴─┴─┴┬┘
+   　│　　　　　　　　　　　　　└─CDC_MPSOFT_ON  1：ぼかしをかける
+   　└───────────────1：設定を変更しない          0：変更する
+</PRE>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+<A HREF="p08_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(MPEGパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

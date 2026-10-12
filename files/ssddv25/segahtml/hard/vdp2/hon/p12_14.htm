@@ -1,0 +1,199 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;70/86&gt;VDP2 User's Manual/12.1 Color calculation function-5</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no12">VDP2 User's Manual</a> ★ <A HREF="p12_10.htm">Chapter 12 Color calculation</a><HR>
+ <B>▲ <A HREF="p12_13.htm">Back</a> ｜ <A HREF="p12_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 12 Color Calculation</b><HR NOSHADE>
+<DL>
+<A NAME="no12_15"></A><P><DT><H3> ●Color calculation control register</H3><DD> The color calculation control register controls color calculation. This is a 16-bit write-only register located at address 1800ECH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CCCTL_"></A><P><DD> <B><FONT SIZE=5>CCCTL</font> <FONT SIZE=4>1800ECH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> <A HREF="#BOKN_">BOKEN</a></TH><TH><PRE> <A HREF="#BOKN_">BOKN2</a></TH><TH><PRE> <A HREF="#BOKN_">BOKN1</a></TH><TH><PRE> <A HREF="#BOKN_">BOKN0</a></TH><TH><PRE> -</TH><TH><PRE> <A HREF="#EXCCEN_">EXCCEN</a></TH><TH><PRE> <A HREF="#CCRTMD_">CCRTMD</a></TH><TH><PRE> <A HREF="#CCMD_">CCMD</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCCEN_">SPCCEN</a></TH><TH><PRE> <A HREF="#NxCCEN_">LCCCEN</a></TH><TH><PRE> <A HREF="#NxCCEN_">R0CCEN</a></TH><TH><PRE> <A HREF="#NxCCEN_">N3CCEN</a></TH><TH><PRE> <A HREF="#NxCCEN_">N2CCEN</a></TH><TH><PRE> <A HREF="#NxCCEN_">N1CCEN</a></TH><TH><PRE> <A HREF="#NxCCEN_">N0CCEN</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="BOKEN_"></A><DT> <B>Blur operation enable bit</b> : Gradation enable bit (BOKEN), bit 15<DD> Specify whether to use the blur calculation function.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> BOKEN</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Do not use blur calculation function</TD></TR>
+<TR><TH> 1</TH><TD> Using the blur calculation function</TD></TR>
+</TABLE>
+</P>
+<P><DD> Setting this bit to 1 disables the extended color calculation function.<BR>
+ The blur calculation function can only be used when the TV screen mode is normal mode and the color RAM mode is mode 0.</P>
+<A NAME="BOKN_"></A><DT> <B>Blur screen number bit</b> : Gradation number bit (BOKN2 to BOKN0), bits 14 to 12<DD> Specify the screen that uses the blur calculation function.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> BOKN2</TH><TH> BOKN1</TH><TH> BOKN0</TH><TH> Blur calculation function usage screen</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD> sprite</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD> RBG0</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD> NBG0 or RBG1</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD> Setting prohibited</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD> NBG1 or EXBG</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD> NBG2</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD> NBG3</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD> Setting prohibited</TD></TR>
+</TABLE>
+</P>
+<A NAME="EXCCEN_"></A><DT> <B>Extended color calculation</b> enable bit (EXCCEN), bit 10<DD> Specify whether to use the extended color calculation function.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> EXCCEN</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Do not use extended color calculation function</TD></TR>
+<TR><TH> 1</TH><TD> Use extended color calculation functions</TD></TR>
+</TABLE>
+</P>
+<P><DD> The blur calculation function cannot be used at the same time. This bit is ignored when the BOKEN bit is 1.<BR>
+ The extended color calculation function can only be used when the TV screen mode is normal mode, and cannot be used when the TV screen mode is high resolution or dedicated monitor mode.</P>
+<A NAME="CCRTMD_"></A><DT> <B>Color calculation ratio</b> mode bit (CCRTMD), bit 9<DD> Specifies the color calculation ratio mode.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> CCRTMD</TH><TH> mode</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TD> Specify the color calculation ratio on the top image side</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TD> Specify the color calculation ratio on the second image side</TD></TR>
+</TABLE>
+</P>
+<P><DD> Whether or not to perform normal color calculations is always specified on the top image side.</P>
+<A NAME="CCMD_"></A><DT> <B>Color calculation</b> mode bit (CCMD), bit 8<DD> Specifies the color calculation mode.</P>
+<P><DD><TABLE BORDER>
+<TR><TH> CCMD</TH><TH> mode</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TD> Add according to the color calculation ratio register value</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TD> Add as is</TD></TABLE>
+</P>
+<P><DD> In mode 1, the value of the color calculation ratio register for each screen is ignored.</P>
+<A NAME="NxCCEN_"></A><DT> <B>Color calculation enable bit</b><DD> (N0CCEN, N1CCEN, N2CCEN, N3CCEN, R0CCEN, LCCCEN, SPCCEN)<BR>
+ Specify whether to perform color calculation (color calculation enable).</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0CCEN</TD><TD> 1800ECH</TD><TD> bit 0</TD><TD> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD> N1CCEN</TD><TD> 1800ECH</TD><TD> bit 1</TD><TD> For NBG1 (or for EXBG)</TD></TR>
+<TR><TD> N2CCEN</TD><TD> 1800ECH</TD><TD> bit 2</TD><TD> For NBG2</TD></TR>
+<TR><TD> N3CCEN</TD><TD> 1800ECH</TD><TD> bit 3</TD><TD> For NBG3</TD></TR>
+<TR><TD> R0CCEN</TD><TD> 1800ECH</TD><TD> bit 4</TD><TD> For RBG0</TD></TR>
+<TR><TD> LCCCEN</TD><TD> 1800ECH</TD><TD> bit 5</TD><TD> For LNCL</TD></TR>
+<TR><TD> SPCCEN</TD><TD> 1800ECH</TD><TD> bit 6</TD><TD> for sprites</TD></TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> xxCCEN</TH><TH> process</TH></TR>
+<TR><TH> 0</TH><TD> Do not perform color calculations</TD></TR>
+<TR><TH> 1</TH><TD> Perform color calculations</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, LC, or SP.</P>
+<P><DD> When performing color calculations between the top image and the second image, control is done using the color calculation enable bit on the top image side. When using the extended color calculation function, the connection between the second image and the third image is controlled by the color calculation enable bit on the second image side, and the connection between the third image and the fourth image is controlled by the color calculation enable bit on the third image side. Masu.</P>
+<A NAME="no12_16">　</A><P><DT><H3>●Color calculation ratio register</H3><DD> The color calculation ratio register specifies the color calculation ratio. This is a 16-bit write-only register located at addresses 180108H to 18010EH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CCRNA_"></A><P><DD> <B><FONT SIZE=5>CCRNA</font> <FONT SIZE=4>180108H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCCRT_">N1CCRT4</a></TH><TH><PRE> <A HREF="#NxCCRT_">N1CCRT3</a></TH><TH><PRE> <A HREF="#NxCCRT_">N1CCRT2</a></TH><TH><PRE> <A HREF="#NxCCRT_">N1CCRT1</a></TH><TH><PRE> <A HREF="#NxCCRT_">N1CCRT0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCCRT_">N0CCRT4</a></TH><TH><PRE> <A HREF="#NxCCRT_">N0CCRT3</a></TH><TH><PRE> <A HREF="#NxCCRT_">N0CCRT2</a></TH><TH><PRE> <A HREF="#NxCCRT_">N0CCRT1</a></TH><TH><PRE> <A HREF="#NxCCRT_">N0CCRT0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CCRNB_"></A><P><DD> <B><FONT SIZE=5>CCRNB</font> <FONT SIZE=4>18010AH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCCRT_">N3CCRT4</a></TH><TH><PRE> <A HREF="#NxCCRT_">N3CCRT3</a></TH><TH><PRE> <A HREF="#NxCCRT_">N3CCRT2</a></TH><TH><PRE> <A HREF="#NxCCRT_">N3CCRT1</a></TH><TH><PRE> <A HREF="#NxCCRT_">N3CCRT0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCCRT_">N2CCRT4</a></TH><TH><PRE> <A HREF="#NxCCRT_">N2CCRT3</a></TH><TH><PRE> <A HREF="#NxCCRT_">N2CCRT2</a></TH><TH><PRE> <A HREF="#NxCCRT_">N2CCRT1</a></TH><TH><PRE> <A HREF="#NxCCRT_">N2CCRT0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CCRR_"></A><P><DD> <B><FONT SIZE=5>CCRR</font> <FONT SIZE=4>18010CH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCCRT_">R0CCRT4</a></TH><TH><PRE> <A HREF="#NxCCRT_">R0CCRT3</a></TH><TH><PRE> <A HREF="#NxCCRT_">R0CCRT2</a></TH><TH><PRE> <A HREF="#NxCCRT_">R0CCRT1</a></TH><TH><PRE> <A HREF="#NxCCRT_">R0CCRT0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="CCRLB_"></A><P><DD> <B><FONT SIZE=5>CCRLB</font> <FONT SIZE=4>18010EH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCCRT_">BKCCRT4</a></TH><TH><PRE> <A HREF="#NxCCRT_">BKCCRT3</a></TH><TH><PRE> <A HREF="#NxCCRT_">BKCCRT2</a></TH><TH><PRE> <A HREF="#NxCCRT_">BKCCRT1</a></TH><TH><PRE> <A HREF="#NxCCRT_">BKCCRT0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxCCRT_">LCCCRT4</a></TH><TH><PRE> <A HREF="#NxCCRT_">LCCCRT3</a></TH><TH><PRE> <A HREF="#NxCCRT_">LCCCRT2</a></TH><TH><PRE> <A HREF="#NxCCRT_">LCCCRT1</a></TH><TH><PRE> <A HREF="#NxCCRT_">LCCCRT0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="NxCCRT_"></A><DT> <B>Color calculation ratio bit (for scroll screen)</b> : Color calculation ratio bit<DD> (N0CCRT4~N0CCRT0, N1CCRT4~N1CCRT0, N2CCRT4~N2CCRT0, N3CCRT4~N3CCRT0, R0CCRT4~R0CCRT0, LCCCRT4~LCCCRT0, BKCCRT4~BKCCRT0)<BR>
+ Specify the color calculation ratio for each scroll screen. The color calculation ratio is based on the value obtained by multiplying the RGB color data by 1/32.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0CCRT4〜N0CCRT0</TD><TD> 180108H</TD><TD> bits 4-0</TD><TD> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD> N1CCRT4～N1CCRT0</TD><TD> 180108H</TD><TD> bits 12-8</TD><TD> For NBG1 (or for EXBG)</TD></TR>
+<TR><TD> N2CCRT4～N2CCRT0</TD><TD> 18010AH</TD><TD> bits 4-0</TD><TD> For NBG2</TD></TR>
+<TR><TD> N3CCRT4～N3CCRT0</TD><TD> 18010AH</TD><TD> bits 12-8</TD><TD> For NBG3</TD></TR>
+<TR><TD> R0CCRT4～R0CCRT0</TD><TD> 18010CH</TD><TD> bits 4-0</TD><TD> For RBG0</TD></TR>
+<TR><TD> LCCCRT4~LCCCRT0</TD><TD> 18010EH</TD><TD> bits 4-0</TD><TD> For LNCL</TD></TR>
+<TR><TD> BKCCRT4～BKCCRT0</TD><TD> 18010EH</TD><TD> bits 12-8</TD><TD> For BACK</TD></TR>
+</TABLE>
+</P>
+<P><DD><TABLE BORDER>
+<TR><TH> xxCCRT4</TH><TH> xxCCRT3</TH><TH> xxCCRT2</TH><TH> xxCCRT1</TH><TH> xxCCRT0</TH><TH> Color calculation ratio<BR>
+ Top image: Second image</TH></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 31:1</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 30:2</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 29:3</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 28:4</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 27:5</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 26:6</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 25:7</TD></TR>
+<TR><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 24:8</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 23:9</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 22:10</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 21:11</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 20:12</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 19:13</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 18:14</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 17:15</TD></TR>
+<TR><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 16:16</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 15:17</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 14:18</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 13:19</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 12:20</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 11:21</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 10:22</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 9:23</TD></TR>
+<TR><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 8:24</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 7:25</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 6:26</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 5:27</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 4:28</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 3:29</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 2:30</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 0</TH><TD ALIGN=CENTER><PRE> 1:31</TD></TR>
+<TR><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TH> 1</TH><TD ALIGN=CENTER><PRE> 0:32</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is N0, N1, N2, N3, R0, LC, or BK.</P>
+<P><DD> For information on the color calculation ratio register for sprites, see ` <B><A HREF="p09_21.htm#no9_26">`●Color calculation ratio register</a></b> '' in <B><A HREF="p09_20.htm">``9.2 Priority and color calculation</a></b> .''</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p12_13.htm">Back</a> ｜ <A HREF="p12_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no12">VDP2 User's Manual</a> ★ <A HREF="p12_10.htm">Chapter 12 Color calculation</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

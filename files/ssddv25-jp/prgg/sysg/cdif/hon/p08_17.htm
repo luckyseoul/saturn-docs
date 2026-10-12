@@ -1,0 +1,254 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/19&gt;CD通信I/F(CDパート)/関数詳細-7</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(CDパート)(CDパート)</A>
+<HR>
+<B>▲
+<A HREF="p08_16.htm">戻る</A>｜
+<A HREF="p08_18.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル(CDパート)</B>
+<H2 ALIGN=CENTER>関数詳細-7</H2>
+<HR NOSHADE>
+<H3>8.2.7　バッファ入出力</H3>
+　バッファ入出力の各機能(セクタデータの取り出し、消去、書き込み、複写、移動)は、コネクタ接続の処理を含んでいます。<BR>
+　つまり、1回のコマンド発行で、デバイスとセレクタの接続、セクタの流入出という複合処理をします。区画出力コネクタに接続済みのコネクタは切断されます。<BR>
+　バッファ入出力の動作中に、他のデバイスやセレクタによってコネクタが切断されると、エラーが発生します。
+(「<B><A HREF="p05_10.htm#no5_3_40">5.3.4 セレクタに関する注意事項</A></B>」を参照)
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_1"><HR></A><DL>
+<P><DT><TABLE border><TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_7">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>セクタ長の設定</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_SetSctLen</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.1</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_SetSctLen(Sint32 getslen, Sint32 putslen)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>getslen</TD><TD><PRE>：取り出し時のセクタ長</TD></TR>
+<TR><TD><PRE>putslen</TD><TD><PRE>：書き込み時のセクタ長</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<B>終了フラグ　</B>ESELフラグ
+<DT><B>　機　能</B><DD>次の場合における、1セクタの長さ(セクタ長)を設定します。<BR>
+・セクタデータを取り出す(CDバッファ→ホスト)<BR>
+・セクタデータを書き込む(ホスト→CDバッファ)
+<P><DT><B>　(1)セクタ長</B>
+<DD><TABLE BORDER=1>
+<TH WIDTH=100><PRE>定数名</TH><TH WIDTH=420><PRE>説　明</TH></TR>
+<TD><PRE>CDC_SLEN_2048</TD><TD><PRE>2048バイト（ユーザデータ）……初期値<br>取り出し時、モード2フォーム2ならば2324バイト</TD></TR>
+<TD><PRE>CDC_SLEN_2336</TD><TD><PRE>2336バイト（サブヘッダまで）</TD></TR>
+<TD><PRE>CDC_SLEN_2340</TD><TD><PRE>2340バイト（ヘッダまで）</TD></TR>
+<TD><PRE>CDC_SLEN_2352</TD><TD><PRE>2352バイト（セクタ全体）</TD></TR>
+<TD><PRE>CDC_SLEN_NOCHG</TD><TD><PRE>設定を変更しない</TD></TABLE>
+<DT><B>　備　考</B><DD>設定した「取り出し時のセクタ長」は、
+実データサイズの計算(<B><A HREF="p08_16.htm#no6_3">CDC_CalActSiz</A></B>)にも反映されます。<BR>
+実データサイズの計算中や、セクタデータの転送中(
+<B><A HREF="#no7_2">CDC_GetSctData</A></B>,
+<B><A HREF="#no7_3">CDC_GetdelSctData</A></B>,
+<B><A HREF="#no7_5">CDC_PutSctData</A></B>関数の処理中)に、セクタ長を変更してはいけません。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_2"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_7">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>セクタデータの取り出し</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_GetSctData</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.2</H4></TD>
+</TR></TABLE></p>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_GetSctData(Sint32 bufno, Sint32 spos, Sint32 snum)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>bufno</TD><TD><PRE>：バッファ区画番号</TD></TR>
+<TR><TD><PRE>spos</TD><TD><PRE>：セクタ位置(<B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</A></B>：区画最後のセクタを示す)</TD></TR>
+<TR><TD><PRE>snum</TD><TD><PRE>：セクタ数(<B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</A></B>：sposから区画最後までのセクタ数を示す)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>EHSTフラグ(<B><A HREF="p08_11.htm#no1_10">CDC_DataEnd</A></B>関数の実行後、1になる)
+<DT><B>　機　能</B><DD>バッファ区画の指定セクタ範囲からセクタデータを取り出します。<BR>
+1セクタの長さは、セクタ長の設定(CDC_SetSctLen)で変更できます。
+<DT><B>　備　考</B><DD>関数実行後、データを転送して取り出す必要があります。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_3"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_7">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>セクタデータの消去</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_DelSctData</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.3</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_DelSctData(Sint32 bufno, Sint32 spos, Sint32 snum)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>bufno</TD><TD><PRE>：バッファ区画番号</TD></TR>
+<TR><TD><PRE>spos </TD><TD><PRE>：セクタ位置(<B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</A></B>：区画最後のセクタを示す)</TD></TR>
+<TR><TD><PRE>snum </TD><TD><PRE>：セクタ数(<B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</A></B>：sposから区画最後までのセクタ数を示す)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>EHSTフラグ
+<DT><B>　機　能</B><DD>バッファ区画の指定セクタ範囲からセクタデータを消去します。
+<DT><B>　備　考</B><DD>データを消去すると、それ以降のセクタ位置は順次繰り上がります。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_4"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_7">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>セクタデータの取り出し消去</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_GetdelSctData</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.4</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_GetdelSctData(Sint32 bufno, Sint32 spos, Sint32 snum)
+<DT><B>　入　力</B><DD><TABLE BORDER=1>
+<TR><TD><PRE>bufno</TD><TD><PRE>：バッファ区画番号</TD></TR>
+<TR><TD><PRE>spos </TD><TD><PRE>：セクタ位置(<B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</A></B>：区画最後のセクタを示す)</TD></TR>
+<TR><TD><PRE>snum </TD><TD><PRE>：セクタ数(<B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</A></B>：sposから区画最後までのセクタ数を示す)</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>EHSTフラグ(CDC_DataEnd関数の実行後、1になる)
+<DT><B>　機　能</B><DD>バッファ区画の指定セクタ範囲からセクタデータを取り出し、消去します。<BR>
+1セクタの長さは、セクタ長の設定(CDC_SetSctLen)で変更できます。
+<DT><B>　備　考</B><DD>関数実行後、データを転送して取り出す必要があります。<BR>
+データを全て取り出さずに転送終了しても、指定したセクタ範囲のデータは全て消去されます。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_5"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_7">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>セクタデータの書き込み</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_PutSctData</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.5</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32 CDC_PutSctData(Sint32 filtno, Sint32 snum)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>filtno</TD><TD><PRE>：絞り番号</TD></TR>
+<TR><TD><PRE>snum</TD><TD><PRE>：セクタ数</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>EHSTフラグ(CDC_DataEnd関数の実行後、1になる)
+<DT><B>　機　能</B><DD>指定した絞りにセクタデータを書き込みます。<BR>
+1セクタの長さは、セクタ長の設定(CDC_SetSctLen)で変更できます。
+<DT><B>　備　考</B><DD>関数実行後、データを転送して書き込む必要があります。<BR>
+データ転送を途中で中断しても、指定したセクタ数のデータは書き込まれます。転送したデータ以外の値は不定です。
+
+<P><DT><B>　《セクタデータの組み込み》</B>
+<DD>　セクタデータは、データ転送の終了(CDC_DataEnd)を実行後、絞りから区画に組み込まれます。全セクタが組み込み終わると、EHSTフラグが1になります。</P>
+
+<P><DT><B>　《空き領域の確保》</B>
+<DD>　コマンド発行時に空き領域が不足する場合、WAITを返します。(空き領域＜snum)コマンド受付後に空き領域が確保できなかった場合、割り込み要因レジスタのDRDYフラグが０のまま、EHSTフラグが1になります。(他のデバイス処理で空き領域が使われた場合)</P>
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_6"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_7">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>セクタデータの複写</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_CopySctData</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.6</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_CopySctData(Sint32 srcbn, Sint32 spos, Sint32 snum, Sint32 dstfln)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>srcbn</TD><TD><PRE>：複写元バッファ区画番号</TD></TR>
+<TR><TD><PRE>spos</TD><TD><PRE>：セクタ位置(<B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</A></B>：区画最後のセクタを示す)</TD></TR>
+<TR><TD><PRE>snum</TD><TD><PRE>：セクタ数(<B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</A></B>：sposから区画最後までのセクタ数を示す)</TD></TR>
+<TR><TD><PRE>dstfln</TD><TD><PRE>：複写先絞り番号</TD></TR></TABLE>
+
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>ECPYフラグ
+<DT><B>　機　能</B><DD>バッファ区画の指定セクタ範囲から絞りにセクタデータを複写します。(セレクタ間での複写)<BR>
+1セクタの長さは、2352バイト固定です。
+<DT><B>　備　考</B><DD>コマンド発行時に空き領域が不足する場合、WAITを返します。(空き領域＜snum)コマンド処理中に空き領域が無くなった場合、その時点で複写処理を中止してエラーになります。(他のデバイス処理で空き領域が使われた場合)<BR>
+エラー情報を得るには、セクタデータ複写／移動エラー取得(CDC_GetCopyErr)を実行します。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_7"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_7">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>セクタデータの移動</H4></TD>
+<TD WIDTH=160><PRE>Function Name［SR］<BR><H3>CDC_MoveSctData</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.7</H4></TD>
+</TR></TABLE></P>
+
+<DT><B>　書　式</B><DD>Sint32　CDC_MoveSctData(Sint32 srcbn, Sint32 spos, Sint32 snum, Sint32 dstfln)
+<DT><B>　入　力</B><DD><TABLE>
+<TR><TD><PRE>srcbn</TD><TD><PRE>：移動元バッファ区画番号</TD></TR>
+<TR><TD><PRE>spos</TD><TD><PRE>：セクタ位置(<B><A HREF="p07_11.htm#no2_03">CDC_SPOS_END</A></B>：区画最後のセクタを示す)</TD></TR>
+<TR><TD><PRE>snum</TD><TD><PRE>：セクタ数(<B><A HREF="p07_11.htm#no2_03">CDC_SNUM_END</A></B>：sposから区画最後までのセクタ数を示す)</TD></TR>
+<TR><TD><PRE>dstfln</TD><TD><PRE>：移動先絞り番号</TD></TR></TABLE>
+<DT><B>　出　力</B><DD>なし
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　終了フラグ</B><DD>ECPYフラグ
+<DT><B>　機　能</B><DD>バッファ区画の指定セクタ範囲から絞りにセクタデータを移動します。(セレクタ間での移動)<BR>
+１セクタの長さは、2352バイト固定です。
+<DT><B>　備　考</B><DD>バッファが満杯でも実行できます。<BR>
+エラー情報を得るには、セクタデータ複写／移動エラー取得(CDC_GetCopyErr)を実行します。
+</DL>
+
+<!-- -------------------------------------------------------------------------------------- -->
+<A NAME="no7_8"><HR></A><DL>
+<P><DT><TABLE border>
+<TR>
+<TD><PRE><A HREF="p08_10.htm#t8_1_7">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=100><PRE>Title<BR><H4>関数仕様</H4></TD>
+<TD WIDTH=270><PRE>Function<BR><H4>セクタデータ複写／移動エラー取得</H4></TD>
+<TD WIDTH=160><PRE>Function Name［S-］<BR><H3>CDC_GetCopyErr</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>7.8</H4></TD>
+</TR></TABLE></P>
+<DT><B>　書　式</B><DD>Sint32　CDC_GetCopyErr(Sint32 *cpyerr)
+<DT><B>　入　力</B><DD>なし
+<DT><B>　出　力</B><DD>cpyerr：複写／移動エラー情報
+<DT><B>　関数値</B><DD>エラーコードを返します。
+<DT><B>　機　能</B><DD>セクタデータの複写／移動実行時のエラー情報を取得します。<BR>
+前回のエラー情報は、次に複写／移動(CDC_CopySctData, CDC_MoveSctData)を実行するまで保持されます。
+
+<P><DT><B>　(1)複写／移動エラー情報</B>
+<DD><TABLE BORDER=1>
+<TR><TH WIDTH=100><PRE>定数名</TH><TH WIDTH=420><PRE>説　明</TH></TR>
+<TR><TD><PRE>CDC_COPY_OK</TD><TD><PRE>正常終了……初期値</TD></TR>
+<TR><TD><PRE>CDC_COPY_NG</TD><TD><PRE>エラー発生<br>・複写／移動中にセレクタが切り離された。<br>・バッファの空き領域が無くなった。</TD></TR>
+<TR><TD><PRE>CDC_COPY_BUSY</TD><TD><PRE>複写／移動処理中</TD></TR></TABLE></P>
+</DL>
+
+<HR NOSHADE>
+<B>▲
+<A HREF="p08_16.htm">戻る</A>｜
+<A HREF="p08_18.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

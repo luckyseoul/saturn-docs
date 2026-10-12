@@ -1,0 +1,309 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SpriteEditorTextFormat</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm">Graphic Tools Guide</a> ★ <A HREF="../index.htm#frm">Format list</a><HR NOSHADE>
+<CENTER>
+<H1> Sprite Editor</H1><H5> Ver1.32</H5><H2> text format</H2></CENTER>
+<Hr>
+<DL>
+<A NAME="no1"></A><P><DT><H3> ■1. C type (no rotation)</H3><DL>
+<P><DT> <B>XXX.cl file example</b><DD><PRE>
+/******************************************
+        Color table
+*******************************************/
+
+/*0:16*/              ←Palette entry number & color mode
+SPR_PAL pal_testFile_000[] = {
+        0x8000, /*0*/ ←Actual color data
+        0xE318, /*1*/ (Continues for 16 or 256 colors depending on the mode)
+        0xD318, /*2*/
+          :
+          :
+          :
+
+SPR_PAL_DAT paldata_testFile[] = {
+        SPR_PAL_DEF(0x0040, 16, pal_AtestFile_000),
+        SPR_PAL_DEF(0x0020, 16, pal_AtestFile_001),
+          :             ↑
+          : Palette address, color mode, label when editing  
+          : (Basically, unused areas are not output)
+</PRE><P><DT><B>XXX.cg file example</b><DD><PRE>
+/******************************************
+        CG
+*******************************************/
+
+/*0: 88x136*/           ←Sprite number & sprite size
+SPR_CG cg_testFile_000[] = {
+        0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,
+        0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,
+        0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,0x0011,
+        0x0011,0x0011,0x0011,0x0011,0x0021,0x0099,0x0066,0x00AA,
+          :    ↑
+          :    Real pixel data        
+          :   (Palette code in palette mode, actual color data in 32K color mode)
+
+SPR_CG_DAT cgdata_testFile[] = {
+        SPR_CG_DEF( 88,136,0x00000000),
+        SPR_CG_DEF( 24, 16,0x00001760),
+        SPR_CG_DEF( 32, 23,0x00001820),
+        SPR_CG_DEF( 40, 23,0x00001990),
+        SPR_CG_DEF( 56, 48,0x00001B5C),
+          :            ↑
+          : H size, V size, relative address for each sprite
+          :
+</PRE><P><DT><B>XXX.map file example</b><DD><PRE>
+/******************************************
+        MAP
+*******************************************/
+/* 0:*/            ←Pattern number
+SPR_MAP map_testFile_000[] = {
+        SPR_MAP_DEF( 1,COL_16 ,cg_testFile_005, 24, 16, 7, -62,0x0010),
+        SPR_MAP_DEF( 2,COL_16 ,cg_testFile_002, 32, 23, 2, -46,0x0030),
+                :     ↑
+                : Sprite number, color mode (COL_16, COL_256, COL_DC)
+                :     
+Sprite label, H size, V size, H offset, V offset
+                : Reversal information (0x0010=H inversion, 0x0020=V inversion)
+</PRE><P><DT><B>XXX.anm file example</b><DD><PRE>
+/******************************************
+        ANIME
+*******************************************/
+/* 0:*/
+ANM_BNK bank_testFile_000[] = {
+        ANM_DEF(map_testFile_000, 5),
+        ANM_DEF(map_testFile_010, 20),
+        ANM_DEF(map_testFile_001, 5),
+                : ↑
+                : Display target pattern label, display time
+                :
+</PRE></DL>
+<A NAME="no2"></A>
+<P><DT><H3>■2. C format (+rotation)</H3>
+<DD> Exactly the same as (1) except for *XXX.pat
+<DL>
+<P><DT><B>XXX.pat file example</B>
+<DD><PRE>
+/******************************************
+         PATTERN(+rot)
+*******************************************/
+/* 0:*/
+PAT_MAP pat_testFile_000[] = {
+         PAT_MAP_DEF( 0,COL_256,cg_testFile_000, 0, 3, -16, -16, 16,
+16,0x20B6,0x0000)
+};
+
+/* 1:*/
+PAT_MAP pat_testFile_001[] = {
+         PAT_MAP_DEF( 1,COL_256,cg_testFile_001, 0, 3, -16, -16, 16,
+16,0xF60A,0x0000),
+         PAT_MAP_DEF( 1,COL_256,cg_testFile_001, -19, 5, -16, -16, 16,
+16,0xEAAA,0x0000),
+         PAT_MAP_DEF( 2,COL_256,cg_testFile_002, 27, -17, -16, -16, 16,
+16,0x18E2,0x0000)
+                 :     ↑
+                 :     Sprite number, color mode (COL_16, COL_256, COL_DC)
+                 :     Sprite label, rotation center H coordinate, rotation center V coordinate,
+                 :     Offset A, Offset B, Offset C, Offset D,
+                 :     Rotation angle, inversion information (0x0010=H inversion, 0x0020=V inversion)
+　
+*Rotation center coordinates = relative coordinates from the pattern origin
+*Offset A to D = Relative coordinate values between the rotation center point and each vertex of the sprite (when the angle is 0°)
+(A=TopLeft-H coordinate B=TopLeft-V coordinate C=BottomRight-H coordinate D=BottomRight-V coordinate
+)
+*Rotation angle = rotation angle for each sprite (0° to 360° expressed in hexadecimal from $0000 to $FFFF)
+</PRE>
+</DL>
+
+<A NAME="no3"></A>
+<P><DT><H3>■３． ASM format (no rotation)</H3>
+<DL>
+<P><DT><B>XXX.cl file example</B>
+<DD><PRE>
+;----------------------------------------
+; color data
+
+;----------------------------------------
+; global
+         .global pal_Test_000
+         .global pal_Test_000_END
+                 :
+                 :
+
+;----------------------------------------
+; cg_Test_131 ← Sprite that was using the corresponding palette when editing
+pal_Test_000:
+         CLSIZE pal_Test_000_END-pal_Test_000-4　←Data size
+
+         COLOR
+h'E318,h'F39C,h'D2DD,h'BA1C,h'A114,h'BA58,h'FA0C,h'F968　;No=00-07
+         COLOR
+h'D808,h'A194,h'990E,h'8088,h'82FD,h'8000,h'8000,h'8000　;No=08-0F
+                 :     ↑
+                 :     Actual color code
+                 :
+pal_Test_000_END:
+</PRE>
+
+<P><DT><B>XXX.cg file example</B>
+<DD><PRE>
+;----------------------------------------
+; CG-data
+
+;----------------------------------------
+;        global
+         .global cg_Test_000 ← Global definition of used label
+         .global cg_Test_000_END
+                 :
+                 :
+                
+;----------------------------------------
+; x_size:40 y_size:43 (16colors)
+←H size, V size, color mode
+cg_Test_000:
+         CGSIZE cg_Test_000_END-cg_Test_000-4 ←Data size
+
+        .data.b
+h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'02,h'20,h'00,h'00,h'00,h
+'00
+        .data.b
+h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'00,h'2B,h
+'B2
+                 :     ↑
+                 :     Pixel data (4bit/pixel in 16 color mode)
+,8bit/pixel in 256 color mode)
+                
+cg_Test_000_END:
+
+;----------------------------------------
+;       x_size:56 y_size:105 (32Kcolors)
+cg_Test_001:
+        CGSIZE cg_Test_001_END-cg_Test_001-4
+
+        .data.w h'6F7B,h'6F7B,h'6F7B,h'4631,h'0000,h'7FFF,h'6F7B,h'6F7B
+        .data.w h'6F7B,h'6F7B,h'0000,h'7FFF,h'7FFF,h'7FFF,h'7FFF,h'7FFF
+                :      ↑
+                :      Pixel data (16bit/pixel in 32K color mode)
+cg_Test_001_END:
+</PRE>
+
+<P><DT><B>XXX.map file example</B>
+<DD><PRE>
+;----------------------------------------
+; Sprite Map
+
+;----------------------------------------
+; global
+         .global map_Test_000
+         .global map_Test_001
+                 :
+                 :
+                
+map_test_000:
+        SPRNUM     8                  ←Total number of sprites
+        SPRDEF     1,  24,  16, -16, -60,       NONE
+        SPRDEF     2,  32,  23, -19, -44,       NONE
+        SPRDEF     3,  40,  23, -24, -21,       HREV
+        SPRDEF     4,  56,  48,  45, -18,       HREV|VREV
+        SPRDEF     5,  40,  72,   5, -18,       HREV
+        SPRDEF     6,  48,  25, -60,   1,       NONE
+        SPRDEF     7,  48,  21, -60,  36,       VREV
+        SPRDEF     8,  24,  10, -52,  26,       NONE
+        SPREND          ↑
+               
+Sprite number, H size, V size, H offset, V offset, reverse information
+                 (H inversion=HREV, V inversion=VREV, None=NONE)
+</PRE>
+<P><DT><B>XXX.anm file example</B>
+<DD><PRE>
+;----------------------------------------
+; Anime Table
+
+;----------------------------------------
+; global
+         .global bank_Test_000
+         .global bank_Test_001
+                 :
+                 :
+
+bank_anumSamp_000:
+         ANIMNUM 12 ←Total number of patterns used
+         ANIM map_Test_000, 5
+         ANIM map_Test_010, 20
+         ANIM map_Test_001, 5
+                 :↑Target pattern, display time
+                 :
+         ANIMEND
+</PRE>
+</DL>
+
+<A NAME="no4"></A>
+<P><DT><H3>■4. ASM format (+rotation)</H3>
+<DD> Exactly the same as (3) except for *XXX.pat
+<DL>
+<P><DD><PRE>
+;----------------------------------------
+; Sprite Pattern(+rot)
+
+;----------------------------------------
+; global
+         .global pat_anumSamp_000
+         .global pat_anumSamp_001
+                 :
+                 :
+
+pat_anumSamp_000:
+        PATNUM     5
+        PATTERN    1,   0,   3, -16, -16,  16,  16,h'F60A,NONE
+        PATTERN    1, -19,   5, -16, -16,  16,  16,h'EAAA,NONE
+                 :     ↑
+                 :     Sprite number, rotation center H coordinate, rotation center V coordinate,
+                 :     Offset A, Offset B, Offset C, Offset D,
+                 :     Rotation angle, reversal information (H reversal = HREV, V reversal = VREV, None = NONE)
+　　　　PATEND
+
+*Rotation center coordinates = relative coordinates from the pattern origin
+*Offset A to D = Relative coordinate values between the rotation center point and each vertex of the sprite (when the angle is 0°)
+(A=TopLeft-H coordinate B=TopLeft-V coordinate C=BottomRight-H coordinate D=BottomRight-V coordinate
+)
+*Rotation angle = rotation angle for each sprite (0° to 360° expressed in hexadecimal from $0000 to $FFFF)
+</PRE>
+</DL>
+
+<A NAME="no5"></A>
+<P><DT><H3>■5. C format (+rotation+reverse Pri)</H3>
+
+<A NAME="no6"></A>
+<P><DT><H3>■6. ASM format (+rotation+reverse Pri)</H3>
+<DD>Respectively, <A HREF="#no2">■2. </A><A HREF="#no4">■4. About the pattern data output with </A>'s XXX.pat
+Reverse the priority of sprites placed on the tool
+Change and output.
+<P>The file format itself is <A HREF="#no2">■2. </A><A HREF="#no4">■4. Same as </A>.
+</DL>
+
+<HR NOSHADE>
+<A HREF="../../index.htm"><IMG srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm">Graphic Tools Guide</A>
+★<A HREF="../index.htm#frm">Format list</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

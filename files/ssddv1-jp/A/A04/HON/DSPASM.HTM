@@ -1,0 +1,250 @@
+<HTML>
+<HEAD>
+<TITLE>ＳＣＵ ＤＳＰアランブラ 使用説明書</TITLE>
+</HEAD>
+<BODY bgcolor="FFFFFF">　<A HREF=p166.htm>前のページに戻る</A>｜<A HREF=../mokuzi.htm>メニューに戻る</A>｜<A HREF=dspsim.htm>次のページに進む</A> <HR> <H1>ＳＣＵ ＤＳＰアランブラ 使用説明書</H1>
+'94/07/08
+<HR>
+<H2>目次</H2>
+<DIR>
+<DT><A HREF="#1">１. アセンブラの機能</A>
+<DT><A HREF="#2">２. アセンブラの実行</A>
+<DT><A HREF="#3">３. プログラム記述形式</A>
+<DT><A HREF="#4">４. 命令一覧</A>
+<DT><A HREF="#5">５. サンプルプログラム</A>
+</DIR>
+
+<H2><A NAME="1">１. アセンブラの機能概要</A></H2>
+本アセンブラは、ＤＳＰ用の命令コードを生成するためのもので、ＭＳーＤＯＳ上及び、ＵＮＩＸ上で動作させる事を目的としています。出力コードは、モトローラのＳフォーマットで、直接コードを出力しますので、リンクは必要ありません。<BR>
+ＤＳＰアセンブラは、ハードウェアについての知識を多く必要としますので、アセンブラを使用する前に、ＤＳＰハードウェアに関する理解を深めておいて下さい。
+
+<H2><A NAME="2">２. アセンブラの実行</A></H2>
+ｄｓｐａｓｍ　［オプション］　&lt;ソースファイル名&gt;
+<OL>
+<LI>オプションには、次の指定が出来ます。（ファイルの作成は正常終了時のみ）
+<DD>-l[ファイル名] : リスト出力指定
+<DD>-a[ファイル名] : ＳＨアセンブラ用データ形式出力指定
+<DD>-c[ファイル名] : Ｃ言語用データ形式出力指定
+<DD>-m             : ＭＯＤＥＬ　Ｍの開発環境を使用する場合に指定
+<LI>ソースファイル名に、デフォルトの拡張子はありません。
+<LI>エラーの表示は、最初に検出したもののみですので、エラーが出なくなるまで修正とアセンブルを繰り返して下さい。
+</OL>
+
+<H2><A NAME="3">３. プログラム記述形式</A></H2>
+<B>［ラベル］［△オペレーション［△オペランド］］…［コメント］</B><BR>
+例: LABEL:   MOV MC0,X    ; コメント
+
+<H3>(1) ラベル</H3>
+<UL>
+<LI>プログラマーが定義し、JMP 命令の飛び先の名前に使えます。
+<LI>ラベルを記述する際には、１カラム目から書き始めるか、「LABEL:」のように最後に「:」を付けます。
+<LI>ラベルの最大長は、３２文字で、使用可能な文字は、英大文字、英小文字、数字、アンダースコア(_)で、先頭に置けるのは数字以外です。尚、大文字・小文字は、同一視されます。
+</UL>
+
+<H3>(2) オペレーション</H3>
+<UL>
+<LI>ＤＳＰの実行命令を記述します。
+<LI>オペレーションから書き始める際は、前に空白文字を置いてください。
+<LI>オペレーションは、演算命令のみ、最大６つまで並べることがあります。
+</UL>
+
+<H3>(3) オペランド</H3>
+<UL>
+<LI>オペレーションの実行対象になるものを記述します。
+<LI>オペランドとの区切りは、空白文字を使用します。
+</UL>
+
+<H3>(4) コメント</H3>
+<UL>
+<LI>プログラムをわかりやすくするための注釈を書けます。
+<LI>コメントは、「;」を付けた位置から行末までです。
+</UL>
+
+<B>* 記述上の注意</B>
+<UL>
+<LI>基本的にオペレーション～オペランドは１行に収まるように記述しますが、もしも、１行に収まらない場合には、改行コードの前に「\」を付け、次の行と繋げることができます。但し、コメントある行の後にオペレーションを繋げる場合には 「;」の前に「\」を付けてください。この際、１行の最大長である２５５バイトを越えないようにしてください。
+<LI>オペレーション、オペランドは、英大文字でも英小文字でも可です。
+<LI>数値の表記は、１６進・$xx、１０進・xxx、２進・ %xxxxxxxx を使用して下さい。
+<LI>出力コードを配置する番地は、ORG疑似命令によって指定できます。
+<LI>ＤＳＰ内のプログラムエリアは、２５６命令分しかありませんが、処理の分割や最適化の作業がスムーズに行くように、Warning を出して、２０４８命令分のコードを出力できるようになっています。このコードは、シミュレータのみが対応できますので、実際のＤＳＰで使用する際には、２５６命令以内に短くしてアセンブルする必要があります。また、２５６命令を越えるアドレスのラベルを使用する場合、８ビット値では代入出来ない事に注意して下さい。
+</UL>
+
+<B>* 予約語について</B>
+<UL>
+<LI>オペランドに使用される次の名前は、ラベルに使用する事が出来ません。<BR>
+｛ALH, ALL, ALU, M0, M1, M2, M3, MC0, MC1, MC2, MC3, MUL}
+</UL>
+
+<B>* 数値演算について</B>
+<UL>
+<LI>ラベルに値を設定したり、オペランドに数値を使う際、以下の演算子が使用できます。（但し、オペランドに使用する場合は、空白文字を入れられませんので、ご注意下さい。例：○ JMP $+2、× JMP $ + 2）
+</UL>
+
+<H3>演算関係</H3>
+<DT>+  … 加算
+<DT>-  … 減算
+<DT>*  … 乗算
+<DT>/  … 除算
+<DT>%  … 除余
+<DT>~  … ビット否定
+<DT>&  … ビット積
+<DT>|  … ビット和
+<DT>^  … 排他的ビット和
+<DT>&lt;&lt;… 左シフト
+<DT>&gt;&gt;… 右シフト
+
+<H3>優先順位</H3>
+<DT>1. + - ~ (単項演算子)
+<DT>2. * / %
+<DT>3. + -
+<DT>4. &lt;&lt;&gt;&gt;
+<DT>5. &
+<DT>6. | ^
+
+<H2><A NAME="4">４. 命令一覧</A></H2>
+<OL>
+<LI>演算命令
+<DD>NOP AND OR XOR ADD SUB AD2 SR RR SL RL RL8 CLR MOV
+<LI>Load immediate命令
+<DD>MVI
+<LI>ＤＭＡ命令
+<DD>DMA DMAH
+<LI>ＪＵＭＰ命令
+<DD>JMP
+<LI>LOOP BOTTOM 命令
+<DD>BTM LPS
+<LI>ＥＮＤ命令
+<DD>END ENDI
+</OL>
+
+<H3>疑似命令</H3>
+<UL>
+<LI>EQU (=)  ………………  ラベルの定義に使用。
+<LI>ORG      ………………  命令を配置する先頭番地を指定。
+<LI>ENDS     ………………  プログラムの最後に入れると、以後は無視されます。
+<LI>IF  <数値・ラベル> …  数値やラベルの計算結果が０以外なら、以後、ELSE又は、ENDIFまでをアセンブルします。
+<LI>IFDEF &lt;ラベル&gt; ………  ラベルが前方に定義されていれば、以後、ELSE又は、ENDIFまでをアセンブルします。<BR>
+IF、IFDEFのネストレベルは16までです。）
+</UL>
+
+<H2><A NAME="5">５. サンプルプログラム</A></H2>
+
+<H3>(1) ＤＳＰの内部ＲＡＭ０の内容を、内部ＲＡＭ１に複写する場合。</H3>
+<PRE>
+; ------- sample (1) start -------
+
+COPY_SIZE  =  12          ; 複写サイズ
+RAM0_ADR   =  $00         ; 複写元アドレス
+RAM1_ADR   =  $00         ; 複写先アドレス
+
+	MOV RAM0_ADR,CT0      ; RAM0の複写元アドレスをセット
+	MOV RAM1_ADR,CT1      ; RAM1の複写先アドレスをセット
+	MOV COPY_SIZE-1,LOP   ; 転送サイズー１を LOP レジスタにセット
+	LPS                   ; １命令ループの実行
+	MOV MC0,MC1           ; RAM0からRAM1への転送
+	ENDI
+
+; ------- sample (1) end -------
+</PRE>
+
+<H3>(2) ２×３＋４×５の計算をする場合。（RAM0×RAM1＋RAM0×RAM1＝RAM2）（sample 2b は、2aを最適化したものです。）</H3>
+<PRE>
+; ------- sample (2a) start -------
+
+RAM0_ADR   =  $00          ; 2, 4 格納アドレス先頭
+RAM1_ADR   =  $00          ; 3, 5 格納アドレス先頭
+RAM2_ADR   =  $00          ; 結果格納アドレス
+
+	MOV RAM0_ADR,CT0   ; RAM0のアドレスをセット
+	MOV RAM1_ADR,CT1   ; RAM1のアドレスをセット
+	MVI #2,MC0         ; RAM0に「2」をセット
+	MVI #3,MC1         ; RAM1に「3」をセット
+	MVI #4,MC0         ; RAM0に「4」をセット
+	MVI #5,MC1         ; RAM1に「5」をセット
+	MOV RAM0_ADR,CT0   ; RAM0のアドレスをセット
+	MOV RAM1_ADR,CT1   ; RAM1のアドレスをセット
+	MOV RAM2_ADR,CT2   ; RAM2のアドレスをセット
+	MOV MC0,X          ; RAM0から、RXへデータ転送
+	MOV MC1,Y          ; RAM1から、RYへデータ転送
+	MOV MUL,P          ; RXとRYの積算結果をPH,PLに格納
+	MOV MC0,X          ; RAM0から、RXへデータ転送
+	MOV MC1,Y          ; RAM1から、RYへデータ転送
+	CLR A              ; ACH,ACLに「0」をセット
+	AD2  MOV ALU,A     ; PH,PLとACH,ACLの加算結果をACH,ACLに格納
+	MOV MUL,P          ; RXとRYの積算結果をPH,PLに格納
+	AD2  MOV ALL,MC2   ; PH,PLとACH,ACLの加算結果をRAM2に格納
+	ENDI
+
+; ------- sample (2a) end -------
+; ------- sample (2b) start -------
+
+RAM0_ADR   =  $00          ; 2, 4 格納アドレス先頭
+RAM1_ADR   =  $00          ; 3, 5 格納アドレス先頭
+RAM2_ADR   =  $00          ; 結果格納アドレス
+
+	                                                 MOV RAM0_ADR,CT0
+	                                                 MOV RAM1_ADR,CT1
+	MVI #2,MC0
+	MVI #3,MC1
+	MVI #4,MC0
+	MVI #5,MC1
+	                                                 MOV RAM0_ADR,CT0
+	                                                 MOV RAM1_ADR,CT1
+	     MOV MC0,X             MOV MC1,Y             MOV RAM2_ADR,CT2
+	     MOV MC0,X  MOV MUL,P  MOV MC1,Y  CLR A
+	AD2             MOV MUL,P             MOV ALU,A
+	AD2                                              MOV ALL,MC2
+	ENDI
+
+; ------- sample (2b) end -------
+</PRE>
+
+<H3> (3) マトリックスに対して移動処理の計算をする場合。（RAM0×RAM1＝RAM2）</H3>
+<PRE> ／Ｍ００ Ｍ０１ Ｍ０２ Ｍ０３＼  ／１００ｘ＼  　  ／Ｍ００ Ｍ０１Ｍ０２ Ｍ０３＼｜ Ｍ１０ Ｍ１１ Ｍ１２ Ｍ１３ ｜｜ ０１０ｙ ｜ → ｜ Ｍ１０ Ｍ１１Ｍ１２ Ｍ１３ ｜ ＼Ｍ２０ Ｍ２１ Ｍ２２ Ｍ２３／ ｜ ００１ｚ ｜ 　  ＼Ｍ２０ Ｍ２１Ｍ２２ Ｍ２３／ 　　　　 　　　 　　　 　　　　  ＼０００１／
+
+; ------- sample (3) start -------
+
+DATA_TOP   =  $10000 >> 2       ; 外部メモリのアドレスは、４バイト単位
+MAT_SIZE   =  $0C               ; 配列サイズ
+RAM0_ADR   =  $00               ; X, Y, Z の移動量を格納する先頭アドレス
+RAM1_ADR   =  $00               ; 配列用ワークのアドレス
+RAM2_ADR   =  $00               ; 元の配列のアドレス
+
+; （外部メモリから、RAM0へ移動量をセットした配列を転送）
+;
+	MVI DATA_TOP,RA0
+	                                                 MOV RAM0_ADR,CT0
+	DMA D0,MC0,#$02
+;
+; （RAM2 から RAM1へ演算する配列の複写）
+	                                                 MOV RAM2_ADR,CT2
+	                                                 MOV RAM1_ADR,CT1
+	                                                 MOV MAT_SIZE-1,LOP
+	LPS
+	                                                 MOV MC2,MC1
+WAITING:
+	JMP T0,WAITING
+;
+; （配列の計算実行）
+	                                                 MOV RAM0_ADR,CT0
+	                                                 MOV RAM1_ADR,CT1
+	     MOV MC0,X             MOV MC1,Y 
+	     MOV MC0,X  MOV MUL,P  MOV MC1,Y  CLR A
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM0_ADR,CT0
+	AD2             MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV #1,RX
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM2_ADR+3,CT2
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  CLR A      MOV ALL,MC2
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM0_ADR,CT0
+	AD2             MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV #1,RX
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM2_ADR+7,CT2
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  CLR A      MOV ALL,MC2
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM0_ADR,CT0
+	AD2             MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV #1,RX
+	AD2             MOV MUL,P             MOV ALU,A  MOV RAM2_ADR+11,CT2
+	AD2                                              MOV ALL,MC2
+	ENDI
+
+; ------- sample (3) end -------
+</PRE>
+以上<HR>　<A HREF=p166.htm>前のページに戻る</A>｜<A HREF=../mokuzi.htm>メニューに戻る</A>｜<A HREF=dspsim.htm>次のページに進む</A>  </BODY>
+</HTML>

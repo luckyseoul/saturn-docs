@@ -1,0 +1,335 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/19&gt;CD通信I/F(CDパート)/データ仕様</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+<a href="p07_12_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>CD通信インタフェースユーザーズマニュアル(CDパート)/リファレンス</B>
+<H2 ALIGN=CENTER>データ詳細</H2>
+<HR NOSHADE>
+<DL>
+<!-- --------------------------------------------------------------------------------------- -->
+<A NAME="no1_0"></A>
+	<P><DT><H3>7.2.1　基本的なデータ</H3>
+		<DT><TABLE BORDER=1><TR>
+<TD><PRE><a href="p07_10_j.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=220><PRE>Data<BR><H4>基本的なデータ</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>　</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>1.0</H4></TD>
+</TABLE></P>
+	<P><DT><B>(1)基本データ型</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH=100><PRE>型　名</TH><TH width=200><PRE>説　明</TH></TR>
+	<TR><TD><PRE>Uint8</TD><TD><PRE>符号なし1バイト整数</TD></TR>
+	<TR><TD><PRE>Sint8</TD><TD><PRE>符号あり1バイト整数</TD></TR>
+	<TR><TD><PRE>Uint16</TD><TD><PRE>符号なし2バイト整数</TD></TR>
+	<TR><TD><PRE>Sint16</TD><TD><PRE>符号あり2バイト整数</TD></TR>
+	<TR><TD><PRE>Uint32</TD><TD><PRE>符号なし4バイト整数</TD></TR>
+	<TR><TD><PRE>Sint32</TD><TD><PRE>符号あり4バイト整数</TD></TR>
+	<TR><TD><PRE>Boo1</TD><TD><PRE>論理型4バイト整数（論理定数を値に取る）</TD></TR></TABLE></P>
+
+	<P><DT><B>(2)論理定数</B>
+		<DD>論理型(Bool)の値として使用する。<P>
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH=70><PRE>定数名</TH><TH WIDTH=100><PRE>値</TH><th width=320><PRE>説　明</TH></TR>
+	<TR><TD><PRE>FALSE<br>TRUE</TD><TD ALIGN=CENTER><PRE>0<br>1</TD><TD><PRE>論理値の偽を表す。<br>論理値の真を表す。</TD></TR>
+	<TR><TD><PRE>OFF<br>ON</TD><TD ALIGN=CENTER><PRE>0<br>1</TD><TD><PRE>スイッチオフ（偽）を表す。<br>スイッチオン（真）を表す。</TD></TABLE></P>
+
+	<P><DT><B>(3)その他</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH WIDTH=70><PRE>定数名</TH><TH WIDTH=100><PRE>値</TH><th width=320><PRE>説　明</TH></TR>
+	<TR><TD><PRE>NULL</TD><TD><PRE>（（void＊）0）</TD><TD><PRE>NULLポインタ</TD></TR></TABLE></P>
+
+<!-- --------------------------------------------------------------------------------------- -->
+<A NAME="no2_0"></A>
+	<DT><H3>7.2.2　定数</H3>
+	<DT><TABLE BORDER=1><TR>
+<TD><PRE><a href="p07_10_j.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=220><PRE>Data<BR><H4>定数（1/2）</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>Constant</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>2.0</H4></TD>
+</TR></TABLE><P>
+
+<A NAME="no2_01"></A>
+	<DT><B>(１)割り込み要因レジスタ関係（HIRQREQ, HIRQMSK）のビット名</B>
+	<DD><PRE>
+bit  7  6  5  4  3  2  1  0
+    [ ][ ][ ][ ][ ][ ][ ][ ]
+     |  |  |  |  |  |  |  |
+     |  |  |  |  |  |  |  +---- CDC_HIRQ_CMOK  1:コマンド発行可能
+     |  |  |  |  |  |  +------- CDC_HIRQ_DRDY  1:データ転送準備完了
+     |  |  |  |  |  +---------- CDC_HIRQ_CSCT  1:1セクタ読み込み完了
+     |  |  |  |  +------------- CDC_HIRQ_BFUL  1:ＣＤバッファフル
+     |  |  |  +---------------- CDC_HIRQ_PEND  1:ＣＤ再生終了
+     |  |  +------------------- CDC_HIRQ_DCHG  1:ディスク交換の発生
+     |  +---------------------- CDC_HIRQ_ESEL  1:セレクタ設定処理の終了
+     +------------------------- CDC_HIRQ_EHST  1:ホスト入出力処理の終了
+
+bit 15 14 13 12 11 10  9  8
+    [-][-][ ][ ][ ][ ][ ][ ]
+           |  |  |  |  |  |
+           |  |  |  |  |  +---- CDC_HIRQ_ECPY  1:複写／移動処理の終了
+           |  |  |  |  +------- CDC_HIRQ_EFLS  1:ファイルシステム処理の終了
+           |  |  |  +---------- CDC_HIRQ_SCDQ  1:サブコードＱの更新完了
+           |  |  +------------- CDC_HIRQ_MPED  1:ＭＰＥＧ関連処理の終了
+           |  +---------------- CDC_HIRQ_MPCM  1:ＭＰＥＧ動作不良区間の終了
+           +------------------- CDC_HIRQ_MPST  1:ＭＰＥＧ割り込みステータスの通知
+
+
+</PRE>
+<A NAME="no2_02"></A>
+	<P><DT><B>(２)エラーコード</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH=150><PRE>定数名</TH><th width=370><PRE>説　明</TH></TR>
+	<TR><TD><PRE>CDC_ERR_OK</TD><TD><PRE>関数が正常終了した。</TD></TR>
+	<TR><TD><PRE>CDC_ERR_CMDBUSY</TD><TD><PRE>コマンド発行時、コマンド終了フラグが1になっていない。<br>対象：コマンド終了フラグをチェックする全ての関数</TD></TR>
+	<TR><TD><PRE>CDC_ERR_CMDNG</TD><TD><PRE>コマンド発行時、CMOKフラグが1になっていない。<br>対象：コマンドを発行する全ての関数</TD></TR>
+	<TR><TD><PRE>CDC_ERR_TMOUT</TD><TD><PRE>タイムアウトした。（レスポンス待ち、データ転送準備待ち）<br>対象：コマンドを発行する全ての関数<br>　　　CDC_GetPeriStat関数、CDC_DataReady関数</TD></TR>
+	<TR><TD><PRE>CDC_ERR_PUT</TD><TD><PRE>セクタデータの書き込みによるデータ転送準備待ちで、空<br>きセクタを確保できなかった。<br>対象：CDC_PutSctData関数実行後のCDC_DataReady関数</TD></TR>
+	<TR><TD><PRE>CDC_ERR_REJECT</TD><TD><PRE>コマンドに対するレスポンスがREJECTとなった。<br>対象：コマンドを発行する全ての関数</TD></TR>
+	<TR><TD><PRE>CDC_ERR_WAIT</TD><TD><PRE>コマンドに対するレスポンスがWAITとなった。<br>対象：コマンドを発行する全ての関数</TD></TR>
+	<TR><TD><PRE>CDC_ERR_TRNS</TD><TD><PRE>データ転送サイズが異常である。<br>対象：内部でデータ転送する関数（CDC_Tgetで始まる関数）</TD></TR>
+	<TR><TD><PRE>CDC_ERR_PERI</TD><TD><PRE>定期レスポンスを取得できなかった。<br>対象：CDC_GetPeriStat関数</TD></TR></TABLE></P>
+
+<A NAME="no2_03"></A>
+	<P><DT><B>(3)バッファ区画のセクタ範囲（セクタ位置とセクタ数)の特殊指定</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH=150><PRE>定数名</TH><th width=370><PRE>説　明</TH></TR>
+	<TR><TD><PRE>CDC_SPOS_END</TD><TD><PRE>区画最後のセクタ位置を示す。<br>（区画内セクタ数−1）の指定と同じ。</TD></TR>
+	<TR><TD><PRE>CDC_SNUM_END</TD><TD><PRE>指定セクタ位置SPから区画最後までのセクタ数を示す。<br>（区画内セクタ数−SP）の指定と同じ。</TD></TR></TABLE>
+	<DD>　以下のバッファ区画に対する関数で有効です。</P>
+
+	<P><DD>　<A HREF="#CDC_CalActSiz">CDC_CalActSiz</A>
+		<DD>　<A HREF="#CDC_GetSctInfo">CDC_GetSctInfo</A>
+		<DD>　<A HREF="#CDC_ExeFadSearch">CDC_ExeFadSearch</A>
+		<DD>　<A HREF="#CDC_GetSctData">CDC_GetSctData</A>
+		<DD>　<A HREF="#CDC_DelSctData">CDC_DelSctData</A>
+		<DD>　<A HREF="#CDC_GetdelSctData">CDC_GetdelSctData</A>
+		<DD>　<A HREF="#CDC_CopySctData">CDC_CopySctData</A>
+		<DD>　<A HREF="#CDC_MoveSctData">CDC_MoveSctData</A>
+	</P>
+
+	<P ALIGN=CENTER><img srcset="../grp/i086_03_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DT><B>注意</B>
+		<DD>区画内セクタ数が0のときは、いずれの指定でも常にWAITを返します。これらの関数を実行する前には、必ずバッファ区画のセクタ数の取得（CDC_GetSctNum)を実行して、セクタ数が0でないことを確認すること。</P>
+
+<A NAME="no2_04"></A>
+	<P><DT><B>(4)その他の特殊指定</B>
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH=150><PRE>定数名</TH><th width=370><PRE>説　明</TH></TR>
+	<TR><TD><PRE>CDC_PARA_DFL</TD><TD><PRE>設定パラメータの省略値指定（0）<br>省略値を0で指定する場合に使用できる。</TD></TR>
+	<TR><TD><PRE>CDC_PARA_NOCHG</TD><TD><PRE>設定パラメータの未変更指定（−1）<br>未変更をFFH,FFFFH,最上位ビット＝1などで指定する場合<br>に使用できる。</TD></TR>
+	<TR><TD><PRE>CDC_NUL_SEL</TD><TD><PRE>セレクタ番号（絞り番号、バッファ区画番号）の特殊値</TD></TR>
+	<TR><TD><PRE>CDC_NUL_FID</TD><TD><PRE>ファイル識別子の特殊値</TD></TR></TABLE></P>
+
+<!-- --------------------------------------------------------------------------------------- -->
+<A NAME="no3_0"></A>
+	<P><DT><H3>7.2.3　TOC情報／セッション情報</H3>
+		<DT><TABLE BORDER=1><TR>
+<TD><PRE><a href="p07_10_j.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=220><PRE>Data<BR><H4>TOC情報／セッション情報</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>TOC/SES</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>3.0</H4></TD>
+</TR></TABLE></P>
+
+<A NAME="no3_01"></A>
+	<P><DT><B>　(1)TOC情報……CDC_TgetToc関数</B>
+	<P ALIGN=CENTER><img srcset="../grp/i087_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no3_02"></A>
+	<P><DT><B>　(2)セッション情報……CDC_GetSes関数</B>
+	<P ALIGN=CENTER><img srcset="../grp/i087_03_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<!-- --------------------------------------------------------------------------------------- -->
+<A NAME="no4_0"></A>
+	<P><DT><H3>7.2.4　サブコード情報</H3>
+	<DT><TABLE BORDER=1><TR>
+<TD><PRE><a href="p07_10_j.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=220><PRE>Data<BR><H4>サブコード情報</H4></TD>
+<TD WIDTH=160><PRE>Data Name<BR><H3>Subcode</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>4.0</H4></TD>
+</TR></TABLE></P>
+
+<A NAME="no4_01"></A>
+	<P><DT><B>(1)　サブコードQ情報……CDC_TgetScdQch関数</B>
+		<DD><B>(a)</B>Adr＝1の場合</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TD>byte</TD><TH><PRE>　１　</TH><TH><PRE>　２　</TH><TH><PRE>　３　</TH><TH><PRE>　４　</TH><TH><PRE>　５　</TH><TH><PRE>　６　</TH><TH><PRE>　７　</TH><TH><PRE>　８　</TH><TH><PRE>　９　</TH><TH><PRE>　10　</TH>
+<TH><PRE>　　　</TH><TH><PRE>　　　</TH></TR>
+	<TR ALIGN=CENTER><TD></TD>
+<TD>Ctrl<BR>Adr</TD>
+<TD>TNO</TD>
+<TD>X</TD>
+<TD COLSPAN=3>P_FAD</TD>
+<TD>00</TD>
+<TD COLSPAN=3>Q_FAD</TD>
+<TD COLSPAN=2>CRC</TD></TR></TABLE></P>
+
+	<TABLE>
+	<TR><TD>Ctrl Adr</TD><TD>：CONTROL/ADRバイト</TD></TR>
+	<TR><TD>TNO     </TD><TD>：トラック番号(BCDではなくバイナリ値)</TD></TR>
+	<TR><TD>X       </TD><TD>：インデックス番号(BCDではなくバイナリ値)</TD></TR>
+	<TR><TD>P_FAD   </TD><TD>：トラック内時間(トラック先頭を0とするフレームアドレス形式)</TD></TR>
+	<TR><TD>Q_FAD   </TD><TD>：絶対時間(00:00:00を0とするフレームアドレス形式)<P></TD></TR></TABLE>
+
+	<P><DD>各ステータスにおける内容は、CDレポートの場合と同様です。
+		<DD>各TNOにおける値を次の表に示します。
+		<DD>(リードインとリードアウトはマルチセッションで取得可能)</P>
+
+	<P><TABLE BORDER=1>
+	<TR><TH WIDTH=150><PRE>TNO</TH><th width=150><PRE>X</TH><th width=150><PRE>P＿FAD</TH></TR>
+	<TR><TD><PRE>01H〜63H（1〜99）</TD><TD><PRE>01H〜63H</TD><TD><PRE>トラック内の経過FAD</TD></TR>
+	<TR><TD><PRE>AAH（リードアウト）</TD><TD><PRE>01H〜63H</TD><TD><PRE>トラック内の経過FAD</TD></TR>
+	<TR><TD><PRE>00H（リードイン）</TD><TD><PRE>01H〜63H,A0H,A1H,A2H</TD><TD><PRE>000000H</TD></TR></TABLE></P>
+
+	<DD>先頭セッションのリードインは、Q_FAD＝000000Hとなります。
+	<DD>（通常は取得できません）</P>
+
+	<P><DD><B>(b)</B>その他(ADR≠1)の場合：
+		<DD>サブコードQのそのままの値(CRC以外の10バイト)</P>
+
+	<P><DT><B>(2)サブコードR〜W情報……CDC_TgetScdRwch関数</B>
+	<P ALIGN=CENTER><img srcset="../grp/i088_04_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P><DD>　サブコードＲ〜Ｗは1パック(24バイト＝12ワード)単位でデコードされます。<BR>
+　CDブロックは、内部に24パック(6パケット)分のパックバッファを持ちます。</P>
+
+<!-- --------------------------------------------------------------------------------------- -->
+<A NAME="no5_0"></A>
+	<P><DT><H3>7.2.5　ステータスとレポート</H3>
+<DT><TABLE BORDER=1><TR>
+<TD><PRE><a href="p07_10_j.htm#t7_1">一<BR>覧<BR>表</A></TD>
+<TD WIDTH=150><PRE>Title<BR><H4>データ仕様</H4></TD>
+<TD WIDTH=180><PRE>Data<BR><H4>ステータスとレポート</H4></TD>
+<TD WIDTH=200><PRE>Data Name<BR><H3>Status & CD Report</H3></TD>
+<TD WIDTH=060><PRE>No<BR><H4>5.0</H4></TD>
+</TR></TABLE></P>
+
+<A NAME="no5_01"></A>
+	<P><DT><B>(1)レスポンスの形式</B>
+		<DD>　レスポンスはステータス(Status)とレポート（Report）から構成されます。レポートとしてCDレポート（CD Report）を返すかどうかはコマンドに依存します。定期レスポンスは必ずCDレポートを返します。<BR>
+　ステータスとCDレポートを合わせて、CDステータス情報と呼びます。<BR>
+
+	<P ALIGN=CENTER><img srcset="../grp/i089_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no5_02"></A>
+	<P><DT><B>　(2)ステータス</B>
+		<DD>　ステータスがFFHの時はREJECT(コマンド不正)を示します。REJECT時を除き、ステータスコードは常に有効です。また、bit5〜bit7は排他的で、同時には1になりません。</P>
+	<P><DD><PRE>
+bit  7  6  5  4  3  2  1  0
+    [ ][ ][ ][-][          ]
+     |  |  |     ステータスコード(ＣＤドライブ状態)
+     |  |  |
+     |  |  +----- CDC_ST_PERI  1:定期レスポンス　　　　0:コマンドの対するレスポンス
+     |  +-------- CDC_ST_TRNS  1:データ転送要求あり　　0:要求なし
+     +----------- CDC_ST_WAIT  1:ＷＡＩＴ（実行保留）　0:ＡＣK（コマンド正常受付）
+</PRE></P>
+
+	<P><DD><B>(a)</B>ステータスコード(CDドライブ状態)
+		<DD><TABLE BORDER=1>
+	<TR><th width=150><PRE>定数名</TH><th width=40><PRE>値</TH><TH><PRE>状態</TH><th width=250><PRE>説　明</TH></TR>
+	<TR><TD><PRE>CDC_ST_BUSY</TD>   <TD ALIGN=CENTER><PRE>00H</TD><TD ALIGN=CENTER><PRE>〈BUSY〉</TD><TD><PRE>状態遷移中</TD></TR>
+	<TR><TD><PRE>CDC_ST_PAUSE</TD>  <TD ALIGN=CENTER><PRE>01H</TD><TD ALIGN=CENTER><PRE>〈PAUSE〉</TD><TD><PRE>ポーズ中（一時停止）</TD></TR>
+	<TR><TD><PRE>CDC_ST_STANDBY</TD><TD ALIGN=CENTER><PRE>02H</TD><TD ALIGN=CENTER><PRE>〈STANDBY〉</TD><TD><PRE>スタンバイ（ドライブ停止状態）</TD></TR>
+	<TR><TD><PRE>CDC_ST_PLAY</TD>   <TD ALIGN=CENTER><PRE>03H</TD><TD ALIGN=CENTER><PRE>〈PLAY〉</TD><TD><PRE>CD再生中</TD></TR>
+	<TR><TD><PRE>CDC_ST_SEEK</TD>   <TD ALIGN=CENTER><PRE>04H</TD><TD ALIGN=CENTER><PRE>〈SEEK〉</TD><TD><PRE>シーク中</TD></TR>
+	<TR><TD><PRE>CDC_ST_SCAN</TD>   <TD ALIGN=CENTER><PRE>05H</TD><TD ALIGN=CENTER><PRE>〈SCAN〉</TD><TD><PRE>スキャン再生中</TD></TR>
+	<TR><TD><PRE>CDC_ST_OPEN</TD>   <TD ALIGN=CENTER><PRE>06H</TD><TD ALIGN=CENTER><PRE>〈OPEN〉</TD><TD><PRE>トレイが開いている</TD></TR>
+	<TR><TD><PRE>CDC_ST_NODISC</TD> <TD ALIGN=CENTER><PRE>07H</TD><TD ALIGN=CENTER><PRE>〈NODISC〉</TD><TD><PRE>ディスクがない</TD></TR>
+	<TR><TD><PRE>CDC_ST_RETRY</TD>  <TD ALIGN=CENTER><PRE>08H</TD><TD ALIGN=CENTER><PRE>〈RETRY〉</TD><TD><PRE>リードリトライ処理中</TD></TR>
+	<TR><TD><PRE>CDC_ST_ERROR</TD>  <TD ALIGN=CENTER><PRE>09H</TD><TD ALIGN=CENTER><PRE>〈ERROR〉</TD><TD><PRE>リードデータエラーが発生した</TD></TR>
+	<TR><TD><PRE>CDC_ST_FATAL</TD>  <TD ALIGN=CENTER><PRE>0AH</TD><TD ALIGN=CENTER><PRE>〈FATAL〉</TD><TD><PRE>致命的エラーが発生した</TD></TR></TABLE></P>
+
+<A NAME="no5_03"></A>
+	<P><DT><B>　(3)CDレポート</B>
+		<DD><TABLE BORDER=1>
+	<TR><TD ALIGN=RIGHT>byte</TD><TH COLSPAN=2><PRE>　１　</TH><TH><PRE>　２　</TH><TH><PRE>　３　</TH><TH><PRE>　４　</TH><TH><PRE>　５　</TH><TH><PRE>　６　</TH><TH><PRE>　７　</TH></TR>
+	<TR ALIGN=CENTER><TD ALIGN=RIGHT><B>CD Report</B></TD><TD>Flg</TD><TD>Rep<BR>Cnt</TD><TD>Ctrl<BR>Adr</TD><TD>TNO</TD><TD>X</TD><TD COLSPAN=3>FAD</TD></TR></TABLE></P>
+
+	<P><DD><TABLE>
+	<TR><TD>Flg</TD><TD>：ＣＤフラグ　（上位４ビット）……〈PLAY〉状態で有効</TD></TR>
+	<TR><TD>RepCnt</TD><TD>：リピート回数（下位４ビット）……通知範囲は0H〜EH</TD></TR></TABLE>
+	<DD><PRE>
+bit  7  6  5  4  3  2  1  0
+    [ ][-][-][-][          ]
+     |           リピート回数
+     |
+     +----------- CDC_CDFLG_ROM  1:ＣＤ−ＲＯＭデコード中
+                                 0:ＣＤ−ＤＡ，シーク，スキャン等
+</PRE></P>
+	<P><DD><TABLE>
+	<TR><TD>Ctrl Adr</TD><TD>：CONTROL/ADRバイト</TD></TR>
+	<TR><TD>TNO     </TD><TD>：トラック番号　　(BCDではなくバイナリ値)　サブコードQに基づく</TD></TR>
+	<TR><TD>X       </TD><TD>：インデックス番号(BCDではなくバイナリ値)</TD></TR>
+	<TR><TD>FAD     </TD><TD>：フレームアドレス(CD-ROM時はヘッダ情報に、それ以外はサブコードQに基づく)</PRE></UL></UL></UL></TD></TR></TABLE></P>
+
+<A NAME="no5_04"></A>
+	<P><DT><B>　(4)各ステータスにおけるCDレポート内容</B>
+		<DD>　CDドライブ状態とCDレポート内容を以下に示します。FFHの並びは無効値を意味します。(REJECT時のCDレポートは無効、WAIT時は有効です。)</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH><PRE>状　態</TH><TH><PRE>CDフラグ/リピート</TH><TH><PRE>CONTROL/ADR</TH><TH><PRE>トラック番号</TH><TH><PRE>インデックス番号</TH><TH><PRE>フレームアドレス</TH></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈BUSY〉</TD><TD><PRE>○/FFH</TD><TD><PRE>○/FFH</TD><TD><PRE>○/FFH</TD><TD><PRE>○/FFH</TD><TD><PRE>○/FFFFFFH</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈PAUSE〉</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈STANDBY〉</TD><TD><PRE>ポーズ時の値</TD><TD><PRE>ポーズ時の値</TD><TD><PRE>ポーズ時の値</TD><TD><PRE>ポーズ時の値</TD><TD><PRE>ポーズ時の値</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>シークホーム時</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFFFFFH</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈PLAY〉</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈SEEK〉</TD><TD><PRE>○</TD><TD><PRE>目標位置</TD><TD><PRE>目標位置</TD><TD><PRE>目標位置</TD><TD><PRE>目標位置</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈SCAN〉</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈OPEN〉</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFFFFFH</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈NODISC〉</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFFFFFH</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈RETRY〉</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD><TD><PRE>○</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈ERROR〉</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFH</TD><TD><PRE>FFFFFFH</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>〈FATAL〉</TD><TD><PRE>不定</TD><TD><PRE>不定</TD><TD><PRE>不定</TD><TD><PRE>不定</TD><TD><PRE>不定</TD></TABLE>
+	<DD>○：現在の値　シークホーム：ホーム位置へのシーク（ストップ）
+	<DD>スタンバイタイムを経過して〈PAUSE〉から〈STANDBY〉状態になった場合、ポーズ時の値を保持します。</P>
+
+<A NAME="no5_05"></A>
+	<P><DT><B>　(5)CDレポート内容が無効値の場合</B>
+		<DD><OL TYPE=a>
+	<P><B><LI></B>リピート回数は直前の値が保持されます。別の状態に遷移すると、保持値に戻ります。</P>
+	<P><B><LI></B>シークホームから〈PAUSE〉状態に遷移すると、ディスク先頭（FAD＝150）に移動します。</P>
+	<P><B><LI></B>〈ERROR〉時は直前の値が保持されます。&lt;PAUSE&gt;状態に遷移すると、保持値に戻ります。</P>
+	<P><B><LI></B>状態遷移する場合、途中の&lt;BUSY&gt;状態では無効値を返すことがあります。<BR>必ず〈BUSY〉以外の状態に確定してから、CDレポート内容を参照してください。</P>
+	</OL>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p07_10_j.htm">戻る</A>｜
+<a href="p07_12_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#sysg_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm">CD通信I/F(CDパート)</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

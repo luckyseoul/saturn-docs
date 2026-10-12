@@ -1,0 +1,36 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p112.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p115.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD> <B> (6) ADPCM compatible </B> <BR>
+<DD> <UL TYPE = "DISK"> <LI> Link the ADPCM decompression library SEGA_ADP.LIB. <BR>
+Call the ADPCM usage declaration PCM_DeclareUseAdpcm after the <LI> initialization function. <P></UL>
+<B> ◆ Playback of specified ADPCM format </B> <BR>
+<UL TYPE = "DISK"> <LI> You can play in exactly the same procedure (same program) as AIFF format. However, please note that the CPU load is higher than in AIFF format. <P></UL>
+<B> ◆ CD-ROM XA Audio format playback </B> <BR>
+<UL TYPE = "DISK"> <LI> The library determines the playback frequency and the number of channels (stereo / mono) from the coding information in the subheader area. Make sure it is written correctly. <BR>
+The <LI> stream key is set by the library user. <BR>
+<LI> Make the ring buffer an integral multiple of the sector size 2324 bytes. <BR>
+Set playback information with <LI> PCM_SetInfo. <BR>
+<LI> CD_ROM XA Audio playback can only be used in stream playback mode. <BR>
+<LI> Please refer to the sample program smppcm5.c. <P></UL>
+<DD> <B> (7) How to use the function </B> <BR>
+<DD> <UL TYPE = "DISK"> <LI> Be sure to call PCM_Init at the beginning of the program. <BR>
+Be sure to call PCM_VblIn within a <LI> V blank IN interrupt. <BR>
+<LI> PCM_Start can only be executed once for a handle. <BR>
+If you want to play the same file over and over again, create a handle each time. <BR>
+Call <LI> PCM_SetLoadNum, PCM_SetPcmCmdBlockNo, and PCM_SetPcmStreamNo before starting playback. <BR>
+<LI> Be sure to use PCM_NotifyWriteSize for the handle created by PCM_CreateMemHandle to notify the data supply amount to the ring buffer. <BR>
+<LI> When using the pause function, it is necessary to specify the work for pause processing in advance with PCM_SetPauseWork. This work need not be prepared for each handle. <BR>
+Since this work is a work area that is temporarily used in the pause-on process, you can reserve the area immediately before the pause-on process and release the area immediately after. <BR>
+<LI> Data transfer method from CD block to ring buffer By default, data is transferred by CPU DMA. <BR>
+PCM_SetTrModeCd can be used to specify program transfer, CPU DMA, or SCU DMA. <BR>
+Call PCM_SetTrModeCd before calling the task function for the first time after creating the handle. <BR>
+<LI> When playing CD-ROM XA Audio, be sure to set the playback information with PCM_SetInfo. <P></UL>
+</DL><P><P><HR>
+<A HREF=p112.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p115.htm> Go to next page </A>
+</BODY>
+</HTML>

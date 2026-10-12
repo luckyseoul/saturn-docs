@@ -1,0 +1,70 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/17&gt; Sound driver Ver2.10 guide/system interface work (480H-4FFH:128B)</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no7">Sound Driver Programmer's Guide</a><HR>
+ <B>▲ <A HREF="snditf1.htm">Back</a> ｜ <A HREF="snditf3.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Sound driver programmer's guide/7. System interface (work area)</b><h2 align="center"> System interface work (480H-4FFH: 128B)</h2><HR NOSHADE>
+<table border cellpadding="4">
+<tr><th> Offset</th><th> Size</th><th> Data content</th><th> explanation</th></tr>
+<tr><td> 0x25a00480</td><td> 1B</td><td nowrap> Interrupt Control Word<BR>
+ ( Host ---> Sound )</td><td><dl>
+<dt> Bit7: IPT ENABLE<dd> 0: PCM playback address update interrupt disabled<dt><dd> 1: Enable PCM playback address update interrupt</dl>
+</td></tr>
+<tr><td> 0x25A00441</td><td> 1B</td><td nowrap> Interrupt type (1-127)<BR>
+ ( Sound ---> Host )</td><td><dl compact>
+<dt> 1<dd> : PCM playback address update interrupt<dt> 2-127<dd> : unused</dl>
+</td></tr>
+<tr><td> 0x25A00442</td><td> 1B</td><td nowrap> Corresponding stream playback number<BR>
+ ( Sound ---> Host )</td><td> Corresponding stream playback number at PCM playback address update interrupt<BR>
+ □ Bit0-7 corresponds to PCM playback number 0-7<BR>
+ (Updated with Bit=1)</td></tr>
+<tr><td> 0x25A00443</td><td> 1B</td><td nowrap> Sound Mode Control Word<BR>
+ ( Host ---> Sound )</td><td><dl>
+<dt> Bit7: Sound mode<dd> 0: Sound output STEREO mode<dd> 1: Sound output MONO mode</dl>
+</td></tr>
+<tr><td> 0x25A00444</td><td> 1B</td><td nowrap> 3D sound control word<BR>
+ ( Host ---> Sound )</td><td><dl>
+<dt> Bit7: 3D 1ch mode<dd> 0: not used<dt><dd> 1: Use<dt> Bit6: 3D 2ch mode<dd> 0: not used<dt><dd> 1: Use<dt> Bit5: Qsound 4ch mode<dd> 0: not used<dt><dd> 1: Use<dt> Bit4: Qsound 8ch mode<dd> 0: not used<dt><dd> 1: Use</dl>
+</td></tr>
+<tr><td> 0x25A00445</td><td> 1B</td><td> Q sound COEF Pointer</td><td> Q sound COEF Pointer</td></tr>
+<tr><td> 0x25A00446</td><td> 1B</td><td> 3D sound COEF Pointer</td><td> 3D sound COEF Pointer</td></tr>
+<tr><td> 0x25A00447</td><td> 1B</td><td> 3D sound MADRS Pointer</td><td> 3D sound MADRS Pointer</td></tr>
+<tr><td> 0x25A00448</td><td> 32B</td><td> 3D sound parameters</td><td> 3D sound parameter storage area</td></tr>
+<tr><td> 0x25A00468</td><td> 48B</td><td> 3D sound program work</td><td> 3D sound program work area (30h)</td></tr>
+<tr><td> 0x25A00498</td><td> 8B</td><td> reserved</td><td> -</td></tr>
+<tr><td> 0x25A004A0</td><td> 1B</td><td> Command Sequence<BR>
+ Timing Flag<BR>
+ ( Host <--->
+ Sound )</td><td> Bit7: Timing Flag 0: Idle 1: Command Set completed</td></tr>
+<tr><td> 0x25A004A1</td><td> 1B</td><td nowrap> Command Sequence<BR>
+ Control Word<BR>
+ ( Host ---> Sound )</td><td><dl>
+<dt> Bit7: Command mode<dd> 0: Handshake OFF (V1.00-1.29)<dt><dd> 1: Handshake ON (V1.30- )<dt> Bit6:SCSP MIDI output<dd> 0:OFF<dt><dd> 1:ON<dt> Bit5: Unusable<dd> always 0</dl>
+</td></tr>
+<tr><td> 0x25A004A2</td><td> 14B</td><td> reserved</td><td> -<tr><td> 0x25A004B0</td><td> 16B</td><td> ST-V's work</td><td> Reserved area for ST-V compatibility (cannot be used with SATURN)</td></tr>
+</table>
+<p><HR NOSHADE>
+ <B>▲ <A HREF="snditf1.htm">Back</a> ｜ <A HREF="snditf3.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no7">Sound Driver Programmer's Guide</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

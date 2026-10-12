@@ -1,0 +1,46 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;10/19&gt;SMPC User's Manual/3.1 Optimization of peripheral data acquisition time</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+ <B>▲ <A HREF="p03_11.htm">Back</a> ｜ <A HREF="p03_13.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SMPC User's Manual/3.1 SMPC Control Mode</b><H2> ◆Optimization of peripheral data acquisition time</H2><HR NOSHADE>
+<DL>
+<P><DD> SMPC is designed to follow the application processing cycle.</P>
+<P><DD><OL>
+<LI> Prepare peripheral data by V-BLANK-IN<LI> Calculate parameters for sprites and scroll surfaces controlled by peripherals<LI> 3D calculation etc.<LI> Draw sprites and polygons<LI> display</OL>
+</P>
+<P><DD> The purpose of optimizing peripheral data collection time is to collect peripheral data as close to V-BLANK-IN as possible. In other words, start peripheral data collection as close as possible to V-BLANK-IN, and minimize the time from peripheral data collection until SH-2 acquires peripheral data. Figure 3.5 shows an overview of peripheral data collection time optimization.</P>
+<A NAME="z3_5"></A><P ALIGN=CENTER> <B>Figure 3.5 Operation overview of peripheral data collection time optimization</b><BR>
+<img srcset="../grp/i055_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<DT><H3> ●Operation when peripheral data collection time is not optimized</H3><DD> Issue the INTBACK command after 300μs after V-BLANK-IN and before V-BLANK-OUT. This allows you to start collecting peripheral data reliably with V-BLANK-OUT. When SMPC detects V-BLANK-OUT, it starts collecting peripheral data. Terminate the INTBACK command when peripheral data collection is complete.</P>
+<DT><H3> ●Notes on not optimizing peripheral data collection time</H3><DD> The timing at which peripheral data collection is completed varies depending on the type and number of connected peripherals. As an example, if we consider the configuration of two standard Saturn PADs, all peripheral data will be available in OREG much earlier than in V-BLANK-IN. At this time, using SMPC interrupts allows you to obtain peripheral data at a faster timing than V-BLANK-IN. In addition, if the configuration uses 32 or fewer OREGs as described above, peripheral data can be obtained at V-BLANK-IN timing without using SMPC interrupts.</P>
+<DT><H3> ●Operation when optimizing peripheral data collection time</H3><DD> Issue the INTBACK command after 300μs after V-BLANK-IN and before V-BLANK-OUT. This allows you to start collecting peripheral data reliably with V-BLANK-OUT. When optimizing peripheral data collection time, SMPC first collects peripheral data without optimizing it and measures the collection time. The peripheral data collection start timing is the same as when the peripheral data collection time is not optimized, when the SMPC detects V-BLANK-OUT.<BR>
+ From the next frame onwards, the peripheral data collection time is the measurement time plus a 1msec margin, and peripheral data is collected at that timing. See <A HREF="#z3_5">Figure 3.5</a> . After that, we constantly monitor the peripheral data collection time and optimize the data collection time. Also, if a time-over occurs after optimization, the above optimization is executed again with V-BLANK-OUT as the start timing.</P>
+<DT><H3> ●Points to note when optimizing peripheral data collection time</H3><DD> Peripheral data collection timing changes depending on the type and number of connected peripherals. When optimizing peripheral data collection time, clarify the type, number, and combination of supported peripherals, evaluate them thoroughly, and prevent time-overs.<BR>
+ In addition, if a continue is involved, the waiting time for the continue request is also measured as the peripheral data collection time. Therefore, please be careful to keep the time from SMPC interrupt occurrence to a continue request as short as possible, and to execute within a constant time.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_11.htm">Back</a> ｜ <A HREF="p03_13.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SMPC User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

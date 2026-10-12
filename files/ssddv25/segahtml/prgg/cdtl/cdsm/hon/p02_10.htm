@@ -1,0 +1,201 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 4&gt;Simple CD simulator/2.Tool guide</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Simple CD simulator</a><HR>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Simple CD simulator</b><H1> 2.Tool guide</H1><HR NOSHADE>
+<DL>
+<A NAME="no2_10"></A><P><DT><H3> ■Debug support function overview</H3><P><DT> <B>●Debug support function overview</b><DD> It supports efficient debugging by reading files that should be read from a CD from a memory file in RAM on the target or a DOS file in a SCSI hard disk and simulating a CD-ROM.<BR>
+ If files with the same name exist, the priority order is SIMM, SCSI, and CD, so I would like to try patching the program and data from CD for debugged files and SCSI for files being debugged. In some cases, loading files from SIMM enables efficient debugging.</P>
+<P><DT> <B>●Debug support function using CD library</b><DD><PRE>
+ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  
+ ┃              Application               ┃  
+ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  
+ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  
+ ┃          File system library           ┃  
+ ┃       (compatible with IOS9660)        ┃  
+ ┃                 ┌──────────────────────╂┐ 
+ ┃●Logical file    │●CD block replacement ┃│ 
+ ┃ access function │ function using a     ┃│ 
+ ┃●Immediate return│ simple CD simulator  ┃│ 
+ ┃ type access     │                      ┃│ 
+ ┃ function        │                      ┃│ 
+ ┗━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━┛│ 
+ ┏━━━━━━━━━━━━━┓   │┏━━━━━━━━━━┓           │ 
+ ┃CD           ┃   │┃SCSI      ┃           │ 
+ ┃communication┃   │┃driver    ┃           │ 
+ ┃interface    ┃   │┃          ┃           │ 
+ ┗━━━━━━━━━━━━━┛   │┗━━━━━━━━━━┛           │ 
+━ ━ ━ ━ ━ ━ ━ ━ ━ ━│━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━│━
+ ┏━━━━━━━━━━━┓     │┏━━━━━━━━━━┓ ┏━━━━━━━━┓│ 
+ ┃CD block   ┃     │┃IBM PC HDD┃ ┃SIMM    ┃│ 
+ ┃●CD file   ┃     │┃●DOS file ┃ ┃●Memory ┃│ 
+ ┃           ┃     │┃          ┃ ┃ file   ┃│ 
+ ┗━━━━━━━━━━━┛     │┗━━━━━━━━━━┛ ┗━━━━━━━━┛│ 
+                   │                       │ 
+                   └───────────────────────┘ 
+</PRE><P><DD><B>CD file</b><DD> This is a file recorded on a CD in ISO9660 format.<BR>
+ It can be read from a CD disc or a CD emulator through the CD block.</P>
+<P><DD> <B>DOS file</b><DD> This is a file recorded on the HDD in MS-DOS format.<BR>
+ Using the SCSI driver, it can be read from the IBM PC's simple simulator software.</P>
+<P><DD> <B>memory file</b><DD> A file recorded in memory in memory file format.<BR>
+ It can be read directly using the file system library.</P>
+<P><DT> <B>●Prerequisites</b><DD> <B>CD file</b><DD> The simple CD simulator cannot read CD files.<BR>
+ It is supported by CD emulation system.</P>
+<P><DD> <B>Same name file</b><DD> These three files can be accessed at the same time, but if there is a file with the same name,</P>
+<P><DD><OL>
+<P><B><LI></b> memory file</P>
+<P><B><LI></b> DOS file</P>
+<P><B><LI></b> CD file</P>
+</OL>
+<P><DD> They are read out preferentially in this order.</P>
+<P><DD> <B>real-time emulation</b><DD> The simple CD simulator does not perform real-time emulation.</P>
+<A NAME="no2_20"></A><P><DT><H3> ■Simple CD simulator/SIMM system</H3><P><DT> <B>● SIMM system overview</b><DD> The processing flow during debugging is as follows.</P>
+<P><DD><OL>
+<P><B><LI></b> Create a binary file to be placed on the CD.</P>
+<P><B><LI></b> Use [MFCAT.EXE] to combine multiple files and create a memory file.</P>
+<P><B><LI></b> Load the memory file into RAM on the target.<BR>
+</P>
+<P><B><LI></b> Use the CD file system library to read files from memory files in RAM on the target in the same way you read files from a CD.</P>
+</OL>
+<P><DT> <B>●How to create a memory file</b><DD><PRE>
+┌──────┐   ┌─────────┐   ┌──────┐               ┌──────┐
+├──────┤   │Compiler │   ├──────┤   ┌───────┐   ├──────┤
+│Source├──→│Assembler│──→│Load  │──→│ROF2BIN│──→│Binary│
+│      │   │Linker   │   │module│   └───────┘   │module│
+└──────┘   └─────────┘   └──────┘               └──┬───┘
+         ┌─────────────────────────────────────────┘   
+┌──────┐ │               ┌──────┐                      
+├──────┤ │ ┌─────────┐   ├──────┤                      
+│Binary│─┼→│MFCAT    │──→│Memory│                      
+│module│ │ └─────────┘   │File  │                      
+└──────┘ │               └──────┘                      
+         │                                         
+┌──────┐ │                                         
+├──────┤ │                                         
+│Binary├─┘                                         
+│module│                                           
+└──────┘                                           
+</PRE><P><DD><OL>
+<P><B><LI></b>Compile, assemble, and link source files to create a SYSROF format load module.</P>
+<P><B><LI></b> Convert to binary module with ROF2BIN.</P>
+<P><B><LI></b> Repeat steps 1 and 2 to create multiple files that you want to load from the memory file as CD-ROM files.</P>
+<P><B><LI></b> Use MFCAT to combine multiple files to create a memory file.</P>
+</OL>
+<P><DT> <B>●How to use memory files</b><DD> The standard steps from ICE startup to execution of the target program are shown below.</P>
+<P><DT> <B>(1) BOOT ROM startup</b><DD><OL>
+<P><B><LI></b> Start the BOOT ROM.<BR>
+<HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+:rs[RET]
+** RESET IN BY E700!
+
+:g[RET]
+** PC = 060027XX
+</PRE><HR WIDTH=60% ALIGN=LEFT>
+</P>
+<P><B><LI></b>Press [Ctrl-C] when the logo appears.<BR>
+<HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+PC=
+PR=
+MACH=
+R0-7
+R8-15
+RUN-TIME=
++++:BREAKE KEY
+</PRE><HR WIDTH=60% ALIGN=LEFT>
+</P>
+</OL>
+<P><DT><B>(2) Load</b><DD><OL>
+<P><B><LI></b> Load the target program and memory file according to the format of the ICE file read command.</P>
+</OL>
+<P><DT> <B>(3) Memory file settings</b><DD><OL>
+<P><B><LI></b> Set the start address of the memory file to make the file system library recognize that the memory file is loaded.</P>
+<P><B><LI></b> Search the address of [_GFMC_base] from the map file of the target program and set there the address where the memory file was loaded.</P>
+</OL>
+<P><DT> <B>(4) Target program execution</b><DD><OL>
+<P><B><LI></b> Executes the target program from the start address.</P>
+</OL>
+<A NAME="no2_30"></A><P><DT><H3> ■Simple CD simulator/SCSI system</H3><P><DT> <B>●SCSI system overview</b><DD> The processing flow during debugging is as follows.<DD><OL>
+<P><B><LI></b> Create a binary file to be placed on the CD.</P>
+<P><B><LI></b> Start by typing CDSIM.EXE at the MS-DOS prompt.</P>
+<P><B><LI></b> Use the CD file system library to read files from a SCSI hard disk in the same way you read files from a CD.</P>
+</OL>
+<P><DT> <B>●Operations up to program execution</b><DD> The standard steps from ICE startup to execution of the target program are shown below.</P>
+<P><DT> <B>(1) BOOT ROM startup</b><DD><OL>
+<P><B><LI></b> Start the BOOT ROM.<BR>
+<HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+:rs[RET]
+** RESET IN BY E700!
+
+:g[RET]
+** PC = 060027XX
+</PRE><HR WIDTH=60% ALIGN=LEFT>
+</P>
+<P><B><LI></b>Press [Ctrl-C] when the logo appears.<BR>
+<HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+PC=
+PR=
+MACH=
+R0-7
+R8-15
+RUN-TIME=
++++:BREAKE KEY
+</PRE><HR WIDTH=60% ALIGN=LEFT>
+</P>
+</OL>
+<P><DT><B>(2) PC side startup</b><DD><OL>
+<P><B><LI></b> Power on or reset your PC.<BR>
+ The following message appears during startup:<BR>
+ In particular, make sure that the message "SEGA SATURN XXXX" is output.<BR>
+<HR WIDTH=60% ALIGN=LEFT>
+<PRE>
+AHA-1540/1542/1640 APSI Manager for DOS
+Version 3.XX
+
+	Omitted
+
+Host Adapter #0 - SCSI IS 1 - LUN 0: SEGA SATURN  XXXX
+
+	The following omitted</PRE><HR WIDTH=60% ALIGN=LEFT>
+</P>
+</OL>
+<P><DT> <B>(3)Target program load</b><DD><OL>
+<P><B><LI></b> Load the target program according to the format of the ICE file read command.<BR>
+ If you also use the SIMM system at the same time, load and configure the memory file at this time.</P>
+</OL>
+<P><DT> <B>(4) Target program execution</b><DD><OL>
+<P><B><LI></b> Executes the target program from the start address.</P>
+</OL>
+<P><DT> <B>(5) Start [CDSIM.EXE]</b><DD><OL>
+<P><B><LI></b> Launch [CDSIM.EXE] in the appropriate directory.</P>
+</OL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p01_10.htm">Back</a> ｜ <A HREF="p03_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">Simple CD simulator</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

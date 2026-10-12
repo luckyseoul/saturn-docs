@@ -1,0 +1,57 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/13&gt;Virtual CD System/3.CD Emulator</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">Virtual CD System</a><HR>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Virtual CD System User's Manual/Chapter 3 CD Emulator VCDEMU</b><HR NOSHADE>
+<DL>
+<P><DT><H3> 3.2.1 Log window</H3><DD> The log window displays messages in two formats.</P>
+<P><DD><UL TYPE=DISC>
+<LI> Command display<LI> Other messages</UL>
+</P>
+<P><DT> <B>●Display commands</b><DD> When displaying a command, the message is divided into fields. The meanings of the fields are as follows from left to right: There is a field identification indicator in the line just below the top bar.</P>
+<P><DD><PRE>
+Command      Atime      FAD(10)   Rtc    NopOutPREFD
+Play         00:02:00   96        0x80   00230   000001000
+Stop         00:00:00   00        0x80   00015   001011000
+Pause        00:00:00   00        0x80   00030   001011000
+Play2        00:10:05   2F3       0x80   00224   000001000
+</PRE></P>
+<P><DD><B>◆Command</b><DD> Displays the command name. The identification display is "Command". A number may be added to the end of the command name. This indicates whether it is double speed or not. 2 means that a command for double speed has been received.</P>
+<P><DD> <B>◆Absolute time</b><DD> When a command with an access position as an argument is received, the value of that argument is displayed. The identification display is "Atime". The format is mm:ss:ff, where mm represents minutes, ss represents seconds, and ff represents frames. For commands that do not have the access location as an argument, 00:00:00 is displayed.</P>
+<P><DD> <B>◆Frame address</b><DD> Displays absolute time in frames in decimal or hexadecimal (switchable, default is decimal). For example, when the absolute time is displayed as 00:02:15, this field will be displayed as 165 (75 x 2 + 15). The identification display is "FAD(10)".</P>
+<P><DD> <B>◆Message</b><DD> Displays the number of NOP commands and the number of frames of transferred data. The number of NOP commands is the number of NOP commands received between the time the command displayed just before was received and the command displayed on this line.<BR>
+ The number of frames is the number sent to the VCD I/F board between receiving the command that involves data transfer shown just before and receiving the command shown on this line. Therefore, it is a larger value than the number received in the target box. The identification display is "Message".</P>
+<P><DD> <B>◆Status</b><DD> Indicates the status of the I/F board when the command is received. Another display is "Status:PREFD". It is a string of 5 values of 0 or 1. From the left</P>
+<DD> -1 indicates Play status.<BR>
+ Always 0. It is not set on the VCD I/F board.<P> -1 indicates Ready status.<BR>
+ If normal, it is 1.<P> -1 indicates an error status.<BR>
+ Indicates that some error has occurred.<P> -1 indicates DiskEnd (Finish) status.<BR>
+ Always 0. It is not set on the VCD I/F board.<P> -1 indicates DmaEnd status.<BR>
+ Used as a trigger for transfer when in playback mode.<P><P><DT> <B>●Other messages</b><DD> Other messages, such as error messages, are not separated into fields.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_10.htm">Back</a> ｜ <A HREF="p09_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no2">Virtual CD System</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

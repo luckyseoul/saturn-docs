@@ -1,0 +1,107 @@
+<HTML>
+<HEAD> <TITLE> Event control </TITLE> </HEAD> <BODY>
+
+<P> <A HREF="../controla/pr9-4.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> ｜ <A HREF="pr10-2.htm"> Go to next page </A> </BR> </P>
+<HR>
+
+<IMG SRC="logo.gif">
+
+<H1 ALIGN=CENTER>
+Programmer’s Tutorial
+</H1>
+
+<H2 ALIGN=CENTER>
+Event control
+</H2>
+
+<P>
+<B> This chapter explains the specific use of the event structure and event management functions. <BR>
+By using the concept of events, it is possible to describe a program as a combination of program events (one element in a program), which makes it very easy to understand the overall program flow.
+In addition, since each program event can be used in common, the program can be simplified. </B>
+</P>
+
+<H2>
+<A NAME="NO4"> 10-1. Event structure </A>
+</H2>
+
+<H3>
+<A NAME="NO1"> Event processing </A>
+</H3>
+
+<P>
+Event processing refers to processing in which a group of functions appearing in a program list is represented by a label called an event, and a continuous list of events is executed in order from the top. <BR>
+By using event processing, it is possible to process complicated functions that are executed continuously as a simple list of labels. Also, the execution order can be easily changed as an operation of the label registered as an event. <BR>
+As a result, the overall program flow can be grasped, and common use of events and simplification of the program can be achieved.
+</P>
+
+<H4> Figure 10-1 Event image </H4>
+<IMG SRC="p10-02.gif">
+
+<P>
+The functions registered as events and the execution order of events are processed in the event management area called the EVENT structure reserved in the event RAM area. <BR>
+In SGL, the event execution order is called an event list.
+</P>
+
+<H3>
+<A NAME="KOZOTAI"> EVENT structure </A>
+</H3>
+
+<P>
+An event is defined as an EVENT structure in the event RAM area (8 kbytes). One EVENT structure consists of 128 bytes, and up to 64 EVENT structures can be defined in this RAM area.
+The EVENT structure is configured as shown in Figure 10-2.
+</P>
+
+<H4> Figure 10-2 EVENT structure </H4>
+<IMG SRC="p10-03.gif">
+
+<P>
+Each EVENT structure consists of the following members.
+</P>
+
+<PRE>
+* work: Start address of WORK structure for user area expansion.
+* next: The start address of the next event to be executed.
+* before: The start address of the event executed immediately before.
+* exad (): Start address of the area where the function to be executed as an event is stored.
+user []: User area for storing variables used by event registered functions.
+        It is also possible to expand the user area using workpieces.
+</PRE>
+
+<P>
+If each member of “* work”, “* next”, “* before” does not have the corresponding address, NULL is assigned.
+</P>
+
+<P>
+When the user uses the user area in the EVENT structure, it is very convenient to cast the user area with a structure defined for the user.
+</P>
+<P>
+The user area of ​​one EVENT structure consists of 112 bytes, but if you want to use the user area beyond this, it is possible to extend the user area using a work or the like.
+For details on expansion of the user area, refer to “10-4: Expansion of user area”.
+</P>
+
+<H3>
+<A NAME="NO7"> Event list </A>
+</H3>
+
+<P>
+Each event defined as an EVENT structure in the event RAM area constitutes a list according to the order of events to be executed. <BR>
+A list is a series of events that are linked by “* next” and “* before” reserved in the event structure, and are called an event list. <BR>
+In addition, events that are continuously executed in the event list do not necessarily need to be continuously stored in the event RAM area, and if the pointers are concatenated with “* next” and “* before”, It is executed continuously.
+</P>
+
+<H4> Figure 10-3 Event list structure </H4>
+<IMG SRC="p10-04.gif">
+
+<BLOCKQUOTE><P>
+Note) NULL (0) if the corresponding event work does not exist
+</P></BLOCKQUOTE>
+
+<P>
+The system uses the top address of the EVENT structure registered at the top of the event list as the EventTop variable. When executing an event, the event is executed in order from the event specified by “EventTop”. <BR>
+The executed event passes the value of the pointer “* next” in the EVENT structure to the EventNow variable, and the system then executes the EVENT structure starting from the address pointed to by “EventNow”. The system executes events in order according to “EventNow”, and ends event execution processing when the value pointed to by “* next” becomes NULL (there is no event to follow). <BR>
+The EventLast variable points to the start address of the EVENT structure registered at the end of the list, and is used when adding or registering events. The EventLast variable is changed only when executing “slSetEvent”, “slSetEventNext”, and “slCloseEvent” in the library functions. <BR>
+“* Before” is used when inserting / registering / deleting events.
+</P>
+<HR>
+<P> <A HREF="../controla/pr9-4.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> ｜ <A HREF="pr10-2.htm"> Go to next page </A> </BR> </P>
+</BODY></HTML>

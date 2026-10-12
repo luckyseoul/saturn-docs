@@ -1,0 +1,80 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/86&gt;VDP2ユーザーズマニュアル/3.3表示期間中のVRAMアクセス方法</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>★
+<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>★
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<B>▲
+<a href="p03_20_j.htm">戻る</A>｜
+<a href="p03_31_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第３章　ＲＡＭ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_30"></A>
+	<P>	<DT><H2>■3.3　表示期間中のVRAMアクセス方法</H2>
+<A NAME="no3_31"></A>
+	<P>	<H3>　●表示期間中のVRAMアクセス</H3>
+		<DD>　VDP2は、スクロール画面のデータをTVの走査に同期してVRAMから読み出しながら表示しています。表示期間中のVRAMアクセスは、4回または8回のアクセスを動作単位(1サイクル)として、そのサイクルを繰り返します。TV画面モードがノーマルモードのときは、8回のアクセスが1サイクルになります。また、ハイレゾリューションモードまたは専用モニターモードのときは、4回のアクセスが1サイクルになります。<P>
+　1サイクル中に行うVRAMアクセスには、以下の10種類があります。</P>
+
+	<P><DD><OL>
+	<P>	<LI>ノーマルスクロール画面のパターンネームデータリードアクセス</P>
+	<P>	<LI>ノーマルスクロール画面のキャラクタパターンデータリードアクセスまたは、ビットマップパターンデータリードアクセス</P>
+	<P>	<LI>NBG0、NBG1の縦セルスクロールテーブルデータリードアクセス</P>
+	<P>	<LI>CPUによるリード／ライトアクセス</P>
+	<P>	<LI>アクセスしない</P>
+	<P>	<LI>RBG0のパターンネームデータリードアクセス</P>
+	<P>	<LI>RBG0のキャラクタパターンデータリードアクセスまたは、ビットマップパターンデータリードアクセス</P>
+	<P>	<LI>RBG0の係数テーブルデータリードアクセス</P>
+	<P>	<LI>RBG1のパターンネームデータリードアクセス</P>
+	<P>	<LI>RBG1ののキャラクタパターンデータリードアクセス</P>
+	</OL>
+
+	<P>	<DD>　上記<B>1.</B>〜<B>5.</B>のVRAMアクセスは、1サイクル中のどのタイミングで行うかを、VRAM-A0、VRAM-A1、VRAM-B0、VRAM-B1のそれぞれのバンクについて指定しなければいけません。その指定は、それぞれのVRAMアクセスの種類に対応したアクセスコマンドと呼ばれる4ビットの値をVRAMサイクルパターンレジスタに書き込むことで行います。</P>
+
+	<P>	<DD>　<B>6.</B>〜<B>8.</B>のVRAMアクセスは、それぞれ1サイクル全てのタイミングを占有するので、1つのバンクに対して1種類しか指定できません。その指定は、それぞれのVRAMアクセスの種類に対応した値をRAMコントロールレジスタの回転データバンク指定ビットに書き込むことで行います。<B>6.</B>〜<B>8.</B>のVRAMアクセスを指定されたバンクのVRAMサイクルパターンレジスタの設定は無効になります。</P>
+
+	<P>	<DD>　<B>9.</B>、<B>10.</B>のVRAMアクセスは、それぞれ1サイクル全てのタイミングを占有し、<B>9.</B>はVRAM-B1に、<B>10.</B>はVRAM-B0に固定されています。<B>9.</B>、<B>10.</B>の指定は、RBG1を表示させると自動的に行われ、そのときVRAM-B0、VRAM-B1のVRAMサイクルパターンレジスタの設定は無効になります。<BR>
+　VRAMサイクルパターンレジスタには、VRAM-A0、VRAM-A1、VRAM-B0、VRAM-B1のそれぞれのバンクに対応したレジスタがあります。VRAMを2分割しない場合は、VRAM-A0用のレジスタがVRAM-A用に、VRAM-B0用のレジスタがVRAM-B用に使用され、VRAM-A1とVRAM-B1用のレジスタは使用されません。それぞれのバンクに対応したレジスタは、T0〜T7の8つのアクセスタイミングに区切られ、T0用ビットに指定されたアクセスコマンドの示すVRAMアクセスから順番にアクセスが行われます。TV画面がノーマルモードの時は、T0〜T7のすべてが有効になりますが。ハイレゾリューションモードまたは専用モニターモードのときはT0〜T3のみが有効となり、T4〜T7は無視されます。1サイクル中に使用されるVRAMサイクルパターンレジスタを図3.2に示します。</P>
+
+<A NAME="z3_2"></A>
+	<P ALIGN=CENTER><B>図3.2　VRAMサイクルパターンレジスタ</B><BR><img srcset="../grp/i032_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+
+	<P>	<DD>　表示に必要なVRAMアクセスを指定した後に余ったアクセスタイミングには、必ず「アクセスしない」を設定してください。また、VRAMサイクルパターンレジスタに指定したVRAMアクセスのアドレスが、指定したバンク内のアドレスでなかった場合、アクセスが行われず正しい画面表示ができません。</P>
+
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p03_20_j.htm">戻る</A>｜
+<a href="p03_31_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#hard"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#vdp2">HARDWARE Manual</A>
+<a href="../index_j.htm#no3">VDP2ユーザーズマニュアル</A>★
+<a href="p03_10_j.htm">第３章　ＲＡＭ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

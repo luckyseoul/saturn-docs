@@ -1,0 +1,74 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;23/54&gt;VDP1 User's Manual/5.3 Gouraud Shading Table</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p05_20.htm">Back</a> ｜ <A HREF="p05_40.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 5 Table</b><HR NOSHADE>
+<DL>
+<A NAME="no5_30"></A><P><DT><H2> ■5.3 Gouraud shading table</H2><DD> This table specifies the RGB data of 4 points when performing Gouraud shading processing on parts. Each of the 4 points of data is 16 bits, so 1 table requires 8 Bytes. Place it at the position starting from the 8HByte boundary address. However, please do not write from 00000H to 0001FH.<BR>
+ VRAM is up to address 7FFFFH. Do not define Gouraud shading tables beyond address 80000H.<BR>
+ The table defines RGB data in the order of vertices (A), (B), (C), and (D). For lines, only vertices A and B are valid, and correspond to the line start and end points. For sprites, vertices (A), (B), (C), and (D) correspond to the top left, top right, bottom right, and bottom left.<BR>
+ This table is referenced from the command table when Gouraud shading processing is specified.</P>
+<A NAME="t5_2"></A><P><DD> <B>Table 5.2 Gouro shading table</b><DD><TABLE BORDER=1>
+<TR><TD ROWSPAN=2 ALIGN="CENTER"><PRE> table address</TD><TD COLSPAN=2 ALIGN="CENTER"><PRE> corresponding vertex</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> sprites, polygons, polylines</TD><TD WIDTH=50 ALIGN="CENTER"><PRE> line</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Table start address</TD><TD ALIGN="CENTER"><PRE> Vertex (A)</TD><TD ALIGN="CENTER"><PRE> line start point</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Table start address +2</TD><TD ALIGN="CENTER"><PRE> Vertex (B)</TD><TD ALIGN="CENTER"><PRE> line end point</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Table start address +4</TD><TD ALIGN="CENTER"><PRE> Vertex (C)</TD><TD ALIGN="CENTER"><PRE> ignore</TD></TR>
+<TR><TD ALIGN="LEFT"><PRE> Table start address +6</TD><TD ALIGN="CENTER"><PRE> Vertex (D)</TD><TD ALIGN="CENTER"><PRE> ignore</TD></TR>
+</TABLE>
+</P>
+<A NAME="z5_4"></A><P><DD> <B>Figure 5.4 RGB code format</b><PRE>
+MSB LSB
+┌─┬─────────┬─────────┬─────────┐
+│ │    B    │    G    │    R    │
+│X├─┬─┬─┬─┬─┼─┬─┬─┬─┬─┼─┬─┬─┬─┬─┤
+│ │4│3│2│1│0│4│3│2│1│0│4│3│2│1│0│
+└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</PRE></P>
+<A NAME="_z5_40"></A><P><DT><B>●Gouraud shading</b><DD> Gouraud shading processing can be performed on parts drawn with RGB code. Gouraud shading uses a Gouraud shading table to specify the amount of change in brightness for each RGB code for RGB code parts. Valid only for RGB code color codes.<BR>
+ If Gouraud shading is specified for the color code of the color bank code, the color is not guaranteed.</P>
+<A NAME="_z5_41"></A><P><DT> <B>●Specifying Gouraud shading</b><DD> When performing Gouraud shading processing, specify Gouraud shading using the color calculation bit. Color operation bit is the start address of the command table</P>
+<P><DD> Located in bits 2-0 of the drawing mode word at +04H. When Gouraud shading is specified, specify the Gouraud shading address.<BR>
+ For the Gouraud shading table address, set the Gouraud shading table start address /8H to the command table start address + 1CH.</P>
+<A NAME="_z5_41"></A><P><DT> <B>●Gouraud shading processing</b><DD> For the Gouraud shading table, specify the RGB variation data for 4 points (2 points for lines) of the part. The data interpolated between the four points for each RGB is added to the original color of the part.<BR>
+ Each RGB value takes a value from 00H to 1FH, so subtract 10H from the complemented RGB data and add it to the original color of the part. For example, if the RGB value is 10H, the original color will be kept, if it is 00H, it will be -10H, and if it is 1FH, it will be +0FH. If the value after calculation is less than 00H, it will be set as 00H, and if it is larger than 1FH, it will be set as 1FH.<BR>
+ The relationship between Gouraud shading table settings and correction values is shown below.</P>
+<A NAME="t5_3"></A><P><DD> <B>Table 5.3 Relationship between Gouraud shading table settings and correction values</b><BR>
+<DD><TABLE BORDER=1>
+<TR><TH><PRE> Table setting value</TH><TH><PRE> Correction value for original data</TH><TH><PRE> Table setting value</TH><TH><PRE> Correction value for original data</TH─/TR>
+	<TR align=center><TD><PRE>00H</TD><TD><PRE> −10H</TD><TD><PRE> 10H</TD><TD><PRE> 0</TD></TR>
+	<TR align=center><TD><PRE>01H</TD><TD><PRE> −0FH</TD><TD><PRE> 11H</TD><TD><PRE> +01H</TD></TR>
+	<TR align=center><TD><PRE>02H</TD><TD><PRE> −0EH</TD><TD><PRE> 12H</TD><TD><PRE> +02H</TD></TR>
+	<TR align=center><TD><PRE>03H</TD><TD><PRE> −0DH</TD><TD><PRE> 13H</TD><TD><PRE> +03H</TD></TR>
+	<TR align=center><TD><PRE>04H</TD><TD><PRE> −0CH</TD><TD><PRE> 14H</TD><TD><PRE> +04H</TD></TR>
+	<TR align=center><TD><PRE>05H</TD><TD><PRE> −0BH</TD><TD><PRE> 15H</TD><TD><PRE> +05H</TD></TR>
+	<TR align=center><TD><PRE>06H</TD><TD><PRE> −0AH</TD><TD><PRE> 16H</TD><TD><PRE> +06H</TD></TR>
+	<TR align=center><TD><PRE>07H</TD><TD><PRE> −09H</TD><TD><PRE> 17H</TD><TD><PRE> +07H</TD></TR>
+	<TR align=center><TD><PRE>08H</TD><TD><PRE> −08H</TD><TD><PRE> 18H</TD><TD><PRE> +08H</TD></TR>
+	<TR align=center><TD><PRE>09H</TD><TD><PRE> −07H</TD><TD><PRE> 19H</TD><TD><PRE> +09H</TD></TR>
+	<TR align=center><TD><PRE>0AH</TD><TD><PRE> −06H</TD><TD><PRE> 1AH</TD><TD><PRE> +0AH</TD></TR>
+	<TR align=center><TD><PRE>0BH</TD><TD><PRE> −05H</TD><TD><PRE> 1BH</TD><TD><PRE> +0BH</TD></TR>
+	<TR align=center><TD><PRE>0CH</TD><TD><PRE> −04H</TD><TD><PRE> 1CH</TD><TD><PRE> +0CH</TD></TR>
+	<TR align=center><TD><PRE>0DH</TD><TD><PRE> −03H</TD><TD><PRE> 1DH</TD><TD><PRE> +0DH</TD></TR>
+	<TR align=center><TD><PRE>0EH</TD><TD><PRE> −02H</TD><TD><PRE> 1EH</TD><TD><PRE> +0EH</TD></TR>
+	<TR align=center><TD><PRE>0FH</TD><TD><PRE> −01H</TD><TD><PRE> 1FH</TD><TD><PRE> +0FH</TD></TR>
+	</TABLE></P><P><DD>True Gouraud shading changes only the brightness, but since this method changes RGB individually, the hue may also change depending on the case.<BR> To avoid changing the hue, define each RGB position of one point defined in the Gouraud shading table to the same value. This will give you a white gouraud.<BR> Lines, polylines, and polygons are processed for non-texture colors, and sprites are processed for colors referenced in character pattern data or color lookup tables.</P></DL><HR NOSHADE> <B>▲ <A HREF="p05_20.htm">Back</a> ｜ <A HREF="p05_40.htm">Forward</a> ▼</b><HR><A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

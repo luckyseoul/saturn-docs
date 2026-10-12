@@ -1,0 +1,84 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;29/54&gt;VDP1ユーザーズマニュアル/</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p06_31_j.htm">戻る</A>｜
+     <a href="p06_33_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第６章　コマンドテーブル</B>
+<HR NOSHADE>
+<DL>
+
+<A NAME="no6_32_1"></A>
+	<P><DT><H3>■プリクリッピング無効</H3>
+	<DT><B>プリクリッピング無効：</B>　preclipping disable(Pclp)、ビット11<BR>
+	<DD>　プリクリッピングをさせるか、無効にするかを指定します。０を指定すると、プリクリッピングが行われます。１を指定すると、プリクリッピングが行われません。<BR>
+　１つの描画コマンドは、数本のラインの集合で形成され、それぞれのラインは数個のドットの集合です。１ドットごとの描画は、CPUによって指定されたクリッピングエリア(描画エリア)情報に基づき行っています。<BR>
+　描画エリアから完全に外れ、１ライン全体が描画不要になるラインは、事前に検出でき、描画開始をしないようにすれば描画効率のアップにつながります。また、１ラインの１つの端点が描画エリア外にある場合、描画エリア内から描き始めた方が効率は良くなります(そのラインは水平または垂直方向に限ります)。<BR>
+　VDP1は通常その検出作業を行っていますが、頂点(A)−(B)または(D)−(C)方向に小サイズのものの描画の場合、その検出作業によるオーバヘッド(１ラインに最大５CPUクロック)が目立ち逆に描画効率を下げる原因になります。<BR>
+　サイズの大きなもので、描画エリアから大きくはみ出すような場合、プリクリッピングを行った方が効率が良くなります。<BR>
+　このビットは、描画コマンドのときだけ有効です。その他のコマンドでは０に固定してください。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>Pclp</TH><TH><PRE>処　理</TH></TR>
+	<TR><TH>0</TH><TD>プリクリッピング、左右反転あり</TD></TR>
+	<TR><TH>1</TH><TD>プリクリッピングなし、左右反転なし</TD></TR>
+	</TABLE></P>
+
+<A NAME="z6_6"></A>
+	<P ALIGN=CENTER><B>図6.6　プリクリッピング</B><BR><img srcset="../grp/i083_02_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no6_32_2"></A>
+<DT><H3>■ユーザクリッピング有効</H3>
+<DT><B>ユーザクリッピング有効ビット：</B>　user clipping enable bit(Clip)、ビット10<BR>
+<DD>　パーツの描画コマンドのとき、既に設定したユーザクリッピング座標に従ってパーツを描画するかしないかを指定します。0のときユーザクリッピング座標を無視して、システムクリッピング座標に従ってクリップされ、描画されます。1のときユーザクリッピング座標とクリッピングモードビット(Cmod)の指定に従ってクリッピングされ、描画されます。1のときもシステムクリッピング座標でクリッピングされます。<BR>
+　ユーザ/システムクリッピング座標は共に、リセット時は不定となるので、システムクリッピング座標はリセット後、ユーザクリッピング座標はユーザクリッピング指定以前に、それぞれクリッピングレジスタ設定コマンドで指定してください。</P>
+
+<A NAME="no6_32_3"></A>
+	<P><DT><H3>■ユーザクリッピングモード</H3>
+	<DT><B>クリッピングモードビット：</B>　clipping mode bit(Cmod)、ビット9<BR>
+	<DD>　ユーザクリッピングが有効(Clip=1)のとき、ユーザクリッピング座標の内側/外側どちらを描画するかを選択します。0のとき内側を描画し、1のとき外側を描画します。<BR>　Cmod=1のとき、すでに指定したユーザクリッピング短形のラインも含めて描画領域となります。Cmod=0のとき、描画領域にはその短形のラインが含まれません。</P>
+
+<A NAME="z6_7"></A>
+	<P ALIGN=CENTER><B>図6.7　描画領域</B><BR><img srcset="../grp/i084_01_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+	
+	<P><DD>　ユーザクリッピングを無効(Clip=0)にしたときはこのビットを1にしないでください。<BR>　ユーザクリッピング有効ビットとクリッピングモードビットの組み合わせは次のとおりです。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>Clip</TH><TH WIDTH=50><PRE>Cmod</TH><TH><PRE>ユーザクリッピング処理</TH></TR>
+	<TR><TH>0</TH><TH>0</TH><TD><PRE>ユーザクリッピング無効</TD></TR>
+	<TR><TH>0</TH><TH>1</TH><TD><PRE>設定禁止（設定しないでください）</TD></TR>
+	<TR><TH>1</TH><TH>0</TH><TD><PRE>内側描画モード</TD></TR>
+	<TR><TH>1</TH><TH>1</TH><TD><PRE>外側描画モード　　　　　　　　　　</TD></TR>
+	</TABLE></P>
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p06_31_j.htm">戻る</A>｜
+     <a href="p06_33_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

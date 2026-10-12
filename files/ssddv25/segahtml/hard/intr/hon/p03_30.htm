@@ -1,0 +1,144 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 9&gt;SEGA Saturn Overview Manual/3.Functions/3.3 VDP1</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm#intr">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">SEGA Saturn Overview Manual</a><HR>
+ <B>▲ <A HREF="p03_20.htm">Back</a> ｜ <A HREF="p03_40.htm">Forward</a> ▼</b><HR NOSHADE>
+<DL>
+<A NAME="no3_30"></A><P><DT><H3> ■3.3 VDP1</H3><DD> VDP1 controls sprites. Drawing is much faster than previous systems, and there is no limit to the number of sprites in the horizontal direction, so more sprites (characters) can be displayed. You can also display polygons as an application of sprites.</P>
+<A NAME="no3_31"></A><P><DT> <B>●System configuration</b><DD> VRAM and two frame buffers are connected to VDP1 (Figure 3.2). VRAM drawing commands are set from the CPU via the SCU.<BR>
+ VDP1 reads drawing commands from VRAM and writes drawing data to the frame buffer (draws). Information that controls drawing is set in the VDP1's internal system registers. The drawn frame buffer data is displayed on the TV via VDP2, which controls image display.</P>
+<A NAME="z3_2"></A><P ALIGN="CENTER"> <B>Figure 3.2 VDP1 system configuration</b><BR>
+<img srcset="../grp/i016_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Table 3.3 shows the VDP1 system specifications.</P>
+<A NAME="t3_3"></A><P><DD><TABLE BORDER>
+<CAPTION> <B>Table 3.3 VDP1 system specifications</b></CAPTION>
+<TD ALIGN="CENTER"><PRE> No</TD><TD ALIGN="CENTER"><PRE> Item</TD><TD ALIGN="CENTER"><PRE> specification</TD><TD ALIGN="CENTER"><PRE> remarks</TD><TR><TD ALIGN="CENTER"><PRE> 1</TD><TD ALIGN="LEFT"><PRE> Texture parts display</TD><TD ALIGN="LEFT"><PRE>・Standard sprite<BR> (Normal sprite, horizontal 8-504 dots, vertical 1-255 dots)<BR>&#12539; Scaling sprite<BR> (You can specify any size in units of 1 dot vertically and horizontally)<BR>&#12539; deformed sprite<BR> (Free coordinates of 4 vertices can be specified)</TD><TD ALIGN="LEFT"><PRE> Flip vertically and horizontally for all sprites<BR> Can <BR><BR><BR><BR></TD><TR><TD ALIGN="CENTER"><PRE> 2</TD><TD ALIGN="LEFT"><PRE> non-texture<BR> Parts display</TD><TD ALIGN="LEFT"><PRE>・Rectangular polygon<BR>&#12539; polyline<BR>&#12539; line</TD><TD ALIGN="LEFT"><PRE> If two adjacent vertices have the same coordinates,<BR> Triangular polygons and polylines<BR> Possible</TD><TR><TD ALIGN="CENTER"><PRE> 3</TD><TD ALIGN="LEFT"><PRE> color calculation</TD><TD ALIGN="LEFT"><PRE>・Semi-transparent between parts<BR>&#12539; half brightness<BR>&#12539; shadow<BR>&#12539; mesh<BR>&#12539; gouraud shading</TD><TD ALIGN="LEFT"><PRE> Gouraud shading and translucency<BR> Or can be combined with half brightness<BR><BR><BR></TD><TR><TD ALIGN="CENTER"><PRE> 4</TD><TD ALIGN="LEFT"><PRE> Drawing method</TD><TD ALIGN="LEFT"><PRE>・Double frame buffer method<BR> (Enlarge, reduce, rotate, or change the entire frame buffer plane.<BR> shape is possible.<BR> Frame buffer erase range and erase data can be specified.<BR> Writing local coordinates can be set.<BR> Clipping of rectangular areas can be specified. )</TD><TD><PRE></TD><TR><TD ALIGN="CENTER"><PRE> 5</TD><TD ALIGN="LEFT"><PRE> Number of simultaneous colors</TD><TD ALIGN="LEFT"><PRE>・16,64,128,256,32768 colors</TD><TD ALIGN="LEFT"><PRE> 16,64,128,256 colors at high resolution</TD><TR><TD ALIGN="CENTER"><PRE> 6</TD><TD ALIGN="LEFT"><PRE> Memory capacity</TD><TD ALIGN="LEFT"><PRE>・VRAM 4Mbit<BR> (Character generation, for various tables)<BR>&#12539; Frame buffer 2Mbit x 2 sides<BR> (Both sides can be used as bitmaps. Only one side is displayed.)</TD><TD><PRE></TD></TABLE>
+</P>
+<A NAME="no3_32"></A><A NAME="no00"></A><P><DT> <B>●Function</b><DD> The main features of VDP1 are listed below.</P>
+<DD><UL TYPE=DISC>
+<LI> <A HREF="#No01">Drawing parts (character lines)</a><LI> <A HREF="#No02">Specifying color mode</a><LI> <A HREF="#No03">color calculation</a><LI> <A HREF="#No04">mesh processing</a><LI> <A HREF="#No05">Specifying clipping and relative coordinates</a><LI> <A HREF="#No06">Frame buffer display control</a><LI> <A HREF="#No07">Display method</a></UL>
+<P><DD> Parts, color modes, and coordinates are controlled by command tables in VRAM, and frame buffer display is controlled by system registers.</P>
+<A NAME="No01"></A><P><DD>&#65308; <B>parts</b>&#65310;<DD> The parts drawn by VDP1 are divided into texture parts and non-texture parts, depending on the presence or absence of the original image. Table 3.4 shows the classification of parts.</P>
+<A NAME="t3_4"></A><DD><TABLE BORDER>
+<CAPTION> <B>Table 3.4 Classification of parts</b></CAPTION>
+<TR><TD COLSPAN=2 ALIGN="CENTER"><PRE> Classification</TD><TD ALIGN="CENTER"><PRE> Part name</TD><TD ALIGN="CENTER"><PRE> function</TD><TD ALIGN="CENTER"><PRE> Definition method</TD></TR>
+<TR><TD ROWSPAN=6 ALIGN="CENTER"><PRE> parts</TD><TD ROWSPAN=3><PRE> texture parts</TD><TD><PRE> shaped sprite</TD><TD><PRE> charactor,<BR> Flip vertically and horizontally</TD><TD><PRE> 1 vertex read direction</TD></TR>
+<TR><TD><PRE> Scaling sprite</TD><TD><PRE> charactor,<BR> Up/down, left/right flip,<BR> Can be scaled and expanded</TD><TD><PRE> 2 vertices readout direction or immobile<BR> Point, width and readout direction</TD></TR>
+<TR><TD><PRE> deformed sprite</TD><TD><PRE> charactor,<BR> Up/down, left/right flip,<BR> Scaling, stretching,<BR> Can be rotated and twisted</TD><TD><PRE> 4 vertices readout direction</TD></TR>
+<TR><TD ROWSPAN=3><PRE> Non-texture parts</TD><TD><PRE> polygon</TD><TD><PRE> square,<BR> Fill in the inside</TD><TD><PRE> 4 vertices</TD></TR>
+<TR><TD><PRE> polyline</TD><TD><PRE> square</TD><TD><PRE> 4 vertices</TD></TR>
+<TR><TD><PRE> line</TD><TD><PRE> straight line</TD><TD><PRE> start and end points</TD></TR>
+</TABLE>
+</P>
+<DL>
+<A NAME="No01_1"></A> <A HREF="#no00">▲</a><DT> <B>◆Texture parts</b><DD> Sprites draw character patterns. Character patterns are defined in VRAM using pixel data as a character pattern table.</DL>
+<UL TYPE=DISC>
+<LI> <B>stylized sprite</b><BR>
+ It's a normal rectangular sprite. You can flip the original picture pattern vertically and horizontally. In addition, it is possible to flip vertically and horizontally in any sprite mode (Figure 3.3).<A NAME="z3_3"></A><P ALIGN="CENTER"> <B>Figure 3.3 Regular sprite</b><BR>
+<img srcset="../grp/i019_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<LI> <B>Scaling sprite</b><BR>
+ It is a sprite that can be enlarged or reduced, and it is possible to zoom only in the vertical and horizontal directions (Figure 3.4).<A NAME="z3_4"></A><P ALIGN="CENTER"> <B>Figure 3.4 Scaling sprite</b><BR>
+<img srcset="../grp/i019_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="z3_4_1"></A><LI> <B>deformed sprite</b><BR>
+ A deformable sprite. By specifying the coordinates of the four vertices of the character, you can transform the original picture into any shape you want, so you can enlarge, reduce, rotate, and flip it as you wish. If you look at this as a polygon, you can say it is the same as a texture-mapped polygon.</UL>
+<P><A NAME="No01_2"></A> <A HREF="#no00">▲</a><BR>
+ <B>◆Non-texture parts</b></P>
+<UL>
+<LI> <B>polygon</b><BR>
+ It is a polygon with 4 vertices. The difference from sprites is that the inside of the plane surrounded by four points is filled with a single color. The ones with the original picture are sprites, and the ones without are polygons.<LI> <B>polyline</b><BR>
+ It is a rectangle with four connected lines.<LI> <B>line</b><BR>
+ Draw a line between two points in a single color.<A NAME="z3_6"></A><P ALIGN="CENTER"> <B>Figure 3.6 Polygon, polyline, line</b><BR>
+<img srcset="../grp/i021_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</UL>
+<P><A NAME="No02"></A> <A HREF="#no00">▲</a><BR>
+ <B>●Color mode specification</b><BR>
+ There are three ways to specify the color mode of texture parts: color bank method, RGB code method, or color lookup method. Color specifications for non-texture parts include pixel data.</P>
+<A NAME="No02_1"></A> <B>◆Color bank method</b><UL>
+<LI> Combine the 16, 64, 128, and 256 color palette codes with color banks to refer to the colors stored in VDP2's color RAM.<LI> Select the VDP2 color palette in the color bank, and select a color from the color palette with the palette code.<LI> 16, 64, 128, and 256 colors can be expressed within one character.<LI> Data written using the color bank method is processed on the VDP2 side by dividing it into function bits: color calculation, priority, color bank, and palette code.</UL>
+<P></UL>
+<A NAME="z3_7"></A><P ALIGN=CENTER> <B>Figure 3.7 Configuration of color bank method</b><BE>
+<PRE><B>
+MSB LSB
+┌──┬──┬──────────┬──────────────┐
+│  │  │Color bank│ Palette code │
+└──┴──┴──────────┴──────────────┘
+ │  │　
+ │  └─→Priority　
+ ↓　
+color calculation　
+</b></PRE></P>
+<DL>
+<A NAME="No02_2"></A><DT><B>◆RGB code generation</b><DD> Colors are expressed using 5 bits of brightness for each RGB (red, green, blue). 32,768 colors can be expressed within one character.</DL>
+<DL>
+<A NAME="No02_3"></A><DT> <B>◆Color lookup table</b><DD> Define 16 colors in the color lookup table and select a color from among them. One color is 16 bits and can be either an RGB code or a color bank code.</DL>
+<P><A NAME="No03"></A> <A HREF="#no00">▲</a><BR>
+ <B>●Color calculation</b><BR>
+ VDP1 allows you to specify Gouraud shading, shadow, semi-brightness, and translucent color operations.<BR>
+ Table 3.5 shows the types of color operations.</P>
+<A NAME="t3_5"></A><P><DD><TABLE BORDER>
+<CAPTION> <B>Table 3.5 Types of color operations</b></CAPTION>
+<TD ALIGN="CENTER"><PRE> kinds</TD><TD ALIGN="CENTER"><PRE> Contents</TD><TR><TD ALIGN="LEFT"><PRE> half brightness</TD><TD ALIGN="LEFT"><PRE> Draws the original image with half the brightness to the frame buffer. On the base<BR> Since it is overwritten, the background will not be visible and the brightness of the original image will be halved.</TD><TR><TD ALIGN="LEFT"><PRE> Translucent</TD><TD ALIGN="LEFT"><PRE> Add the background brightness halved and the original image brightness halved,<BR> Draw the result to the framebuffer.</TD><TR><TD ALIGN="LEFT"><PRE> shadow</TD><TD ALIGN="LEFT"><PRE> Redraw the background with half the brightness to the frame buffer. this<BR> In this case, a shadow will be created in the shape of the character in the original picture. Also, the characters in the original picture are shadows.<BR> Only used for the shape, color data is ignored.</TD><TR><TD ALIGN="LEFT"><PRE> gouraud shading</TD><TD ALIGN="LEFT"><PRE> Draw the original image with Gouraud shading to the frame buffer.<BR> To do.</TD><TR><TD ALIGN="LEFT"><PRE> gouraud shading<BR> Translucent</TD><TD ALIGN="LEFT"><PRE> Gouraud shading was applied to the original picture, but the brightness was further reduced to half,<BR> The brightness of the background is halved and added. the result in the frame buffer<BR> Draw on.</TD><TR><TD ALIGN="LEFT"><PRE> gouraud shading<BR> half brightness</TD><TD ALIGN="LEFT"><PRE> I applied Gouraud shading to the original picture, but further reduced the brightness to half,<BR> Draw to the framebuffer.</TD></TABLE>
+<A NAME="No03_01"></A><P> <B>◆Gouraud shading</b><BR>
+ Gouraud shading can only be applied to parts drawn in RGB. Gouraud shading is a method that interpolates colors between polygon vertices to make a plane look like a curved surface.<BR>
+ A brightness correction value is given to each of the four vertices of the polygon, and Gouraud shading is applied between these four vertices to make it look like a curved surface. In addition to polygons, you can also apply Gouraud shading to polylines and lines. Figure 3.8 shows an example of Gouraud shading.</P>
+<A NAME="z3_8"></A><P ALIGN="CENTER"> <B>Figure 3.8 Example of Gouraud shading</b><BR>
+<img srcset="../grp/i024_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><A NAME="No04"></A> <A HREF="#no00">▲</a><BR>
+ <B>●Mesh processing</b><BR>
+ You can apply a mesh to all parts. When you apply a mesh, the part is drawn in a grid pattern every other dot.<BR>
+ If the "X coordinate value + Y coordinate value" is an even number, it will be drawn, and if it is an odd number, it will not be drawn and will be skipped. (Figure 3.9)</P>
+<A NAME="z3_9"></A><P ALIGN="CENTER"> <B>Figure 3.9 Example of mesh processing</b><BR>
+<img srcset="../grp/i024_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="No05"></A> <A HREF="#no00">▲</a><BR>
+ <B>●Clipping</b><BR>
+ Clipping means cutting out (clipping) so that it does not draw in areas other than the set display area. There are two types of clipping: system clipping, which sets the system drawing area, and user clipping, which can be set freely using software.<DL>
+<A NAME="No05_01"></A><DT> <B>◆System clipping</b><DD> System clipping is always enabled when drawing, and the area inside the set area is drawn.<BR>
+ The settings are fixed at the top left coordinates (0,0) of the screen, and can be set by specifying the bottom right coordinates. (Figure 3.10)<A NAME="z3_10"></A><P ALIGN="CENTER"> <B>Figure 3.10 System clipping</b><BR>
+<img srcset="../grp/i025_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<DL>
+<A NAME="No05_02"></A><DT> <B>◆User clipping</b><DD> User clipping can be selected in the software, and you can enable user clipping for each part or select the effective area for user clipping to be outside or inside the set area.<BR>
+ The user clipping area can be set by specifying each vertex of the upper left coordinate and lower right coordinate. (Figure 3.11).<P><A NAME="z3_11"></A><P ALIGN="CENTER"> <B>Figure 3.11 User clipping</b><BR>
+<img srcset="../grp/i025_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+</DL>
+<P><A NAME="No06"></A> <A HREF="#no00">▲</a><BR>
+ <B>●Frame buffer</b><BR>
+ The frame buffer is divided into two parts: the display frame buffer and the drawing frame buffer.<BR>
+ Read/write access from the SCU to the frame buffer is performed only to the drawing frame buffer. The display frame buffer is the back bank and cannot be accessed.<BR>
+ Also, by reading the frame buffer, the entire frame buffer plane can be enlarged, reduced, or rotated by giving displacement in the X and Y directions that specifies the read start coordinates and where the next read dot should be. .<P><P><A NAME="No07"></A> <A HREF="#no00">▲</a><BR>
+ <B>●Display method</b><BR>
+ For display, a TV, which is a common display device, is used. The TV standard in Japan and America is NTSC. Europe uses PAL system.<BR>
+ TV display is performed by reading data from the beginning of the frame buffer every frame (one frame is 1/60 seconds).<BR>
+ Normally, one frame is one field, but with interlacing, one frame can be made into two fields, and the vertical resolution can be doubled (one frame is 1/30 second). There are two types of interlace: double-dense interlace and single-dense interlace, as shown in Table 3.6.</P>
+<A NAME="t3_6"></A><DD><TABLE BORDER=1>
+<CAPTION> <B>Table 3.6 Interlace</b></CAPTION>
+<TR><TD ALIGN="CENTER"><PRE> double dense interlace</TD><TD ALIGN="LEFT"><PRE> Display separate images on odd and even lines</TD></TR>
+<TR><TD ALIGN="CENTER"><PRE> Single dense interlace</TD><TD ALIGN="LEFT"><PRE> Display the same image on odd and even lines</TD></TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_20.htm">Back</a> ｜ <A HREF="p03_40.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm#intr">HARDWARE Manual</a> ★ <A HREF="../index.htm#no3">SEGA Saturn Overview Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

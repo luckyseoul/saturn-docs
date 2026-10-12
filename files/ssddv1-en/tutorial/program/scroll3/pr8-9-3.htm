@@ -1,0 +1,151 @@
+<HTML>
+<HEAD>
+<TITLE> Rotating scroll screen rotation </TITLE>
+</HEAD><BODY>
+
+<P> <A HREF="pr8-9-2.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr8-10-1.htm"> Go to next page </A> </BR> </P>
+<HR>
+
+
+<H3>
+Rotating scroll screen rotation
+</H3>
+
+<P>
+In SEGA Saturn, it is possible to rotate the scroll with an arbitrary axis and arbitrary angle on the rotary scroll screen <BR> (image model below).
+</P>
+
+<H4> Figure 8-22 Scroll rotation image </H4>
+<IMG SRC="p08-42-1.gif">
+
+<P>
+<B> ● 2D rotation (Z-axis rotation) </B> <BR>
+Use the library function “slZrotR” to perform 2D rotation operation (Z-axis rotation) of the rotary scroll screen with SGL. <BR>
+The point set by the library function “slDispCenterR” is used as the center of rotation (one point on the scroll map).
+</P>
+
+<DL>
+<DT> <B> [void slZrotR (ANGLE z_angle);] </B>
+<DD> Rotate the scroll screen “RBG0” with respect to the Z axis. <BR>
+In the parameter, specify the Z-axis rotation angle of the current rotation parameter. <BR>
+For the rotation angle, substitute the absolute rotation angle value, not the rotation angle value from the current state. <BR>
+(The current parameter can be switched with the function “slCurRpara”). <BR>
+The rotation center uses the point set by the library function “slLookR”.
+</DL>
+
+<H4> Figure 8-23 Actual operation of scroll rotation </H4>
+<IMG SRC="p08-42-2.gif">
+
+<BLOCKQUOTE>
+<P> <B> Notes on using functions </B> <BR>
+The function group “slZrotR”, “slZoomR”, “slLookR” used for the rotary scroll conversion operation is the same rotation parameter as the function “slScrMatSet” that performs various rotary scroll conversion operations (including 3D rotation). Please note that they cannot be used together. <BR>
+This is because the above function group rewrites a specific area of ​​the rotation parameter, whereas the function group described below rewrites the entire rotation parameter.
+</P>
+</BLOCKQUOTE>
+
+<P>
+The following sample program (Listing 8-5) is an example of actually rotating the rotating scroll screen using the SGL library function.
+</P>
+
+<H4> List 8-5 sample_8_9_1: Scroll 2D rotation </H4>
+<IMG SRC="p08-43.gif">
+
+<H4> Flow 8-6 sample_8_9_1: Scroll 2D rotation </H4>
+<IMG SRC="p08-44.gif">
+
+<P>
+<B> ● 3D rotation using current matrix </B> <BR>
+To perform 3D rotation operation (rotation of all axes) of the rotary scroll screen using the current matrix in SGL, it is necessary to take the following steps.
+</P>
+
+<P>
+<B> 1) Settings for rotating scroll </B> <BR>
+Complete the settings required for using rotary scrolling, such as rotating parameter settings, screen overprocessing, and coefficient table settings.
+</P>
+
+<P>
+<B> <A NAME="ZAHYO"> 2) Coordinate operation </B> <BR>
+First, the 3D rotation operation multiplied by the scroll is executed for the current matrix. <BR>
+Use the same function group such as “slRorX”, “slTranslate”, “slScale”. <BR>
+However, the operation sequence for rotation, movement, and enlargement / reduction operations is the reverse of the normal coordinate conversion operation (see “Chapter 4: Coordinate Conversion” for the conversion operation sequence). <BR>
+The scroll coordinate system is the left-handed coordinate system with the positive and negative of the Z axis reversed, but it looks exactly the same because it is captured by the image of the monitor rotating relative to the scroll. <BR>
+If you want to perform coordinate transformation with the same matrix manipulation procedure as normal coordinate transformation, use the function “slScrMatConv” before transferring the matrix data. <BR>
+The function “slScrMatConv” converts the current matrix converted by the normal coordinate conversion procedure into a coordinate conversion matrix for scrolling and uses it as the current matrix.
+</P>
+
+<DL>
+<DT> <B> [void slScrMatConv (void);] </B>
+<DD> Converts the current matrix to scroll coordinate conversion data and replaces the current matrix. <BR>
+Naturally, if the function is used for the current matrix after the scroll coordinate conversion operation is executed, the current matrix is ​​replaced with the normal coordinate conversion matrix.
+</DL>
+
+<P>
+<B> <A NAME="PARA"> 3) Transfer the calculation result to the rotation parameter </A> </B> <BR>
+Transfers the coordinate calculation result executed for the current matrix to the rotation parameter. <BR>
+Rotating scroll is transformed / drawn based on the rotation parameter data transferred to the calculation result. <BR>
+Use the function “slScrMatSet” to transfer data.
+</P>
+
+<DL>
+<DT> <B> [void slScrMatSet (void);] </B>
+<DD> Transfers the current matrix data to the current rotation parameter. <BR>
+Use this to transfer the current matrix that has undergone coordinate transformation operations in accordance with the rotating scroll.
+</DL>
+
+<H4> Flow 8-7 3D rotation operation procedure using current matrix </H4>
+<IMG SRC="p08-46.gif">
+
+<P>
+<B> <A NAME="TABLE"> ● Control zoom ratio using coefficient table </A> </B> <BR>
+When performing 3D rotation operation of rotating scroll, rotating scroll scales the scroll according to the depth of the scroll. Usually, this scale ratio is calculated based on each parameter used for 3D coordinate calculation such as perspective transformation, and the scroll is deformed, but this deformation ratio is preset in line units or dot units, It is available at runtime and is called the coefficient table. <BR>
+When using the coefficient table, the following two functions are required.
+</P>
+
+<P>
+<B> 1) Creating a coefficient table </B> <BR>
+First, it is necessary to reserve an area for the coefficient table in the VRAM area. <BR>
+Be sure to create the coefficient table in VRAM. <BR>
+The coefficient table occupies one bank in the VRAM area. This is because the coefficient table refers to the VRAM area at the maximum number of accesses (8 times) per bank.
+</P>
+
+<DL>
+<DT> <B> [void slMakeKtable (void * adr);] </B>
+<DD> Creates a coefficient table to be used for 3D rotation operation at the specified address. <BR>
+For the parameter, substitute the start address of the area where the coefficient table is created. <BR>
+The coefficient table must be secured in the VRAM area.
+</DL>
+
+<P>
+<B> 2) Coefficient table usage mode setting </B> <BR>
+When using the area specified as the coefficient table as the coefficient table, it determines the usage mode of how to use the coefficient table.
+</P>
+
+<DL>
+<DT> <B> [void slKtableRA, RB (void * table_adr, Uint16 mode);] </B>
+<DD> Specify the address of the coefficient table to be used, and further determine the usage contents of the coefficient table. <BR>
+For the parameter, substitute the coefficient table start address and the value shown in the figure below indicating the use mode of the coefficient table (concatenation can be used with the or operator "|"). <BR>
+The function “slKtableRA” sets the coefficient table used by the rotation parameter A, and the function “slKtableRB” sets the coefficient table used by the rotation parameter B.
+</DL>
+
+<H4> Figure 8-24 “slKtableRA, RB” parameter substitution value (mode) </H4>
+<IMG SRC="p08-47.gif">
+<BLOCK QUOTE><P>
+Note) When fixed coefficient is specified for the parameter, the coefficient table is assumed to be prepared in advance, and the calculation of the coefficient table in real time is not executed.
+</P></BLOCKQUOTE>
+
+<BLOCKQUOTE>
+<P>
+<B> Caution </B> <BR>
+For details on the coefficient table, refer to “HARDWARE MANUAL vol.2: VDP2 User's Manual”.
+<P>
+</BLOCKQUOTE>
+
+<H4> List 8-6 sample_8_9_2: 3D rotation </H4>
+<IMG SRC="p08-48.gif">
+
+<H4> Flow 8-8 sample_8_9_2: 3D rotation </H4>
+<IMG SRC="p08-49.gif">
+
+<HR>
+<P> <A HREF="pr8-9-2.htm"> Return to previous page </A> | <A HREF="../index.htm"> Return to menu </A> | <A HREF = "pr8-10-1.htm"> Go to next page </A> </BR> </P>
+</BODY></HTML>

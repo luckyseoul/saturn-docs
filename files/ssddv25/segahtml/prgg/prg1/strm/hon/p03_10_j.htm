@@ -1,0 +1,124 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/18&gt;ストリームシステムライブラリ/3.基本事項</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>ストリームシステムライブラリ</B>
+<H2 ALIGN=CENTER>3.基本事項</H2>
+<HR NOSHADE>
+<DL>
+
+<A NAME="no3_10"></A>
+	<P><DT><H3>3.1　用語・略語の定義</H3>
+	<DD><B>表3.1　用語一覧</B>
+	<DD><TABLE BORDER>
+	<TR><TH width=180><PRE>用語</TH><TH width=340><PRE>意味</TH></TR>
+	<TR><TD><PRE>ストリーム</TD><TD><PRE>サブヘッダによって区別される論理的に連続したデータ<BR>の流れ。</TD></TR>
+	<TR><TD><PRE>ストリームキー</TD><TD><PRE>ストリームをCDバッファに読み込む際のキー。フレーム<BR>アドレス範囲、ファイル番号(FN)、チャネル番号(CN)、<BR>サブモード(SM)、コーディング情報(CI)からなります。<BR>サブモード(SM)とコーディング情報(CI)はマスクパター<BR>ン比較パターンが指定可能であり、<BR>({SM|CI}&マスクパターン==比較パターン)<BR>となるセクタを読み込みます。</TD></TR>
+	<TR><TD><PRE>ストリームグループ</TD><TD><PRE>複数のストリームの集合。</TD></TR>
+	<TR><TD><PRE>最終ストリーム</TD><TD><PRE>ストリームグループに属するストリームの中で最後に再<BR>生されるストリーム。</TD></TR>
+	<TR><TD><PRE>ループ開始ストリーム</TD><TD><PRE>ストリームグループの最終ストリームを再生した後の戻<BR>り先ストリーム。</TD></TR>
+	<TR><TD><PRE>ループ回数</TD><TD><PRE>最終ストリームを再生した後、ループ開始ストリームに<BR>ピックアップを移動する回数。</TD></TR>
+	<TR><TD><PRE>転送開始FAD</TD><TD><PRE>CDバッファに読み込んだデータをプログラム内のバッ<BR>ファなどに転送し始めるピックアップの位置。</TD></TR>
+	<TR><TD><PRE>転送ゲート</TD><TD><PRE>CDバッファに読み込んだデータをプログラム内のバッ<BR>ファなどに転送する際のゲート。これを閉じることに<BR>よって、ストリームのデータをCDバッファに蓄えること<BR>ができます。</TD></TR></TABLE></P>
+
+<A NAME="z3_2"></A>
+	<P ALIGN=CENTER><B>図3.1　ストリームシステムのデータフロー</B>
+<PRE>
+┌─────────┐　　　　　　　　　　　　　　
+│　ＣＤドライブ　　│　　　　　　　　　　　　　　
+└────┬────┘　　　　　　　　　　　　　　
+　　　　　│　読込み　　　──┐　　　　　　　　　
+　　　　　↓　　　　　　　　　│　　　　　　　　　
+┌─────────┐　　　　│　　　　　　　　　
+│　ＣＤバッファ　　│　　　　├ストリームアクセス
+└────┬────┘　　　　│　　　　　　　　　
+　　　　　│　取出し・転送　　│　　　　　　　　　
+　　　　　↓　　　　　　　──┘　　　　　　　　　
+┌─────────┐　　　　　　　　　　　　　　
+│メインＣＰＵ領域　│　　　　　　　　　　　　　　
+└─────────┘　　　　　　　　　　　　　　
+</PRE></P>
+
+<A NAME="t3_2"></A>
+	<P><DD><B>表3.2　略語一覧</B>
+		<DD><TABLE BORDER>
+	<TR><TH width=100><PRE>略語</TH><TH width=200><PRE>意味</TH><TH width=320><PRE>説明</TH></TR>
+	<TR><TD><PRE>GFS</TD><TD><PRE>general file system</TD><TD><PRE>ファイルシステム</TD></TR>
+	<TR><TD><PRE>STM</TD><TD><PRE>stream</TD><TD><PRE>ストリーム</TD></TR>
+	<TR><TD><PRE>StmGrpHn</TD><TD><PRE>stream group handle</TD><TD><PRE>ストリームグループ操作用ハンドル</TD></TR>
+	<TR><TD><PRE>StmHn</TD><TD><PRE>stream handle</TD><TD><PRE>ストリーム操作用ハンドル</TD></TR>
+	<TR><TD><PRE>TrMode</TD><TD><PRE>transfer mode</TD><TD><PRE>転送モード</TD></TR>
+	<TR><TD><PRE>bn</TD><TD><PRE>buffer number</TD><TD><PRE>バッファ区画番号</TD></TR>
+	<TR><TD><PRE>ci</TD><TD><PRE>coding information</TD><TD><PRE>コーディング情報</TD></TR>
+	<TR><TD><PRE>cn</TD><TD><PRE>chanel number</TD><TD><PRE>チャネル番号</TD></TR>
+	<TR><TD><PRE>fad</TD><TD><PRE>frame address</TD><TD><PRE>フレームアドレス</TD></TR>
+	<TR><TD><PRE>fid</TD><TD><PRE>file ID</TD><TD><PRE>ファイル識別子</TD></TR>
+	<TR><TD><PRE>fn</TD><TD><PRE>file number</TD><TD><PRE>ファイル番号</TD></TR>
+	<TR><TD><PRE>fname</TD><TD><PRE>file name</TD><TD><PRE>ファイル名</TD></TR>
+	<TR><TD><PRE>frange</TD><TD><PRE>fad range</TD><TD><PRE>再生範囲(フレームアドレス範囲)</TD></TR>
+	<TR><TD><PRE>loopstm</TD><TD><PRE>loop stream</TD><TD><PRE>ループ開始ストリーム</TD></TR>
+	<TR><TD><PRE>sinfo</TD><TD><PRE>sector information</TD><TD><PRE>セクタ情報</TD></TR>
+	<TR><TD><PRE>sm</TD><TD><PRE>sub mode</TD><TD><PRE>サブモード</TD></TR></TABLE></P>
+
+	<DD><UL TYPE="DISK">
+	<P><LI>その他の用語については、CD通信インタフェース及び、ファイルシステムに準じます。</P>
+
+	<P><LI>ディレクトリについての詳細は、
+「<a href="../../file/index_j.htm">ファイルシステムライブラリ</A>」の
+「<a href="../../file/hon/p03_10_j.htm"> ディレクトリ操作</A>」の章を参照してください。</P>
+	</UL>
+
+<A NAME="no3_20"></A>
+	<P><DT><H3>3.2　名前の制限</H3>
+		<DD>　ストリームシステムライブラリでは、関数名、変数名、型名、マクロ名として次のような名前を使用しています。</P>
+	<DD><TABLE>
+	<TR ALIGN=CENTER><TD><PRE>　関数名、変数名　</TD><TD><PRE>　ST〜 および st〜　</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>型　名</TD><TD><PRE>St〜</TD></TR>
+	<TR ALIGN=CENTER><TD><PRE>マクロ名</TD><TD><PRE>ST〜</TD></TR></TABLE>
+
+	<P><DD>　ストリームシステムライブラリを使用するために必要なライブラリは、以下のグローバルシンボルを使用しています。</P>
+
+<A NAME="t3_3"></A>
+	<P><DD><B>表3.3　各ライブラリのシンボル名</B>
+		<DD><TABLE BORDER>
+	<TR><TH width=260><PRE>ライブラリ名</TH><TH width=260><PRE>使用するシンボル</TH></TR>
+	<TR><TD><PRE>ファイルシステム</TD><TD><PRE>GF〜,gf〜,Gf〜</TD></TR>
+	<TR><TD><PRE>CD通信インタフェース</TD><TD><PRE>CD〜,cd〜,Cd〜</TD></TR></TABLE></P>
+
+	<P><DD>　アプリケーションプログラムはこれらのシンボルを使用してはいけません。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../../index_j.htm#prg1_">PROGRAMMER'S GUIDE</A>
+★<a href="../index_j.htm#no1">ストリームシステムライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

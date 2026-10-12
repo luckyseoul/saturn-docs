@@ -1,0 +1,52 @@
+﻿<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/54&gt;VDP1 User's Manual/4. System register</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p04_11.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual</b><H2 ALIGN=CENTER> Chapter 4 System Register</H2><HR NOSHADE>
+<DL>
+<P><DD> The functions of the system registers are as follows:</P>
+<A NAME="t4_1"></A><P><DT><H3> ●System register list</H3><DL>
+<P><DT> <B><A HREF="p04_11.htm">TV mode selection</a> TVMR</b><DD> Address: 100000H Write only (word)<DD> Function: Specify TV display mode<DD> Update period: <B>PTM</b> as needed, <B>VBE</b> in the field</P>
+<P><DT> <B><A HREF="p04_12.htm">Frame buffer switching mode</a> FBCR</b><DD> Address: 100002H Write only (word)<DD> Function: Control frame buffer switching and double-dense interlacing<DD> Update timing: For FCM and FMT, each field, for others, frame buffer switching timing</P>
+<P><DT> <B><A HREF="p04_13.htm">Plot trigger</a> PTMR</b><DD> Address: 100004H Write only (word)<DD> Function: Controls drawing start<DD> Update timing: 01B write at any time, 00B and 10B write at frame buffer switching timing</P>
+<P><DT> <B><A HREF="p04_14.htm#no1_14_1">Erase write data</a> EWDR</b><DD> Address: 100006H Write only (word)<DD> Function: Specifies frame buffer fill data when erasing and writing.<DD> Update timing: Frame buffer switching timing</P>
+<P><DT> <B><A HREF="p04_14.htm#no1_14_2">Erase write upper left coordinate</a> EWLR</b><DD> Address: 100008H Write only (word)<DD> Function: Specifies the upper left coordinates of the fill area of the frame buffer when writing an erase.<DD> Update timing: Frame buffer switching timing</P>
+<P><DT> <B><A HREF="p04_14.htm#no1_14_3">Erase write lower right coordinate</a> EWRR</b><DD> Address: 10000AH write only (word)<DD> Function: Specifies the lower right coordinates of the fill area of the frame buffer when writing an erase.<DD> Update timing: Frame buffer switching timing</P>
+<P><DT> <B><A HREF="p04_15.htm">Forced termination of drawing</a> ENDR</b><DD> Address: 10000CH write only (word)<DD> Function: Force drawing to end<DD> Update period: Any time</P>
+<P><DT> <B><A HREF="p04_16.htm">Transfer end status</a> EDSR</b><DD> Address: 100010H Read only (word)<DD> Function: Displays the end bit fetch status of the current and previous frame.<DD> Update time:-</P>
+<P><DT> <B><A HREF="p04_17.htm">Processing suspension table address</a> LOPR</b><DD> Address: 100012H Read only (word)<DD> Function: Display final processing command table address of previous frame<DD> Update time:-</P>
+<P><DT> <B><A HREF="p04_18.htm">Current processing table address</a> COPR</b><DD> Address: 100014H Read only (word)<DD> Function: Display of command table address currently being processed<DD> Update time:-</P>
+<P><DT> <B><A HREF="p04_19.htm">Mode state</a> MODR</b><DD> Address: 100016H Read only (word)<DD> Function: Displays the set value to the write-only register<DD> Update time:-</P>
+</DL>
+<P><DT><H3> ●Timing at which system register setting values change</H3><DD> The timing at which the system register setting value becomes valid is as follows.</P>
+<P><DT><UL TYPE=DISC>
+<LI> <B>Something that changes immediately</b><DD> Plot trigger mode (when writing PTM, 01B)<DD> TV mode selection (TVM)</P>
+<P><LI> <B>Things that change every field (1/60 seconds)</b><DD> Frame buffer switching mode (FCM)<DD> Frame buffer switching trigger (FCT)</P>
+<P><LI> <B>What changes when switching frame buffers</b><DD> Plot trigger mode (when writing PTM, 00B or 10B)<DD> Even/odd coordinate selection bit (EOS)<DD> Double dense interlacing enabled (DIE)<DD> Double dense interlaced drawing line (DIL)<DD> Erase write data<DD> Erase write coordinates (top left, bottom right)</P>
+<P><LI> <B>What changes after 1 line is displayed after V blank IN interrupt</b><DD> V blank erase write permission (VBE)</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p04_11.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

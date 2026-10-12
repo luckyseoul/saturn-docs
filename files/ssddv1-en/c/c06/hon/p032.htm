@@ -1,0 +1,50 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p031.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p033.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT> <H1> 6. VDP13D Reference </H1>
+<DT> <H2> 6.1 Data specifications </H2>
+<DT><TABLE BORDER CELLPADDING=5>
+<TD ALIGN = "LEFT" WIDTH = 150> <PRE> <B> Title </B> <BR> Data specifications </TD>
+<TD ALIGN = "LEFT" WIDTH = 220> <PRE> <B> Data </​​B> <BR> Cluster definition </TD>
+<TD ALIGN="LEFT" WIDTH=180><PRE><B>Data Name</B><BR>SprCluster</TD>
+<TD ALIGN="LEFT" WIDTH=60><PRE><B>No</B><BR> </TD>
+</TABLE><P>
+<DD><PRE>typedef     struct SprCluster {
+     Uint16 no; / * Cluster number * /
+     Uint16 angleSeq; / * Rotation order * /
+     MthXyz angle; / * Rotation in the coordinate system of the parent cluster * /
+     MthXyz point; / * origin coordinates in parent cluster coordinate system * /
+     SprObject3D * object / * 3D object * /
+     SprCluster * next; / * Next cluster * /
+     SprCluster * child; / * Child cluster * /
+     SprInbetInf * inbetInf; / * Inter-object connection polygon information * /
+     void            (*transStart)(SprCluster*);
+                                   / * User callback routine before starting coordinate conversion * /
+     void            (transEnd)(SprCluster*, SprObject3D*, MthMatrix*, MthXyz*);
+                                   / * User callback routine after coordinate transformation * /
+     void * context; / * User context area * /
+} SprCluster;</PRE><P>
+no is for user callback routines to identify the cluster table and is optional. <P>
+<PRE> angleSeq = ROT_SEQ_ZYX: Rotate objects in order of Z → Y → X
+           = ROT_SEQ_ZXY: “Z → X → Y”
+           = ROT_SEQ_YZX: “Y → Z → X”
+           = ROT_SEQ_YXZ: “Y → X → Z”
+           = ROT_SEQ_XYZ: “X → Y → Z”
+           = ROT_SEQ_XZY: “X → Z → Y” </PRE> <P>
+<PRE> If 3D object, next cluster and child cluster are not connected, each
+Set object, next, and child to 0. <P>
+If there is no inter-object connection polygon information, set inbetInf to 0. <P>
+transStart is the user callback that is called before the coordinate transformation of this cluster starts
+Specifies a routine. Within the routine, move the cluster,
+Make changes. Set to 0 if there is no callback routine. <P>
+[Calling sequence of transStart routine]
+void transStart(SprCluster *cluster);<BR>
+     cluster: Local cluster table <BR> </PRE>
+</DL><P><P><HR>
+<A HREF=p031.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p033.htm> Go to next page </A>
+</BODY>
+</HTML>

@@ -1,0 +1,181 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;22/31&gt;SCU User's Manual/5.DSP Instruction Details</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p04_51.htm">Back</a> ｜ <A HREF="p04_53.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 4 DSP Control</b><H2 ALIGN=CENTER> Arithmetic instruction</H2><H3 ALIGN=CENTER> X-Bus control instructions</H3><HR NOSHADE>
+<!-- --------------------------------------------------------- -->
+<A NAME="xbus_nop"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#xbus">List</a> | ▲ <A HREF="p04_51.htm#alu_rl8">Back</a> | <A HREF="#xbus_mov_sx">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> NOP</H1><DD><H3> X-Bus no operation</H3></P>
+<P><DT> <B>Operation details</b><DD> The X-Bus instruction section will be unprocessed.<P><DT> <B>descriptive formula</b><DD> label: NOP<P><DT> <B>instruction code</b> 
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>25</TD><TD>24</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>23</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>０</TD><TD>０</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+</TR></TABLE>
+<DD></P>
+<P><DT> <B>flag</b><DD> No change.</P>
+<P><DT> <B>remarks</b><DD> none.</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="xbus_mov_sx"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#xbus">List</a> | ▲ <A HREF="#xbus_nop">Back</a> | <A HREF="#xbus_mov_mul_p">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MOV[s],X</H1><DD><H3> Transfer (memory → [RX])</H3></P>
+<P><DT> <B>Operation details</b><DD> Data is transferred from the data RAM at the address indicated by [CTx(x=0 to 3)] to [RX].</P>
+<P ALIGN=CENTER><img srcset="../grp/p107.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>descriptive formula</b><DD> label: MOV[Source RAM],X<DD> Source RAM=M0～M3,MC0～MC3</P>
+<DT> <B>instruction code</b>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>25</TD><TD>24</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>23</TD><TH>22</TH><TH>21</TH><TH>20</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>１</TD><TD>０</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>０</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+</TR></TABLE></P>
+<CENTER>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3> bit data</TH><TH ROWSPAN=2> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TH> bit22</TH><TH> bit21</TH><TH> bit20</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0→[RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1→[RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2→[RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3→[RX]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0→[RX],CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1→[RX],CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2→[RX],CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3→[RX],CT3++</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<P><DT> <B>flag</b><DD> RX;This will be the data selected in the options.<DD> CTx(x=0~3);Incremented only when b22=1. There is no change when b22=0.</P>
+<P><DT> <B>remarks</b><DD> [Mx(x=0~3)] specifies DATA RAMx(x0~3).<DD> [MCx(x=0~3)] specifies DATA RAMx(x0~3), and after transfer, increments [CTx(x=0~3)].</P>
+</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="xbus_mov_mul_p"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#xbus">List</a> | ▲ <A HREF="#xbus_mov_sx">Back</a> | <A HREF="#xbus_mov_sp">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MOV MUL,P</H1><DD><H3> Transfer (MULTIPLIER→[Pn])</H3><P><P><DT> <B>Operation details</b><DD> Transfer the upper 16 bits of 48 bits of MULTIPLIER data to [PH] and the lower 32 bits to [PL].<P ALIGN=CENTER><img srcset="../grp/p108.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>descriptive formula</b><DD> label: MOV MUL,P<P><DT> <B>instruction code</b>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>25</TD><TD>24</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>23</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>０</TD><TD>１</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+</TR></TABLE>
+<DD></P>
+<DD></P>
+<P><DT> <B>flag</b><DD> PH;MULTIPLIER upper 16 bit data.<DD> PL;MULTIPLIER lower 32 bit data.<P><DT> <B>remarks</b><DD> none.</DL>
+<!-- --------------------------------------------------------- -->
+<A NAME="xbus_mov_sp"><HR></a><!-- --------------------------------------------------------- -->
+ <B><A HREF="p04_02.htm#xbus">List</a> | ▲ <A HREF="#xbus_mov_mul_p">Back</a> | <A HREF="p04_53.htm#ybus_nop">Next</a> ▼ | <A HREF="dspasm.htm">Assembler</a></b><DL>
+<P><DT><H1> MOV[s],P</H1><DD><H3> Transfer (memory → [PH])</H3></P>
+<P><DT> <B>Operation details</b><DD> Transfer data from the data RAM at the address indicated by [CTx(x=0 to 3)] to [PL].<P ALIGN=CENTER><img srcset="../grp/p109.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT> <B>descriptive formula</b><DD> label: MOV [Source RAM],P<DD> Source RAM = M0~M3,MC0~MC3<P><DT> <B>instruction code</b>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>31</TD><TD>30</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>25</TD><TD>24</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>23</TD><TH>22</TH><TH>21</TH><TH>20</TH><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>　</TD><TD>０</TD>
+</TR>
+<TR ALIGN=CENTER>
+<!--31         30         29         28         27         26         25         24  -->
+<TD>０</TD><TD>０</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>０</TD><TD>１</TD>
+<!--23         22         21         20         19         18         17         16  -->
+<TD>１</TD><TD>ｘ</TD><TD>ｘ</TD><TD>ｘ</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--15         14         13         12         11         10         09         08  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+<!--07         06         05         04         03         02         01         00  -->
+<TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD><TD>−</TD>
+</TR></TABLE>
+</P>
+<CENTER>
+<TABLE BORDER=1>
+<TR ALIGN=CENTER><TH COLSPAN=3> bit data</TH><TH ROWSPAN=2> Addition mode options</TH></TR>
+<TR ALIGN=CENTER><TH> bit22</TH><TH> bit21</TH><TH> bit20</TH></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0→[PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1→[PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2→[PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3→[PL]</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 0</TD><TD> DATA RAM0→[PL],CT0++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 0</TD><TD> 1</TD><TD> DATA RAM1→[PL],CT1++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 0</TD><TD> DATA RAM2→[PL],CT2++</TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><TD> 1</TD><TD> 1</TD><TD> DATA RAM3→[PL],CT3++</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<P><DT> <B>flag</b><DD> PL;This will be the data selected in the options.<DD> Changes with sign extension of PH;[PL]. To do.<DD> CTx(x=0~3);Incremented only when b22=1. There is no change when b22=0.<P><DT> <B>remarks</b><DD> [Mx(x=0~3)] specifies DATA RAMx(x0~3).<DD> [MCx(x=0~3)] specifies DATA RAMx(x0~3), and increments [CTx(x=0~3)] after transfer.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_51.htm">Back</a> ｜ <A HREF="p04_53.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

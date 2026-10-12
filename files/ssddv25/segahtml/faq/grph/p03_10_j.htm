@@ -1,0 +1,201 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 4&gt;FAQ/グラフィック関連/SOFTIMAGE</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#grph">FAQ</A>
+★<a href="index_j.htm#no3">グラフィック関連</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/グラフィック関連</B>
+<H2 ALIGN=CENTER>SOFTIMAGE</H2>
+<HR NOSHADE>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_01"><HR></A><DL>
+<H3>ハイレゾモード用のデータを作りたい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> ハイレゾリューション用のモデルデータを作りたいのですが、どうやって
+      SGLフォーマットを作成したら良いのでしょうか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> 現在SOFTIMAGEがサポートしているテクスチャデータのカラーモードは
+      32000色のRGBモードのみです。
+      一方ハイレゾモードを使用した場合、テクスチャには1ドット当たり8ビットしか
+      持てませんので、RGBの指定はできません。
+      そのため、ハイレゾモードの画面を使用するときには、SOFTIMAGE上のみで
+      全ての作業を行なうことはできません。
+      実際にはどうするのかというと。SOFTIMAGEで作ったモデルをセガから
+      提供している「SMAP」を使って256色などの色数で書かれたDGTデータを
+      張り付け、
+      slcon -cm 256 -f filename
+      等として作成する必要があります。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_02"><HR></A><DL>
+<H3>SOFTIMAGEでテクスチャに透明色の設定をしたい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> SOFTIMAGE 3Dで透明色を含むテクスチャ付ポリゴンを作成しようと試みたの
+      ですが、どうもよく分かりません。
+      どうやって透明色の設定をしたよいのでしょうか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> 残念ながら、現在のバージョンのSaturn Exportでは、透明色の設定は
+      できません。
+      SMAPなどのツールを経由して設定してください。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_03"><HR></A><DL>
+<H3>SOFTIMAGEで複数のモデルを一つのモデルとして扱いたい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> 複数のポリゴン(Grid)を組み合わせて1個の物体を作ると、どうして
+      も階層構造で表現された形状データになってしまいます。
+      階層になることでマトリックスデータのpush&amp;popが発生してしまい、
+      処理時間が無駄に消費されてしまうので、できれば同一階層の形状に
+      したいのですがどうすれば良いでしょうか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> モデルのマージという機能を使用します。
+      一つにまとめたいモデルを(Multi Selectモードで)全て選択した後、
+      ModelsモジュールのEffectメニューからMARGEを選択してダイアログのパラメータ
+      を設定してください。一つにマージされたモデルが新しく生成されます。
+      但し、この場合マージする全てのモデルは接触している(或は近接している)
+      必要があります。<BR>
+      それ以外の場合、slPushMatrix〜slPopMatrixの中で複数回slPutPolygon(構成する
+      モデルの数)を実行する事でPush/Popの処理時間のロスを防ぐ事ができます。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_04"><HR></A><DL>
+<H3>SOFTIMAGEでポリゴン毎にマテリアルの設定をしたい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> Cubeなどを変形させても、同じマテリアルになってしまい、異なる
+      テクスチャを設定できないようなので困っています。ポリゴン毎にマテリアルを
+      設定する方法はありませんか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> [G]キーを押しながら、マウスボタンボタンをクリックするとそのポリゴンが
+      赤くなり選択されますが、その状態でMatterモジュールのPolygonメニューから
+      Assign New Materialを選択します。Materialメニューを選択したときと同じ
+      マテリアルの設定画面が出てきますので、ここでマテリアルを設定してください。
+      なお、ローカルマテリアルの設定は必ずグローバルマテリアルの設定をしてから
+      行ってください。(そうしないとローカルマテリアルの設定は無効になります。)
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_05"><HR></A><DL>
+<H3>SOFTIMAGEで作成したデータを3D Editor等で編集したい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> SOFTIMEGE 3Dで作成したモデルをSEGA 3D Editor( Mac )でテクスチャを
+      貼るなどの編集を行いたいのですが、可能なのでしょうか。もし編集が
+      可能でしたら、方法を詳しく教えて頂けないでしょうか。
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> SOFTIMEGE 3Dで作成したモデルをスタンドアロンのsoft2dxfコマンドで、
+      .dxfファイルにコンバートします。この.dxfファイルを改行コードの変換等を
+      行った後(Mac側で自動的にできる場合もありますが)、3D Editorに
+      読み込ませます。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_06"><HR></A><DL>
+<H3>SGLのTUTORIALと今のSOFTIMAGEではだいぶ使い方が異なるのですが。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> SGLのTUTORIALを見ながらSOFTIMAGEでモデルを作っているのですが、
+      TUTORIALの内容と、実際の操作が違うのでかなり困っています。
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> TUTORIALの説明にあるSOFTIMAGEは Ver. 2.66cというバージョンをベースにして
+      書かれています。しかし、最新のSOFTIMAGEのバージョンは Ver. 3.51である為
+      細かい所で大分異なっています。SOFTIMAGEの3.0ベースの日本語マニュアル
+      を、亜土電子工業などから有償で販売しています。
+      基本的には、3.0と3.51の差異はわずかですので、このマニュアルで一通りの
+      ことができる筈です。<BR>
+      また、SATURN関連の処理についてもTUTORIALと現在のバージョンでは異なります。
+      マニュアルにはSMAPを使う様に書いてありますが、今はToolsモジュールに
+      Saturn Export、Saturn Import、Saturn Viewerなどのカスタムエフェクトが
+      使えますので特殊な目的以外はこれらのツールだけで事足りてしまいます。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_07"><HR></A><DL>
+<H3>テクスチャデータの共有設定をしたいのですが。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> SOFTIMAGEでテクスチャデータの共有化をしたいのですが、Saturn Exportで
+      出力されるデータを見る限りでは、正しく共有化ができていません。<BR>
+      SOFTIMAGEでは、テクスチャデータの共有化はできないのでしょうか？<BR>
+      また、できるとしたらその方法をお教えください。
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> SOFTIMAGEでテクスチャの共有化をしたい場合、単純に同じテクスチャを貼る
+      だけでは、共有化されません。実際に共有化させるためには、
+      MaterialモジュールのPaintメニューを使います。<BR>
+      ここで、共有化させたいテクスチャをClipboardにコピーしておき、
+      共有させたい場所にこのClipboardにあるテクスチャを貼ります。
+      もう一つ注意ですが、Textureメニューダイアログ(2D Local、2D Global)にある
+      テクスチャの繰り返し指定や範囲選択指定などはSaturn Exportでは
+      反映されません。その場合も同様に、Paintメニューで設定してください。
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no3_08"><HR></A><DL>
+<H3>テクスチャ分割がうまくいかない。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD> SOFTIMAGEで、複数ポリゴンにテクスチャを貼り付け、ポリゴン毎に分割された
+      テクスチャデータを取り出したいのですが、うまくいきません。何か設定
+      する事があるのでしょうか？
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD> 現在のSOFTIMAGEは、複数ポリゴンにマテリアルを設定した際などは、
+      マテリアルに対してテクスチャがアサインされてしまいます。<BR>
+      MatterモジュールのPaintメニューを使ってUVエディットした場合には、
+      変更されたテクスチャだけが別に生成されるようになっています。<BR>
+      したがってSOFTIMAGE内部としてそういうオペレーションはできませんが、
+      SOFTIMAGE Ver. 3.5xからついてくるSaturn Importを使えば、ある程度
+      この様な要求を満たせると思います。</P>
+<P>      まず、目的のモデルをSaturn Exportします。
+      次にExportしたデータをSaturn Importで読み込みます。
+      このデータをSceneデータまたはModelデータとしてセーブします。
+      但し、骨の情報やモーションの情報については、正確に復元できない可能性が
+      ありますので注意が必要になります。
+</DL>
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../index_j.htm#grph">FAQ</A>
+★<a href="index_j.htm#no3">グラフィック関連</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

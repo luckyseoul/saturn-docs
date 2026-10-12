@@ -1,0 +1,184 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 8/86&gt;VDP2ユーザーズマニュアル/2.4TV画面モードレジスタ</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm">HARDWARE Manual</A>★
+<A HREF="../index.htm">VDP2ユーザーズマニュアル</A>★
+<A HREF="p02_10.htm">第２章　TV画面</A>
+<HR>
+<B>▲
+<A HREF="p02_30.htm">戻る</A>｜
+<A HREF="p02_50.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP2ユーザーズマニュアル/第２章　TV画面</B>
+<HR NOSHADE>
+<DL>
+
+
+<A NAME="no2_40"></A>
+	<P><DT><H2>■2.4　TV画面モードレジスタ</H2>
+		<DD>　TV画面モードレジスタは、TV画面の表示を制御します。リードライト可能な16ビットのレジスタで、180000H番地にあります。電源投入後またはリセット後、値は0にクリアされますので必ず設定してください。</P>
+
+<A NAME="TVMD_"></A>
+<P>	<DD><B><FONT SIZE=5>TVMD</FONT>　<FONT SIZE=4>180000H</FONT></B>
+<DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><A HREF="#DISP_">DISP</A></TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH>-</TH><TH><A HREF="#BDCLMD_">BDCLMD</A></TH>
+</TR></TABLE><P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><A HREF="#LSMD_">LSMD1</A></TH><TH><A HREF="#LSMD_">LSMD0</A></TH>
+<TH><A HREF="#VRESO_">VRESO1</A></TH><TH><A HREF="#VRESO_">VRESO0</A></TH><TH>-</TH><TH><A HREF="#HRESO_">HRESO2</A></TH><TH><A HREF="#HRESO_">HRESO1</A></TH><TH><A HREF="#HRESO_">HRESO0</A></TH>
+</TR></TABLE></P>
+
+<A NAME="DISP_"></A>
+	<P><DT><B>TV画面表示ビット</B>：Display bit (DISP)、ビット15
+		<DD>　TV画面への絵の表示を制御します。</P>
+
+	<P><DD><TABLE BORDER=1>
+	<TR><TH WIDTH=50><PRE>DISP</TH><TH WIDTH=200><PRE>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>TV画面に絵を表示しない</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>TV画面に絵を表示する</TD></TR>
+	</TABLE></P>
+
+	<P><DD>　このビットが0のときは、表示期間中もブランク状態になっているので、CPUまたはDMAコントローラからのVRAMアクセスはいつでも可能になります。<BR>
+		　このビットが0のときに表示されるカラーは、BDCLMDビットによって指定します。<BR>
+		　このビットの0から1への変更は、必ずVブランク期間中に行ってください。</P>
+
+<A NAME="BDCLMD_"></A> 
+	<P><DT><B>ボーダーカラーモードビット</B>：Border color mode bit (BDCLMD)、ビット8
+		<DD>　ボーダーエリアで表示するカラーを制御します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>BDCLMD</TH><TH WIDTH=200><PRE>処　理</TH></TR>
+	<TR><TH><PRE>0</TH><TD><PRE>黒色を表示</TD></TR>
+	<TR><TH><PRE>1</TH><TD><PRE>バック画面を表示</TD></TR>
+	</TABLE></P>
+
+	<P><DD>　DISPビットが0のときは、規格表示エリア全てのカラーを指定します。ただし、電源投入後またはリセット後、1度もDISPビットを1にせずにこのビットを1にした場合、バック画面は正しく表示されません。
+	バック画面をラインごとに指定できるように設定している場合、ボーダーエリアに表示されるカラーは、設定表示エリアの一番下のラインと同じカラーになります。</P>
+
+<A NAME="LSMD_"></A>
+	<P><DT><B>インタレースモードビット</B>：Interlace mode bit (LSMD1, LSMD0)、ビット7、6
+		<DD>　インタレースモードを指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>LSMD1</TH><TH WIDTH=50><PRE>LSMD0</TH><TH WIDTH=200><PRE>処　理</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TD><PRE>ノンインタレース</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TD><PRE>設定禁止</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TD><PRE>単密インタレース</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TD><PRE>倍密インタレース</TD></TR>
+	</TABLE></P>
+
+	<P><DD>　単密インタレースは、奇数フィールドと偶数フィールドに同じ絵を表示するモードで、倍密インタレースは奇数フィールドと偶数フィールドで異なる絵を表示するモードです。どちらの場合も走査線間のすき間は空かなくなります。
+		倍密インタレース時の垂直方向解像度072垂直方向解像度はノンインタレース時と同じになります。<BR>
+	　倍密インタレース時に表示される絵は、ノンインタレース時または単密インタレース時に表示される絵を垂直方向に1/2倍したものになります。<BR>
+	　水平方向解像度(HRESO2〜HRESO0)の設定を専用モニターモードにした場合は、必ずノンインタレース(00B)にしてください。</P>
+
+<A NAME="VRESO_"></A>
+	<P><DT><B>垂直方向解像度ビット</B>：Vertical resolution bit (VRESO1, VRESO0)、ビット5、4
+		<DD>　TV画面に絵を表示するときの垂直方向の解像度を指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH WIDTH=50><PRE>VRESO1</TH><TH WIDTH=50><PRE>VRESO0</TH><TH WIDTH=164><PRE>垂直方向解像度</TH><TH WIDTH=164><PRE>表示可能モニター</TH></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TD><PRE>224ライン</TD><TD><PRE>NTSC方式またはPAL方式TV</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TD><PRE>240ライン</TD><TD><PRE>NTSC方式またはPAL方式TV</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TD><PRE>256ライン</TD><TD><PRE>PAL方式TV</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TD><PRE>設定禁止</TD><TD><PRE>−</TD>
+	</TABLE></P>
+
+	<P><DD>　垂直方向の解像度を上げた場合の増分は画面の上下に加えられ、画面の中心は変わりません。<BR>
+	　水平方向解像度(HRESO2〜HRESO0)の設定を専用モニターモードにした場合、このビットの設定は無視され、480ラインに固定されます。</P>
+
+<A NAME="HRESO_"></A>
+	<P><DT><B>水平方向解像度ビット</B>：Horizontal resolution bit (HRESO2〜HRESO0)、ビット2〜0
+		<DD>　TV画面に絵を表示するときの水平方向の解像度を指定します。</P>
+
+	<P><DD><TABLE BORDER>
+	<TR><TH><PRE>HRES02</TH><TH><PRE>HRESO1</TH><TH><PRE>HRESO0</TH><TH><PRE>水平方向解像度</TH><TH><PRE>グラフィックモード</TH><TH><PRE>表示可能<BR>モニター</TH></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD><PRE>320ピクセル</TD><TD><PRE>ノーマル<BR>グラフィックA</TD><TD ROWSPAN=4><PRE>NTSC方式または<BR>PAL方式TV</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD><PRE>352ピクセル</TD><TD><PRE>ノーマル<BR>グラフィックB</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD><PRE>640ピクセル</TD><TD><PRE>ハイレゾリューション<BR>グラフィックA</TD></TR>
+	<TR><TH><PRE>0</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD><PRE>704ピクセル</TD><TD><PRE>ハイレゾリューション<BR>グラフィックB</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>0</TH><TD><PRE>320ピクセル</TD><TD><PRE>専用ノーマル<BR>グラフィックA</TD><TD><PRE>31kHzモニター</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>0</TH><TH><PRE>1</TH><TD><PRE>352ピクセル</TD><TD><PRE>専用ノーマル<BR>グラフィックB</TD><TD><PRE>ハイビジョンモニター</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>0</TH><TD><PRE>640ピクセル</TD><TD><PRE>専用ハイレゾリューション<BR>グラフィックA</TD><TD><PRE>31kHzモニター</TD></TR>
+	<TR><TH><PRE>1</TH><TH><PRE>1</TH><TH><PRE>1</TH><TD><PRE>704ピクセル</TD><TD><PRE>専用ハイレゾリューション<BR>グラフィックB</TD><TD><PRE>ハイビジョンモニター</TD>
+	</TABLE></P>
+
+
+	<P><DD>　ノーマルグラフィックＡ（３２０ピクセル）またはハイレゾグラフィックＡ（６４０ピクセル）からノーマルグラフィックＢ
+（３５２ピクセル）またはハイレゾグラフィックＢ（７０４ピクセル）への切り替えは、水平帰線期間中に行わなければいけません。
+この制限を守るため、水平方向解像度の切り替えは必ずＢＯＯＴ−ＲＯＭ内のサービスルーチンを使用してください。
+
+
+	<P><DD>　専用ハイレゾリューショングラフィックAまたは専用ハイレゾリューショングラフィックBを指定した場合は、
+	他のレジスタを決められたように設定しなければいけません。「<A HREF="p02_10.htm"><B>2.1　TV画面モード</B></A>」の「<A HREF="p02_10.htm#no2_11"><B>専用ハイレゾリューショングラフィックモード</B></A>」を参照してください。<BR>
+	　TV画面モードを専用モニターモードからノーマルモードおよびハイレゾリューションモードに切り替える場合は、VDP2を必ずリセットしてください。</P><!-- VDP2のリセットってどうやるの？？？？？ -->
+
+<P><DT><TABLE><TR>
+<TH>注　意<BR><IMG SRC="../../../what/atto.gif"></TH>
+<TD><B>水平方向解像度の切り換えは、必ずBOOT ROM内のサービスルーチンを使うようにしてください。</B></TD></TR></TABLE></P>
+
+
+	<P><DD>　ＶＤＰ１とＶＤＰ２のＴＶ画面モード設定の組み合わせには制限があります。
+また、インタレースモード設定の組み合わせによって画面表示が変わります。
+ＴＶ画面モード設定の制限を<A HREF="#t2_2">表2.2</A>に、インタレースモード設定によるそれぞれの画面表示を<A HREF="#t2_3">表2.3</A>に示します。
+
+
+<A NAME="t2_2"></A>
+	<P><DD><B>表2.2　ＴＶ画面モード設定の制限</B>
+	<TABLE BORDER=1><TR>
+	<TH>ＶＤＰ２の設定<A HREF="../../hard/vdp2/hon/p02_40.htm#HRESO_">(TVMD:HRESO2..0)</A></TH>
+	<TH>ＶＤＰ１の設定<A HREF="../../hard/vdp1/hon/p04_11.htm#TVM_">(TVMR:TVM2..0)</A></TH><TH>設定許否</TH></TR>
+
+<TR ALIGN=CENTER><TH ROWSPAN=5>ノーマルモード<BR>(000または001)</TH>
+	<TD>ノーマル　　　　　　　０００</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>ハイレゾリューション　００１</TD><TD>設定禁止</TD></TR>
+<TR ALIGN=CENTER><TD>回転１６　　　　　　　０１０</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>回転　８　　　　　　　０１１</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>ＨＤＴＶ　　　　　　　１００</TD><TD>設定禁止</TD></TR>
+
+<TR ALIGN=CENTER><TH ROWSPAN=5>ハイレゾリューションモード<BR>(010または011)</TH>
+	<TD>ノーマル　　　　　　　０００</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>ハイレゾリューション　００１</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>回転１６　　　　　　　０１０</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>回転　８　　　　　　　０１１</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>ＨＤＴＶ　　　　　　　１００</TD><TD>設定禁止</TD></TR>
+
+<TR ALIGN=CENTER><TH ROWSPAN=5>専用モニタモード<BR>(100,101,110,111)</TH>
+	<TD>ノーマル　　　　　　　０００</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>ハイレゾリューション　００１</TD><TD>設定禁止</TD></TR>
+<TR ALIGN=CENTER><TD>回転１６　　　　　　　０１０</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>回転　８　　　　　　　０１１</TD><TD>　可能　</TD></TR>
+<TR ALIGN=CENTER><TD>ＨＤＴＶ　　　　　　　１００</TD><TD>設定禁止</TD></TR>
+</TABLE>
+
+<A NAME="t2_3"></A>
+	<P><DD><B>表2.3　インタレースモード設定による画面表示</B>
+	<TABLE BORDER=1>
+	<TR><TH> ＬＳＭＤ値 </TH><TH>ＤＩＥ値</TH><TH> ＶＤＰ２の表示 </TH><TH>  ＶＤＰ１の表示  </TH></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>  ００      </TD><TD>   ０   </TD><TD>ノンインタレース</TD><TD>ノンインタレース  </TD></TR>
+	<TR ALIGN=CENTER>				<TD>   １   </TD><TD>ノンインタレース</TD><TD>正しく表示できない</TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>  ０１      </TD><TD>   ０   </TD><TD>単密インタレース</TD><TD>単密インタレース  </TD></TR>
+	<TR ALIGN=CENTER>				</TD><TD>   １   </TD><TD>単密インタレース</TD><TD>倍密インタレース  </TD></TR>
+	<TR ALIGN=CENTER><TD ROWSPAN=2>  １１      </TD><TD>   ０   </TD><TD>倍密インタレース</TD><TD>単密インタレース  </TD></TR>
+	<TR ALIGN=CENTER>				</TD><TD>   １   </TD><TD>倍密インタレース</TD><TD>倍密インタレース  </TD></TR>
+	</TABLE>
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p02_30.htm">戻る</A>｜
+<A HREF="p02_50.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>★
+<A HREF="../../index.htm">HARDWARE Manual</A>★
+<A HREF="../index.htm">VDP2ユーザーズマニュアル</A>★
+<A HREF="p02_10.htm">第２章　TV画面</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

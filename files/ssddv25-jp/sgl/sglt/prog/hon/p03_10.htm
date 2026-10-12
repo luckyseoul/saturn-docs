@@ -1,0 +1,180 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/30&gt;SGL Programmer's Tutorial/3.光源</TITLE>
+</HEAD>
+<BODY>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<B>▲<A HREF="p02_10.htm">戻る</A>｜<A HREF="p04_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>PROGRAMMER'S TUTORIAL</B>
+<H2 ALIGN=CENTER>3.光源</H2>
+<HR NOSHADE>
+
+<P>　本章では、ＳＧＬにおける光源の設定法について解説します。光源を用いることによって、
+３Ｄグラフィックス表示されたオブジェクト群は陰影を与えられ、よりリアルな映像を描画する
+ことが可能となります。</P>
+
+<DL>
+<A NAME="no3_10"></A>
+  <P><H3>3-1. 光源</H3>
+     <DD>　光源は、一般に次の情報を含んでいます。</P>
+
+  <P><DD>・光源の位置
+     <DD>・光の強さ
+     <DD>・光の色</P>
+
+  <P>　しかし、これら全てを光源情報として計算し正確に描画するには、膨大な時間がかかります。
+	そこで、ＳＧＬではこれら光源情報の中から光源方向のみを選択してポリゴン描画に反映します。<BR>
+	また、光の方向に関しても、通常光はある一点からの放射として定義されますが、これも計算に時間がかかりすぎます。
+	そこで、光源位置を無限遠方と想定し、光の方向はオブジェクトの座標位置によらず、
+	常に同じ方向から照射されるものとして処理します。</P>
+
+  <P ALIGN=CENTER><B>＜図3-1　光源イメージモデル＞</B><BR>
+  <IMG SRC="../grp/p03_2_1.gif"></P>
+
+
+  <P>　オブジェクト表面の光源による変化は、光線の方向と各ポリゴン面の法線ベクトルの向きによって決定されます。
+	これをイメージ化したものが、下図になります。</P>
+
+  <P ALIGN=CENTER><B>図3-2　陰影イメージモデル</B><BR>
+	光源によるポリゴン面の陰影<BR>
+  <IMG SRC="../grp/p03_2_2.gif"></P>
+	<LI>ポリゴン面は、光の入射角に応じてポリゴンカラーを変化させます。
+	<LI>入射角が垂直に近いほど明るく、水平に近いほど暗くなります。
+	<LI>入射角が負の垂直の場合最も暗くなります。</P>
+</P>
+
+<A NAME="no3_20"></A>
+  <P><DT><H3>3-2. 光源の設定</H3>
+     <DD> ＳＧＬにおける光源の設定には、関数“slLight”を使用してください。
+	光源関数は光線の向きを表す方向ベクトル（光源ベクトル）のみをもち、光の強さや色情報は含まれません。</P>
+
+  <P ALIGN=CENTER><B>【void slLight ( VECTOR light ) ;】</B></P>
+
+  <P><DD>　ＳＧＬにおける光源の設定を行います。<BR>
+	パラメータには、光線の方向を示すVECTOR型変数（光源ベクトル）を代入します。<BR>
+	光源の強さ及び色の情報などはパラメータに含まれません。<BR>
+	ＳＧＬでは、光線は指定された方向ベクトルの向きから常に照射されるとして定義されます。<BR>
+	　また、オブジェクトの表面属性で光源計算をオンにしない限り、光源を設定しても光源による陰影は反映されません
+	（詳細は“<A HREF="p07_10.htm">第7章 　ポリゴンの面属性</A>”参照）。
+
+  <P>　ポリゴン面は、面に対する光の入射角からポリゴンカラーを決定します。<BR>
+	入射角が垂直に近いほど明るく、水平に近いほど暗く表示されます。
+	また、負の垂直方向が最も暗く表現されます。</P>
+
+
+  <P><DT><H3>光源設定時の注意</H3>
+     <DD>　カレントマトリクスにスケールなど各種変換操作がかかっている場合、
+	光源計算が正常に行われない場合があります。<BR>
+	これは、関数“<B>slLight</B>”で指定する光源ベクトルの算出に、
+	ユーザーがマトリクス演算を使用するために発生するものです。そこで、光源の設定を行う場合は、
+	カレントマトリクスを初期化しておく必要があります。<BR>
+	　カレントマトリクスの初期化には、関数“<B>slPushUnitMatrix</B>”または“<B>slUnitMatrix</B>”
+	を使用してください。</P>
+
+  <P ALIGN=CENTER><B>【Bool slPushUnitMatrix ( void )】</B></P>
+
+  <P><DD>　単位行列をスタックに確保し、カレントマトリクスとします。<BR>
+	以前のカレントマトリクスは、スタック中の上位レベルに一時保存されます。</P>
+
+  <P ALIGN=CENTER><B>【void slUnitMatrix ( MATRIX mtptr )】</B></P>
+  
+  <P><DD>　パラメータで指定されたマトリクスを単位行列にします。<BR>
+	パラメータには指定するMATRIX型変数を代入します。<BR>
+	また、パラメータに“CURRENT”を指定した場合、変換対象マトリクスはカレントマトリクスになり、
+	カレントマトリクスの初期化が行えます。</P>
+
+  <P>　カレントマトリクス及びマトリクス関数の詳細は
+	“<A HREF="p05_10.htm">第５章　マトリクス</A>”を参考してください。</P>
+
+  <P>　次のリスト3-1は、空間内に置かれた立方体に対し、光源の方向ベクトル
+	を次々に変化させていったときの立方体ポリゴン面の陰影の変化を示したものです。</P>
+
+	<P>	<DD><B>＜リスト3-1　sample_3_2：光源移動によるオブジェクト面の変化＞</B>
+		<DD>
+<PRE>
+/*----------------------------------------------------------------------*/
+/*	Cube & A Light Source						*/
+/*----------------------------------------------------------------------*/
+#include	"sgl.h"
+
+extern PDATA PD_PLANE1;
+
+void ss_main(void)
+{
+	static ANGLE	ang[XYZ];
+	static FIXED	pos[XYZ];
+	static FIXED	light[XYZ];
+	static ANGLE	tmp = DEGtoANG(0.0);
+
+	slInitSystem(TV_320x224,NULL,1);
+
+	ang[X] = DEGtoANG(30.0);
+	ang[Y] = DEGtoANG(45.0);
+	ang[Z] = DEGtoANG( 0.0);
+	pos[X] = toFIXED(  0.0);
+	pos[Y] = toFIXED(  0.0);
+	pos[Z] = toFIXED(190.0);
+
+	light[X] = toFIXED(-1.0);
+	light[Y] = toFIXED( 0.0);
+	light[Z] = toFIXED( 0.0);
+
+	slPrint("Sample program 3.2" , slLocate(9,2));
+
+	while(-1){
+		slPushMatrix();
+		{
+			slRotY(tmp);
+			slRotX(DEGtoANG(15.0));
+			slRotZ(DEGtoANG(15.0));
+			slCalcPoint(toFIXED(0.0),toFIXED(0.0),toFIXED(1.0),light);
+		}
+		slPopMatrix();
+		slLight(light);
+		tmp += DEGtoANG(1.0);
+
+		slPushMatrix();
+		{
+			slTranslate(pos[X] , pos[Y] , pos[Z]);
+			slRotX(ang[X]);
+			slRotY(ang[Y]);
+			slRotZ(ang[Z]);
+			slPutPolygon(&PD_PLANE1);
+		}
+		slPopMatrix();
+
+		slSynch();
+	}
+}
+</PRE>
+
+<H4>フロー3-1　sample_3_2：光源移動フローチャート</H4>
+<IMG SRC="../grp/p03_5.gif">
+
+<A NAME="no3_f"></A>
+  <P><DT><H3>付記　本章に登場したＳＧＬライブラリ関数</H3>
+     <DD>　本章では、次表の関数を解説しました。</P>
+<A NAME="t3_1"></A>
+	<P>	<DT><TABLE BORDER=1>
+	<CAPTION><B>表3-1　本章に登場したＳＧＬライブラリ関数</B></CAPTION>
+	<TR ALIGN=CENTER><TH>　関数型　</TH><TH>　関数名　</TH><TH>　パラメータ　</TH><TH>　機　能　</TH></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slLight</TD><TD>VECTOR light</TD><TD>光源ベクトルの設定</TD></TR>
+	<TR ALIGN=CENTER><TD>Bool</TD><TD>slPushUintMatrix</TD><TD>void</TD><TD>単位行列をスタックに確保</TD></TR>
+	<TR ALIGN=CENTER><TD>void</TD><TD>slUintMatrix</TD><TD>MATRIX mptrt</TD><TD>指定マトリクスを単位行列にする</TD></TR>
+	</TABLE></P>
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p02_10.htm">戻る</A>｜<A HREF="p04_10.htm">進む</A>▼</B>
+<HR>
+  <A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0></A>
+★<A HREF="../../../index.htm">SGL User's Manual</A>
+★<A HREF="../index.htm">PROGRAMMER'S TUTORIAL</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

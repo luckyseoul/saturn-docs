@@ -1,0 +1,98 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/17&gt;Sound driver Ver2.10 guide/8. About MIDI format</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no8">Sound Driver Programmer's Guide</a><HR>
+ <B>▲ <A HREF="snditf6.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>Sound Driver Programmer's Guide</b><H2 ALIGN="CENTER"> 8. About MIDI format</H2><HR NOSHADE>
+ As an appendix, we provide a list of MIDI messages currently supported by the sound driver.<p> MIDI message correspondence table<BR>
+<table border cellpadding="4">
+<tr><th></th><th> STATUS BYTE</th><th> Compatibility</th></tr>
+<tr><td> NOTE OFF</td><td> 0x8n + MIDI Channel</td><td> ○</td></tr>
+<tr><td> NOTE ON</td><td> 8x9n + MIDI Channel</td><td> ○</td></tr>
+<tr><td> POLIPHONIC KEY PRESSURE</td><td> 0xAn + MIDI Channel</td><td> ----</td></tr>
+<tr><td> CONTROL CHANGE</td><td> 0xBn + MIDI Channel</td><td> ○</td></tr>
+<tr><td> PROGRAM PRESSURE</td><td> 0xCn + MIDI Channel</td><td> ○</td></tr>
+<tr><td> CHANNEL PRESSURE</td><td> 0xDn + MIDI Channel</td><td> ----</td></tr>
+<tr><td> PITCH WHEEL CHANGE</td><td> 0xEn + MIDI Channel</td><td> ○</td></tr>
+<tr><td> EXCLUSIVE CHANGE</td><td> 0xF0</td><td> ----</td></tr>
+<tr><td> QUATER FRAME CHANGE</td><td> 0xF1</td><td> ----</td></tr>
+<tr><td> SONG POSITION POINTER</td><td> 0xF2</td><td> ----</td></tr>
+<tr><td> SONG SELECT</td><td> 0xF3</td><td> ----</td></tr>
+<tr><td> TUNE REQUEST</td><td> 0xF6</td><td> ----</td></tr>
+<tr><td> END OF EXCLUSIVE</td><td> 0xF7</td><td> ----</td></tr>
+<tr><td> TIMING CLOCK</td><td> 0xF8</td><td> ----</td></tr>
+<tr><td> START</td><td> 0xFA</td><td> ----</td></tr>
+<tr><td> CONTINUE</td><td> 0xFB</td><td> ----</td></tr>
+<tr><td> STOP</td><td> 0xFC</td><td> ----</td></tr>
+<tr><td> ACTIVE SENCING</td><td> 0xFE</td><td> ----</td></tr>
+<tr><td> SYSTEM RESET</td><td> 0xFF</td><td> ----</td></tr>
+</table>
+<p> Control change correspondence table<BR>
+<table border cellpadding="4">
+<tr><th> Dec</th><th> Hex</th><th> FUNCTION</th><th> ○: Compatible, △: Special processing, ----: Not compatible.</th></tr>
+<tr><td> 1</td><td> 01</td><td> Modulation Depth</td><td> ○</td></tr>
+<tr><td> 2</td><td> 02</td><td> Bleath Control</td><td> ○ However, it works in the same way as Expression.</td></tr>
+<tr><td> 4</td><td> 04</td><td> Foot Control</td><td> ----</td></tr>
+<tr><td> 5</td><td> 05</td><td> Portament Time</td><td> ----</td></tr>
+<tr><td> 6</td><td> 06</td><td> Data Entry</td><td> ----</td></tr>
+<tr><td> 7</td><td> 07</td><td> Main volume</td><td> ○</td></tr>
+<tr><td> 8</td><td> 08</td><td> Balance Control</td><td> ----</td></tr>
+<tr><td> 10</td><td> 0A</td><td> Panpot</td><td> ○</td></tr>
+<tr><td> 11</td><td> 0B</td><td> Expression</td><td> ○</td></tr>
+<tr><td> 12</td><td> 0C</td><td><pre></pre></td><td> △ Racing game controls 1.</td></tr>
+<tr><td> 13</td><td> 0D</td><td><pre></pre></td><td> △ Racing game controls 2.</td></tr>
+<tr><td> 31</td><td> 1F</td><td><pre></pre></td><td> △ Special processing for sequence data (*Note).</td></tr>
+<tr><td> 32</td><td> 20</td><td><pre></pre></td><td> △ Bank change.</td></tr>
+<tr><td> 64</td><td> 40</td><td> Hold 1 (Damper)</td><td> ○</td></tr>
+<tr><td> 65</td><td> 41</td><td> Portament</td><td> ----</td></tr>
+<tr><td> 66</td><td> 42</td><td> Sostenute</td><td> ----</td></tr>
+<tr><td> 67</td><td> 43</td><td> Soft Pedal</td><td> ----</td></tr>
+<tr><td> 68</td><td> 44</td><td> Hold 2 (Freeze)</td><td> ----</td></tr>
+<tr><td> 80</td><td> 50</td><td><pre></pre></td><td> △ Specify Qsound position (MIDI channel is 1-4 for 4ch, 1-8 for 8ch).</td></tr>
+<tr><td> 81</td><td> 51</td><td><pre></pre></td><td> △ YAMAHA 3D Control Direction specification.</td></tr>
+<tr><td> 82</td><td> 52</td><td><pre></pre></td><td> △ YAMAHA 3D Control distance specification.</td></tr>
+<tr><td> 83</td><td> 53</td><td><pre></pre></td><td> △ YAMAHA 3D Control height specification.</td></tr>
+<tr><td> 91</td><td> 5B</td><td> Effect Depth</td><td> △ Used as an effect change.</td></tr>
+<tr><td> 92</td><td> 5C</td><td> Tremolo Depth</td><td> ----</td></tr>
+<tr><td> 93</td><td> 5D</td><td> Chorus Depth</td><td> ----</td></tr>
+<tr><td> 94</td><td> 5E</td><td> Celeste Depth</td><td> ----</td></tr>
+<tr><td> 95</td><td> 5F</td><td> Phaser Depth</td><td> ----</td></tr>
+<tr><td> 96</td><td> 60</td><td> Data Increment</td><td> ----</td></tr>
+<tr><td> 97</td><td> 61</td><td> Data Decrement</td><td> ----</td></tr>
+<tr><td> 98</td><td> 62</td><td> LSB of NRPN</td><td> ----</td></tr>
+<tr><td> 99</td><td> 63</td><td> MSB of NRPN</td><td> ----</td></tr>
+<tr><td> 100</td><td> 64</td><td> LSB of RPN</td><td> ----</td></tr>
+<tr><td> 101</td><td> 65</td><td> MSB of RPN</td><td> ----</td></tr>
+<tr><td> 120</td><td> 78</td><td><pre></pre></td><td> △ Stop all sequences (not supported after 1.33).</td></tr>
+<tr><td> 122</td><td> 7A</td><td> Local Control</td><td> ----</td></tr>
+<tr><td> one two three</td><td> 7B</td><td> All Note Off</td><td> ○ Can be used during development, but must not be incorporated into the game.</td></tr>
+<tr><td> 124</td><td> 7C</td><td> OMNI off</td><td> ----</td></tr>
+<tr><td> 125</td><td> 7D</td><td> OMNI on</td><td> ----</td></tr>
+<tr><td> 126</td><td> 7E</td><td> Mono mode on</td><td> ----</td></tr>
+<tr><td> 127</td><td> 7F</td><td> Poly mode on</td><td> ----</td></tr>
+</table>
+<p> *Note: When decompressing data compressed by the converter, it is processed as a loop point for sequence data. Therefore, if you send this command directly, it will not be executed.<p><HR NOSHADE>
+ <B>▲ <A HREF="snditf6.htm">Back</a> | ■</b><HR>
+<A HREF="../../../index.htm#sndt"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#prog">SOUND Manual</a> ★ <A HREF="index.htm#no8">Sound Driver Programmer's Guide</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

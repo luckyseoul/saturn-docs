@@ -1,0 +1,105 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;63/86&gt;VDP2 User's Manual/11.1 Priority Function</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no11">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p10_30.htm">Back</a> ｜ <A HREF="p11_20.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual</b><H2 ALIGN=CENTER> Chapter 11 Priority Function</H2><HR NOSHADE>
+<DL>
+<P><DD> VDP2 compares the priority number values of the sprite and each scroll screen to determine the display priority up to the third from the top. At that time, the priority number of the sprite can be selected for each character from a maximum of 8 values, and the priority number of each scroll screen can be changed for each character or dot by using the special priority function. can.</P>
+<P><DD> A line color screen can be inserted in the second position below the specified screen when it has the highest priority.</P>
+<A NAME="no11_10"></A><P><DT><H2> ■11.1 Priority function</H2><DD> The priority (display priority order) of the sprite and each scroll screen is determined by comparing the size of the priority number value of the non-transparent screen dot by dot located at the same TV screen coordinates. The screen priority increases as the priority number increases, and the image made up of dots with the highest priority is called the top image 061 third image. Also, the back screen is displayed where all dots on the sprite and each scroll screen are transparent. The priority function is shown in Figure 11.1.</P>
+<A NAME="z11_1"></A><P ALIGN=CENTER> <B>Figure 11.1 Priority function</b><BR>
+<img srcset="../../intr/grp/i034_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no11_11"></A><P><DT><H3> ●Priority number</H3><DD> The scrolling screens have one 3-bit priority number register per screen. This priority number is normally used for the entire surface, but special priority modes allow you to change the value of the least significant bit on a character-by-character or dot-by-dot basis. sprite priority number</P>
+<P><DD> The bar can select one of eight 3-bit priority number registers for each character. For information on selecting a sprite's priority number register, see " <B><A HREF="p09_20.htm#no9_21">Priority number selection</a></b> " in " <B><A HREF="p09_20.htm">9.2 Priority and color operations</a></b> ."</P>
+<P><DD> The higher the priority number, the higher the screen priority, but if they are equal, the priority is determined according to the order shown in Table 11.1. When the priority number value is 0H, it is considered transparent.</P>
+<A NAME="t11_1"></A><P><DD> <B>Table 11.1 Priority when priority numbers are equal</b><DD><TABLE BORDER>
+<TR ALIGN=CENTER><TH><PRE> priority</TH><TH><PRE> usually</TH><TH><PRE> External screen data<BR> When entering</TH><TH><PRE> rotating scroll screen<BR> When displaying on two sides</TH><TH><PRE> rotating scroll screen<BR> External screen on 2 sides<BR> When entering</TH></TR>
+<TR ALIGN=CENTER><TH ROWSPAN=6> high<BR>
+ ↑<BR>
+ │<BR>
+ │<BR>
+ │<BR>
+ │<BR>
+ │<BR>
+ │<BR>
+ │<BR>
+ │<BR>
+ ↓<BR>
+ low</TH><TD> sprite</TD><TD> sprite</TD><TD> sprite</TD><TD> sprite</TD></TR>
+<TR ALIGN=CENTER><TD> RBG0</TD><TD> RBG0</TD><TD> RBG0</TD><TD> RBG0</TD></TR>
+<TR ALIGN=CENTER><TD> NBG0</TD><TD> NBG0</TD><TD> RBG1</TD><TD> RBG1</TD></TR>
+<TR ALIGN=CENTER><TD> NBG1</TD><TD> EXBG</TD><TD> −</TD><TD> EXBG</TD></TR>
+<TR ALIGN=CENTER><TD> NBG2</TD><TD> NBG2</TD><TD> −</TD><TD> −</TD></TR>
+<TR ALIGN=CENTER><TD> NBG3</TD><TD> NBG3</TD><TD> −</TD><TD> −</TD></TR>
+</TABLE>
+</P>
+<A NAME="no11_12"></A><P><DT><H3> ●Priority number register</H3><DD> The priority number register specifies the priority number. This is a 16-bit write-only register located at addresses 1800F8H to 1800FCH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRINA_"></A><P><DD> <B><FONT SIZE=5>PRINA</font> <FONT SIZE=4>1800F8H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxPRIN_">N1PRIN2</a></TH><TH><PRE> <A HREF="#NxPRIN_">N1PRIN1</a></TH><TH><PRE> <A HREF="#NxPRIN_">N1PRIN0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxPRIN_">N0PRIN2</a></TH><TH><PRE> <A HREF="#NxPRIN_">N0PRIN1</a></TH><TH><PRE> <A HREF="#NxPRIN_">N0PRIN0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRINB_"></A><P><DD> <B><FONT SIZE=5>PRINB</font> <FONT SIZE=4>1800FAH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxPRIN_">N3PRIN2</a></TH><TH><PRE> <A HREF="#NxPRIN_">N3PRIN1</a></TH><TH><PRE> <A HREF="#NxPRIN_">N3PRIN0</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxPRIN_">N2PRIN2</a></TH><TH><PRE> <A HREF="#NxPRIN_">N2PRIN1</a></TH><TH><PRE> <A HREF="#NxPRIN_">N2PRIN0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="PRIR_"></A><P><DD> <B><FONT SIZE=5>PRIR</font> <FONT SIZE=4>1800FCH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#NxPRIN_">R0PRIN2</a></TH><TH><PRE> <A HREF="#NxPRIN_">R0PRIN1</a></TH><TH><PRE> <A HREF="#NxPRIN_">R0PRIN0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="NxPRIN_"></A><DT> <B>Priority number bit (for scroll screen)</b> : Priority number bit<DD> (N0PRIN2~N0PRIN0, N1PRIN2~N1PRIN0, N2PRIN2~N2PRIN0, N3PRIN2~N3PRIN0, R0PRIN2~R0PRIN0)<BR>
+ Specify the priority number for each scroll screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> N0PRIN2～N0PRIN0</TD><TD> 1800F8H</TD><TD> bits 2-0</TD><TD> For NBG0 (or for RBG1)</TD></TR>
+<TR><TD> N1PRIN2～N1PRIN0</TD><TD> 1800F8H</TD><TD> bits 10-8</TD><TD> For NBG1 (or for EXBG)</TD></TR>
+<TR><TD> N2PRIN2～N2PRIN0</TD><TD> 1800FAH</TD><TD> bits 2-0</TD><TD> For NBG2</TD></TR>
+<TR><TD> N3PRIN2～N3PRIN0</TD><TD> 1800FAH</TD><TD> bits 10-8</TD><TD> For NBG3</TD></TR>
+<TR><TD> R0PRIN2～R0PRIN0</TD><TD> 1800FCH</TD><TD> bits 2-0</TD><TD> For RBG0</TD></TR>
+</TABLE>
+</P>
+<P><DD> The higher the priority number, the higher the display priority. Also, when the priority number value is 0, it is considered transparent and is not displayed.<BR>
+ For information on sprite priority number registers, see " <B><A HREF="p09_21.htm#no9_25">●Priority number register</a></b> " in " <B><A HREF="p09_20.htm">9.2 Priority and color operations</a></b> ".</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p10_30.htm">Back</a> ｜ <A HREF="p11_20.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no11">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

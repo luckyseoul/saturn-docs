@@ -1,0 +1,136 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;14/19&gt;SMPCユーザーズマニュアル/3.1リザルトパラメータの詳細</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<B>▲<A HREF="p03_15.htm">戻る</A>｜
+     <A HREF="p03_17.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SMPCユーザーズマニュアル/3.1　SMPCコントロールモード</B>
+<H2>◆リザルトパラメータの詳細</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no3_16_1"></A>
+	<P>	<DT><B>　●ペリフェラルコントロールステータス</B>
+		<DD>　SMPCは、SMPCコントロールモード使用時にステータスレジスタ(SR)にペリフェラルコントロールステータスを出力します。ステータスレジスタ(SR)は、INTBACKコマンドと無関係に読み出し可能なレジスタです。
+			ただし、INTBACKコマンド使用中以外にこのレジスタをリードしても、RESBビット以外は不定です。</P>
+
+<A NAME="z3_13"></A>
+	<P>	<DD><B>図3.13　ペリフェラルコントロールステータス</B>
+		<DD><TABLE BORDER=1 NOSHADE>
+		<TR><TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+		<TR ALIGN=CENTER><TD>1</TD><TD>PDL</TD><TD>NPE</TD><TD>RESB</TD><TD>P2MD1</TD><TD>P2MD0</TD><TD>P1MD1</TD><TD>P1MD0</TD>
+		</TR></TABLE>
+
+<A NAME="_z3_13_0"></A>
+	<P>	<DT><B>　P1MD:ポート1モード</B>
+		<DD>00:15バイトモード(ペリフェラルデータを最大15byteまで返します)
+		<DD>01:255バイトモード(ペリフェラルデータを最大255byteまで返します)
+		<DD>10:未使用(設定禁止)<!-- 常識 -->
+		<DD>11:0バイトモード(ポートにはアクセスしません)</P>
+
+<A NAME="_z3_13_1"></A>
+	<P>	<DT><B>　P2MD:ポート2モード</B>
+		<DD>00:15バイトモード(ペリフェラルデータを最大15byteまで返します)
+		<DD>01:255バイトモード(ペリフェラルデータを最大255byteまで返します)
+		<DD>10:未使用(設定禁止)<!-- 常識だよね -->
+		<DD>11:0バイトモード(ポートにはアクセスしません)</P>
+
+<A NAME="_z3_13_2"></A>
+	<P>	<DT><B>　RESB:リセットボタン状態ビット</B>
+		<DD>0:リセットボタンOFF
+		<DD>1:リセットボタンON
+		<DD>　INTBACKコマンドに関係なく読むことが可能です。(V-BLANK-IN毎の状態を表示)</P>
+
+<A NAME="_z3_13_3"></A>
+	<P>	<DT><B>　NPE:残りペリフェラルデータの有無ビット</B>
+		<DD>0:残りデータなし
+		<DD>1:残りデータあり</P>
+
+<A NAME="_z3_13_4"></A>
+	<P>	<DT><B>　PDL:ペリフェラルデータの位置ビット</B>
+		<DD>0:2nd以降のペリフェラルデータ
+		<DD>1:1stのペリフェラルデータ</P>
+
+<A NAME="_z3_13_5"></A>
+	<P>	<DT><B>　bit7</B>
+		<DD>常に１です。</P><!-- よ -->
+
+<A NAME="no3_16_2"></A>
+	<P>	<DT><B>　●ポートステータス</B>
+		<DD>　ポートステータスは、ポートに接続されているペリフェラルの状況を示す１バイトのデータです。ポートステータスを利用することにより該当ポートにペリフェラルが直接接続されているか何タップのマルチタップが接続されているかなどを判定できます。
+		図3.14にポートステータスの構成を示します。</P>
+
+<A NAME="z3_14"></A>
+	<P>	<DD><B>図3.14　ポートステータスの構成</B>
+		<DD><TABLE BORDER=1>
+		<TR ALIGN=CENTER><TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+		<TR ALIGN=CENTER><TD COLSPAN=4>マルチタップID</TD><TD COLSPAN=4>コネクタ数</TD></TR></TABLE></P>
+
+<A NAME="no3_16_3"></A>
+	<P>	<DD><B>コネクタ数</B>
+		<DD>　コネクタ数は、ペリフェラルポートにペリフェラルが直接接続されていれば、1Hを示し、該当ポートに1台のペリフェラルが接続されていることを示します。マルチタップが接続されていれば、そのマルチタップのタップ数を示します。
+			ペリフェラルポートに何も接続されていないとき、または、ペリフェラルポートにSMPCが認識できないペリフェラルが接続されているときには、0Hを示します。<BR>
+			　表3.5にコネクタ数と接続されているペリフェラルとの関係を示します。</P>
+
+<A NAME="t3_5"></A>
+	<P>	<DD><B>表3.5　コネクタ数とペリフェラルの関係</B>
+	<TABLE BORDER=1>
+	<TR><TD ALIGN="CENTER"><PRE>コネクタ数</TD><TD WIDTH=300 ALIGN="CENTER"><PRE>接続されているペリフェラル</TD></TR>
+	<TR><TD><PRE>0H</TD><TD WIDTH=300><PRE>・未接続である<BR>・SMPC UNKOWNのペリフェラルが接続されている</TD></TR>
+	<TR><TD><PRE>1H</TD><TD WIDTH=300><PRE>・直接ペリフェラルが接続されている</TD></TR>
+	<TR><TD><PRE>2H〜FH</TD><TD WIDTH=300><PRE>・マルチタップのタップ数</TD></TR>
+	</TABLE></P>
+
+<A NAME="no3_16_4"></A>
+	<P>	<DD><B>マルチタップID</B>
+		<DD>　マルチタップIDは、接続されているペリフェラルにより以下のように分類されます。</P>
+
+	<P>	<DD><OL>
+		<LI>ペリフェラルポートにペリフェラルが直接接続されているとき、およびペリフェラルが未接続のときは、マルチタップIDはFHを示します。</P>
+
+	<P>	<LI>ペリフェラルポートにマルチタップが接続されているときは、0H〜EHを示します。</P>
+
+	<P>	<LI>ペリフェラルポートにSMPCが認識できないデバイス(UNKNOWNデバイス)が接続されているときは、メガドライブペリフェラルID(以下MD PID)を示します。</OL></P>
+
+	<P>	<DD>　SMPC UNKNOWNデバイスの接続判定は、SMPCとペリフェラル間の初期フェーズでSMPCがサポートしていないMD PIDを受信したことにより判定しています。ジャスティファイヤ(リーサルエンフォーサーズのガン)などを使用する際に、
+		接続判定をSMPCコントロールモードで実行し、ポートステータス取得後、SH2ダイレクトモードを使用することで対応することもできます。また、SMPCとペリフェラル間の初期フェーズに回線上のエラーが生じたときにもUNKNOWNとして判定することがあります。</P>
+
+<A NAME="t3_6"></A>
+	<P>	<DD><B>表3.6　接続されているペリフェラルとマルチタップIDの関係</B>
+		<DD><TABLE BORDER=1>
+	<TR><TD ALIGN="CENTER"><PRE>ペリフェラルポートに接続されている<BR>ペリフェラル</TD><TD ALIGN="CENTER"><PRE>　　マルチタップIDの示すデータ　　</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>ペリフェラルの直接接続、未接続</TD><TD ALIGN="CENTER"><PRE>FH</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>マルチタップ接続</TD><TD ALIGN="CENTER"><PRE>0H〜EH</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>UNKNOWNデバイス接続</TD><TD ALIGN="CENTER"><PRE>MD-PID</TD></TR>
+	</TABLE></P>
+
+	<P>	<DD>　マルチタップIDは、サターンペリフェラルIDとは別に収集されます。マルチタップIDは、マルチタップの仕様として提供されます。<BR>
+	　表3.7に現在サポートされているマルチタップのIDとコネクタ数を示します。</P>
+
+<A NAME="t3_7"></A>
+	<P>	<DD><B>表3.7　マルチタップIDとコネクタ数</B>
+		<DD><TABLE BORDER=1>
+	<TR><TD ALIGN="CENTER"><PRE>マルチタップ名称</TD><TD ALIGN="CENTER"><PRE>　　マルチタップID　　</TD><TD ALIGN="CENTER"><PRE>　　　コネクタ数　　　</TD></TR>
+	<TR><TD><PRE>セガタップ</TD><TD ALIGN="CENTER"><PRE>0H</TD><TD ALIGN="CENTER"><PRE>4H</TD></TR>
+	<TR><TD><PRE>セガサターン6Pマルチタップ</TD><TD ALIGN="CENTER"><PRE>1H</TD><TD ALIGN="CENTER"><PRE>6H</TD></TR>
+	<TR><TD><PRE>セガ予約</TD><TD ALIGN="CENTER"><PRE>2H〜EH</TD><TD ALIGN="CENTER"><PRE>-</TD></TR>
+	</TABLE></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p03_15.htm">戻る</A>｜
+     <A HREF="p03_17.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

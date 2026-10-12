@@ -1,0 +1,94 @@
+﻿<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;17/54&gt;VDP1ユーザーズマニュアル/4.6　転送終了状態レジスタ</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p04_15_j.htm">戻る</A>｜
+     <a href="p04_17_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第４章　システムレジスタ</B>
+<HR NOSHADE>
+<DL>
+<A NAME="4_60"></A>
+	<P>	<DT><H2>■4.6　転送終了状態レジスタ</H2>
+		<DD>　転送終了状態レジスタ(EDSR、End status register)は、直前のフレーム処理の終了状態を表します。読み出し専用の16bitのレジスタで、100010H番地にあります。未使用ビットは0に設定してください。</P>
+
+		<DT><TABLE BORDER=1>
+	<TR ALIGN=CENTER><TH ROWSPAN=2><PRE>EDSR<BR>100010H<BR>(R)</TH>
+	<TH><PRE>bit15</TH><TH><PRE>bit14</TH><TH><PRE>bit13</TH><TH><PRE>bit12</TH><TH><PRE>bit11</TH><TH><PRE>bit10</TH><TH><PRE>bit９</TH><TH><PRE>bit８</TH>
+	<TH><PRE>bit７</TH><TH><PRE>bit６</TH><TH><PRE>bit５</TH><TH><PRE>bit４</TH><TH><PRE>bit３</TH><TH><PRE>bit２</TH><TH><PRE>bit１</TH><TH><PRE>bit０</TH></TR>
+	<TR ALIGN=CENTER>
+	<TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD>
+	<TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>CEF</TD><TD>BEF</TD>
+	</TR></TABLE></P>
+
+<A NAME="4_61"></A>
+	<P>	<DT><B>現フレームでの、エンドビットのフェッチ状態:</B>　current end-bit fetch status(CEF)、bit1<BR>
+		<DD>　現在描画中のフレームでコマンドテーブルからエンドビット(描画終了コマンド)をフェッチしたかどうかを表します。0のとき、エンドビットは未フェッチの状態を表し、1のときエンドビットをフェッチし、描画を終了していることを表します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD ALIGN="CENTER"><PRE>CEF</TD><TD ALIGN="LEFT"><PRE>エンドビットのフェッチ状態</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>現フレームでのエンドビットの未フェッチ</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>現フレームでのエンドビットのフェッチ、描画終了</TD></TR>
+	</TABLE></P>
+
+	<P>	<DT><UL TYPE=DISC>
+		<LI>VDP1は、VRAM上のコマンドテーブルを次々にフェッチし、フレームバッファに描画します。描画終了コマンド(エンドビットが1)をフェッチすると1フレームの描画処理を終了します。このとき、CEFは1に設定されます。</P>
+	<P>	<LI>描画終了(CEF=1)の状態で、CPUからVRAMへデータを転送すると、描画停止のためのオーバーヘッド無しに、CPUは待たされることなくVRAMをアクセスすることができます。<BR>
+	<P>	<LI>描画終了コマンドをフェッチし、VDP1はCEFを1に設定して、割り込み信号を発生させます。</P>
+	<P>	<LI>描画終了を判定する方法として、エンドビットのフェッチ状態をそのつどCEFで確認する(ポーリング)方法と、この割り込み信号を使う方法との2つがあります。</P>
+	<P>	<LI>VRAM上に描画終了コマンドが無い場合、あってもジャンプ形式でフェッチできないように定義した場合は、このビットは0のままです。</P>
+	<P>	<LI>このビットはフレームバッファの切り替え時、または描画開始時に0に初期化されます。</P>
+	<P>	<LI>フレームバッファ切り替え時に描画終了コマンドのフェッチが一致した場合は、CEF、BEFが1にならないことがあります。</UL></P>
+
+	<P>	<DT><B>前フレームでの、エンドビットのフェッチ状態:</B>　before end-bit fetch status(BEF)、ビット0<BR>
+		<DD>　前のフレームでコマンドテーブルからエンドビット(描画終了コマンド)をフェッチしたかどうかを表します。0のとき、エンドビットは未フェッチの状態を表し、1のときエンドビットをフェッチし、描画を終了していることを表します。</P>
+
+	<P>	<DD><TABLE BORDER>
+	<TR><TD ALIGN="CENTER"><PRE>BEF</TD><TD ALIGN="LEFT"><PRE>エンドビットのフェッチ状態</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>0</TD><TD ALIGN="LEFT"><PRE>前フレームでのエンドビットの未フェッチ</TD></TR>
+	<TR><TD ALIGN="CENTER"><PRE>1</TD><TD ALIGN="LEFT"><PRE>前フレームでのエンドビットのフェッチ、描画終了</TD></TR>
+	</TABLE></P>
+
+<A NAME="4_61_0"></A>
+	<P>	<DT><UL TYPE="DISC">
+		<LI>VDP1は、VRAM上のコマンドテーブルを次々にフェッチし、フレームバッファに描画します。描画終了コマンド(エンドビットが1)をフェッチすると1フレームの描画処理を終了します。
+		コマンドが多かったり、拡大のため描画するピクセルが多いと、1フレーム内に描画を終了しないことがあり、これを「転送オーバーした」といいます。このビットは、転送オーバーの状態を表します。</P>
+
+	<P>	<LI>転送オーバーになった場合は、描画コマンドを減らしたり、描画ピクセルを減らすなどの対策が必要です。</P>
+
+	<P>	<LI>VRAM上に描画終了コマンドが無い場合、あってもジャンプ形式でフェッチできないように定義した場合は、このビットは0のままです。</P>
+
+	<P>	<LI>このビットはフレームバッファの切り替え時、または描画開始時にCEFの値が書き込まれ、つぎのフレームバッファ切り替え時まで保持されます。</UL></P>
+
+
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p04_15_j.htm">戻る</A>｜
+     <a href="p04_17_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

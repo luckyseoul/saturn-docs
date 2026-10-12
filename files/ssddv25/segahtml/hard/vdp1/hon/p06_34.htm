@@ -1,0 +1,59 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;31/54&gt;VDP1 User's Manual/</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p06_33.htm">Back</a> ｜ <A HREF="p06_35.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 6 Command Table</b><HR NOSHADE>
+<DL>
+<A NAME="no6_34"></A><DT><H3> ■End code invalid</H3><DT> <B>End-code disable bit:</b> end-code disable (ECD), bit 7<BR>
+<DD> Specifies whether to disable the character pattern end code. When set to 0, the end code is enabled; when set to 1, the end code is disabled.<BR>
+ The end code invalid bit is only valid for drawing sprites with character patterns. Set this bit to 1 for polygons, polylines, and lines.<BR>
+ If the end code is enabled (ECD=0), when the end code is read for the second time in the horizontal direction while drawing a character pattern, the drawing for that line will end there and the drawing will move to the beginning of the next line. The end code will not be drawn and its pixels will be transparent.<BR>
+ When end codes are disabled (ECD=1), end codes are treated like any other color code.<BR>
+ Horizontal drawing ends when the end code is read twice, and end processing is performed only in the horizontal direction of the character pattern; the vertical direction is not affected.<BR>
+ Processed independently of the Transparent Pixel Disabled bit (SPD).<BR>
+ Please note that if the end code is enabled (ECD=0), the end code cannot be used for color display, so the number of colors that can be used will be reduced by one.<BR>
+ Also, for sprites that shrink horizontally with HSS=1, disable the end code (ECD=1).</P>
+<TABLE BORDER>
+<TD WIDTH=50><PRE> HSS</TD><TD WIDTH=50><PRE> ECD</TD><TD><PRE> End code processing</TD><TR><TD><PRE> 0</TD><TD><PRE> 0</TD><TD><PRE> End code is valid, horizontal drawing ends with the second end code,<BR> End code will be transparent</TD><TR><TD><PRE> 0</TD><TD><PRE> 1</TD><TD><PRE> End code invalid, end code not processed,<BR> The color comes out according to the code</TD><TR><TD><PRE> 1 and<BR> enlarge</TD><TD><PRE> 0</TD><TD><PRE> End code is valid, horizontal drawing ends with the second end code,<BR> End code will be transparent</TD><TR><TD><PRE> 1 and<BR> reduce</TD><TD><PRE> 0</TD><TD><PRE> End code invalid, end code not processed,<BR> The color comes out according to the code</TD><TR><TD><PRE> 1</TD><TD><PRE> 1</TD><TD><PRE> End code invalid, end code not processed,<BR> The color comes out according to the code</TD></TABLE>
+</P>
+ The relationship between color mode and end code is as follows. The number of bits of the end code differs depending on the color mode.</P>
+<TABLE BORDER>
+<TD WIDTH=350 COLSPAN=2><PRE> color mode</TD><TD WIDTH=200><PRE> end code</TD><TR><TD WIDTH=50><PRE> 0</TD><TD><PRE> 16 colors (color bank mode)</TD><TD><PRE> FH (4 bits)</TD><TR><TD WIDTH=50><PRE> 1</TD><TD><PRE> 16 colors (lookup table mode)</TD><TD><PRE> FH (4 bits)</TD><TR><TD WIDTH=50><PRE> 2</TD><TD><PRE> 64 colors (color bank mode)</TD><TD><PRE> FFH (8 bit)</TD><TR><TD WIDTH=50><PRE> 3</TD><TD><PRE> 128 colors (color bank mode)</TD><TD><PRE> FFH (8 bit)</TD><TR><TD WIDTH=50><PRE> 4</TD><TD><PRE> 256 colors (color bank mode)</TD><TD><PRE> FFH (8 bit)</TD><TR><TD WIDTH=50><PRE> 5</TD><TD><PRE> 32768 colors (RGB mode)</TD><TD><PRE> 7FFFH (16 bit)</TD></TABLE>
+</P>
+<DD> An example of end code processing is:</P>
+<A NAME="z6_10a"></A><P ALIGN=CENTER> <B>Figure 6.10(a) End code processing (Part 1)</b><BR>
+<img srcset="../grp/i087_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> Place only transparent pixels outside the end code to prevent drawing even if read from the left or right. Therefore, when ECD=0, be sure to set SPD=0. Do not use the combination of ECD=0 and SPD=1.<BR>
+ The drawing direction may be reversed during pre-clipping.<BR>
+ If you want to use an end code for the original picture, use it as follows.</P>
+<A NAME="z6_10b"></A><P ALIGN=CENTER> <B>Figure 6.10(b) End code processing (Part 2)</b><BR>
+<img srcset="../grp/i087_02.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<DD><OL>
+<B><LI></b> Place transparent pixels outside the end code<B><LI></b> Place one end code on each side of the picture made of transparent pixels.<B><LI></b> Even if there are transparent pixels inside, the end code can only be placed in the outermost one.<B><LI></b> For lines with all transparent pixels, place two end codes at each end.<B><LI></b> Do not place end codes on lines that do not have transparent pixels at either or both ends.</OL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_33.htm">Back</a> ｜ <A HREF="p06_35.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

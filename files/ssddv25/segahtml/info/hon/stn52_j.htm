@@ -1,0 +1,107 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>SEGASATURN Developer's Information STN-52</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../index_j.htm">INDEX</A>
+▲
+|<a href="stn49_j.htm">STN-49</A>
+|<a href="stn50_j.htm">STN-50</A>
+|<a href="stn51_j.htm">STN-51</A>
+|<B>STN-52</B>
+■
+<HR NOSHADE>
+<H1 ALIGN=CENTER>STN-52</H1>
+<H2 ALIGN=CENTER>バックアップライブラリ作業領域サイズ</H2>
+<HR NOSHADE>
+<TABLE>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発行番号：</TH><TD>STN-52</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>発 行 日：</TH><TD>96/11/07</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>メディア：</TH><TD>●共　通</TD><TD>○CD-ROM</TH><TD>○カートリッジ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>関　　連：</TH><TD>●プログラム</TD><TD>○ハード</TD><TD>○マニュアル</TD><TD>○ツール</TD><TD>○ゲーム</TD><TD>○バグ</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>情報区別：</TH><TD>●新　規</TD><TD>○変　更</TD><TD>○追　加</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>重 要 度：</TH><TD>●厳　守</TD><TD>○推　奨</TD><TD>○参　考</TD><TD>○その他</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>添付資料：</TH><TD>●無</TH><TD>○有</TD></TR>
+<TR ALIGN=LEFT><TH ALIGN=RIGHT><PRE>件名補足：</TH><TD COLSPAN=7>    </TD></TR>
+</TABLE>
+<HR>
+<H3 ALIGN=CENTER>内　容</H3>
+<DL>
+
+	<P><DT><H3>■変数領域の破壊</H3>
+		<DD>　バックアップライブラリの作業領域を8192バイト分確保した場合以下の条件で他の変数領域
+		が破壊される可能性があります。
+
+	<P><OL>
+		<LI>最大サイズのデータを作成した場合
+		<LI>ブロックアクセステーブル(2048ブロック)の最後の30ブロックを使用した場合</OL></P>
+
+	<P><DD>　これは、ブロックアクセステーブルが8192バイト(2048ブロック)使用してしまい、
+		バックアップライブラリの使用する変数領域120バイト分不足するため、ブロックアクセステー
+		ブルの最後120バイト(30ブロック)分が他の変数領域を破壊してしまうためです。</P>
+
+<PRE>
+　　　　変更前　　　　　　　　　　　　　　　　　　　　変更後　　　　　　　　　　　
+＋−−−−−−−−−−＋−−−−−−−−−−　＋−−−−−−−−−−＋−−−−−−
+｜　　　変数領域　　　｜　　　　↑　　　　　　｜　　　変数領域　　　｜　　　　↑　
+｜　＝１２０バイト　　｜　　　　　　　　　　　｜　＝１２０バイト　　｜　　　　	　
+＋−−−−−−−−−−＋　　　　　　　　　　　＋−−−−−−−−−−＋　　　　　　
+｜　　　　　↑　　　　｜　　定義サイズ　　　　｜　　　　　↑　　　　｜　　　　　　
+｜　　　　　　　　　　｜　　　　　　　　　　　｜　　　　　　　　　　｜　　　　　　
+｜　ブロックアクセス　｜　＝８１９２バイト　　｜　ブロックアクセス　｜　　定義サイズ
+｜　　　テーブル　　　｜　　　　　　　　　　　｜　　　テーブル　　　｜　　　　　　
+｜　＝８１９２バイト　｜　　　　↓　　　　　　｜　＝８１９２バイト　｜　＝８３１２バイト
+＋　−　−　−　−　−＋−−−−−−−−−−　＋　　　　　　　　　　＋　　　　　　
+｜　　　　　　　　　　｜←この部分が破壊されて｜　　　　　　　　　　｜　　　　　　
+｜　　　　　↓　　　　｜　しまう。　　　　　　｜　　　　　↓　　　　｜　　　　↓　
+＋−−−−−−−−−−＋　−　−　−　−　−　＋−−−−−−−−−−＋−−−−−−
+</PRE>
+
+	<P><DD>注：「変数領域=120byte」はバックアップライブラリが使用する変数領域です。
+
+	<P><DT><H3>■対策</H3>
+		<DD>　バックアップライブラリの使用する作業領域を8312バイト確保してください。<BR>
+		　このうちわけは、</P>
+	<P><DD><UL TYPE=DISC>
+	<LI>ブロックアクセステーブル 2048個ｘ4　8192バイト(2048ブロック分)
+	<LI>バックアップライブラリの変数領域　　120バイト(30ブロック分)
+	</UL>
+
+	<P><DD>の合計 8312バイトです。</P>
+
+	<P><DT><TABLE><TR>
+	<TH><img srcset="../../what/atto_j.png 5x"></TH>
+	<TD><B>ブロックアクセステーブルはロングワードアクセス(4バイト)でおこなうので　Uint32　で定義してください。</B></TD></TABLE></P>
+
+	<P><DT><H3>■例</H3>
+	<DD>Uint32　BackUpRamWork[2048+30];
+</DL>
+以上
+<HR NOSHADE>
+  <a href="../../index_j.htm"><img srcset="../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../index_j.htm">INDEX</A>
+▲
+|<a href="stn49_j.htm">STN-49</A>
+|<a href="stn50_j.htm">STN-50</A>
+|<a href="stn51_j.htm">STN-51</A>
+|<B>STN-52</B>
+■
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

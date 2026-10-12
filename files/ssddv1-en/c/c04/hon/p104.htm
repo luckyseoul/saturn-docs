@@ -1,0 +1,33 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p103.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p105.htm> Go to next page </A>
+<HR><P><P><DL>
+<DT><table border cellpadding=5>
+<td width = 150> <pre> <B> Title </B> <br> Function specifications </td> <td width = 220> <pre> <B> Function </B> <br> Initial CD block (1/3) </td> <td width = 160> <pre> <B> Function Name </B> [SR] <br> CDC_CdInit </td> <td width = 60> <pre> <B >No</B><br>1.7</td>
+</table><P>
+<DD><PRE>
+<B> Format </B> Sint32 CDC_CdInit (Sint32 iflag, Sint32 stnby, Sint32 ecc, Sint32 retry)
+<B> Input </B> iflag: Initialization flag (lower 8 bits are valid)
+<B> st </b> stnby: Standby time (lower 16 bits are valid)
+<B>: </B> ecc: ECC count (lower 8 bits are valid)
+<B> </B> retry: Number of retries (lower 8 bits are valid)
+<B> Output </B> None
+<B> Function value </B> Returns an error code.
+<B> </B> End flag ESEL flag (valid only at software reset, only cleared to 0)
+<B> Function </B> Initializes the CD block and pauses the CD drive at the current position. <P>
+<UL> <B> (1) Initialization flag </B>
+<IMG SRC="hyou/i104-02.gif">
+(A) Recognition of Mode 2 subheader is used for correction processing during CD-ROM decoding. Selector is always
+Recognizes the Mode2 subheader. (E.g., determining aperture and sector length conditions)
+(B) If Form 2 read retry is not performed, data will be output even if there is an error.
+(C) The CD-ROM data read speed is switched when the 〈PAUSE〉 status is entered. During playback of the CD-DA area
+Standard speed will be automatically set. When the CD-ROM area is entered, the original speed is restored. <P>
+<B> (2) Soft reset …… Please refer to “5.5 Initializing CD block” </B>
+</UL> <TABLE> <TD> <IMG SRC = "hyou / atto.gif"> </TD> <TD> <PRE> (a) When soft resetting, wait about 3ms in this function, Ignoring the CMOK flag and issuing the command <BR>. (It can be issued forcibly regardless of the normal communication procedure.) <BR> <B> (b) All commands are prohibited during software reset. Determine the end of the software reset by checking that the ESEL flag in the interrupt factor register is 1. </B> <BR> (c) Other input parameters (iflag bits 1 to 6, stnby, etc.) are ignored and become initial values. <BR> (d) Can be executed in 〈OPEN〉 and 〈NODISC〉 states, but the CD drive state does not change. </TD></TABLE></PRE><P>
+</DL><P><P><HR>
+<A HREF=p103.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p105.htm> Go to next page </A>
+</BODY>
+</HTML>

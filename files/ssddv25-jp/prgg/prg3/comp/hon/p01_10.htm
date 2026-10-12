@@ -1,0 +1,107 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/ 5&gt;圧縮伸張ライブラリ/1．ガイド</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">圧縮伸張ライブラリ</A>
+<HR>
+<B>■
+　　｜
+<A HREF="p01_11.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>圧縮伸張ライブラリ</B>
+<H2 ALIGN=CENTER>1．ガイド</H2>
+<HR NOSHADE>
+<DL>
+<A NAME="no1_10"></A>
+	<P><DT><H3>1.1　適用</H3>
+	<DD>　この圧縮伸張ライブラリは、別途提供しているランレングス圧縮ツールで圧縮したデータを伸張するためのものです。</P>
+
+	<P><DD>　ランレングス圧縮ツール　　CMPRUN.EXE</P>
+
+<A NAME="no1_20"></A>
+	<P><DT><H3>1.2　圧縮方式</H3>
+	<DD>　独自の、不一致系列処理を付加しています。単純なランレングスのアルゴリズムでは、不一致系列が圧縮率を悪化させるので、不一致系列をまとめて処理します。　一致系列は、連長及び値で表現します。不一致系列は、不一致系列長及び不一致系列値(非圧縮データ)で表現します。<BR>　一致系列を表す符号と不一致系列を表す符号を識別するために、不一致系列長は負の値（２の補数）で記述します。<BR>　短い連長の入力は、不一致系列を分断しかえって圧縮率を悪化させるので、不一致系列の終了条件を工夫しています。</P>
+
+	<P><DT><B>　[不一致系列の定義]</B>
+	<DD>　不一致系列は、次の開始条件と終了条件で定義しています。</P>
+
+	<P><DD>＜不一致系列の開始条件＞</P>
+	<P><DD><FONT SIZE=4>連長１の記号（文字）の入力。</FONT></P>
+
+
+	<P><DT><B>　[不一致系列の例]</B>
+	<DD>　次の図は、不一致系列の例です。</P>
+	<P><DD>＜不一致系列の終了条件＞</P>
+	<P><DD><FONT SIZE=4>連長３以上の一致系列の入力。<BR>または、<BR>不一致系列長が、処理単位バイト数で表現できる限界になった場合。</FONT></P>
+
+<A NAME="z1_1"></A>
+	<P><DD><B>図1.1　不一致系列の例</B>
+	<DD><PRE>
+　　　　　　　　開始
+・・・Ａ　Ａ　Ａ　<B>Ｂ</B>　Ｃ　Ｃ　Ｃ　Ｃ　Ｄ　Ｄ　Ｄ　・・・・・・
+　　　　　　　　　終了
+
+　　　　　　　　 開始
+・・・Ａ　Ａ　Ａ　<B>Ｂ　Ｃ　Ｄ　Ｅ　Ｆ</B>　Ｇ　Ｇ　Ｇ　・・・・・・
+　　　　　　　　　　　　　　　　　終了
+
+　　　　　　　　 開始
+・・・Ａ　Ａ　Ａ　<B>Ｂ　Ｃ　Ｃ　Ｄ　Ｄ</B>　Ｅ　Ｅ　Ｅ　・・・・・・
+　　　　　　　　　　　　　　　　　終了
+
+　　　　　　　　 開始
+・・・Ａ　Ａ　Ａ　<B>Ｂ　Ｃ　Ｃ　Ｄ　Ｄ　Ｄ　Ｅ</B>　Ｆ　Ｆ　・・・・
+　　　　　　　　　　　　　　　　　　　　　 終了
+</PRE></P>
+
+	<P><DT><B>　[処理単位]</B>
+	<DD>　処理単位は次の表に示す３とおりから選択します。先頭から、処理単位境界ごとに区切って、１つの文字(記号)の入力とします。</P>
+
+<A NAME="t1_1"></A>
+	<P><DD><B>表1.1　処理単位</B>
+	<DD><TABLE BORDER=1>
+	<TR><TH>処理単位</TH><TH>入力データに対する圧縮処理単位のイメージ</TH></TR>
+	<TR ALIGN=CENTER><TD>BYTE<BR>(1バイト)</TD><TD><IMG SRC="../grp/i091_21.gif"></TD></TR>
+	<TR ALIGN=CENTER><TD>WORD<BR>(2バイト)</TD><TD><IMG SRC="../grp/i091_22.gif"></TD></TR>
+	<TR ALIGN=CENTER><TD>DWORD<BR>(4バイト)</TD><TD><IMG SRC="../grp/i091_23.gif"></TD></TR></TABLE></P>
+	<P><DD><B>※</B>　数値は16進数で、<IMG SRC="../grp/i091_24.gif">は、1バイトに相当します。</P>
+
+	<P><DT><B>　[連長の表現]</B>
+	<DD>　通常の連長(一致系列長)を正の数で、不一致系列長を負の数で表します。連長（一致系列長）は常に２以上なので、２を引いた値で記述します。<BR>　連長を表現するために使用するバイト数は、処理単位バイト数と同じものです。<BR>　連長に対する実際のデータの量は、処理単位で解釈します。つまり、処理単位がWORDで連長が５の場合は、10バイトのデータに対する符号化処理を意味します。<BR>　次の表は、表現できる連長の値の範囲です。</P>
+
+<A NAME="t1_2"></A>
+	<P><DD><B>表1.2　連長幅と連長表現</B>
+	<DD><TABLE BORDER>
+	<TR><TH ROWSPAN=2><PRE>　<BR>　<BR>処理単位</TH><TH><PRE>連長（一致系列長）</TH><TH><PRE>不一致系列長</TH></TR>
+	<TR><TH><PRE>表現（記述）</TH><TH><PRE>表現（記述）</TH></TR>
+	<TR><TD><PRE>BYTE1バイト</TD> <TD><IMG SRC="../grp/i092_1.gif"></TD><TD><IMG SRC="../grp/i092_2.gif"></TD></TR>
+	<TR><TD><PRE>WORD2バイト</TD> <TD><IMG SRC="../grp/i092_3.gif"></TD><TD><IMG SRC="../grp/i092_4.gif"></TD></TR>
+	<TR><TD><PRE>DWORD4バイト</TD><TD><IMG SRC="../grp/i092_5.gif"></TD><TD><IMG SRC="../grp/i092_6.gif"></TD></TR></TABLE></P>
+<DT><H3>[処理イメージ図]</H3>
+<DD>　次の図は、ランレングス／不一致系列処理による圧縮アルゴリズムの処理イメージです。<BR>
+
+<A NAME="z1_2"></A>
+<DT>
+	<P ALIGN=CENTER><B>図1.2　ランレングス／不一致系列処理</B><BR><IMG SRC="../grp/i092_02.gif"></P>
+
+	<DD><TABLE BORDER=1>
+	<TR><TD><IMG SRC="../grp/i092_021.gif"></TD><TD><PRE>・・・・一致系列値、または不一致系列値(非圧縮データ)<BR>・・・・処理単位。BYTE,WORD,DWORDのいずれか。</TD></TR>
+	<TR><TD><IMG SRC="../grp/i092_022.gif"></TD><TD>・・・・連長、または、不一致系列長。<BR>・・・・連長幅。処理単位と等しい。</TD></TR></TABLE></P>
+
+</DL>
+<HR NOSHADE>
+<B>■
+　　｜
+<A HREF="p01_11.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#prg3_">PROGRAMMER'S GUIDE</A>
+★<A HREF="../index.htm">圧縮伸張ライブラリ</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

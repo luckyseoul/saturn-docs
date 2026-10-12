@@ -1,0 +1,311 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;11/12&gt;トーンエディタユーザーズマニュアル/1．概要</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#no2">SOUND Manual</A>
+★<A HREF="../index.htm">トーンエディタユーザーズマニュアル/</A>
+<HR>
+<B>▲
+<A HREF="p10_10.htm">戻る</A>｜
+<A HREF="p12_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>トーンエディタユーザーズマニュアル</B>
+<H2 ALIGN=CENTER>付　録　２</H2>
+<HR NOSHADE>
+<DL>
+
+<!-------------------------------------------------------------------------------------------------------->
+	<P>　プロジェクトファイル（バンクファイル）のフォーマットについて
+プロジェクトファイルのフォーマットとバンクファイルのフォーマットはヘッダー
+部分をのぞきほぼ同じフォーマットになっています。<BR>
+フォーマットは大きく分けて２つのブロックに分けられます。<BR>
+前半のシンセサイザーパラメータ部分と後半の波形部分から構成されています。
+
+<A NAME="no11_11"></A>
+	<P>
+	<DT><H3>●シンセサイザーパラメータ部分</H3>
+	<DD>この部分には簡易的なデータ圧縮がかかっています。<BR>0x00をまとめるようにアルゴリズムが組まれています。
+
+	<P><DT><B>例</B>
+	<DD>「0x01,0x00,0x00,0x00,0xFF,0xFF,0x00,0x00,0x00,0x00,0x01」の場合<BR>
+<FONT SIZE=5>↓</FONT><BR>
+「0x01,0x00,0x03,0xFF,0xFF,0x00,0x04,0x01」に変換されます。
+
+<A NAME="no11_11"></A>
+	<P>
+	<P><DT><H3>●プロトコル</H3>
+	<DD><UL TYPE=DISC>
+	<LI><B>１バイト目</B><BR>　フォーマットのバージョンを設定する。<BR>現在(1997/1/24)はVer1.00フォーマットで「0xFF」が設定されています。
+	<LI><B>２、３、４バイト目</B><BR>　展開時のデータの大きさ。
+	<LI><B>５バイト以降</B><BR>　圧縮データ
+	<LI><B>最後の２バイト</B><BR>　0xFFFFデータの終わりを示す。
+	</UL>
+
+	<P><DD>圧縮されていないデータ部分のフォーマットは以下の通りです。
+
+	<DL>
+
+	<P><DT><FONT SIZE=5>------- start file --------</FONT>
+	<P>
+	<DT><B>項　目</B>：ファイルヘッダー
+	<DT><B>サイズ</B>：100バイト（プロジェクトファイルの場合）
+	<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+	<TR ALIGN=CENTER><TD>88</TD><TD><PRE>StandardFileReply</TD><TD><PRE>reply;</TD><TD<PRE>プロジェクトファイルの位置</TD></TR>
+	<TR ALIGN=CENTER><TD>2</TD><TD><PRE>short</TD><TD><PRE>posH;</TD><TD<PRE>ウインドウの水平ポジション</TD></TR>
+	<TR ALIGN=CENTER><TD>2</TD><TD><PRE>short</TD><TD><PRE>posV;</TD><TD<PRE>ウインドウの垂直ポジション</TD></TR>
+	<TR ALIGN=CENTER><TD>2</TD><TD><PRE>short</TD><TD><PRE>bankNo;</TD><TD<PRE>バンクの総数</TD></TR>
+	<TR ALIGN=CENTER><TD>2</TD><TD><PRE>short</TD><TD><PRE>top;</TD><TD<PRE>ウインドウの先頭に表示されるバンク</TD></TR>
+	<TR ALIGN=CENTER><TD>4</TD><TD><PRE>long</TD><TD><PRE>version;</TD><TD<PRE>ファイルのバージョン</TD></TR>
+	</TABLE>
+	<P>
+	<DT><B>サイズ</B>：8バイト（バンクファイルの場合）
+	<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+	<TR ALIGN=CENTER><TD>4</TD><TD><PRE>long</TD><TD><PRE>fileCode</TD><TD<PRE>'Bank'(バンクの認識コード）</TD></TR>
+	<TR ALIGN=CENTER><TD>4</TD><TD><PRE>long</TD><TD><PRE>version;</TD><TD<PRE>ファイルのバージョン</TD></TR>
+	</TABLE>
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P>
+	<DT><B>項　目</B>：バンクデータ
+	<DT><B>サイズ</B>：84バイト*バンクの数
+	<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+		<TR ALIGN=CENTER><TD><PRE>64</TD><TD><PRE>Str63</TD><TD><PRE>name;</TD><TD><PRE>バンクの名前</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Handle</TD><TD><PRE>voice;</TD><TD><PRE>ボイス&レイヤー情報へのハンドル</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>voiceNo;</TD><TD><PRE>ボイスの数</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>sendBank;</TD><TD><PRE>何番のバンクに送信するのか</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>selVoice;</TD><TD><PRE>現在選択されているボイスの位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>top;</TD><TD><PRE>ウインドウの先頭に表示されるボイス</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>windowPv;</TD><TD><PRE>ボイスのウインドウV位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>windowPh;</TD><TD><PRE>ボイスのウインドウH位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>windowSize;</TD><TD><PRE>ボイスウインドウのサイズ</TD></TR>
+</TABLE>
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>項　目</B>：ボイスデータ
+	<DT><B>サイズ</B>：60バイト*ボイスの総数
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+		<TR ALIGN=CENTER><TD><PRE>34</TD><TD><PRE>Str31</TD><TD><PRE>voiceName;</TD><TD><PRE>ボイスの名前</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>bendrange;</TD><TD><PRE>ベンドレンジ(0 -13)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>portament;</TD><TD><PRE>ポルタメント(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>volBias;</TD><TD><PRE>ボリュームバイアス(0 -127</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>checkFM;</TD><TD><PRE>このボイスはFMボイスかどうかのフラグ</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Handle</TD><TD><PRE>layer;</TD><TD><PRE>レイヤー情報のハンドル</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>layerNo;</TD><TD><PRE>レイヤーの総数</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>selLayer;</TD><TD><PRE>現在選択されているレイヤー</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>top;</TD><TD><PRE>ウインドウの先頭に表示されるレイヤー</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>windowPv;</TD><TD><PRE>最後に開かれたレイヤーウインドウのV位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>windowPh;</TD><TD><PRE>最後に開かれたレイヤーウインドウのH位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>windowSize;</TD><TD><PRE>最後に開かれていたウインドウのサイズ</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>upDate;</TD><TD><PRE>再計算用のフラグ</TD></TR>
+	</TABLE>
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>項　目</B>：レイヤーデータ
+	<DT><B>サイズ</B>：86バイト*レイヤーの総数
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+		<TR ALIGN=CENTER><TD><PRE>32</TD><TD><PRE>Str31</TD><TD><PRE>layerName;</TD><TD><PRE>レイヤーの名前</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>short</TD><TD><PRE>waveNo;</TD><TD><PRE>レイヤーに登録された波形番号</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>unsigned char</TD><TD><PRE>start;</TD><TD><PRE>キースプリットの始まり(0-127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>unsigned char</TD><TD><PRE>end;</TD><TD><PRE>キースプリットの終わり(0-127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>roopMode;</TD><TD><PRE>ループモード(0-4)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>decayR1;</TD><TD><PRE>EG Decay Rate1設定(0-31)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>decayR2;</TD><TD><PRE>EG Decay Rate2設定(0-31)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>egHold;</TD><TD><PRE>EG Hold(0,1)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>attack;</TD><TD><PRE>EG Attack設定(0-31)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>loopSL;</TD><TD><PRE>使用されていません。</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>keyRS;</TD><TD><PRE>EG キーレートスケーリング設定(0-15)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>decayL;</TD><TD><PRE> EG Decay Level設定(0-31)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>release;</TD><TD><PRE>EG Release Rate設定(0-31)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>stwinh;</TD><TD><PRE>使用されていません</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>soundD;</TD><TD><PRE>使用されていません</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>totalL;</TD><TD><PRE>トータルレベル(0ー127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>mdl;</TD><TD><PRE>FMモジュレーション(0 -15)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>lfoRes;</TD><TD><PRE>LFOリセット(0 -1)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>lfof;</TD><TD><PRE>LFO周波数(0 -31)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>mdxsl;</TD><TD><PRE>FM結線用1(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>mdysl;</TD><TD><PRE>FM結線用2(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>Boolean</TD><TD><PRE>pLFO;</TD><TD><PRE>PLFOスイッチ(0 -1)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>Boolean</TD><TD><PRE>pLFOM;</TD><TD><PRE>PLFOモジュレーション(0 -1)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>pLFOWS;</TD><TD><PRE>PLFO波形選択(0 -3)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>pLFOS;</TD><TD><PRE>PLFO深度(0 -7)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>aLFOWS;</TD><TD><PRE>ALFO波形選択(0 -3)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>aLFOS;</TD><TD><PRE>ALFO深度(0 -7)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>unsigned char</TD><TD><PRE>inSelect;</TD><TD><PRE>EffectSelect(0 -15)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>inMixLev;</TD><TD><PRE>EffectSend(0 -7)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>dilectL;</TD><TD><PRE>DirectLevel(0 -7)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>dilectP;</TD><TD><PRE>DirectPAN(0 -31) <B><A HREF="#_1">注</A></B></TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>unsigned char</TD><TD><PRE>baseNote;</TD><TD><PRE>ベースノート(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>fineTune;</TD><TD><PRE>ファインチューン(-63 - 63)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>unsigned char</TD><TD><PRE>vlNo;</TD><TD><PRE>ベロシティー番号(0 -255)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>unsigned char</TD><TD><PRE>pegNo;</TD><TD><PRE>PEG番号(0 -255)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>unsigned char</TD><TD><PRE>plfoNo;</TD><TD><PRE>PLFO番号(0 -255)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>Boolean</TD><TD><PRE>pEG;</TD><TD><PRE>PEGスイッチ(0 -1)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>Boolean</TD><TD><PRE>pEGM;</TD><TD><PRE>PEGモジュレーション(0 -1)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>Boolean</TD><TD><PRE>lfoM;</TD><TD><PRE>LFOモジュレーション(0 -1)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>Boolean</TD><TD><PRE>totalLM;</TD><TD><PRE>トータルレベルモジュレーション(0,1)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>size;</TD><TD><PRE>このレイヤーの現在のサイズ</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>winH;</TD><TD><PRE>レイヤーウインドウのH位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>winV;</TD><TD><PRE>レイヤーウインドウのV位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>fmH;</TD><TD><PRE>FMレイヤーウインドウのH位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>fmV;</TD><TD><PRE>FMレイヤーウインドウのV位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>Boolean</TD><TD><PRE>upDate;</TD><TD><PRE>サイズアップデートのチェック</TD></TR>
+	</TABLE>
+
+<A NAME="_1"></A>
+	<P><DT><B>注意</B>
+	<DD>DirectPANは以下のような「パラメータ／バランス」の対応になります。
+	<DD><TABLE BORDER=1>
+<TR><TH><PRE>パラメータ</B></TH>
+<TH><PRE>0 </TH><TH><PRE>1 </TH><TH><PRE>2 </TH><TH><PRE>3 </TH><TH><PRE>4 </TH><TH><PRE>5 </TH><TH><PRE>...</TH><TH><PRE>15 </TH><TH><PRE>16</TH><TH><PRE>17</TH><TH><PRE>18</TH><TH><PRE>19</TH><TH><PRE>...</TH><TH><PRE>31 </TH></TR>
+<TR><TH><PRE>バランス</B></TH>
+<TH><PRE>C </TH><TH><PRE>R1</TH><TH><PRE>R2</TH><TH><PRE>R3</TH><TH><PRE>R4</TH><TH><PRE>R5</TH><TH><PRE>...</TH><TH><PRE>R15</TH><TH><PRE>C </TH><TH><PRE>L1</TH><TH><PRE>L2</TH><TH><PRE>L3</TH><TH><PRE>...</TH><TH><PRE>L15</TH></TR>
+</TABLE>
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>データの区切り用</B>
+	<DD>"0xFFFF"
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>項　目</B>：Mixer、Velocity、PEG、PLFOを統括するデータ
+	<DT><B>サイズ</B>：48バイト
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>mixerNo;</TD><TD><PRE>ミキサーの総数</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>veloNo;</TD><TD><PRE>ベロシティーの総数</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>pegNo;</TD><TD><PRE>PEGの総数</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>plfoNo;</TD><TD><PRE>PLFOの総数</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>selMixer;</TD><TD><PRE>現在選択されているミキサー</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>selVelocity;</TD><TD><PRE>現在選択されているベロシティー</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>selPEG;</TD><TD><PRE>現在選択されているPEG</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>selPLFO;</TD><TD><PRE>現在選択されているPLFO</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Point</TD><TD><PRE>posMixer;</TD><TD><PRE>ミキサーウインドウの位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Point</TD><TD><PRE>posVelocity;</TD><TD><PRE>ベロシティーウインドウの位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Point</TD><TD><PRE>posPEG;</TD><TD><PRE>PEGウインドウの位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Point</TD><TD><PRE>posPLFO;</TD><TD><PRE>PLFOウインドウの位置</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Handle</TD><TD><PRE>mixer;</TD><TD><PRE>ミキサーデータハンドル</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Handle</TD><TD><PRE>velocity;</TD><TD><PRE>ベロシティーデータハンドル</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Handle</TD><TD><PRE>peg;</TD><TD><PRE>PEGデータハンドル</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>Handle</TD><TD><PRE>plfo;</TD><TD><PRE>PLFOデータハンドル</TD></TR>
+	</TABLE>
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>項　目</B>：Mixerデータ
+	<DT><B>サイズ</B>：68バイト*Mixerの総数	
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数(<B><A HREF="#_11">注1</A></B>)</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+		<TR ALIGN=CENTER><TD><PRE>32</TD><TD><PRE>Str31</TD><TD><PRE>name;</TD><TD><PRE>	ミキサーの名前です。</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>18</TD><TD><PRE>unsigned char</TD><TD><PRE>pan[18];</TD><TD><PRE>	ミキサーのPAN(0 -31)(<B><A HREF="#_12">注2</A></B>)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>18</TD><TD><PRE>unsigned char</TD><TD><PRE>sendRet[18];</TD><TD><PRE>ミキサーのEffectLevel(0 -7)</TD></TR>
+	</TABLE>
+<A NAME="_11"></A>
+	<P><DT><B>注意1</B>
+	<DD>配列の各引数はそのミキサーのチャンネルを表しています。
+
+<A NAME="_12"></A>
+	<P><DT><B>注意2</B>
+	<DD>PANは以下のような「パラメータ／バランス」の対応になります。
+	<DD><TABLE BORDER=1>
+<TR><TH><PRE>パラメータ</B></TH>
+<TH><PRE>0 </TH><TH><PRE>1 </TH><TH><PRE>2 </TH><TH><PRE>3 </TH><TH><PRE>4 </TH><TH><PRE>5 </TH><TH><PRE>...</TH><TH><PRE>15 </TH><TH><PRE>16</TH><TH><PRE>17</TH><TH><PRE>18</TH><TH><PRE>19</TH><TH><PRE>...</TH><TH><PRE>31 </TH></TR>
+<TR><TH><PRE>バランス</B></TH>
+<TH><PRE>C </TH><TH><PRE>R1</TH><TH><PRE>R2</TH><TH><PRE>R3</TH><TH><PRE>R4</TH><TH><PRE>R5</TH><TH><PRE>...</TH><TH><PRE>R15</TH><TH><PRE>C </TH><TH><PRE>L1</TH><TH><PRE>L2</TH><TH><PRE>L3</TH><TH><PRE>...</TH><TH><PRE>L15</TH></TR>
+</TABLE>
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>項　目</B>：Velocityデータ
+	<DT><B>サイズ</B>：46バイト*Velocityの総数
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+		<TR ALIGN=CENTER><TD><PRE>32</TD><TD><PRE>Str31</TD><TD><PRE>name;</TD><TD><PRE>ベロシティーの名前</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>point0;</TD><TD><PRE>ベロシティーポイント０の位置(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>level0;</TD><TD><PRE>ベロシティーポイント０のレベル(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>point1;</TD><TD><PRE>ベロシティーポイント１の位置(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>level1;</TD><TD><PRE>ベロシティーポイント１のレベル(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>point2;</TD><TD><PRE>ベロシティーポイント２の位置(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>level2;</TD><TD><PRE>ベロシティーポイント２のレベル(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>level3;</TD><TD><PRE>ベロシティーポイント３のレベル(0 -127)</TD></TR>
+	</TABLE>
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>項　目</B>：PEGデータ
+	<DT><B>サイズ</B>：60バイト*PEGの総数
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+		<TR ALIGN=CENTER><TD><PRE>32</TD><TD><PRE>Str31</TD><TD><PRE>name;</TD><TD><PRE>	PEGの名前</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>dly;</TD><TD><PRE>	Delayタイム(0 -127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>ol;</TD><TD><PRE>Offsetレベル(-127 - 127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>al;</TD><TD><PRE>Attackレベル(-127 - 127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>at;</TD><TD><PRE>Attackタイム(0 -2048)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>dl;</TD><TD><PRE>Decayレベル(-127 - 127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>dt;</TD><TD><PRE>Decayタイム(0 -2048)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>sl;</TD><TD><PRE>Sustainレベル(-127 - 127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>st;</TD><TD><PRE>Sustaunタイム(0 -2048)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>rl;</TD><TD><PRE>Releaseレベル(-127 - 127)</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>rt;</TD><TD><PRE>Releaseタイム(0 -8192)</TD></TR>
+	</TABLE>
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>項　目</B>：PLFOデータ
+	<DT><B>サイズ</B>：40バイト*PLFOの総数
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+		<TR ALIGN=CENTER><TD><PRE>32</TD><TD><PRE>Str31</TD><TD><PRE>name;</TD><TD><PRE>PLFOの名前</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>dly;</TD><TD><PRE>Delayタイム</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>freq;</TD><TD><PRE>PLFO周波数</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>amp;</TD><TD><PRE>アンプ</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>2</TD><TD><PRE>short</TD><TD><PRE>fdTime;</TD><TD><PRE>フェードタイム</TD></TR>
+	</TABLE>
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>波形データ</B>
+	<DD>後半部に当たる波形データには圧縮は全くかかっていません。
+	<DD>バンクファイルの保存の場合は使用された波形を判別し保存するようになっています。
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>データの区切り用</B>
+	<DD>"0xFFFF"
+
+	<P><DT><FONT SIZE=5>---------------------------</FONT>
+	<P><DT><B>項　目</B>：波形の保存
+	<DT><B>サイズ</B>：92バイト+波形のサイズ
+		<DD><TABLE BORDER=1>
+	<TR><TH WIDTH="20"><PRE>サイズ</TH><TH WIDTH="80">型</TH><TH WIDTH="150"><PRE>引　数</TH><TH WIDTH="280"><PRE>説　明</TH></TR>
+		<TR ALIGN=CENTER><TD><PRE>32</TD><TD><PRE>Str63</TD><TD><PRE>name;</TD><TD><PRE>波形ファイルの名前</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>dataSize;</TD><TD><PRE>データサイズ（含ヘッダー）</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>numChannels;</TD><TD><PRE>チャンネル数</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>numSampleFrames;</TD><TD><PRE>サンプルフレーム数</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>1</TD><TD><PRE>char</TD><TD><PRE>sampleSize;</TD><TD><PRE>サンプルサイズ</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>sampleRate;</TD><TD><PRE>サンプルレート</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>start;</TD><TD><PRE>ループスタート</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>4</TD><TD><PRE>long</TD><TD><PRE>end;</TD><TD><PRE>ループエンド</TD></TR>
+		<TR ALIGN=CENTER><TD><PRE>x</TD><TD><PRE>char</TD><TD><PRE>waveData[];</TD><TD><PRE>実際の波形データ</TD></TR>
+	</TABLE>
+
+	<P><DT><TABLE><TR>
+	<TH><PRE>注　意<BR><IMG SRC="../../../../what/atto.gif"></TH>
+	<TD><B>YAMAHA製トーンエディターからデータをコンバートしてきた場合、サンプルレー
+トが検出できません。しかし再生レートはレイヤーが持つベースノートとファイ
+ンチューンで行いますのでサンプルレートは０でもかまいません。</B></TD></TABLE>
+
+	<P><DT><FONT SIZE=5>-------End of file---------</FONT>
+
+
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p10_10.htm">戻る</A>｜
+<A HREF="p12_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../../index.htm#no2">SOUND Manual</A>
+★<A HREF="../index.htm">トーンエディタユーザーズマニュアル/</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

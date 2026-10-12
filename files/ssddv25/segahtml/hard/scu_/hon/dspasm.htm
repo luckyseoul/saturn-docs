@@ -1,0 +1,178 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;30/31&gt;SCU DSP Assembler Instruction Manual</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p04_59.htm">Back</a> ｜ <A HREF="dspsim.htm">Forward</a> ▼</b><HR NOSHADE>
+<CENTER>
+<H1> SCU DSP Assembler Instruction Manual</H1> '94/07/08</CENTER>
+<HR NOSHADE>
+<H2> table of contents</H2><DIR>
+<DT> <A HREF="#1">1. Assembler functions</a><DT> <A HREF="#2">2. Executing assembler</a><DT> <A HREF="#3">3. Program description format</a><DT> <A HREF="#4">4. Command list</a><DT> <A HREF="#5">5. Sample program</a></DIR>
+<H2> <A NAME="1">1. Overview of assembler functions</a></H2> This assembler is for generating instruction codes for DSP, and is intended to run on MS-DOS and UNIX. The output code is directly output in Motorola's S format, so there is no need to link.<BR>
+ The DSP assembler requires a lot of knowledge about the hardware, so please deepen your understanding of the DSP hardware before using the assembler.<H2> <A NAME="2">2. Executing assembler</a></H2> dspasm [option]&lt; source file name&gt;<OL>
+<LI> The options can be specified as follows: (The file is created only when it ends normally)<DD> -l[file name]: List output specification<DD> -a[file name] : Data format output specification for SH assembler<DD> -c[file name]: C language data format output specification<DD> -m: Specify when using MODEL M development environment<LI> Source file names have no default extension.<LI> Only the first error detected will be displayed, so please repeat the correction and assembly until the error no longer occurs.</OL>
+<H2> <A NAME="3">3. Program description format</a></H2> <B>[Label] [△Operation [△Operand]]…[Comment]</b><BR>
+ Example: LABEL: MOV MC0,X ; Comment<H3> (1) Label</H3><UL>
+<LI> Can be defined by the programmer and used as a destination name for JMP instructions.<LI> When writing a label, start from the first column or add a ``:'' at the end, such as ``LABEL:''.<LI> The maximum length of a label is 32 characters, and the characters that can be used are uppercase letters, lowercase letters, numbers, and underscores (_). Anything other than numbers can be placed at the beginning. In addition, uppercase and lowercase letters are considered the same.</UL>
+<H3> (2) Operation</H3><UL>
+<LI> Write the DSP execution command.<LI> When starting with an operation, put a space character in front of it.<LI> Up to 6 operations may be arranged, including only arithmetic instructions.</UL>
+<H3> (3) Operand</H3><UL>
+<LI> Describes what the operation will be performed on.<LI> Use a space character to separate it from the operand.</UL>
+<H3> (4) Comments</H3><UL>
+<LI> You can write annotations to make the program easier to understand.<LI> A comment starts from the point where the ";" is added to the end of the line.</UL>
+ <B>* Notes on description</b><UL>
+<LI> Basically, operations ~ operands are written so that they fit on one line, but if they do not fit on one line, you can connect them to the next line by adding "\" before the line feed code. However, if you want to connect an operation after a line with a comment, add "\" before ";". At this time, please make sure that the maximum length of one line is 255 bytes.<LI> Operations and operands can be in uppercase or lowercase letters.<LI> Please use hexadecimal ($xx), decimal (xxx), and binary (%xxxxxxxx) to represent numerical values.<LI> The address where the output code is placed can be specified using the ORG pseudo-instruction.<LI> The program area in the DSP is only 256 instructions long, but in order to ensure that processing division and optimization work goes smoothly, a warning can be issued and 2048 instructions worth of code can be output. This code can only be supported by a simulator, so when using it in an actual DSP, it must be shortened to 256 instructions or less and assembled. Also, if you use a label with an address that exceeds 256 instructions, please note that you cannot assign an 8-bit value.</UL>
+ <B>* About reserved words</b><UL>
+<LI> The following names used for operands cannot be used for labels.<BR>
+ {ALH, ALL, ALU, M0, M1, M2, M3, MC0, MC1, MC2, MC3, MUL}</UL>
+ <B>* About numerical operations</b><UL>
+<LI> The following operators can be used when setting values for labels or using numbers for operands. (However, when using it as an operand, please note that blank characters are not allowed. Example: ○ JMP $+2, × JMP $ + 2)</UL>
+<H3> Arithmetic relationship</H3><DT> + … addition<DT> - … Subtraction<DT> * … Multiplication<DT> / … division<DT> % … Remainder<DT> ‾ … bit negation<DT> & … bit product<DT> | … bit sum<DT> ^ … Exclusive bitwise sum<DT>&lt;&lt; … left shift<DT>&gt;&gt; … right shift<H3> Priority</H3><DT> 1. + - ~ (unary operator)<DT> 2. * / %<DT> 3. + -<DT> 4.&lt;&lt;&gt;&gt;<DT> 5. &<DT> 6. | ^<H2> <A NAME="4">4. Command list</a></H2><OL>
+<LI> Arithmetic instruction<DD> NOP AND OR XOR ADD SUB AD2 SR RR SL RL RL8 CLR MOV<LI> Load immediate instruction<DD> MVI<LI> DMA command<DD> DMA DMAH<LI> JUMP instruction<DD> JMP<LI> LOOP BOTTOM instruction<DD> BTM LPS<LI> END command<DD> END ENDI</OL>
+<H3> pseudo-instruction</H3><UL>
+<LI> EQU (=) ……………… Used to define a label.<LI> ORG ...... Specifies the starting address where the instruction will be placed.<LI> ENDS ……………… If placed at the end of the program, it will be ignored thereafter.<LI> IF &lt;number/label&gt;
+... If the calculation result of the number or label is other than 0, then assemble up to ELSE or ENDIF.<LI> IFDEF&lt; label&gt; ...... If the label is defined at the front, then ELSE or ENDIF will be assembled.<BR>
+ The nesting level for IF and IFDEF is up to 16. )</UL>
+<H2> <A NAME="5">5. Sample program</a></H2><H3> (1) When copying the contents of internal RAM 0 of the DSP to internal RAM 1.</H3><PRE>
+; ------- sample (1) start -------
+
+COPY_SIZE  =  12          ; Copy size
+RAM0_ADR   = $00          ; Copy source address
+RAM1_ADR   = $00          ; Copy destination address
+
+	MOV RAM0_ADR,CT0      ; Set the copy source address of RAM0
+	MOV RAM1_ADR,CT1      ; Set the copy destination address of RAM1
+	MOV COPY_SIZE-1,LOP   ; Set transfer size - 1 to LOP register
+	LPS                   ; Execute 1-instruction loop
+	MOV MC0,MC1           ; Transfer from RAM0 to RAM1
+	ENDI
+
+; ------- sample (1) end -------
+</PRE>
+
+<H3>(2) When calculating 2 x 3 + 4 x 5. (RAM0 x RAM1 + RAM0 x RAM1 = RAM2) (Sample 2b is an optimized version of 2a.)</H3>
+<PRE>
+; ------- sample (2a) start -------
+
+RAM0_ADR   = $00          ; 2, 4 Storage address first
+RAM1_ADR   = $00          ; 3, 5 Storage address first
+RAM2_ADR   = $00          ; Result storage address
+
+	MOV RAM0_ADR,CT0   ; Set RAM0 address
+	MOV RAM1_ADR,CT1   ; Set RAM1 address
+	MVI #2,MC0         ; Set "2" to RAM0
+	MVI #3,MC1         ; Set "3" to RAM1
+	MVI #4,MC0         ; Set "4" to RAM0
+	MVI #5,MC1         ; Set "5" to RAM1
+	MOV RAM0_ADR,CT0   ; Set the address of RAM0
+	MOV RAM1_ADR,CT1   ; Set the address of RAM1
+	MOV RAM2_ADR,CT2   ; Set the address of RAM2
+	MOV MC0,X          ; Transfer data from RAM0 to RX
+	MOV MC1,Y          ; Transfer data from RAM1 to RY
+	MOV MUL,P          ; Store the integration results of RX and RY in PH,PL
+	MOV MC0,X          ; Transfer data from RAM0 to RX
+	MOV MC1,Y          ; Transfer data from RAM1 to RY
+	CLR A              ; Set "0" to ACH,ACL
+	AD2 MOV ALU,A      ; Store the addition result of PH,PL and ACH,ACL in ACH,ACL
+	MOV MUL,P          ; Store the integration result of RX and RY in PH,PL
+	AD2 MOV ALL,MC2    ; Store the addition result of PH, PL and ACH, ACL in RAM2
+	ENDI
+
+; ------- sample (2a) end -------
+; ------- sample (2b) start -------
+
+RAM0_ADR   =  $00          ; 2, 4 Storage address first
+RAM1_ADR   =  $00          ; 3, 5 Storage address first
+RAM2_ADR   =  $00          ; Result storage address
+
+	                                                 MOV RAM0_ADR,CT0
+	                                                 MOV RAM1_ADR,CT1
+	MVI #2,MC0
+	MVI #3,MC1
+	MVI #4,MC0
+	MVI #5,MC1
+	                                                 MOV RAM0_ADR,CT0
+	                                                 MOV RAM1_ADR,CT1
+	     MOV MC0,X             MOV MC1,Y             MOV RAM2_ADR,CT2
+	     MOV MC0,X  MOV MUL,P  MOV MC1,Y  CLR A
+	AD2             MOV MUL,P             MOV ALU,A
+	AD2                                              MOV ALL,MC2
+	ENDI
+
+; ------- sample (2b) end -------
+</PRE>
+
+<H3>(3) When calculating movement processing for a matrix. (RAM0×RAM1=RAM2)</H3>
+<PRE>
+ ／Ｍ００ Ｍ０１ Ｍ０２ Ｍ０３＼  ／１００ｘ＼  　  ／Ｍ００ Ｍ０１Ｍ０２ Ｍ０３＼
+｜ Ｍ１０ Ｍ１１ Ｍ１２ Ｍ１３ ｜｜ ０１０ｙ ｜ → ｜ Ｍ１０ Ｍ１１Ｍ１２ Ｍ１３ ｜
+ ＼Ｍ２０ Ｍ２１ Ｍ２２ Ｍ２３／ ｜ ００１ｚ ｜ 　  ＼Ｍ２０ Ｍ２１Ｍ２２ Ｍ２３／
+ 　　　　 　　　 　　　 　　　　  ＼０００１／
+
+; ------- sample (3) start -------
+
+DATA_TOP   =  $10000 >> 2       ; External memory address is in 4-byte units
+MAT_SIZE   =  $0C               ; Array size
+RAM0_ADR   =  $00               ; Start address for storing X, Y, Z movement amount
+RAM1_ADR   =  $00               ; Array work address
+RAM2_ADR   =  $00               ; Original array address
+
+; (Transfer the array with the movement amount set from external memory to RAM0)
+;
+	MVI DATA_TOP,RA0
+	                                                 MOV RAM0_ADR,CT0
+	DMA D0,MC0,#$02
+;
+; (Copying the array to be operated from RAM2 to RAM1)
+	                                                 MOV RAM2_ADR,CT2
+	                                                 MOV RAM1_ADR,CT1
+	                                                 MOV MAT_SIZE-1,LOP
+	LPS
+	                                                 MOV MC2,MC1
+WAITING:
+	JMP T0,WAITING
+;
+; (Execute array calculation)
+	                                                 MOV RAM0_ADR,CT0
+	                                                 MOV RAM1_ADR,CT1
+	     MOV MC0,X             MOV MC1,Y 
+	     MOV MC0,X  MOV MUL,P  MOV MC1,Y  CLR A
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM0_ADR,CT0
+	AD2             MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV #1,RX
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM2_ADR+3,CT2
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  CLR A      MOV ALL,MC2
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM0_ADR,CT0
+	AD2             MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV #1,RX
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM2_ADR+7,CT2
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  CLR A      MOV ALL,MC2
+	AD2  MOV MC0,X  MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV RAM0_ADR,CT0
+	AD2             MOV MUL,P  MOV MC1,Y  MOV ALU,A  MOV #1,RX
+	AD2             MOV MUL,P             MOV ALU,A  MOV RAM2_ADR+11,CT2
+	AD2                                              MOV ALL,MC2
+	ENDI
+
+; ------- sample (3) end -------
+</PRE>that's all<HR NOSHADE>
+ <B>▲ <A HREF="p04_59.htm">Back</a> ｜ <A HREF="dspsim.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+</BODY>
+</HTML>

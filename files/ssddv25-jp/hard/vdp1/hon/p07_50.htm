@@ -1,0 +1,118 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;46/54&gt;VDP1ユーザーズマニュアル/</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+★<A HREF="p07_00.htm">第７章　コマンド</A>
+<HR>
+<B>▲<A HREF="p07_40.htm">戻る</A>｜
+     <A HREF="p07_51.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>VDP1ユーザーズマニュアル/第７章　コマンド</B>
+<HR NOSHADE>
+<DL>
+<A NAME="7_50"></A>
+	<P>	<DT><H2>■7.5　矩形スプライト描画コマンド</H2>
+		<DD>　矩形スプライト描画コマンドは、キャラクタパターンをフレームバッファに描画します。描画するとき、キャラクタパターンを指定した座標に上下反転、左右反転、拡大縮小、伸縮して描画することができます。<BR>
+		　エンドビットが0Bで、コマンド選択ビットが0001Bのとき矩形スプライト描画コマンドです。ズームポイントが0000Bのとき座標2点指定で定義します。0000B以外のとき不動点指定の定義になります。<BR>
+		　矩形スプライトは、90°回転させることはできません。90°回転させたいときは、変形スプライト描画コマンドで指定します。</P>
+
+<A NAME="7_51"></A>
+	<P>	<DT><H3>　●座標2点指定(矩形スプライト描画コマンド)</H3>
+		<DD>　座標2点指定のコマンドテーブルの内容は次のとおりです。</P>
+<!-- -------------------------------------------------------------------------------- -->
+	<P>	<DT><TABLE BORDER=0<TR><TD>
+	<TABLE BORDER=1>
+	<TR><TH><PRE>ビット</TH>
+			<TH><PRE>15</TH><TH><PRE>14</TH><TH><PRE>13</TH><TH><PRE>12</TH><TH><PRE>11</TH><TH><PRE>10</TH><TH><PRE>９</TH><TH><PRE>８</TH>
+			<TH><PRE>７</TH><TH><PRE>６</TH><TH><PRE>５</TH><TH><PRE>４</TH><TH><PRE>３</TH><TH><PRE>２</TH><TH><PRE>１</TH><TH><PRE>０</TH></TR>
+
+	<TR ALIGN=CENTER><TD>CMDCTRL<BR>+00</TD>
+			<TH>0</TH><TD COLSPAN=3>JP</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD COLSPAN=2>Dir</TH><TH>0</TH><TH>0</TH><TH>0</TH><TH>1</TH></TR>
+
+	<TR ALIGN=CENTER><TD>CMDLINK<BR>+02</TD>
+			<TD COLSPAN=14>LINK指定/8H</TD><TD>0</TD><TD>0</TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDPMOD<BR>+04</TD>
+			<TD>MO</TD><TD>0</TD><TD>0</TD><TD>0</TD><TD>Pc</TD><TD>Cl</TD><TD>Cm</TD><TD>Me</TD><TD>EC</TD><TD>SP</TD><TD COLSPAN=3>カラー<BR>モード</TD><TD COLSPAN=3>色演算</TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDCOLR<BR>+06</TD>
+			<TD COLSPAN=16>カラーバンク,カラールックアップテーブル/8H(LSBは00固定)</TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDSRCA<BR>+08</TD>
+			<TD COLSPAN=16>キャラクタアドレス/8H</TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDSIZE<BR>+0A</TD>
+			<TD>0</TD><TD>0</TD><TD COLSPAN=6>キャラクタサイズＸ/8</TD><TD COLSPAN=8>キャラクタサイズＹ/8</TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDXA<BR>+0C</TD>
+			<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(A)，Ｘ座標(XA)</TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDYA<BR>+0E</TD>
+			<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(A)，Ｙ座標(YA)</TD></TR>
+
+	<TR ALIGN=CENTER><TD>+10</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+12</TD><TD COLSPAN=16></TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDXC<BR>+14</TD>
+			<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(C)，Ｘ座標(XC)</TD></TR>
+
+	<TR ALIGN=CENTER><TD>CMDYC<BR>+16</TD>
+			<TD COLSPAN=5>符号拡張</TD><TD COLSPAN=11>頂点(C)，Ｙ座標(YC)</TD></TR>
+
+	<TR ALIGN=CENTER><TD>+18</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>+1A</TD><TD COLSPAN=16></TD></TR>
+	<TR ALIGN=CENTER><TD>CMDGRDA<BR>+1C</TD>
+			<TD COLSPAN=16>グーローシェーディングテーブル/8H</TD></TR>
+	</TABLE>
+	</TD><TD><IMG SRC="../grp/i120.gif"></TD></TR></TABLE>
+	<TABLE><TR><TD>【注】</TD><TD><TABLE BORDER cellspacing=10><TR><TD></TD></TR></TABLE></TD><TD>は無視されます(don't care)</TD></TR></TABLE></P>
+<!-- -------------------------------------------------------------------------------- -->
+
+	<P>	<DD>矩形スプライト描画コマンドの座標2点指定は次のように定義します。</P>
+	<P>	<DT><UL TYPE=DISC>
+		<LI>エンドビットを0Bに、コマンド選択ビットを0001Bに設定すると、矩形スプライト描画コマンドになります。</P>
+	
+	<P>	<LI>ジャンプ形式を指定します。ジャンプ形式がアサインまたはコールのとき、次に処理するコマンドテーブルのアドレスを8Hで割ってCMDLINKに設定します。</P>
+
+	<P>	<LI>ズームポイントに0000Bを設定します。座標2点指定になります。</P>
+
+	<P>	<LI>キャラクタパターンの読み出し方向を設定します。読み出し方向の指定で上下反転、左右反転させて描画することができます。読み出し方向の指定と、頂点(A)(CMDXA, CMDYA)、頂点(C)(CMDXC, CMDYC)の指定とで反転を2重に指定した場合は、
+		反転が相殺されて向きは元に戻ります。</P>
+
+	<P>	<LI>ハイスピードシュリンクを設定します。精度優先または速度優先を指定します。</P>
+
+	<P>	<LI>プリクリッピングを設定します。クリッピングエリアとパーツの描画位置を考えて、有効か無効を指定します。</P>
+
+	<P>	<LI>ユーザクリッピング有効ビットとクリッピングモードを指定します。クリッピングモードでユーザクリッピングを外側にするか内側にするかを指定します。</P>
+
+	<P>	<LI>メッシュ有効、エンドコード無効、透明ピクセル無効を設定します。VDP2でシェードまたはウィンドウ処理をするMSBオンを設定します。</P>
+
+	<P>	<LI>キャラクタパターンを定義したカラーモードを設定します。カラーモードがカラーバンクモードのとき、カラーバンクを指定します。ルックアップテーブルモードのときカラールックアップテーブルのアドレスを8Hで割って定義します。</P>
+
+	<P>	<LI>色演算を指定します。色演算はRGBモードのとき有効です。色演算しない場合はリプレースを指定します。グーローシェーディング処理をするときはグーローシェーディングテーブルのアドレスを8Hで割って指定します。
+		グーローシェーディング処理はRGBモのとき有効です。</P>
+
+	<P>	<LI>キャラクタパターンテーブルのアドレスを8Hで割ってCMDSRCAに定義します。キャラクタパターンテーブルに定義したキャラクタサイズの横と縦をCMDSIZEに定義します。横のサイズは8で割った値を定義します。</P>
+
+	<P>	<LI>描画する領域の左上座標を頂点(A)(CMDXA, CMDYA)に、右下座標を頂点(C)(CMDXC, CMDYC)に定義します。頂点(A)、頂点(C)の指定で拡大縮小、伸縮して描画することができます。また、(頂点(A)のXA)＞(頂点(C)のXC)とすると、左右反転した形になります。
+		(頂点(A)のYA)＞(頂点(C)のYC)とすると、上下反転した形になります。</P>
+
+	<P>	<LI>補足：頂点Aと頂点Cを同一座標にセットすると、1ピクセルで描画されます。</UL></P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<A HREF="p07_40.htm">戻る</A>｜
+     <A HREF="p07_51.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../../index.htm"><IMG SRC="../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../../index.htm">HARDWARE Manual</A>
+★<A HREF="../index.htm">VDP1ユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

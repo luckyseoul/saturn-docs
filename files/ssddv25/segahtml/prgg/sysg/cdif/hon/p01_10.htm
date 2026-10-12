@@ -1,0 +1,78 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 1/19&gt;CD communication I/F (CD part)/Overview</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual</b><H2 ALIGN=CENTER> overview</H2><HR NOSHADE>
+<DL>
+<P><DD> This document summarizes the functions of the CD block and the external specifications of the CD communication interface.<BR>
+ The functions of the CD block are classified as shown in Table 1.1.</P>
+<A NAME="t1_1"></A><P><DD> <B>Table 1.1 Functional classification of CD block</b><BR>
+<TABLE BORDER=1>
+<TR><TH><PRE> classification</TD><TH><PRE> Contents</TD></TR>
+<TR><TD><PRE> CD part</TD><TD><PRE> Communication method, CD drive related, CD buffer related<BR> CD block file system related</TD></TR>
+<TR><TD><PRE> MPEG part</TD><TD><PRE> MPEG related</TD></TR>
+</TABLE>
+</P>
+<P><DD> The CD communication interface allows you to use the functionality of the CD block with a common software interface.</P>
+<A NAME="no1_10"></A><P><DT><H3> 1.1 Library configuration</H3><DD> Figure 1.1 shows the CD-related library configuration.<P><A NAME="z1_1"></A><P><DD> <B>Figure 1.1 CD-related library configuration</b><PRE>
+       ┌────────────────────────────────┐    
+       │                                │    
+       │          Application           │    
+       │                                │    
+       └────────────────────────────────┘    
+       ┌───────┐ ┌───────────┐ ┌────────┐    
+       │MPEG   │ │Stream     │ │File    │    
+       │library│ │system     │ │system  │    
+       │       │ │library┌───┘ │library │    
+       │       │ │       │ ┌───┘        │    
+       │       │ │       │ │            │    
+       └───────┘ └───────┘ └─────┐      │    
+       ┏━━━━━━━━━━━━━━━━━━━━━━━┓ │      │    
+       ┃   CD communication    ┃ │      │    
+       ┃        interface      ┃ │      │    
+       ┗━━━━━━━━━━━┯━━━━━━━━━━━┛ └──┬───┘    
+Software           │                │        
+━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━
+Hardware           │                │        
+            ┌──────┴─────┐   ┌──────┴────────┐ 
+            │  CD block  │   │SIMM, SCSI file│ 
+            └────────────┘   └───────────────┘ 
+</PRE><P><DD>Alphabetical symbols that represent libraries, such as CDC, are called library symbols.<BR>
+ In this manual, the CD communication interface is sometimes abbreviated as " <B>CDC</b> ".</P>
+<A NAME="no1_20"></A><P><DT><H3> 1.2 System configuration</H3><DD> Figure 1.2 shows the CD-related system configuration.</P>
+<A NAME="z1_2"></A><P ALIGN=CENTER> <B>Figure 1.2 CD-related system configuration</b><img srcset="../grp/i050_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><BR>
+</P>
+<P><DD> The main system that interfaces with the CD block is called the host.<BR>
+ Also, CD block is one of the subsystems.</P>
+<A NAME="no1_21"></A><P><DT> <B>(1)Communication with CD block</b><DD> The host and CD block communicate (command/response, data transfer) using registers on the hardware interface.<BR> A command issued from the host to a CD block is called a CD block command. Usually abbreviated as "command".</P><A NAME="no1_22"></A><P><DT> <B>(2)CD drive</b><DD> The CD block periodically communicates with the CD drive and controls the CD drive in response to commands from the host.<BR>
+ The CD drive supports the CD-ROMXA standard and multi-session. It is also possible to switch between standard speed and double speed. (When playing CD-DA, the speed is automatically set to standard speed.)</P>
+<A NAME="no1_30"></A><P><DT><H3> 1.3 Functions and features</H3><DD> <B>(1) to (3)</b> are the functions of the CD communication interface, and <B>(4) to (7)</b> are the functions of the CD block.</P>
+<A NAME="no1_31"></A><P><DT> <B>(1) Communication function with CD block</b><DD><OL TYPE=a><LI> A set of C language interface functions that communicate between the host and CD block.<LI> Issue commands to the CD block and receive responses.<LI> There is almost a one-to-one correspondence with the CD block command.</OL></P><A NAME="no1_32"></A><P><DT> <B>(2) Auxiliary function for data transfer</b><DD> Supports auxiliary functions related to data transfer, such as preparing and terminating data transfer and acquiring the address of the data transfer register.<BR>
+ Data to be read or written to the CD block is transferred through the data transfer register of the CD block. The transfer itself does not go through the CD communication interface. A data transfer module such as DMA mediates this. (Software transfer by CPU, CPU DMA, and SCU DMA are possible)</P>
+<A NAME="no1_33"></A><P><DT> <B>(3) Register access function</b><DD> Supports functions that access registers in the CD block.</P><A NAME="no1_34"></A><P><DT> <B>(4)CD drive function</b><DD> Music playback (CD-DA) and sector read (CD-ROM) are handled using the same format command called CD playback.<BR>
+ To stop or pause CD playback, use the seek command, and to resume CD playback (unpause), use the CD playback command.</P>
+<A NAME="no1_35"></A><P><DT> <B>(5) Decoding function of subcodes R to W</b><DD> Decodes subcodes R to W during CD-DA playback. There is a pack buffer for 24 packs to store decoded pack data.</P><A NAME="no1_36"></A><P><DT> <B>(6) Stream selection function</b><DD> It uniformly processes CD-ROM XA standard sectors and streams from various devices (host, MPEG, etc.).</P>
+<P><DD><OL TYPE=a>
+<LI> There is a CD buffer of 200 sectors (approximately 460K bytes) to store the stream.<LI> There are 24 independent selectors for selecting streams (separating, storing, retrieving).</OL>
+</P>
+<A NAME="no1_37"></A><P><DT> <B>(7)CD block file system function (ISO9660)</b><DD> Maintains directory information within the CD block for easy access to files that comply with the ISO9660 standard.</P></DL><HR NOSHADE> <B>■ ｜ <A HREF="p02_10.htm">Go forward</a> ▼</b><HR><A HREF="../../../../index.htm"><IMG SRC="../../../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

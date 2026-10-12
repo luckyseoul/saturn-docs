@@ -1,0 +1,74 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;54/54&gt;VDP1 User's Manual/9. Precautions for use</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p08_10.htm">Back</a> | ■</b><HR NOSHADE>
+ <B>VDP1 User's Manual</b><H2 ALIGN=CENTER><img srcset="../../../what/atto.png 5x" ALIGN=MIDDLE> Chapter 9 Precautions for use</H2><HR NOSHADE>
+<DL>
+<P><DD> Precautions for use are as follows.</P>
+<A NAME="no9_11"></A><P><DT><H3> ● VDP1 general</H3><DT><UL TYPE="DISC">
+<P><LI> For normal, high resolution, HDTV, and double-dense interlacing, frame buffer rotation reading is prohibited. <B>[ <A HREF="p01_20.htm">reference</a> ]</b></P>
+<P><LI> The CPU can only access the drawing framebuffer. <B>[ <A HREF="p02_10.htm#z2_1">reference</a> ]</b></P>
+</UL>
+<A NAME="no9_12"></A><P><DT><H3> ● System register</H3><DT><UL TYPE="DISC">
+<P><LI> DMA access to system registers is prohibited. Please be sure to use Word Access. <B>[ <A HREF="p02_12.htm">reference</a> ]</b></P>
+<P><LI> After turning on the power, be sure to set the system registers. <B>[ <A HREF="p02_12.htm">reference</a> ]</b></P>
+<P><LI> Be sure to set unused bits of system registers to 0. <B>[ <A HREF="p02_12.htm">reference</a> ]</b></P>
+<P><LI> When reading the frame buffer rotationally, be sure to set DIE = 0. Rotational reading with double-dense interlacing is prohibited. <B>[ <A HREF="p01_20.htm#no1_22">reference</a> ]</b></P>
+<P><LI> Please note that an undefined surface will be displayed in the first frame immediately after changing the DIE bit. <B>[ <A HREF="p04_12.htm#die">reference</a> ]</b></P>
+<P><LI> When changing TVM bits, it is necessary to mask the frame buffer. When changing, one frame of the irregular surface will be displayed. <B>[ <A HREF="p04_11.htm">reference</a> ]</b></P>
+<P><LI> For double-dense interlacing, set FCM=0 and FCT=0. Field switching is only possible at 1/60 seconds. <B>[ <A HREF="p04_12.htm">reference</a> ]</b></P>
+<P><LI> Erase write area settings are (upper left coordinates XA)&#65308; Please set so that (lower right coordinate XC) and (upper left coordinate YA) ≦ (lower right coordinate YC). <B>[ <A HREF="p04_14.htm">reference</a> ]</b></P>
+</UL>
+<A NAME="no9_13"></A><P><DT><H3> ● Command</H3><DT><UL TYPE="DISC">
+<P><LI> Relative coordinates must be set after the power is turned on. <B>[ <A HREF="p07_30.htm">reference</a> ]</b></P>
+<P><LI> The range that can be set for clipping coordinates is from (0, 0) to (1023, 511). <B>[ <A HREF="p07_10.htm">reference</a> ]</b></P>
+<P><LI> The range of clipping coordinates is (upper left coordinate XA) ≦ (lower right coordinate XC) and (upper left coordinate YA) ≦ (lower right coordinate YC). <B>[ <A HREF="p07_20.htm">reference</a> ]</b></P>
+<P><LI> For clipping, set appropriate values according to the screen mode set with the TVM bit. <B>[ <A HREF="p07_10.htm">reference</a> ]</b></P>
+<P><LI> Be sure to set the user clipping area inside the system clipping area. Collinearity can be set. <B>[ <A HREF="p07_20.htm">reference</a> ]</b></P>
+<P><LI> The upper left coordinate of the system clipping area is fixed to (0, 0) by hardware. <B>[ <A HREF="p07_10.htm">reference</a> ]</b></P>
+<P><LI> Set unused bits in the words you are using to 0 in the command table. <B>[ <A HREF="p06_10.htm">reference</a> ]</b></P>
+<P><LI> Calls (calls, jump calls, skip calls) within command subroutines are prohibited. <B>[ <A HREF="p06_10.htm#no6_12">reference</a> ]</b></P>
+<P><LI> Returns (returns, jump returns, skip returns) within the command main routine are prohibited. <B>[ <A HREF="p06_10.htm#no6_12">reference</a> ]</b></P>
+<P><LI> Zoom point values can only be 0H, 5H, 6H, 7H, 9H, AH(10), BH(11), DH(13), EH(14), FH(15). Any other settings are prohibited. <B>[ <A HREF="p06_10.htm#no6_13">reference</a> ]</b></P>
+<P><LI> When HSS=1, the end code of the original picture is ignored regardless of whether the sprite is enlarged or reduced. <B>[ <A HREF="p06_31.htm">reference</a> ]</b></P>
+<P><LI> Set the lower 2 bits of CMDLINK to 00. <B>[ <A HREF="p06_20.htm">reference</a> ]</b></P>
+<P><LI> Set the lower two bits of the lookup table to 00. <B>[ <A HREF="p02_12.htm">reference</a> ]</b></P>
+<P><LI> When setting the color bank, set the lower 4 bits of the color bank data to 0000. <B>[ <A HREF="p06_40.htm#no6_41">reference</a> ]</b></P>
+<P><LI> When using non-texture, set ECD=1, SPD=1, and color mode=0. <B>[ <A HREF="p06_40.htm#no6_43">reference</a> ]</b></P>
+<P><LI> When performing color calculations without texture, set RGB data (8000H or higher) to the non-texture color. <B>[ <A HREF="p06_40.htm#no6_43">reference</a> ]</b></P>
+<P><LI> When setting to RGB mode and using 7FFFH data for the original picture, please set ECD = 0. <B>[ <A HREF="p06_37.htm#no6_37_9">reference</a> ]</b></P>
+<P><LI> When setting to RGB mode and using data of 0000H for the original picture, please set SPD = 0. <B>[ <A HREF="p06_37.htm#no6_37_9">reference</a> ]</b></P>
+<P><LI> When set to RGB mode, setting the frame buffer to 8 bits/pixel is prohibited. The only color modes that allow 8 bits/pixel are modes 0, 1, 2, 3, and 4. <B>[ <A HREF="p02_11.htm">reference</a> ]</b></P>
+<P><LI> When setting the frame buffer to 8 bits/pixel, set the color calculation mode to 0. Only replacement is possible. Other color operations are prohibited. <B>[ <A HREF="p02_11.htm">reference</a> ]</b></P>
+<P><LI> When the frame buffer is set to 8 bits/pixel, the upper 8 bits of non-textured colors are ignored. At this time, use of RGB data is prohibited. <B>[ <A HREF="p02_11.htm">reference</a> ]</b></P>
+<P><LI> Do not set the MSB on bit (MON) to 1 when the frame buffer is set to 8 bits/pixel. <B>[ <A HREF="p02_11.htm">reference</a> ]</b></P>
+<P><LI> When the MSB on bit (MON) is set to 1, set the color calculation mode to 0. <B>[ <A HREF="p06_38.htm">reference</a> ]</b></P>
+<P><LI> Store the command table at address 000000H of VRAM. <B>[ <A HREF="p02_10.htm">reference</a> ]</b></P>
+</UL>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p08_10.htm">Back</a> ｜■</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

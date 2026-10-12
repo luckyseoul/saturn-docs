@@ -1,0 +1,163 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 3/ 5&gt;サウンド開発ノウハウ集/3.音色関連とTONE EDITORに関して</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm">サウンド開発ノウハウ集</A>
+<HR>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>サウンド開発ノウハウ集</B>
+<H2 ALIGN="CENTER">第3章　音色関連とTONE EDITORに関して</H2>
+<HR NOSHADE>
+
+<ul>
+<li>TL+VolBiasの加算結果が最大を超えてはなりません。その場合は、ドライバがStatusにエラーナンバーを返し、シーケンスを再生しません。<br>
+具体的には、TLが0の場合、VolBiasは0以下でなければなりません。<p>
+
+<li>ベロシティカーブがエディタの表示上、リニアになっていても、聴感上は、その通りにならないことがあります。ベロシティ制御については、あくまで聴感を目安にしてください。<p>
+
+<li>音色エディタでパラメータのツメをもって激しく数値を変更すると、SCSIの通信がうまくいかなくなり、MACが飛びやすいのでやめてください。特にMIDI発音中は頻度が高くなります。<p>
+
+<li>ソフトLFOはMIDIモジュレーションwheelによるON/OFF制御ができません。<p>
+
+<li>ＬＦＯのモジュレーション波形はサインウェーブのみです。<p>
+
+<li>FMについて<br>
+　1個のスロットをキャリアにもモジュレータにも自由に割り当てることや自己変調（セルフフィードバック）も可能です。自己変調だけでも充分実用に耐える波形は出力可能ですので、その場合は、最大32音ポリのFM出力ということになります。しかしFM音色を多用すると、どうしても動作が遅くなる可能性があります。<p>
+
+<li>TONEエディタのVOICEのパラメータ、PLAY MODEはポリモードのみに対応。POLY以外の、MONO,PORTA, LEGATO, L&Pは無効です。 TONE EDITORで設定できてもサウンドドライバがこれらのモードでは正しく動作しません。音がノートオフしない等のバグになりますので絶対に使用しないでください。<p>
+
+<li>ボイスウィンドウのPORTAMENT TIMEは機能していません。設定するとトラブルのもとになりますので設定しない方が賢明です。将来の対応もまったく未定です。<p>
+
+<li>PEGの動作にいくつかのバグがあり、思ったような動作をしないことがあります。<p>
+
+<li>TONEEditorは、トーンデータの重複によるデータ量の増加をふせぐため、AIFFデータをファイル名で参照しています。つまり、同一音色データ内の他のレイヤーと同じAIFFデータを選択するとデータは読み込まず、RAMに先に読み込んだ音色と同じ設定を行います。ですから、いったんトーンデータに取り込んだAIFFファイルを波形エディタ等で波形編集しても、ファイル名が同じならばトーンエディタは新たに編集したAIFFデータを読み込まずトーンデータは更新されません。読み込ませたい場合はファイル名を変えるか、一度違うデータを取り込んでから再度読み込み直してください。<br>
+なお、波形を共有しているVOICEはサイズのあとにアスタリスク(*)が表示されます。<p>
+
+<img srcset="../image/tone_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];">
+<p>
+
+<li>Toneエディタは、デフォルトでSndSimulatorでカレントになっているサウンドマップの、音色BANK0のアドレスとサイズを参照します。音色BANK0番目のサイズが小さく設定してある場合、SCSIのエラーがでることがあります。音色BANK0のサイズを大きく設定してください。また音色BANK0以外に設定することも可能です。音色データのエディット時は作成用として設定音色BANKのサイズを大きくとったマップをつくって使用することをお奨めします。<br>
+またToneエディタは、音色ファイルをOpenしたときに必ず音色データのサウンドボックスへの転送を行おうとします。<br>
+（再度転送する必要がある場合はPreferenceメニューのDownloadにて行ってください。）<p>
+
+<li>素朴な疑問<br>
+　MIDI入力によって音色パラメータを変更したのにTONEエディタの画面上では同じままになっています。これはTONEエディタはSCSI通信でSOUND BOXに対して変更部分のデータを送りますが、MIDIによって変更されたデータも認識してTONEエディタの画面上に反映させる仕様にはなっていないからです。<p>
+
+<li>トーンエディタのPANポジションが現在(Ver2.06)、左から<p>
+
+L16,L15,L14,L13,L12,L11,L10,L9,L8,L7,L6,L5,L4,L3,L2,L1,C,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,R13,R14,R15<p>
+
+と並んでいますが、正しくは<p>
+
+L15,L14,L13,L12,L11,L10,L9,L8,L7,L6,L5,L4,L3,L2,L1,C,C,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,R13,R14,R15<p>
+
+です。単なる表示ミスですが、注意が必要です。また次バージョン(Ver2.07)でこのバグは修正されます。<p>
+
+<li>TONE EDITORの謎のパラメータについて<p>
+
+<b>波形読み込みウインドウを開くとこのようになっています。</b><p>
+<img srcset="../image/wave_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p>
+上のラジオボタンの意味は、<p>
+<dl compact>
+<dt>・ALL'0'
+<dd>音がでません。
+<dt>・NOISE
+<dd>シャーといいます。試しに使ってみてください。
+</dl>
+<p>
+<b>EGウインドウを開くとこのようになっています。</b><p>
+<img srcset="../image/eg_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p>
+<dl compact>
+<dt>・EGHOLD 
+<dd>チェックすると、ARの値は無視され最大音量からEGがはじまります。
+<dt>・KEY RATE SCALE
+<dd>0-14まで値が大きくなるほどキースケーリングの効果が強くなります。注意する点は、15ではキースケーリング効果がかからないことです。
+<dt>・LPSLNK
+<dd>LooP StartLiNKの略
+チェックしないとEGの係り具合とLoopStartのポイントのEGのが無関係。
+チェックするとLoopStartの位置によりEGの効果が変化する。
+</dl>
+（詳細は、「Hardware Manual/SCSPユーザーズマニュアル/<B><a href="../../../hard/scsp/hon/p04_22_j.htm">EGレジスタ</A></B>」を参照してください）。<p>
+<p>
+<b>LFO（ハードによるもの）ウインドウを開くとこのようになっています。</b><p>
+<img srcset="../image/lfo_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p>
+<dl compact>
+<dt>・MODULATION
+<dd>MIDIのControl Change1番のモジュレーションデプスの値により、LFOのオンオフができます。<br>
+0でオフ、1-127でオンになり、深さのコントロールはできません。
+<dt>・LFO RESET
+<dd>ノートオンの度にLFOの波形がリセットされ、基準音程から変調がスタートします。
+</dl>
+<p>
+<b>INVERTウインドウを開くとこのようになっています。</b><p>
+<img srcset="../image/invert_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p>
+<dl compact>
+<dt>・SAOFSET
+<dd>Start AddressOFfSETの略でPCM波形のStart Addressに書き込む値に対してオフセットをあたえるものです。DSPのコーラスなどのエフェクトを使用する場合に、モジュレーション用の波形の位相をずらしてうねらせたりするときなどに使用。<br>
+現状はサウンドドライバが参照していないので、何をいれても無意味です。
+<dt>・FMWAVE
+<dd>チェックすると、通常はFM変調を3波長のサイン波で行うところを、1波長で行います。データがほんの少し減る以外メリットはありません。いろいろ考えてみて使わない方がいいでしょう。
+<dt>・SPCTL1, SPCTL0
+<dd>通常使用しませんので、チェックしないでください。
+</dl>
+<p>
+<b>TOTAL LEVELウインドウを開くとこのようになっています。</b><p>
+<img srcset="../image/tl_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p>
+<dl compact>
+<dt>・MOD
+<dd>DSPの変調波形用につかうパラメータ<br>
+まあ、普通はつかうことはないです。
+<dt>・SDIR
+<dd>SoundDIRectの略<br>
+EGもLFOもなんにもかからないで、PCM波形がそのまま鳴ります。音量も最大音量のままで変化しません。<br>
+SH2側からのSequence Volumeの効果も受け付けないので、チェックしない方がいいです。Invision作成の一部の音色はチェックされていますが、Sequence Volumeを使いたい場合などは外さなければいけないこともありますので注意してください。<br>
+また、最近ノイズの発生する原因らしいこともわかりましたので、チェックしないほうが賢明です。
+<dt>・STINH
+<dd>STackWrite INHibit   スタックへの書き込み禁止。通常はチェックしないパラメータです。
+</dl>
+<p>
+<b>FMウインドウを開くとこのようになっています。</b><p>
+<img srcset="../image/fm_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"><p>
+<dl compact>
+<dt>・generation
+<dd>0か1かですが、気にしないでください。0でオッケー。<br>
+（詳細は、「Hardware Manual/SCSPユーザーズマニュアル/
+<B><a href="../../../hard/scsp/hon/p04_23_j.htm">FM変調レジスタ</A></B>および
+<B><a href="../../../hard/scsp/hon/p04_fm1_j.htm">FM音源方式を使用するにあたって</A></B>」を参照してください）。<p>
+
+
+</dl>
+</ul>
+
+<HR NOSHADE>
+<B>▲
+<a href="p02_10_j.htm">戻る</A>｜
+<a href="p04_10_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm#sndt"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm#prog">SOUND Manual</A>
+★<a href="index_j.htm">サウンド開発ノウハウ集</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

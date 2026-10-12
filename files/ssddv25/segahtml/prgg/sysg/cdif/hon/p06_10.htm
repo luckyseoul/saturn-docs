@@ -1,0 +1,93 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 6/19&gt;CD communication I/F (CD part)/CD block file system</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD communication interface user's manual</b><H2 ALIGN=CENTER> CD block file system</H2><HR NOSHADE>
+<DL>
+<A NAME="no6_10"></A><P><DT><H2> 6.1 File management on CD-ROM (ISO9660)</H2><DD> The CD block file system supports logical formats compliant with ISO9660.</P>
+<A NAME="z6_1"></A><P ALIGN=CENTER> <B>Figure 6.1 File management data structure in CD-ROM (ISO9660)</b><BR>
+<img srcset="../grp/i079_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DT><UL TYPE=DISC>
+<LI> <B>Volume descriptor:</b><BR>
+ It is located from 00:02:16 (FAD=166=A6H) on the CD.<BR>
+ (Typically 2 seconds and 16 frames from the beginning of the final session)</P>
+<P><LI> <B>Path table:</b><BR>
+ A collection of path table records. The size and address of the path table are recorded in the volume descriptor.</P>
+<P><LI> <B>Path table record:</b><BR>
+ Supports one directory (root, sub).<BR>
+ The position of the record becomes the directory number. (1~n)<BR>
+ Directory information is written in a directory block.</P>
+<P><LI> <B>Directory block:</b><BR>
+ A collection of directory records. Treats a directory block as one file.<BR>
+ (directory file)</P>
+<P><LI> <B>Directory record:</b><BR>
+ Supports one file (including directory).</P>
+</UL>
+<A NAME="no6_20"></A><P><DT><H2> 6.2 CD Block File System Features</H2><DD> The CD block file system (hereinafter abbreviated as file system) has the following functions. (Available only for GAME-CD)</P>
+<A NAME="no6_21"></A><P><DT> <B>(1) Directory movement (CDC_ChgDir) and file information retention (CDC_ReadDir)</b><DD> Move to the specified directory and keep the file information in that directory in the file information table inside the CD block.</P>
+<A NAME="no6_22"></A><P><DT> <B>(2) Acquisition of retained file information (CDC_GetFileScope, CDC_TgetFileInfo)</b><DD> Gets the range of file information held and extracts the contents of the file information table.</P>
+<A NAME="no6_23"></A><P><DT> <B>(3) Reading the file (CDC_ReadFile)</b><DD> Reads the file's sector data into the CD buffer based on the stored file information. The host can retrieve the read sector data by data transfer.</P>
+<A NAME="no6_24"></A><P><DT> <B>(4) Abort file access (CDC_AbortFile)</b><DD> Stops moving directories, preserving file information, and loading files. When you perform abort file access, CD Block pauses the CD drive.</P>
+<A NAME="z6_2"></A><P ALIGN=CENTER> <B>Figure 6.2 Structure of CD block file system</b><BR>
+<img srcset="../grp/i080_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no6_2_10"></A><P><DT><H3> 6.2.1 File information retention method</H3><DD> The CD block prepares a file information table for 256 pieces and holds the file information to be accessed.<BR>
+ The first two entries in this table always contain information about the current directory (self) and parent directory. Up to 254 general file information can be held. (The number cannot be specified.)</P>
+<A NAME="no6_2_11"></A><P><DT> <B>(1)Move directory</b><DD> When moving a directory, the directory record is read, file information (12 bytes) is extracted and stored in a table. The range to keep is from the beginning of the directory block.</P>
+<A NAME="no6_2_12"></A><P><DT> <B>(2) Retention of file information (specifying the range to be retained)</b><DD> You can specify a file identifier to retain file information from any location within the current directory. In this case as well, the first two pieces of the table will hold information for yourself and the parent.</P>
+<A NAME="no6_2_20"></A><P><DT><H3> 6.2.2 File access procedures</H3><A NAME="no6_2_21"></A><P><DT> <B>(1) Move to root directory</b><DD> To use the file system, you must first create a file information table by navigating to the root directory. The same applies when file information is cleared, such as when starting up or replacing a disk.<BR>
+ If the disk is not in ISO9660 format (standard identifier is “CD001”), the table will not be created and the file system will not be usable. To check the table creation results, try retrieving the retained file information range. If it cannot be created, it will be REJECT.</P>
+<A NAME="no6_2_22"></A><P><DT> <B>(2) Retention of file information</b><DD> A file system can only access files and directories in the file information table. Before you can load files, move directories, or retrieve retained file information, you must retain file information. If the target file information is not retained, the result will be REJECT.</P>
+<A NAME="no6_2_23"></A><P><DT> <B>(3) Loading files</b><DD> Reads a file by specifying the file identifier and offset (in sectors). The load destination selector is specified by the aperture number.</P>
+<A NAME="no6_2_24"></A><P><DT> <B>(4) Extracting sector data</b><DD> Files read into the buffer section are transferred and retrieved by retrieving sector data (e.g. CDC_GetSctData). You can retrieve data even while it is being loaded, and there is no need to wait for it to finish loading.<BR>
+ If the CD buffer becomes full in the middle of a file, it will pause, and when it becomes free, it will unpause and read the rest of the file.</P>
+<A NAME="no6_2_25"></A><P><DT> <B>(5) End of file reading</b><DD> When the file has been read, the EFLS flag in the interrupt factor register becomes 1. To stop reading a file, execute Stop File Access. (The same applies when accessing files by moving directories or retaining file information.)</P>
+<A NAME="no6_2_30"></A><P><DT><H3> 6.2.3 File system notes</H3><A NAME="no6_2_31"></A><P><DT> <B>(1) Specifying the work selector</b><DD> When reading file information, CD block requires a selector to work with. Specify one selector when moving directories or preserving file information. At this time, at least one free sector is required. After the process is finished, the unused sectors will be erased.<P/>
+<A NAME="no6_2_32"></A><P><DT> <B>(2) Selector settings</b><DD> When accessing a file, the file system makes the following settings for the selector:</P>
+<P><DD><OL TYPE=a>
+<B><LI></b> Connection status of specified aperture<UL TYPE="DISK">
+<LI> Aperture input connector: Connects to a CD device.<LI> True output connector: Connects to a buffer section with the same number.<LI> False output connector: Separate from other selectors.</UL>
+</P>
+<P><B><LI></b> Aperture conditions<DT> <B>Table 6.1 Aperture conditions to be set</b><DT><TABLE BORDER=1>
+<TR><th><pre> motion</th><th><pre> Aperture conditions</th></TR>
+<TR><td><pre> Move directory</td><td rowspan=2><pre> -Set the aperture frame address range.<BR>&#12539; Enable frame address range for aperture mode.</td></TR>
+<TR><td><pre> Retaining file information</td></TR>
+<TR><td><pre> Load file</td><td><pre> -Set the aperture frame address range (FAD range).<BR>&#12539; Set the file number (FN) for the aperture subheader condition.<BR>&#12539; Enable FAD range and FN selection in aperture mode.</td></TR>
+</table>
+</P>
+<P><B><LI></b> Buffer compartment connected to aperture<BR>
+ Clear sectors of the buffer partition before file access.</P>
+</OL>
+<A NAME="no6_2_33"></A><P><DT> <B>(3)CD playback range and drive commands</b><DD> When accessing a file, the playback range will be the default value (from the beginning to the end of the disc).<BR>
+ Drive commands (CD playback, pause, etc.) are executed as is even if the file system is running. Please be careful as it is possible to interfere with the operation of the file system.<BR>
+ The settings made by CD block initialization (CDC_CdInit) (ECC count, retry count, etc.) are valid even when accessing files.<BR>
+ Automatic pause/unpause when the buffer is full also works as usual.</P>
+<A NAME="no6_2_34"></A><P><DT> <B>(4) Termination and cancellation of file access</b><DD> When you finish or abort file access, the EFLS flag becomes 1. File access is also canceled when the tray is opened.<BR>
+ If a directory is being moved or file information is being retained, if file access is stopped, the file information table will be destroyed (initialized) and no information will be entered.</P>
+<A NAME="no6_2_35"></A><P><DT> <B>(5) For multi-session</b><DD> The file system refers to the last session's volume descriptor.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p05_10.htm">Back</a> ｜ <A HREF="p07_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#sysg_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD communication I/F (CD part)</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

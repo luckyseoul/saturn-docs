@@ -1,0 +1,160 @@
+<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 7/ 8&gt;FAQ/SGLプログラミング関連</TITLE>
+</HEAD>
+<BODY>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#sgl">FAQ</A>
+★<A HREF="index.htm#PRE">SGLプログラミング関連</A>
+<HR>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+<A HREF="p08_10.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>FAQ/SGLプログラミング関連</B>
+<H2 ALIGN=CENTER>ペリフェラル/SMPC</H2>
+<HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_01"><HR></A><DL>
+<H3>マウスを使用したい。</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>SGLでマウスを使用したいのですが、デジタルデバイスデータ型のように、
+      ポインティングデバイスデータ型を見つけることができませんでした。<BR>
+      SGLでマウスを使用したい場合は、どうすれば良いのでしょうか？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>PerPointという構造体が用意されています。この構造体を使うとマウス等の
+      ポインティングデバイスのペリフェラル情報を取得できます。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_02"><HR></A><DL>
+<H3>SATURNのペリフェラルポート2のデータを取得するには？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>コントローラ1をコントローラ2に変更して動作しようと試みたのですが
+      動きませんでした。<BR>
+      どうすればコントローラ2でも動作するのでしょうか？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SGLのSmpc_Peripheral構造体でのペリフェラルデータのアサインは、</P>
+<DD><PRE>
+0 :SATURNのポート1番又は、ポート1番に接続されているマルチタップの1番
+|
+5 :ポート1番のマルチタップの6番
+|   (予約)
+14:ポート1番のマルチタップの15番
+
+15:SATURNのポート2番又は、ポート2番に接続されているマルチタップの1番
+|
+19:ポート2番のマルチタップの6番
+|   (予約)
+29:ポート2番のマルチタップの15番
+</PRE></P>
+      になります。
+
+<!--あ1997-04-14 「刺さっ」→「接続され」-->
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_03"><HR></A><DL>
+<H3>接続ペリフェラルの種類を判別したいのですが？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>接続ペリフェラルの種類を判別したいのですが？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SGLのもっている変数Smpc_peripheralの構造体メンバー"id"を参照して
+      判別します。( 参照例 ：Smpc_peripheral[0].id )<BR>
+      ここにどのような値が入っているかを調べることで、接続デバイスの
+      種類を特定できます。</P>
+
+<P>      ペリフェラルデータ自体は、デバイスの種類によらず同じ変数で参照します。
+      デジタルデバイス以外については、種類に応じてキャストして使用してください。</P>
+
+<P><DD><TABLE BORDER=1>
+<TR><TD>PerAnalog：</TD><TD><PRE>レーシングコントローラー、ミッションスティック 用</TD></TR>
+<TR><TD>PerPoint：</TD><TD><PRE>マウス用</TD></TR>
+<TR><TD>PerKeyBoard：</TD><TD><PRE>キーボード用</TD></TR>
+</TABLE></P>
+
+<P><DT><B>補足1</B>
+<DD>デバイスの判別には、sl_def.hにて次の値が定義済みですので参考にして
+       ください。</P>
+<P><DD><PRE>
+PER_ID_StnPad           0x02  /* サターン標準パッド               */
+PER_ID_StnLacing        0x13  /* サターンレーシングコントローラー */
+PER_ID_StnAnalog        0x15  /* サターンアナログジョイスティック */
+PER_ID_StnKeyBoard      0x34  /* サターンキーボード               */
+PER_ID_MD3BtnPad        0xe1  /* メガドライブ3ボタンパッド       */
+PER_ID_MD6BtnPad        0xe2  /* メガドライブ6ボタンパッド       */
+PER_ID_ShuttleMouse     0xe3  /* シャトルマウス                   */
+PER_ID_NotConnect       0xff  /* 未接続                           */
+</PRE></P>
+
+<P><DT><B>補足2</B>
+<DD>「マルチコントローラー」のペリフェラルIDは、0x16になります。<BR>
+         使用するには、次の構造体を用意してください。</P>
+<P><DD><PRE>
+typedef struct {            /* マルコン     */
+  Uint8   id;         /* ペリフェラルID       */
+  Uint8   ext;        /* 拡張データサイズ     */
+  Uint16  data;       /* ボタン現在データ     */
+  Uint16  push;       /* ボタン押下データ     */
+  Uint16  pull;       /* ボタン引上データ     */
+  Uint8   x;          /* X軸データ絶対値      */
+  Uint8   y;          /* Y軸データ絶対値      */
+  Uint8   r;          /* R軸データ絶対値      */
+  Uint8   l;          /* L軸データ絶対値      */
+  Uint32  dummy2[3];  /* ダミー2              */
+} PerMultiControler;
+</PRE></P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_04"><HR></A><DL>
+<H3>セーブする際の時刻情報はどのように設定するのですか？</H3>
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>セーブする際の時刻情報はどのように設定するのですか？</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>時刻情報は、SGLの持つ変数の Smpc_Status-&gt;rtc を参照することで
+      取得します。rtc は、SmpcDateTime構造体としてアクセスします。<BR>
+      通常この値は、slInitSystemが最後に実行された時の値が保持されています。<BR>
+      最新の時刻情報を取得したい場合は、slGetStatus()関数を実行してから
+      2フレームの後に再度参照してください。<BR>
+      取得した時刻データをセーブデータに反映させるには、BUP_SetDate()関数を
+      使用してください。</P>
+
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no7_05"><HR></A><DL>
+<H3>バックアップの日付が異なった値として返ってくる。</H3>
+<!--あ1997-04-14「帰」→「返」-->
+
+<P><DT><FONT SIZE=5>Ｑ)</FONT>
+<DD>BUP_SetDate()で時間データを圧縮し,BUP_GetDate()で時間データを展開し
+      てみると、データによって時間データが変化してしまいます。<BR>原因を
+      教えてください。</P>
+
+<P><DT><FONT SIZE=5>Ａ)</FONT>
+<DD>SGLのマニュアルにあるバックアップのサンプルプログラムには、
+      バグがあります。現在提供しているSGLに附属のサンプルはバグ修正された
+      ものです。<BR>具体的にバグの内容を説明すると、
+      dayメンバの指定をHexで設定しています。(本当は、BCDでなくてはいけません。)<BR>
+      そのため、実際より12日多く登録している可能性があります。</P>
+</DL>
+<HR NOSHADE>
+<B>▲
+<A HREF="p06_10.htm">戻る</A>｜
+<A HREF="p08_10.htm">進む</A>▼</B>
+<HR>
+<A HREF="../../index.htm"><IMG SRC="../../what/dosei.gif" BORDER=0 ALIGN="MIDDLE"></A>
+★<A HREF="../index.htm#sgl">FAQ</A>
+★<A HREF="index.htm#PRE">SGLプログラミング関連</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD,. 1997</ADDRESS>
+</BODY>
+</HTML>

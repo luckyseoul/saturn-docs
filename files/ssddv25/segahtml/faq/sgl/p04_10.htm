@@ -1,0 +1,49 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 4/ 8&gt;FAQ/SGL programming related</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#SLAVE">SGL programming related</a><HR>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>FAQ/SGL programming related</b><H2 ALIGN=CENTER> slave CPU</H2><HR NOSHADE>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_01"><HR></a><DL>
+<H3> I want to use a slave CPU.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I want to use a slave CPU, but I don't know how to specify it.</P>
+<P><DD> <B>void slSlaveFunc(void (*func)() , void *par)</b><P><DD> What does void *par in the above function mean?<BR>
+ Also, is it necessary to turn slave SH2 ON/OFF before and after this function?<BR>
+ Also, please tell me how to notify the main that the slave's processing has finished, and how to issue a command on the main to forcibly terminate the slave's processing.</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> The slave CPU is turned on and off within this function, so it is not necessary. Also, the argument par is a pointer to the argument list to the registration function.</P>
+</DL>
+<!----------------------------------------------------------------------------->
+<A NAME="no4_02"><HR></a><DL>
+<H3> I want to execute SGL functions on the slave.</H3><P><DT> <FONT SIZE=5>Q)</font><DD> I would like to have the slave side handle the sound, but is there anything I should be careful about?</P>
+<P><DT> <FONT SIZE=5>A)</font><DD> SGL functions are not designed to operate on the slave side.</P>
+<P> One of the causes is gbr. In the SGL system, gbr is used as the start address of the system variable area, and data is read and written from there using relative loading.<BR>
+ However, currently nothing is set in gbr, so it will not work as is.<BR>
+ So, it doesn't mean that it will work if you set gbr. This is a problem that depends on each CPU's cache. Data updated on the other CPU must be retrieved using a cache-through address, but SGL functions are not designed to retrieve that data using a cache-through address. Since SGL is running on each other's CPUs, the problem of system variable consistency is considered to be very large, so we cannot guarantee that it will work properly.</P>
+<P> For the above reasons, avoid using SGL functions in slaves. SGL<!--SATURN あ1997-04-14 -->
+ Think of the basic slave position as being for calculation (geometry engine).</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p03_10.htm">Back</a> ｜ <A HREF="p05_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../index.htm"><img srcset="../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../index.htm#sgl">FAQ</a> ★ <A HREF="index.htm#SLAVE">SGL programming related</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

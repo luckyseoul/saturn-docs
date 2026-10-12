@@ -1,0 +1,221 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 5/ 8&gt; Branch playback library/5.Basic program</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no5">Branch playback library</a><HR>
+ <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>Branch playback library</b><H2 ALIGN=CENTER> 5.Basic program</H2><HR NOSHADE>
+<DL>
+<A NAME="no5_10"></A><P><DT><H3> 5.1 Scenario processing</H3><DD> Figure 5.1 shows an example scenario for branch playback.</P>
+<A NAME="z5_1"></A><P ALIGN=CENTER> <B>Figure 5.1 Example scenario for branch playback</b><BR>
+<img srcset="../grp/i009_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<P><DD> The A button is pressed while playing BSTM1.MPG → After playing BSTM1.MPG, BSTM2.MPG will be played.<DD> The B button is pressed while playing BSTM1.MPG → After playing BSTM1.MPG, BSTM3.MPG will be played.</P>
+<P><DD> An example program that sets up this scenario is shown below.</P>
+<DT><HR>
+<!-- +++ Update by CRI ：1.5 -->
+<PRE>
+#define BSTM_MAX 3 /* Total number of branch streams
+
+                             (BSTM1.MPG, BSTM2.MPG, BSTM3.MPG) */
+
+#define BRANCH_MAX 2 /* Total number of branches (number of arrows in Figure 5.1) */
+
+#define KEY_MAX 2 /* Total number of stream key types */
+
+#define A_BTN 0 /* A button branch number */
+
+#define B_BTN 1 /* B button branch number */
+
+#define BR_NUM 2 /* Number of branches per stream */
+
+#define BSTM1_ID 0 /* BSTM1.MPG branch stream identifier */
+
+#define BSTM2_ID 1 /* BSTM2.MPG branch stream identifier */
+
+#define BSTM3_ID 2 /* Branch stream identifier of BSTM3.MPG */
+
+
+
+/* Branch playback library work area */
+
+Sint32 work_bpl[BPL_WORK_SIZE(BSTM_MAX, BRANCH_MAX, KEY_MAX)/sizeof(Sint32)];
+
+
+
+void setScenario(void)
+
+{
+
+     StmKey key[KEY_MAX]; /* Area for setting stream key */
+
+     Sint32 brtbl[BR_NUM]; /* Area for setting branch destination */
+
+     Sint32 fid; /* File identifier */
+
+
+
+     /* Initialize branch playback */
+
+     BPL_Init(BSTM_MAX, BRANCH_MAX, KEY_MAX, work_bpl);
+
+
+
+     /* Setting branch stream information */
+
+     STM_KEY_CN(key + 0) = STM_KEY_CIMSK(key + 0) = STM_KEY_NONE;
+
+     STM_KEY_CN(key + 1) = STM_KEY_CIMSK(key + 1) = STM_KEY_NONE;
+
+     STM_KEY_SMMSK(key + 0) = STM_KEY_SMVAL(key + 0) = STM_SM_VIDEO;
+
+     STM_KEY_SMMSK(key + 1) = STM_KEY_SMVAL(key + 1) = STM_SM_AUDIO;
+
+     fid = GFS_NameToId("BSTM1.MPG");
+
+     BPL_SetStmInfo(BSTM1_ID, fid, KEY_MAX, key);
+
+     fid = GFS_NameToId("BSTM2.MPG");
+
+     BPL_SetStmInfo(BSTM2_ID, fid, KEY_MAX, key);
+
+     fid = GFS_NameToId("BSTM3.MPG");
+
+     BPL_SetStmInfo(BSTM3_ID, fid, KEY_MAX, key);
+
+
+
+     /* Setting branch destination information */
+
+     brtbl[A_BTN] = BSTM2_ID; /* Branch to BSTM2.MPG when A button is pressed */
+
+     brtbl[B_BTN] = BSTM3_ID; /* Branch to BSTM3.MPG when B button is pressed */
+
+     BPL_SetBranchInfo(BSTM1_ID, BR_NUM, brtbl); /* Setting the branch destination of BSTM1.MPG */
+
+}</PRE><!-- --- Update by CRI ：1.5 -->
+<HR>
+</P>
+<A NAME="no5_20"></A><P><DT><H3> 5.2 Branch playback processing</H3><DD> An example program for branch playback is shown below. (See <B><A HREF=#no5_1">5.1</a></b> for scenario)<DT><HR><!-- --- Update by CRI ：1.6 --><PRE>
+ Sint32 work_gfs[GFS_WORK_SIZE(BSTM_MAX*KEY_MAX)/sizeof(Sint32)];
+
+Sint32 work_stm[STM_WORK_SIZE(GRP_MAX, BSTM_MAX*KEY_MAX)/sizeof(Sint32)];
+
+Sint32 brno; /* branch number */
+
+StmHn stmtbl[KEY_MAX]; /* Table of stream handles */
+
+Sint32 bpl_stat; /* Branch playback status */
+
+Sint32 decode_stat; /* Decoder operating status */
+
+DecodeHn dc_hn = NULL; /* Decoder handle */
+
+Bool chgsw = OFF; /* Branch execution switch */
+
+Bool endflag = FALSE;
+
+Sint32 ret;
+
+
+
+/* Initialize each library */
+
+GFS_Init(...); /* Initialize the file system */
+
+STM_Init(...); /* Initialize the stream system */
+
+initDecoder(); /* Initialize the decoder */
+
+setScenario(); /* Set scenario (see 5.1) */
+
+
+
+/* Branch playback */
+
+BPL_SetStart(BSTM1_ID); /* Specify playback start stream */
+
+BPL_GetCurStm(KEY_MAX, stmtbl); /* Get first branch stream */
+
+dc_hn = createDecodeHn(stmtbl); /* Create decoder handle */
+
+while (endflag == FALSE) {
+
+     bpl_stat = BPL_ExecServer(chgsw); /* Execute branch playback server */
+
+     chgsw = OFF;
+
+     STM_ExecServer(); /* Execute stream server */
+
+     decode_stat = execDecoder(dc_hn); /* Execute decoder server function */
+
+
+
+     switch (bpl_stat) {
+
+     case BPL_SVR_COMPLETED: /* Branch playback completion status */
+
+         endflag = TRUE;
+
+         break;
+
+     case BPL_SVR_WAITSEL: /* Waiting for branch destination selection */
+
+         /* Get pad input (0: A button, 1: B button, if negative: no input */
+
+         brno = getPadEvent();
+
+         if (brno >= 0) {
+
+             BPL_SelectBranch(brno); /* Select branch destination */
+
+         }
+
+         break;
+
+     case BPL_SVR_SELECT: /* Branch destination determination state */
+
+     case BPL_SVR_NOBRN: /* No branch destination */
+
+         if (decode_stat != COMPLETED) { /* Check for decoding completion */
+
+             break;
+
+         }
+
+         chgsw = ON; /* Branch execution switch ON */
+
+         ret = BPL_GetNextStm(KEY_MAX, stmtbl); /* Get branch destination stream */
+
+         if (ret >= 0) { /* If there is a branch destination */
+
+             destroyDecodeHn(dc_hn); /* Erase the decoder handle */
+
+             dc_hn = createDecodeHn(stmtbl); /* Create decoder handle */
+
+         }
+
+         break;
+
+     }
+
+}
+
+destroyDecodeHn(dc_hn); /* Erase the decoder handle */</PRE><!-- --- Update by CRI ：1.6 --><HR><P><P><DD> The branch playback library automatically opens and closes streams using the stream system. For decoders, please refer to each library's manual.</P></DL><HR NOSHADE> <B>▲ <A HREF="p04_10.htm">Back</a> ｜ <A HREF="p06_10.htm">Forward</a> ▼</b><HR><A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#prg1_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm#no5">Branch playback library</a><HR><ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS></BODY></HTML>

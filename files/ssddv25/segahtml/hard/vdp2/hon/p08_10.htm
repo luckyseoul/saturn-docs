@@ -1,0 +1,167 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;53/86&gt;VDP2 User's Manual/8.1 Window Area</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no8">VDP2 User's Manual</a><HR>
+ <B>▲ <A HREF="p07_20.htm">Back</a> ｜ <A HREF="p08_11.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP2 User's Manual/Chapter 8 Window</b><HR NOSHADE>
+<DL>
+<P><DT><H2> ■8.1 Window area</H2><DD> The scroll IC windows have two normal windows (W0, W1) and one sprite window (SW). The normal window is specified by the start and end point coordinates on the TV screen, and the sprite window is specified by the value of the most significant bit of the sprite data written to the frame buffer. For each window, you can specify which scroll screen to enable, and whether to enable the inner or outer area. Additionally, if multiple windows are enabled, they can be stacked using AND or OR logic.</P>
+<P><DD> You can select either a normal rectangular window, which is specified by horizontal and vertical start and end coordinates, or a normal line window, which specifies horizontal start and end coordinates for each line. For the start point coordinates and end point coordinates, set the coordinate values on the TV screen, not the coordinate values on the scroll screen, in each register.</P>
+<A NAME="no8_11"></A><P><DT><H3> ●Normal rectangular window</H3><DD> A normal rectangular window can be obtained by specifying the start point coordinates of the upper left corner and the end point coordinates of the lower right corner of the window in the window position register. The area surrounded by the specified coordinates is inside, and the other area is outside. The window border is considered internal.<BR>
+ If the start point coordinates are larger than the end point coordinates in either the horizontal or vertical direction, the entire screen is considered to be the area outside the window.<BR>
+ A normal rectangular window is shown in Figure 8.1.</P>
+<A NAME="z8_1"></A><P ALIGN=CENTER> <B>Figure 8.1 Normal rectangular window</b><BR>
+<img srcset="../grp/i180_01.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+<A NAME="no8_12"></A><P><DT><H3> ●Window position register</H3><DD> The window position register specifies the horizontal and vertical start and end coordinates of a normal window. This is a 16-bit write-only register located at addresses 1800C0H to 1800CEH. The value is cleared to 0 after power-on or reset, so be sure to set it. </P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WPSX0_"></A><P><DD> <B><FONT SIZE=5>WPSX0</font> <FONT SIZE=4>1800C0H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#W0SX_">W0SX9</a></TH><TH><PRE> <A HREF="#W0SX_">W0SX8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#W0SX_">W0SX7</a></TH><TH><PRE> <A HREF="#W0SX_">W0SX6</a></TH><TH><PRE> <A HREF="#W0SX_">W0SX5</a></TH><TH><PRE> <A HREF="#W0SX_">W0SX4</a></TH><TH><PRE> <A HREF="#W0SX_">W0SX3</a></TH><TH><PRE> <A HREF="#W0SX_">W0SX2</a></TH><TH><PRE> <A HREF="#W0SX_">W0SX1</a></TH><TH><PRE> <A HREF="#W0SX_">W0SX0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WPSY0_"></A><P><DD> <B><FONT SIZE=5>WPSY0</font> <FONT SIZE=4>1800C2H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#W0SY_">W0SY9</a></TH><TH><PRE> <A HREF="#W0SY_">W0SY8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#W0SY_">W0SY7</a></TH><TH><PRE> <A HREF="#W0SY_">W0SY6</a></TH><TH><PRE> <A HREF="#W0SY_">W0SY5</a></TH><TH><PRE> <A HREF="#W0SY_">W0SY4</a></TH><TH><PRE> <A HREF="#W0SY_">W0SY3</a></TH><TH><PRE> <A HREF="#W0SY_">W0SY2</a></TH><TH><PRE> <A HREF="#W0SY_">W0SY1</a></TH><TH><PRE> <A HREF="#W0SY_">W0SY0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WPEX0_"></A><P><DD> <B><FONT SIZE=5>WPEX0</font> <FONT SIZE=4>1800C4H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#W0EX_">W0EX9</a></TH><TH><PRE> <A HREF="#W0EX_">W0EX8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#W0EX_">W0EX7</a></TH><TH><PRE> <A HREF="#W0EX_">W0EX6</a></TH><TH><PRE> <A HREF="#W0EX_">W0EX5</a></TH><TH><PRE> <A HREF="#W0EX_">W0EX4</a></TH><TH><PRE> <A HREF="#W0EX_">W0EX3</a></TH><TH><PRE> <A HREF="#W0EX_">W0EX2</a></TH><TH><PRE> <A HREF="#W0EX_">W0EX1</a></TH><TH><PRE> <A HREF="#W0EX_">W0EX0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WPEY0_"></A><P><DD> <B><FONT SIZE=5>WPEY0</font> <FONT SIZE=4>1800C6H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#W0EY_">W0EY9</a></TH><TH><PRE> <A HREF="#W0EY_">W0EY8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#W0EY_">W0EY7</a></TH><TH><PRE> <A HREF="#W0EY_">W0EY6</a></TH><TH><PRE> <A HREF="#W0EY_">W0EY5</a></TH><TH><PRE> <A HREF="#W0EY_">W0EY4</a></TH><TH><PRE> <A HREF="#W0EY_">W0EY3</a></TH><TH><PRE> <A HREF="#W0EY_">W0EY2</a></TH><TH><PRE> <A HREF="#W0EY_">W0EY1</a></TH><TH><PRE> <A HREF="#W0EY_">W0EY0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WPSX1_"></A><P><DD> <B><FONT SIZE=5>WPSX1</font> <FONT SIZE=4>1800C8H</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#W1SX_">W1SX9</a></TH><TH><PRE> <A HREF="#W1SX_">W1SX8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#W1SX_">W1SX7</a></TH><TH><PRE> <A HREF="#W1SX_">W1SX6</a></TH><TH><PRE> <A HREF="#W1SX_">W1SX5</a></TH><TH><PRE> <A HREF="#W1SX_">W1SX4</a></TH><TH><PRE> <A HREF="#W1SX_">W1SX3</a></TH><TH><PRE> <A HREF="#W1SX_">W1SX2</a></TH><TH><PRE> <A HREF="#W1SX_">W1SX1</a></TH><TH><PRE> <A HREF="#W1SX_">W1SX0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WPSY1_"></A><P><DD> <B><FONT SIZE=5>WPSY1</font> <FONT SIZE=4>1800CAH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#W1SY_">W1SY9</a></TH><TH><PRE> <A HREF="#W1SY_">W1SY8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#W1SY_">W1SY7</a></TH><TH><PRE> <A HREF="#W1SY_">W1SY6</a></TH><TH><PRE> <A HREF="#W1SY_">W1SY5</a></TH><TH><PRE> <A HREF="#W1SY_">W1SY4</a></TH><TH><PRE> <A HREF="#W1SY_">W1SY3</a></TH><TH><PRE> <A HREF="#W1SY_">W1SY2</a></TH><TH><PRE> <A HREF="#W1SY_">W1SY1</a></TH><TH><PRE> <A HREF="#W1SY_">W1SY0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WPEX1_"></A><P><DD> <B><FONT SIZE=5>WPEX1</font> <FONT SIZE=4>1800CCH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#W1EX_">W1EX9</a></TH><TH><PRE> <A HREF="#W1EX_">W1EX8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#W1EX_">W1EX7</a></TH><TH><PRE> <A HREF="#W1EX_">W1EX6</a></TH><TH><PRE> <A HREF="#W1EX_">W1EX5</a></TH><TH><PRE> <A HREF="#W1EX_">W1EX4</a></TH><TH><PRE> <A HREF="#W1EX_">W1EX3</a></TH><TH><PRE> <A HREF="#W1EX_">W1EX2</a></TH><TH><PRE> <A HREF="#W1EX_">W1EX1</a></TH><TH><PRE> <A HREF="#W1EX_">W1EX0</a> </TH></TR>
+</TABLE>
+</P>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<A NAME="WPEY1_"></A><P><DD> <B><FONT SIZE=5>WPEY1</font> <FONT SIZE=4>1800CEH</font></b><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   15   </TD><TD><PRE>   14   </TD><TD><PRE>   13   </TD><TD><PRE>   12   </TD><TD><PRE>   11   </TD><TD><PRE>   10   </TD><TD><PRE>   09   </TD><TD><PRE>   08   </TD></TR>
+<TR><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> -</TH><TH><PRE> <A HREF="#W1EY_">W1EY9</a></TH><TH><PRE> <A HREF="#W1EY_">W1EY8</a></TH></TR>
+</TABLE>
+<P><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD><PRE>   07   </TD><TD><PRE>   06   </TD><TD><PRE>   05   </TD><TD><PRE>   04   </TD><TD><PRE>   03   </TD><TD><PRE>   02   </TD><TD><PRE>   01   </TD><TD><PRE>   00   </TD></TR>
+<TR><TH><PRE> <A HREF="#W1EY_">W1EY7</a></TH><TH><PRE> <A HREF="#W1EY_">W1EY6</a></TH><TH><PRE> <A HREF="#W1EY_">W1EY5</a></TH><TH><PRE> <A HREF="#W1EY_">W1EY4</a></TH><TH><PRE> <A HREF="#W1EY_">W1EY3</a></TH><TH><PRE> <A HREF="#W1EY_">W1EY2</a></TH><TH><PRE> <A HREF="#W1EY_">W1EY1</a></TH><TH><PRE> <A HREF="#W1EY_">W1EY0</a></TH></TR>
+</TABLE>
+</P>
+<A NAME="W0SX_">　</A><A NAME="W0EX_">　</A><A NAME="W1SX_">　</A><A NAME="W1EX_">　</A><DT><B>Window position bit (for horizontal coordinates)</b> : Window start/end X bit<DD> (W0SX9〜W0SX0, W0EX9〜W0EX0, W1SX9〜W1SX0, W1EX9〜W1EX0)<BR>
+ Specify the horizontal start and end coordinates. The specified coordinate values are the coordinate values (H counter value) on the TV screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> W0SX9〜W0SX0</TD><TD> 1800C0H</TD><TD> Bits 9-0</TD><TD> For W0 starting point coordinates</TD></TR>
+<TR><TD> W0EX9〜W0EX0</TD><TD> 1800C4H</TD><TD> Bits 9-0</TD><TD> For W0 end point coordinates</TD></TR>
+<TR><TD> W1SX9～W1SX0</TD><TD> 1800C8H</TD><TD> Bits 9-0</TD><TD> For W1 starting point coordinates</TD></TR>
+<TR><TD> W1EX9～W1EX0</TD><TD> 1800CCH</TD><TD> Bits 9-0</TD><TD> For W1 end point coordinates</TD></TR>
+</TABLE>
+</P>
+<P><DD> The bit configuration of the register changes depending on the graphics mode setting. In the case of normal graphics, the least significant bit is invalid data. In the case of dedicated normal graphics, the most significant bit is invalid data. In addition, in the case of dedicated high-resolution graphics, the most significant bit is invalid data, and since there is no bit for H0, the value is in units of 2 pixels.<BR>
+ Table 8.1 shows the bit contents of the window position register depending on the graphic mode setting.</P>
+<A NAME="t8_1"></A><P><DD> <B>Table 8.1 Bit contents of window position register for horizontal coordinates</b><DD><TABLE BORDER>
+<TR><TD> graphic<BR>
+ mode</TD><TD> WxxX9</TD><TD> WxxX8</TD><TD> WxxX7</TD><TD> WxxX6</TD><TD> WxxX5</TD><TD> WxxX4</TD><TD> WxxX3</TD><TD> WxxX2</TD><TD> WxxX1</TD><TD> WxxX0</TD></TR>
+<TR><TD> normal</TD><TD> H8</TD><TD> H7</TD><TD> H6</TD><TD> H5</TD><TD> H4</TD><TD> H3</TD><TD> H2</TD><TD> H1</TD><TD> H0</TD><TD> invalid</TD></TR>
+<TR><TD> high resolution</TD><TD> H9</TD><TD> H8</TD><TD> H7</TD><TD> H6</TD><TD> H5</TD><TD> H4</TD><TD> H3</TD><TD> H2</TD><TD> H1</TD><TD> H0</TD></TR>
+<TR><TD> exclusive<BR>
+ normal</TD><TD> invalid</TD><TD> H8</TD><TD> H7</TD><TD> H6</TD><TD> H5</TD><TD> H4</TD><TD> H3</TD><TD> H2</TD><TD> H1</TD><TD> H0</TD></TR>
+<TR><TD> exclusive<BR>
+ high resolution</TD><TD> invalid</TD><TD> H9</TD><TD> H8</TD><TD> H7</TD><TD> H6</TD><TD> H5</TD><TD> H4</TD><TD> H3</TD><TD> H2</TD><TD> H1</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is 0S, 0E, 1S, or 1E.</P>
+<A NAME="W0SY_">　</A><A NAME="W0EY_">　</A><A NAME="W1SY_">　</A><A NAME="W1EY_">　</A><P><DT><B>Window position bit (for vertical coordinates)</b> : Window start/end Y bit<DD> (W0SY8〜W0SY0, W0EY8〜W0EY0, W1SY8〜W1SY0, W1EY8〜W1EY0)<BR>
+ Specify the vertical start and end coordinates. The specified coordinate values are the coordinate values (V counter values) on the TV screen.</P>
+<P><DD><TABLE BORDER>
+<TR><TD> W0SY8〜W0SY0</TD><TD> 1800C2H</TD><TD> bits 8-0</TD><TD> For W0 starting point coordinates</TD></TR>
+<TR><TD> W0EY8〜W0EY0</TD><TD> 1800C6H</TD><TD> bits 8-0</TD><TD> For W0 end point coordinates</TD></TR>
+<TR><TD> W1SY8〜W1SY0</TD><TD> 1800CAH</TD><TD> bits 8-0</TD><TD> For W1 starting point coordinates</TD></TR>
+<TR><TD> W1EY8〜W1EY0</TD><TD> 1800CEH</TD><TD> bits 8-0</TD><TD> For W1 end point coordinates</TD></TR>
+</TABLE>
+</P>
+<P><DD> The bit configuration of the register changes depending on the screen mode setting. For single dense interlacing in normal and high-resolution modes, specify the V counter value for each even field and odd field. For double-dense interlacing in normal and high-resolution modes, the least significant bit is disabled, and the remaining bits specify the V counter value in each field.<BR>
+ Table 8.2 shows the bit contents of the window position register depending on the screen mode setting.</P>
+<A NAME="t8_2"></A><P><DD> <B>Table 8.2 Bit contents of window position register for vertical coordinates</b><DD><TABLE BORDER>
+<TR><TD> TV screen (interlaced)<BR>
+ mode</TD><TD> WxxY8</TD><TD> WxxY7</TD><TD> WxxY6</TD><TD> WxxY5</TD><TD> WxxY4</TD><TD> WxxY3</TD><TD> WxxY2</TD><TD> WxxY1</TD><TD> WxxY0</TD></TR>
+<TR><TD> Normal, high resolution<BR>
+ (Non-interlaced,<BR>
+ single dense interlace)</TD><TD> V8</TD><TD> V7</TD><TD> V6</TD><TD> V5</TD><TD> V4</TD><TD> V3</TD><TD> V2</TD><TD> V1</TD><TD> V0</TD></TR>
+<TR><TD> Normal, high resolution<BR>
+ (Double dense interlace)</TD><TD> V7</TD><TD> V6</TD><TD> V5</TD><TD> V4</TD><TD> V3</TD><TD> V2</TD><TD> V1</TD><TD> V0</TD><TD> invalid</TD></TR>
+<TR><TD> dedicated monitor</TD><TD> V8</TD><TD> V7</TD><TD> V6</TD><TD> V5</TD><TD> V4</TD><TD> V3</TD><TD> V2</TD><TD> V1</TD><TD> V0</TD></TR>
+</TABLE>
+<DD> <B>[Note]</b> xx in the bit name is 0S, 0E, 1S, or 1E.</P>
+<P><DT> <B>Window position vertical end point coordinate limit</b><DD> When using a normal window in double-dense interlace mode, do not set the value of the vertical end point coordinate window position register (WPEY0:1800C6H,WPEY:1800CEH) to "1FCH to 1FFH".<BR>
+ Entering these values will disable the window.</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p07_20.htm">Back</a> ｜ <A HREF="p08_11.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm#hard"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm#vdp2">HARDWARE Manual</a> ★ <A HREF="../index.htm#no8">VDP2 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

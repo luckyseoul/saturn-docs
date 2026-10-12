@@ -1,0 +1,91 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;12/22&gt;CD builder script syntax/3.4 Volume definition</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>CD Builder Script Grammar Manual</b><H2 ALIGN=CENTER> 3.4 Defining volumes</H2><HR NOSHADE>
+<DL>
+<P><DT> A volume descriptor set must be defined for the first track of the disk. This is called a volume descriptor track.</P>
+<DD><PRE>
+　　　　　：
+          Track  MODE1      ; 1st track number = volume descriptor track
+　　　　　　Volume  ISO9660  sample.PVD
+ 　　　        PrimaryVolume 0:2:16
+ 　              SystemIdentifier "identifier" ...
+ 　            EndPrimaryVolume
+               ：
+    　　    EndVolume
+            ：
+　　　　　EndTrack
+          ：
+</PRE></P>
+<P><DD>Information such as a system identifier and date are recorded in a volume descriptor to identify the volume, but these details are explained in "3.11 Definition of Volume Descriptor Information".</P>
+</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="4.1"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_4">one</a><BR> <A HREF="p03_10.htm#t3_1_4">View</a><BR> <A HREF="p03_10.htm#t3_1_4">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Starting volume definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> Volume</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 4.1</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> Volume voltype pvdfile<DT> <B>parameters</b><DD> voltype: Volume type (valid only for ISO9660)<DD> pvdfile: PVD file name (extension is "PVD")<DT> <B>function</b><DD> Begins defining a volume descriptor set.<DT> <B>remarks</b><DD> Be sure to specify the first track for volume definition.<BR>
+ The Sega Saturn Disc tool assumes that the base name of the PVD file and the disc image file are the same. Please use the same base name.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="4.2"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_4">one</a><BR> <A HREF="p03_10.htm#t3_1_4">View</a><BR> <A HREF="p03_10.htm#t3_1_4">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of volume definition</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndVolume</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 4.2</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndVolume<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finishes defining the volume descriptor set.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="4.3"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_4">one</a><BR> <A HREF="p03_10.htm#t3_1_4">View</a><BR> <A HREF="p03_10.htm#t3_1_4">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Start of base volume descriptor</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> PrimaryVolume</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 4.3</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> PrimaryVolume pos<DT> <B>parameters</b><DD> pos: Location on disk where the basic volume descriptor is recorded. Always specifies 00:02:16.<DT> <B>function</b><DD> Begins defining a base volume descriptor.<DT> <B>remarks</b><DD> Details of descriptor information are explained in "3.11 Definition of volume descriptor information".</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="4.4"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_4">one</a><BR> <A HREF="p03_10.htm#t3_1_4">View</a><BR> <A HREF="p03_10.htm#t3_1_4">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of base volume descriptor</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndPrimaryVolume</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 4.4</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndPrimaryVolume<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish defining the base volume descriptor.</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="4.5"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_4">one</a><BR> <A HREF="p03_10.htm#t3_1_4">View</a><BR> <A HREF="p03_10.htm#t3_1_4">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> Start of secondary volume descriptor</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> SupplementaryVolume</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 4.5</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> SupplementaryVolume pos<DT> <B>parameters</b><DD> pos: Location on the disk where the secondary volume descriptor is recorded Always specify 00:02:17.<DT> <B>function</b><DD> Begins defining the secondary volume descriptor.<DT> <B>remarks</b><DD> Details of descriptor information are explained in "3.11 Definition of volume descriptor information".</DL>
+<!-------------------------------------------------------------------------->
+<A NAME="4.6"><HR></a><DL>
+<P><TABLE BORDER=1>
+<TR><TD><PRE> <A HREF="p03_10.htm#t3_1_4">one</a><BR> <A HREF="p03_10.htm#t3_1_4">View</a><BR> <A HREF="p03_10.htm#t3_1_4">table</a></TD><TD WIDTH=100><PRE> Title<BR><H4> Command specifications</H4></TD><TD WIDTH=280><PRE> Command<BR><H4> End of secondary volume descriptor</H4></TD><TD WIDTH=200><PRE> Keyword<BR><H3> EndSupplementaryVolume</H3></TD><TD WIDTH=030><PRE> No<BR><H4> 4.6</H4></TD></TR>
+</TABLE>
+</P>
+<DT> <B>Format</b><DD> EndSupplementaryVolume<DT> <B>parameters</b><DD> none<DT> <B>function</b><DD> Finish defining the secondary volume descriptor.</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_10.htm">Back</a> ｜ <A HREF="p08_10.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../../index.htm"><img srcset="../../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../../index.htm#cdtl_">PROGRAMMER'S GUIDE</a> ★ <A HREF="../index.htm">CD Builder Script Grammar</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD. 1997</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,113 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 9/19&gt;SMPCユーザーズマニュアル/3.1◆INTBACコマンドの使用方法</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<B>▲<a href="p03_10_j.htm">戻る</A>｜
+     <a href="p03_12_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>SMPCユーザーズマニュアル/3.1　SMPCコントロールモード</B>
+<H2>◆INTBACコマンドの使用方法</H2>
+<HR NOSHADE>
+<DL>
+
+	<P>	<DD>　第2章でも説明したようにINTBACKコマンドには、以下の３種類の使用方法があります。</P>
+
+	<P>	<DD><OL>
+		<LI>SMPCステータスのみ取得する
+		<LI>SMPCステータス取得に続いて、ペリフェラルデータを取得する
+		<LI>ペリフェラルデータのみ取得する</OL></P>
+
+	<P>	<DD>　本章は、ペリフェラルコントロール機能を中心に説明を進めます。ここでは、<B>(2.)のSMPCステータス取得に続くペリフェラルデータの取得</B>と<B>(3.)のペリフェラルデータのみ取得</B>について説明します。</P>
+
+<A NAME="no3_11_01">
+	<P>	<DT><H3>　●SMPCステータス取得に続くペリフェラルデータを取得する方法</H4>
+		<DD>　INTBACKコマンドを使用してSMPCステータス取得に続いて、ペリフェラルデータを取得する手順を説明します。SMPCステータス取得までは２章で説明したので、ステータスデータ取得以降の手順を以下に示します。
+(<A HREF="#z3_3">図3.3</A>、<A HREF="#z3_4">図3.4</A>参照)</P>
+
+	<P>	<DD><OL>
+		<LI>コンティニュー要求またはブレイク要求(SH-2)<BR></P>
+
+	<P>	<LI>ペリフェラルデータ収集、リザルトパラメータ設定(SMPC)</P>
+
+	<P>	<LI>SMPC割り込み発生(SMPC)</P>
+
+	<P>	<LI>ペリフェラルデータ取得(SH-2)<BR>
+			<B>→</B>残りペリフェラルデータがあるときは<B>(1.)</B>の処理から繰り返す</P>
+
+	<P>	<LI>INTBACKコマンド終了</OL></P>
+
+<A NAME="no3_11_02">
+	<P>	<DT><H3>　●ペリフェラルデータのみ取得する方法</H3>
+		<DD>　INTBACKコマンドを使用してペリフェラルデータのみを取得する手順を以下に示します。
+(<A HREF="#z3_3">図3.3</A>、<A HREF="#z3_4">図3.4</A>参照)</P>
+
+	<P>	<DD><OL>
+		<LI>コマンドパラメータの設定(SH-2)<BR>
+			→<A HREF="#t3_3">表3.3</A>にコマンドパラメータの設定例を示します。</P>
+
+	<P>	<LI>INTBACKコマンド発行(SH-2)</P>
+
+	<P>	<LI>ペリフェラルデータ収集、リザルトパラメータ設定(SMPC)</P>
+
+	<P>	<LI>SMPC割り込み発生(SMPC)</P>
+
+	<P>	<LI>ペリフェラルデータ取得(SH-2)<BR>
+			→残りペリフェラルデータがない時、INTBACKコマンド終了(SMPC)</P>
+
+	<P>	<LI>コンティニュー要求またはブレイク要求(SH-2)</P>
+
+	<P>	<LI>コンティニュー要求したときは、<B>(3.)</B>の処理から繰り返す。</P>
+
+	<P>	<LI>INTBACKコマンド終了</OL></P>
+
+<A NAME="t3_3"></A>
+	<P>	<DD><B>表3.3　ペリフェラルデータのみ取得のコマンドパラメータ設定例</B>
+	<P>	<DT><B>　　IREG0　設定値=00H</B>
+		<DD>・日時、カートリッジコード、エリアコード、端子状態、SMEM、リセットボタンモードの各データを返さない 
+
+	<P>	<DT><B>　　IREG1　設定値=xxxx10x0B</B>(x=アプリケーションの仕様による)
+		<DD>・端子2モード(P2MD1,P2MD0)=アプリケーションの仕様による
+		<DD>・端子1モード(P1MD1,P1MD0)=アプリケーションの仕様による
+ 		<DD>・ペリフェラルデータイネーブル(PEN)=1B→ペリフェラルデータを返す
+		<DD>・ペリフェラル取得時間の最適化(OPE)=アプリケーションの仕様による
+
+	<P>	<DT><B>　　IREG2　設定値=F0H</B>
+		<DD>・無条件にF0Hを設定してください</P>
+
+	<P>	<DD>　(
+<a href="p02_40_j.htm#c2_01_ireg0">IREG0</A>,
+<a href="p02_40_j.htm#c2_01_ireg1">IREG1</A>,
+<a href="p02_40_j.htm#c2_01_ireg2">IREG2</A>は、
+<a href="p02_40_j.htm#c2_01">INTBACKコマンド</A>を参照してください)</P>
+
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p03_10_j.htm">戻る</A>｜
+     <a href="p03_12_j.htm">進む</A>▼</B>
+<HR>
+<a href="../../../index_j.htm"><img srcset="../../../what/dosei_j.png 5x" BORDER=0 ALIGN="MIDDLE"></A>
+★<a href="../../index_j.htm">HARDWARE Manual</A>
+★<a href="../index_j.htm">SMPCユーザーズマニュアル</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

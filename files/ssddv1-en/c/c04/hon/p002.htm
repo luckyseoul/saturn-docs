@@ -1,0 +1,29 @@
+﻿<HTML>
+<HEAD>
+<TITLE>SEGA SATURN DEVELOPER'S MANUAL</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<A HREF=p001.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p003.htm> Go to next page </A>
+<HR><P><P><DL>
+<DD> Use this operation routine to register an interrupt processing routine in the interrupt vector or to refer to the current processing routine address. <BR>
+For SCU interrupts on the master side, there is an SCU interrupt routine that implements interrupt processing in the form of a C function subroutine call, and you can register C functions there and refer to their registered addresses. The <BR>
+∙ Functions registered in the SCU interrupt routine will be called each time an interrupt occurs. Before and after the call, register saving and restoration that match the register saving rules of the SHC compiler are performed. Therefore, any C function or routine that conforms to its rules can be registered and processed. <BR>
+However, it may not be suitable for interrupt processing that requires a quick response, such as H blank In. <BR>
+∙ If another interrupt processing routine is registered in the SCU interrupt vector, the SCU interrupt processing routine is bypassed and disabled. <P>
+<DT> <H3> Set / reference / change operation of SCU interrupt mask </H3>
+<DD> The mask value set in the SCU interrupt mask register cannot be read, so when changing it, it is not possible to perform an operation on the actually set value. <BR>
+For this purpose, a service routine is provided that stores this value separately in memory and updates it consistently with the actual SCU interrupt mask register. <BR>
+When using, it is necessary for the library and application to always set or change the SCU interrupt mask via these functions. <BR>
+Furthermore, after setting or changing the SCU interrupt mask register, the SCU interrupt status register and, if necessary, the A-Bus interrupt acknowledge register are cleared. <P>
+<DT> <H3> Simple semaphore operation </H3>
+<DD> Provides a service that can use the memory (256 bytes) prepared by BOOT ROM as 256 simple semaphores. <BR>
+The first half of the semaphore (numbers 0 to 127) can be used freely. The second half (128-255) is for operations related to the library. <BR>
+If the library uses a specific function such as DMA, set the MSB (80H) of the semaphore to 1 to indicate that it is in use. It also clears the MSB after use, indicating that it is free. <BR>
+Normally, in a process that requires securing a resource for a relatively long time, the procedure for operating and referring to the semaphore should be determined so that interrupt processing that enters between them does not access the resource without permission. <BR>
+∙ For semaphore memory, SH2 TAS instruction is used when MSB is set. Since this instruction is inseparable (it does not release the bus), it is guaranteed that only one process can acquire the semaphore. <BR>
+□ Once you have completed the process of acquiring a semaphore, you must release it. <BR>
+At reset, all semaphore memory is released (cleared). <BR>
+</DL><P><P><HR>
+<A HREF=p001.htm> Return to previous page </A> ｜ <A HREF=../mokuzi.htm> Return to menu </A> ｜ <A HREF=p003.htm> Go to next page </A>
+</BODY>
+</HTML>

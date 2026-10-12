@@ -1,0 +1,144 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;36/54&gt;VDP1 User's Manual/6.4 CMDCOLR (Color Control Word)</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+ <B>▲ <A HREF="p06_38.htm">Back</a> ｜ <A HREF="p06_50.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>VDP1 User's Manual/Chapter 6 Command Table</b><HR NOSHADE>
+<DL>
+<A NAME="no6_40"></A><P><DT><H2> ■6.4 CMDCOLR (color control word)</H2><DD> CMDCOLR specifies the color of the part. Functions vary depending on the part and color mode. Set a color bank, color lookup table address, or non-textured color. CMDCOLR is 16 bits located at the command table start address +06H.<P><DT><TABLE BORDER=1>
+<TR ALIGN=CENTER><TD> bit</TD><TD><PRE> 15</TD><TD><PRE> 14</TD><TD><PRE> 13</TD><TD><PRE> 12</TD><TD><PRE> 11</TD><TD><PRE> 10</TD><TD><PRE> 9</TD><TD><PRE> 8</TD><TD><PRE> 7</TD><TD><PRE> 6</TD><TD><PRE> 5</TD><TD><PRE> 4</TD><TD><PRE> 3</TD><TD><PRE> 2</TD><TD><PRE> 1</TD><TD><PRE> 0</TD></TR>
+<TR ALIGN=CENTER><TD> CMDCOLR<BR>
+ +06H</TD><TD COLSPAN=16> Color bank, color lookup table/8H ( <B>LSB fixed at 00B</b> ), non-texture</TD></TABLE>
+</P>
+<dt> <B>CMDCOLR:</b> Command table start address +06H<BR>
+<dd> When a texture part is in color bank mode, it is a color bank, when a texture part is in lookup table mode, it is a color lookup table address, and when it is a non-texture part, it is a non-texture color. This word is ignored when in RGB mode with texture parts.<P><A NAME="t6_3"></A><P><DD> <B>Table 6.3 CMDCOLR</b><DD><TABLE BORDER=1>
+<TR ALIGN=CENTER><TH><PRE> parts</TH><TH><PRE> color mode</TH><TH><PRE> CMDCOLR</TH></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=3><PRE> texture parts</TD><TD><PRE> color bank mode</TD><TD><PRE> color bank</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> lookup table mode</TD><TD><PRE> color lookup table<BR> address</TD></TR>
+<TR ALIGN=CENTER><TD><PRE> RGB mode</TD><TD><PRE> will be ignored</TD></TR>
+<TR ALIGN=CENTER><TD COLSPAN=2><PRE> non-textured parts</TD><TD><PRE> non-textured color</TD></TR>
+</TABLE>
+</P>
+<A NAME="no6_41"></A><P><dt><H3> ■Color bank</H3><BR>
+<dd><ul type="disc">
+<li> Color bank is a bit added to the upper bits when writing character pattern pixel data to the frame buffer when the color mode of the texture part is color bank mode.<li> Specify the color bank in 16 bits, but fix the lower 4 bits to 0. Depending on the color mode, it will be 12, 10, 9, or 8 bit. The addition looks like this:<li> For 16bit/pixel, this data is written as is to the frame buffer. When it is 8bit/pixel, the lower 8bits are written.</ul>
+</P>
+<A NAME="z6_17"></A><P><DD> <B>Figure 6.17 Color bank</b><PRE>
+                ┌──────────────────────────────┐┐
+Color Bank      │Color Bank             0 0 0 0││ <B>*1</b>
+                └──────────────┬───────┬───────┘┘
+                ┌──────────────┴───────┼─┬─┬─┬─┐┐
+16 color mode   │ Color bank           │○│○│○│○││ <B>*2</b>
+                │ Top 12 bits          │ │ │ │ ││
+                └──────────────┬───────┴─┴─┴─┴─┘│
+                ┌──────────────┴───┬─┬─┬─┬─┬─┬─┐│
+64 color mode   │ Color bank       │○│○│○│○│○│○││
+                │ Top 10 bits      │ │ │ │ │ │ ││
+                └──────────────┬───┴─┴─┴─┴─┴─┴─┘│
+                ┌──────────────┴─┬─┬─┬─┬─┬─┬─┬─┐│
+128 color mode  │ Color bank     │○│○│○│○│○│○│○││
+                │ Top 9 bits     │ │ │ │ │ │ │ ││
+                └──────────────┬─┴─┴─┴─┴─┴─┴─┴─┘│
+                ┌──────────────┼─┬─┬─┬─┬─┬─┬─┬─┐│
+256 color mode  │ Color bank   │○│○│○│○│○│○│○│○││
+                │ Top 8 bits   │ │ │ │ │ │ │ │ ││
+                └──────────────┼─┴─┴─┴─┴─┴─┴─┴─┘┘
+                └┬─────────────────────────────┘
+                 ↓             └┬──────────────┘
+       When 16bit/pixel         ↓
+                             When 8 bits/pixel
+
+        ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+RGB mode│○│○│○│○│○│○│○│○│○│○│○│○│○│○│○│ <B>*2</b>
+        └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+        ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+Lookup  │○│○│○│○│○│○│○│○│○│○│○│○│○│○│○│
+        └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+[Supplement] In lookup table mode, the lookup table data referenced from the defined character pattern is written to the frame buffer
+
+[Note] <B>*1</b> : The lower 4 bits of the color bank are fixed to "0".
+       <B>*2</b> : ○ indicates that the bit data of the defined character pattern is written to the frame buffer.
+</PRE>
+
+<dd><ul type="disc">
+<li> The data written to the frame buffer is transferred to VDP2 as 16bit data when it becomes the display buffer in the next frame.<li> The relationship between color banks, defined character pattern data, and drawing frame buffer data is shown below.</ul>
+<P><A NAME="t6_4"></A><P><DD> <B>Table 6.4 Example of relationship between color bank, definition data, and drawing data</b><DD><TABLE BORDER=1>
+<TR><TH><PRE> color bank</TH><TH COLSPAN=2><PRE> Definition data</TH><TH><PRE> drawing data</TH></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=5> 0000H</TD><TD> 16 color mode</TD><TD><PRE> DH</TD><TD><PRE> <B>0 0 0</b> DH</TD></TR>
+<TR ALIGN=CENTER><TD> 64 color mode</TD><TD><PRE> CDH</TD><TD><PRE> <B>0 0 0</b> DH</TD></TR>
+<TR ALIGN=CENTER><TD> 128 color mode</TD><TD><PRE> CDH</TD><TD><PRE> <B>0 0</b> 4 DH</TD></TR>
+<TR ALIGN=CENTER><TD> 256 color mode</TD><TD><PRE> CDH</TD><TD><PRE> <B>0 0</b> CDH</TD></TR>
+<TR ALIGN=CENTER><TD> RGB mode</TD><TD><PRE> ABCDH</TD><TD><PRE> ABCDH</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=5> 0010H</TD><TD> 16 color mode</TD><TD><PRE> DH</TD><TD><PRE> <B>0 0 1</b> DH</TD></TR>
+<TR ALIGN=CENTER><TD> 64 color mode</TD><TD><PRE> CDH</TD><TD><PRE> <B>0 0 0</b> DH</TD></TR>
+<TR ALIGN=CENTER><TD> 128 color mode</TD><TD><PRE> CDH</TD><TD><PRE> <B>0 0</b> 4 DH</TD></TR>
+<TR ALIGN=CENTER><TD> 256 color mode</TD><TD><PRE> CDH</TD><TD><PRE> <B>0 0</b> CDH</TD></TR>
+<TR ALIGN=CENTER><TD> RGB mode</TD><TD><PRE> ABCDH</TD><TD><PRE> ABCDH</TD></TR>
+<TR ALIGN=CENTER><TD ROWSPAN=5> 1230H</TD><TD> 16 color mode</TD><TD><PRE> DH</TD><TD><PRE> <B>1 2 3</b> DH</TD></TR>
+<TR ALIGN=CENTER><TD> 64 color mode</TD><TD><PRE> CDH</TD><TD><PRE> <B>1 2 0</b> DH</TD></TR>
+<TR ALIGN=CENTER><TD> 128 color mode</TD><TD><PRE> CDH</TD><TD><PRE> <B>1 2</b> 4 DH</TD></TR>
+<TR ALIGN=CENTER><TD> 256 color mode</TD><TD><PRE> CDH</TD><TD><PRE> <B>1 2</b> CDH</TD></TR>
+<TR ALIGN=CENTER><TD> RGB mode</TD><TD><PRE> ABCDH</TD><TD><PRE> ABCDH</TD></TR>
+</TABLE>
+<DD> <B>[Note]: The bold</b> part is the color bank code</P>
+<A NAME="no6_42"></A><P><dt><H3> ■Color lookup table</H3><dd><ul type="disc">
+<li> Defines the address of the color lookup table.<li> When the color mode is lookup table mode, the 4bit data of the character pattern of the texture part is converted to 16bit pixel data by referring to the color lookup table and written to the frame buffer.<li> A color lookup table defines 16-bit 16-color color codes. Since the 16-bit data on the table is written to the frame buffer as is, there is no distinction between color bank code and RGB code as character patterns for texture parts.<BR>
+ When read to VDP2, when the 16-bit MSB is 0, it is treated as a color bank code, and when it is 1, it is treated as an RGB code.<li> Color lookup table address defines the address of the color lookup table /8H. The color lookup table is defined with a 20HByte boundary, so the LSB2bit of the lookup table address is fixed to 00.</ul>
+</P>
+<A NAME="z6_18"></A><CENTER>
+ <B>Figure 6.18 Color lookup table</b><PRE>
+               Specified by table address                
+Character         16 color                   Frame buffer
+pattern           lookup table                           
+┏━━━━━━━━━━━┓     ┏━━━━━━━━━━━┓               ┏━━━━━━━━━━━┓
+┃           ┃ +00H┃16-bit data┃(0H color code)┃           ┃
+┃           ┃     ┠───────────┨               ┃           ┃
+┃           ┃ +02H┃16-bit data┃(1H color code)┃           ┃
+┃           ┃     ┠───────────┨               ┃           ┃
+┃           ┃ +03H┃16-bit data┃(2H color code)┃           ┃
+┃           ┃     ┠───────────┨               ┃           ┃
+┃           ┃   : ┃     :     ┃      :        ┃           ┃
+┠━━━━━━━━━━━┨   : ┃     :     ┃      :        ┠━━━━━━━━━━━┨
+┃Definition ┃→  : ┃     :     ┃      :       →┃Drawing    ┃
+┃4-bit data ┃→  : ┃     :     ┃      :       →┃16-bit data┃
+┠━━━━━━━━━━━┨   : ┃     :     ┃      :        ┠━━━━━━━━━━━┨
+┃           ┃   : ┃     :     ┃      :        ┃           ┃
+┃           ┃     ┠───────────┨               ┃           ┃
+┃           ┃ +1CH┃16-bit data┃(EH color code)┃           ┃
+┃           ┃     ┠───────────┨               ┃           ┃
+┃           ┃ +1EH┃16-bit data┃(FH color code)┃           ┃
+┗━━━━━━━━━━━┛     ┗━━━━━━━━━━━┛               ┗━━━━━━━━━━━┛
+
+●The 16-bit data of the color lookup table selected by the 4-bit character
+pattern is written directly to the frame buffer as pixel data.
+</PRE></CENTER>
+<A NAME="no6_43"></A><P><dt><H3>■Non-texture color</H3><dd><ul type="disc">
+<li> Non-texture color defines the color of non-texture parts.<li> For non-texture parts, the non-texture color is written as pixel data to the frame buffer.<li> Non-texture colors are unrelated to transparent color codes and end codes.<li> When the display mode is 8bit/pixel, the lower 8bits are valid. At this time, only the color bank code can be specified.<li> When performing color calculations (excluding shadows) on non-texture parts, be sure to set the RGB code for the non-texture color.</ul>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p06_38.htm">Back</a> ｜ <A HREF="p06_50.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" BORDER=0 ALIGN="MIDDLE"></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">VDP1 User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

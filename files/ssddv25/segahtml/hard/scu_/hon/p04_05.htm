@@ -1,0 +1,189 @@
+﻿<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt;20/31&gt;SCU User's Manual/4.DSP Control</TITLE>
+<script>
+
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+
+</HEAD>
+<BODY>
+<A HREF="javascript:window.location.href = window.location.pathname.replace('.htm', '_j.htm');" style="position:absolute; top:20px; right:20px;">Japanese</A><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a>★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+ <B>▲ <A HREF="p04_04.htm">Back</a> ｜ <A HREF="p04_51.htm">Forward</a> ▼</b><HR NOSHADE>
+ <B>SCU User's Manual/Chapter 4 DSP Control</b><HR NOSHADE>
+<H2> ■4.5 Instruction details</H2><DL>
+<A NAME="4_50_"></A><P><DT><H3> <A HREF="p04_02.htm">◆Instruction list</a></H3></P>
+<A NAME="4_50"></A><P><DT><H3> ◆Arithmetic instructions</H3><DD> Arithmetic instructions use the X, Y, and D1 buses and the arithmetic operation circuit (ALU). Arithmetic instructions can be classified into the following four types of control.</P>
+<P><DD><OL>
+<B><LI></b> <A HREF="p04_51.htm">ALU control instructions</a><B><LI></b> <A HREF="p04_52.htm">X-Bus control instructions</a><B><LI></b> <A HREF="p04_53.htm">Y-Bus control instructions</a><B><LI></b> <A HREF="p04_54.htm">D1-Bus control instructions</a></OL>
+</P>
+<P><DD> The format of the calculation instruction is shown in Figure 4.5.</P>
+<A NAME="z4_5"></A><P><DT> Figure 4.5 Arithmetic instruction format
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>25</TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>20</TD><TD><PRE>19</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR ALIGN=CENTER><TD> 0</TD><!-- 31 -->
+<TD> 0</TD><!-- 30 -->
+<TD COLSPAN=4  > <A HREF="p04_51.htm">ALU control</a><!-- 29 -->
+<TD COLSPAN=6  > <A HREF="p04_52.htm">X-Bus control</a><!-- 25 -->
+<TD COLSPAN=6  > <A HREF="p04_53.htm">Y-Bus control</a><!-- 19 -->
+<TD COLSPAN=14 > <A HREF="p04_54.htm">D1-Bus control</a><!-- 13 -->
+</TR>
+</TABLE>
+</P>
+<P><DD> Arithmetic instructions can execute the above four types of instructions in parallel. For the mnemonic, write the ALU control command on the left end, and write any other necessary commands separated by spaces or tabs.</P>
+<P><DT><H3> <A HREF="p04_55.htm">◆Load Immediate instruction</a></H3><DD> The Load Immediate instruction transfers immediate data to the storage destination. Unconditional transfers follow the format shown in Figure 4.6, and conditional transfers follow the format shown in Figure 4.7. Details of the instructions will be shown from the next page.</P>
+<A NAME="z4_6"></A><P><DT> Figure 4.6 Load Immediate command format 1 (unconditional transfer)
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>26</TD><TD><PRE>25</TD><TD><PRE>24</TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><!-- 31 -->
+<TD> 0</TD><!-- 30 -->
+<TD COLSPAN=4 > Storage location</TD><!-- 29 -->
+<TD> 0</TD><!-- 25 -->
+<TD COLSPAN=25 > Immediate data</TD><!-- 24 -->
+</TR>
+</TABLE>
+</P>
+<A NAME="z4_7"></A><P><DT> Figure 4.7 Load Immediate command format 2 (conditional transfer)
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>26</TD><TD><PRE>25</TD><TD><PRE>24</TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>19</TD><TD><PRE>18</TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><!-- 31 -->
+<TD> 0</TD><!-- 30 -->
+<TD COLSPAN=4  > Storage location</TD><!-- 29 -->
+<TD> 1</TD><!-- 25 -->
+<TD COLSPAN=6  > situation</TD><!-- 24 -->
+<TD COLSPAN=19 > Immediate data</TD><!-- 18 -->
+</TR>
+</TABLE>
+</P>
+<P><DT><H3> <A HREF="p04_56.htm">◆DMA instruction</a></H3><DD> DMA instructions perform data transfers between external and DSP internal RAM via the external bus. There are two methods: directly setting the number of transfer words using Imm data, and setting the number of transfer words in RAM by specifying the internal data RAM number. The former format is shown in Figure 4.8, and the latter in Figure 4.9. Details of the instructions will be shown from the next page.</P>
+<A NAME="z4_8"></A><P><DT> Figure 4.8 DMA instruction format 1
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>18</TD><TD><PRE>17</TD><TD><PRE>  </TD>
+<TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><!-- 31 -->
+<TD> 1</TD><TD> 0</TD><TD> 0</TD><!-- 28 -->
+<TD> −</TD><!-- 27 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 24 -->
+<TD> −</TD><!-- 23 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 20 -->
+<TD> −</TD><!-- 19 -->
+<TD> −</TD><TD COLSPAN=3> addition<BR>
+ mode</TD><TD> H</TD><TD> 0</TD><TD> dir</TD><!-- 12 -->
+<TD> −</TD><TD COLSPAN=3> RAM</TD><!-- 11 -->
+<TD COLSPAN=8> Immediate</TD></TR>
+</TABLE>
+</P>
+<A NAME="z4_9"></A><P><DT> Figure 4.9 DMA instruction format 2
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>18</TD><TD><PRE>17</TD><TD><PRE>  </TD>
+<TD><PRE>15</TD><TD><PRE>14</TD><TD><PRE>13</TD><TD><PRE>12</TD><TD><PRE>11</TD><TD><PRE>10</TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>3 </TD><TD><PRE>2 </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><!-- 31 -->
+<TD> 1</TD><TD> 0</TD><TD> 0</TD><!-- 28 -->
+<TD> −</TD><!-- 27 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 24 -->
+<TD> −</TD><!-- 23 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 20 -->
+<TD> −</TD><!-- 19 -->
+<TD> −</TD><TD COLSPAN=3> addition<BR>
+ mode</TD><TD> H</TD><TD> 0</TD><TD> dir</TD><!-- 12 -->
+<TD> −</TD><TD COLSPAN=3> RAM</TD><!-- 11 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD COLSPAN=3> SOURCE</TD></TR>
+</TABLE>
+</P>
+<P><DT><H3> <A HREF="p04_57.htm">◆JUMP instruction</a></H3><DD> The JUMP instruction is achieved by storing immediate data in the program counter. Figure 4.10 shows the format of the JUMP instruction. Details of the instructions will be shown from the next page.</P>
+<A NAME="z4_10"></A><P><DT> Figure 4.10 JUMP instruction format
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>26</TD><TD><PRE>25</TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>19</TD><TD><PRE>18</TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><!-- 31 -->
+<TD> 1</TD><TD> 0</TD><TD> 1</TD><!-- 28 -->
+<TD> −</TD><TD> −</TD><TD COLSPAN=7> situation</TD><!-- 25 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD> −</TD><TD COLSPAN=8> Immediate</TD></TR>
+</TABLE>
+</P>
+<P><DT><H3> <A HREF="p04_58.htm">◆LOOP BOTTOM instruction</a></H3><DD> The LOOP BOTTOM instruction executes a program of one to several steps repeatedly. The format is shown in Figure 4.11. Details of the instructions will be shown from the next page.</P>
+<A NAME="z4_11"></A><P><DT> Figure 4.11 LOOP BOTTOM instruction format
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD>
+<TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><!-- 31 -->
+<TD> 1</TD><TD> 1</TD><TD> 0</TD><!-- 28 -->
+<TD> MOD</TD><!-- 27 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 24 -->
+<TD> −</TD><!-- 23 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 20 -->
+<TD> −</TD><!-- 19 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 16 -->
+<TD> −</TD><!-- 15 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 12 -->
+<TD> −</TD><!-- 11 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 8 -->
+<TD> −</TD><!-- 7 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 4 -->
+<TD> −</TD><!-- 3 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 0 -->
+</TR>
+</TABLE>
+</P>
+<P><DT><H3> <A HREF="p04_59.htm">◆END command</a></H3><DD> The END instruction terminates the currently running program. The format is as shown in Figure 4.12. Details of the instructions will be shown from the next page.</P>
+<A NAME="z4_12"></A><P><DT> Figure 4.12 END instruction format
+  <TABLE BORDER=1><TR ALIGN=CENTER>
+<TD><PRE>31</TD><TD><PRE>30</TD><TD><PRE>29</TD><TD><PRE>28</TD><TD><PRE>27</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>24</TD>
+<TD><PRE>23</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>16</TD>
+<TD><PRE>15</TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>8 </TD>
+<TD><PRE>7 </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>  </TD><TD><PRE>0 </TD></TR>
+<TR ALIGN=CENTER><TD> 1</TD><!-- 31 -->
+<TD> 1</TD><TD> 1</TD><TD> 1</TD><!-- 28 -->
+<TD> IE</TD><!-- 27 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 24 -->
+<TD> −</TD><!-- 23 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 20 -->
+<TD> −</TD><!-- 19 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 16 -->
+<TD> −</TD><!-- 15 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 12 -->
+<TD> −</TD><!-- 11 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 8 -->
+<TD> −</TD><!-- 7 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 4 -->
+<TD> −</TD><!-- 3 -->
+<TD> −</TD><TD> −</TD><TD> −</TD><!-- 0 -->
+</TR>
+</TABLE>
+</P>
+</DL>
+<HR NOSHADE>
+ <B>▲ <A HREF="p04_04.htm">Back</a> ｜ <A HREF="p04_51.htm">Forward</a> ▼</b><HR>
+<A HREF="../../../index.htm"><img srcset="../../../what/dosei.png 5x" ALIGN=MIDDLE BORDER=0></a> ★ <A HREF="../../index.htm">HARDWARE Manual</a> ★ <A HREF="../index.htm">SCU User's Manual</a><HR>
+<ADDRESS> Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>

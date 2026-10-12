@@ -1,0 +1,176 @@
+﻿<HTML>
+<HEAD><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<TITLE>&lt; 2/ 4&gt;SGL Tutorial DATA/2.Sound Data</TITLE>
+<script>
+  window.onload = function loadedFunction() {
+    var rootFolders = [ 'faq', 'grph', 'hard', 'info', 'movi', 'prgg', 'sgl', 'sndt', 'soft', 'what', 'xhistory', 'xindex' ];
+    var pathNameSegments = window.location.pathname.split("/")
+    var rootIndex = pathNameSegments.findIndex(x => rootFolders.includes(x))
+    var pageName = pathNameSegments.slice(rootIndex).join('/');
+    if (window.self == window.top) {
+      window.top.location.href = pathNameSegments.slice(0, rootIndex).join('/') + '/index.html?page=' + pageName;
+    }
+    else {
+      window.top.postMessage(pageName,'*');
+    }
+  }</script>
+</HEAD>
+<BODY><A HREF="javascript:window.location.href = window.location.pathname.replace('_j.htm', '.htm');" style="position:absolute; top:20px; right:20px;">English</A>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">データの受け渡し</A>
+<HR>
+<B>▲<a href="p001_j.htm">戻る</A>｜<a href="p003_j.htm">進む</A>▼</B>
+<HR NOSHADE>
+<B>データの受け渡し</B>
+<H2 ALIGN=CENTER>2.サウンドデータ</H2>
+<HR NOSHADE>
+<DL>
+	<P>	<DD>　本章では、サウンドデザイナーが作成したサウンドデータを、ＳＧＬを使用したソフトウエアに組み込むために、プログラマに渡す際に知らなければならない最低限のデータフォーマット、作業について説明します。</P>
+
+<A NAME="no2_10"></A>
+	<P><DT><H2>2-1. データの種類</H2>
+	<DD>　マッキントッシュで作成されたサウンドデータは全て、バイナリファイルであり、以下のファイルに分かれます。</P>
+
+	<DD><UL TYPE=DISC>
+	<LI>BGM、シーケンス用データファイル
+	<LI>PCMストリーム再生用データファイル
+	</UL>
+
+<A NAME="no2_11"></A>
+	<P><DT><H3>ＢＧＭ、シーケンス用データ</H3>
+
+	<P><DD><B>1）トーンバンクデータ</B>
+	<DD>　曲、効果音に使用する音色データです。<BR>
+	セガ・サウンド・ツールのＴｏｎｅエディタにより作成します。</P>
+
+<A NAME="z2_1"></A>
+	<P ALIGN=CENTER><H4>図2-1　トーンバンクデータファイル例</H4><BR><img srcset="../grp/p02_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　マップに使用する数だけファイルが必要です。<BR>
+			マップ内での順番をプログラマに伝えてください。</P>
+
+	<P>	<DD><B>２）シーケンスデータ</B>
+		<DD>　曲、効果音のデータです。<BR>
+		セガ・サウンド・ツールのサウンドシミュレータにより作成します。</P>
+
+<A NAME="z2_2"></A>
+	<P ALIGN=CENTER><H4>図2-2　シーケンスデータファイル例</H4><BR><img srcset="../grp/p02_2_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　マップに使用する数だけファイルが必要です。<BR>
+		マップ内での順番をプログラマに伝えてください。</P>
+
+	<P>	<DD><B>３）DSPプログラム</B>
+		<DD>　エフェクトモジュール用プログラムです。<BR>
+		セガ・サウンド・ツールのDSP Linkerにより作成します。</P>
+
+<A NAME="z2_3"></A>
+	<P ALIGN=CENTER><H4>図2-3　DSPプログラムファイル例</H4><BR><img srcset="../grp/p02_3_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　エフェクトを使用しない場合には不要です。<BR>
+		マップ内での順番をプログラマに伝えてください。</P>
+
+	<P>	<DD><B>４）マップバイナリファイル</B>
+		<DD>　サウンドCPUである６８０００のメモリに上記<B>１）</B>〜<B>３）</B>のファイルのロードアドレスと、ＤＳＰプログラムに使用するワークエリアの領域を指示します。<BR>
+		このファイルは、６８０００用メモリのＡ０００ｈにロードします。</P>
+
+	<P>	<DD>　マップは最大４０９６byte で、最大１２８までのエリアマップを持つことができ、１つのエリアマップには最大３２byte までのMap情報を持つことができます。</P>
+
+<A NAME=z2_4"></A>
+	<P ALIGN=CENTER><H4>図2-4　マップバイナリファイルの構造</H4><BR><img srcset="../grp/p03_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　それぞれのマップ（Map1〜4）のビットイメージは下図の通りです。</P>
+
+<A NAME=z2_5"></A>
+	<P ALIGN=CENTER><H4>図2-5　MAPのビットイメージ</H4><BR><img srcset="../grp/p03_2_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME=z2_6"></A>
+	<P ALIGN=CENTER><H4>図2-6　マップバイナリファイル例</H4><BR><img srcset="../grp/p03_3_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD><B>５）サウンドドライバー</B>
+		<DD>　バージョンを統一させるために、マッキントッシュのサウンドツールに付属のものをプログラマに渡した方が確実です。</P>
+
+<A NAME=z2_7"></A>
+	<P ALIGN=CENTER><H4>図2-7　サウンドドライバー</H4><BR><img srcset="../grp/p04_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD><B>６）ダンプデータファイル</B>
+		<DD>　上記<B>１）</B>〜<B>３）</B>のファイルを６８０００のメモリにロードした状態で、Ｂ０００ｈからマップデータの最後のデータまでのメモリをダンプしたものです。<BR>
+		（但し、最後のデータがＤＳＰワークＲＡＭだった場合には、一つ前のデータまでをダンプします。）
+		必要なバンクだけを部分的にロードして使う必要が無く、一度にマップのデータ全てをロードする場合には、このダンプデータファイルを使えば上記１）〜３）のファイルを一つずつロードさせずに済みます。
+		これにより、データのロード順を間違えることもなくなり、また、プログラマ側の手間も省けます。
+		ダンプデータファイルは、セガ・サウンド・ツールのサウンドシミュレータにより作成します。</P>
+
+<A NAME=z2_8"></A>
+	<P ALIGN=CENTER><H4>図2-8　ダンプデータファイル例</H4><BR><img srcset="../grp/p04_2_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　下図に、プログラマに渡す必要のあるBGM、シーケンス用ファイルを示します。<BR>
+		プログラマには次のいずれかのファイルを渡してください。</P>
+
+	<P>	<DD><OL>
+		<LI>サウンドドライバー、マップバイナリ、ダンプデータ（トーンバンクデータ、シーケンスデータ、DSPプログラムを含んでいる）
+		<LI>サウンドドライバ、マップバイナリ、トーンバンクデータ、シーケンスデータ、DSPプログラム</OL></P>
+
+<A NAME=z2_9"></A>
+	<P ALIGN=CENTER><H4>図2-9　プログラマに渡すBGM、シーケンス用ファイル</H4><BR><img srcset="../grp/p05_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DT><H4>　●サウンドコントロールナンバーの連絡</H4>
+		<DD>　プログラマは、ＳＧＬで曲を演奏させたり、効果音を鳴らすのに「サウンドコントロールナンバー」を使います。<BR>
+		サウンドシミュレータ上でのシーケンスデータ番号と、ソング番号を合わせたものが、「サウンドコントロールナンバー」となりますので、サウンドデザイナーは、ファイルを渡す際にどの番号を使うと、どんな音が出るのかをプログラマに伝えてください。</P>
+
+<A NAME=z2_"></A>
+	<P ALIGN=CENTER><H4>図2-10プログラマに渡すサウンドコントロールナンバー</H4><BR>
+	<img srcset="../grp/p05_2_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+<A NAME="no2_12"></A>
+	<P>	<DT><H3>ＰＣＭストリーム再生用データ</H3>
+		<DD>　ＳＧＬで使用するためのＰＣＭデータです。</P>
+
+<A NAME="z2_11"></A>
+	<P ALIGN=CENTER><B>図2-11　PCMデータファイル例</B><BR><img srcset="../grp/p06_1_j.png 5x" onclick="var srcSet=this.srcset.split(' '); this.srcset=srcSet[0].toLowerCase().endsWith('_j.png') ? srcSet[0].substring(0, srcSet[0].length - '_j.png'.length) + '.png ' + srcSet[1] : srcSet[0].substring(0, srcSet[0].length - '.png'.length) + '_j.png ' + srcSet[1];"></P>
+
+	<P>	<DD>　セガ・サウンド・ツールのサウンドシミュレータにより作成します。</P>
+
+	<P>	<DD>　サウンドデザイナーは、ファイルを渡す際に以下のような情報をプログラマに伝えてください。</P>
+
+<A NAME="t2_1"></A>
+	<P>	<DD><B>表2-1　プログラマに渡すPCMデータファイルの情報</B>
+	<P>	<DD><TABLE BORDER=1>
+	<TR><TH>ファイル名</TH><TH>音</TH><TH>ステレオ</TH><TH>ビット</TH><TH>ピッチ</TH><TH>コメント</TH></TR>
+	<TR><TD>stereo.8</TD><TD>「10年早いんだよ」</TD><TD>ステレオ</TD><TD>8</TD><TD>7800</TD><TD>左右ずれてあります</TD></TR>
+	<TR><TD>mono.16</TD><TD>「はいな」</TD><TD>モノラル</TD><TD>16</TD><TD>7180</TD><TD>　</TD></TR>
+	<TR><TD>stereo.16</TD><TD>「アウー」</TD><TD>ステレオ</TD><TD>16</TD><TD>7F00</TD><TD>右から左に声がながれます</TD></TR>
+	</TABLE></P>
+
+<A NAME="no2_20"></A>
+	<P><DT><H2>2-2. データの組み込み</H2>
+	<DD>　前項で説明したサウンドデータのファイルをＳＧＬを使ったソフトウェアに組み込むには、それぞれのバイナリデータのファイルを、Ｃ言語で読み込めるように、配列のデータに変換してやる必要があります。</P>
+
+	<P><DD>　以下に、ＵＮＩＸでこの作業を行うスクリプトの例を示します。<BR>
+		ここでは、ＧＮＵのｓｅｄを使用しています。</P>
+
+<PRE>
+<H3>
+スクリプトファイル名  [バイナリファイル名] [配列名] ＞ [出力ファイル名]
+</H3><B>
+
+#!/bin/csh -f
+echo "char$2[]={"
+od -hv$1|cut -s -d ""-f2-|gsed's/¥(..¥)¥(..¥)*/0x¥1,0x¥2,/g'
+echo"};"
+</B></PRE>
+
+	<P>	<DD>　Ｃ言語でもＡＮＳＩの関数で容易にできますので、開発環境がＰＣのかたは、Ｃ言語で作ってください。</P>
+
+	<P>	<DD> これでソフトウェアに組み込めるサウンドデータができました。あとは、他のデータと同様に扱うだけです。</P>
+</DL>
+<HR NOSHADE>
+<B>▲<a href="p001_j.htm">戻る</A>｜<a href="p003_j.htm">進む</A>▼</B>
+<HR>
+  <a href="../../../../index_j.htm"><img srcset="../../../../what/dosei_j.png 5x" BORDER=0></A>
+★<a href="../../../index_j.htm">SGL User's Manual</A>
+★<a href="../index_j.htm">データの受け渡し</A>
+<HR>
+<ADDRESS>Copyright SEGA ENTERPRISES, LTD., 1997</ADDRESS>
+</BODY>
+</HTML>
